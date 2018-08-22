@@ -32,6 +32,9 @@ type
       requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
     procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure AndroidModule1Rotate(Sender: TObject; rotate: TScreenStyle);
     procedure jButton1Click(Sender: TObject);
     procedure jView1Draw(Sender: TObject; Canvas: jCanvas);
@@ -54,9 +57,13 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  jCamera1.RequestCode := 12345;
-  jCamera1.TakePhoto;
-  //ShowMessage(jCamera1.FullPathToBitmapFile);
+   if IsRuntimePermissionGranted('android.permission.CAMERA') and IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
+   begin
+       //ShowMessage('RuntimePermissionGranted !!!');
+       jCamera1.RequestCode := 12345;
+       jCamera1.TakePhoto;
+   end
+   else  ShowMessage('RuntimePermission NOT Granted ...');
 end;
 
 procedure TAndroidModule1.jView1Draw(Sender: TObject; Canvas: jCanvas);
@@ -64,16 +71,10 @@ begin
   if FPhotoExist then
   begin
     jView1.Canvas.DrawBitmap(jBitmap1.GetImage, jView1.Width, jView1.Height);
-
     //just to ilustration.... you can draw and write over....
     jView1.Canvas.PaintColor := colbrRed;
     jView1.Canvas.drawLine(0, 0, Trunc(jView1.Width / 2), Trunc(jView1.Height / 2));
     jView1.Canvas.drawText('Hello People!', 30, 30);
-
-    //..simply show jImageView1
-    jImageView1.SetImageBitmap(jBitmap1.GetImage, jImageView1.Width,
-      jImageView1.Height);
-
   end;
 end;
 
@@ -85,20 +86,19 @@ end;
 
 procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
   requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
-var
-  dir: string;
 begin
-
   if resultCode = RESULT_CANCELED then
+  begin
     ShowMessage('Photo Canceled!')
+  end
   else if resultCode = RESULT_OK then //ok...
   begin
     if requestCode = jCamera1.RequestCode then
     begin
-
-      FPhotoExist := True;
       jBitmap1.LoadFromFile(jCamera1.FullPathToBitmapFile);
+      jImageView1.SetImageBitmap(jBitmap1.GetImage, jImageView1.Width, jImageView1.Height);
 
+      FPhotoExist:= True;
       jView1.Refresh;   //dispatch   OnDraw!
     end;
   end
@@ -151,6 +151,34 @@ begin
 
   Self.UpdateLayout;
   jEditText1.SetFocus;
+
+  //https://www.captechconsulting.com/blogs/runtime-permissions-best-practices-and-how-to-gracefully-handle-permission-removal
+  if  IsRuntimePermissionNeed() then   // that is, target API >= 23
+  begin
+     ShowMessage('RequestRuntimePermission....');
+     Self.RequestRuntimePermission('android.permission.CAMERA', 1000); //from AndroodManifest.xml
+     Self.RequestRuntimePermission('android.permission.WRITE_EXTERNAL_STORAGE', 1001);  //from AndroodManifest.xml
+  end;
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+  case requestCode of  //CAMERA
+     1000:begin
+              if grantResult = PERMISSION_GRANTED  then
+                  ShowMessage(manifestPermission + ' :: Success! Permission grant!!! ' )
+              else  //PERMISSION_DENIED
+                ShowMessage(manifestPermission + '   :: Sorry... permission not grant... ' )
+          end;
+     1001:begin   //STORAGE
+              if grantResult = PERMISSION_GRANTED  then
+                  ShowMessage(manifestPermission + ' :: Success! Permission grant!!! ' )
+              else  //PERMISSION_DENIED
+                ShowMessage(manifestPermission + '   :: Sorry... permission not grant... ' )
+          end;
+  end;
 end;
 
 procedure TAndroidModule1.AndroidModule1Rotate(Sender: TObject; rotate: TScreenStyle);
@@ -158,7 +186,7 @@ begin
   FSaveRotate := rotate;
   if rotate = ssLandscape then
   begin
-    //after rotation device is in horizontal
+    //after rotation device is on horizontal
     jPanel1.LayoutParamHeight := lpMatchParent;
     jPanel1.LayoutParamWidth := lpOneThirdOfParent;
     jPanel1.PosRelativeToParent := [rpLeft];

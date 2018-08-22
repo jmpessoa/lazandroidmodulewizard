@@ -669,6 +669,10 @@ type
 
   TOnActivityRst = Procedure(Sender: TObject; requestCode: integer; resultCode: TAndroidResult; intentData: jObject) of Object;
 
+  TManifestPermissionResult = (PERMISSION_DENIED = -1, PERMISSION_GRANTED = 0);
+
+  TOnRequestPermissionResult = Procedure(Sender: TObject; requestCode: integer; manifestPermission: string; grantResult: TManifestPermissionResult) of Object;
+
   TOnActivityCreate = Procedure(Sender: TObject; intentData: jObject) of Object;
 
   TOnActivityPause = Procedure(Sender: TObject) of Object;
@@ -1050,6 +1054,7 @@ end;
     FOnActivityCreate: TOnActivityCreate;
     FOnActivityPause: TOnActivityPause;
     FOnActivityResume: TOnActivityResume;
+    FOnRequestPermissionResult: TOnRequestPermissionResult;
     //FOnNewIntent: TOnNewIntent;
     FLayoutVisibility: boolean;
 
@@ -1222,15 +1227,19 @@ end;
     procedure RemoveFromLayoutParent();
     procedure SetLayoutVisibility(_value: boolean);
     procedure ResetLayoutParent();
+
     function GetSettingsSystemInt(_strKey: string): integer;
     function GetSettingsSystemString(_strKey: string): string;
     function GetSettingsSystemFloat(_strKey: string): single;
     function GetSettingsSystemLong(_strKey: string): int64;
-
     function PutSettingsSystemInt(_strKey: string; _value: integer): boolean;
     function PutSettingsSystemLong(_strKey: string; _value: int64): boolean;
     function PutSettingsSystemFloat(_strKey: string; _value: single): boolean;
     function PutSettingsSystemString(_strKey: string; _strValue: string): boolean;
+
+    function IsRuntimePermissionNeed(): boolean;
+    function IsRuntimePermissionGranted(_manifestPermission: string): boolean;
+    procedure RequestRuntimePermission(_manifestPermission: string; _requestCode: integer);
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1289,6 +1298,7 @@ end;
     property OnActivityCreate: TOnActivityCreate read FOnActivityCreate write FOnActivityCreate;
     property OnActivityPause: TOnActivityPause read FOnActivityPause write FOnActivityPause;
     property OnActivityResume: TOnActivityResume read FOnActivityResume write FOnActivityResume;
+    property OnRequestPermissionResult: TOnRequestPermissionResult read FOnRequestPermissionResult write FOnRequestPermissionResult;
     //property OnNewIntent: TOnNewIntent read FOnNewIntent write FOnNewIntent;
   end;
 
@@ -1647,6 +1657,9 @@ function jForm_PutSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: stri
 function jForm_PutSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string; _value: int64): boolean;
 function jForm_PutSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string; _value: single): boolean;
 function jForm_PutSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string; _strValue: string): boolean;
+function jForm_IsRuntimePermissionNeed(env: PJNIEnv; _jform: JObject): boolean;
+function jForm_IsRuntimePermissionGranted(env: PJNIEnv; _jform: JObject; _androidPermission: string): boolean;
+procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermission: string; _requestCode: integer);
 
 
 
@@ -3867,6 +3880,27 @@ begin
    Result:= jForm_PutSettingsSystemString(FjEnv, FjObject, _strKey ,_strValue);
 end;
 
+function jForm.IsRuntimePermissionNeed(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsRuntimePermissionNeed(FjEnv, FjObject);
+end;
+
+function jForm.IsRuntimePermissionGranted(_manifestPermission: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsRuntimePermissionGranted(FjEnv, FjObject, _manifestPermission);
+end;
+
+procedure jForm.RequestRuntimePermission(_manifestPermission: string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_RequestRuntimePermission(FjEnv, FjObject, _manifestPermission ,_requestCode);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -5430,6 +5464,53 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jForm_IsRuntimePermissionNeed(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsRuntimePermissionNeed', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_IsRuntimePermissionGranted(env: PJNIEnv; _jform: JObject; _androidPermission: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_androidPermission));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsRuntimePermissionGranted', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
+  Result:= boolean(jBoo);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermission: string; _requestCode: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_androidPermission));
+  jParams[1].i:= _requestCode;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestRuntimePermission', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //-----{ jApp } ------
 

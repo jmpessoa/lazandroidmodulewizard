@@ -82,7 +82,9 @@
 			http://xperia-mewah.blogspot.com.br/2017/02/lazarus-for-android-laz4android.html
 			http://xperia-mewah.blogspot.com.br/2017/02/laz4android-lazandroidmodulewizard-lamw.html
 
-				
+		-Frederico Marques - Tutorial in Portuguese
+			https://www.linkedin.com/pulse/lazarus-android-module-wizard-lamw-gere-seu-apk-usando-marques/	
+			
 		-Lazarus forum community!
 		
 	References:
@@ -123,6 +125,18 @@
 	*
 	*
 	****************************************************************************************************
+
+Version 0.8 - rev 02 - 21 - August - 2018
+
+	NEW!  jsAdMob component [thanks to TR3E]
+		NOTE: Need "AppCompat" theme...
+
+	NEW demo "AppCompatAdMobDemo1" 
+
+	NEW! Added support to App "Runtime Permission" [Required by "target"  Api >= 23]
+
+	UPDATED!! demo "AppCameraDemo"  ["Runtime Permission" example...]
+
 
 Version 0.8 - rev 01 - 12 - May- 2018
 

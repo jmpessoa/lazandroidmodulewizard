@@ -29,7 +29,7 @@
 I. Infrastructure
 
 .Java JDK 8 : [recommended!!!]
-       
+
 	http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
  
 	Warning:  Java JDK > 8 don't support [anymore] "ant" build system!
@@ -75,9 +75,11 @@ I. Infrastructure
 	Simply extract the zip file to a convenient location...
 
 .Gradle 4.1 [to build Apk with "AppCompat" [material] theme]
-
 	https://gradle.org/next-steps/?version=4.1&format=bin
-		Simply extract the zip file to a convenient location...
+
+		RECOMMENDED: 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
+
+	Simply extract the zip file to a convenient location...
 
 	warning: Gradle build process need internet connection!!!
 
@@ -86,8 +88,11 @@ I. Infrastructure
 
 
 .[LAMW 0.8] "AppCompat" [material] theme need:'+
-		1. Java JDK 1.8'
+		1. Java JDK 1.8   
+
 		2. Gradle 4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]
+			RECOMMENDED: 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
+
 		3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]
 		3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]
 		3. Android SDK "plataforms" 27 + "build-tools" 27.0.3

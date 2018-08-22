@@ -1,5 +1,6 @@
-package ml.smartware.appdbgridviewdemo1;
+package com.example.appcamerademo;
 
+import android.content.pm.PackageManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -15,11 +16,10 @@ public class jCommons {
 
     //owner of this instance
 	private View aOwnerView = null;
-
 	//Java-Pascal Interface
 	private long PasObj = 0; // Pascal Obj
 
-	private ViewGroup parent = null;                     // parent view	
+	private ViewGroup parent = null;                     // parent view
 	private ViewGroup.MarginLayoutParams lparams = null; // layout XYWH
 	
 	private int lparamsAnchorRule[] = new int[30];
@@ -41,12 +41,11 @@ public class jCommons {
 	private float lweight = 0;
 	private boolean mRemovedFromParent = false;
 	private int algravity;
-        private int algravityAnchorId;
+	private int algravityAnchorId;
 
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
 		aOwnerView = _view;       // set owner
 		PasObj   = _pasobj; 	//Connect Pascal I/F						
-		
 		lgravity = Gravity.NO_GRAVITY;
 		algravity = Gravity.NO_GRAVITY;
                 algravityAnchorId = -1;
@@ -343,7 +342,6 @@ public class jCommons {
 		}
 	}
 
-
 	public void setCollapseMode(int _mode) {  //called on JNIPrompt
 		
 	}
@@ -371,11 +369,28 @@ public class jCommons {
     public int getColorPrimaryLightId() {
     	return  R.color.primary_light;
     }
-    
-    
+
     public int getColorAccentId() {
     	return  R.color.accent;
     }
-    
+
+	public static void RequestRuntimePermission(Controls controls, String androidPermission, int requestCode) {  //"android.permission.CAMERA"
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			controls.activity.requestPermissions(new String[]{androidPermission}, requestCode);
+		} //[endif_api23up]
+	}
+
+	public static boolean IsRuntimePermissionGranted(Controls controls, String _androidPermission) {  //"android.permission.CAMERA"
+		boolean r = true;
+		int IsGranted = PackageManager.PERMISSION_GRANTED; //0    PERMISSION_DENIED = -1
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			IsGranted =  controls.activity.checkSelfPermission(_androidPermission);
+		} //[endif_api23up]
+		if (IsGranted != PackageManager.PERMISSION_GRANTED) r = false;
+
+		return r;
+	}
 
 }

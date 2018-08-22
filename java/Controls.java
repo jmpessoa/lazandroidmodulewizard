@@ -1,6 +1,6 @@
-package com.example.appedittextdemo1;
+package com.example.appcamerademo;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8  - 31 March  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.2 - 21 August  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -13,7 +13,7 @@ package com.example.appedittextdemo1;
 //                       simonsayz@naver.com
 //                       http://blog.naver.com/simonsayz
 //
-//          LoadMan    / Jang,Yang-Ho
+//         LoadMan    / Jang,Yang-Ho
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
 //
@@ -1350,6 +1350,17 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 		return android.provider.Settings.System.putString(controls.activity.getContentResolver(), _strKey, _strValue);
 	}
 
+	public boolean IsRuntimePermissionNeed() {
+		return Build.VERSION.SDK_INT >= 23;  //Build.VERSION_CODES.M
+	}
+
+	public boolean IsRuntimePermissionGranted(String _androidPermission) {  //"android.permission.CAMERA"
+		return jCommons.IsRuntimePermissionGranted(controls, _androidPermission);
+	}
+
+	public void RequestRuntimePermission(String _androidPermission, int _requestCode) {  //"android.permission.CAMERA"
+		jCommons.RequestRuntimePermission(controls, _androidPermission, _requestCode);
+	}
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1399,7 +1410,7 @@ public native void pOnLostFocus(long pasobj, String text);
 public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
-
+public native void pAppOnRequestPermissionResult(int requestCode, String permission, int grantResult);
 // -------------------------------------------------------------------------------------------
 //Load Pascal Library - Please, do not edit the static content commented in the template file
 // -------------------------------------------------------------------------------------------
@@ -1449,6 +1460,10 @@ public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
 public void jAppOnListItemClick(AdapterView<?> adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
 //public  void jAppOnHomePressed()          { pAppOnHomePressed();           }
 public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {return pAppOnSpecialKeyDown(keyChar, keyCode, keyCodeString);};
+
+public  void jAppOnRequestPermissionResult(int requestCode, String permission, int grantResult) {
+	pAppOnRequestPermissionResult(requestCode, permission ,grantResult);
+}
 
 //// -------------------------------------------------------------------------
 //  System, Class

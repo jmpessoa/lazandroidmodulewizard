@@ -1,6 +1,6 @@
-package org.lamw.appbroadcastreceiverdemo2;
+package com.example.appcamerademo;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8  - 31 March - 2018
+//Lamw: Lazarus Android Module Wizard - version 0.8.2 - 21 August - 2018
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -75,7 +75,20 @@ public class App extends Activity {
       
       //Log.i("jApp","03.Controls.jAppOnCreate");
     }
-       
+
+    @Override
+    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+     /*   switch(permsRequestCode){
+            case 200:
+                boolean audioAccepted = grantResults[0]==PackageManager.PERMISSION_GRANTED;
+                boolean cameraAccepted = grantResults[1]==PackageManager.PERMISSION_GRANTED;
+                break;
+                //PERMISSION_GRANTED = 0
+                //PERMISSION_DENIED = -1
+        }*/
+        controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[0] ,grantResults[0]);
+    }
+
     @Override    
     protected void onNewIntent(Intent intent) {
     	super.onNewIntent(intent);

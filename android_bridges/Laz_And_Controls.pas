@@ -1903,6 +1903,9 @@ type
 
   procedure Java_Event_pAppOnCreateContextMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
 
+  Procedure Java_Event_pAppOnRequestPermissionResult(env: PJNIEnv; this: jobject;
+                                                requestCode: integer; permission: JString; grantResult: integer);
+
   // Control Event
   Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject; Obj: TObject);
 
@@ -2384,6 +2387,31 @@ begin
   end;
 
   if Assigned(Form.OnClickContextMenuItem) then Form.OnClickContextMenuItem(Form,jObjMenuItem,itemID,pasStr, Boolean(checked));
+end;
+
+Procedure Java_Event_pAppOnRequestPermissionResult(env: PJNIEnv; this: jobject;
+                                                requestCode: integer; permission: JString; grantResult: integer);
+var
+  Form: jForm;
+  pasStr: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+
+  pasStr := '';
+  if permission <> nil then
+  begin
+    _jBoolean := JNI_False;
+    pasStr    := String( env^.GetStringUTFChars(Env,permission,@_jBoolean) );
+  end;
+
+  if Assigned(Form.OnRequestPermissionResult) then
+    Form.OnRequestPermissionResult(Form,requestCode,pasStr,TManifestPermissionResult(grantResult));
+
 end;
 
 //------------------------------------------------------------------------------
