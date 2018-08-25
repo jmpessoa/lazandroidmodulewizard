@@ -75,19 +75,11 @@ public class App extends Activity {
       
       //Log.i("jApp","03.Controls.jAppOnCreate");
     }
-
+    //[ifdef_api23up]	 		
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
-     /*   switch(permsRequestCode){
-            case 200:
-                boolean audioAccepted = grantResults[0]==PackageManager.PERMISSION_GRANTED;
-                boolean cameraAccepted = grantResults[1]==PackageManager.PERMISSION_GRANTED;
-                break;
-                //PERMISSION_GRANTED = 0
-                //PERMISSION_DENIED = -1
-        }*/
         controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[0] ,grantResults[0]);
-    }
+    } //[endif_api23up]
 
     @Override    
     protected void onNewIntent(Intent intent) {
