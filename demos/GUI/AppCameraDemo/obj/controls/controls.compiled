@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\laz4android\fpc\3.1.1\bin\i386-win32\fpc.exe" Date="1195508275"/>
+  <Params Value=" -Tandroid -Parm -MDelphi -Scghim -O1 -Xs -XX -l -vewnhibq -FlC:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib -FlC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9 -FuC:\laz4android\components\androidmodulewizard\android_bridges\lib\arm-android -FuC:\laz4android\lcl\units\arm-android -FuC:\laz4android\components\lazutils\lib\arm-android -FuC:\laz4android\packager\units\arm-android -FuC:\github\lazandroidmodulewizard\demos\GUI\AppCameraDemo\jni\ -FUC:\github\lazandroidmodulewizard\demos\GUI\AppCameraDemo\obj\controls\ -FEC:\github\lazandroidmodulewizard\demos\GUI\AppCameraDemo\libs\armeabi\ -olibcontrols.so -Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin controls.lpr"/>
+</CONFIG>

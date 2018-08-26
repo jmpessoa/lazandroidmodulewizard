@@ -7,20 +7,23 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
   OnJNIPrompt = DataModuleJNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jButton1: jButton
     Left = 5
-    Top = 87
-    Width = 285
-    Height = 40
+    Top = 93
+    Width = 290
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jCheckBox1
     Id = 1712792
@@ -33,17 +36,19 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jButton2: jButton
     Left = 5
-    Top = 137
-    Width = 285
-    Height = 40
+    Top = 160
+    Width = 290
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 5497825
@@ -56,17 +61,19 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
   end
   object jCheckBox1: jCheckBox
     Left = 5
-    Top = 45
-    Width = 285
+    Top = 51
+    Width = 290
     Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 3200406
@@ -84,13 +91,14 @@ object AndroidModule1: TAndroidModule1
   end
   object jWebView1: jWebView
     Left = 0
-    Top = 182
+    Top = 222
     Width = 300
     Height = 346
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jButton2
     Id = 0
@@ -103,14 +111,15 @@ object AndroidModule1: TAndroidModule1
     ZoomControl = True
   end
   object jTextView1: jTextView
-    Left = 87
+    Left = 67
     Top = 10
-    Width = 126
-    Height = 20
+    Width = 165
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 804639
     PosRelativeToAnchor = []
@@ -119,12 +128,12 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     Text = 'App jLocation Demo1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jLocation1: jLocation
     MapType = mtRoadmap

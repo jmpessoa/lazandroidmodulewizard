@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -35,266 +37,344 @@ import android.provider.Settings;
 
 public class jLocation /*extends ...*/ {
 
-    private long     pascalObj = 0;      // Pascal Object
-    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
-    private Context  context   = null;
+    private long pascalObj = 0;      // Pascal Object
+    private Controls controls = null;   // Control Class -> Java/Pascal Interface ...
+    private Context context = null;
 
-    private MyLocationListener mlistener;    
+    private MyLocationListener mlistener;
     private LocationManager mLocationManager;
     private Criteria mCriteria;
     private String mProvider;
-        
+
     private String mAddress;
     private String mStatus;
-    
+
     //The minimum distance to change Updates in meters
     private long mDistanceForUpdates;
     // The minimum time between updates in milliseconds
     private long mTimeForUpdates;
-    
-    private double mLat; 
+
+    private double mLat;
     private double mLng;
     private double mAlt;
-    
+
     private int mCriteriaAccuracy;
-  
+
     private String mMapType;
     private int mMapZoom;
     private int mMapSizeW;
     private int mMapSizeH;
     private Location location;
-    
+
     private String mMarkerHighlightColor = "blue";
-    
+
     private GpsStatus mGpsStatus = null;
     private int mSatCount = 0;
     ArrayList<String> mylist = new ArrayList<String>();
-    
+
     GpsStatus.Listener gpsListener;
-    
+
     private String hasAlmanac;
     private String hasEphemeris;
     private float mTimeToFirstFix = 0;
-         
+    public boolean mListening = false;
+
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jLocation(Controls _ctrls, long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) { //Add more others news "_xxx" params if needed!
-       //super(_ctrls.activity);
-       context   = _ctrls.activity;
-       pascalObj = _Self;
-       controls  = _ctrls;
-       
-       //Get the location manager
-       mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-       
-       //Define the criteria how to select the location provider
-       mCriteria = new Criteria();
-       
-       if (_CriteriaAccuracy == 0) {
-          mCriteriaAccuracy = Criteria.ACCURACY_COARSE; //default::Network-based/wi-fi
-       }else {
-    	  mCriteriaAccuracy = Criteria.ACCURACY_FINE;  
-       }
-       
-       switch(_MapType) { //mt, mt, mtHybrid
-         case 0: mMapType = "roadmap"; break;
-         case 1: mMapType = "satellite"; break;
-         case 2: mMapType = "terrain"; break;
-         case 3: mMapType = "hybrid"; break;
-         default: mMapType = "roadmap";
-       }
-       
-       /*
-        * the Android Location Services periodically checks on your location using GPS, Cell-ID, 
-        * and Wi-Fi to locate your device. When it does this,
-        *  your Android phone will send back publicly broadcast Wi-Fi access points' Service set identifier (SSID) 
-        *  and Media Access Control (MAC) data.
-        *  ref: http://www.zdnet.com/blog/networking/how-google-and-everyone-else-gets-wi-fi-location-data/1664
-        */       
-       mlistener = new MyLocationListener();     
-       mLat = 0.0; 
-       mLng = 0.0;       
-       mTimeForUpdates = _TimeForUpdates;           //(long) (1000 * 60 * 1)/4; // 1 minute
-       mDistanceForUpdates = _DistanceForUpdates;  //1; //meters
-       
-       mMapZoom = 14;
-       mMapSizeW = 512;
-       mMapSizeH = 512;
+        //super(_ctrls.activity);
+        context = _ctrls.activity;
+        pascalObj = _Self;
+        controls = _ctrls;
 
-	   //get the best provider depending on the criteria
-       mProvider = mLocationManager.getBestProvider(mCriteria, true);       
-       //Register the listener with the Location Manager to receive location updates
-       mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
-       
-       
-       gpsListener = new GpsStatus.Listener() {
-    	    public void onGpsStatusChanged(int event) {    	    	
- 		        	switch( event) {
- 		        	
-		        	   case GpsStatus.GPS_EVENT_STARTED: controls.pOnGpsStatusChanged(pascalObj, 0, 1); break;
-		        	   case GpsStatus.GPS_EVENT_STOPPED: controls.pOnGpsStatusChanged(pascalObj, mSatCount, 2); break;
-		        	  
-		        	   case GpsStatus.GPS_EVENT_FIRST_FIX: {		        		  
-		        		   
-		        		  if ( TrySatellitesInfo() ) { 
-		        			 mTimeToFirstFix = mGpsStatus.getTimeToFirstFix();   
-		        		     controls.pOnGpsStatusChanged(pascalObj, mSatCount, 3); break;
-		        		  }   
-		        		  
-		        	   }
-		        	  
-		        	   case GpsStatus.GPS_EVENT_SATELLITE_STATUS: {			        	  
-			        	  if ( TrySatellitesInfo() ) {		        		   
-		        		     controls.pOnGpsStatusChanged(pascalObj, mSatCount, 4);
-			        	  }   
-		        	   }	
-		        	   
- 		        	} 
- 		    }     			        			            	    
-    	};
-    	mLocationManager.addGpsStatusListener(gpsListener);    	              
+        //Get the location manager
+        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+        //Define the criteria how to select the location provider
+        mCriteria = new Criteria();
+
+        if (_CriteriaAccuracy == 0) {
+            mCriteriaAccuracy = Criteria.ACCURACY_COARSE; //default::Network-based/wi-fi
+        } else {
+            mCriteriaAccuracy = Criteria.ACCURACY_FINE;
+        }
+
+        switch (_MapType) { //mt, mt, mtHybrid
+            case 0:
+                mMapType = "roadmap";
+                break;
+            case 1:
+                mMapType = "satellite";
+                break;
+            case 2:
+                mMapType = "terrain";
+                break;
+            case 3:
+                mMapType = "hybrid";
+                break;
+            default:
+                mMapType = "roadmap";
+        }
+
+        /*
+         * the Android Location Services periodically checks on your location using GPS, Cell-ID,
+         * and Wi-Fi to locate your device. When it does this,
+         *  your Android phone will send back publicly broadcast Wi-Fi access points' Service set identifier (SSID)
+         *  and Media Access Control (MAC) data.
+         *  ref: http://www.zdnet.com/blog/networking/how-google-and-everyone-else-gets-wi-fi-location-data/1664
+         */
+        mlistener = new MyLocationListener();
+
+        mLat = 0.0;
+        mLng = 0.0;
+        mTimeForUpdates = _TimeForUpdates;           //(long) (1000 * 60 * 1)/4; // 1 minute
+        mDistanceForUpdates = _DistanceForUpdates;  //1; //meters
+
+        mMapZoom = 14;
+        mMapSizeW = 512;
+        mMapSizeH = 512;
+
+        //get the best provider depending on the criteria
+        mProvider = mLocationManager.getBestProvider(mCriteria, false); //fixed by Damian [if true then only a provider that is currently enabled is returned]
+
+        //Register the listener with the Location Manager to receive location updates
+        //mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener); //**
+
+        gpsListener = new GpsStatus.Listener() {
+            public void onGpsStatusChanged(int event) {
+
+                switch (event) {
+
+                    case GpsStatus.GPS_EVENT_STARTED:
+                        controls.pOnGpsStatusChanged(pascalObj, 0, 1);
+                        break;
+                    case GpsStatus.GPS_EVENT_STOPPED:
+                        controls.pOnGpsStatusChanged(pascalObj, mSatCount, 2);
+                        break;
+
+                    case GpsStatus.GPS_EVENT_FIRST_FIX: {
+
+                        if (TrySatellitesInfo()) {
+                            mTimeToFirstFix = mGpsStatus.getTimeToFirstFix();
+                            controls.pOnGpsStatusChanged(pascalObj, mSatCount, 3);
+                            break;
+                        }
+
+                    }
+
+                    case GpsStatus.GPS_EVENT_SATELLITE_STATUS: {
+                        if (TrySatellitesInfo()) {
+                            controls.pOnGpsStatusChanged(pascalObj, mSatCount, 4);
+                        }
+                    }
+
+                }
+            }
+        };
+        //mLocationManager.addGpsStatusListener(gpsListener);  //***
     }
 
-    private boolean TrySatellitesInfo() {  
-    	mSatCount = 0;
-        mGpsStatus = mLocationManager.getGpsStatus( mGpsStatus ); 			      
-        if (mGpsStatus!=null) {  			         			                    
-          mylist.clear();
-          if ( mGpsStatus != null ) { 
-            for ( GpsSatellite sat : mGpsStatus.getSatellites() ) { 
-               if ( sat.usedInFix() ) {             	   
-            	   mSatCount++;		            	   
-            	   hasAlmanac = "false";
-            	   if ( sat.hasAlmanac() )  hasAlmanac = "true";
-            	   hasEphemeris = "false";
-            	   if ( sat.hasEphemeris() )  hasEphemeris = "false";            	   
-                   mylist.add( "SNR=" + sat.getSnr() + ";" +
-                		       "Elevation=" + sat.getElevation()+ ";" +
-                		       "Azimuth=" + sat.getAzimuth()+ ";" +
-                		       "PRN=" + sat.getPrn()+ ";" +
-                		       "hasAlmanac=" + hasAlmanac + ";" +
-                		       "hasEphemeris=" + hasEphemeris 
-                		      );
-               } 
-            }
-            
-          }        			           			           			           
+    private boolean TrySatellitesInfo() {
+        mSatCount = 0;
+        try {
+            mGpsStatus = mLocationManager.getGpsStatus(mGpsStatus);
         }
-        
+        catch (SecurityException se) {
+            //Log.d("TAG", "SE CAUGHT");
+            mGpsStatus = null;
+            se.printStackTrace();
+        }
+        if (mGpsStatus != null) {
+            mylist.clear();
+            if (mGpsStatus != null) {
+                for (GpsSatellite sat : mGpsStatus.getSatellites()) {
+                    if (sat.usedInFix()) {
+                        mSatCount++;
+                        hasAlmanac = "false";
+                        if (sat.hasAlmanac()) hasAlmanac = "true";
+                        hasEphemeris = "false";
+                        if (sat.hasEphemeris()) hasEphemeris = "false";
+                        mylist.add("SNR=" + sat.getSnr() + ";" +
+                                "Elevation=" + sat.getElevation() + ";" +
+                                "Azimuth=" + sat.getAzimuth() + ";" +
+                                "PRN=" + sat.getPrn() + ";" +
+                                "hasAlmanac=" + hasAlmanac + ";" +
+                                "hasEphemeris=" + hasEphemeris
+                        );
+                    }
+                }
+
+            }
+        }
+
         if (mSatCount > 0) return true;
         else return false;
-        
+
     }
 
     public void jFree() {
-      //free local objects...
-      //mLocationManager.removeGpsStatusListener(gpsListener);	//depr api 24
-      //mLocationManager.unregisterGnssStatusCallback(GpssStatus.Callback);    	
-      mLocationManager = null;
-      mCriteria = null;
-      mlistener = null;
-      location = null;
+        //free local objects...
+        //mLocationManager.removeGpsStatusListener(gpsListener);	//depr api 24
+        //mLocationManager.unregisterGnssStatusCallback(GpssStatus.Callback);
+        mLocationManager = null;
+        mCriteria = null;
+        mlistener = null;
+        location = null;
     }
-    
-  //write others [public] methods code here......
-  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    
-  public boolean StartTracker() {
-        boolean res= false;        
-	    mCriteria.setAccuracy(mCriteriaAccuracy);	    
-	    //mCriteria.setCostAllowed(false);	                                 		 		            
+
+    //write others [public] methods code here......
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+    private void Listen() {  //Register the listener
+
+        if (mListening) return;
+
+        try {
+            mListening = true;
+            mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
+            mLocationManager.addGpsStatusListener(gpsListener);
+        }
+        catch (SecurityException se) {
+            //Log.d("TAG", "SE CAUGHT");
+            se.printStackTrace();
+        }
+    }
+
+    public boolean StartTracker() {
+        boolean res = false;
+
+        if (!mListening) Listen();
+
+        mCriteria.setAccuracy(mCriteriaAccuracy);
+        //mCriteria.setCostAllowed(false);
         if (location != null) {
-          mlistener.onLocationChanged(location);
-          res = true;
-        }            
+            mlistener.onLocationChanged(location);
+            res = true;
+        }
         return res;
-   }
-  
-  public double[] GetLatitudeLongitude(String _fullAddress) {  //double _latitude, double _longitude
-	  	 
-      Geocoder geocoder = new Geocoder(context, Locale.getDefault());      
-      double[] d;
-      d = new double[]{0, 0};     
-      // Create a list to contain the result address      
-      List<Address> addresses = null;            
-      try {
-          /* Return 1 address. */
-          addresses = geocoder.getFromLocationName(_fullAddress, 1);   
-         
-      } catch (IOException e1) {
-          e1.printStackTrace();          
-      } catch (IllegalArgumentException e2) {          
-          e2.printStackTrace();
-          return d;
-      }
-      // If the reverse geocode returned an address
-      if (addresses != null && addresses.size() > 0) {
-          // Get the first address
-          Address address = addresses.get(0);                   
-          d[0] = address.getLatitude();                         
-          d[1] = address.getLongitude(); 
-      }
-      return d;
-      
-  }
-    
-  public boolean StartTracker(String _locationName) {	  
-      boolean res = false;
-      double[] d;      
-	  mCriteria.setAccuracy(mCriteriaAccuracy);                     
-	  //mCriteria.setCostAllowed(false);	    	                 
-      if (location != null) {    	  
-    	d = this.GetLatitudeLongitude(_locationName);    	
-        location.reset();
-        location.setLatitude(d[0]);
-        location.setLongitude(d[1]);
-        mlistener.onLocationChanged(location); //force
-        res = true;
-      }                           
-      return res;
-   }  
-  
-   public void ShowLocationSouceSettings() {
-	  Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-      context.startActivity(intent); 
-   }   
-   
-   public void RequestLocationUpdates() {          	      
-      mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);            
-   }
-      
-   public void RequestLocationUpdates(int _provider) {          	      
-	  if (_provider == 0) 
-	    mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,mTimeForUpdates, mDistanceForUpdates, mlistener);
-	  else
-	    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,mTimeForUpdates, mDistanceForUpdates, mlistener);	      
-   }
-       
-   public void StopTracker() {  // finalize ....
-      mlistener.RemoveUpdates(mLocationManager);
-   }
-    
-   public void SetCriteriaAccuracy(int _accuracy) {
-       if(_accuracy == 0){  //default...     	            
-          mCriteria.setAccuracy(Criteria.ACCURACY_COARSE);   //less accuracy      
-       }else { 
-    	  mCriteria.setAccuracy(Criteria.ACCURACY_FINE); //high accuracy         
-       }          
-    }       
-        
-    public boolean IsGPSProvider() {    	
-    	if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { 
-          //the last known location of this provider        
-          location = mLocationManager.getLastKnownLocation(mProvider);
-          return true;
-    	}
-    	else return false;    	              
+    }
+
+    public double[] GetLatitudeLongitude(String _fullAddress) {  //double _latitude, double _longitude
+
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        double[] d;
+        d = new double[]{0, 0};
+        // Create a list to contain the result address
+        List<Address> addresses = null;
+        try {
+            /* Return 1 address. */
+            addresses = geocoder.getFromLocationName(_fullAddress, 1);
+
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        } catch (IllegalArgumentException e2) {
+            e2.printStackTrace();
+            return d;
+        }
+        // If the reverse geocode returned an address
+        if (addresses != null && addresses.size() > 0) {
+            // Get the first address
+            Address address = addresses.get(0);
+            d[0] = address.getLatitude();
+            d[1] = address.getLongitude();
+        }
+        return d;
+
+    }
+
+    public boolean StartTracker(String _locationName) {
+        boolean res = false;
+        double[] d;
+
+        if (!mListening) Listen();
+
+        mCriteria.setAccuracy(mCriteriaAccuracy);
+        //mCriteria.setCostAllowed(false);
+        if (location != null) {
+            d = this.GetLatitudeLongitude(_locationName);
+            location.reset();
+            location.setLatitude(d[0]);
+            location.setLongitude(d[1]);
+            mlistener.onLocationChanged(location); //force
+            res = true;
+        }
+        return res;
+    }
+
+    public void ShowLocationSouceSettings() {
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        context.startActivity(intent);
+    }
+
+    public void RequestLocationUpdates() {
+        try {
+            mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
+        }
+        catch (SecurityException se) {
+            //Log.d("TAG", "SE CAUGHT");
+            se.printStackTrace();
+        }
+    }
+
+    public void RequestLocationUpdates(int _provider) {
+        if (_provider == 0) {
+            try {
+                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, mTimeForUpdates, mDistanceForUpdates, mlistener);
+            }
+            catch (SecurityException se) {
+                //Log.d("TAG", "SE CAUGHT");
+                se.printStackTrace();
+            }
+        }
+        else {
+            try {
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, mTimeForUpdates, mDistanceForUpdates, mlistener);
+            }
+            catch (SecurityException se) {
+                //Log.d("TAG", "SE CAUGHT");
+                se.printStackTrace();
+            }
+        }
+    }
+
+    public void StopTracker() {  // finalize ....
+        //mListening = false;
+        mlistener.RemoveUpdates(mLocationManager);
+    }
+
+    public void SetCriteriaAccuracy(int _accuracy) {
+        if (_accuracy == 0) {  //default...
+            mCriteria.setAccuracy(Criteria.ACCURACY_COARSE);   //less accuracy
+        } else {
+            mCriteria.setAccuracy(Criteria.ACCURACY_FINE); //high accuracy
+        }
+    }
+
+    public boolean IsGPSProvider() {
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+             try {
+                 location = mLocationManager.getLastKnownLocation(mProvider);
+                 return true;
+             }
+             catch (SecurityException se) {
+                 //Log.d("TAG", "SE CAUGHT");
+                 se.printStackTrace();
+                 return false;
+             }
+    	} else return false;
     }
     
     public boolean IsNetProvider() {    	
     	if ( mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ) { 
-          //the last known location of this provider        
-          location = mLocationManager.getLastKnownLocation(mProvider);
-          return true;
+          //the last known location of this provider
+          try {
+              location = mLocationManager.getLastKnownLocation(mProvider);
+              return true;
+          }
+          catch (SecurityException se) {
+              //Log.d("TAG", "SE CAUGHT");
+              se.printStackTrace();
+              return false;
+          }
     	}
     	else return false;    	       
     }

@@ -20,6 +20,9 @@ type
       jLocation1: jLocation;
       jTextView1: jTextView;
       jWebView1: jWebView;
+      procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+        requestCode: integer; manifestPermission: string;
+        grantResult: TManifestPermissionResult);
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
@@ -62,6 +65,31 @@ begin
   begin
     if Self.isConnectedWifi() then jCheckBox1.Checked:= True
   end;
+
+    //https://developer.android.com/guide/topics/security/permissions#normal-dangerous
+    //https://www.captechconsulting.com/blogs/runtime-permissions-best-practices-and-how-to-gracefully-handle-permission-removal
+  if IsRuntimePermissionNeed() then   // that is, target API >= 23
+  begin
+     ShowMessage('RequestRuntimePermission....');
+     Self.RequestRuntimePermission('android.permission.ACCESS_FINE_LOCATION', 1003); //from AndroodManifest.xml
+  end;
+
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+    case requestCode of
+     1003:begin   //android.permission.ACCESS_FINE_LOCATION
+               if grantResult = PERMISSION_GRANTED  then
+               begin
+                   ShowMessage(manifestPermission + ' :: Success! Permission grant!!! ' )
+               end
+               else  //PERMISSION_DENIED
+                 ShowMessage(manifestPermission + '   :: Sorry... permission not grant... ' )
+           end;
+  end;
 end;
 
 procedure TAndroidModule1.jCheckBox1Click(Sender: TObject);
@@ -89,15 +117,17 @@ begin
   case gpsStatusEvent of
 
      gpsStarted: ShowMessage('gpsStarted');
+
      gpsStopped: ShowMessage('gpsStopped');
-     gpsFirstFix: ShowMessage( FloatToStr( jLocation1.GetTimeToFirstFix() ) );
+
+     gpsFirstFix: ShowMessage('gpsFirstFix = ' +FloatToStr( jLocation1.GetTimeToFirstFix() ) );
 
      gpsSatelliteStatus:
      begin
-       ShowMessage(IntToStr(countSatellites));
+       ShowMessage('Satellites count = '+IntToStr(countSatellites));
        for i:= 0 to countSatellites-1 do
        begin
-         ShowMessage(jLocation1.GetSatelliteInfo(i));
+         ShowMessage('Satellite ['+IntToStr(i)+'] Info: ' +jLocation1.GetSatelliteInfo(i));
        end;
      end;
 
@@ -120,17 +150,21 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  if not jLocation1.IsGPSProvider then
+  if IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION')  then
   begin
-     ShowMessage('Sorry, GPS is Off. Please, active it and try again.');
-     jLocation1.ShowLocationSouceSettings()
+      if not jLocation1.IsGPSProvider then
+      begin
+         ShowMessage('Sorry, GPS is Off. Please, active it and try again.');
+         jLocation1.ShowLocationSouceSettings()
+      end
+      else
+      begin
+         ShowMessage('GPS is On! Starting Tracker...');
+         //jLocation1.MapType:= mtHybrid;  // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
+         jLocation1.StartTracker();  //handled by "OnLocationChanged"
+      end;
   end
-  else
-  begin
-     ShowMessage('GPS is On! Starting Tracker...');
-     //jLocation1.MapType:= mtHybrid;  // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
-     jLocation1.StartTracker();  //handled by "OnLocationChanged"
-  end;
+  else  ShowMessage('Sorry.. Runtime Permission NOT Granted ...');
 end;
 
 {

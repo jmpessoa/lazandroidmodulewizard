@@ -1,14 +1,10 @@
 package com.example.applocationdemo1;
 
-import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
+import android.util.Log;
+import android.view.View;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.view.Gravity;
 
 //-------------------------------------------------------------------------
 //WebView
@@ -81,28 +77,13 @@ public class jWebView extends WebView {
     //Java-Pascal Interface
     private long             PasObj   = 0;      // Pascal Obj
     private Controls        controls = null;   // Control Class for Event
+    private jCommons LAMWCommon;
     //
-    private ViewGroup       parent   = null;   // parent view
-    private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
     private jWebClient      webclient;
-
-    //by jmpessoa
-    private int lparamsAnchorRule[] = new int[30];
-    int countAnchorRule = 0;
-
-    private int lparamsParentRule[] = new int[30];
-    int countParentRule = 0;
-
-    int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-    int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-    int marginLeft = 5;
-    int marginTop = 5;
-    int marginRight = 5;
-    int marginBottom = 5;
-    private int lgravity = Gravity.TOP | Gravity.START;
-    private float lweight = 0;
-
-
+    
+    private OnLongClickListener onClickListener;   
+    private Boolean         enabled  = true;    
+    
     //Constructor
     public  jWebView(android.content.Context context,
                      Controls ctrls,long pasobj ) {
@@ -111,126 +92,77 @@ public class jWebView extends WebView {
         //Connect Pascal I/F
         PasObj   = pasobj;
         controls = ctrls;
-
-        //Init Class
+        LAMWCommon = new jCommons(this,context,pasobj);
+        
         webclient = new jWebClient();
-
         webclient.PasObj   = pasobj;
         webclient.controls = ctrls;
 
         setWebViewClient(webclient); // Prevent to run External Browser
-
         this.getSettings().setJavaScriptEnabled(true);
-
-        lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-        lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
+        
+        onClickListener = new OnLongClickListener() {        	
+		@Override
+		public boolean onLongClick(View arg0) {
+			// TODO Auto-generated method stub
+            if (enabled) {
+                controls.pOnLongClick(PasObj,Const.Click_Default);
+            }			
+			return false;
+		};
+        };                       
+        setOnLongClickListener(onClickListener);
     }
 
 
     public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-        marginLeft = _left;
-        marginTop = _top;
-        marginRight = _right;
-        marginBottom = _bottom;
-        lparamH = _h;
-        lparamW = _w;
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
     }
 
-    private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-        if (aparent instanceof FrameLayout) {
-            return new FrameLayout.LayoutParams(baseparams);
-        } else if (aparent instanceof RelativeLayout) {
-            return new RelativeLayout.LayoutParams(baseparams);
-        } else if (aparent instanceof LinearLayout) {
-            return new LinearLayout.LayoutParams(baseparams);
-        } else if (aparent == null) {
-            throw new NullPointerException("Parent is null");
-        } else {
-            throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-                    + aparent.getClass().getName());
-        }
-    }
 
     public  void setParent( android.view.ViewGroup _viewgroup ) {
-        if (parent != null) { parent.removeView(this); }
-        parent = _viewgroup;
-        parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-        lparams = null;
-        lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
+    	LAMWCommon.setParent(_viewgroup);
     }
 
     //Free object except Self, Pascal Code Free the class.
     public  void Free() {
-        if (parent != null) { parent.removeView(this); }
+    	this.setOnLongClickListener(null);    	
         setWebViewClient(null);
         webclient = null;
-        lparams = null;
+    	LAMWCommon.free();
     }
 
     //by jmpessoa
     public void setLParamWidth(int _w) {
-        lparamW = _w;
+    	LAMWCommon.setLParamWidth(_w); 
     }
 
     public void setLParamHeight(int _h) {
-        lparamH = _h;
+    	LAMWCommon.setLParamHeight(_h);
     }
 
     public void setLGravity(int _g) {
-        lgravity = _g;
+    	LAMWCommon.setLGravity(_g);
     }
 
     public void setLWeight(float _w) {
-        lweight = _w;
+    	LAMWCommon.setLWeight(_w);
     }
 
     public void addLParamsAnchorRule(int rule) {
-        lparamsAnchorRule[countAnchorRule] = rule;
-        countAnchorRule = countAnchorRule + 1;
+    	LAMWCommon.addLParamsAnchorRule(rule);
     }
 
     public void addLParamsParentRule(int rule) {
-        lparamsParentRule[countParentRule] = rule;
-        countParentRule = countParentRule + 1;
+    	LAMWCommon.addLParamsParentRule(rule);
     }
 
-    //by jmpessoa
     public void setLayoutAll(int idAnchor) {
-        lparams.width  = lparamW; //matchParent;
-        lparams.height = lparamH; //wrapContent;
-        lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
-
-        if (lparams instanceof RelativeLayout.LayoutParams) {
-            if (idAnchor > 0) {
-                for (int i=0; i < countAnchorRule; i++) {
-                    ((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
-                }
-            }
-            for (int j=0; j < countParentRule; j++) {
-                ((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-            }
-        }
-        if (lparams instanceof FrameLayout.LayoutParams) {
-            ((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-        }
-        if (lparams instanceof LinearLayout.LayoutParams) {
-            ((LinearLayout.LayoutParams)lparams).weight = lweight;
-        }
-        //
-        setLayoutParams(lparams);
+    	LAMWCommon.setLayoutAll(idAnchor);
     }
 
     public void clearLayoutAll() {
-        if (lparams instanceof RelativeLayout.LayoutParams) {
-            for (int i=0; i < countAnchorRule; i++) {
-                ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
-            }
-            for (int j=0; j < countParentRule; j++) {
-                ((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
-            }
-        }
-        countAnchorRule = 0;
-        countParentRule = 0;
+    	LAMWCommon.clearLayoutAll();
     }
 
     public  void setJavaScript(boolean javascript) {

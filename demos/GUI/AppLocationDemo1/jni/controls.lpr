@@ -11,12 +11,12 @@ uses
 
 { Class:     com_example_applocationdemo1_Controls
   Method:    pAppOnCreate
-  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
+  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;Landroid/content/Intent;)V }
 procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
-  layout: JObject); cdecl;
+  layout: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnCreate(PEnv, this, context, layout); AndroidModule1.Init(gApp
-    );
+  Java_Event_pAppOnCreate(PEnv, this, context, layout, intent);
+    AndroidModule1.Init(gApp);
 end;
 
 { Class:     com_example_applocationdemo1_Controls
@@ -29,10 +29,10 @@ end;
 
 { Class:     com_example_applocationdemo1_Controls
   Method:    pAppOnNewIntent
-  Signature: ()V }
-procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject); cdecl;
+  Signature: (Landroid/content/Intent;)V }
+procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnNewIntent(PEnv, this);
+  Java_Event_pAppOnNewIntent(PEnv, this, intent);
 end;
 
 { Class:     com_example_applocationdemo1_Controls
@@ -177,11 +177,10 @@ end;
 
 { Class:     com_example_applocationdemo1_Controls
   Method:    pOnDraw
-  Signature: (JLandroid/graphics/Canvas;)V }
-procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject
-  ); cdecl;
+  Signature: (J)V }
+procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnDraw(PEnv, this, TObject(pasobj), canvas);
+  Java_Event_pOnDraw(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     com_example_applocationdemo1_Controls
@@ -219,6 +218,15 @@ procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
   cdecl;
 begin
   Java_Event_pOnClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
+  Method:    pOnLongClick
+  Signature: (JI)V }
+procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
+  ); cdecl;
+begin
+  Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     com_example_applocationdemo1_Controls
@@ -329,6 +337,16 @@ begin
 end;
 
 { Class:     com_example_applocationdemo1_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     com_example_applocationdemo1_Controls
   Method:    pOnLocationChanged
   Signature: (JDDDLjava/lang/String;)V }
 procedure pOnLocationChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -387,15 +405,16 @@ begin
     url);
 end;
 
-const NativeMethods: array[0..41] of JNINativeMethod = (
+const NativeMethods: array[0..43] of JNINativeMethod = (
    (name: 'pAppOnCreate';
-    signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
+    signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
+      +'Landroid/content/Intent;)V';
     fnPtr: @pAppOnCreate; ),
    (name: 'pAppOnScreenStyle';
     signature: '()I';
     fnPtr: @pAppOnScreenStyle; ),
    (name: 'pAppOnNewIntent';
-    signature: '()V';
+    signature: '(Landroid/content/Intent;)V';
     fnPtr: @pAppOnNewIntent; ),
    (name: 'pAppOnDestroy';
     signature: '()V';
@@ -446,7 +465,7 @@ const NativeMethods: array[0..41] of JNINativeMethod = (
     signature: '(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr: @pAppOnClickContextMenuItem; ),
    (name: 'pOnDraw';
-    signature: '(JLandroid/graphics/Canvas;)V';
+    signature: '(J)V';
     fnPtr: @pOnDraw; ),
    (name: 'pOnTouch';
     signature: '(JIIFFFF)V';
@@ -460,6 +479,9 @@ const NativeMethods: array[0..41] of JNINativeMethod = (
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
+   (name: 'pOnLongClick';
+    signature: '(JI)V';
+    fnPtr: @pOnLongClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -496,6 +518,9 @@ const NativeMethods: array[0..41] of JNINativeMethod = (
    (name: 'pOnLayouting';
     signature: '(JZ)V';
     fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
    (name: 'pOnLocationChanged';
     signature: '(JDDDLjava/lang/String;)V';
     fnPtr: @pOnLocationChanged; ),
@@ -610,6 +635,7 @@ exports
   pAppOnSpecialKeyDown name 'Java_com_example_applocationdemo1_Controls_'
     +'pAppOnSpecialKeyDown',
   pOnClick name 'Java_com_example_applocationdemo1_Controls_pOnClick',
+  pOnLongClick name 'Java_com_example_applocationdemo1_Controls_pOnLongClick',
   pOnChange name 'Java_com_example_applocationdemo1_Controls_pOnChange',
   pOnChanged name 'Java_com_example_applocationdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_com_example_applocationdemo1_Controls_pOnEnter',
@@ -628,6 +654,8 @@ exports
   pOnAfterDispatchDraw name 'Java_com_example_applocationdemo1_Controls_'
     +'pOnAfterDispatchDraw',
   pOnLayouting name 'Java_com_example_applocationdemo1_Controls_pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_com_example_applocationdemo1_'
+    +'Controls_pAppOnRequestPermissionResult',
   pOnLocationChanged name 'Java_com_example_applocationdemo1_Controls_'
     +'pOnLocationChanged',
   pOnLocationStatusChanged name 'Java_com_example_applocationdemo1_Controls_'
