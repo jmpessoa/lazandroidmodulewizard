@@ -43,7 +43,8 @@ I. Infrastructure
 		2)run  "android sdk" to open a GUI "SDK Manager"
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
-		5)check "Android SDK Build-Tools 25.0.3"		
+		5)check "Android SDK Build-Tools 25.0.3"	
+		5.1)check "Android SDK Build-Tools 26.0.2" [need by 3.0.1  "gradle" android plugin ...] 	
 		6)go to "Android 7.1.1 (API 25)" and check only "SDK Platform"
 		7)go to "Extras" and check: 
 				"Android Support Repository"				
@@ -94,7 +95,7 @@ I. Infrastructure
 			RECOMMENDED: 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
 
 		3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]
-		3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]
+		3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 [or]
 		3. Android SDK "plataforms" 27 + "build-tools" 27.0.3
 		4. Android SDK/Extra  "Support Repository"
 		5. Android SDK/Extra  "Support Library"
