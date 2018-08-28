@@ -286,42 +286,62 @@ public  void Close2() {
   controls.pOnClose(PasObj);
 }
 
-public boolean IsConnected(){ // by renabor
-   boolean r = false;	
+public boolean IsConnected(){ //by TR3E
+ 
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-   if (cm == null) return r;   
-   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-   if (activeNetwork == null) return r;   
-   return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+ 
+   if (cm != null)
+   {
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+ 
+    if (activeNetwork != null)
+     return (activeNetwork.isAvailable() && activeNetwork.isConnected());
+   }
+ 
+   return false;
 }
-
-public boolean IsConnectedWifi(){ // by renabor
-   boolean r = false;
+ 
+public boolean IsConnectedWifi(){ // by TR3E
+ 
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-   if (cm == null) return r;   
-   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-   if (activeNetwork == null) return r;   
-   return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+ 
+   if (cm != null)
+   {
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+ 
+    if (activeNetwork != null)
+     return (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI);
+   }
+ 
+   return false;
 }
-
-public boolean IsConnectedTo(int _connectionType) {	   
-	   int r = -1;
-	   if (!IsConnected()) return false;	   
-	   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);	   
-	   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();	   
-	   if (activeNetwork != null) {   	   
-		  switch (activeNetwork.getType()){
-		  case ConnectivityManager.TYPE_MOBILE: r = 0; break;  //0
-		  case ConnectivityManager.TYPE_WIFI: r = 1; break;  //1
- 		  case ConnectivityManager.TYPE_BLUETOOTH: r = 2; break; //7
-		  case ConnectivityManager.TYPE_ETHERNET: r = 3; break; //9		  
-		  }	      
-	   }	   
-	   if (r == _connectionType)  
-		   return true;
-	   else 
-		  return false;
-	   
+ 
+public boolean IsConnectedTo(int _connectionType) { // by TR3E
+ 
+           ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+ 
+           if( cm != null )
+           {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+ 
+            int result = -1;
+ 
+            if (activeNetwork != null)
+             if (activeNetwork.isAvailable() && activeNetwork.isConnected());
+             {
+                  switch (activeNetwork.getType()){
+                   case ConnectivityManager.TYPE_MOBILE:    result = 0; break; //0
+                   case ConnectivityManager.TYPE_WIFI:      result = 1; break; //1
+                   case ConnectivityManager.TYPE_BLUETOOTH: result = 2; break; //7
+                   case ConnectivityManager.TYPE_ETHERNET:  result = 3; break; //9
+                  }
+             }
+ 
+            return (result == _connectionType);
+           }
+ 
+           return false;
+ 
 }
 
 public void ShowMessage(String msg){
