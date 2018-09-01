@@ -13,7 +13,7 @@ type
 
   TLamwGlobalSettings = class
   public const
-    Version = '0.8'; //Beta
+    Version = '0.8';
   private const
     IniFileName = 'JNIAndroidProject.ini';
     IniFileSection = 'NewProject';

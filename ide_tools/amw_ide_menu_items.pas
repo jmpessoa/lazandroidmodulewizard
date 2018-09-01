@@ -1,4 +1,4 @@
-unit amw_ide_menu_items;    //By Thierrydijoux!
+unit amw_ide_menu_items; //By Thierrydijoux!
 
 {$mode objfpc}{$H+}
 
@@ -1096,9 +1096,9 @@ begin
  // Adding 5a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent Create', nil,@StartComponentCreate);
   // Adding 6a. entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToBuildFPCCross', 'Build FPC Cross Android', nil,@StartPathToBuildFPCCross);
-  // Adding 7a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToFPCTrunkSource', 'Get FPC Source [Trunk]', nil, @StartFPCTrunkSource);
+  // Adding 7a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToBuildFPCCross', 'Build FPC Cross Android', nil,@StartPathToBuildFPCCross);
   // Adding 8a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToEclipseToggleTooling', 'Eclipse Compatibility [ADT<->Andmore] ...', nil, @StartEclipseToggleTooling);
 

@@ -244,12 +244,14 @@ type
   TOnHttpClientContentResult = procedure(Sender: TObject; content: string) of Object;
   TOnHttpClientCodeResult = procedure(Sender: TObject; code: integer) of Object;
 
-  //NEW by jmpessoa
+  TOnHttpClientUploadProgress = procedure(Sender: TObject; progress: int64) of Object;
+  TOnHttpClientUploadFinished = procedure(Sender: TObject; connectionStatusCode: integer; responseMessage: string; fileName: string) of Object;
 
   { jHttpClient }
 
   jHttpClient = class(jControl)
   private
+    FOntUpLoadProgress: TOnHttpClientUpLoadProgress;
     FUrl : string;
     FUrls: TStrings;
     FIndexUrl: integer;
@@ -259,9 +261,16 @@ type
     FOnContentResult: TOnHttpClientContentResult;
     FOnCodeResult: TOnHttpClientCodeResult;
 
+    FOnUploadProgress: TOnHttpClientUploadProgress;
+    FOnUploadFinished: TOnHttpClientUploadFinished;
+
     FResponseTimeout: integer;
     FConnectionTimeout: integer;
 
+    FUploadFormName: string;
+
+    function GetConnectionTimeout: integer;
+    function GetResponseTimeout: integer;
     procedure SetCharSet(AValue: string);
     procedure SetIndexUrl(Value: integer);
     procedure SetUrlByIndex(Value: integer);
@@ -335,11 +344,16 @@ type
     function GetDefaultConnection(): jObject;
     procedure SetResponseTimeout(_timeoutMilliseconds: integer);
     procedure SetConnectionTimeout(_timeoutMilliseconds: integer);
-    function GetResponseTimeout(): integer;
-    function GetConnectionTimeout(): integer;
+
+    procedure UploadFile(_url: string; _fullFileName: string; _uploadFormName: string); overload;
+    procedure UploadFile(_url: string; _fullFileName: string);  overload;
+    procedure SetUploadFormName(_uploadFormName: string);
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
+
+    procedure GenEvent_OnHttpClientUploadProgress(Obj: TObject; progress: int64);
+    procedure GenEvent_OnHttpClientUploadFinished(Obj: TObject; code: integer; response: string; fileName: string);
 
     // Property
     property Url: string read FUrl;
@@ -350,9 +364,12 @@ type
     property AuthenticationMode: THttpClientAuthenticationMode read FAuthenticationMode write SetAuthenticationMode;
     property ResponseTimeout: integer read GetResponseTimeout write SetResponseTimeout;
     property ConnectionTimeout: integer read GetConnectionTimeout write SetConnectionTimeout;
-
+    property UploadFormName: string read FUploadFormName write SetUploadFormName;
     property OnContentResult: TOnHttpClientContentResult read FOnContentResult write FOnContentResult;
     property OnCodeResult: TOnHttpClientCodeResult read FOnCodeResult write FOnCodeResult;
+    property OnUploadProgress: TOnHttpClientUpLoadProgress read FOntUpLoadProgress write FOntUpLoadProgress;
+    property OnUploadFinished: TOnHttpClientUpLoadFinished read FOnUpLoadFinished write FOnUpLoadFinished;
+
   end;
 
   //NEW by jmpessoa
@@ -1961,6 +1978,9 @@ type
   Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
   procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: jString);
   procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
+  procedure Java_Event_pOnHttpClientUploadFinished(env: PJNIEnv; this: jobject; Obj: TObject; code: integer; response: JString; fullFileName: JString );
+  procedure Java_Event_pOnHttpClientUploadProgress(env: PJNIEnv; this: jobject; Obj: TObject; progress: int64);
+
 
   Procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
 
@@ -3096,6 +3116,49 @@ begin
 
 end;
 
+procedure Java_Event_pOnHttpClientUploadProgress(env: PJNIEnv; this: jobject; Obj: TObject; progress: int64);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj) then Exit;
+  if Obj is jHttpClient then
+  begin
+     jHttpClient(Obj).UpdateJNI(gApp);
+     jHttpClient(Obj).GenEvent_OnHttpClientUploadProgress(Obj, progress);
+  end
+end;
+
+procedure Java_Event_pOnHttpClientUploadFinished(env: PJNIEnv; this: jobject; Obj: TObject;
+                                      code: integer; response: JString; fullFileName: JString );
+var
+  pasfullFileName: String;
+  pasResponse: string;
+  _jBoolean  : jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  //
+  if not Assigned(Obj) then Exit;
+
+  if Obj is jHttpClient then
+  begin
+    pasfullFileName := '';
+    pasResponse:= '';
+    if fullFileName <> nil then
+    begin
+      _jBoolean := JNI_False;
+      pasfullFileName:= String( env^.GetStringUTFChars(Env,fullFileName,@_jBoolean) );
+    end;
+    if response <> nil then
+    begin
+      _jBoolean := JNI_False;
+      pasResponse:= String(env^.GetStringUTFChars(Env,response,@_jBoolean) );
+    end;
+    jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
+    jHttpClient(Obj).GenEvent_OnHttpClientUploadFinished(Obj, code, pasResponse, pasfullFileName);
+  end;
+end;
+
 Procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
 var
   pascontent    : String;
@@ -3144,7 +3207,6 @@ begin
 end;
 
 procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
-
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -6988,7 +7050,7 @@ begin
 
   FResponseTimeout:= 15000;
   FConnectionTimeout:= 15000;
-
+  FUploadformName:= 'lamwFormUpload';
 end;
 
 destructor jHttpClient.Destroy;
@@ -7018,6 +7080,9 @@ begin
 
   if FConnectionTimeout <> 15000 then
      jHttpClient_SetConnectionTimeout(FjEnv, FjObject, FConnectionTimeout);
+
+  if FUploadFormName <> '' then
+      jHttpClient_SetUploadFormName(FjEnv, FjObject, FUploadFormName);
 
   FInitialized:= True;
   SetUrlByIndex(FIndexUrl);
@@ -7078,7 +7143,6 @@ end;
 
 procedure jHttpClient.SetCharSet(AValue: string);
 begin
-
   FCharSet := AValue;
 end;
 
@@ -7106,7 +7170,7 @@ begin
   end else Result := '';
 end;
 
-function jHttpClient.Get: string;
+function jHttpClient.Get(): string;
 begin
   Result := '';
   if not FInitialized then Exit;
@@ -7294,6 +7358,16 @@ begin
    if Assigned(FOnCodeResult) then FOnCodeResult(Obj, code);
 end;
 
+procedure jHttpClient.GenEvent_OnHttpClientUploadProgress(Obj: TObject; progress: int64);
+begin
+   if Assigned(FOnUploadProgress) then FOnUploadProgress(Obj, progress);
+end;
+
+procedure jHttpClient.GenEvent_OnHttpClientUploadFinished(Obj: TObject; code: integer; response: string; fileName: string);
+begin
+  if Assigned(FOnUploadFinished) then FOnUploadFinished(Obj, code, response,  fileName);
+end;
+
 function jHttpClient.UrlExist(_urlString: string): boolean;
 begin
   //in designing component state: result value here...
@@ -7429,6 +7503,29 @@ begin
   Result:= FConnectionTimeout;
   if FInitialized then
    Result:= jHttpClient_GetConnectionTimeout(FjEnv, FjObject);
+end;
+
+
+procedure jHttpClient.UploadFile(_url: string; _fullFileName: string; _uploadFormName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_UploadFile(FjEnv, FjObject, _url ,_fullFileName ,_uploadFormName);
+end;
+
+procedure jHttpClient.UploadFile(_url: string; _fullFileName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_UploadFile(FjEnv, FjObject, _url ,_fullFileName);
+end;
+
+procedure jHttpClient.SetUploadFormName(_uploadFormName: string);
+begin
+  //in designing component state: set value here...
+  FUploadFormName:=_uploadFormName;
+  if FInitialized then
+     jHttpClient_SetUploadFormName(FjEnv, FjObject, _uploadFormName);
 end;
 
 { jSMTPClient }

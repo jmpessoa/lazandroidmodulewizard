@@ -4173,7 +4173,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jComboEditText, TDraftComboEditText);
   RegisterAndroidWidgetDraftClass(jDrawingView, TDraftDrawingView);
 
-  // TODO :: (default drawing and layout)
+  // TODO::(default drawing and layout)
   RegisterAndroidWidgetDraftClass(jCanvasES2, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jCanvasES1, TDraftWidget);
 

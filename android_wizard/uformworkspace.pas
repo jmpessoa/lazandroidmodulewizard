@@ -95,7 +95,7 @@ type
 
     FTouchtestEnabled: string;
     FAntBuildMode: string;
-    FMainActivity: string;   //Simon "App"
+    FMainActivity: string;  //Simon "App"
     FNDK: string;
     FAndroidNdkPlatform: string;   //android-15
 

@@ -10,7 +10,7 @@ uses
 // tk min and max API versions for build.xml
 const
   cMinAPI = 10;
-  cMaxAPI = 27;
+  cMaxAPI = 28;
 // end tk
 
 type
@@ -473,6 +473,10 @@ var
   linuxPathToGradle: string;
   linuxDirSeparator: string;
   buildToolApi: string;
+
+  gradleCompatibleStr: string;
+  gradleCompatibleNumber: integer;
+
 begin
 
   strList:= TStringList.Create;
@@ -590,7 +594,9 @@ begin
     if buildTool <> '' then
     begin
 
-       if targetApi >= 25 then
+       buildToolApi:= Copy(buildTool,1,2);   //25.0.3  --> 25
+
+       if StrToInt(buildToolApi) >= 25 then
          pluginVersion:= GetPluginVersion(buildTool)
        else
          pluginVersion:= '2.3.3';
@@ -600,6 +606,9 @@ begin
          androidPluginStr:= StringReplace(pluginVersion,'.', '', [rfReplaceAll]);
          androidPluginNumber:= StrToInt(Trim(androidPluginStr));  //ex. 3.0.0 --> 300
          gradleCompatible:= TryGradleCompatibility(pluginVersion, FGradleVersion);
+
+         gradleCompatibleStr:= StringReplace(gradleCompatible,'.', '', [rfReplaceAll]);
+         gradleCompatibleNumber:= StrToInt(Trim(gradleCompatibleStr));
 
          strList.Clear;
          strList.Add('buildscript {');
@@ -621,10 +630,27 @@ begin
          strList.Add('       abortOnError false');
          strList.Add('    }');
 
-         buildToolApi:= Copy(buildTool,1,2);   //25.0.3  --> 25
+         if Pos('AppCompat', AndroidTheme) > 0 then
+         begin
 
-         strList.Add('    compileSdkVersion '+buildToolApi);
-         strList.Add('    buildToolsVersion "'+buildTool+'"'); //25.0.3
+            buildToolApi:= '25'; //need [must have!] by 'com.android.support:appcompat-v7:25.3.1' and others...
+
+            //if StrToInt(buildToolApi) > 25 then
+              strList.Add('    compileSdkVersion '+ buildToolApi);
+            //else strList.Add('    compileSdkVersion 25');}
+
+           if androidPluginNumber < 300 then
+              strList.Add('    buildToolsVersion "25.0.3"'); //buildTool
+           //else: each version of the Android Gradle Plugin now has a default version of the build tools
+
+         end
+         else
+         begin
+           strList.Add('    compileSdkVersion '+ buildToolApi);
+           if androidPluginNumber < 300 then
+              strList.Add('    buildToolsVersion "'+buildTool+'"');
+           //else: each version of the Android Gradle Plugin now has a default version of the build tools
+         end;
 
          strList.Add('    defaultConfig {');
          strList.Add('            minSdkVersion 14');
@@ -657,11 +683,22 @@ begin
          strList.Add('dependencies {');
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin   //compile fileTree(dir: 'libs', include: ['*.jar'])
+            if androidPluginNumber < 300 then
+            begin
             strList.Add('    compile ''com.android.support:appcompat-v7:25.3.1''');
             strList.Add('    compile ''com.android.support:design:25.3.1''');
             strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
             strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
             strList.Add('    compile ''com.google.android.gms:play-services-ads:11.0.4''');
+            end
+            else
+            begin
+              strList.Add('    implementation ''com.android.support:appcompat-v7:25.3.1''');
+              strList.Add('    implementation ''com.android.support:design:25.3.1''');
+              strList.Add('    implementation ''com.android.support:cardview-v7:25.3.1''');
+              strList.Add('    implementation ''com.android.support:recyclerview-v7:25.3.1''');
+              strList.Add('    implementation ''com.google.android.gms:play-services-ads:11.0.4''');
+            end
             {
             Extras
             Android Support Repository
@@ -1044,7 +1081,7 @@ begin
        buildTool:= GetBuildTool(manifestTargetApi);
   end;
 
-  KeepBuildUpdated(manifestTargetApi{25}, buildTool {25.0.3})
+  KeepBuildUpdated(manifestTargetApi, buildTool)
 
 end;
 

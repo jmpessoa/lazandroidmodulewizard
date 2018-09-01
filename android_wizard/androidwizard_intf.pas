@@ -583,13 +583,11 @@ begin
 
         if Pos('AppCompat', FAndroidTheme) > 0 then
         begin
-           if FMaxSdkPlatform >= 25 then
-             auxList.Add('target=android-'+ IntToStr(FMaxSdkPlatform))
+           if StrToInt(FTargetApi) >= 25 then  //if FMaxSdkPlatform >= 25 then
+             auxList.Add('target=android-'+ FTargetApi) //IntToStr(FMaxSdkPlatform))
            else
-           begin
-             auxList.Add('target=android-25');
-             ShowMessage('Warning:[LAMW 0.8] AppCompat theme requirement: SDK "platform 25" [or up],  SDK "build-tools 25.0.3" and Gradle 4.1');
-           end;
+             auxList.Add('target=android-25');  //25
+           //ShowMessage('Warning:[LAMW 0.8] AppCompat theme requirement: SDK "platform 25" [or up],  SDK "build-tools 25.0.3" [or up] and Gradle 4.1 [or up]');
         end
         else
         begin
@@ -930,7 +928,7 @@ var
   androidPluginStr: string;
   androidPluginNumber: integer;
   gradleCompatible: string;
-  buildToolApi: string;
+
 begin
   Result:= False;
   FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
@@ -1420,8 +1418,8 @@ begin
           strList.Add('<project name="'+FSmallProjName+'" default="help">');
           strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');
 
-          if (Pos('AppCompat', FAndroidTheme) > 0) and (intTargetApi < 25) then
-            strList.Add('<property name="target" value="android-25"/>')
+          if (Pos('AppCompat', FAndroidTheme) > 0) and (intTargetApi < 21) then
+            strList.Add('<property name="target" value="android-21"/>')
           else
             strList.Add('<property name="target" value="android-'+Trim(FTargetApi)+'"/>');
 
@@ -1745,9 +1743,6 @@ begin
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'jarsigner-verify-macos.sh');
 
-          //Add GRADLE support ... [... initial code ...]
-          //Building "build.gradle" file    -- for gradle we need "sdk/build-tools" >= 21.1.1
-
           strList.Clear;
           {$IFDEF UNIX}
           strList.Add('sdk.dir=' + FPathToAndroidSDK);
@@ -1760,6 +1755,9 @@ begin
           strList.Add('sdk.dir=' + tempStr) ;
           {$ENDIF}
           strList.SaveToFile(FAndroidProjectName+PathDelim+'local.properties');
+
+          //Add GRADLE support ... [... initial code ...]
+          //Building "build.gradle" file    -- for gradle we need "sdk/build-tools" >= 21.1.1
 
           compileSdkVersion:= IntToStr(FMaxSdkPlatform);
           sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
@@ -1804,16 +1802,30 @@ begin
                 strList.Add('       abortOnError false');
                 strList.Add('    }');
 
-                if StrToInt(compileSdkVersion) > 25 then
-                begin
-                  strList.Add('    compileSdkVersion '+compileSdkVersion);  //25
-                  strList.Add('    buildToolsVersion "'+sdkBuildTools+'"'); //25.0.3
-                end
-                else
-                begin
-                   strList.Add('    compileSdkVersion 25');  //25
-                   strList.Add('    buildToolsVersion "25.0.3"'); //25.0.3
-                end;
+               if Pos('AppCompat', FAndroidTheme) > 0 then
+               begin
+
+                  if StrToInt(compileSdkVersion) > 25 then
+                  begin
+                    strList.Add('    compileSdkVersion '+compileSdkVersion);
+                  end
+                  else
+                  begin
+                     strList.Add('    compileSdkVersion 25');
+                  end;
+
+                 if androidPluginNumber < 300 then
+                    strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
+                 //else: each version of the Android Gradle Plugin now has a default version of the build tools
+
+               end
+               else
+               begin
+                 strList.Add('    compileSdkVersion '+compileSdkVersion);
+                 if androidPluginNumber < 300 then
+                    strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
+                 //else: each version of the Android Gradle Plugin now has a default version of the build tools
+               end;
 
                 strList.Add('    defaultConfig {');
 
@@ -1823,13 +1835,18 @@ begin
                      strList.Add('            minSdkVersion '+FMinApi)
                   else
                      strList.Add('            minSdkVersion 14');
+
+                  if StrToInt(FTargetApi) > 21 then
+                    strList.Add('            targetSdkVersion '+ FTargetApi)  //compileSdkVersion
+                  else
+                    strList.Add('            targetSdkVersion 21'+ FTargetApi)
+
                 end
                 else
                 begin
-                   strList.Add('            minSdkVersion '+FMinApi);
+                     strList.Add('            minSdkVersion '+FMinApi);
+                     strList.Add('            targetSdkVersion '+ FTargetApi);  //compileSdkVersion
                 end;
-
-                strList.Add('            targetSdkVersion '+ FTargetApi);  //compileSdkVersion
 
                 strList.Add('            versionCode 1');
                 strList.Add('            versionName "1.0"');
@@ -1853,11 +1870,22 @@ begin
                 strList.Add('dependencies {');
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin   //compile fileTree(dir: 'libs', include: ['*.jar'])
-                   strList.Add('    compile ''com.android.support:appcompat-v7:25.3.1''');
-                   strList.Add('    compile ''com.android.support:design:25.3.1''');
-                   strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
-                   strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
-                   strList.Add('    compile ''com.google.android.gms:play-services-ads:11.0.4''');
+                   if androidPluginNumber < 300 then
+                   begin
+                     strList.Add('    compile ''com.android.support:appcompat-v7:25.3.1''');
+                     strList.Add('    compile ''com.android.support:design:25.3.1''');
+                     strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
+                     strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
+                     strList.Add('    compile ''com.google.android.gms:play-services-ads:11.0.4''');
+                   end
+                   else
+                   begin
+                     strList.Add('    implementation ''com.android.support:appcompat-v7:25.3.1''');
+                     strList.Add('    implementation ''com.android.support:design:25.3.1''');
+                     strList.Add('    implementation ''com.android.support:cardview-v7:25.3.1''');
+                     strList.Add('    implementation ''com.android.support:recyclerview-v7:25.3.1''');
+                     strList.Add('    implementation ''com.google.android.gms:play-services-ads:11.0.4''');
+                   end
                    {from:
                    C:\android\sdk\extras\android\m2repository\com\android\support\appcompat-v7
                    C:\android\sdk\extras\android\m2repository\com\android\support\design
@@ -1881,6 +1909,7 @@ begin
                 strList.Add('}');
                 strList.Add('//how to use: look for "gradle_readme.txt"');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'build.gradle');
+
                 strList.Clear;
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle.properties');  //dummy to configure proxy
 

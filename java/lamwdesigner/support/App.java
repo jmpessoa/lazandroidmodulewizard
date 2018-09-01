@@ -1,6 +1,6 @@
 package org.lamw.appadmoddemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8.2 - 21 August - 2018
+//Lamw: Lazarus Android Module Wizard - version 0.8.2  - 21 August - 2018
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -75,11 +75,13 @@ public class App extends AppCompatActivity {
       //Log.i("jApp","03.Controls.jAppOnCreate");
     }
 
-   //[ifdef_api23up]
+    //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+      if ( (permissions.length > 0) && (grantResults.length > 0) ) {
         controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[0] ,grantResults[0]);
-    }//[endif_api23up]
+      }
+    } //[endif_api23up]
 
 
     @Override    

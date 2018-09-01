@@ -1019,6 +1019,10 @@ procedure jHttpClient_SetResponseTimeout(env: PJNIEnv; _jhttpclient: JObject; _t
 procedure jHttpClient_SetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject; _timeoutMilliseconds: integer);
 function jHttpClient_GetResponseTimeout(env: PJNIEnv; _jhttpclient: JObject): integer;
 function jHttpClient_GetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject): integer;
+procedure jHttpClient_UploadFile(env: PJNIEnv; _jhttpclient: JObject; _url: string; _fullFileName: string; _uploadFormName: string); overload;
+procedure jHttpClient_UploadFile(env: PJNIEnv; _jhttpclient: JObject; _url: string; _fullFileName: string);  overload;
+procedure jHttpClient_SetUploadFormName(env: PJNIEnv; _jhttpclient: JObject; _uploadFormName: string);
+
 
 {ImageList}
 
@@ -11178,6 +11182,56 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetConnectionTimeout', '()I');
   Result:= env^.CallIntMethod(env, _jhttpclient, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHttpClient_UploadFile(env: PJNIEnv; _jhttpclient: JObject; _url: string; _fullFileName: string; _uploadFormName: string);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_url));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_fullFileName));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_uploadFormName));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'UploadFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHttpClient_UploadFile(env: PJNIEnv; _jhttpclient: JObject; _url: string; _fullFileName: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_url));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_fullFileName));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'UploadFile', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHttpClient_SetUploadFormName(env: PJNIEnv; _jhttpclient: JObject; _uploadFormName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_uploadFormName));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetUploadFormName', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
