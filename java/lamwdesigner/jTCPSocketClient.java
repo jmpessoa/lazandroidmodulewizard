@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 //import java.net.InetAddress;
@@ -228,10 +229,10 @@ public class jTCPSocketClient {
          Progress, the type of the progress units published during the background computation.
          Result, the type of the result of the background computation.
          
-         X – The type of the input variables value you want to set to the background process. 
+         X  The type of the input variables value you want to set to the background process.
               This can be an array of objects.
-         Y – The type of the objects you are going to enter in the onProgressUpdate method.
-         Z – The type of the result from the operations you have done in the background process.         
+         Y  The type of the objects you are going to enter in the onProgressUpdate method.
+         Z  The type of the result from the operations you have done in the background process.
        */
       
       class TCPSocketClientFileTask extends AsyncTask<String, Integer, String> {
@@ -307,7 +308,7 @@ public class jTCPSocketClient {
                                                         
     					} catch (IOException e) {
     						// TODO Auto-generated catch block
-    						Log.e("jTCPSocketClient Sending file", "Error_doInBackground", e);
+    						Log.e("jTCPSocketClient", "Error_doInBackground", e);
     						e.printStackTrace();
     					}   
                         
@@ -353,7 +354,36 @@ public class jTCPSocketClient {
       public void SetTimeOut(int _millisecondsTimeOut) {
     	  mTimeOut = _millisecondsTimeOut;
       }
-      
+
+    //https://stackoverflow.com/questions/2878867/how-to-send-an-array-of-bytes-over-a-tcp-connection-java-programming
+      private boolean sendBytes(byte[] myByteArray, int start, int len, boolean _writeLen) throws IOException {
+        boolean  res = false;
+        if (len < 0)
+            throw new IllegalArgumentException("Negative length not allowed");
+        if (start < 0 || start >= myByteArray.length)
+            throw new IndexOutOfBoundsException("Out of bounds: " + start);
+        // Other checks if needed.
+
+        // May be better to save the streams in the support class;
+        // just like the socket variable.
+        if ( mSocket != null && !mSocket.isClosed()) {
+            OutputStream out = mSocket.getOutputStream();
+            DataOutputStream dos = new DataOutputStream(out);
+            if (_writeLen) dos.writeInt(len);
+            if (len > 0) {
+                dos.write(myByteArray, start, len);
+                dos.flush();
+                dos.close();
+                res = true;
+            }
+        }
+        return res;
+    }
+
+    public boolean SendBytes(byte[] _jbyteArray, boolean _writeLength) throws IOException {
+        return sendBytes(_jbyteArray, 0, _jbyteArray.length, _writeLength);
+    }
+
 }
 
 

@@ -48,6 +48,8 @@ jTCPSocketClient = class(jControl)
 
     procedure SetTimeOut(_millisecondsTimeOut: integer);
 
+    function SendBytes(var _jbyteArray: TDynArrayOfJByte; _writeLength: boolean): boolean;
+
     procedure GenEvent_OnTCPSocketClientMessagesReceived(Sender: TObject; messagesReceived: array of string);
     procedure GenEvent_OnTCPSocketClientConnected(Sender: TObject);
     procedure GenEvent_OnTCPSocketClientFileSendProgress(Sender: TObject; filename: string; count: integer; filesize: integer);
@@ -81,7 +83,7 @@ procedure jTCPSocketClient_SendFile(env: PJNIEnv; _jtcpsocketclient: JObject; fu
 procedure jTCPSocketClient_SetSendFileProgressStep(env: PJNIEnv; _jtcpsocketclient: JObject; _bytes: integer);
 
 procedure jTCPSocketClient_SetTimeOut(env: PJNIEnv; _jtcpsocketclient: JObject; _millisecondsTimeOut: integer);
-
+function jTCPSocketClient_SendBytes(env: PJNIEnv; _jtcpsocketclient: JObject; var _jbyteArray: TDynArrayOfJByte; _writeLength: boolean): boolean;
 
 
 implementation
@@ -215,6 +217,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jTCPSocketClient_SetTimeOut(FjEnv, FjObject, _millisecondsTimeOut);
+end;
+
+function jTCPSocketClient.SendBytes(var _jbyteArray: TDynArrayOfJByte; _writeLength: boolean): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTCPSocketClient_SendBytes(FjEnv, FjObject, _jbyteArray ,_writeLength);
 end;
 
 procedure jTCPSocketClient.GenEvent_OnTCPSocketClientMessagesReceived(Sender: TObject; messagesReceived: array of string);
@@ -453,6 +462,28 @@ begin
   jCls:= env^.GetObjectClass(env, _jtcpsocketclient);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTimeOut', '(I)V');
   env^.CallVoidMethodA(env, _jtcpsocketclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jTCPSocketClient_SendBytes(env: PJNIEnv; _jtcpsocketclient: JObject; var _jbyteArray: TDynArrayOfJByte; _writeLength: boolean): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_jbyteArray);
+  jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
+  env^.SetByteArrayRegion(env, jNewArray0, 0 , newSize0, @_jbyteArray[0] {source});
+  jParams[0].l:= jNewArray0;
+  jParams[1].z:= JBool(_writeLength);
+  jCls:= env^.GetObjectClass(env, _jtcpsocketclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SendBytes', '([BZ)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jtcpsocketclient, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
