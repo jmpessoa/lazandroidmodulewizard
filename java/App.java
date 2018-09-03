@@ -1,6 +1,6 @@
 package org.lamw.apphttpclientdemo3;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8.2  - 21 August - 2018
+//Lamw: Lazarus Android Module Wizard - version 0.8.2.1  - 2 September - 2018
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html

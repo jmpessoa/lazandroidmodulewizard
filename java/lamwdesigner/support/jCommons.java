@@ -1,8 +1,11 @@
-package org.lamw.appadmoddemo1;
+package org.lamw.appcompatnewtest16;
 
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -519,5 +522,82 @@ public class jCommons {
 		return r;
 	}
 
+	public static boolean HasActionBar(Controls controls) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null) return true;
+		else return false;
+	}
+
+	public static void SetActionBarSubTitle(Controls controls, String subtitle) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+		  ((AppCompatActivity) controls.activity).getSupportActionBar().setSubtitle(subtitle);
+	}
+
+	public static void SetActionBarTitle(Controls controls, String title) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setTitle(title);
+	}
+
+	public static void ActionBarHide(Controls controls) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().hide();
+	}
+
+	public static void ActionBarShow(Controls controls) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().show();
+	}
+
+	public static void ActionBarShowTitle(Controls controls, boolean value) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayShowTitleEnabled(value);
+	}
+
+	public static void ActionBarShowLogo(Controls controls, boolean value) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayUseLogoEnabled(value);
+	}
+
+	public static void ActionBarDisplayHomeAsUpEnabled(Controls controls, boolean value) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayHomeAsUpEnabled(value);
+	}
+
+	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setIcon(icon);;
+
+	}
+
+	public static void ActionBarSetTabNavigationMode(Controls controls) {
+      //not AppCompat ..
+	}
+
+	public static void ActionBarRemoveAllTabs(Controls controls) {
+		//not AppCompat ..
+	}
+
+	public static int ActionGetBarBarHeight(Controls controls) {
+		return 0; //not AppCompat ..
+	}
+
+	public static boolean ActionBarIsShowing(Controls controls) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			return actionBar.isShowing();
+		else return false;
+	}
+
+	public static boolean IsAppCompatProject() {
+		return true;
+	}
 
 }

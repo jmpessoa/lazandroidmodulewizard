@@ -1241,6 +1241,9 @@ end;
     function IsRuntimePermissionGranted(_manifestPermission: string): boolean;
     procedure RequestRuntimePermission(_manifestPermission: string; _requestCode: integer);
 
+    function HasActionBar(): boolean;
+    function IsAppCompatProject(): boolean;
+
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
@@ -1660,8 +1663,8 @@ function jForm_PutSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: s
 function jForm_IsRuntimePermissionNeed(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_IsRuntimePermissionGranted(env: PJNIEnv; _jform: JObject; _androidPermission: string): boolean;
 procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermission: string; _requestCode: integer);
-
-
+function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
+function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -2769,19 +2772,22 @@ begin
     FormState := fsFormWork;
     //gApp.TopIndex:= FormIndex;
 
-    if FActionBarTitle = abtHide then
-       jForm_HideActionBar(FjEnv, FjObject);
-
-    if FActionBarTitle = abtHideLogo then
-        jForm_ShowLogoActionBar(FjEnv, FjObject, False);
-
-    if FActionBarTitle = abtTextAsTitle then
-       jForm_SetTitleActionBar(FjEnv, FjObject, FText);
-
-    if FActionBarTitle = abtTextAsTitleHideLogo then
+    if Self.HasActionBar() then
     begin
-       jForm_ShowLogoActionBar(FjEnv, FjObject, False);
-       jForm_SetTitleActionBar(FjEnv, FjObject, FText);
+      if FActionBarTitle = abtHide then
+         jForm_HideActionBar(FjEnv, FjObject);
+
+      if FActionBarTitle = abtHideLogo then
+          jForm_ShowLogoActionBar(FjEnv, FjObject, False);
+
+      if FActionBarTitle = abtTextAsTitle then
+         jForm_SetTitleActionBar(FjEnv, FjObject, FText);
+
+      if FActionBarTitle = abtTextAsTitleHideLogo then
+      begin
+         jForm_ShowLogoActionBar(FjEnv, FjObject, False);
+         jForm_SetTitleActionBar(FjEnv, FjObject, FText);
+      end;
     end;
 
     //Show ...
@@ -3899,6 +3905,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jForm_RequestRuntimePermission(FjEnv, FjObject, _manifestPermission ,_requestCode);
+end;
+
+function jForm.HasActionBar(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_HasActionBar(FjEnv, FjObject);
+end;
+
+function jForm.IsAppCompatProject(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsAppCompatProject(FjEnv, FjObject);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -5508,6 +5528,34 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'RequestRuntimePermission', '(Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'HasActionBar', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsAppCompatProject', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
 
