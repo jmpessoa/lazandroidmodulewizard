@@ -1,4 +1,4 @@
-package org.lamw.applistviewdemo3;
+package com.example.apptcpclientdemo1;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -625,7 +625,6 @@ public class jEditText extends EditText {
 		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
 		     }
     }
-
 	   
 }
 

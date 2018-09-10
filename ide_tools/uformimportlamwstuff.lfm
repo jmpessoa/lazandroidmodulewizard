@@ -1,0 +1,83 @@
+object FormImportLAMWStuff: TFormImportLAMWStuff
+  Left = 484
+  Height = 325
+  Top = 293
+  Width = 390
+  Caption = 'Import LAMW Stuff'
+  ClientHeight = 325
+  ClientWidth = 390
+  DesignTimePPI = 120
+  LCLVersion = '1.8.0.6'
+  object ListBoxTarget: TListBox
+    Left = 16
+    Height = 136
+    Top = 32
+    Width = 356
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 0
+    TabOrder = 0
+  end
+  object EditSource: TEdit
+    AnchorSideTop.Control = SpeedButton1
+    Left = 16
+    Height = 28
+    Top = 216
+    Width = 321
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 16
+    Height = 20
+    Top = 8
+    Width = 171
+    Caption = 'Target [will be modified!]:'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 20
+    Top = 192
+    Width = 93
+    Caption = 'Source [*.lfm]:'
+    ParentColor = False
+  end
+  object SpeedButton1: TSpeedButton
+    Left = 343
+    Height = 28
+    Top = 216
+    Width = 30
+    Anchors = [akTop, akRight]
+    Caption = '...'
+    OnClick = SpeedButton1Click
+  end
+  object BitBtn1: TBitBtn
+    Left = 168
+    Height = 38
+    Top = 272
+    Width = 93
+    Anchors = [akTop, akRight]
+    Default = True
+    DefaultCaption = True
+    Kind = bkOK
+    ModalResult = 1
+    TabOrder = 2
+  end
+  object BitBtn2: TBitBtn
+    Left = 278
+    Height = 38
+    Top = 272
+    Width = 94
+    Anchors = [akTop, akRight]
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 3
+  end
+  object OpenDialog1: TOpenDialog
+    Filter = 'LFM|*.lfm'
+    left = 40
+    top = 256
+  end
+end

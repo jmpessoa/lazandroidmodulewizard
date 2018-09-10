@@ -7,7 +7,8 @@ interface
 uses
   Classes, SysUtils, FileUtil, Dialogs, IDECommands, MenuIntf, Forms,
   uformsettingspaths{, lazandroidtoolsexpert}, ufrmEditor, ufrmCompCreate,
-  uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked, uimportcstuff, process;
+  uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked,
+  uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
@@ -28,7 +29,6 @@ implementation
 
 uses LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf,
   ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles, LCLType;
-
 
 procedure StartFPCTrunkSource(Sender: TObject);
 begin
@@ -264,26 +264,9 @@ begin
         12: Result:= 'android-25';
         13: Result:= 'android-26';
         14: Result:= 'android-27';
+        15: Result:= 'android-28';
      end;
   end;
-end;
-
-function GetPathToLamwWizard(const fileName: string): string;
-var
-  k: integer;
-  PathToJavaTemplates: string;
-begin
-  if FileExists(fileName) then
-  begin
-    with TIniFile.Create(fileName) do
-    try
-       PathToJavaTemplates := ReadString('NewProject','PathToJavaTemplates', '');
-    finally
-      Free;
-    end;
-  end;
-  k:= LastPos(DirectorySeparator, PathToJavaTemplates);
-  Result:= Copy(PathToJavaTemplates, 1, k-1);
 end;
 
 //function add(a:longint; b:longint):longint;cdecl;
@@ -439,13 +422,6 @@ begin
 
 end;
 
-(*
-procedure StartLogcatSync(Sender: TObject);
-begin
-   StartLogcat('logcat');  //dump
-end;
-*)
-
 procedure StartLogcatClear(Sender: TObject);
 begin
    StartLogcat('logcat -c');  //clear
@@ -456,12 +432,155 @@ begin
    StartLogcat('logcat -d');  //dump
 end;
 
-(*
-procedure StartLogcatRuntimeError(Sender: TObject);
+
+function GetTargetFromManifest(pathToProject: string): string;
+var
+  ManifestXML: TXMLDocument;
+  n: TDOMNode;
 begin
-   StartLogcat('logcat AndroidRuntime:E *:S');  //error
+  Result := '';
+  if not FileExists(pathToProject + 'AndroidManifest.xml') then Exit;
+  try
+    ReadXMLFile(ManifestXML, pathToProject + 'AndroidManifest.xml');
+    try
+      n := ManifestXML.DocumentElement.FindNode('uses-sdk');
+      if not (n is TDOMElement) then Exit;
+      Result := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
+    finally
+      ManifestXML.Free
+    end;
+  except
+    Exit;
+  end;
 end;
-*)
+
+procedure ConvertToAppCompat(paramTheme: string);
+var
+   Project: TLazProject;
+   p: integer;
+   packageName: string;
+   pathToJavaTemplates: string;
+   fileName: string;
+   pathToProject: string;
+   pathToJavaSrc: string;
+   list: TStringList;
+   isOldTheme: boolean;
+   targetApi, tmpStr: string;
+   gradlePath, gradleVersion: string;
+begin
+  Project:= LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] = 'GUI' ) then
+  begin
+
+    if  Project.CustomData.Values['Theme'] =  paramTheme then
+    begin
+       ShowMessage('Warning: this theme ['+paramTheme+'] is already being used...');
+       Exit;
+    end;
+
+    isOldTheme:= True;
+    if Pos('AppCompat', Project.CustomData.Values['Theme']) > 0 then
+      isOldTheme:= False;
+
+    Project.CustomData.Values['Theme']:= paramTheme;
+    Project.CustomData.Values['BuildSystem']:= 'Gradle';
+    //Project.CustomData.Values['LamwVersion']:= '0.8';
+
+    packageName:= Project.CustomData.Values['Package'];
+
+    p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
+    pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
+
+    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+    with TIniFile.Create(fileName) do
+    try
+      pathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
+      if pathToJavaTemplates <> '' then
+      begin
+        pathToJavaSrc:= pathToProject+'src'+DirectorySeparator+StringReplace(packageName,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
+
+        list:= TStringList.Create;
+        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'App.java');
+        list.Strings[0]:= 'package '+packageName+';';
+        list.SaveToFile(pathToJavaSrc+DirectorySeparator+'App.java');
+
+        list.Clear;
+        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java');
+        list.Strings[0]:= 'package '+packageName+';';
+        list.SaveToFile(pathToJavaSrc+DirectorySeparator+'jCommons.java');
+
+        list.Clear;
+        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'values'+DirectorySeparator+paramTheme+'.xml');
+        list.SaveToFile(pathToProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
+
+        list.Clear;
+        if not FileExists(pathToProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml') then
+        begin
+          list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'values'+DirectorySeparator+'colors.xml');
+          list.SaveToFile(pathToProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
+        end;
+
+        if isOldTheme then
+        begin
+          if FileExists(pathToProject+'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml') then
+          begin
+             DeleteFile(pathToProject+'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml')
+          end;
+
+          targetApi:= Trim(GetTargetFromManifest(pathToProject));
+          gradlePath:= ReadString('NewProject','PathToGradle', '');
+          if gradlePath <> '' then     // C:\adt32\gradle-4.4.1
+          begin
+             p:= Pos('dle-', gradlePath);
+             gradleVersion:=  Copy(gradlePath, p+4, MaxInt);
+          end;
+
+          list.Clear;
+          list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'buildgradle.txt');
+
+          if StrToInt(targetApi) < 21 then targetApi:= '21';
+          if StrToInt(targetApi) > 25 then targetApi:= '25';
+
+          tmpStr:= StringReplace(list.Text,'#sdkapi', targetApi, [rfReplaceAll]);
+          list.Text:= tmpStr;
+          tmpStr:= StringReplace(list.Text,'#package', packageName, [rfReplaceAll]);
+          list.Text:= tmpStr;
+          tmpStr:= StringReplace(list.Text,'#localgradle', gradleVersion, [rfReplaceAll]);
+          list.Text:= tmpStr;
+          list.SaveToFile(pathToProject+'build.gradle');
+
+          ShowMessage('Welcome to Material Design!!' +sLineBreak + 'Welcome to "Android Bridges Support" components!!!');
+        end;
+        list.Free;
+
+      end;
+    finally
+      Free;
+    end;
+
+  end else
+    ShowMessage('Sorry, the active Project is not a "GUI" LAMW Project!');
+end;
+
+procedure StartAppCompatDarkActionBar(Sender: TObject);
+var
+  userReturn, BoxStyle: Integer;
+begin
+  BoxStyle := MB_ICONQUESTION + MB_OKCANCEL; //MB_YESNO;   //MB_CANCELTRYCONTINUE
+  userReturn := Application.MessageBox('Converting the Project [structure] to AppCompat'+sLineBreak+'Did you remember to make a copy/backup?', 'Warning: Backup it!', BoxStyle);
+  if userReturn = IDOK then
+    ConvertToAppCompat('AppCompat.Light.DarkActionBar');
+end;
+
+procedure StartAppCompatNoActionBar(Sender: TObject);
+var
+  userReturn, BoxStyle: Integer;
+begin
+  BoxStyle := MB_ICONQUESTION + MB_OKCANCEL;
+  userReturn := Application.MessageBox('Converting the Project [structure] to AppCompat'+sLineBreak+'Did you remember to make a copy/backup?', 'Warning: Backup it!', BoxStyle);
+  if userReturn = IDOK then
+     ConvertToAppCompat('AppCompat.Light.NoActionBar');
+end;
 
 procedure StartImportCStuff(Sender: TObject);
 var
@@ -707,14 +826,14 @@ begin
        pathTojavacode:= FormImportJavaStuff.EditImportCode.Text;
        pathToLayout:= FormImportJavaStuff.EditImportLayout.Text;
        pathToDrawable:= FormImportJavaStuff.EditImportResource.Text;
-       pathToAssets:=  FormImportJavaStuff.EditImportAssets.Text;
-       pathToJarLibs:=  FormImportJavaStuff.EditImportJarLibs.Text;;
+       pathToAssets:= FormImportJavaStuff.EditImportAssets.Text;
+       pathToJarLibs:= FormImportJavaStuff.EditImportJarLibs.Text;;
 
        listSaveTo:= TStringList.Create;
 
        if pathTojavacode <> '' then
        begin
-         list:= FindAllFiles(pathTojavacode, '*.java', False); //***
+         list:= FindAllFiles(pathTojavacode, '*.java', False);
 
          saveCodeTo:= pathToProject+'src'+DirectorySeparator+StringReplace(package,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
 
@@ -736,6 +855,7 @@ begin
               end;
            end;
          end;
+
          list.Free;
        end;
 
@@ -845,13 +965,153 @@ begin
          list.Free;
        end;
 
-       ShowMessage('Java Stuff Imported !');
+       ShowMessage('Sucess!! Java Stuff Imported !');
      end
      else
         ShowMessage('Cancel');
 
   end else
     ShowMessage('Sorry, the active project is not a LAMW project!');
+end;
+
+procedure StartImportLAMWStuff(Sender: TObject);
+var
+  Project: TLazProject;
+  listProject: TStringList;
+  listUnit: TStringList;
+  listComponent: TStringList;
+  listTemp: TStringList;
+  listProjComp: TStringList;
+  fileName: string;
+  pathToProject: string;
+  p, i, k: integer;
+  compName: string;
+  pathToJavaTemplates: string;
+  package, pathToJavasSrc: string;
+  fullPathToUnitTarget, fullPathToUnitSourceLFM: string;
+  listIndex: integer;
+  tempStr, targetFormName, sourceFormName: string;
+begin
+  listProject:= TStringList.Create;
+  listUnit:= TStringList.Create;
+  listComponent:= TStringList.Create;
+  listTemp:= TStringList.Create;
+
+  listProjComp:= TStringList.Create;
+  listProjComp.Sorted:= True;;
+  listProjComp.Duplicates:= dupIgnore;
+
+  listComponent.Sorted:= True;;
+  listComponent.Duplicates:= dupIgnore;
+  listComponent.StrictDelimiter:= True;
+  listComponent.Delimiter:= ';';
+
+  Project:= LazarusIDE.ActiveProject;
+
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] = 'GUI' ) then
+  begin
+
+      package:= Project.CustomData.Values['Package'];
+      p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
+
+      pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
+      pathToJavasSrc:= pathToProject+'src'+DirectorySeparator+StringReplace(package,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
+
+      pathToProject:= Copy(Project.ProjectInfoFile, 1, p+3);
+
+      fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+      with TIniFile.Create(fileName) do
+      try
+        pathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
+      finally
+        Free;
+      end;
+
+     FormImportLAMWStuff:= TFormImportLAMWStuff.Create(Application);
+
+     listProjComp.Clear;
+     for k:= 0 to Project.FileCount-1 do
+     begin
+       if Pos('.lpr', Project.Files[k].Filename) <= 0 then
+       begin
+         listTemp.LoadFromFile(ChangeFileExt(Project.Files[k].Filename, '.lfm'));
+         p:= Pos(':', listTemp.Strings[0]);
+         listProjComp.Add(Trim(Copy(listTemp.Strings[0], p+3, MaxInt)));
+         FormImportLAMWStuff.ListBoxTarget.Items.Add(ExtractFileName(ChangeFileExt(Project.Files[k].Filename, '')));
+       end;
+     end;
+
+     if FormImportLAMWStuff.ShowModal = mrOK then
+     begin
+       listIndex:= FormImportLAMWStuff.ListBoxTarget.ItemIndex;
+       if  listIndex >= 0 then
+       begin
+
+          targetFormName:= listProjComp.Strings[listIndex]; //selected unit to be replaced...
+
+          fullPathToUnitTarget:= Project.Files[listIndex+1].Filename;
+          fullPathToUnitSourceLFM:= FormImportLAMWStuff.EditSource.Text;
+          listUnit.LoadFromFile(fullPathToUnitSourceLFM);
+
+          p:= Pos(':', listUnit.Strings[0]);
+          sourceFormName:=  Trim(Copy(listUnit.Strings[0], p+3, MaxInt)); //AndroidModule1
+
+          for i:= 1 to listUnit.Count-1 do
+          begin
+            if Pos('object ', listUnit.Strings[i]) > 0 then
+            begin
+               p:= Pos(':', listUnit.Strings[i]);
+               compName:= Trim(Copy(listUnit.Strings[i], p+2, MaxInt));
+               if FileExists(pathToJavaTemplates+PathDelim+'lamwdesigner'+PathDelim+compName+'.java')  then
+               begin
+                 listComponent.Add(compName);
+               end;
+            end;
+          end;
+       end;
+     end;
+  end;
+
+  if listComponent.Count > 0 then
+  begin
+
+    for i:= 0 to listComponent.Count-1 do
+    begin
+       if not FileExists(pathToJavasSrc+PathDelim+listComponent.Strings[i]+'.java') then
+       begin
+          listTemp.LoadFromFile(pathToJavaTemplates+PathDelim+'lamwdesigner'+PathDelim+listComponent.Strings[i]+'.java');
+          listTemp.Strings[0]:= 'package '+ package +';';
+          listTemp.SaveToFile(pathToJavasSrc+PathDelim+listComponent.Strings[i]+'.java');
+       end;
+    end;
+
+    listTemp.Clear;
+    //CopyFile(fullPathToUnitSourceLFM, ChangeFileExt(fullPathToUnitTarget, '.lfm'));
+    listTemp.LoadFromFile(fullPathToUnitSourceLFM);
+    tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
+    listTemp.Text:= tempStr;
+    listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
+
+    listTemp.Clear;
+    //CopyFile(ChangeFileExt(fullPathToUnitSourceLFM, '.pas'), fullPathToUnitTarget);
+    listTemp.LoadFromFile(ChangeFileExt(fullPathToUnitSourceLFM, '.pas'));
+    tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
+    listTemp.Text:= tempStr;
+    listTemp.Strings[0]:= 'unit '+ChangeFileExt(ExtractFileName(fullPathToUnitTarget),'') +';';
+    listTemp.Strings[1]:='//';
+    listTemp.SaveToFile(fullPathToUnitTarget);
+
+    listComponent.Add('jForm');
+    Project.Files[listIndex+1].CustomData['jControls']:= listComponent.DelimitedText;
+
+    ShowMessage('Sucess!!! Imported LAMW Stuff !!' +sLineBreak + 'Hint: "Run-->Build" and (Re)"Open" to update...');
+  end;
+
+  listTemp.Free;
+  listUnit.Free;
+  listProject.Free;
+  listComponent.Free;
+  listProjComp.Free;
 end;
 
 procedure StartCanUpdateJavaTemplates(Sender: TObject);
@@ -1075,6 +1335,8 @@ Var
   ideSubMnuAMW: TIDEMenuSection;
   ideSubMnuLog: TIDEMenuSection;
 
+  ideSubMnuAppCompat: TIDEMenuSection;
+
   Key: TIDEShortCut;
   Cat: TIDECommandCategory;
   CmdMyTool: TIDECommand;
@@ -1102,7 +1364,7 @@ begin
   // Adding 8a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToEclipseToggleTooling', 'Eclipse Compatibility [ADT<->Andmore] ...', nil, @StartEclipseToggleTooling);
 
-  // register IDE shortcut and menu item
+  //register IDE shortcut and menu item
   //Key := IDEShortCut(VK_F1,[ssCtrl],VK_UNKNOWN,[]);
   //Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
   //CmdMyTool := RegisterIDECommand(Cat,'Export To Android Studio', 'Export .so to Android Studio', Key, nil, @StartExportLibToPath);
@@ -1117,18 +1379,29 @@ begin
   // Adding 11a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportCCode', 'Use/Import C Stuff...', nil, @StartImportCStuff);
 
+  //Adding 12a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportLAMWForm', 'Use/Import LAMW Stuff...', nil, @StartImportLAMWStuff);
+
   // And so on...
 
-  // Register submenu    StartLogcatRuntimeError
-  ideSubMnuLog:= RegisterIDESubMenu(ideSubMnuAMW, 'Logcatch', 'ADB Logcat');
-  // Adding first entry
+  //Register submenu AppCompat
+  ideSubMnuAppCompat:= RegisterIDESubMenu(ideSubMnuAMW, 'ConvertToAppCompat', 'Convert the Project to AppCompat Theme');
+  //Adding first entry
+  RegisterIDEMenuCommand(ideSubMnuAppCompat, 'AppCompatDarkActionBar', 'AppCompatDarkActionBar', nil, @StartAppCompatDarkActionBar);
+  RegisterIDEMenuCommand(ideSubMnuAppCompat, 'AppCompatNoActionBar', 'AppCompatNoActionBar', nil, @StartAppCompatNoActionBar);
 
-  RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat -d [dump]', nil, @StartLogcatDump);
-  //RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat Runtime:E [error]', nil, @StartLogcatRuntimeError);
-  //RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat [sync]', nil, @StartLogcatSync);
-  RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcat', 'Logcat -c [clear]', nil, @StartLogcatClear);
+  // Register submenu  Logcat
+  ideSubMnuLog:= RegisterIDESubMenu(ideSubMnuAMW, 'Logcatch', 'ADB Logcat');
+  //Adding entry ...
+  RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcatd', 'Logcat -d [dump]', nil, @StartLogcatDump);
+  RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcatc', 'Logcat -c [clear]', nil, @StartLogcatClear);
+
   //Run
-  RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[LAMW] Build Android Apk and Run', nil, @BuildApkAndRun);
+   Key := IDEShortCut(VK_F1,[ssCtrl],VK_UNKNOWN,[]);
+   Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
+   CmdMyTool := RegisterIDECommand(Cat,'BuildApkAndRun', '[LAMW] Build Android Apk and Run', Key, nil, @BuildApkAndRun);
+   RegisterIDEMenuCommand(itmRunBuilding, 'LAMW Build Apk And Run', '[LAMW] Build Android Apk and Run', nil, nil, CmdMyTool);
+   //RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[LAMW] Build Android Apk and Run', nil, @BuildApkAndRun);
 
   ApkBuild.RegisterExtToolParser;
 end;

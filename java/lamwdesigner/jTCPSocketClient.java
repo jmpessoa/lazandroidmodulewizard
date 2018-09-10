@@ -41,16 +41,25 @@ public class jTCPSocketClient {
     private String mServerMessage;
     
     private boolean mRun    = false;
+
     // used to send messages
-    private PrintWriter mBufferOut;
+    private PrintWriter mTextBufferOut; //Prints formatted representations of objects to a text-output stream
     // used to read messages from the server
     private BufferedReader mBufferIn;
+
+    // used to send bytes
+    private DataOutputStream mByteBufferOut;
+
+    private OutputStream mStreamBufferOut;
+
     private Socket  mSocket;
     //private boolean mExecutedForMessage = false;
     private int progressStep = -1;
            	
-    private int mTimeOut = 300;
-    
+    private int mTimeOut = 5000;// 300 LAN TIMEOUT 5000 INTERNET TIMEOUT
+
+    private int connectionType = 0; //text, file, bytes
+
     public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
     	   //super(_ctrls.activity);
  	       context   = _ctrls.activity;
@@ -60,8 +69,10 @@ public class jTCPSocketClient {
 
     public void jFree() {
        //free local objects...
-        mBufferOut= null;;
+        mTextBufferOut= null;;
         mBufferIn= null;
+        mByteBufferOut = null;
+        mStreamBufferOut = null;
 
         if (mSocket != null) {
       	 try {
@@ -98,45 +109,57 @@ public class jTCPSocketClient {
           }
           
           try {
-                   mBufferOut = null;
                    mBufferIn  = null;
-		   mSocket = new Socket();
+                   mStreamBufferOut = null;
+
+		           mSocket = new Socket();
                    mSocket.connect( new InetSocketAddress(SERVER_IP, SERVER_PORT), _timeOut );
                    controls.pOnTCPSocketClientConnected(pascalObj);
-                   if( mRun ) while( mBufferOut == null ){ if(!mRun) break; }; // Wait for run
+                   if( mRun ) {
+                           while (mStreamBufferOut == null) {
+                               if (!mRun) break;
+                           } // Wait for run
+                   }
                    connected = true;
 		  } catch (IOException e) {
 			  // TODO Auto-generated catch block
 		      e.printStackTrace();
 		  }
 
-          if( connected && !mRun ){
-           mBufferOut = null;
-           mBufferIn  = null;
-    	   new TCPSocketClientTask().execute();
-           mRun = true;
+          if( connected && !mRun ) {
+              mBufferIn = null;
+              mStreamBufferOut = null;
 
-           while( mBufferOut == null ){ if(!mRun) break; }; // Wait for run
+              new TCPSocketClientTask().execute();
+              mRun = true;
+
+              while (mStreamBufferOut == null) {
+                      if (!mRun) break;
+              }// Wait for run
           }
 
           return connected;
-      }
+    }
 
     public boolean SendMessage(String message) {
-
+        connectionType = 0;
         if ( mSocket == null )    return false;
         if ( mSocket.isClosed() ) return false;
 
-        if (mBufferOut != null && !mBufferOut.checkError()) {
-            mBufferOut.println(message);
-            mBufferOut.flush();
-            return true;
+        if (mStreamBufferOut != null ) { //&& !mBufferOut.checkError()
+            mTextBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mStreamBufferOut)), true);
+            if ( (mTextBufferOut != null)   && !mTextBufferOut.checkError()) {
+                mTextBufferOut.println(message);
+                mTextBufferOut.flush();
+                return true;
+            }
+            else return false;
         }else
             return false;
 
     }
 
-     public boolean Connect(String _serverIP, int _serverPort, String _login) {
+    public boolean Connect(String _serverIP, int _serverPort, String _login) {
     	 if( Connect(_serverIP,_serverPort) )
     	  if( SendMessage(_login) )
            return true;
@@ -144,13 +167,20 @@ public class jTCPSocketClient {
          return false;
       }
 
-
       public void CloseConnection(String _finalMessage) {
 
           mRun    = false;
           
-          if (mBufferOut != null) {
-              mBufferOut.flush();
+          if (mTextBufferOut != null) {
+              mTextBufferOut.flush();
+          }
+
+          if (mByteBufferOut != null) {
+              try {
+                  mByteBufferOut.flush();
+              } catch (IOException e) {
+                  e.printStackTrace();
+              }
           }
 
           if (_finalMessage.equals(""))
@@ -183,8 +213,13 @@ public class jTCPSocketClient {
 
                         try {
                           if ( mSocket != null && !mSocket.isClosed()) {
-    			    mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream())), true);
-    	                    mBufferIn  = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+
+                              mStreamBufferOut = mSocket.getOutputStream();
+
+                            //  mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mStreamBufferOut)), true);
+                            //  mDOSBufferOut = new DataOutputStream(mStreamBufferOut);
+
+                              mBufferIn  = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
 
     	                    if (mBufferIn != null)
                                 mServerMessage = mBufferIn.readLine();
@@ -356,28 +391,32 @@ public class jTCPSocketClient {
       }
 
     //https://stackoverflow.com/questions/2878867/how-to-send-an-array-of-bytes-over-a-tcp-connection-java-programming
-      private boolean sendBytes(byte[] myByteArray, int start, int len, boolean _writeLen) throws IOException {
-        boolean  res = false;
-        if (len < 0)
-            throw new IllegalArgumentException("Negative length not allowed");
-        if (start < 0 || start >= myByteArray.length)
-            throw new IndexOutOfBoundsException("Out of bounds: " + start);
-        // Other checks if needed.
+    private boolean sendBytes(byte[] myByteArray, int start, int len, boolean _writeLen) {
+        if ( mSocket == null )    return false;
+        if ( mSocket.isClosed() ) return false;
 
-        // May be better to save the streams in the support class;
-        // just like the socket variable.
-        if ( mSocket != null && !mSocket.isClosed()) {
-            OutputStream out = mSocket.getOutputStream();
-            DataOutputStream dos = new DataOutputStream(out);
-            if (_writeLen) dos.writeInt(len);
-            if (len > 0) {
-                dos.write(myByteArray, start, len);
-                dos.flush();
-                dos.close();
-                res = true;
+        if (mStreamBufferOut != null ) {
+            mByteBufferOut = new DataOutputStream(mStreamBufferOut);
+            if (_writeLen) {
+                try {
+                    mByteBufferOut.writeInt(len);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        return res;
+
+            if (len > 0) {
+                try {
+                    mByteBufferOut.write(myByteArray, start, len);
+                    mByteBufferOut.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return true;
+        }else
+            return false;
+
     }
 
     public boolean SendBytes(byte[] _jbyteArray, boolean _writeLength) throws IOException {

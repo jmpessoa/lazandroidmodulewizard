@@ -16,119 +16,112 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="29">
+    <Files Count="26">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="amw_ide_menu_items"/>
       </Item1>
       <Item2>
-        <Filename Value="uformsettingspaths.lfm"/>
-        <Type Value="LFM"/>
-      </Item2>
-      <Item3>
-        <Filename Value="uformsettingspaths.pas"/>
-        <UnitName Value="uformsettingspaths"/>
-      </Item3>
-      <Item4>
-        <Filename Value="ufrmEditor.lfm"/>
-        <Type Value="LFM"/>
-      </Item4>
-      <Item5>
-        <Filename Value="ufrmEditor.pas"/>
-        <UnitName Value="ufrmEditor"/>
-      </Item5>
-      <Item6>
-        <Filename Value="ufrmcompcreate.pas"/>
-        <UnitName Value="ufrmCompCreate"/>
-      </Item6>
-      <Item7>
-        <Filename Value="ufrmcompcreate.lfm"/>
-        <Type Value="LFM"/>
-      </Item7>
-      <Item8>
-        <Filename Value="uregistercompform.pas"/>
-        <UnitName Value="uregistercompform"/>
-      </Item8>
-      <Item9>
-        <Filename Value="uregistercompform.lfm"/>
-        <Type Value="LFM"/>
-      </Item9>
-      <Item10>
-        <Filename Value="apkbuild.pas"/>
-        <UnitName Value="ApkBuild"/>
-      </Item10>
-      <Item11>
-        <Filename Value="uformstartemulator.lfm"/>
-        <Type Value="LFM"/>
-      </Item11>
-      <Item12>
-        <Filename Value="uformstartemulator.pas"/>
-        <UnitName Value="uFormStartEmulator"/>
-      </Item12>
-      <Item13>
         <Filename Value="androidprojoptions.pas"/>
         <UnitName Value="AndroidProjOptions"/>
+      </Item2>
+      <Item3>
+        <Filename Value="androidprojoptions.lfm"/>
+        <Type Value="LFM"/>
+      </Item3>
+      <Item4>
+        <Filename Value="apkbuild.pas"/>
+        <UnitName Value="ApkBuild"/>
+      </Item4>
+      <Item5>
+        <Filename Value="uFormBuildFPCCross.pas"/>
+        <UnitName Value="uFormBuildFPCCross"/>
+      </Item5>
+      <Item6>
+        <Filename Value="uFormBuildFPCCross.lfm"/>
+        <Type Value="LFM"/>
+      </Item6>
+      <Item7>
+        <Filename Value="uformgetfpcsource.pas"/>
+        <UnitName Value="uFormGetFPCSource"/>
+      </Item7>
+      <Item8>
+        <Filename Value="uformgetfpcsource.lfm"/>
+        <Type Value="LFM"/>
+      </Item8>
+      <Item9>
+        <Filename Value="uformsettingspaths.pas"/>
+        <UnitName Value="uformsettingspaths"/>
+      </Item9>
+      <Item10>
+        <Filename Value="uformsettingspaths.lfm"/>
+        <Type Value="LFM"/>
+      </Item10>
+      <Item11>
+        <Filename Value="uformstartemulator.pas"/>
+        <UnitName Value="uFormStartEmulator"/>
+      </Item11>
+      <Item12>
+        <Filename Value="uformstartemulator.lfm"/>
+        <Type Value="LFM"/>
+      </Item12>
+      <Item13>
+        <Filename Value="ufrmcompcreate.pas"/>
+        <UnitName Value="ufrmCompCreate"/>
       </Item13>
       <Item14>
-        <Filename Value="androidprojoptions.lfm"/>
+        <Filename Value="ufrmcompcreate.lfm"/>
         <Type Value="LFM"/>
       </Item14>
       <Item15>
-        <Filename Value="uFormBuildFPCCross.lfm"/>
-        <Type Value="LFM"/>
+        <Filename Value="ufrmEditor.pas"/>
+        <UnitName Value="ufrmEditor"/>
       </Item15>
       <Item16>
-        <Filename Value="uFormBuildFPCCross.pas"/>
-        <UnitName Value="uFormBuildFPCCross"/>
+        <Filename Value="ufrmEditor.lfm"/>
+        <Type Value="LFM"/>
       </Item16>
       <Item17>
-        <Filename Value="uformgetfpcsource.lfm"/>
-        <Type Value="LFM"/>
+        <Filename Value="uimportcstuff.pas"/>
+        <UnitName Value="uimportcstuff"/>
       </Item17>
       <Item18>
-        <Filename Value="uformgetfpcsource.pas"/>
-        <UnitName Value="uFormGetFPCSource"/>
+        <Filename Value="uimportcstuff.lfm"/>
+        <Type Value="LFM"/>
       </Item18>
       <Item19>
-        <AddToUsesPkgSection Value="False"/>
+        <Filename Value="uimportjavastuff.pas"/>
+        <UnitName Value="uimportjavastuff"/>
       </Item19>
       <Item20>
         <Filename Value="uimportjavastuff.lfm"/>
         <Type Value="LFM"/>
       </Item20>
       <Item21>
-        <Filename Value="uimportjavastuff.pas"/>
-        <UnitName Value="uimportjavastuff"/>
-      </Item21>
-      <Item22>
-        <AddToUsesPkgSection Value="False"/>
-      </Item22>
-      <Item23>
-        <Filename Value="uimportjavastuffchecked.lfm"/>
-        <Type Value="LFM"/>
-      </Item23>
-      <Item24>
         <Filename Value="uimportjavastuffchecked.pas"/>
         <UnitName Value="uimportjavastuffchecked"/>
+      </Item21>
+      <Item22>
+        <Filename Value="uimportjavastuffchecked.lfm"/>
+        <Type Value="LFM"/>
+      </Item22>
+      <Item23>
+        <Filename Value="uregistercompform.pas"/>
+        <UnitName Value="uregistercompform"/>
+      </Item23>
+      <Item24>
+        <Filename Value="uregistercompform.lfm"/>
+        <Type Value="LFM"/>
       </Item24>
       <Item25>
-        <AddToUsesPkgSection Value="False"/>
+        <Filename Value="uformimportlamwstuff.pas"/>
+        <UnitName Value="uformimportlamwstuff"/>
       </Item25>
       <Item26>
-        <Filename Value="uimportcstuff.lfm"/>
+        <Filename Value="uformimportlamwstuff.lfm"/>
         <Type Value="LFM"/>
       </Item26>
-      <Item27>
-        <Filename Value="uimportcstuff.pas"/>
-        <UnitName Value="uimportcstuff"/>
-      </Item27>
-      <Item28>
-        <AddToUsesPkgSection Value="False"/>
-      </Item28>
-      <Item29>
-        <AddToUsesPkgSection Value="False"/>
-      </Item29>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>

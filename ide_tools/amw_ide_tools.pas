@@ -8,10 +8,10 @@ unit amw_ide_tools;
 interface
 
 uses
-  amw_ide_menu_items, uformsettingspaths, ufrmEditor, ufrmCompCreate, 
-  uregistercompform, ApkBuild, uFormStartEmulator, AndroidProjOptions, 
-  uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, 
-  uimportjavastuffchecked, uimportcstuff, LazarusPackageIntf;
+  amw_ide_menu_items, AndroidProjOptions, ApkBuild, uFormBuildFPCCross, 
+  uFormGetFPCSource, uformsettingspaths, uFormStartEmulator, ufrmCompCreate, 
+  ufrmEditor, uimportcstuff, uimportjavastuff, uimportjavastuffchecked, 
+  uregistercompform, uformimportlamwstuff, LazarusPackageIntf;
 
 implementation
 

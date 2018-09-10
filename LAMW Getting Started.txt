@@ -44,13 +44,15 @@ I. Infrastructure
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
 		5)check "Android SDK Build-Tools 25.0.3"	
-		5.1)check "Android SDK Build-Tools 26.0.2" [need by 3.0.1  "gradle" android plugin ...] 	
-		6)go to "Android 7.1.1 (API 25)" and check only "SDK Platform"
-		7)go to "Extras" and check: 
+		6)check "Android SDK Build-Tools 26.0.2" [need by 3.0.1  "gradle" android plugin ...] 	
+		7)go to "Android 7.1.1 (API 25)" and check only "SDK Platform"
+		8)go to "Extras" and check: 
 				"Android Support Repository"				
 				"Android Support Library"				
-				"Google USB Drive"				
-		
+				"Google USB Drive"	
+				"Google Repository"
+				"Google Play Services"		
+
 .Android SDK  [updated] --- only "gradle" build  supported...
 
 	[Windows]	https://dl.google.com/android/repository/sdk-tools-windows-3859397.zip
@@ -61,11 +63,11 @@ I. Infrastructure
 .Android NDK
 	https://developer.android.com/ndk/downloads/index.html
 
-.Laz4Android [Windows] [cross-arm-ndroid compiler installed!] 
+.Laz4Android [Windows] [cross-arm-android compiler installed!] 
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
 
 	:: OR Lazarus [canonical]
-		Do It Yourself cross Android compile! [windows]: 			
+		"Do It Yourself" a cross Android compile! [windows]: 			
 			After install the LAMW go to:
 			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
 			2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
@@ -75,10 +77,8 @@ I. Infrastructure
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
 
-.Gradle 4.1 [to build Apk with "AppCompat" [material] theme]
-	https://gradle.org/next-steps/?version=4.1&format=bin
-
-		RECOMMENDED: 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
+.Gradle 4.4.1 [to build Apk with "AppCompat" [material] theme]
+	https://gradle.org/next-steps/?version=4.4.1&format=bin
 
 	Simply extract the zip file to a convenient location...
 
@@ -90,15 +90,12 @@ I. Infrastructure
 
 .[LAMW 0.8] "AppCompat" [material] theme need:'+
 		1. Java JDK 1.8   
-
-		2. Gradle 4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]
-			RECOMMENDED: 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
-
-		3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]
-		3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 [or]
-		3. Android SDK "plataforms" 27 + "build-tools" 27.0.3
-		4. Android SDK/Extra  "Support Repository"
-		5. Android SDK/Extra  "Support Library"
+		2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
+		3. Android SDK "plataforms" 25 + "build-tools" 25.0.3  + "build-tools" 26.0.2 
+		4. Android SDK/Extra	"Support Repository"
+		5. Android SDK/Extra	"Support Library"
+		5. Android SDK/Extra	"Google Repository"
+		5. Android SDK/Extra	"Google Play Services"		
 
 II. LAMW:  Lazarus Android Module Wizard
 
