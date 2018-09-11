@@ -30,16 +30,16 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     Left = 16
     Height = 20
     Top = 8
-    Width = 171
-    Caption = 'Target [will be modified!]:'
+    Width = 259
+    Caption = 'Target [selected unit will be modified!]:'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 16
     Height = 20
     Top = 192
-    Width = 93
-    Caption = 'Source [*.lfm]:'
+    Width = 148
+    Caption = 'Source/import  [*.lfm]:'
     ParentColor = False
   end
   object SpeedButton1: TSpeedButton

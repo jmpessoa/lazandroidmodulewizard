@@ -1,72 +1,103 @@
 
-[By Handoko]
-ref.
-http://forum.lazarus.freepascal.org/index.php/topic,38777.0.html
+Tutorial by  Handoko
 
-Today I tried to install LAMW on Lazarus 1.8.0RC5 and it succeed! :D
+Lazarus 1.8.0RC5 + LAMW
 
-So I write this tutorial, maybe someone will find it useful.
+- Ubuntu Mate 18.04 64-bit
+- Lazarus 1.8.4 64-bit GTK2 FPC 3.0.4
+- Lazarus Android Module Wizard 0.8 revision 754
+- Android 7 mobile phone
 
-Before You Start
+This installation uses the combination of these software:
+- Android NDK Revision 11c
+- Android SDK Tools 25.2.5 (SDK API25) 
+- OpenJDK 8
+- Subversion, Android adb, Ant
 
-Remember, you should do proper backup before you start.
+If you want to see the screenshots during this installation process, you can visit here:
+http://graphicslearning.com/lamw-0-8-ubuntu-18-04-installation-guide/
 
-Linux users can use this script:
-https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs/linux
-I tested the script but I prefer my way to install because I don't want multiple versions of Lazarus/FPC put on my computer.
+Note:
+This installation guide is in CC0 Public Domain, you can republish this article or do anything you like with it.
+ ;D
 
-More documentations can be found here:
-https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs
+=== Before Start Installing ===
 
-=== Environment ===
+You need to have Lazarus and FPC installed that have the ability to do cross compiling. The Lazarus/FPC installed from Ubuntu default repository may fail to cross compile because of missing make files issue.
 
-This tutorial should work on other environments with no or some changes but I only tested on:
-- Ubuntu Mate 17.10 64-bit
-- Intel x64
-- Lazarus 1.8.0RC5 FPC 3.0.4 x86_64-linux-gtk2
+If you have LAMW installed previously, you have to uninstall all the related packages and remove the ~/Android folder in your computer.
 
-This tutorial assume you're using NDK revision 11c. If you're not using this version, you have to change all the texts "4.9" below accordingly.
+In this installation guide, the texts in green color mean you need to type them in your Linux Terminal. 
 
-=== Install Necessary Libraries & Tools ===
+=== Download and Install Android NDK, SDK and Required Packages ===
 
-On my system I only need to use Terminal to install these:
-01. sudo apt-get install subversion
-02. sudo apt-get install android-tools-adb ant openjdk-8-jdk
+Warning:
+The total size of the items you're going to download in this "Download and Install Android NDK, SDK and Required Packages" section is about 2.2 GB, so you better use a fast internet connection.
 
-I saw on other tutorials, they said you may also need to install:
-03. sudo apt-get install freeglut3 freeglut3-dev libwxgtk3.0-0v5
-04. sudo apt-get install libgtk2-gladexml-perl libgtk2.0-bin libgtk2.0-cil
-05. sudo apt-get install make build-essential libncurses5-dev libtinfo-dev
-06. sudo apt-get install libcairo2-dev libpango1.0-dev libatk1.0-dev libghc-x11-dev
-07. sudo apt-get install libgtk2.0-dev libgdk-pixbuf2.0-dev libgpm-dev fakeroot
+01. sudo apt-get install subversion openjdk-8-jdk
 
-=== Prepare Android NDK & SDK ===
+02. sudo apt-get install android-tools-adb ant
 
-08. mkdir ~/Android
-09. Extract Android NDK https://developer.android.com/ndk/downloads to ~/Android
-10. ln -sf ~/Android/android-ndk-r11c ~/Android/ndk
-11. cd /usr/bin
-12. sudo ln -sf ~/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as arm-linux-androideabi-as
-13. sudo ln -sf ~/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld arm-linux-androideabi-ld
-14. sudo ln -sf /usr/bin/arm-linux-androideabi-as arm-linux-as
-15. sudo ln -sf /usr/bin/arm-linux-androideabi-ld arm-linux-ld
-16. Extract Android SDK https://developer.android.com/sdk to ~/Android
-17. ln -sf ~/Android/android-sdk-linux ~/Android/sdk
-18. Install SDK Packages by running ~/Android/sdk/tools/android
-19. Use a text editor to open ~/.bashrc and add this text below:
+03. mkdir ~/Android
+
+04. cd ~/Android
+
+05. mkdir ~/Android/sdk
+
+06. Download NDK Revision 11c from:
+https://dl.google.com/android/repository/android-ndk-r11c-linux-x86_64.zip
+
+07. Extract android-ndk-r11c-linux-x86_64.zip to ~/Android
+
+08. Download SDK Tools 25.2.5 from:
+https://dl.google.com/android/repository/tools_r25.2.5-linux.zip
+
+09. Extract tools_r25.2.5-linux.zip to ~/Android/sdk
+
+10. cd ~/Android/sdk/tools
+
+11. ./android
+
+12. Click Deselect All
+
+13. Inside the Tools group
+Check Android SDK Platform-tools
+Check Android SDK Build-tools Rev. 25
+
+14. Scroll down to find Android 7.1.1 (API25)
+Check SDK Platform 
+Check Google APIs ARM EABI v7a System Image
+
+15. Click Install 4 packages...
+
+16. ln -sf ~/Android/android-ndk-r11c ~/Android/ndk
+
+17. cd /usr/bin
+
+18. sudo ln -sf ~/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-as arm-linux-androideabi-as
+
+19. sudo ln -sf ~/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld arm-linux-androideabi-ld
+
+20. sudo ln -sf /usr/bin/arm-linux-androideabi-as arm-linux-as
+
+21. sudo ln -sf /usr/bin/arm-linux-androideabi-ld arm-linux-ld
+
+22. Use a text editor to open ~/.bashrc and add this blue text below:
 export PATH=$PATH:~/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin
-
-Note for #18:
-I only enable Android 4.4.2 (API 19), you can try other version if you want.
 
 === Cross Compile Android ARM ===
 
-20. cd /usr/share/fpcsrc/3.0.4
-21. sudo make clean crossall OS_TARGET=android CPU_TARGET=arm
-22. sudo make crossinstall OS_TARGET=android CPU_TARGET=arm INSTALL_PREFIX=/usr
-23. sudo ln -sf /usr/lib/fpc/3.0.4/ppcrossarm /usr/bin/ppcrossarm
-24. sudo ln -sf /usr/bin/ppcrossarm /usr/bin/ppcarm
-25. Add these blue lines below to /etc/fpc.cfg:
+23. cd /usr/share/fpcsrc/3.0.4
+
+24. sudo make clean crossall OS_TARGET=android CPU_TARGET=arm
+
+25. sudo make crossinstall OS_TARGET=android CPU_TARGET=arm INSTALL_PREFIX=/usr
+
+26. sudo ln -sf /usr/lib/fpc/3.0.4/ppcrossarm /usr/bin/ppcrossarm
+
+27. sudo ln -sf /usr/bin/ppcrossarm /usr/bin/ppcarm
+
+28. Add these blue lines below to your /etc/fpc.cfg:
 #IFDEF ANDROID
 #IFDEF CPUARM
 -Fu/usr/lib/fpc/$fpcversion/units/$fpctarget
@@ -75,80 +106,45 @@ I only enable Android 4.4.2 (API 19), you can try other version if you want.
 #ENDIF
 #ENDIF
 
-=== Cross Compile Android i386 ===
-
-You can skip this section if you do not need to target Android Intel CPU.
-
-26. cd /usr/bin
-27. sudo ln -sf ~/Android/ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-as i686-linux-android-as
-28. sudo ln -sf ~/Android/ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin/i686-linux-android-ld i686-linux-android-ld
-29. sudo ln -sf /usr/bin/i686-linux-android-as i686-linux-as
-30. sudo ln -sf /usr/bin/i686-linux-android-ld i686-linux-ld
-31. cd /usr/share/fpcsrc/3.0.4
-32. sudo make clean crossall OS_TARGET=android CPU_TARGET=i386
-33. sudo make crossinstall OS_TARGET=android CPU_TARGET=i386 INSTALL_PREFIX=/usr
-34. sudo ln -sf /usr/lib/fpc/3.0.4/ppcross386 /usr/bin/ppcross386
-
 === Lazarus Android Module Wizard Installation ===
 
-35. cd ~/Android
-36. svn co https://github.com/jmpessoa/lazandroidmodulewizard.git
-37. ln -sf ~/Android/lazandroidmodulewizard.git ~/Android/lazandroidmodulewizard
-38. Start Lazarus IDE
-39. menu > Package > Open Package (.lpk) > "tfpandroidbride_pack.lpk"
-40. Compile, then and Use > Install
-41. menu > Package > Open Package (.lpk) > "lazandroidwizardpack.lpk"
-42. Compile, then and Use > Install
-43. menu > Package > Open Package (.lpk) > "amw_ide_tools.lpk"
-44. Compile, then and Use > Install
-45. menu > Tools > [Lamw] Android Module Wizard > Paths Settings: [Jdk, Sdk, Ndk, ...]:
+For the steps #33, #35, #37 below, the *.lpk files are inside ~/Android/lazandroidmodulewizard.git/trunk
+
+You need to change the text [handoko] with the current username on your computer.
+
+29. cd ~/Android
+
+30. svn co https://github.com/jmpessoa/lazandroidmodulewizard.git
+
+31. ln -sf ~/Android/lazandroidmodulewizard.git ~/Android/lazandroidmodulewizard
+
+32. Start Lazarus IDE
+
+33. Menu > Package > Open Package File (.lpk)
+Select .../android_bridges/tfpandroidbride_pack.lpk
+
+34. Compile, then and Use > Install > No
+
+35. Menu > Package > Open Package File (.lpk)
+Select .../android_wizard/lazandroidwizardpack.lpk
+
+36. Compile, then and Use > Install > No
+
+37. Menu > Package > Open Package File (.lpk)
+Select .../ide_tools/amw_ide_tools.lpk
+
+38. Compile, then and Use > Install > Yes
+
+39. Start Lazarus IDE
+
+40. Menu > Tools > [Lamw] Android Module Wizard > Paths Settings: [Jdk, Sdk, Ndk, ...]:
 Path to Java JDK: /usr/lib/jvm/java-8-openjdk-amd64
 Path to Ant bin: /usr/bin
 Path to Android SDK: /home/[handoko]/Android/sdk
 Path to Android NDK: /home/[handoko]/Android/ndk
+Path to [LAMW] Java Templates:
+/home/[handoko]/Android/lazandroidmodulewizard.git/trunk/java
 NDK Version: 11c
+NDK [prebuild] System: linux-x86_64
 
-Note for #39, #41, #43:
-Those lpk files can be found inside "lazandroidmodulewizard.git" folder.
 
-Note for #45:
-You should change the name "[handoko]" to the user name on your computer.
-
-=== How To Start A LAMW Project ===
-
-Lazarus main menu > New > Project > choose one of these:
-- Android [NoGUI] JNI Module [Lamw]
-- Android [GUI] JNI Module [Lamw]
-- Android Console App [Lamw]
-
-The components you can use in LAMW Projects are limited on the those inside "Android Bridges" and "Android Bridges Extras" tabs only.
-
-The pascal source code will be saved in: [projectname]\jni.
-The compiled binary (*.so) will be saved in: [projectname]\libs (inside armeabi or x86)
-The Android binary (*.apk) will be saved in: [projectname]\bin
-
-To produce the apk file (from *.so), you need to run "build-debug.sh" or "build-release.sh", which can be found on the project folder. 
-
-Below I provided an apk sample compiled to target ARMV7A, it should run correctly on Intel CPU too. 
-It shows some moving rectangles drawn using OpenGL ES 2 (jCanvasES2). The source code can be downloaded here:
-http://forum.lazarus.freepascal.org/index.php/topic,38777.msg264878.html#msg264878
-
-Note:
-LATE does not work correctly on Linux.
-
-=== Setting For Android i386 Target ===
-
-You need to make some changes if you want to target on Android i386.
-
-46. Lazarus main menu > Project > Project Options > Paths > Libraries (-Fl):
-/home/[handoko]/Android/ndk/platforms/android-21/arch-x86/usr/lib/
-47. Lazarus main menu > Project > Project Options > Paths > Target file name (-o):
-../libs/x86/libcontrols
-48. Lazarus main menu > Project > Project Options > Config and Target > Target file name (-P):
-i386
-49. Lazarus main menu > Project > Project Options > Custom Options:
--Xd -XPi686-linux-android- -FD/home/[handoko]/Android/ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin
-
-Note:
-To make fat binary (https://en.wikipedia.org/wiki/Fat_binary), compile as much target as you want before running that build debug/release script. 
-To cancel fat binary producing, delete all things inside [projectname]\libs folder before compiling.

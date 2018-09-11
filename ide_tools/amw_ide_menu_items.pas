@@ -1043,32 +1043,34 @@ begin
 
      if FormImportLAMWStuff.ShowModal = mrOK then
      begin
-       listIndex:= FormImportLAMWStuff.ListBoxTarget.ItemIndex;
-       if  listIndex >= 0 then
-       begin
-
-          targetFormName:= listProjComp.Strings[listIndex]; //selected unit to be replaced...
-
-          fullPathToUnitTarget:= Project.Files[listIndex+1].Filename;
-          fullPathToUnitSourceLFM:= FormImportLAMWStuff.EditSource.Text;
-          listUnit.LoadFromFile(fullPathToUnitSourceLFM);
-
-          p:= Pos(':', listUnit.Strings[0]);
-          sourceFormName:=  Trim(Copy(listUnit.Strings[0], p+3, MaxInt)); //AndroidModule1
-
-          for i:= 1 to listUnit.Count-1 do
-          begin
-            if Pos('object ', listUnit.Strings[i]) > 0 then
+         listIndex:= FormImportLAMWStuff.ListBoxTarget.ItemIndex;
+         if  listIndex >= 0 then
+         begin
+            targetFormName:= listProjComp.Strings[listIndex]; //selected unit to be replaced...
+            fullPathToUnitTarget:= Project.Files[listIndex+1].Filename;
+            fullPathToUnitSourceLFM:= FormImportLAMWStuff.EditSource.Text;
+            if fullPathToUnitSourceLFM <> '' then
             begin
-               p:= Pos(':', listUnit.Strings[i]);
-               compName:= Trim(Copy(listUnit.Strings[i], p+2, MaxInt));
-               if FileExists(pathToJavaTemplates+PathDelim+'lamwdesigner'+PathDelim+compName+'.java')  then
-               begin
-                 listComponent.Add(compName);
-               end;
-            end;
-          end;
-       end;
+              if FileExists(fullPathToUnitSourceLFM) then
+              begin
+                listUnit.LoadFromFile(fullPathToUnitSourceLFM);
+                p:= Pos(':', listUnit.Strings[0]);
+                sourceFormName:=  Trim(Copy(listUnit.Strings[0], p+3, MaxInt)); //AndroidModule1
+                for i:= 1 to listUnit.Count-1 do
+                begin
+                  if Pos('object ', listUnit.Strings[i]) > 0 then
+                  begin
+                     p:= Pos(':', listUnit.Strings[i]);
+                     compName:= Trim(Copy(listUnit.Strings[i], p+2, MaxInt));
+                     if FileExists(pathToJavaTemplates+PathDelim+'lamwdesigner'+PathDelim+compName+'.java')  then
+                     begin
+                       listComponent.Add(compName);
+                     end;
+                  end;
+                end;
+              end;
+            end else ShowMessage('Fail. None LAMW Form were selected...');
+         end else ShowMessage('Fail. None [candidate] Unit were selected...');
      end;
   end;
 
