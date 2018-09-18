@@ -19,6 +19,7 @@ uses
   digitalClock,
   analogClock,
   chronometer,
+  calendarview,
   drawingview,
   autocompletetextview,
   radiogroup,
@@ -74,6 +75,7 @@ begin
   {$I jchronometer_icon.lrs}
   {$I jdigitalclock_icon.lrs}
   {$I janalogclock_icon.lrs}
+  {$I jcalendarview_icon.lrs}
   {$I jswitchbutton_icon.lrs}
   {$I jtogglebutton_icon.lrs}
   {$I jImageBtn_icon.lrs}
@@ -123,6 +125,7 @@ begin
       jChronometer,
       jDigitalClock,
       jAnalogClock,
+      jCalendarView,
       jSwitchButton,
       jToggleButton,
       jImageBtn,

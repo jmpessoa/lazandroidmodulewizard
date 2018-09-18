@@ -229,7 +229,7 @@ begin
     end;
     if ListBoxNdkPlatform.Items.Count > 0 then
        ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.Count-1;
-  end;
+  end else ShowMessage('Fail! Folder ' + IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms is empty!');
   lisDir.free;
 
 end;
@@ -1187,21 +1187,25 @@ begin
            begin
              strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
              intApi:= StrToInt(strApi);
-             if HasBuildTools(intApi, outBuildTool) then
+             if intApi > 0 then
              begin
-                ListBoxTargetAPI.Items.Add(strApi);
+               if HasBuildTools(intApi, outBuildTool) then
+               begin
+                  ListBoxTargetAPI.Items.Add(strApi);
+               end;
              end;
            end;
          end;
        end;
     end;
+
     if ListBoxTargetAPI.Items.Count > 0 then
     begin
       ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count - 1;
       FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-      //FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
-    end;
-  end;
+    end else ShowMessage('Fail! Folder '+ IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms is empty!');
+
+  end else ShowMessage('Fail! Folder '+ IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms is empty!');
   lisDir.free;
 
 end;

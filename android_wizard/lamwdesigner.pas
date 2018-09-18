@@ -501,6 +501,13 @@ type
      procedure Draw; override;
   end;
 
+  { TDraftCalendarView }
+  TDraftCalendarView = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
+
   { TDraftSAdMob }
 
   TDraftSAdMob = class(TDraftWidget)
@@ -680,7 +687,7 @@ uses
   sfloatingbutton, scoordinatorlayout, stoolbar, sdrawerlayout,
   snavigationview, scardview, srecyclerview, stextinput,
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
-  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView}, customcamera, sadmob;
+  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView}, customcamera, sadmob, calendarview;
 
 const
   DrawableSearchPaths: array [0..3] of string = (
@@ -1380,6 +1387,22 @@ begin
   begin
     if jLinearLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
       Brush.Color := ToTColor(jLinearLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
+{ TDraftCalendarView }
+
+procedure TDraftCalendarView.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jCalendarView(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jCalendarView(FAndroidWidget).BackgroundColor)
     else begin
       Brush.Color:= clNone;
       Brush.Style:= bsClear;
@@ -4185,6 +4208,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jFrameLayout, TDraftFrameLayout);
   RegisterAndroidWidgetDraftClass(jLinearLayout, TDraftLinearLayout);
   RegisterAndroidWidgetDraftClass(jCaptionPanel, TDraftCaptionPanel);
+  RegisterAndroidWidgetDraftClass(jCalendarView, TDraftCalendarView);
 
   RegisterAndroidWidgetDraftClass(jsFloatingButton, TDraftSFloatingButton);
   RegisterAndroidWidgetDraftClass(jsBottomNavigationView, TDraftSBottomNavigationView);

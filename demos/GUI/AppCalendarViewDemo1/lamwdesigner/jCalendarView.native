@@ -1,0 +1,1 @@
+public native void pOnCalendarSelectedDayChange(long pasobj, int year, int monthOfYear, int dayOfMonth);

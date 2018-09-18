@@ -152,6 +152,11 @@ uses
 
    Procedure Java_Event_pOnSTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; position: integer;  title: JString);
 
+   Procedure Java_Event_pOnCustomCameraSurfaceCreated(env: PJNIEnv; this: jobject; Obj: TObject);
+   Procedure Java_Event_pOnCustomCameraSurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
+
+   Procedure Java_Event_pOnCalendarSelectedDayChange(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
+
 implementation
 
 uses
@@ -162,7 +167,7 @@ uses
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup, drawingview,
    autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
-   stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview;
+   stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview, customcamera, calendarview;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -801,6 +806,17 @@ begin
   begin
     jForm(jDatePickerDialog(Obj).Owner).UpdateJNI(gApp);
     jDatePickerDialog(Obj).GenEvent_OnDatePicker(Obj,  year, monthOfYear, dayOfMonth);
+  end;
+end;
+
+Procedure Java_Event_pOnCalendarSelectedDayChange(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jCalendarView then
+  begin
+    jForm(jCalendarView(Obj).Owner).UpdateJNI(gApp);
+    jCalendarView(Obj).GenEvent_OnSelectedDayChange(Obj,  year, monthOfYear, dayOfMonth);
   end;
 end;
 
@@ -1747,6 +1763,28 @@ begin
       pastitle:= string( env^.GetStringUTFChars(env,title,@_jBoolean) );
     end;
     jsTabLayout(Obj).GenEvent_OnSTabSelected(Obj, position, pastitle);
+  end;
+end;
+
+procedure Java_Event_pOnCustomCameraSurfaceCreated(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jCustomCamera then
+  begin
+    jForm(jCustomCamera(Obj).Owner).UpdateJNI(gApp);
+    jCustomCamera(Obj).GenEvent_OnCustomCameraSurfaceCreated(Obj);
+  end;
+end;
+
+procedure Java_Event_pOnCustomCameraSurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jCustomCamera then
+  begin
+    jForm(jCustomCamera(Obj).Owner).UpdateJNI(gApp);
+    jCustomCamera(Obj).GenEvent_OnCustomCameraSurfaceChanged(Obj, width, height);
   end;
 end;
 
