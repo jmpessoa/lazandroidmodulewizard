@@ -9,13 +9,24 @@ uses
 
 type
 
+TCustomCameraSurfaceCreated = Procedure(Sender: TObject) of object;
+TCustomCameraSurfaceChanged = Procedure(Sender: TObject; width: integer; height: integer) of object;
+
 {Draft Component code by "Lazarus Android Module Wizard" [4/18/2018 16:53:34]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
 {jVisualControl template}
 
+{ jCustomCamera }
+
 jCustomCamera = class(jVisualControl)
  private
+    FColor: TARGBColorBridge;
+    FOnClick: TOnNotify;
+
+    FOnSurfaceCreated: TCustomCameraSurfaceCreated;
+    FOnSurfaceChanged: TCustomCameraSurfaceChanged;
+
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
@@ -25,12 +36,17 @@ jCustomCamera = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
+
+
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure ClearLayout;
 
     procedure GenEvent_OnClick(Obj: TObject);
+    procedure GenEvent_OnCustomCameraSurfaceCreated(Obj: TObject);
+    procedure GenEvent_OnCustomCameraSurfaceChanged(Obj: TObject; width: integer; height: integer);
+
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject);  override;
@@ -50,10 +66,13 @@ jCustomCamera = class(jVisualControl)
     procedure ClearLayoutAll();
     procedure SetId(_id: integer);
     procedure TakePicture();
+    procedure SetEnvironmentStorage(_environmentDir: integer; _folderName: string);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
+    property OnSurfaceCreated: TCustomCameraSurfaceCreated read FOnSurfaceCreated write FOnSurfaceCreated;
+    property OnSurfaceChanged: TCustomCameraSurfaceChanged read FOnSurfaceChanged write FOnSurfaceChanged;
 
 end;
 
@@ -76,7 +95,7 @@ procedure jCustomCamera_SetLayoutAll(env: PJNIEnv; _jcustomcamera: JObject; _idA
 procedure jCustomCamera_ClearLayoutAll(env: PJNIEnv; _jcustomcamera: JObject);
 procedure jCustomCamera_SetId(env: PJNIEnv; _jcustomcamera: JObject; _id: integer);
 procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject);
-
+procedure jCustomCamera_SetEnvironmentStorage(env: PJNIEnv; _jcustomcamera: JObject; _environmentDir: integer; _folderName: string);
 
 implementation
 
@@ -355,6 +374,17 @@ begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
+procedure jCustomCamera.GenEvent_OnCustomCameraSurfaceCreated(Obj: TObject);
+begin
+  if Assigned(FOnSurfaceCreated) then FOnSurfaceCreated(Obj);
+end;
+
+procedure jCustomCamera.GenEvent_OnCustomCameraSurfaceChanged(Obj: TObject;
+  width: integer; height: integer);
+begin
+   if Assigned(FOnSurfaceChanged) then FOnSurfaceChanged(Obj, width, height);
+end;
+
 function jCustomCamera.jCreate(): jObject;
 begin
    Result:= jCustomCamera_jCreate(FjEnv, int64(Self), FjThis);
@@ -484,6 +514,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCustomCamera_TakePicture(FjEnv, FjObject);
+end;
+
+procedure jCustomCamera.SetEnvironmentStorage(_environmentDir: integer; _folderName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCustomCamera_SetEnvironmentStorage(FjEnv, FjObject, _environmentDir ,_folderName);
 end;
 
 {-------- jCustomCamera_JNI_Bridge ----------}
@@ -738,6 +775,21 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomcamera);
   jMethod:= env^.GetMethodID(env, jCls, 'TakePicture', '()V');
   env^.CallVoidMethod(env, _jcustomcamera, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCustomCamera_SetEnvironmentStorage(env: PJNIEnv; _jcustomcamera: JObject; _environmentDir: integer; _folderName: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _environmentDir;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_folderName));
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetEnvironmentStorage', '(ILjava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jcustomcamera, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
