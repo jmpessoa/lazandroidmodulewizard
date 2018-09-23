@@ -1,5 +1,6 @@
 public native void pOnTCPSocketClientMessageReceived(long pasobj, String[] messagesReceived);
 
+public native void pOnTCPSocketClientBytesReceived(long pasobj, byte[] bytesReceived);
 public native void pOnTCPSocketClientConnected(long pasobj);
 
 public native void pOnTCPSocketClientFileSendProgress(long pasobj, String filename, int count, int filesize);

@@ -58,6 +58,7 @@ uses
 
    Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: JString);
    Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messagesReceived: JStringArray);
+   Procedure Java_Event_pOnTCPSocketClientBytesReceived(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayReceived: JByteArray);
    Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 
    Procedure Java_Event_pOnTCPSocketClientFileSendProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; count: integer; filesize: integer);
@@ -852,28 +853,50 @@ begin
   if Obj is jTCPSocketClient then
   begin
     jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
-    if messagesReceived <> nil then
+    if  messagesReceived <> nil then
     begin
-      if  messagesReceived <> nil then
+      messageSize:= env^.GetArrayLength(env, messagesReceived);
+      SetLength(pasmessagesReceived, messageSize);
+      for i:= 0 to messageSize - 1 do
       begin
-        messageSize:= env^.GetArrayLength(env, messagesReceived);
-        SetLength(pasmessagesReceived, messageSize);
-        for i:= 0 to messageSize - 1 do
-        begin
-          jStr:= env^.GetObjectArrayElement(env, messagesReceived, i);
-          case jStr = nil of
-            True : pasmessagesReceived[i]:= '';
-            False: begin
-                    jBoo:= JNI_False;
-                    pasmessagesReceived[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-                   end;
-          end;
+        jStr:= env^.GetObjectArrayElement(env, messagesReceived, i);
+        case jStr = nil of
+          True : pasmessagesReceived[i]:= '';
+          False: begin
+                  jBoo:= JNI_False;
+                  pasmessagesReceived[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+                 end;
         end;
       end;
     end;
     jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientMessagesReceived(Obj, pasmessagesReceived);
   end;
 end;
+
+Procedure Java_Event_pOnTCPSocketClientBytesReceived(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayReceived: JByteArray);
+var
+  sizeArray: integer;
+  arrayResult: TDynArrayOfJByte; //array of jByte;  //shortint
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if byteArrayReceived <> nil then
+  begin
+    sizeArray:=  env^.GetArrayLength(env, byteArrayReceived);
+    SetLength(arrayResult, sizeArray);
+    env^.GetByteArrayRegion(env, byteArrayReceived, 0, sizeArray, @arrayResult[0] {target});
+  end;
+
+  if Obj is jTCPSocketClient then
+  begin
+    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
+    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientBytesReceived(Obj, arrayResult);
+  end;
+
+end;
+
+
 
 Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 begin

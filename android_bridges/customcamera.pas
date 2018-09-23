@@ -65,7 +65,9 @@ jCustomCamera = class(jVisualControl)
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayoutAll();
     procedure SetId(_id: integer);
-    procedure TakePicture();
+    procedure TakePicture(); overload;
+    procedure TakePicture(_filename: string); overload;
+
     procedure SetEnvironmentStorage(_environmentDir: integer; _folderName: string);
 
  published
@@ -94,8 +96,9 @@ procedure jCustomCamera_AddLParamsParentRule(env: PJNIEnv; _jcustomcamera: JObje
 procedure jCustomCamera_SetLayoutAll(env: PJNIEnv; _jcustomcamera: JObject; _idAnchor: integer);
 procedure jCustomCamera_ClearLayoutAll(env: PJNIEnv; _jcustomcamera: JObject);
 procedure jCustomCamera_SetId(env: PJNIEnv; _jcustomcamera: JObject; _id: integer);
-procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject);
+procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject);  overload;
 procedure jCustomCamera_SetEnvironmentStorage(env: PJNIEnv; _jcustomcamera: JObject; _environmentDir: integer; _folderName: string);
+procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject; _filename: string);  overload;
 
 implementation
 
@@ -516,6 +519,13 @@ begin
      jCustomCamera_TakePicture(FjEnv, FjObject);
 end;
 
+procedure jCustomCamera.TakePicture(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCustomCamera_TakePicture(FjEnv, FjObject, _filename);
+end;
+
 procedure jCustomCamera.SetEnvironmentStorage(_environmentDir: integer; _folderName: string);
 begin
   //in designing component state: set value here...
@@ -790,6 +800,20 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetEnvironmentStorage', '(ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcustomcamera, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'TakePicture', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jcustomcamera, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

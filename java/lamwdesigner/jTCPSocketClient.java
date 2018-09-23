@@ -1,8 +1,10 @@
 package com.example.apptcpclientdemo1;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +14,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 //import java.net.InetAddress;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.InetSocketAddress;
 
@@ -39,29 +42,25 @@ public class jTCPSocketClient {
        
     // message to send to the server
     private String mServerMessage;
-    
+    private byte[] mServerBytes;
+
     private boolean mRun    = false;
 
     // used to send messages
     private PrintWriter mTextBufferOut; //Prints formatted representations of objects to a text-output stream
     // used to read messages from the server
     private BufferedReader mBufferIn;
-
     // used to send bytes
     private DataOutputStream mByteBufferOut;
-
     private OutputStream mStreamBufferOut;
 
-    private Socket  mSocket;
-    //private boolean mExecutedForMessage = false;
+    private Socket mSocket;
     private int progressStep = -1;
-           	
     private int mTimeOut = 5000;// 300 LAN TIMEOUT 5000 INTERNET TIMEOUT
-
-    private int connectionType = 0; //text, file, bytes
+    private int mDataType = 0; //0=text,  1=bytes, 3=file,
+    private byte mCloseByte = -1;
 
     public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
-    	   //super(_ctrls.activity);
  	       context   = _ctrls.activity;
     	   pascalObj = _Self;
     	   controls  = _ctrls; 	
@@ -130,7 +129,11 @@ public class jTCPSocketClient {
               mBufferIn = null;
               mStreamBufferOut = null;
 
-              new TCPSocketClientTask().execute();
+              if (mDataType == 0)   //string
+                 new TCPSocketClientMessageTask().execute();
+              else if (mDataType == 1)   //byte
+                  new TCPSocketClientByteTask().execute();
+
               mRun = true;
 
               while (mStreamBufferOut == null) {
@@ -142,7 +145,7 @@ public class jTCPSocketClient {
     }
 
     public boolean SendMessage(String message) {
-        connectionType = 0;
+        mDataType = 0;
         if ( mSocket == null )    return false;
         if ( mSocket.isClosed() ) return false;
 
@@ -183,12 +186,24 @@ public class jTCPSocketClient {
               }
           }
 
-          if (_finalMessage.equals(""))
-              SendMessage("client_closed");
-          else
-              SendMessage(_finalMessage);
+          if (mDataType == 0) {
+                if (_finalMessage.equals(""))
+                    SendMessage("client_closed");
+               else
+                   SendMessage(_finalMessage);
+          } else if (mDataType == 1) {
 
-          if (mSocket != null) {
+              byte[] byteArray = new byte[1];
+              byteArray[0] = mCloseByte;
+              try {
+                  SendBytes(byteArray, false);
+              } catch (IOException e) {
+                  e.printStackTrace();
+              }
+
+          }
+
+              if (mSocket != null) {
         	  try {
 				mSocket.close();
 				mSocket = null;
@@ -200,10 +215,10 @@ public class jTCPSocketClient {
       }
 
       public void CloseConnection() {
-      	CloseConnection("client_closed");
+        CloseConnection("client_closed");
       }
 
-      class TCPSocketClientTask extends AsyncTask<String, String, String> {
+      class TCPSocketClientMessageTask extends AsyncTask<String, String, String> {
           @Override
           protected String doInBackground(String... message) {
               mRun = true;
@@ -213,28 +228,22 @@ public class jTCPSocketClient {
 
                         try {
                           if ( mSocket != null && !mSocket.isClosed()) {
-
                               mStreamBufferOut = mSocket.getOutputStream();
-
-                            //  mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mStreamBufferOut)), true);
-                            //  mDOSBufferOut = new DataOutputStream(mStreamBufferOut);
-
                               mBufferIn  = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
 
-    	                    if (mBufferIn != null)
+    	                      if (mBufferIn != null)
                                 mServerMessage = mBufferIn.readLine();
 
-    	                    if (mServerMessage != null )
+    	                      if (mServerMessage != null )
     	                       	publishProgress(mServerMessage);
                           }
     			} catch (IOException e) {
     		            // TODO Auto-generated catch block
-    			    Log.e("jTCPSocketClient", "Error_doInBackground", e);
+    			    Log.e("jTCPSocketClient", "Error_doInBackground_ClientMessage", e);
     			    e.printStackTrace();
     			}
 
               }
-
               return null;
           }
 
@@ -258,7 +267,72 @@ public class jTCPSocketClient {
      	    }            
           }
         }
-      
+
+
+    class TCPSocketClientByteTask extends AsyncTask<String, /*byte[]*/ ByteArrayOutputStream, String> {
+
+        byte[] headerBuffer;
+
+        @Override
+        protected String doInBackground(String... message) {
+            mRun = true;
+            //in this while the client listens for the messages sent by the server
+            while (mRun) {
+
+                try {
+                    if ( mSocket != null && !mSocket.isClosed()) {
+
+                        mStreamBufferOut = mSocket.getOutputStream();
+                        //mBufferIn  = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+                        mServerMessage = null;
+                        mServerBytes = new byte[1024];
+                        BufferedInputStream mBufferInput = new BufferedInputStream(mSocket.getInputStream());
+                        int bytes_read = -1;
+                        ByteArrayOutputStream bufferOutput = new ByteArrayOutputStream();
+
+                        if (mBufferInput!=null) {
+                            bytes_read =  mBufferInput.read(mServerBytes, 0, mServerBytes.length);   //blocking ...
+                            if (bytes_read > 0) {
+                                bufferOutput.write(mServerBytes, 0, bytes_read);
+                                publishProgress(bufferOutput);
+                            }
+                        }
+
+                    }
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    Log.e("jTCPSocketClient", "Error_doInBackground_ClientByte", e);
+                    e.printStackTrace();
+                }
+
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(/*byte[]*/ ByteArrayOutputStream... values) {
+            super.onProgressUpdate(values);
+            if (values[0].toByteArray().length > 0 ) {
+                controls.pOnTCPSocketClientBytesReceived(pascalObj, /*values[0]*/values[0].toByteArray());
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String values) {
+            super.onPostExecute(values);
+            try {
+                if( mSocket != null ){
+                    mSocket.close();
+                    mSocket = null;
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
       /* https://stackoverflow.com/questions/6053602/what-arguments-are-passed-into-asynctaskarg1-arg2-arg3
        * Params, the type of the parameters sent to the task upon execution.
          Progress, the type of the progress units published during the background computation.
@@ -288,35 +362,13 @@ public class jTCPSocketClient {
         	  
               if ( mSocket != null && !mSocket.isClosed()) {
                         try {
-                        	
-                            //DataInputStream dis = new DataInputStream(new BufferedInputStream(mSocket.getInputStream()));                        	
-                        	
-                        	/*
-                        	mBufferIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
-    	                    if (mBufferIn != null) mServerMessage = mBufferIn.readLine();    	                    
-   	                        if (mServerMessage != null ) 
-   	                        	publishProgress(mServerMessage);                     	
-                            */
-                        	
+
    	                        DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(mSocket.getOutputStream()));
    	                                	 
                             //write file size
    	                        filesize = (int)file.length();
-                            //publishProgress("Sending file size...");
-   	                        /*
-                            int file_size = (int)file.length();                            
-                            dos.writeLong(file_size);
-                            dos.flush();
-                            */
-   	                        
-   	                        filename = file.getName();
-                            //write file names
-   	                        /*
-                            publishProgress("Sending file name...");                            
-                            dos.writeUTF( file.getName() );
-                            dos.flush();
-                            */
-   	                        
+                            filename = file.getName();
+
                             //file writing
                             int n = 0;
                             byte[] buf;                            
@@ -337,13 +389,10 @@ public class jTCPSocketClient {
                             
                             dos.close();
                             fis.close();
-                            
-                            //write file names                      	
-                            //publishProgress("Sucess!!");                            
-                                                        
+
     					} catch (IOException e) {
     						// TODO Auto-generated catch block
-    						Log.e("jTCPSocketClient", "Error_doInBackground", e);
+    						Log.e("jTCPSocketClient", "Error_doInBackground_ClientFileTask", e);
     						e.printStackTrace();
     					}   
                         
@@ -423,6 +472,14 @@ public class jTCPSocketClient {
         return sendBytes(_jbyteArray, 0, _jbyteArray.length, _writeLength);
     }
 
+    public void SetDataType(int _dataType) {
+        mDataType = _dataType;
+    }
+
+    public void CloseConnection(byte _jbtyte) {
+        mCloseByte = _jbtyte;
+        CloseConnection();
+    }
 }
 
 
