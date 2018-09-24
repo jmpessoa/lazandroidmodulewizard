@@ -472,7 +472,7 @@ public class jTCPSocketClient {
         return sendBytes(_jbyteArray, 0, _jbyteArray.length, _writeLength);
     }
 
-    public void SetDataType(int _dataType) {
+    public void SetDataTransferMode(int _dataType) {
         mDataType = _dataType;
     }
 
