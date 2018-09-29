@@ -115,7 +115,7 @@ public class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object 
 		return LAMWCommon.getLParamWidth();					
 	}
 	
-    public void setLGravity(int _g) {
+    public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
     }
 
@@ -152,7 +152,7 @@ public class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object 
     }
 
     public void SetProgress(int _progress) {
-        if (_progress <  this.getMax())
+        if (_progress <=  this.getMax())
             this.setProgress(_progress);
     }
 
@@ -163,6 +163,18 @@ public class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object 
     public void SetRotation(float _rotation) {  //  API level 11 270 = vertical
         this.setRotation(_rotation);
     }
+
+  /* Pascal:
+     TFrameGravity = (fgNone,
+                   fgTopLeft, fgTopCenter, fgTopRight,
+                   fgBottomLeft, fgBottomCenter, fgBottomRight,
+                   fgCenter,
+                   fgCenterVerticalLeft, fgCenterVerticalRight
+                   );     
+   */
+   public void SetFrameGravity(int _value) {	   
+      LAMWCommon.setLGravity(_value);
+   }
 
 } //end class
 
