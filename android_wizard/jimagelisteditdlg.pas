@@ -407,7 +407,7 @@ end;
 
 procedure TjImagesEditorDlg.ShowImage(Index: Integer);
 begin
-  if Index < FImages.Count then
+  if (Index >= 0) and (Index < FImages.Count) then
     Image1.Picture.Bitmap :=
       FImgCache.GetImageAsBMP(TImageListItem(FImages[Index]).FullFileName)
   else
