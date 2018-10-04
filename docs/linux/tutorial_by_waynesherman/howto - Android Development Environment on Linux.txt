@@ -27,6 +27,7 @@ I recommend running these commands one at a time so you can verify the results b
 sudo apt-get install -y libx11-dev libgtk2.0-dev libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev libxtst-dev libatk1.0-dev libghc-x11-dev freeglut3 freeglut3-dev
 sudo apt-get install -y git subversion make build-essential gdb zip unzip unrar wget
 sudo apt-get install -y openjdk-8-jdk android-tools-adb ant
+// sudo apt-get install icedtea-8-plugin
 sudo update-java-alternatives --set /usr/lib/jvm/java-1.8.0-openjdk-amd64
  
 mkdir -p "$HOME/android/sdk"
