@@ -170,10 +170,10 @@ public class jImageView extends ImageView {
 			res = this.controls.activity.getResources().getDrawable(_resID);
 		}
 		
-		//[ifdef_api17up]
+		//[ifdef_api21up]
 		if(Build.VERSION.SDK_INT >= 21)
 			res = this.controls.activity.getResources().getDrawable(_resID, null);
-        //[endif_api17up]
+        //[endif_api21up]
 						
 		return res;
 	}
