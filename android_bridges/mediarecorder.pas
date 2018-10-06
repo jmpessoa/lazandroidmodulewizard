@@ -63,6 +63,7 @@ jMediaRecorder = class(jControl)
     procedure Prepare();
     procedure Start();
     procedure Stop();
+    function HasMicrophone(): boolean;
  published
       //
 end;
@@ -80,7 +81,7 @@ procedure jMediaRecorder_SetOutputFile(env: PJNIEnv; _jmediarecorder: JObject; _
 procedure jMediaRecorder_Prepare(env: PJNIEnv; _jmediarecorder: JObject);
 procedure jMediaRecorder_Start(env: PJNIEnv; _jmediarecorder: JObject);
 procedure jMediaRecorder_Stop(env: PJNIEnv; _jmediarecorder: JObject);
-
+function jMediaRecorder_HasMicrophone(env: PJNIEnv; _jmediarecorder: JObject): boolean;
 
 implementation
 
@@ -190,6 +191,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jMediaRecorder_Stop(FjEnv, FjObject);
+end;
+
+function jMediaRecorder.HasMicrophone(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jMediaRecorder_HasMicrophone(FjEnv, FjObject);
 end;
 
 {-------- jMediaRecorder_JNI_Bridge ----------}
@@ -353,6 +361,18 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jMediaRecorder_HasMicrophone(env: PJNIEnv; _jmediarecorder: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jmediarecorder);
+  jMethod:= env^.GetMethodID(env, jCls, 'HasMicrophone', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jmediarecorder, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 
 end.

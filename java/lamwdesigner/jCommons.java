@@ -1,4 +1,4 @@
-package org.lamw.appnewtest11;
+package com.example.appmediarecorderdemo1;
 
 import android.app.ActionBar;
 import android.content.pm.PackageManager;
@@ -381,6 +381,13 @@ public class jCommons {
 		//[ifdef_api23up]
 		if (Build.VERSION.SDK_INT >= 23) {
 			controls.activity.requestPermissions(new String[]{androidPermission}, requestCode);
+		} //[endif_api23up]
+	}
+
+	public static void RequestRuntimePermission(Controls controls, String[] androidPermissions, int requestCode) {  //"android.permission.CAMERA"
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			controls.activity.requestPermissions(androidPermissions, requestCode);
 		} //[endif_api23up]
 	}
 

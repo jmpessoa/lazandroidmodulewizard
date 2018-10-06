@@ -3,6 +3,7 @@ package com.example.appmediarecorderdemo1;
 import java.io.IOException;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.util.Log;
@@ -22,7 +23,7 @@ public class jMediaRecorder /*extends ...*/ {
    private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
    private Context  context   = null;
  
-   private MediaRecorder myAudioRecorder;
+   private MediaRecorder myAudioRecorder = null;
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
    public jMediaRecorder(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -34,8 +35,10 @@ public class jMediaRecorder /*extends ...*/ {
    }
  
    public void jFree() {
-     //free local objects...	 
-	 myAudioRecorder.release(); //This method should be called when the recorder instance is needed.	   
+     //free local objects...
+     if (myAudioRecorder != null)
+	     myAudioRecorder.release();
+
 	 myAudioRecorder  = null;
    }
  
@@ -121,7 +124,12 @@ public class jMediaRecorder /*extends ...*/ {
    
    //This method stops the recording process.
    public void Stop() {
-     myAudioRecorder.stop();
+       myAudioRecorder.stop();
    }
+
+    public boolean HasMicrophone() {
+        PackageManager pmanager = controls.activity.getPackageManager();
+        return pmanager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE);
+    }
            
 }

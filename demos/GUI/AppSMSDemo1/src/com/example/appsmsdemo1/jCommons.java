@@ -1,6 +1,9 @@
 package com.example.appsmsdemo1;
 
+import android.app.ActionBar;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -381,6 +384,13 @@ public class jCommons {
 		} //[endif_api23up]
 	}
 
+	public static void RequestRuntimePermission(Controls controls, String[] androidPermissions, int requestCode) {  //"android.permission.CAMERA"
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			controls.activity.requestPermissions(androidPermissions, requestCode);
+		} //[endif_api23up]
+	}
+
 	public static boolean IsRuntimePermissionGranted(Controls controls, String _androidPermission) {  //"android.permission.CAMERA"
 		boolean r = true;
 		int IsGranted = PackageManager.PERMISSION_GRANTED; //0    PERMISSION_DENIED = -1
@@ -393,4 +403,100 @@ public class jCommons {
 		return r;
 	}
 
+	public static boolean HasActionBar(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null) return true;
+		else return false;
+	}
+
+	public static void SetActionBarSubTitle(Controls controls, String subtitle) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().setSubtitle(subtitle);
+	}
+
+	public static void SetActionBarTitle(Controls controls, String title) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().setTitle(title);
+	}
+
+	public static void ActionBarHide(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().hide();
+	}
+
+	public static void ActionBarShow(Controls controls) {
+		ActionBar actionBar = ( controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().show();
+	}
+
+	public static void ActionBarShowTitle(Controls controls, boolean value) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().setDisplayShowTitleEnabled(value);
+	}
+
+	public static void ActionBarShowLogo(Controls controls, boolean value) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			( controls.activity).getActionBar().setDisplayUseLogoEnabled(value);
+	}
+
+	public static void ActionBarDisplayHomeAsUpEnabled(Controls controls, boolean value) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			( controls.activity).getActionBar().setDisplayHomeAsUpEnabled(value);
+	}
+
+	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			( controls.activity).getActionBar().setIcon(icon);;
+
+	}
+
+	public static void ActionBarSetTabNavigationMode(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null) {
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);    //API 11
+			actionBar.setSelectedNavigationItem(0);
+		}
+	}
+
+	public static void ActionBarRemoveAllTabs(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null) {
+			actionBar.removeAllTabs();
+			controls.activity.invalidateOptionsMenu(); // by renabor
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
+		}
+	}
+
+	public static int ActionGetBarBarHeight(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		int actionBarHeight = 0;
+		TypedValue tv = new TypedValue();
+		if (actionBar != null) {
+				if (actionBar.isShowing()) {
+					if (controls.activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+						actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, controls.activity.getResources().getDisplayMetrics());
+					}
+				}
+		}
+		return actionBarHeight;
+	}
+
+	public static boolean ActionBarIsShowing(Controls controls) {
+		 ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			return actionBar.isShowing();
+		else return false;
+	}
+
+	public static boolean IsAppCompatProject() {
+		return false;
+	}
 }

@@ -57,13 +57,13 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-   if IsRuntimePermissionGranted('android.permission.CAMERA') and IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
+   if IsRuntimePermissionGranted('android.permission.CAMERA') and
+      IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
    begin
-       //ShowMessage('RuntimePermissionGranted !!!');
        jCamera1.RequestCode := 12345;
        jCamera1.TakePhoto;
    end
-   else  ShowMessage('RuntimePermission NOT Granted ...');
+   else  ShowMessage('Sorry... Some Runtime Permission NOT Granted ...');
 end;
 
 procedure TAndroidModule1.jView1Draw(Sender: TObject; Canvas: jCanvas);
@@ -108,6 +108,8 @@ begin
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+var
+  manifestPermissions: TDynArrayOfString;
 begin
 
   if Self.GetScreenOrientationStyle = ssLandscape then   // device is on horizontal...
@@ -126,7 +128,6 @@ begin
     jPanel3.LayoutParamHeight := lpMatchParent;
     jPanel3.LayoutParamWidth := lpOneThirdOfParent;
     jPanel3.PosRelativeToAnchor := [raToRightOf, raAlignBaseline];
-
 
   end
   else
@@ -153,11 +154,21 @@ begin
   jEditText1.SetFocus;
 
   //https://www.captechconsulting.com/blogs/runtime-permissions-best-practices-and-how-to-gracefully-handle-permission-removal
+  //https://developer.android.com/guide/topics/security/permissions#normal-dangerous
   if  IsRuntimePermissionNeed() then   // that is, target API >= 23
   begin
-     ShowMessage('RequestRuntimePermission....');
-     Self.RequestRuntimePermission('android.permission.CAMERA', 1000); //from AndroodManifest.xml
-     Self.RequestRuntimePermission('android.permission.WRITE_EXTERNAL_STORAGE', 1001);  //from AndroodManifest.xml
+
+      ShowMessage('warning: Requesting Runtime Permission.... please, wait..');
+
+      SetLength(manifestPermissions, 2);
+
+      manifestPermissions[0]:= 'android.permission.CAMERA';  //from AndroodManifest.xml
+      manifestPermissions[1]:= 'android.permission.WRITE_EXTERNAL_STORAGE'; //from AndroodManifest.xml
+
+      Self.RequestRuntimePermission(manifestPermissions, 1001);
+
+      SetLength(manifestPermissions, 0);
+
   end;
 end;
 
@@ -165,18 +176,12 @@ procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
   Sender: TObject; requestCode: integer; manifestPermission: string;
   grantResult: TManifestPermissionResult);
 begin
-  case requestCode of  //CAMERA
-     1000:begin
+  case requestCode of
+     1001:begin
               if grantResult = PERMISSION_GRANTED  then
-                  ShowMessage(manifestPermission + ' :: Success! Permission grant!!! ' )
+                ShowMessage('Success! ['+manifestPermission+'] Permission grant!!! ' )
               else  //PERMISSION_DENIED
-                ShowMessage(manifestPermission + '   :: Sorry... permission not grant... ' )
-          end;
-     1001:begin   //STORAGE
-              if grantResult = PERMISSION_GRANTED  then
-                  ShowMessage(manifestPermission + ' :: Success! Permission grant!!! ' )
-              else  //PERMISSION_DENIED
-                ShowMessage(manifestPermission + '   :: Sorry... permission not grant... ' )
+                ShowMessage('Sorry... ['+manifestPermission+'] Permission not grant... ' );
           end;
   end;
 end;

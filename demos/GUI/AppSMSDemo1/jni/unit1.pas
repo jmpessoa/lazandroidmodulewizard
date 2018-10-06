@@ -63,14 +63,24 @@ begin
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+var
+  manifestPermissions: TDynArrayOfString;
+
 begin
    //https://developer.android.com/guide/topics/security/permissions#normal-dangerous
    //https://www.captechconsulting.com/blogs/runtime-permissions-best-practices-and-how-to-gracefully-handle-permission-removal
    if IsRuntimePermissionNeed() then   // that is, target API >= 23
    begin
       ShowMessage('RequestRuntimePermission....');
-      Self.RequestRuntimePermission('android.permission.RECEIVE_SMS', 2001); //from AndroodManifest.xml
-      Self.RequestRuntimePermission('android.permission.SEND_SMS', 2002); //from AndroodManifest.xml
+
+      SetLength(manifestPermissions, 2);
+
+      manifestPermissions[0]:= 'android.permission.RECEIVE_SMS';  //from AndroodManifest.xml
+      manifestPermissions[1]:= 'android.permission.SEND_SMS'; //from AndroodManifest.xml
+
+      Self.RequestRuntimePermission(manifestPermissions, 2001);
+
+      SetLength(manifestPermissions, 0);
    end;
 
    jEditText1.SetFocus;
@@ -85,23 +95,20 @@ begin
       2001:begin
               if grantResult = PERMISSION_GRANTED  then
               begin
-                  ShowMessage(manifestPermission + ' :: Success! Permission granted!!! ' );
-                  jBroadcastReceiver1.RegisterIntentActionFilter('android.provider.Telephony.SMS_RECEIVED');
-                  //or jBroadcastReceiver1.IntentActionFilter:= afSMSReceived;
-              end
-              else  //PERMISSION_DENIED
-                ShowMessage(manifestPermission + '   :: Sorry... permission not granted... ' )
-           end;
-      2002:begin   //android.permission.SEND_SMS
-              if grantResult = PERMISSION_GRANTED  then
-              begin
-                  ShowMessage(manifestPermission + ' :: Success! Permission granted!!! ' );
+                  ShowMessage('Success! ['+manifestPermission+'] Permission granted!!! ' );
+
+                  if manifestPermission = 'android.permission.RECEIVE_SMS' then
+                      jBroadcastReceiver1.RegisterIntentActionFilter('android.provider.Telephony.SMS_RECEIVED');
+
                   //register custom app action to retrieve DELIVERED status
-                  jBroadcastReceiver2.RegisterIntentActionFilter('com.example.appsmsdemo1.SMS_DELIVERED');
+                  if manifestPermission = 'android.permission.SEND_SMS' then
+                      jBroadcastReceiver2.RegisterIntentActionFilter('com.example.appsmsdemo1.SMS_DELIVERED');
+
               end
-              else  //PERMISSION_DENIED
-                ShowMessage(manifestPermission + '   :: Sorry... permission not granted... ' )
-          end;
+              else//PERMISSION_DENIED
+                  ShowMessage('Sorry... ['+manifestPermission+'] permission not granted... ' )
+           end;
+
   end;
 end;
 

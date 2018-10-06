@@ -1,1 +1,0 @@
-public native void pOnBroadcastReceiver(long pasobj, Intent intent);

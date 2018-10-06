@@ -1,6 +1,6 @@
-package org.lamw.apphttpclientdemo3;
+package com.example.appmediarecorderdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8.2.1  - 2 September - 2018
+//Lamw: Lazarus Android Module Wizard - version 0.8.2.2  - 6 October - 2018
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -80,7 +80,9 @@ public class App extends Activity {
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
         if ( (permissions.length > 0) && (grantResults.length > 0) ) {
-            controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[0], grantResults[0]);
+            for (int i = 0; i < permissions.length; i++) {
+                controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[i], grantResults[i]);
+            }
         }
     } //[endif_api23up]
 

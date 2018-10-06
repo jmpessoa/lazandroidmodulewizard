@@ -510,6 +510,15 @@ public class jCommons {
 		} //[endif_api23up]
 	}
 
+
+	public static void RequestRuntimePermission(Controls controls, String[] androidPermissions, int requestCode) {  
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			controls.activity.requestPermissions(androidPermissions, requestCode);
+		} //[endif_api23up]
+	}
+
+
 	public static boolean IsRuntimePermissionGranted(Controls controls, String _androidPermission) {  //"android.permission.CAMERA"
 		boolean r = true;
 		int IsGranted = PackageManager.PERMISSION_GRANTED; //0    PERMISSION_DENIED = -1

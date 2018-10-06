@@ -1,6 +1,6 @@
 package com.example.appsmsdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8.2 - 21 August - 2018
+//Lamw: Lazarus Android Module Wizard - version 0.8.2.1  - 2 September - 2018
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -79,7 +79,11 @@ public class App extends Activity {
    //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
-        controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[0] ,grantResults[0]);
+        if ( (permissions.length > 0) && (grantResults.length > 0) ) {
+            for (int i = 0; i < permissions.length; i++) {
+                controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[i], grantResults[i]);
+            }
+        }
     } //[endif_api23up]
 
     @Override    

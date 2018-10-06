@@ -41,9 +41,9 @@ dependencies {
  
 task run(type: Exec, dependsOn: ':installDebug') {
 	if (System.properties['os.name'].toLowerCase().contains('windows')) {
-	    commandLine 'cmd', '/c', 'adb', 'shell', 'am', 'start', '-n', "com.example.appsmsdemo1/.App"
+	    commandLine 'cmd', '/c', 'adb', 'shell', 'am', 'start', '-n', "com.example.appmediarecorderdemo1/.App"
 	} else {
-	    commandLine 'adb', 'shell', 'am', 'start', '-n', "com.example.appsmsdemo1/.App"
+	    commandLine 'adb', 'shell', 'am', 'start', '-n', "com.example.appmediarecorderdemo1/.App"
 	}
 }
  

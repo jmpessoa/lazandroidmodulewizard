@@ -1,6 +1,6 @@
-package org.lamw.appnewtest11;
+package com.example.appmediarecorderdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.2.1  - 2 September  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.2.2  - 6 October  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1369,6 +1369,11 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	public void RequestRuntimePermission(String _androidPermission, int _requestCode) {  //"android.permission.CAMERA"
 		jCommons.RequestRuntimePermission(controls, _androidPermission, _requestCode);
 	}
+
+	public void RequestRuntimePermission(String[] _androidPermissions, int _requestCode) {  //"android.permission.CAMERA"
+		jCommons.RequestRuntimePermission(controls, _androidPermissions, _requestCode);
+	}
+
 }
 //**class entrypoint**//please, do not remove/change this line!
 

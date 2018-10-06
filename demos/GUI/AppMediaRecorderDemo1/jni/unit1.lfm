@@ -1,52 +1,57 @@
 object AndroidModule1: TAndroidModule1
-  Left = 268
-  Top = 152
+  Left = 283
+  Top = 209
   Width = 320
   Height = 400
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 75
+    Left = 52
     Top = 5
-    Width = 169
-    Height = 20
+    Width = 216
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 6020392
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App Media Recorder Demo1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 6020392
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 114
-    Top = 34
+    Top = 40
     Width = 92
-    Height = 40
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 7022689
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpOneThirdOfParent
@@ -56,20 +61,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
-    Id = 7022689
   end
   object jButton2: jButton
     Left = 114
-    Top = 82
+    Top = 105
     Width = 92
-    Height = 40
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton1
+    Id = 7171781
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpOneThirdOfParent
@@ -79,20 +86,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
-    Id = 7171781
   end
   object jButton3: jButton
     Left = 114
-    Top = 130
+    Top = 170
     Width = 92
-    Height = 40
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton2
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpOneThirdOfParent
@@ -102,17 +111,17 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton3Click
-    Id = 0
   end
   object jMediaRecorder1: jMediaRecorder
-    left = 66
-    top = 184
+    left = 52
+    top = 232
   end
   object jMediaPlayer1: jMediaPlayer
     OnPrepared = jMediaPlayer1Prepared
     OnCompletion = jMediaPlayer1Completion
-    left = 191
-    top = 187
+    left = 200
+    top = 248
   end
 end
