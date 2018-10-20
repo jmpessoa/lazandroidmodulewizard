@@ -1,4 +1,4 @@
-package org.lamw.appsmsmanagerdemo1;
+package org.lamw.appsearchviewdemo1;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -27,7 +27,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
   
     public int checkedIndex = -1;   
     int mRadius = 20;
-    int mSeedId = 870;
+    int mSeedId = 723;  //dummy
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
@@ -278,7 +278,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
 	public void Add(String _radioTitle) {
         // Create a Radio Button for RadioGroup
         RadioButton rb = new RadioButton(controls.activity);
-        rb.setId(mSeedId);
+        rb.setId(this.getId() + mSeedId);
         mSeedId = mSeedId +1;
         rb.setText(_radioTitle);
         //rb.setTextColor(Color.BLACK);
@@ -288,7 +288,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
     public void Add(String _radioTitle, int _color) {
         // Create a Radio Button for RadioGroup
         RadioButton rb = new RadioButton(controls.activity);
-        rb.setId(mSeedId);
+        rb.setId(this.getId() + mSeedId);
         mSeedId = mSeedId +1;
         rb.setText(_radioTitle);
         rb.setTextColor(_color);
