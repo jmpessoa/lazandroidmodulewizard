@@ -40,7 +40,8 @@ uses
   linearlayout,
   framelayout,
   captionpanel,
-  customcamera;
+  customcamera,
+  searchview;
 
 Procedure Register;
   
@@ -64,6 +65,7 @@ begin
   {$I jspinner_icon.lrs}
   {$I jcomboedittext_icon.lrs}
   {$I jautotextview_icon.lrs}
+  {$I jsearchview_icon.lrs}
   {$I jgridview_icon.lrs}
   {$I jListView_icon.lrs}
   {$I jdblistview_icon.lrs}
@@ -114,6 +116,7 @@ begin
       jSpinner,
       jComboEditText,
       jAutoTextView,
+      jSearchView,
       jGridView,
       jListView,
       jDBListView,

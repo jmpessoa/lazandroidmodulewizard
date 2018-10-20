@@ -158,6 +158,11 @@ uses
 
    Procedure Java_Event_pOnCalendarSelectedDayChange(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
 
+   Procedure Java_Event_pOnSearchViewFocusChange(env: PJNIEnv; this: jobject; Obj: TObject; hasFocus: jBoolean);
+   Procedure Java_Event_pOnSearchViewQueryTextSubmit(env: PJNIEnv; this: jobject; Obj: TObject; query: JString);
+   Procedure Java_Event_pOnSearchViewQueryTextChange(env: PJNIEnv; this: jobject; Obj: TObject; newText: JString );
+
+
 implementation
 
 uses
@@ -168,7 +173,8 @@ uses
    tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup, drawingview,
    autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
-   stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview, customcamera, calendarview;
+   stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
+   customcamera, calendarview, searchview;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1431,6 +1437,13 @@ begin
     Exit;
   end;
 
+  if Obj is jSearchView then
+  begin
+    jForm(jSearchView(Obj).Owner).UpdateJNI(gApp);
+    jSearchView(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+
 end;
 
 procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);
@@ -1810,6 +1823,59 @@ begin
     jCustomCamera(Obj).GenEvent_OnCustomCameraSurfaceChanged(Obj, width, height);
   end;
 end;
+
+Procedure Java_Event_pOnSearchViewFocusChange(env: PJNIEnv; this: jobject; Obj: TObject; hasFocus: jBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSearchView then
+  begin
+    jForm(jSearchView(Obj).Owner).UpdateJNI(gApp);
+    jSearchView(Obj).GenEvent_OnSearchViewFocusChange(Obj, Boolean(hasFocus));
+  end;
+end;
+
+
+Procedure Java_Event_pOnSearchViewQueryTextSubmit(env: PJNIEnv; this: jobject; Obj: TObject; query: JString);
+var
+  pasquery: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSearchView then
+  begin
+    jForm(jSearchView(Obj).Owner).UpdateJNI(gApp);
+    pasquery := '';
+    if query <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasquery:= string( env^.GetStringUTFChars(env,query,@_jBoolean) );
+    end;
+    jSearchView(Obj).GenEvent_OnSearchViewQueryTextSubmit(Obj, pasquery);
+  end;
+end;
+
+Procedure Java_Event_pOnSearchViewQueryTextChange(env: PJNIEnv; this: jobject; Obj: TObject; newText: JString );
+var
+  pasnewText: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSearchView then
+  begin
+    jForm(jSearchView(Obj).Owner).UpdateJNI(gApp);
+    pasnewText := '';
+    if newText <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasnewText:= string( env^.GetStringUTFChars(env,newText,@_jBoolean) );
+    end;
+    jSearchView(Obj).GenEvent_OnSearchViewQueryTextChange(Obj, pasnewText);
+  end;
+end;
+
 
 end.
 
