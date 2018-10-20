@@ -6,50 +6,22 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
+import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.view.Gravity;
 
-//-----------------------------------------
-//----- jPanel by jmpessoa
-//-----------------------------------------
 public class jPanel extends RelativeLayout {
 	//Java-Pascal Interface
 	private long             PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Class for Event
-	private ViewGroup       parent   = null;
-
-	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
-
-	private int lparamsAnchorRule[] = new int[40];
-	int countAnchorRule = 0;
-
-	private int lparamsParentRule[] = new int[40];
-	int countParentRule = 0;
-
-	int lparamH = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-	int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT; //w
-	int marginLeft = 0;
-	int marginTop = 0;
-	int marginRight  = 0;
-	int marginBottom = 0;
- //[ifdef_api14up]
- private int lgravity = Gravity.TOP | Gravity.START;
- //[endif_api14up]
- /* //[endif_api14up]
- private int lgravity = Gravity.TOP | Gravity.LEFT;
- //[ifdef_api14up] */
-	private float lweight = 0;
-
-	boolean mRemovedFromParent = false;
-
+	
+	private jCommons LAMWCommon;
+	
 	private GestureDetector gDetect;
 	private ScaleGestureDetector scaleGestureDetector;
 
@@ -62,129 +34,61 @@ public class jPanel extends RelativeLayout {
 	//Constructor
 	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
 		super(context);
-		// Connect Pascal I/F
+		
 		PasObj   = pasobj;
 		controls = ctrls;
-
-		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-		//
+		
+		LAMWCommon = new jCommons(this,context, PasObj);
+	 
 		gDetect = new GestureDetector(controls.activity, new GestureListener());
 
 		scaleGestureDetector = new ScaleGestureDetector(controls.activity, new simpleOnScaleGestureListener());
 	}
 
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-		marginLeft = _left;
-		marginTop = _top;
-		marginRight = _right;
-		marginBottom = _bottom;
-		lparamH = _h;
-		lparamW = _w;
-		lparams.width  = lparamW;
-		lparams.height = lparamH;
+		 String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
+	     this.setTag(tag);
+		 LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
 	public void setLParamWidth(int _w) {
-		lparamW = _w;
-		lparams.width  = lparamW;
+		 LAMWCommon.setLParamWidth(_w);
 	}
 
 	public void setLParamHeight(int _h) {
-		lparamH = _h;
-		lparams.height = lparamH;
+		 LAMWCommon.setLParamHeight(_h);
 	}
 
 	public void setLGravity(int _g) {
-		lgravity = _g;
+	  	 LAMWCommon.setLGravity(_g);
 	}
 
 	public void setLWeight(float _w) {
-		lweight = _w;
+		LAMWCommon.setLWeight(_w);
 	}
 
 	public int getLParamHeight() {
-		int r = lparamH;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getHeight();
-		}		
-		return r;
+		return  LAMWCommon.getLParamHeight();
 	}
 
-	public int getLParamWidth() {				
-		int r = lparamW;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getWidth();
-		}		
-		return r;		
+	public int getLParamWidth() {		
+	   return LAMWCommon.getLParamWidth();
 	}
-
-	public void resetLParamsRules() {   //clearLayoutAll
-		
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			
-			for (int i = 0; i < countAnchorRule; i++) {								
-				  if(Build.VERSION.SDK_INT < 17)
-					  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsAnchorRule[i], 0);
-					
-	//[ifdef_api17up]
-				 if(Build.VERSION.SDK_INT >= 17)
-					((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsAnchorRule[i]); //need API >= 17!
-	//[endif_api17up]
-				 
-			 }
-			
-			 for (int j = 0; j < countParentRule; j++) {
-				  if(Build.VERSION.SDK_INT < 17) 
-					  ((android.widget.RelativeLayout.LayoutParams) lparams).addRule(lparamsParentRule[j], 0);
-					
-	//[ifdef_api17up]
-				  if(Build.VERSION.SDK_INT >= 17)
-					  ((android.widget.RelativeLayout.LayoutParams) lparams).removeRule(lparamsParentRule[j]);  //need API >= 17!
-	//[endif_api17up]
-				
-			}
-			
-		}
-		
-		countAnchorRule = 0;
-		countParentRule = 0;
+	
+	public void resetLParamsRules() {   //clearLayoutAll		
+		LAMWCommon.clearLayoutAll();
 	}
 
 	public void addLParamsAnchorRule(int rule) {
-		lparamsAnchorRule[countAnchorRule] = rule;
-		countAnchorRule = countAnchorRule + 1;
+		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
-	public void addLParamsParentRule(int rule) {
-		lparamsParentRule[countParentRule] = rule;
-		countParentRule = countParentRule + 1;
+	public void addLParamsParentRule(int rule) {		
+		 LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	//by jmpessoa
 	public void setLayoutAll(int idAnchor) {
-		lparams.width  = lparamW;
-		lparams.height = lparamH;
-		lparams.setMargins(marginLeft, marginTop,marginRight,marginBottom);
-
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			if (idAnchor > 0) {
-				for (int i = 0; i < countAnchorRule; i++) {
-					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
-				}
-			}
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-			}
-		}
-		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-		}
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}
-		//
-		setLayoutParams(lparams);
+		 LAMWCommon.setLayoutAll(idAnchor);
 	}
 
 	//GetView!-android.widget.RelativeLayout
@@ -192,43 +96,21 @@ public class jPanel extends RelativeLayout {
 		return this;
 	}
 
-	private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-		if (aparent instanceof FrameLayout) {
-			return new FrameLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof RelativeLayout) {
-			return new RelativeLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof LinearLayout) {
-			return new LinearLayout.LayoutParams(baseparams);
-		} else if (aparent == null) {
-			throw new NullPointerException("Parent is null");
-		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ aparent.getClass().getName());
-		}
+	public  void SetViewParent( android.view.ViewGroup _viewgroup ) {		
+		 LAMWCommon.setParent(_viewgroup);
 	}
 
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-
-		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		lparams = null;
-		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
-
-		mRemovedFromParent=false;
+	public ViewGroup GetParent() {   //TODO Pascal .. done!
+	      return LAMWCommon.getParent();
 	}
-
+	
 	// Free object except Self, Pascal Code Free the class.
 	public  void Free() {
-		if (parent != null) { parent.removeView(this); }
-		lparams = null;
+		 LAMWCommon.free();
 	}
 
-	public void RemoveParent() {
-		if (!mRemovedFromParent) {
-			parent.removeView(this);
-			mRemovedFromParent = true;
-		}
+	public void RemoveFromViewParent() {
+		LAMWCommon.removeFromViewParent();
 	}
 
 	@Override
@@ -316,25 +198,16 @@ public class jPanel extends RelativeLayout {
 		MAX_ZOOM = _maxZoomFactor;
 	}
 
-	public void CenterInParent() {
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			((RelativeLayout.LayoutParams)lparams).addRule(android.widget.RelativeLayout.CENTER_IN_PARENT);  //android.widget.RelativeLayout.CENTER_VERTICAL = 15
-			countParentRule = countParentRule + 1;
-		}
+	public void CenterInParent() {		
+		LAMWCommon.CenterInParent();
 	}
 
 	public void MatchParent() {
-		lparamH = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-		lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT; //w
-		lparams.height = lparamH;
-		lparams.width = lparamW;
+		LAMWCommon.MatchParent();		
 	}
 
 	public void WrapParent() {
-		lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-		lparamW = android.view.ViewGroup.LayoutParams.WRAP_CONTENT; //w
-		lparams.height = lparamH;
-		lparams.width = lparamW;
+		LAMWCommon.WrapParent();		
 	}
 	
 	public void SetRoundCorner() {
@@ -356,6 +229,65 @@ public class jPanel extends RelativeLayout {
 	
 	public void SetRadiusRoundCorner(int _radius) {
 		mRadius =  _radius;
+	}
+	
+	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
+	public void SetBackgroundAlpha(int _alpha) {		
+	  this.getBackground().setAlpha(_alpha); //0-255
+	}
+	
+	public void SetMarginLeftTopRightBottom(int _left, int _top, int _right, int _bottom) {		
+		LAMWCommon.setMarginLeftTopRightBottom( _left,  _top, _right,_bottom);
+	}
+	
+	public void AddView(View _view) {	
+		LAMWCommon.AddView(_view);
+	}
+	
+	public void	SetFitsSystemWindows(boolean _value) {
+		LAMWCommon.setFitsSystemWindows(_value);
+	}
+	
+	public void RemoveView(View _view) {
+	   this.removeView(_view);
+	}   
+	   
+	public void RemoveAllViews() {
+	   this.removeAllViews(); 
+	}
+	
+	public int GetChildCount() {
+	  return  this.getChildCount();
+	}
+	
+	public void BringChildToFront(View _view) {		
+		this.bringChildToFront( _view);
+		if (Build.VERSION.SDK_INT < 19 ) {			
+		   	   this.requestLayout();
+			   this.invalidate();		    
+		}		
+	}
+	
+	
+    /*
+    Change the view's z order in the tree, so it's on top of other sibling views.
+    Prior to KITKAT/4.4/Api 19 this method should be followed by calls to requestLayout() and invalidate()
+    on the view's parent to force the parent to redraw with the new child ordering.
+  */
+	public void BringToFront() {
+		this.bringToFront();	
+		if (Build.VERSION.SDK_INT < 19 ) {			
+			ViewGroup parent = LAMWCommon.getParent();
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+		}		
+		this.setVisibility(android.view.View.VISIBLE);
+	}
+	
+	public void SetVisibilityGone() {
+		LAMWCommon.setVisibilityGone();
 	}
 	
 }

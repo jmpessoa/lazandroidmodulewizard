@@ -1,0 +1,889 @@
+unit searchview;
+
+{$mode delphi}
+
+interface
+
+uses
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls;
+
+type
+
+TOnFocusChange = procedure(Sender: TObject; hasFocus: boolean) of object;
+TOnQueryTextSubmit = procedure(Sender: TObject; query: string) of object;
+TOnQueryTextChange = procedure(Sender: TObject; newQuery: string) of object;
+
+{Draft Component code by "Lazarus Android Module Wizard" [9/23/2018 23:32:36]}
+{https://github.com/jmpessoa/lazandroidmodulewizard}
+
+{jVisualControl template}
+
+jSearchView = class(jVisualControl)
+ private
+    FOnFocusChange: TOnFocusChange;
+    FOnQueryTextSubmit: TOnQueryTextSubmit;
+    FOnQueryTextChange: TOnQueryTextChange;
+    FOnXClick: TOnNotify;
+
+    procedure SetVisible(Value: Boolean);
+    procedure SetColor(Value: TARGBColorBridge); //background
+    procedure UpdateLParamHeight;
+    procedure UpdateLParamWidth;
+    procedure TryNewParent(refApp: jApp);
+
+ public
+    constructor Create(AOwner: TComponent); override;
+    destructor  Destroy; override;
+    procedure Init(refApp: jApp); override;
+    procedure Refresh;
+    procedure UpdateLayout; override;
+    procedure ClearLayout;
+
+    procedure GenEvent_OnClick(Obj: TObject);
+    function jCreate(): jObject;
+    procedure jFree();
+    procedure SetViewParent(_viewgroup: jObject); override;
+    function GetParent(): jObject;
+    procedure RemoveFromViewParent();  override;
+    function GetView(): jObject;  override;
+    procedure SetLParamWidth(_w: integer);
+    procedure SetLParamHeight(_h: integer);
+    function GetLParamWidth(): integer;
+    function GetLParamHeight(): integer;
+    procedure SetLGravity(_g: integer);
+    procedure SetLWeight(_w: single);
+    procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+    procedure AddLParamsAnchorRule(_rule: integer);
+    procedure AddLParamsParentRule(_rule: integer);
+    procedure SetLayoutAll(_idAnchor: integer);
+    procedure ClearLayoutAll();
+    procedure SetId(_id: integer);
+    function GetQuery(): string;
+    function GetQueryHint(): string;
+    function IsIconfiedByDefault(): boolean;
+    procedure SetIconifiedByDefault(_value: boolean);
+    procedure SetQueryHint(_hint: string);
+
+    procedure GenEvent_OnSearchViewFocusChange(Sender: TObject; hasFocus: boolean);
+    procedure GenEvent_OnSearchViewQueryTextSubmit(Sender: TObject; query: string);
+    procedure GenEvent_OnSearchViewQueryTextChange(Sender: TObject; newText: string);
+
+ published
+    property BackgroundColor: TARGBColorBridge read FColor write SetColor;
+   // property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
+    property OnXClick: TOnNotify read FOnXClick write FOnXClick;
+    property OnFocusChange: TOnFocusChange read FOnFocusChange write FOnFocusChange;
+    property OnQueryTextSubmit: TOnQueryTextSubmit read FOnQueryTextSubmit write FOnQueryTextSubmit;
+    property OnQueryTextChange: TOnQueryTextChange read FOnQueryTextChange write FOnQueryTextChange;
+
+end;
+
+function jSearchView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+procedure jSearchView_jFree(env: PJNIEnv; _jsearchview: JObject);
+procedure jSearchView_SetViewParent(env: PJNIEnv; _jsearchview: JObject; _viewgroup: jObject);
+function jSearchView_GetParent(env: PJNIEnv; _jsearchview: JObject): jObject;
+procedure jSearchView_RemoveFromViewParent(env: PJNIEnv; _jsearchview: JObject);
+function jSearchView_GetView(env: PJNIEnv; _jsearchview: JObject): jObject;
+procedure jSearchView_SetLParamWidth(env: PJNIEnv; _jsearchview: JObject; _w: integer);
+procedure jSearchView_SetLParamHeight(env: PJNIEnv; _jsearchview: JObject; _h: integer);
+function jSearchView_GetLParamWidth(env: PJNIEnv; _jsearchview: JObject): integer;
+function jSearchView_GetLParamHeight(env: PJNIEnv; _jsearchview: JObject): integer;
+procedure jSearchView_SetLGravity(env: PJNIEnv; _jsearchview: JObject; _g: integer);
+procedure jSearchView_SetLWeight(env: PJNIEnv; _jsearchview: JObject; _w: single);
+procedure jSearchView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jsearchview: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+procedure jSearchView_AddLParamsAnchorRule(env: PJNIEnv; _jsearchview: JObject; _rule: integer);
+procedure jSearchView_AddLParamsParentRule(env: PJNIEnv; _jsearchview: JObject; _rule: integer);
+procedure jSearchView_SetLayoutAll(env: PJNIEnv; _jsearchview: JObject; _idAnchor: integer);
+procedure jSearchView_ClearLayoutAll(env: PJNIEnv; _jsearchview: JObject);
+procedure jSearchView_SetId(env: PJNIEnv; _jsearchview: JObject; _id: integer);
+function jSearchView_GetQuery(env: PJNIEnv; _jsearchview: JObject): string;
+function jSearchView_GetQueryHint(env: PJNIEnv; _jsearchview: JObject): string;
+function jSearchView_IsIconfiedByDefault(env: PJNIEnv; _jsearchview: JObject): boolean;
+procedure jSearchView_SetIconifiedByDefault(env: PJNIEnv; _jsearchview: JObject; _value: boolean);
+procedure jSearchView_SetQueryHint(env: PJNIEnv; _jsearchview: JObject; _hint: string);
+
+
+implementation
+
+uses
+   customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
+   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
+   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;
+
+{---------  jSearchView  --------------}
+
+constructor jSearchView.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FMarginLeft   := 10;
+  FMarginTop    := 10;
+  FMarginBottom := 10;
+  FMarginRight  := 10;
+  FHeight       := 48; //??
+  FWidth        := 192; //??
+  FLParamWidth  := lpMatchParent;  //lpWrapContent
+  FLParamHeight := lpWrapContent; //lpMatchParent
+  FAcceptChildrenAtDesignTime:= False;
+//your code here....
+end;
+
+destructor jSearchView.Destroy;
+begin
+  if not (csDesigning in ComponentState) then
+  begin
+     if FjObject <> nil then
+     begin
+       jFree();
+       FjObject:= nil;
+     end;
+  end;
+  //you others free code here...'
+  inherited Destroy;
+end;
+
+procedure jSearchView.TryNewParent(refApp: jApp);
+begin
+  if FParent is jPanel then
+  begin
+    jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end else
+  if FParent is jCustomDialog then
+  begin
+    jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
+  end else
+  if FParent is jsCoordinatorLayout then
+  begin
+    jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end else
+  if FParent is jsCardView then
+  begin
+      jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+end;
+
+procedure jSearchView.Init(refApp: jApp);
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  if FInitialized  then Exit;
+  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  //your code here: set/initialize create params....
+  FjObject:= jCreate(); //jSelf !
+  FInitialized:= True;
+  if FParent <> nil then
+  begin
+    TryNewParent(refApp);
+  end;
+
+  FjPRLayoutHome:= FjPRLayout;
+
+  jSearchView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+  jSearchView_SetId(FjEnv, FjObject, Self.Id);
+  jSearchView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                        GetLayoutParams(gApp, FLParamWidth, sdW),
+                        GetLayoutParams(gApp, FLParamHeight, sdH));
+
+  if FParent is jPanel then
+  begin
+    Self.UpdateLayout;
+  end;
+
+  for rToA := raAbove to raAlignRight do
+  begin
+    if rToA in FPositionRelativeToAnchor then
+    begin
+      jSearchView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+    end;
+  end;
+  for rToP := rpBottom to rpCenterVertical do
+  begin
+    if rToP in FPositionRelativeToParent then
+    begin
+      jSearchView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+    end;
+  end;
+
+  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
+  else Self.AnchorId:= -1; //dummy
+
+  jSearchView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+
+  if  FColor <> colbrDefault then
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+
+  View_SetVisible(FjEnv, FjObject, FVisible);
+end;
+
+procedure jSearchView.SetColor(Value: TARGBColorBridge);
+begin
+  FColor:= Value;
+  if (FInitialized = True) and (FColor <> colbrDefault)  then
+    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+end;
+procedure jSearchView.SetVisible(Value : Boolean);
+begin
+  FVisible:= Value;
+  if FInitialized then
+    View_SetVisible(FjEnv, FjObject, FVisible);
+end;
+procedure jSearchView.UpdateLParamWidth;
+var
+  side: TSide;
+begin
+  if FInitialized then
+  begin
+    if Self.Parent is jForm then
+    begin
+      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
+      jSearchView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+    end
+    else
+    begin
+      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
+        jSearchView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+      else //lpMatchParent or others
+        jSearchView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+    end;
+  end;
+end;
+
+procedure jSearchView.UpdateLParamHeight;
+var
+  side: TSide;
+begin
+  if FInitialized then
+  begin
+    if Self.Parent is jForm then
+    begin
+      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
+      jSearchView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+    end
+    else
+    begin
+      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
+        jSearchView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+      else //lpMatchParent and others
+        jSearchView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
+    end;
+  end;
+end;
+
+procedure jSearchView.UpdateLayout;
+begin
+  if FInitialized then
+  begin
+    inherited UpdateLayout;
+    UpdateLParamWidth;
+    UpdateLParamHeight;
+  jSearchView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  end;
+end;
+
+procedure jSearchView.Refresh;
+begin
+  if FInitialized then
+    View_Invalidate(FjEnv, FjObject);
+end;
+
+procedure jSearchView.ClearLayout;
+var
+   rToP: TPositionRelativeToParent;
+   rToA: TPositionRelativeToAnchorID;
+begin
+ jSearchView_ClearLayoutAll(FjEnv, FjObject );
+   for rToP := rpBottom to rpCenterVertical do
+   begin
+      if rToP in FPositionRelativeToParent then
+        jSearchView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+   end;
+   for rToA := raAbove to raAlignRight do
+   begin
+     if rToA in FPositionRelativeToAnchor then
+       jSearchView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+   end;
+end;
+
+//Event : Java -> Pascal
+procedure jSearchView.GenEvent_OnClick(Obj: TObject);
+begin
+  if Assigned(FOnXClick) then FOnXClick(Obj);
+end;
+
+function jSearchView.jCreate(): jObject;
+begin
+   Result:= jSearchView_jCreate(FjEnv, int64(Self), FjThis);
+end;
+
+procedure jSearchView.jFree();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_jFree(FjEnv, FjObject);
+end;
+
+procedure jSearchView.SetViewParent(_viewgroup: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetViewParent(FjEnv, FjObject, _viewgroup);
+end;
+
+function jSearchView.GetParent(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSearchView_GetParent(FjEnv, FjObject);
+end;
+
+procedure jSearchView.RemoveFromViewParent();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+function jSearchView.GetView(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSearchView_GetView(FjEnv, FjObject);
+end;
+
+procedure jSearchView.SetLParamWidth(_w: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetLParamWidth(FjEnv, FjObject, _w);
+end;
+
+procedure jSearchView.SetLParamHeight(_h: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetLParamHeight(FjEnv, FjObject, _h);
+end;
+
+function jSearchView.GetLParamWidth(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSearchView_GetLParamWidth(FjEnv, FjObject);
+end;
+
+function jSearchView.GetLParamHeight(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSearchView_GetLParamHeight(FjEnv, FjObject);
+end;
+
+procedure jSearchView.SetLGravity(_g: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetLGravity(FjEnv, FjObject, _g);
+end;
+
+procedure jSearchView.SetLWeight(_w: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetLWeight(FjEnv, FjObject, _w);
+end;
+
+procedure jSearchView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+end;
+
+procedure jSearchView.AddLParamsAnchorRule(_rule: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+end;
+
+procedure jSearchView.AddLParamsParentRule(_rule: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+end;
+
+procedure jSearchView.SetLayoutAll(_idAnchor: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+end;
+
+procedure jSearchView.ClearLayoutAll();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_ClearLayoutAll(FjEnv, FjObject);
+end;
+
+procedure jSearchView.SetId(_id: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetId(FjEnv, FjObject, _id);
+end;
+
+function jSearchView.GetQuery(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSearchView_GetQuery(FjEnv, FjObject);
+end;
+
+function jSearchView.GetQueryHint(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSearchView_GetQueryHint(FjEnv, FjObject);
+end;
+
+function jSearchView.IsIconfiedByDefault(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSearchView_IsIconfiedByDefault(FjEnv, FjObject);
+end;
+
+procedure jSearchView.SetIconifiedByDefault(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetIconifiedByDefault(FjEnv, FjObject, _value);
+end;
+
+procedure jSearchView.SetQueryHint(_hint: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetQueryHint(FjEnv, FjObject, _hint);
+end;
+
+procedure jSearchView.GenEvent_OnSearchViewFocusChange(Sender: TObject; hasFocus: boolean);
+begin
+   if Assigned(FOnFocusChange) then FOnFocusChange(Sender, hasFocus);
+end;
+
+procedure jSearchView.GenEvent_OnSearchViewQueryTextSubmit(Sender: TObject; query: string);
+begin
+  if Assigned(FOnQueryTextSubmit) then FOnQueryTextSubmit(Sender, query);
+end;
+
+procedure jSearchView.GenEvent_OnSearchViewQueryTextChange(Sender: TObject; newText: string);
+begin
+ if Assigned(FOnQueryTextChange) then FOnQueryTextChange(Sender, newText);
+end;
+
+
+{-------- jSearchView_JNI_Bridge ----------}
+
+function jSearchView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jCls:= Get_gjClass(env);
+  jMethod:= env^.GetMethodID(env, jCls, 'jSearchView_jCreate', '(J)Ljava/lang/Object;');
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+end;
+
+
+procedure jSearchView_jFree(env: PJNIEnv; _jsearchview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
+  env^.CallVoidMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetViewParent(env: PJNIEnv; _jsearchview: JObject; _viewgroup: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _viewgroup;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jSearchView_GetParent(env: PJNIEnv; _jsearchview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
+  Result:= env^.CallObjectMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_RemoveFromViewParent(env: PJNIEnv; _jsearchview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
+  env^.CallVoidMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jSearchView_GetView(env: PJNIEnv; _jsearchview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
+  Result:= env^.CallObjectMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetLParamWidth(env: PJNIEnv; _jsearchview: JObject; _w: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _w;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetLParamHeight(env: PJNIEnv; _jsearchview: JObject; _h: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _h;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jSearchView_GetLParamWidth(env: PJNIEnv; _jsearchview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamWidth', '()I');
+  Result:= env^.CallIntMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jSearchView_GetLParamHeight(env: PJNIEnv; _jsearchview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamHeight', '()I');
+  Result:= env^.CallIntMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetLGravity(env: PJNIEnv; _jsearchview: JObject; _g: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _g;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetLWeight(env: PJNIEnv; _jsearchview: JObject; _w: single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _w;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLWeight', '(F)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jsearchview: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+var
+  jParams: array[0..5] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _left;
+  jParams[1].i:= _top;
+  jParams[2].i:= _right;
+  jParams[3].i:= _bottom;
+  jParams[4].i:= _w;
+  jParams[5].i:= _h;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_AddLParamsAnchorRule(env: PJNIEnv; _jsearchview: JObject; _rule: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _rule;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_AddLParamsParentRule(env: PJNIEnv; _jsearchview: JObject; _rule: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _rule;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetLayoutAll(env: PJNIEnv; _jsearchview: JObject; _idAnchor: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _idAnchor;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_ClearLayoutAll(env: PJNIEnv; _jsearchview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetId(env: PJNIEnv; _jsearchview: JObject; _id: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _id;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jSearchView_GetQuery(env: PJNIEnv; _jsearchview: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetQuery', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jsearchview, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jSearchView_GetQueryHint(env: PJNIEnv; _jsearchview: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetQueryHint', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jsearchview, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jSearchView_IsIconfiedByDefault(env: PJNIEnv; _jsearchview: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsIconfiedByDefault', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jsearchview, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetIconifiedByDefault(env: PJNIEnv; _jsearchview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetIconifiedByDefault', '(Z)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSearchView_SetQueryHint(env: PJNIEnv; _jsearchview: JObject; _hint: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_hint));
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetQueryHint', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+
+end.

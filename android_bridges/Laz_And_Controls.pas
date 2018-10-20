@@ -1364,6 +1364,8 @@ type
      property OnClick: TOnNotify read FOnClick write FOnClick;
   end;
 
+  TFilterMode = (fmStartsWith, fmContains);
+
   jListView = class(jVisualControl)
   private
     FOnClickItem  : TOnClickCaptionItem;
@@ -1507,6 +1509,11 @@ type
 
     procedure SaveToFile(_appInternalFileName: string);
     procedure LoadFromFile(_appInternalFileName: string);
+
+    procedure SetFilterQuery(_query: string); overload;
+    procedure SetFilterQuery(_query: string; _filterMode: integer);  overload;
+    procedure SetFilterMode(_filterMode: TFilterMode);
+    procedure ClearFilterQuery();
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -8757,6 +8764,35 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_LoadFromFile(FjEnv, FjObject, _appInternalFileName);
+end;
+
+
+procedure jListView.SetFilterQuery(_query: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetFilterQuery(FjEnv, FjObject, _query);
+end;
+
+procedure jListView.SetFilterQuery(_query: string; _filterMode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetFilterQuery(FjEnv, FjObject, _query ,_filterMode);
+end;
+
+procedure jListView.SetFilterMode(_filterMode: TFilterMode);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetFilterMode(FjEnv, FjObject, Ord(_filterMode));
+end;
+
+procedure jListView.ClearFilterQuery();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_ClearFilterQuery(FjEnv, FjObject);
 end;
 
 //------------------------------------------------------------------------------

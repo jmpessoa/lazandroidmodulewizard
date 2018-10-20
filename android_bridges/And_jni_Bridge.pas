@@ -552,6 +552,10 @@ procedure jListView_SaveToFile(env: PJNIEnv; _jlistview: JObject; _appInternalFi
 //procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
 function jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
 
+procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string); overload;
+procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string; _filterMode: integer);  overload;
+procedure jListView_SetFilterMode(env: PJNIEnv; _jlistview: JObject; _filterMode: integer);
+procedure jListView_ClearFilterQuery(env: PJNIEnv; _jlistview: JObject);
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -5845,6 +5849,62 @@ begin
     end;
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_query));
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFilterQuery', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string; _filterMode: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_query));
+  jParams[1].i:= _filterMode;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFilterQuery', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_SetFilterMode(env: PJNIEnv; _jlistview: JObject; _filterMode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _filterMode;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFilterMode', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jListView_ClearFilterQuery(env: PJNIEnv; _jlistview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearFilterQuery', '()V');
+  env^.CallVoidMethod(env, _jlistview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

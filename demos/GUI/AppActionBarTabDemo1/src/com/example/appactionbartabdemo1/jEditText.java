@@ -1,5 +1,13 @@
 package com.example.appactionbartabdemo1;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 
 import android.content.ClipData;
@@ -42,13 +50,16 @@ public class jEditText extends EditText {
 	private boolean canDispatchChangeEvent = false;
 	private boolean canDispatchChangedEvent = false;
 	private boolean mFlagSuggestion = false;
+	private boolean mFlagCapSentence = false;
 
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
 
-	float mTextSize = 0; //default
-	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+	private float mTextSize = 0; //default
+	private int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
+	private boolean mCloseSoftInputOnEnter = true;
+	
 	//Constructor
 	public  jEditText(android.content.Context context,
 					  Controls ctrls,long pasobj ) {
@@ -83,19 +94,18 @@ public class jEditText extends EditText {
 		};
 		setOnClickListener(onClickListener);
 
-		//Init Event : http://socome.tistory.com/15
 		onKeyListener = new OnKeyListener() {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
-				if (event.getAction() == KeyEvent.ACTION_UP) {
-					if (keyCode == KeyEvent.KEYCODE_ENTER) {
-						InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-						//Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
-						// LoadMan
-						controls.pOnEnter(LAMWCommon.getPasObj());  //just Enter/Done/Next/backbutton ....!
-						return true;
+				//if (event.getAction() == KeyEvent.ACTION_UP) {
+					if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok						
+						if (mCloseSoftInputOnEnter) {
+							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						}
+						controls.pOnEnter(LAMWCommon.getPasObj());
+						return mCloseSoftInputOnEnter;
 					}
-				}
+				//}
 				return false;
 			}
 		};
@@ -129,9 +139,7 @@ public class jEditText extends EditText {
 		removeTextChangedListener(textwatcher);
 		textwatcher = null;
 		setOnKeyListener(null);	
-		setText("");
 		LAMWCommon.free();
-	
 	}
 	
 	public long GetPasObj() {
@@ -207,31 +215,29 @@ public class jEditText extends EditText {
 			this.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED);
 		}
 		else if (str.equals("CAPCHARACTERS")) {
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 		}
 		else if (str.equals("TEXT")) {
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 		}
 		else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
 		else if (str.equals("PASSNUMBER"))  {this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-		else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+		else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 
 		else if (str.equals("TEXTMULTILINE")){
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		}
 
 		else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
+
+		if (!mFlagSuggestion) {
+		  this.setInputType(this.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                }
+		if (mFlagCapSentence) {
+		  this.setInputType(this.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+                }
 
 	}
 
@@ -242,22 +248,23 @@ public class jEditText extends EditText {
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END               ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             case 0 : { setGravity( Gravity.LEFT              ); }; break;
             case 1 : { setGravity( Gravity.RIGHT             ); }; break;
  //[ifdef_api14up] */
-            case 2 : { setGravity( Gravity.TOP               ); }; break;
-            case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
-            case 4 : { setGravity( Gravity.CENTER            ); }; break;
-            case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
-            case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
+            
+            case 2 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+            
  //[ifdef_api14up]
             default : { setGravity( Gravity.START            ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             default : { setGravity( Gravity.LEFT             ); }; break;
  //[ifdef_api14up] */
-        };
+            
+        }
     }
 
 	//by jmpessoa
@@ -392,6 +399,10 @@ public class jEditText extends EditText {
 		mFlagSuggestion = _value;
 	}
 
+	public void SetCapSentence(boolean _value) {
+		mFlagCapSentence = _value;
+	}
+
 	public void CopyToClipboard() {
 		mClipData = ClipData.newPlainText("text", this.getText().toString());
 		mClipBoard.setPrimaryClip(mClipData);
@@ -414,16 +425,15 @@ public class jEditText extends EditText {
 		this.setText(t);
 	}
 
-	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitInches, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
+	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
 	public void SetFontSizeUnit(int _unit) {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
@@ -461,8 +471,8 @@ public class jEditText extends EditText {
 	public void SetBackgroundByImage(Bitmap _image) {	
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 //[ifdef_api16up]
-		//if(Build.VERSION.SDK_INT >= 16) 
-  this.setBackground(d);
+	if(Build.VERSION.SDK_INT >= 16) 
+             this.setBackground(d);
 //[endif_api16up]
 	}	
 		
@@ -525,10 +535,96 @@ public class jEditText extends EditText {
 				case 4: this.setTextDirection(View.TEXT_DIRECTION_RTL); 
 					 		  		  		   
 				}			
-				Log.i("SetTextDirection", "SetTextDirection");
+				//Log.i("SetTextDirection", "SetTextDirection");
 		 }	
        //[endif_api17up]				
 	}
 	
+	public void SetFontFromAssets(String _fontName) {   //   "font/font.ttf"
+        Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
+        this.setTypeface(customfont);
+    }
+	
+	public void RequestFocus() {
+		this.requestFocus();
+	}
+
+	public void SetCloseSoftInputOnEnter(boolean _closeSoftInput) {
+		mCloseSoftInputOnEnter = _closeSoftInput;
+	}
+	
+	public void LoadFromFile(String _path, String _filename) {
+		
+		File file = new File(_path, _filename);
+		StringBuilder content = new StringBuilder();
+		
+		try {
+		    BufferedReader br = new BufferedReader(new FileReader(file));
+		    String line;
+
+		    while ((line = br.readLine()) != null) {
+		    	content.append(line);
+		    	content.append('\n');
+		    }
+		    br.close();
+		}
+		catch (IOException e) {
+			//
+		}
+		this.setText(content.toString());
+	}
+	
+	
+	public void LoadFromFile(String _filename) {
+
+		     String retStr = "";
+
+		     try {
+		         InputStream inputStream = controls.activity.openFileInput(_filename);
+
+		         if ( inputStream != null ) {
+		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		             String receiveString = "";
+		             StringBuilder stringBuilder = new StringBuilder();
+		             while ( (receiveString = bufferedReader.readLine()) != null ) {
+		                 stringBuilder.append(receiveString);
+		             }
+
+		             inputStream.close();
+		             retStr = stringBuilder.toString();
+		         }
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
+		     }
+		     this.setText(retStr);
+    }
+	
+	public void SaveToFile(String _path, String _filename){
+		     FileWriter fWriter;     
+		     try{ // Environment.getExternalStorageDirectory().getPath()
+		          fWriter = new FileWriter(_path +"/"+ _filename);
+		          fWriter.write(this.getText().toString());
+		          fWriter.flush();
+		          fWriter.close();
+		      }catch(Exception e){
+		          e.printStackTrace();
+		      }
+	}
+	
+	public void SaveToFile(String _filename) {	  	 
+		     try {
+		         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(controls.activity.openFileOutput(_filename, Context.MODE_PRIVATE));
+		         //outputStreamWriter.write("_header");
+		         outputStreamWriter.write(this.getText().toString());
+		         //outputStreamWriter.write("_footer");
+		         outputStreamWriter.close();
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
+		     }
+    }
+	   
 }
 

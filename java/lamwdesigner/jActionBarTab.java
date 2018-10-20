@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package com.example.appactionbartabdemo1;
 
 import java.lang.reflect.Field;
 
@@ -23,6 +23,12 @@ import android.widget.RelativeLayout.LayoutParams;
 class TabContentFragment extends Fragment {
     private View mView;
     private String mText;
+
+
+	/*.*/public TabContentFragment() {
+
+	}
+
     /*.*/public TabContentFragment(View v, String tag) {	    	
         mView = v;	       
         mText = tag;

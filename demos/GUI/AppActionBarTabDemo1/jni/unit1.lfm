@@ -7,20 +7,22 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jPanel1: jPanel
-    Left = 8
+    Left = 4
     Top = 56
-    Width = 289
+    Width = 297
     Height = 136
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 4
+    Enabled = True
     Visible = False
     Id = 0
     PosRelativeToAnchor = []
@@ -34,12 +36,13 @@ object AndroidModule1: TAndroidModule1
     object jTextView1: jTextView
       Left = 5
       Top = 5
-      Width = 38
-      Height = 20
+      Width = 50
+      Height = 26
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Id = 7271715
       PosRelativeToAnchor = []
@@ -48,23 +51,24 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       Text = 'Name:'
       Alignment = taLeft
-      Enabled = True
       BackgroundColor = colbrDefault
       FontColor = colbrLimeGreen
       FontSize = 0
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
+      GravityInParent = lgNone
     end
     object jEditText1: jEditText
       Tag = 1
       Left = 5
-      Top = 40
-      Width = 274
+      Top = 46
+      Width = 287
       Height = 39
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
+      Enabled = True
       Visible = True
       Anchor = jTextView1
       Id = 4813408
@@ -87,16 +91,20 @@ object AndroidModule1: TAndroidModule1
       WrappingLine = False
       Editable = True
       FontSizeUnit = unitDefault
+      CloseSoftInputOnEnter = True
+      CapSentence = False
+      GravityInParent = lgNone
     end
     object jButton1: jButton
       Left = 2
-      Top = 93
-      Width = 283
-      Height = 40
+      Top = 99
+      Width = 293
+      Height = 57
       MarginLeft = 2
       MarginTop = 4
       MarginRight = 2
       MarginBottom = 4
+      Enabled = True
       Visible = True
       Anchor = jEditText1
       Id = 0
@@ -109,18 +117,20 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrLimeGreen
       FontSize = 0
       FontSizeUnit = unitDefault
+      GravityInParent = lgNone
       OnClick = jButton1Click
     end
   end
   object jPanel2: jPanel
-    Left = 8
+    Left = 4
     Top = 200
-    Width = 289
+    Width = 297
     Height = 136
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 4
+    Enabled = True
     Visible = False
     Id = 1
     PosRelativeToAnchor = []
@@ -132,14 +142,15 @@ object AndroidModule1: TAndroidModule1
     MaxPinchZoomFactor = 4
     OnFlingGesture = jPanel2FlingGesture
     object jTextView2: jTextView
-      Left = 119
+      Left = 116
       Top = 5
-      Width = 51
-      Height = 20
+      Width = 64
+      Height = 26
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Id = 506422
       PosRelativeToAnchor = []
@@ -148,23 +159,24 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       Text = 'Address:'
       Alignment = taLeft
-      Enabled = True
       BackgroundColor = colbrDefault
       FontColor = colbrMidnightBlue
       FontSize = 0
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
+      GravityInParent = lgNone
     end
     object jEditText2: jEditText
       Tag = 1
       Left = 5
-      Top = 40
-      Width = 274
+      Top = 46
+      Width = 287
       Height = 39
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
+      Enabled = True
       Visible = True
       Anchor = jTextView2
       Id = 3792120
@@ -187,16 +199,20 @@ object AndroidModule1: TAndroidModule1
       WrappingLine = False
       Editable = True
       FontSizeUnit = unitDefault
+      CloseSoftInputOnEnter = True
+      CapSentence = False
+      GravityInParent = lgNone
     end
     object jButton2: jButton
       Left = 2
-      Top = 93
-      Width = 283
-      Height = 40
+      Top = 99
+      Width = 293
+      Height = 57
       MarginLeft = 2
       MarginTop = 4
       MarginRight = 2
       MarginBottom = 4
+      Enabled = True
       Visible = True
       Anchor = jEditText2
       Id = 0
@@ -209,6 +225,7 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrMidnightBlue
       FontSize = 0
       FontSizeUnit = unitDefault
+      GravityInParent = lgNone
       OnClick = jButton2Click
     end
   end
@@ -221,6 +238,7 @@ object AndroidModule1: TAndroidModule1
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
+    Enabled = True
     Visible = False
     Id = 2
     PosRelativeToAnchor = []
@@ -231,14 +249,15 @@ object AndroidModule1: TAndroidModule1
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
     object jCheckBox1: jCheckBox
-      Left = 250
+      Left = 244
       Top = 14
-      Width = 55
+      Width = 61
       Height = 32
       MarginLeft = 0
       MarginTop = 0
       MarginRight = 0
       MarginBottom = 0
+      Enabled = True
       Visible = True
       Id = 3232535
       PosRelativeToAnchor = []
@@ -254,13 +273,14 @@ object AndroidModule1: TAndroidModule1
     end
     object jTextView3: jTextView
       Left = 32
-      Top = 21
-      Width = 22
-      Height = 18
+      Top = 19
+      Width = 27
+      Height = 23
       MarginLeft = 0
       MarginTop = 30
       MarginRight = 0
       MarginBottom = 0
+      Enabled = True
       Visible = True
       Anchor = jImageView1
       Id = 0
@@ -270,12 +290,12 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       Text = 'LIST'
       Alignment = taLeft
-      Enabled = True
       BackgroundColor = colbrDefault
       FontColor = colbrSteelBlue
       FontSize = 12
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
+      GravityInParent = lgNone
     end
     object jImageView1: jImageView
       Tag = 1
@@ -287,6 +307,7 @@ object AndroidModule1: TAndroidModule1
       MarginTop = 0
       MarginRight = 0
       MarginBottom = 0
+      Enabled = True
       Visible = True
       Id = 7721927
       PosRelativeToAnchor = []
@@ -296,17 +317,19 @@ object AndroidModule1: TAndroidModule1
       ImageIndex = 0
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
+      GravityInParent = lgNone
     end
   end
   object jPanel4: jPanel
-    Left = 7
+    Left = 4
     Top = 467
-    Width = 290
+    Width = 297
     Height = 106
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 4
+    Enabled = True
     Visible = False
     Id = 3
     PosRelativeToAnchor = []
@@ -319,14 +342,15 @@ object AndroidModule1: TAndroidModule1
     OnFlingGesture = jPanel4FlingGesture
     object jListView1: jListView
       Tag = 2
-      Left = 9
-      Top = 9
-      Width = 271
-      Height = 87
+      Left = 5
+      Top = 5
+      Width = 287
+      Height = 96
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Id = 0
       PosRelativeToAnchor = []
@@ -344,6 +368,9 @@ object AndroidModule1: TAndroidModule1
       TextAlign = alLeft
       HighLightSelectedItemColor = colbrRed
       FontSizeUnit = unitDefault
+      ItemPaddingTop = 40
+      ItemPaddingBottom = 40
+      WidgetTextColor = colbrDefault
     end
   end
   object jActionBarTab1: jActionBarTab

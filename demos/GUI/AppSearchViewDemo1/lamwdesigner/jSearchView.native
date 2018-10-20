@@ -1,0 +1,3 @@
+public native void pOnSearchViewFocusChange(long pasobj, boolean hasFocus);
+public native void pOnSearchViewQueryTextSubmit(long pasobj, String query);
+public native void pOnSearchViewQueryTextChange(long pasobj, String newText);

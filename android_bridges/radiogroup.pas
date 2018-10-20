@@ -22,11 +22,13 @@ jRadioGroup = class(jVisualControl)
     FOrientation: TRGOrientation;
     FOnCheckedChanged: TOnCheckedChanged;
     FCheckedIndex: integer;
+    FItems: TStrings;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
     procedure TryNewParent(refApp: jApp);
+
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -65,12 +67,17 @@ jRadioGroup = class(jVisualControl)
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
 
+    procedure SetItems(Value: TStrings);
+    procedure Add(_radioTitle: string); overload;
+    procedure Add(_radioTitle: string; _color: TARGBColorBridge);  overload;
+
     procedure GenEvent_CheckedChanged(Sender: TObject; checkedIndex: integer; checkedCaption: string);
     property CheckedIndex: integer read GetChekedRadioButtonIndex write CheckRadioButtonByIndex;
  published
     property Orientation: TRGOrientation read FOrientation write SetOrientation;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property OnCheckedChanged: TOnCheckedChanged read FOnCheckedChanged write FOnCheckedChanged;
+    property Items: TStrings read FItems write SetItems;
 
 end;
 
@@ -101,6 +108,9 @@ function jRadioGroup_IsChekedRadioButtonById(env: PJNIEnv; _jradiogroup: JObject
 function jRadioGroup_IsChekedRadioButtonByIndex(env: PJNIEnv; _jradiogroup: JObject; _index: integer): boolean;
 procedure jRadioGroup_SetRoundCorner(env: PJNIEnv; _jradiogroup: JObject);
 procedure jRadioGroup_SetRadiusRoundCorner(env: PJNIEnv; _jradiogroup: JObject; _radius: integer);
+procedure jRadioGroup_Add(env: PJNIEnv; _jradiogroup: JObject; _radioTitle: string); overload;
+procedure jRadioGroup_Add(env: PJNIEnv; _jradiogroup: JObject; _radioTitle: string; _color: integer); overload;
+
 
 implementation
 
@@ -126,6 +136,7 @@ begin
 //your code here....
   FOrientation:= rgVertical;
   FCheckedIndex:= -1;
+  FItems:= TStringList.Create;
 end;
 
 destructor jRadioGroup.Destroy;
@@ -139,6 +150,7 @@ begin
      end;
   end;
   //you others free code here...'
+  FItems.Free;
   inherited Destroy;
 end;
 
@@ -235,6 +247,7 @@ procedure jRadioGroup.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
+  i: integer;
 begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
@@ -283,6 +296,13 @@ begin
 
   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+
+
+  for i:= 0 to FItems.Count-1 do
+  begin
+    if FItems.Strings[i] <> '' then
+        jRadioGroup_Add(FjEnv, FjObject , FItems.Strings[i]);
+  end;
 
   View_SetVisible(FjEnv, FjObject, FVisible);
 end;
@@ -575,6 +595,37 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jRadioGroup_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+end;
+
+procedure jRadioGroup.SetItems(Value: TStrings);
+var
+  i: integer;
+begin
+  FItems.Assign(Value);
+
+  if FInitialized then
+  begin
+    for i:= 0 to FItems.Count - 1 do
+    begin
+       if FItems.Strings[i] <> '' then
+         jRadioGroup_Add(FjEnv, FjObject , FItems.Strings[i]);
+    end;
+  end;
+
+end;
+
+procedure jRadioGroup.Add(_radioTitle: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jRadioGroup_Add(FjEnv, FjObject, _radioTitle);
+end;
+
+procedure jRadioGroup.Add(_radioTitle: string; _color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jRadioGroup_Add(FjEnv, FjObject, _radioTitle ,GetARGB(FCustomColor, _color));
 end;
 
 {-------- jRadioGroup_JNI_Bridge ----------}
@@ -963,6 +1014,36 @@ begin
   jCls:= env^.GetObjectClass(env, _jradiogroup);
   jMethod:= env^.GetMethodID(env, jCls, 'SetRadiusRoundCorner', '(I)V');
   env^.CallVoidMethodA(env, _jradiogroup, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jRadioGroup_Add(env: PJNIEnv; _jradiogroup: JObject; _radioTitle: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_radioTitle));
+  jCls:= env^.GetObjectClass(env, _jradiogroup);
+  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jradiogroup, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jRadioGroup_Add(env: PJNIEnv; _jradiogroup: JObject; _radioTitle: string; _color: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_radioTitle));
+  jParams[1].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jradiogroup);
+  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jradiogroup, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
