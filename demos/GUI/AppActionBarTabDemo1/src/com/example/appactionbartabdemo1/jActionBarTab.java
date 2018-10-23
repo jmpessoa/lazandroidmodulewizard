@@ -1,65 +1,17 @@
 package com.example.appactionbartabdemo1;
 
 import java.lang.reflect.Field;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 
 /*Draft java code by "Lazarus Android Module Wizard"*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl template*/
-
-class TabContentFragment extends Fragment {
-    private View mView;
-    private String mText;
-
-
-	/*.*/public TabContentFragment() {
-
-	}
-
-    /*.*/public TabContentFragment(View v, String tag) {	    	
-        mView = v;	       
-        mText = tag;
-    }
-
-    /*.*/public String getText() {
-        return mText;
-    }
-    
-    /*.*/public View getView() {
-        return mView;
-    }
-        
-    @Override
-    /*.*/public void onActivityCreated(Bundle savedInstanceState) {
-       super.onActivityCreated(savedInstanceState);   
-    }
-    
-    @Override
-    /*.*/public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {    	    	     	 
-    	    /*
-    	     * You can access the container's id by calling
-               ((ViewGroup)getView().getParent()).getId();
-    	     */
-    	 LayoutParams lparams = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-    	 lparams.addRule(RelativeLayout.CENTER_IN_PARENT);
-    	 mView.setLayoutParams(lparams);
-         return mView;
-    }
-}
 
 public class jActionBarTab {
 		
@@ -135,7 +87,9 @@ public class jActionBarTab {
 	  if (mCountTab != 0) {
 	     v.setVisibility(View.INVISIBLE);
 	  }   
-	  TabContentFragment content = new TabContentFragment(v, title);
+	  TabContentFragment content = new TabContentFragment();
+	  content.setTabContentFragment(v, title);
+
 	  tab.setTabListener(new TabListener(content)); // All tabs must have a TabListener set before being added to the ActionBar.
 	  mCountTab= mCountTab + 1;
 	  return tab; 

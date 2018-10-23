@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  telephonymanager,
   smsmanager,
   modaldialog,
   incomingcallwidgetprovider,
@@ -78,6 +79,7 @@ begin
   {$I jdownloadmanager_icon.lrs}
   {$I jdownloadservice_icon.lrs}
   {$I jcamera_icon.lrs}
+  {$I jtelephonymanager_icon.lrs}
   {$I jsmsmanager_icon.lrs}
   {$I jsms_icon.lrs}
   {$I jlocation_icon.lrs}
@@ -133,6 +135,7 @@ begin
       jDownloadManager,
       jDownloadService,
       jAlarmManager,
+      jTelephonyManager,
       jSMSManager,
       jSMS,
       jCamera,

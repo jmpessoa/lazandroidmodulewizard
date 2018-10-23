@@ -1,6 +1,6 @@
-package com.example.appmediarecorderdemo1;
+package org.lamw.apptelephonymanagerdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.2.2  - 6 October  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.2.3  - 23 October  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1374,6 +1374,18 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 		jCommons.RequestRuntimePermission(controls, _androidPermissions, _requestCode);
 	}
 
+	//by TR3E
+	public int getScreenWidth( ){
+		return this.controls.activity.getResources().getDisplayMetrics().widthPixels;
+	}
+	//by TR3E
+	public int getScreenHeight( ){
+		return this.controls.activity.getResources().getDisplayMetrics().heightPixels;
+	}
+	//by TR3E
+	public String getSystemVersionString(){
+		return android.os.Build.VERSION.RELEASE;
+	}
 }
 //**class entrypoint**//please, do not remove/change this line!
 

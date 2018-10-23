@@ -1321,6 +1321,14 @@ begin
      list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.java');
      list.Strings[0]:= 'package '+FPackageName+';';
      list.SaveToFile(FPathToJavaSource+jclassname+'.java');
+     //add class relational
+     if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.relational') then
+     begin
+       list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.relational');
+       tempStr:= Copy(list.Strings[0], 3, 100);  //get file name...
+       list.Strings[1]:= 'package '+FPackageName+';';
+       list.SaveToFile(FPathToJavaSource + tempStr);
+     end;
      Result:= True;
    end;
 

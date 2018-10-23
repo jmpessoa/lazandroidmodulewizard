@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.appintentdemo3" android:versionCode="1" android:versionName="1.0">
-  <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="17"/>
+  <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="21"/>
   <uses-permission android:name="android.permission.ACCESS_BLUETOOTH_SHARE"/>
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -9,6 +9,8 @@
   <uses-permission android:name="android.permission.BLUETOOTH"/>
   <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
   <uses-permission android:name="android.permission.CALL_PHONE"/>
+  <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
   <uses-permission android:name="android.permission.CAMERA"/>
   <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
   <uses-permission android:name="android.permission.INTERNET"/>

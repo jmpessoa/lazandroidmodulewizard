@@ -107,6 +107,7 @@ class jArrayAdapter extends ArrayAdapter {
     Typeface mWidgetCustomFont = null;
 
 	public ValueFilter customFilter = null;
+	public int mFilterMode = 0;
 
 	private class ValueFilter extends Filter{
 
@@ -123,8 +124,14 @@ class jArrayAdapter extends ArrayAdapter {
 				// We perform filtering operation
 				ArrayList<jListItemRow> filteredList = new ArrayList<jListItemRow>();
 				for (jListItemRow p : items) {
-					if (p.label.toUpperCase().startsWith(constraint.toString().toUpperCase())) {
-						filteredList.add(p);
+					if (mFilterMode == 0) {
+						if (p.label.toUpperCase().startsWith(constraint.toString().toUpperCase())) {
+							filteredList.add(p);
+						}
+					} else {
+						if (p.label.toUpperCase().contains(constraint.toString().toUpperCase())) {
+							filteredList.add(p);
+						}
 					}
 				}
 				results.values = filteredList;
@@ -277,6 +284,10 @@ class jArrayAdapter extends ArrayAdapter {
         items = list;
         thisAdapter.getFilter().filter((CharSequence) query);
     }
+
+    public void setFilterMode(int mode) {
+		mFilterMode = mode;
+	}
 
 	@Override
 	public Filter getFilter() {
@@ -1964,7 +1975,7 @@ public class jListView extends ListView {
 		 	 return sItems; 
 	}
 
-	public void SetQueryFilter(String _query) {
+	public void SetFilterQuery(String _query) {
 		orig_alist.clear();
 		for (jListItemRow p : alist) {
 			orig_alist.add(p);
@@ -1972,7 +1983,16 @@ public class jListView extends ListView {
 		aadapter.setFilter(alist, _query);
 	}
 
-    public void ClearQueryFilter() {
+	public void SetFilterQuery(String _query, int _filterMode) {
+		aadapter.setFilterMode(_filterMode);
+		SetFilterQuery(_query);
+	}
+
+	public void SetFilterMode(int _filterMode) {
+		aadapter.setFilterMode(_filterMode); //0=startsWith ... 1=contains
+	}
+
+    public void ClearFilterQuery() {
 	    if (orig_alist.size() > 0) {
             alist.clear();
             for (jListItemRow p : orig_alist) {

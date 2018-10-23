@@ -7,46 +7,52 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnActivityResult = AndroidModule1ActivityResult
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 67
+    Left = 40
     Top = 5
-    Width = 166
-    Height = 20
+    Width = 219
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 2899912
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App jIntentManager Demo 3'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 2899912
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 2
-    Top = 34
-    Width = 294
-    Height = 40
+    Top = 40
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 5615141
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -56,20 +62,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
-    Id = 5615141
   end
   object jButton2: jButton
     Left = 2
-    Top = 82
-    Width = 294
-    Height = 40
+    Top = 105
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton1
+    Id = 3962920
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -79,8 +87,8 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
-    Id = 3962920
   end
   object jIntentManager1: jIntentManager
     IntentAction = iaNone

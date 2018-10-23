@@ -162,6 +162,8 @@ uses
    Procedure Java_Event_pOnSearchViewQueryTextSubmit(env: PJNIEnv; this: jobject; Obj: TObject; query: JString);
    Procedure Java_Event_pOnSearchViewQueryTextChange(env: PJNIEnv; this: jobject; Obj: TObject; newText: JString );
 
+   Procedure Java_Event_pOnTelephonyCallStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; state: integer; phoneNumber: JString );
+
 
 implementation
 
@@ -174,7 +176,7 @@ uses
    autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
-   customcamera, calendarview, searchview;
+   customcamera, calendarview, searchview, telephonymanager;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1873,6 +1875,26 @@ begin
       pasnewText:= string( env^.GetStringUTFChars(env,newText,@_jBoolean) );
     end;
     jSearchView(Obj).GenEvent_OnSearchViewQueryTextChange(Obj, pasnewText);
+  end;
+end;
+
+Procedure Java_Event_pOnTelephonyCallStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; state: integer; phoneNumber: JString );
+var
+  pasPhoneNumber: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTelephonyManager then
+  begin
+    jForm(jTelephonyManager(Obj).Owner).UpdateJNI(gApp);
+    pasPhoneNumber := '';
+    if phoneNumber <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasPhoneNumber:= string( env^.GetStringUTFChars(env,phoneNumber,@_jBoolean) );
+    end;
+    jTelephonyManager(Obj).GenEvent_OnTelephonyCallStateChanged(Obj, TTelephonyCallState(state), pasPhoneNumber);
   end;
 end;
 

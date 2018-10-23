@@ -1245,6 +1245,15 @@ end;
     function HasActionBar(): boolean;
     function IsAppCompatProject(): boolean;
 
+    //by TR3E
+    function  GetDateTimeDecode(
+                                 var day : integer; var month : integer; var year : integer;
+                                 var hours : integer; var minutes: integer; var seconds : integer ) : boolean;
+    function GetScreenWidth(): integer;
+    function GetScreenHeight(): integer;
+    function GetSystemVersionString(): string;
+    //end TR3E
+
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
@@ -1668,6 +1677,10 @@ procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; var _and
 
 function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
+
+function jForm_getScreenWidth(env: PJNIEnv; _jform: JObject): integer;
+function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
+function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -3937,6 +3950,50 @@ begin
    Result:= jForm_IsAppCompatProject(FjEnv, FjObject);
 end;
 
+function jForm.getScreenWidth(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_getScreenWidth(FjEnv, FjObject);
+end;
+
+function jForm.GetScreenHeight(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_getScreenHeight(FjEnv, FjObject);
+end;
+
+function jForm.GetSystemVersionString(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetSystemVersionString(FjEnv, FjObject);
+end;
+
+function jForm.GetDateTimeDecode(
+                             var day : integer; var month : integer; var year : integer;
+                             var hours : integer; var minutes: integer; var seconds : integer ) : boolean;
+var
+ strDateTime : string;
+begin
+ Result := false;
+ strDateTime := GetDateTime;
+ day := 0; month := 0; year := 0;
+ hours := 0; minutes := 0; seconds := 0;
+ try
+   year  := strToInt( copy(strDateTime, 1, 4) );
+   month := strToInt( copy(strDateTime, 6, 2) );
+   day   := strToInt( copy(strDateTime, 9, 2) );
+   hours   := strToInt( copy(strDateTime, 12, 2) );
+   minutes := strToInt( copy(strDateTime, 15, 2) );
+   seconds := strToInt( copy(strDateTime, 18, 2) );
+ except
+   exit;
+ end;
+ Result := true;
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -5597,6 +5654,50 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsAppCompatProject', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_getScreenWidth(env: PJNIEnv; _jform: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'getScreenWidth', '()I');
+  Result:= env^.CallIntMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'getScreenHeight', '()I');
+  Result:= env^.CallIntMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'getSystemVersionString', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
   env^.DeleteLocalRef(env, jCls);
 end;
 

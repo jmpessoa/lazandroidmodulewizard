@@ -1,0 +1,1 @@
+public native void pOnTelephonyCallStateChanged(long pasobj, int state, String phoneNumber);
