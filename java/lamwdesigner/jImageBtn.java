@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -70,20 +72,41 @@ public class jImageBtn extends View {
 		     return drawableId;
 		  }
 		  catch (Exception e) {
-		     Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
+		     //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
 		     return 0;
 		  }
      }
     
-    public Bitmap GetBitmapResource(String _resourceDrawableIdentifier, boolean _inScaled) {
+     public Drawable GetDrawableResourceById(int _resID) {
+		
+		Drawable res = null;
+		
+		if (android.os.Build.VERSION.SDK_INT < 21 ) {
+			res = this.controls.activity.getResources().getDrawable(_resID);
+		}
+		
+		//[ifdef_api21up]
+		if(android.os.Build.VERSION.SDK_INT >= 21)
+			res = this.controls.activity.getResources().getDrawable(_resID, null);
+        //[endif_api21up]
+						
+		return res;
+	}
+    
+    /*
+     *** It does not load the images correctly according to the resolution ***
+     * 
+     * public Bitmap GetBitmapResource(String _resourceDrawableIdentifier, boolean _inScaled) {
        int id =	GetDrawableResourceId(_resourceDrawableIdentifier);	
        BitmapFactory.Options bo = new BitmapFactory.Options();
        bo.inScaled = _inScaled; //false; 
        return  BitmapFactory.decodeResource(this.controls.activity.getResources(), id, bo);
-    }    
+    }*/    
 
 	public  void setButtonUpByRes(String resup) {   // ..res/drawable
-		bmpUp = GetBitmapResource(resup, false); 
+		//bmpUp = GetBitmapResource(resup, false);
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
+		bmpUp  = ((BitmapDrawable)d).getBitmap();
 		rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
 		LAMWCommon.setLParamWidth(bmpUp.getWidth());
 		LAMWCommon.setLParamHeight(bmpUp.getHeight());										
@@ -91,7 +114,9 @@ public class jImageBtn extends View {
 	}
 
 	public  void setButtonDownByRes(String resdn) {   // ..res/drawable
-		bmpDn = bmpUp = GetBitmapResource(resdn, false);
+		//bmpDn = bmpUp = GetBitmapResource(resdn, false);
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
+		bmpDn  = ((BitmapDrawable)d).getBitmap();
 		rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());		
 		invalidate();
 	}
