@@ -1,4 +1,4 @@
-package com.example.appintentdemo1;
+package org.lamw.appintentdemoprinting;
 
 import java.util.Iterator;
 import java.util.List;
@@ -542,8 +542,17 @@ Sending Data: Extras vs. URI Parameters
        else
           return false;
     }
-     
-   public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
+
+    public boolean IsCallable(String _action) {
+        Intent i = new Intent(_action);
+        List<ResolveInfo> list = controls.activity.getPackageManager().queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
+        if(list.size() > 0)
+            return true ;
+        else
+            return false;
+    }
+
+    public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
 	   return _intent.getAction().equals(_intentAction);
    }
    
@@ -666,6 +675,12 @@ Sending Data: Extras vs. URI Parameters
 	   mIntent.setDataAndType(Uri.parse(_uriAsString), _mimeType);
    }
 
+   /*
+ public void SetDataUriAsString(String _uriAsString) { //Uri.parse(fileUrl) - just Strings!
+	   
+	   mIntent.setData(Uri.parse(_uriAsString));  //just Strings!
+	   
+*/
    
 }
 

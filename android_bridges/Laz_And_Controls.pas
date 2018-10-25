@@ -1287,13 +1287,20 @@ type
   private
     FImageName : string;
     FImageIndex: TImageListIndex;
-    FImageList : jImageList;  //by jmpessoa
+    FImageList : jImageList;
     FFilePath: TFilePath;
     FImageScaleType: TImageScaleType;
 
+    //by tr3e
+    FMouches     : TMouches;
+    FOnTouchDown : TOnTouchEvent;
+    FOnTouchMove : TOnTouchEvent;
+    FOnTouchUp   : TOnTouchEvent;
+    //end tr3e
+
     Procedure SetColor    (Value : TARGBColorBridge);
 
-    procedure SetImages(Value: jImageList);   //by jmpessoa
+    procedure SetImages(Value: jImageList);
     function GetCount: integer;
     procedure SetImageName(Value: string);
     procedure SetImageIndex(Value: TImageListIndex);
@@ -1304,15 +1311,21 @@ type
     procedure SetParamWidth(Value: TLayoutParams); override;
     procedure SetParamHeight(Value: TLayoutParams); override;
     Procedure GenEvent_OnClick(Obj: TObject);
+
+    //by tr3e
+    Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
+
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Refresh;
 
-      //by jmpessoa
     function GetHeight: integer;   override;
     function GetWidth: integer;     override;
+
+    //by tre3
+    procedure ResetAllRules;
 
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
@@ -1326,7 +1339,11 @@ type
 
     function GetBitmapHeight: integer;
     function GetBitmapWidth: integer;
-    procedure SetImageMatrixScale(_scaleX: single; _scaleY: single);
+
+    procedure SetImageMatrixScale(_scaleX: single; _scaleY: single); overload;
+    //by tre3
+    procedure SetImageMatrixScale(_scaleX: single; _scaleY: single; _centerX : single; _centerY: single); overload;
+
     procedure SetScaleType(_scaleType: TImageScaleType);
 
     function GetBitmapImage(): jObject;  //deprecated ..
@@ -1354,14 +1371,20 @@ type
     property Count: integer read GetCount;
   published
     property ImageIndex: TImageListIndex read FImageIndex write SetImageIndex default -1;
-    property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
+    property Images    : jImageList read FImageList write SetImages;
 
     property BackgroundColor     : TARGBColorBridge read FColor       write SetColor;
     property ImageIdentifier : string read FImageName write SetImageByResIdentifier;
     property ImageScaleType: TImageScaleType read FImageScaleType write SetScaleType;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
-     // Event
+
+    // Events
      property OnClick: TOnNotify read FOnClick write FOnClick;
+    //by tre3
+    property OnTouchDown : TOnTouchEvent read FOnTouchDown write FOnTouchDown;
+    property OnTouchMove : TOnTouchEvent read FOnTouchMove write FOnTouchMove;
+    property OnTouchUp   : TOnTouchEvent read FOnTouchUp   write FOnTouchUp;
+
   end;
 
   TFilterMode = (fmStartsWith, fmContains);
@@ -6757,6 +6780,28 @@ begin
   end;
 end;
 
+procedure jImageView.ResetAllRules();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jImageView_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jImageView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jImageView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end;
+
 procedure jImageView.UpdateLayout();
 begin
   if FInitialized then
@@ -6822,6 +6867,14 @@ begin
   if FInitialized then
      jImageView_SetImageMatrixScale(FjEnv, FjObject, _scaleX ,_scaleY);
 end;
+
+procedure jImageView.SetImageMatrixScale(_scaleX: single; _scaleY: single; _centerX : single; _centerY: single); overload;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageMatrixScale(FjEnv, FjObject, _scaleX ,_scaleY, _centerX, _centerY);
+end;
+
 
 procedure jImageView.SetScaleType(_scaleType: TImageScaleType);
 begin
@@ -6943,6 +6996,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jImageView_SetVisibilityGone(FjEnv, FjObject);
+end;
+
+// Event : Java Event -> Pascal
+Procedure jImageView.GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
+begin
+case Act of
+ cTouchDown : VHandler_touchesBegan_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchDown,FMouches);
+ cTouchMove : VHandler_touchesMoved_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchMove,FMouches);
+ cTouchUp   : VHandler_touchesEnded_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchUp  ,FMouches);
+end;
 end;
 
   { jImageList }

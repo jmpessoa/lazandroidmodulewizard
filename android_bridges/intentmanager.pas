@@ -101,7 +101,9 @@ jIntentManager = class(jControl)
     function GetContactNumber(_contactUri: jObject): string;
     function GetContactEmail(_contactUri: jObject): string;
     function GetBundleContent(_intent: jObject): TDynArrayOfString;
-    function IsCallable(_intent: jObject): boolean;
+    function IsCallable(_intent: jObject): boolean; overload;
+    function IsCallable(_intentAction: string): boolean; overload;
+
     function IsActionEqual(_intent: jObject; _intentAction: string): boolean;
 
     procedure PutExtraMediaStoreOutput(_environmentDirectoryPath: string; _fileName: string);
@@ -196,7 +198,8 @@ function jIntentManager_GetContactEmail(env: PJNIEnv; _jintentmanager: JObject; 
 function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): TDynArrayOfString;
 
 procedure jIntentManager_SetAction(env: PJNIEnv; _jintentmanager: JObject; _intentAction: integer); overload;
-function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): boolean;
+function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): boolean;  overload;
+function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intentAction: string): boolean; overload;
 function jIntentManager_IsActionEqual(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _intentAction: string): boolean;
 
 procedure jIntentManager_PutExtraMediaStoreOutput(env: PJNIEnv; _jintentmanager: JObject; _environmentDirectoryPath: string; _fileName: string);
@@ -724,6 +727,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_IsCallable(FjEnv, FjObject, _intent);
+end;
+
+function jIntentManager.IsCallable(_intentAction: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_IsCallable(FjEnv, FjObject, _intentAction);
 end;
 
 function jIntentManager.IsActionEqual(_intent: jObject; _intentAction: string): boolean;
@@ -2322,6 +2332,22 @@ begin
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intentAction: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_intentAction));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsCallable', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

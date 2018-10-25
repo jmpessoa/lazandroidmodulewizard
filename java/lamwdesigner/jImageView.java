@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.view.Gravity;
+import android.view.MotionEvent;
 
 public class jImageView extends ImageView {
 	//Pascal Interface
@@ -60,14 +61,73 @@ public class jImageView extends ImageView {
 		mMatrix = new Matrix();
 
 		//Init Event
-		onClickListener = new OnClickListener() {
+		/*onClickListener = new OnClickListener() {
 			public  void onClick(View view) {
 				controls.pOnClick(PasObj,Const.Click_Default);
 			}
 		};
 
-		setOnClickListener(onClickListener);
+		setOnClickListener(onClickListener);*/
 		//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux			
+	}
+	
+	public  boolean onTouchEvent( MotionEvent event) {
+	      			
+		int act     = event.getAction() & MotionEvent.ACTION_MASK;
+		switch(act) {
+			case MotionEvent.ACTION_DOWN: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}	
+			case MotionEvent.ACTION_MOVE: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchMove,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchMove,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+			case MotionEvent.ACTION_UP: {
+				
+				controls.pOnClick(PasObj,Const.Click_Default);
+				
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+			case MotionEvent.ACTION_POINTER_DOWN: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+			case MotionEvent.ACTION_POINTER_UP  : {
+				
+				controls.pOnClick(PasObj,Const.Click_Default);
+				
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+		}
+		return true;
 	}
 
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
@@ -92,8 +152,38 @@ public class jImageView extends ImageView {
 		mMatrix = null;
 		LAMWCommon.free();		
 	}
+	
+	// Bitmap scaling with smoothing
+	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){		
+		
+		 // Get current dimensions
+		 int width  = _bmp.getWidth();
+		 int height = _bmp.getHeight();
 
-	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+		 // Determine how much to scale
+		 float xScale = ((float) _newWidth) / width;
+		 float yScale = ((float) _newHeight) / height;
+		 
+		// Create a matrix for the scaling and add the scaling data
+		 Matrix matrix = new Matrix();
+		 matrix.postScale(xScale, yScale);
+
+		 // Create a new bitmap and convert it to a format understood by the ImageView
+		 Bitmap scaledBitmap = Bitmap.createBitmap(_bmp, 0, 0, width, height, matrix, true);
+		 BitmapDrawable result = new BitmapDrawable(scaledBitmap);
+		 width  = scaledBitmap.getWidth();
+		 height = scaledBitmap.getHeight();
+
+		 // Apply the scaled bitmap
+		 this.setImageDrawable(result);
+		 this.invalidate();
+		 
+		 Drawable drawing = this.getDrawable();
+		 Bitmap bitmap = ((BitmapDrawable)drawing).getBitmap();
+		 return bitmap;
+		}
+
+	/*private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
 		float factorH = _newHeight / (float)_bmp.getHeight();
 		float factorW = _newWidth / (float)_bmp.getWidth();
 		float factorToUse = (factorH > factorW) ? factorW : factorH;
@@ -101,7 +191,7 @@ public class jImageView extends ImageView {
 				(int) (_bmp.getWidth() * factorToUse),
 				(int) (_bmp.getHeight() * factorToUse),false);
 		return bm;
-	}
+	}*/
 
 	public void SetBitmapImage(Bitmap _bitmap, int _width, int _height) {
 		this.setImageResource(android.R.color.transparent);
@@ -256,13 +346,22 @@ public class jImageView extends ImageView {
 			case 6: setScaleType(ImageView.ScaleType.FIT_XY); break;
 			case 7: setScaleType(ImageView.ScaleType.MATRIX); break;
 		}
+	}	
+	
+	public void SetImageMatrixScale(float _scaleX, float _scaleY, float _centerX, float _centerY ) {
+		
+		if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  
+			this.setScaleType(ImageView.ScaleType.MATRIX);
+		
+		mMatrix.setScale(_scaleX, _scaleY, _centerX, _centerY);
+		
+		this.setImageMatrix(mMatrix);		
+		this.invalidate();
 	}
 
 	public void SetImageMatrixScale(float _scaleX, float _scaleY ) {
-		if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  this.setScaleType(ImageView.ScaleType.MATRIX);	
-		mMatrix.setScale(_scaleX, _scaleY);
-		this.setImageMatrix(mMatrix);
-		this.invalidate();
+		
+		SetImageMatrixScale( _scaleX, _scaleY, 0, 0 );
 	}
 
 	public Bitmap GetBitmapImage() {
