@@ -10,6 +10,11 @@ uses
   Dialogs, Grids, StdCtrls, LResources, ExtCtrls, Spin, ComCtrls, Buttons,
   Themes;
 
+const
+  cMinAPI = 10;
+  cMaxAPI = 28;
+
+
 type
 
   { TLamwAndroidManifestOptions }
@@ -23,12 +28,14 @@ type
     FUsesSDKNode: TDOMElement;
     FApplicationNode: TDOMElement;
     FMinSdkVersion, FTargetSdkVersion: Integer;
+    FOldMinSdkVersion: integer;
     FVersionCode: Integer;
     FVersionName: string;
     FLabelAvailable: Boolean;
     FLabel, FRealLabel: string;
     FIconFileName: string;
     FTheme: string;
+
     function GetString(const XMLPath, Ref: string; out Res: string): Boolean;
     function GetThemeName: string;
     procedure SetString(const XMLPath, Ref, NewValue: string);
@@ -54,19 +61,6 @@ type
     property ThemeName: string read GetThemeName;
   end;
 
-implementation
-
-uses
-  {$if (lcl_fullversion >= 1090000)}
-  IDEOptEditorIntf,
-  {$endif}
-  LazIDEIntf, laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
-  CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
-  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
-
-{$R *.lfm}
-
-type
 
   { TLamwProjectOptions }
 
@@ -161,6 +155,21 @@ type
     procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
     procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
   end;
+
+
+implementation
+
+uses
+  {$if (lcl_fullversion >= 1090000)}
+  IDEOptEditorIntf,
+  {$endif}
+  LazIDEIntf, laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
+  CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
+  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
+
+{$R *.lfm}
+
+type
 
   { TMyCanvas }
 
@@ -300,8 +309,8 @@ procedure TLamwAndroidManifestOptions.Clear;
 begin
   xml.Free;
   FUsesSDKNode := nil;
-  FMinSdkVersion := 11;
-  FTargetSdkVersion := 19;
+  FMinSdkVersion := 14;
+  FTargetSdkVersion := 21;
   FPermissions.Clear;
 end;
 
@@ -310,27 +319,143 @@ var
   fn: string;
   build: TXMLDocument;
   n: TDOMNode;
+
+  strList: TStringList;
+  i: integer;
+  smallProjName: string;
+  pathToAndroidSDK: string;
+  locationSrc: string;
+  tempStr, oldTargetStr: string;
 begin
   fn := ExtractFilePath(FFileName) + 'build.xml';
   if not FileExists(fn) then Exit;
   ReadXMLFile(build, fn);
   try
+    smallProjName:= build.DocumentElement.AttribStrings['name'];
     n := build.DocumentElement.FirstChild;
     while n <> nil do
     begin
       if n is TDOMElement then
         with TDOMElement(n) do
+        begin
+
+          if (TagName = 'property') and (AttribStrings['name'] = 'sdk.dir') then
+          begin
+              pathToAndroidSDK:= AttribStrings['location'];
+          end;
+
           if (TagName = 'property') and (AttribStrings['name'] = 'target') then
           begin
-            AttribStrings['value'] := 'android-' + IntToStr(FTargetSdkVersion);
-            WriteXMLFile(build, fn);
-            Break;
+            oldTargetStr:= Copy (AttribStrings['value'], 9, 2);
+            {AttribStrings['value'] := 'android-' + IntToStr(FTargetSdkVersion);
+             WriteXMLFile(build, fn);
+             Break;}
           end;
+
+          if (TagName = 'property') and (AttribStrings['name'] = 'src.dir') then
+          begin
+              locationSrc:= AttribStrings['location'];
+              Break;
+          end;
+
+        end;
       n := n.NextSibling;
     end;
   finally
     build.Free
   end;
+
+  strList:= TStringList.Create;
+  strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
+  strList.Add('<project name="'+smallProjName+'" default="help">');
+  strList.Add('<property name="sdk.dir" location="'+pathToAndroidSDK+'"/>');
+  strList.Add('<property name="target" value="android-'+ IntToStr(FTargetSdkVersion) +'"/>');
+  strList.Add('<property file="ant.properties"/>');
+  strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
+  // tk Generate code to allow conditional compilation in our java sources
+  strList.Add('');
+  strList.Add('<!-- Tags required to enable conditional compilation in java sources -->');
+  strList.Add('<property name="src.dir" location="'+locationSrc+'"/>');
+  strList.Add('<property name="source.dir" value="${src.dir}/${target}" />');
+  strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
+
+  strList.Add('');
+  strList.Add('<!-- API version properties, modify according to your API level -->');
+  for i := cMinAPI to cMaxAPI do
+  begin
+    if i <= FTargetSdkVersion then
+      strList.Add('<property name="api'+IntToStr(i)+'" value="true"/>')
+    else
+      strList.Add('<property name="api'+IntToStr(i)+'" value="false"/>');
+  end;
+
+  strList.Add('');
+  strList.Add('<!-- API conditions, do not modify -->');
+  for i := cMinAPI to cMaxAPI do
+  begin
+    strList.Add('<condition property="ifdef_api'+IntToStr(i)+'up" value="/*">');
+    strList.Add('  <equals arg1="${api'+IntToStr(i)+'}" arg2="false"/>');
+    strList.Add('</condition>');
+    strList.Add('<condition property="endif_api'+IntToStr(i)+'up" value="*/">');
+    strList.Add('  <equals arg1="${api'+IntToStr(i)+'}" arg2="false"/>');
+    strList.Add('</condition>');
+    strList.Add('<property name="ifdef_api'+IntToStr(i)+'up" value=""/>');
+    strList.Add('<property name="endif_api'+IntToStr(i)+'up" value=""/>');
+  end;
+
+  strList.Add('');
+  strList.Add('<!-- Copy & filter java sources for defined Android target, do not modify -->');
+  strList.Add('<copy todir="${src.dir}/${target}">');
+  strList.Add('  <fileset dir="${src.dir}">');
+  strList.Add('    <include name="*.java"/>');
+  strList.Add('  </fileset>');
+  strList.Add('  <filterset begintoken="//[" endtoken="]">');
+  for i := cMinAPI to cMaxAPI do
+  begin
+    strList.Add('    <filter token="ifdef_api'+IntToStr(i)+'up" value="${ifdef_api'+IntToStr(i)+'up}"/>');
+    strList.Add('    <filter token="endif_api'+IntToStr(i)+'up" value="${endif_api'+IntToStr(i)+'up}"/>');
+  end;
+  strList.Add('  </filterset>');
+  strList.Add('</copy>');
+  // end tk
+  strList.Add('</project>');
+  strList.SaveToFile(ExtractFilePath(FFileName)+'build.xml');
+
+  strList.Clear;
+  strList.Add('# This file is automatically generated by Android Tools.');
+  strList.Add('# Do not modify this file -- YOUR CHANGES WILL BE ERASED!');
+  strList.Add('#');
+  strList.Add('# This file must be checked in Version Control Systems.');
+  strList.Add('#');
+  strList.Add('# To customize properties used by the Ant build system edit');
+  strList.Add('# "ant.properties", and override values to adapt the script to your');
+  strList.Add('# project structure.');
+  strList.Add('#');
+  strList.Add('# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):');
+  strList.Add('#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
+  strList.Add(' ');
+  strList.Add('# Project target.');
+  strList.Add('target=android-'+IntToStr(FTargetSdkVersion));
+  strList.SaveToFile(ExtractFilePath(FFileName)+'project.properties');
+
+  strList.Clear;
+  if FileExists(ExtractFilePath(FFileName)+'build.gradle') then
+  begin
+    strList.LoadFromFile(ExtractFilePath(FFileName)+'build.gradle');
+    tempStr:=StringReplace(strList.Text, 'targetSdkVersion '+oldTargetStr, 'targetSdkVersion '+IntToStr(FTargetSdkVersion),[rfIgnoreCase]);  //targetSdkVersion 23
+    strList.Text:= tempStr;
+
+    if FOldMinSdkVersion <> FMinSdkVersion then
+    begin
+      tempStr:=StringReplace(strList.Text, 'minSdkVersion '+IntToStr(FOldMinSdkVersion), 'minSdkVersion '+IntToStr(FMinSdkVersion),[rfIgnoreCase]);  //minSdkVersion 14
+      strList.Text:= tempStr;
+    end;
+
+    strList.SaveToFile(ExtractFilePath(FFileName)+'build.gradle');
+  end;
+
+  strList.Free;
+
 end;
 
 constructor TLamwAndroidManifestOptions.Create;
@@ -483,7 +608,10 @@ begin
         FUsesSDKNode := Item[i] as TDOMElement;
         n := FUsesSDKNode.Attributes.GetNamedItem('android:minSdkVersion');
         if Assigned(n) then
+        begin
           FMinSdkVersion := StrToIntDef(n.TextContent, FMinSdkVersion);
+          FOldMinSdkVersion:= FMinSdkVersion;
+        end;
         n := FUsesSDKNode.Attributes.GetNamedItem('android:targetSdkVersion');
         if Assigned(n) then
           FTargetSdkVersion := StrToIntDef(n.TextContent, FTargetSdkVersion);
@@ -551,6 +679,7 @@ begin
     else
       xml.ChildNodes[0].AppendChild(n);
   end;
+
   UpdateBuildXML;
 
   if FLabelAvailable and (FLabel <> '') and (FLabel[1] <> '@')
@@ -864,12 +993,13 @@ begin
       strApi := ExtractFileName(sl[i]);
       if strApi <> '' then
       begin
-        if Pos('P', strApi) <= 0  then  //skip android-P
+        if Pos('android-P', strApi) <= 0  then  //skip android-P
         begin
-          if Pos('W', strApi) <= 0  then  //skip android-W
+          if Pos('android-W', strApi) <= 0  then  //skip android-W
           begin
             strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
-            seTargetSdkVersion.Items.Add(strApi);
+            if StrToInt(strApi) >= 14 then
+               seTargetSdkVersion.Items.Add(strApi);
           end;
         end;
       end;
@@ -1136,7 +1266,7 @@ end;
 
 function TLamwProjectOptions.GetTitle: string;
 begin
-  Result := '[Lamw] Android Project Options';
+  Result := '[LAMW] Android Project Options';
 end;
 
 procedure TLamwProjectOptions.Setup(ADialog: TAbstractOptionsEditorDialog);
