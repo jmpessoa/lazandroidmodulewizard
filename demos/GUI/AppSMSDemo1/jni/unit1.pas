@@ -73,10 +73,12 @@ begin
    begin
       ShowMessage('RequestRuntimePermission....');
 
-      SetLength(manifestPermissions, 2);
+      SetLength(manifestPermissions, 3);
 
       manifestPermissions[0]:= 'android.permission.RECEIVE_SMS';  //from AndroodManifest.xml
       manifestPermissions[1]:= 'android.permission.SEND_SMS'; //from AndroodManifest.xml
+      // required for sms send otherwise error is occured on my device - elera
+      manifestPermissions[2]:= 'android.permission.READ_PHONE_STATE';
 
       Self.RequestRuntimePermission(manifestPermissions, 2001);
 
