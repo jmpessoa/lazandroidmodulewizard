@@ -386,8 +386,12 @@ end;
 
 procedure TFormSettingsPaths.BitBtnOKClick(Sender: TObject);
 begin
-   FOk:= True;
-   Close;
+   if RGNDKVersion.ItemIndex > -1 then
+   begin
+     FOk:= True;
+     Close;
+   end
+   else ShowMessage('Please, Select [Radio] "NDK Version" number!!!');
 end;
 
 procedure TFormSettingsPaths.SpBPathToAndroidNDKClick(Sender: TObject);

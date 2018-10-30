@@ -346,7 +346,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 61
     Top = 396
-    Width = 296
+    Width = 308
     AutoFill = True
     AutoSize = True
     BorderSpacing.Around = 8
@@ -361,16 +361,15 @@ object FormSettingsPaths: TFormSettingsPaths
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 6
     ClientHeight = 36
-    ClientWidth = 292
+    ClientWidth = 304
     Columns = 6
-    ItemIndex = 3
     Items.Strings = (
       '7'
       '9'
       '10c'
       '10e'
       '11c'
-      '> 11'
+      '"> 11"'
     )
     TabOrder = 5
   end
@@ -388,7 +387,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideBottom.Control = RGNDKVersion
     AnchorSideBottom.Side = asrBottom
-    Left = 312
+    Left = 324
     Height = 61
     Top = 396
     Width = 171
@@ -1545,7 +1544,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Control = GroupBoxPrebuild
     AnchorSideRight.Side = asrBottom
-    Left = 490
+    Left = 502
     Height = 22
     Top = 403
     Width = 23

@@ -1,7 +1,7 @@
 object FormWorkspace: TFormWorkspace
-  Left = 317
+  Left = 343
   Height = 565
-  Top = 104
+  Top = 123
   Width = 400
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin

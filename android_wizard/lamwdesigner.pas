@@ -189,6 +189,15 @@ type
     procedure UpdateLayout; override;
   end;
 
+  { TDraftSearchView }
+
+  TDraftSearchView = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
+  end;
+
   { TDraftButton }
 
   TDraftButton = class(TDraftDrawableWidget)
@@ -687,7 +696,8 @@ uses
   sfloatingbutton, scoordinatorlayout, stoolbar, sdrawerlayout,
   snavigationview, scardview, srecyclerview, stextinput,
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
-  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView}, customcamera, sadmob, calendarview;
+  sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView},
+  customcamera, sadmob, calendarview, searchview;
 
 const
   DrawableSearchPaths: array [0..3] of string = (
@@ -2999,6 +3009,66 @@ begin
   inherited UpdateLayout;
 end;
 
+
+{ TDraftSearchView }
+
+constructor TDraftSearchView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  BaseStyle := 'autoTextViewStyle';   //SearchViewStyle  TODO!
+  inherited;
+  Color := jSearchView(AWidget).BackgroundColor;
+  //FontColor := jSearchView(AWidget).FontColor;
+end;
+
+procedure TDraftSearchView.Draw;
+var
+  ls: Integer;
+begin
+  with FCanvas do
+  begin
+    if BackgroundColor <> clNone then
+    begin
+      Brush.Color := BackGroundColor;
+      FillRect(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);
+    end else
+      Brush.Style := bsClear;
+    Font.Color := TextColor;
+
+    ls := Font.Size;
+    Font.Size := AndroidToLCLFontSize(jComboEditText(FAndroidWidget).FontSize, 11);
+    TextOut(4, 12, jSearchView(FAndroidWidget).Text);
+    Font.Size := ls;
+
+    if BackgroundColor = clNone then
+    begin
+      Pen.Color := RGBToColor(175,175,175);
+      with FAndroidWidget do
+      begin
+        MoveTo(4, Height - 8);
+        Lineto(4, Height - 5);
+        Lineto(Width - 4, Height - 5);
+        Lineto(Width - 4, Height - 8);
+      end;
+    end;
+  end;
+end;
+
+procedure TDraftSearchView.UpdateLayout;
+var
+  fs: Integer;
+begin
+  with jSearchView(FAndroidWidget) do
+    if LayoutParamHeight = lpWrapContent then
+    begin
+      {
+      fs := FontSize;
+      if fs = 0 then fs := 18;
+      FMinHeight := 29 + (fs - 10) * 4 div 3; // todo: multiline
+      }
+    end;
+  inherited UpdateLayout;
+end;
+
 { TDraftCheckBox }
 
 constructor TDraftCheckBox.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -4209,6 +4279,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jLinearLayout, TDraftLinearLayout);
   RegisterAndroidWidgetDraftClass(jCaptionPanel, TDraftCaptionPanel);
   RegisterAndroidWidgetDraftClass(jCalendarView, TDraftCalendarView);
+  RegisterAndroidWidgetDraftClass(jSearchView, TDraftSearchView);
 
   RegisterAndroidWidgetDraftClass(jsFloatingButton, TDraftSFloatingButton);
   RegisterAndroidWidgetDraftClass(jsBottomNavigationView, TDraftSBottomNavigationView);

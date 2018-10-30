@@ -216,12 +216,12 @@ begin
            auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
            intAux:= StrToInt(auxStr);
 
-           if intAux > 13 then
+           if (intAux > 13) and (intAux < 27)  then
               ListBoxNdkPlatform.Items.Add(auxStr);
 
            if Result < intAux then
            begin
-              Result:= intAux;
+             if  intAux < 27 then Result:= intAux;
            end;
 
          end;
@@ -1021,9 +1021,6 @@ begin
   ListBoxTargetAPI.ItemIndex:= 0;
   StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 
-  //ListBoxNdkPlatform.Clear; //NDK
-  //ListBoxNdkPlatform.Items.Add(IntToStr(FMaxNdkPlatform));
-
   if ListBoxNdkPlatform.Items.Count > 0 then
   begin
     ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.Count-1 ;  //0;
@@ -1246,6 +1243,9 @@ begin
     if p > 0 then
     begin
         Result:= Copy(strAux, p+1, MaxInt);  // 3.3
+
+        if Result = '4.10' then Result:= '4.100';
+
         numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
         if Length(numberAsString) < 3 then
         begin
