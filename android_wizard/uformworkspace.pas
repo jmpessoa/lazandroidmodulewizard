@@ -362,6 +362,8 @@ begin
      FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
      //FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
   end;
+  if StrToInt(FTargetApi) < 26 then
+     ShowMessage('Warning: remember that the "google play" store now requires Target Api >= 26 !');
 end;
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
