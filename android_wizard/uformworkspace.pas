@@ -135,7 +135,7 @@ type
     function GetMaxSdkPlatform(): integer;
     function GetBuildTool(sdkApi: integer): string;
 
-    function GetMaxNdkPlatform(): integer;
+    function GetMaxNdkPlatform(var index: integer): integer;
     procedure SaveWorkSpaceSettings(const pFilename: string);
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
@@ -191,13 +191,16 @@ uses LamwSettings;
 { TFormWorkspace }
 
 //C:\adt32\ndk10e\platforms\
-function TFormWorkspace.GetMaxNdkPlatform(): integer;
+function TFormWorkspace.GetMaxNdkPlatform(var index: integer): integer;
 var
   lisDir: TStringList;
   auxStr: string;
-  i, intAux: integer;
+  i, intAux,  count: integer;
 begin
   Result:= 0;
+  index:= -1;
+  count:= 0;
+
   lisDir:= TStringList.Create;
 
   ListBoxNdkPlatform.Clear;
@@ -217,11 +220,18 @@ begin
            intAux:= StrToInt(auxStr);
 
            if (intAux > 13) and (intAux < 27)  then
+           begin
               ListBoxNdkPlatform.Items.Add(auxStr);
+              count:= count + 1;
+           end;
 
            if Result < intAux then
            begin
-             if  intAux < 27 then Result:= intAux;
+             if intAux < 23 then
+             begin
+                Result:= intAux;   //Max=22 for old 4.x, 5.x devices compatibility!!!!
+                index:= count - 1;
+             end;
            end;
 
          end;
@@ -334,9 +344,15 @@ end;
 
 
 procedure TFormWorkspace.ListBoxNdkPlatformChange(Sender: TObject);
+var
+  ndkApi: string;
 begin
- FAndroidNdkPlatform:= 'android-'+ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
+ ndkApi:= ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
+ FAndroidNdkPlatform:= 'android-'+ ndkApi;
  StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
+ if StrToInt(ndkApi)  > 22 then
+    ShowMessage('Warning: for compatibility with old devices [4.x, 5.x]'+sLIneBreak+
+                'is strongly recommended NDK API < 23!');
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIChange(Sender: TObject);
@@ -1012,6 +1028,8 @@ begin          //C:\adt32\sdk\tools\ant
 end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
+var
+  ndkApi: string;
 begin
   EditPathToWorkspace.Left:= 8; // try fix hidpi bug
   ComboSelectProjectName.Left:= 8;  // try fix hidpi bug
@@ -1020,12 +1038,6 @@ begin
   ListBoxTargetAPI.Items.Add(IntToStr(FMaxSdkPlatform));
   ListBoxTargetAPI.ItemIndex:= 0;
   StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
-
-  if ListBoxNdkPlatform.Items.Count > 0 then
-  begin
-    ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.Count-1 ;  //0;
-    StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
-  end;
 
   ListBoxMinSDK.ItemIndex:= 1;
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
@@ -1303,6 +1315,7 @@ procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by "An
 var
   indexInstructionSet: integer;
   tagVersion: integer;
+  ndkIndex: integer;
 begin
    //before OnFormActive
 
@@ -1361,7 +1374,13 @@ begin
   if FMaxSdkPlatform = 0 then    //  try fix "android-0"
       FMaxSdkPlatform:= FCandidateSdkPlatform;
 
-  FMaxNdkPlatform:= Self.GetMaxNdkPlatform();
+  FMaxNdkPlatform:= Self.GetMaxNdkPlatform(ndkIndex);    //ndkIndex Max =  22 for old 4.x, 5.x devices compatibility!!!!
+
+  if ListBoxNdkPlatform.Items.Count > 0 then
+  begin
+    ListBoxNdkPlatform.ItemIndex:= ndkIndex;
+    StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
+  end;
 
 end;
 
@@ -1396,7 +1415,7 @@ begin
       WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
       WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
-      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxNdkPlatform.Items.Count-1));  //android-25
+      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxNdkPlatform.ItemIndex));  //android-25
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
    finally
       Free;
