@@ -124,6 +124,7 @@ jIntentManager = class(jControl)
     procedure TryDownloadPackage(_packageName: string);
     procedure SetDataAndType(_uriData: jObject; _mimeType: string); overload;
     procedure SetDataAndType(_uriAsString: string; _mimeType: string); overload;
+    function HasLaunchIntentForPackage(_packageName: string): boolean;
 
 
  published
@@ -221,6 +222,7 @@ procedure jIntentManager_TryDownloadPackage(env: PJNIEnv; _jintentmanager: JObje
 
 procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriData: jObject; _mimeType: string); overload;
 procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriAsString: string; _mimeType: string); overload;
+function jIntentManager_HasLaunchIntentForPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string): boolean;
 
 
 implementation
@@ -853,6 +855,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jIntentManager_SetDataAndType(FjEnv, FjObject, _uriAsString ,_mimeType);
+end;
+
+function jIntentManager.HasLaunchIntentForPackage(_packageName: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_HasLaunchIntentForPackage(FjEnv, FjObject, _packageName);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2350,5 +2359,22 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jIntentManager_HasLaunchIntentForPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packageName));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'HasLaunchIntentForPackage', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
+  Result:= boolean(jBoo);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.
