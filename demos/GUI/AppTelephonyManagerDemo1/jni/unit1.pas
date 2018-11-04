@@ -14,6 +14,7 @@ type
 
   TAndroidModule1 = class(jForm)
     jButton1: jButton;
+    jButton2: jButton;
     jCheckBox1: jCheckBox;
     jCheckBox2: jCheckBox;
     jCheckBox3: jCheckBox;
@@ -27,6 +28,7 @@ type
       requestCode: integer; manifestPermission: string;
       grantResult: TManifestPermissionResult);
     procedure jButton1Click(Sender: TObject);
+    procedure jButton2Click(Sender: TObject);
     procedure jTelephonyManager1CallStateChanged(Sender: TObject;
       state: TTelephonyCallState; phoneNumber: string);
   private
@@ -72,6 +74,21 @@ begin
      IsRuntimePermissionGranted('android.permission.MODIFY_AUDIO_SETTINGS') then   //from AndroodManifest.xml
   begin
      jTelephonyManager1.Call(jEditText1.Text);
+  end
+  else
+  begin
+     ShowMessage('Sorry... Some permission was DENIED !! ');
+  end;
+end;
+
+procedure TAndroidModule1.jButton2Click(Sender: TObject);
+begin
+  if IsRuntimePermissionGranted('android.permission.CALL_PHONE')  and
+     IsRuntimePermissionGranted('android.permission.READ_PHONE_STATE')  and
+     IsRuntimePermissionGranted('android.permission.MODIFY_AUDIO_SETTINGS') then   //from AndroodManifest.xml
+  begin
+    ShowMessage(jTelephonyManager1.GetIMEI());
+    ShowMessage(jTelephonyManager1.GetLine1Number())
   end
   else
   begin

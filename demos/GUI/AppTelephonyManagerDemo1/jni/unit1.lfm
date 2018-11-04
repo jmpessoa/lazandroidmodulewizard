@@ -2,7 +2,7 @@ object AndroidModule1: TAndroidModule1
   Left = 340
   Top = 138
   Width = 320
-  Height = 400
+  Height = 428
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -118,7 +118,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'jButton1'
+    Text = 'Call'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
@@ -223,6 +223,31 @@ object AndroidModule1: TAndroidModule1
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
     GravityInParent = lgNone
+  end
+  object jButton2: jButton
+    Left = 5
+    Top = 355
+    Width = 310
+    Height = 57
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jButton1
+    Id = 9
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Get IMEI & Line1'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton2Click
   end
   object jTelephonyManager1: jTelephonyManager
     OnCallStateChanged = jTelephonyManager1CallStateChanged
