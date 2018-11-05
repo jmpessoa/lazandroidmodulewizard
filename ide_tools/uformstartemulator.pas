@@ -189,7 +189,7 @@ begin
   with TProcessUTF8.Create(nil) do
   try
     ShowWindow := swoHIDE;
-    Executable := AppendPathDelim(FSDKPath) + 'tools' + PathDelim + 'emulator';
+    Executable := FSDKPath + 'tools' + PathDelim + 'emulator';
     Parameters.Add('@' + avds[DrawGrid1.Row - 1]);
     Execute;
   finally
@@ -207,7 +207,7 @@ constructor TfrmStartEmulator.Create(ASDKPath: string;
   run: TRunAndGetOutputProc);
 begin
   inherited Create(nil);
-  FSDKPath := ASDKPath;
+  FSDKPath := AppendPathDelim(ASDKPath);
   FRun := run;
   avds := TStringList.Create;
   avds.Sorted := True;
@@ -230,13 +230,21 @@ end;
 procedure TfrmStartEmulator.GetAVDList;
 var
   i, j: Integer;
+  tool, tools_path, params: string;
 begin
   devs.Clear;
   emul_wnds.Clear;
 
   avds.Sorted := False;
-  FRun(AppendPathDelim(FSDKPath) + 'tools' + PathDelim + 'android'
-    {$ifdef Windows} + '.bat'{$endif}, 'list' + sLineBreak + 'avds', avds);
+  tools_path := FSDKPath + 'tools' + PathDelim;
+  tool := tools_path + 'bin' + PathDelim + 'avdmanager' {$ifdef Windows} + '.bat'{$endif};
+  params := 'list' + sLineBreak + 'avd';
+  if not FileExists(tool) then
+  begin
+    tool := tools_path + 'android' {$ifdef Windows} + '.bat'{$endif};
+    params := 'list' + sLineBreak + 'avds';
+  end;
+  FRun(tool, params, avds);
   for i := avds.Count - 1 downto 0 do
   begin
     j := Pos(' Name: ', avds[i]);
@@ -249,7 +257,7 @@ begin
 
   for i := avds.Count - 1 downto 0 do
     if Trim(avds[i]) = '' then avds.Delete(i);
-  FRun(AppendPathDelim(FSDKPath) + 'platform-tools' + PathDelim + 'adb', 'devices', devs);
+  FRun(FSDKPath + 'platform-tools' + PathDelim + 'adb', 'devices', devs);
   DrawGrid1.RowCount := avds.Count + 1 + Ord(avds.Count = 0);
 
   {$ifdef Emulator}
