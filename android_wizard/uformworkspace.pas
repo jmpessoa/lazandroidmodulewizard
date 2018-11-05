@@ -56,6 +56,7 @@ type
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
 
     procedure ListBoxMinSDKChange(Sender: TObject);
@@ -700,6 +701,17 @@ begin
 
   end;
 
+end;
+
+procedure TFormWorkspace.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+  CanClose := True;
+  if ModalResult = mrCancel then Exit;
+  if ListBoxTargetAPI.ItemIndex < 0 then
+  begin
+    MessageDlg('Target API is not selected!', mtError, [mbOk], 0);
+    CanClose := False;
+  end;
 end;
 
 procedure TFormWorkspace.FormCreate(Sender: TObject);

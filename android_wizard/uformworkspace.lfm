@@ -151,6 +151,7 @@ object FormWorkspace: TFormWorkspace
   }
   OnActivate = FormActivate
   OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.8.0.6'
