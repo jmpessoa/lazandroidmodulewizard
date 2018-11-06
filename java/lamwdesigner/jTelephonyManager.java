@@ -1,4 +1,4 @@
-package org.lamw.apptelephonymanagerdemo1;
+package org.lamw.appcompatviewpagerdemo1;
 
 /*Draft java code by "Lazarus Android Module Wizard" [10/21/2018 2:43:41]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -158,11 +158,13 @@ public class jTelephonyManager /*extends ...*/ {
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         }
         try {
-            if (Build.VERSION.SDK_INT < 26) sImei = mTelephonyManager.getDeviceId();
+            /*
             //[ifdef_api26up]
-            if (Build.VERSION.SDK_INT >=  26) sImei =  mTelephonyManager.getImei();
-            //[endif_api26up]
-        } catch (SecurityException securityException) {
+            if (Build.VERSION.SDK_INT >=  26) {
+                sImei = mTelephonyManager.getImei();
+            }else //[endif_api26up]   */
+                sImei = mTelephonyManager.getDeviceId();
+        }   catch (SecurityException securityException) {
                 Log.d("jTelephonyMgr_IMEI", "Sorry... Not Permission granted!!");
         }
         return sImei;

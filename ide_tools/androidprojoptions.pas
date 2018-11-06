@@ -323,7 +323,8 @@ var
   smallProjName: string;
   pathToAndroidSDK: string;
   locationSrc: string;
-  tempStr, oldTargetStr: string;
+  tempStr, oldTargetStr, oldCompileSdkVersion: string;
+  p: integer;
 begin
   fn := ExtractFilePath(FFileName) + 'build.xml';
   if not FileExists(fn) then Exit;
@@ -446,6 +447,18 @@ begin
     if FOldMinSdkVersion <> FMinSdkVersion then
     begin
       tempStr:=StringReplace(strList.Text, 'minSdkVersion '+IntToStr(FOldMinSdkVersion), 'minSdkVersion '+IntToStr(FMinSdkVersion),[rfIgnoreCase]);  //minSdkVersion 14
+      strList.Text:= tempStr;
+    end;
+
+    p:= Pos('compileSdkVersion ', strList.Text);
+    tempStr:= Trim(Copy(strList.Text,p, Length('compileSdkVersion ')+ 2)); //compileSdkVersion 25
+
+    p:=  Pos(' ',tempStr);
+    oldCompileSdkVersion:= Trim(Copy(tempStr, p+1,2));
+
+    if FTargetSdkVersion >  StrToInt(oldCompileSdkVersion) then
+    begin
+      tempStr:=StringReplace(strList.Text, 'compileSdkVersion '+oldCompileSdkVersion, 'compileSdkVersion '+IntToStr(FTargetSdkVersion),[rfIgnoreCase]);
       strList.Text:= tempStr;
     end;
 

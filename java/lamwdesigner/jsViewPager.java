@@ -52,7 +52,7 @@ class CustomPagerAdapter extends PagerAdapter {
 
     /*
      * This method checks whether a particular object belongs to a given position, which is made simple 
-     * in this example—just check whether the View equals the object (i.e., points to the same reference)
+     * in this examplejust check whether the View equals the object (i.e., points to the same reference)
      */
     
     @Override
