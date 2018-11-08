@@ -177,8 +177,8 @@ object FormWorkspace: TFormWorkspace
   end
   object PanelRadioGroup: TPanel
     Left = 8
-    Height = 174
-    Top = 276
+    Height = 164
+    Top = 286
     Width = 384
     Align = alClient
     BorderSpacing.Around = 8
@@ -191,7 +191,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkVertical = crsHomogenousChildResize
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 4
-    ClientHeight = 174
+    ClientHeight = 164
     ClientWidth = 384
     Color = clGradientInactiveCaption
     Constraints.MinHeight = 80
@@ -201,7 +201,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Side = asrBottom
       Left = 0
-      Height = 166
+      Height = 156
       Top = 4
       Width = 203
       AutoFill = True
@@ -214,7 +214,7 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
-      ClientHeight = 141
+      ClientHeight = 131
       ClientWidth = 199
       Color = clGradientInactiveCaption
       ItemIndex = 0
@@ -231,7 +231,7 @@ object FormWorkspace: TFormWorkspace
     end
     object Image1: TImage
       Left = 207
-      Height = 166
+      Height = 156
       Top = 4
       Width = 177
       AutoSize = True
@@ -1757,7 +1757,7 @@ object FormWorkspace: TFormWorkspace
   end
   object PanelPlatform: TPanel
     Left = 8
-    Height = 70
+    Height = 80
     Top = 198
     Width = 384
     Align = alTop
@@ -1771,18 +1771,18 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkVertical = crsHomogenousChildResize
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
-    ClientHeight = 70
+    ClientHeight = 80
     ClientWidth = 384
     Color = clGradientInactiveCaption
     ParentColor = False
     TabOrder = 5
     object GroupBox2: TGroupBox
       Left = 0
-      Height = 62
+      Height = 72
       Top = 4
       Width = 118
       Caption = 'Ndk:'
-      ClientHeight = 37
+      ClientHeight = 47
       ClientWidth = 114
       TabOrder = 0
       object ListBoxNdkPlatform: TComboBox
@@ -1799,11 +1799,11 @@ object FormWorkspace: TFormWorkspace
     end
     object GroupBox3: TGroupBox
       Left = 122
-      Height = 62
+      Height = 72
       Top = 4
       Width = 140
       Caption = 'Min. Device Api:'
-      ClientHeight = 37
+      ClientHeight = 47
       ClientWidth = 136
       Color = clGradientInactiveCaption
       ParentColor = False
@@ -1836,11 +1836,11 @@ object FormWorkspace: TFormWorkspace
     end
     object GroupBox4: TGroupBox
       Left = 266
-      Height = 62
+      Height = 72
       Top = 4
       Width = 118
       Caption = 'Target Api:'
-      ClientHeight = 37
+      ClientHeight = 47
       ClientWidth = 114
       TabOrder = 2
       object ListBoxTargetAPI: TComboBox

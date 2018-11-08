@@ -583,11 +583,10 @@ begin
 
         if Pos('AppCompat', FAndroidTheme) > 0 then
         begin
-           if StrToInt(FTargetApi) >= 25 then  //if FMaxSdkPlatform >= 25 then
-             auxList.Add('target=android-'+ FTargetApi) //IntToStr(FMaxSdkPlatform))
+           if StrToInt(FTargetApi) >= 26 then  //
+             auxList.Add('target=android-'+ FTargetApi)
            else
-             auxList.Add('target=android-25');  //25
-           //ShowMessage('Warning:[LAMW 0.8] AppCompat theme requirement: SDK "platform 25" [or up],  SDK "build-tools 25.0.3" [or up] and Gradle 4.1 [or up]');
+             auxList.Add('target=android-26');  //
         end
         else
         begin
@@ -928,7 +927,7 @@ var
   androidPluginStr: string;
   androidPluginNumber: integer;
   gradleCompatible: string;
-
+  directive, compatVer, designVer, cardVer, recyclerVer: string;
 begin
   Result:= False;
   FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
@@ -1804,19 +1803,62 @@ begin
 
                if Pos('AppCompat', FAndroidTheme) > 0 then
                begin
-
-                  if StrToInt(compileSdkVersion) > 25 then
+                  if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/appcompat-v7/26.1.0') then
                   begin
-                    strList.Add('    compileSdkVersion '+compileSdkVersion);
+                     compileSdkVersion:= '26';
+                     compatVer:= '26.1.0';
+                  end
+                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/appcompat-v7/26.0.0-beta1')  then
+                  begin
+                     compileSdkVersion:= '26';
+                     compatVer:= '26.0.0-beta1';
+                  end
+                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/appcompat-v7/26.0.0-alpha1')  then
+                  begin
+                     compileSdkVersion:= '26';
+                     compatVer:= '26.0.0-alpha1';
                   end
                   else
                   begin
-                     strList.Add('    compileSdkVersion 25');
+                     compileSdkVersion:= '25';
+                     compatVer:= '25.3.1';
                   end;
 
-                 if androidPluginNumber < 300 then
+                  //designVer
+                  if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/design/26.1.0') then
+                    designVer:= '26.1.0'
+                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/design/26.0.0-beta1')  then
+                    designVer:= '26.0.0-beta1'
+                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/design/26.0.0-alpha1')  then
+                    designVer:= '26.0.0-alpha1'
+                  else
+                    designVer:= '25.3.1';
+
+                  //cardVer
+                  if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.1.0') then
+                    cardVer:= '26.1.0'
+                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.0.0-beta1')  then
+                    cardVer:= '26.0.0-beta1'
+                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.0.0-alpha1')  then
+                    cardVer:= '26.0.0-alpha1'
+                  else
+                    cardVer:= '25.3.1';
+
+                  //recyclerVer
+                  if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.1.0') then
+                    recyclerVer:= '26.1.0'
+                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.0.0-beta1')  then
+                    recyclerVer:= '26.0.0-beta1'
+                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.0.0-alpha1')  then
+                    recyclerVer:= '26.0.0-alpha1'
+                  else
+                    recyclerVer:= '25.3.1';
+
+                  strList.Add('    compileSdkVersion '+compileSdkVersion);
+
+                  if androidPluginNumber < 300 then
                     strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
-                 //else: each version of the Android Gradle Plugin now has a default version of the build tools
+                  //else: each version of the Android Gradle Plugin now has a default version of the build tools
 
                end
                else
@@ -1831,15 +1873,16 @@ begin
 
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin
+
                   if StrToInt(FMinApi) >= 14 then
                      strList.Add('            minSdkVersion '+FMinApi)
                   else
                      strList.Add('            minSdkVersion 14');
 
-                  if StrToInt(FTargetApi) > 21 then
+                  if StrToInt(FTargetApi) <= StrToInt(compileSdkVersion)  then
                     strList.Add('            targetSdkVersion '+ FTargetApi)  //compileSdkVersion
                   else
-                    strList.Add('            targetSdkVersion 21'+ FTargetApi)
+                    strList.Add('            targetSdkVersion '+compileSdkVersion);
 
                 end
                 else
@@ -1870,22 +1913,16 @@ begin
                 strList.Add('dependencies {');
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin   //compile fileTree(dir: 'libs', include: ['*.jar'])
-                   if androidPluginNumber < 300 then
-                   begin
-                     strList.Add('    compile ''com.android.support:appcompat-v7:25.3.1''');
-                     strList.Add('    compile ''com.android.support:design:25.3.1''');
-                     strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
-                     strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
-                     strList.Add('    compile ''com.google.android.gms:play-services-ads:11.0.4''');
-                   end
-                   else
-                   begin
-                     strList.Add('    implementation ''com.android.support:appcompat-v7:25.3.1''');
-                     strList.Add('    implementation ''com.android.support:design:25.3.1''');
-                     strList.Add('    implementation ''com.android.support:cardview-v7:25.3.1''');
-                     strList.Add('    implementation ''com.android.support:recyclerview-v7:25.3.1''');
-                     strList.Add('    implementation ''com.google.android.gms:play-services-ads:11.0.4''');
-                   end
+                    if androidPluginNumber < 300 then
+                      directive:='compile'
+                    else
+                      directive:='implementation';
+
+                    strList.Add('    '+directive+' ''com.android.support:appcompat-v7:'+compatVer+'''');
+                    strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');
+                    strList.Add('    '+directive+' ''com.android.support:cardview-v7:'+cardVer+'''');
+                    strList.Add('    '+directive+' ''com.android.support:recyclerview-v7:'+recyclerVer+'''');
+                    strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
                    {from:
                    C:\android\sdk\extras\android\m2repository\com\android\support\appcompat-v7
                    C:\android\sdk\extras\android\m2repository\com\android\support\design

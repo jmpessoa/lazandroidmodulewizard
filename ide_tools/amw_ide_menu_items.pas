@@ -981,7 +981,7 @@ var
   listUnit: TStringList;
   listComponent: TStringList;
   listTemp: TStringList;
-  listProjComp: TStringList;
+  listProjComp, unitsList: TStringList;
   fileName: string;
   pathToProject: string;
   p, i, k: integer;
@@ -1007,11 +1007,13 @@ begin
   listComponent.Delimiter:= ';';
 
   Project:= LazarusIDE.ActiveProject;
+  if not Assigned(Project) then Exit;
 
-  if Assigned(Project) and (Project.CustomData.Values['LAMW'] = 'GUI' ) then
+  if Project.CustomData.Values['LAMW'] = 'GUI' then
   begin
 
       package:= Project.CustomData.Values['Package'];
+
       p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
 
       pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
@@ -1029,20 +1031,20 @@ begin
 
      FormImportLAMWStuff:= TFormImportLAMWStuff.Create(Application);
 
+     unitsList:= FindAllFiles(pathToProject, '*.lfm', False);
      listProjComp.Clear;
-     for k:= 0 to Project.FileCount-1 do
+     for k:= 0 to unitsList.Count-1 do
      begin
-       if Pos('.lpr', Project.Files[k].Filename) <= 0 then
-       begin
-         listTemp.LoadFromFile(ChangeFileExt(Project.Files[k].Filename, '.lfm'));
+         listTemp.LoadFromFile(unitsList.Strings[k]);
          p:= Pos(':', listTemp.Strings[0]);
          listProjComp.Add(Trim(Copy(listTemp.Strings[0], p+3, MaxInt)));
-         FormImportLAMWStuff.ListBoxTarget.Items.Add(ExtractFileName(ChangeFileExt(Project.Files[k].Filename, '')));
-       end;
+         FormImportLAMWStuff.ListBoxTarget.Items.Add(ExtractFileName(ChangeFileExt(unitsList.Strings[k], '')));
      end;
+     unitsList.Free;
 
      if FormImportLAMWStuff.ShowModal = mrOK then
      begin
+
          listIndex:= FormImportLAMWStuff.ListBoxTarget.ItemIndex;
          if  listIndex >= 0 then
          begin
@@ -1071,7 +1073,10 @@ begin
               end;
             end else ShowMessage('Fail. None LAMW Form were selected...');
          end else ShowMessage('Fail. None [candidate] Unit were selected...');
+
+
      end;
+
   end;
 
   if listComponent.Count > 0 then
@@ -1106,7 +1111,10 @@ begin
     listComponent.Add('jForm');
     Project.Files[listIndex+1].CustomData['jControls']:= listComponent.DelimitedText;
 
-    ShowMessage('Sucess!!! Imported LAMW Stuff !!' +sLineBreak + 'Hint: "Run-->Build" and (Re)"Open" to update...');
+    ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
+                'Hint: "Run --> Build" and accept [Reload checked files from disk]!' + sLineBreak +
+                '[Close](Re)"Open" the project to update the form display content ...' + sLineBreak +
+                'Or close the form unit tab and reopen it [Project Inspector...] to see the content changes...');
   end;
 
   listTemp.Free;

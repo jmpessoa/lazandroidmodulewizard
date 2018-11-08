@@ -282,7 +282,7 @@ begin
                 if HasBuildTools(intApi, tempOutBuildTool) then
                 begin
                    Result:= intApi;
-                   outBuildTool:= tempOutBuildTool;  //25.0.3
+                   outBuildTool:= tempOutBuildTool;  //26.0.2
                 end;
               end;
             end;
@@ -344,7 +344,7 @@ begin
   Result:= '';
   if HasBuildTools(sdkApi, tempOutBuildTool) then
   begin
-     Result:= tempOutBuildTool;  //25.0.3
+     Result:= tempOutBuildTool;  //26.0.2
   end;
 end;
 
@@ -357,8 +357,8 @@ begin
 
   if (buildTool = '') then Exit;
 
-  numberAsString:= StringReplace(buildTool,'.', '', [rfReplaceAll]); //25.0.3
-  maxBuilderNumber:= StrToInt(Trim(numberAsString));  //2503
+  numberAsString:= StringReplace(buildTool,'.', '', [rfReplaceAll]); //26.0.2
+  maxBuilderNumber:= StrToInt(Trim(numberAsString));  //2602
 
   if (maxBuilderNumber >= 2111) and (maxBuilderNumber < 2112) then
   begin
@@ -476,7 +476,7 @@ var
 
   gradleCompatibleStr: string;
   gradleCompatibleNumber: integer;
-
+  directive, compatVer, designVer, cardVer, recyclerVer, pathToSdk: string;
 begin
 
   strList:= TStringList.Create;
@@ -594,7 +594,7 @@ begin
     if buildTool <> '' then
     begin
 
-       buildToolApi:= Copy(buildTool,1,2);   //25.0.3  --> 25
+       buildToolApi:= Copy(buildTool,1,2);   //26.0.2  --> 26
 
        if StrToInt(buildToolApi) >= 25 then
          pluginVersion:= GetPluginVersion(buildTool)
@@ -632,15 +632,62 @@ begin
 
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin
+           pathToSdk:= GetPathToSDKFromBuildXML(FPathToAndroidProject+'build.xml');
+           if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/appcompat-v7/26.1.0') then
+           begin
+             buildToolApi:= '26';
+             compatVer:= '26.1.0';
+           end
+           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/appcompat-v7/26.0.0-beta1')  then
+           begin
+             buildToolApi:= '26';
+             compatVer:= '26.0.0-beta1';
+           end
+           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/appcompat-v7/26.0.0-alpha1')  then
+           begin
+             buildToolApi:= '26';
+             compatVer:= '26.0.0-alpha1';
+           end
+           else
+           begin
+             buildToolApi:= '25';
+             compatVer:= '25.3.1';
+           end;
 
-            buildToolApi:= '25'; //need [must have!] by 'com.android.support:appcompat-v7:25.3.1' and others...
+           //designVer
+           if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/design/26.1.0') then
+             designVer:= '26.1.0'
+           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/design/26.0.0-beta1')  then
+             designVer:= '26.0.0-beta1'
+           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/design/26.0.0-alpha1')  then
+             designVer:= '26.0.0-alpha1'
+           else
+             designVer:= '25.3.1';
 
-            //if StrToInt(buildToolApi) > 25 then
-              strList.Add('    compileSdkVersion '+ buildToolApi);
-            //else strList.Add('    compileSdkVersion 25');}
+           //cardVer
+           if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.1.0') then
+             cardVer:= '26.1.0'
+           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.0.0-beta1')  then
+             cardVer:= '26.0.0-beta1'
+           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.0.0-alpha1')  then
+             cardVer:= '26.0.0-alpha1'
+           else
+             cardVer:= '25.3.1';
+
+           //recyclerVer
+           if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.1.0') then
+             recyclerVer:= '26.1.0'
+           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.0.0-beta1')  then
+             recyclerVer:= '26.0.0-beta1'
+           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.0.0-alpha1')  then
+             recyclerVer:= '26.0.0-alpha1'
+           else
+             recyclerVer:= '25.3.1';
+
+           strList.Add('    compileSdkVersion '+ buildToolApi);
 
            if androidPluginNumber < 300 then
-              strList.Add('    buildToolsVersion "25.0.3"'); //buildTool
+              strList.Add('    buildToolsVersion "26.0.2"'); //buildTool
            //else: each version of the Android Gradle Plugin now has a default version of the build tools
 
          end
@@ -683,32 +730,29 @@ begin
          strList.Add('dependencies {');
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin   //compile fileTree(dir: 'libs', include: ['*.jar'])
+
             if androidPluginNumber < 300 then
-            begin
-            strList.Add('    compile ''com.android.support:appcompat-v7:25.3.1''');
-            strList.Add('    compile ''com.android.support:design:25.3.1''');
-            strList.Add('    compile ''com.android.support:cardview-v7:25.3.1''');
-            strList.Add('    compile ''com.android.support:recyclerview-v7:25.3.1''');
-            strList.Add('    compile ''com.google.android.gms:play-services-ads:11.0.4''');
-            end
+              directive:='compile'
             else
-            begin
-              strList.Add('    implementation ''com.android.support:appcompat-v7:25.3.1''');
-              strList.Add('    implementation ''com.android.support:design:25.3.1''');
-              strList.Add('    implementation ''com.android.support:cardview-v7:25.3.1''');
-              strList.Add('    implementation ''com.android.support:recyclerview-v7:25.3.1''');
-              strList.Add('    implementation ''com.google.android.gms:play-services-ads:11.0.4''');
-            end
+              directive:='implementation';
+
+            strList.Add('    '+directive+' ''com.android.support:appcompat-v7:'+compatVer+'''');
+            strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');
+            strList.Add('    '+directive+' ''com.android.support:cardview-v7:'+cardVer+'''');
+            strList.Add('    '+directive+' ''com.android.support:recyclerview-v7:'+recyclerVer+'''');
+            strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
+
             {
             Extras
             Android Support Repository
             Android Support Library
             C:\adt32\sdk\extras\android\m2repository\com\android\support\appcompat-v7
             C:\adt32\sdk\extras\android\m2repository\com\android\support\design
+            C:/adt32/sdk/extras/android/m2repository/com/android/support/design/26.0.0-alpha1/
             C:\adt32\sdk\extras\android\m2repository\com\android\support\cardview-v7
             C:\adt32\sdk\extras\android\m2repository\com\android\support\recyclerview-v7  //25.3.1
-            C:\android\sdk\extras\google\m2repository\com\google\android\gms\play-services-ads   //11.0.4
-            }
+            C:\adt32\sdk\extras\google\m2repository\com\google\android\gms\play-services-ads   //11.0.4}
+
          end;
          strList.Add('}');
 
@@ -1051,15 +1095,15 @@ begin
   manifestTargetApi:= StrToInt(sdkManifestTargetApi);
   buildTool:=  GetBuildTool(manifestTargetApi);
 
-  if manifestTargetApi < 21 then
+  if manifestTargetApi < 26 then
   begin
-     queryValue:= '21';
-     if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 21',
+     queryValue:= '26';
+     if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 26',
                    '[Suggestion] Change Target API to [or up]:', queryValue) then
      begin
        manifestTargetApi:= StrToInt(queryValue);
 
-       if manifestTargetApi <= 25 then
+       if manifestTargetApi <= 26 then
        begin
           if not LamwGlobalSettings.KeepManifestTargetApi  then
              buildTool:= '25.0.3'

@@ -294,11 +294,7 @@ end;
 function TFormWorkspace.GetCodeNameByApi(api: string):string;
 begin
   Result:= 'Unknown';
-  // tk
-  //if api='11' then Result:= 'Honeycomb 3.0x'
-  //else if api='12' then Result:= 'Honeycomb 3.1x'
   if api='13' then Result:= 'Honeycomb 3.2'
-  // end tk
   else if api='14' then Result:= 'IceCream 4.0'
   else if api='15' then Result:= 'IceCream 4.0x'
   else if api='16' then Result:= 'JellyBean 4.1'
@@ -1042,8 +1038,6 @@ begin          //C:\adt32\sdk\tools\ant
 end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
-var
-  ndkApi: string;
 begin
   EditPathToWorkspace.Left:= 8; // try fix hidpi bug
   ComboSelectProjectName.Left:= 8;  // try fix hidpi bug
@@ -1082,14 +1076,14 @@ var
 begin
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then
   begin
-    if (FMaxSdkPlatform < 25) or (FPathToGradle = '')   then
+    if (FMaxSdkPlatform < 26) or (FPathToGradle = '')   then
     begin
       ShowMessage('Warning/Recomendation:'+
                sLineBreak+
                sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
                sLineBreak+' 1. Java JDK 1.8'+
                sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
-               sLineBreak+' 3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 and 26.0.2'+
+               sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
                sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
                sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
                sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1136,7 +1130,7 @@ begin
   begin
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then
-      MessageDlg('[LAMW 0.8] "AppCompat" [material] theme need JDK 1.8 + Gradle 4.1!', mtWarning, [mbOk], 0);
+      MessageDlg('[LAMW 0.8] "AppCompat" [material] theme need JDK 1.8 + Gradle 4.4.1!', mtWarning, [mbOk], 0);
   end;
 
 end;
@@ -1178,7 +1172,7 @@ begin
            sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 and 26.0.2'+
+           sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1240,7 +1234,7 @@ begin
            sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 and 26.0.2'+
+           sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1321,7 +1315,7 @@ begin
   Result:= '';
   if HasBuildTools(sdkApi, tempOutBuildTool) then
   begin
-     Result:= tempOutBuildTool;  //25.0.3
+     Result:= tempOutBuildTool;  //26.0.2
   end;
 end;
 
@@ -1429,7 +1423,7 @@ begin
       WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
       WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
-      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxNdkPlatform.ItemIndex));  //android-25
+      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxNdkPlatform.ItemIndex));  //android-26
       WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
    finally
       Free;

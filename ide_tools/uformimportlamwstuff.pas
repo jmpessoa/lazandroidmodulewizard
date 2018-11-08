@@ -23,7 +23,7 @@ type
     SpeedButton1: TSpeedButton;
     procedure SpeedButton1Click(Sender: TObject);
   private
-
+    //
   public
 
   end;
@@ -41,9 +41,10 @@ procedure TFormImportLAMWStuff.SpeedButton1Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
   begin
-     EditSource.Text:= OpenDialog1.FileName;
+    EditSource.Text:= OpenDialog1.FileName;
   end;
 end;
+
 
 end.
 

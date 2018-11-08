@@ -39,18 +39,22 @@ I. Infrastructure
 	[Linux]		http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz
 	[Mac]		http://dl.google.com/android/android-sdk_r24.0.2-macosx.zip
 
-	Hint:	1)after unpacked, open a terminal and go to "sdk/tools"  folder
-		2)run  "android sdk" to open a GUI "SDK Manager"
+	Hint:	1)after unpacked/install, open a command line Terminal and go to folder "sdk/tools"
+		2)run the command  "android update sdk"   to open a GUI "SDK Manager"
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
-		5)check "Android SDK Build-Tools 25.0.3"		
-		6)go to "Android 7.1.1 (API 25)" and check only "SDK Platform"
-		7)go to "Extras" and check: 
+		5)check "Android SDK Build-Tools 25.0.3"	
+		6)check "Android SDK Build-Tools 26.0.2"  	
+		7)go to "Android 7.1.1 (API 25)" and check only "SDK Platform"
+		8)go to "Android 8.0.0 (API 26)" and check only "SDK Platform"
+		9)go to "Extras" and check: 
 				"Android Support Repository"				
 				"Android Support Library"				
-				"Google USB Drive"				
-		
-.Android SDK  [updated] --- only "gradle" build  supported...
+				"Google USB Drive"	//windows only...
+				"Google Repository"
+				"Google Play Services"		
+
+.Android SDK  [updated/modern version] --- only "gradle" build  supported...
 
 	[Windows]	https://dl.google.com/android/repository/sdk-tools-windows-3859397.zip
 	[Linux]		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
@@ -60,11 +64,11 @@ I. Infrastructure
 .Android NDK
 	https://developer.android.com/ndk/downloads/index.html
 
-.Laz4Android [Windows] [cross-arm-ndroid compiler installed!] 
+.Laz4Android [Windows] [cross-arm-android compiler installed!] 
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
 
 	:: OR Lazarus [canonical]
-		Do It Yourself cross Android compile! [windows]: 			
+		"Do It Yourself" a cross Android compile! [windows]: 			
 			After install the LAMW go to:
 			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
 			2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
@@ -74,10 +78,8 @@ I. Infrastructure
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
 
-.Gradle 4.1 [to build Apk with "AppCompat" [material] theme]
-	https://gradle.org/next-steps/?version=4.1&format=bin
-
-		RECOMMENDED: 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
+.Gradle 4.4.1 [to build Apk with "AppCompat" [material design] theme]
+	https://gradle.org/next-steps/?version=4.4.1&format=bin
 
 	Simply extract the zip file to a convenient location...
 
@@ -87,17 +89,14 @@ I. Infrastructure
 	https://github.com/FlKo/LazarusDockedDesktops
 
 
-.[LAMW 0.8] "AppCompat" [material] theme need:'+
+.[LAMW 0.8] "AppCompat" [material design] theme need:'+
 		1. Java JDK 1.8   
-
-		2. Gradle 4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]
-			RECOMMENDED: 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
-
-		3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]
-		3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]
-		3. Android SDK "plataforms" 27 + "build-tools" 27.0.3
-		4. Android SDK/Extra  "Support Repository"
-		5. Android SDK/Extra  "Support Library"
+		2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
+		3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 
+		4. Android SDK/Extra	"Support Repository"
+		5. Android SDK/Extra	"Support Library"
+		5. Android SDK/Extra	"Google Repository"
+		5. Android SDK/Extra	"Google Play Services"		
 
 II. LAMW:  Lazarus Android Module Wizard
 
@@ -107,7 +106,7 @@ II. LAMW:  Lazarus Android Module Wizard
 		lazandroidwizardpack.lpk	[..../android_wizard]
 		amw_ide_tools.lpk		[..../ide_tools]
 
-III. USE
+III. USING LAMW
 
 1. Configure Paths:
 
@@ -117,7 +116,7 @@ III. USE
 
 	NOTE: [MacOs >= 10.5] path to Java JDK auto setting as: ${/usr/libexec/java_home}
 
-2. New Project [Thanks to Ahmad Bohloolbandi (a.k.a. @developing)]
+2. [How to] New Project [Thanks to Ahmad Bohloolbandi (a.k.a. @developing)]
 
 	After install "LAMW" packages and Configured the paths:
 
@@ -242,7 +241,7 @@ AppTryCode2: jDumpJavaMethods component demo [about java to pascal converter...]
 Thanks to All!
 	
 
-FAQ: [Thanks to Ahmad Bohloolbandi (a.k.a. @developing) ]
+[FAQ 2]: [Thanks to Ahmad Bohloolbandi (a.k.a. @developing) ]
 
 #Question: How do we can design a layout that shown same in real device?
 

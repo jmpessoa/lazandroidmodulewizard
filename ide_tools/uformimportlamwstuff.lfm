@@ -1,18 +1,18 @@
 object FormImportLAMWStuff: TFormImportLAMWStuff
-  Left = 484
+  Left = 446
   Height = 325
-  Top = 293
-  Width = 390
+  Top = 216
+  Width = 432
   Caption = 'Import LAMW Stuff'
   ClientHeight = 325
-  ClientWidth = 390
+  ClientWidth = 432
   DesignTimePPI = 120
   LCLVersion = '1.8.0.6'
   object ListBoxTarget: TListBox
     Left = 16
     Height = 136
     Top = 32
-    Width = 356
+    Width = 398
     Anchors = [akTop, akLeft, akRight]
     ItemHeight = 0
     TabOrder = 0
@@ -22,7 +22,7 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     Left = 16
     Height = 28
     Top = 216
-    Width = 321
+    Width = 363
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 1
   end
@@ -30,20 +30,20 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     Left = 16
     Height = 20
     Top = 8
-    Width = 259
-    Caption = 'Target [selected unit will be modified!]:'
+    Width = 355
+    Caption = 'Target [select an unit/form to be modified/replaced!]:'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 16
     Height = 20
     Top = 192
-    Width = 148
-    Caption = 'Source/import  [*.lfm]:'
+    Width = 188
+    Caption = 'Source/import  form  [*.lfm]:'
     ParentColor = False
   end
   object SpeedButton1: TSpeedButton
-    Left = 343
+    Left = 385
     Height = 28
     Top = 216
     Width = 30
@@ -52,7 +52,7 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     OnClick = SpeedButton1Click
   end
   object BitBtn1: TBitBtn
-    Left = 168
+    Left = 210
     Height = 38
     Top = 272
     Width = 93
@@ -64,7 +64,7 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     TabOrder = 2
   end
   object BitBtn2: TBitBtn
-    Left = 278
+    Left = 320
     Height = 38
     Top = 272
     Width = 94
