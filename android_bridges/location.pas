@@ -55,6 +55,7 @@ jLocation = class(jControl)
     FOnLocationProviderDisabled: TLocationProviderDisabled; //called when Gps is turned OFF!!
 
     FOnGpsStatusChanged: TOnGpsStatusChanged;
+    FGoogleMapsApiKey: string;
  protected
 
  public
@@ -110,6 +111,8 @@ jLocation = class(jControl)
     function GetSatelliteCount(): integer;
     function GetSatelliteInfo(_index: integer): string;
     function GetTimeToFirstFix(): single;
+    procedure SetGoogleMapsApiKey(_key: string);
+   // procedure Listen();
 
     procedure GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
     procedure GenEvent_OnLocationStatusChanged(Obj: TObject; status: integer; provider: string; msgStatus: string);
@@ -128,6 +131,7 @@ jLocation = class(jControl)
 
     property TimeForUpdates: int64 read FTimeForUpdates write SetTimeForUpdates;    // millsecs
     property DistanceForUpdates: int64 read FDistanceForUpdates write SetDistanceForUpdates;  //meters
+    property GoogleMapsApiKey: string read FGoogleMapsApiKey write SetGoogleMapsApiKey;
 
     property OnLocationChanged: TLocationChanged read FOnLocationChanged write FOnLocationChanged;
     property OnLocationStatusChanged: TLocationStatusChanged read FOnLocationStatusChanged write FOnLocationStatusChanged;
@@ -174,7 +178,8 @@ procedure jLocation_SetMarkerHighlightColor(env: PJNIEnv; _jlocation: JObject; _
 function jLocation_GetSatelliteCount(env: PJNIEnv; _jlocation: JObject): integer;
 function jLocation_GetSatelliteInfo(env: PJNIEnv; _jlocation: JObject; _index: integer): string;
 function jLocation_GetTimeToFirstFix(env: PJNIEnv; _jlocation: JObject): single;
-
+procedure jLocation_SetGoogleMapsApiKey(env: PJNIEnv; _jlocation: JObject; _key: string);
+//procedure jLocation_Listen(env: PJNIEnv; _jlocation: JObject);
 
 function GeoPoint2D(latitute: double; longitude: double): TGeoPoint2D;
 
@@ -219,7 +224,11 @@ begin
   //your code here: set/initialize create params....
   FjObject := jCreate(FTimeForUpdates ,FDistanceForUpdates ,Ord(FCriteriaAccuracy) ,Ord(FMapType));
 
+  if FGoogleMapsApiKey <> '' then
+     jLocation_SetGoogleMapsApiKey(FjEnv, FjObject, FGoogleMapsApiKey);
+
   FInitialized:= True;
+
 end;
 
 function jLocation.jCreate( _TimeForUpdates: int64; _DistanceForUpdates: int64; _CriteriaAccuracy: integer; _MapType: integer): jObject;
@@ -565,6 +574,23 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jLocation_GetTimeToFirstFix(FjEnv, FjObject);
+end;
+
+{
+procedure jLocation.Listen();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jLocation_Listen(FjEnv, FjObject);
+end;
+}
+
+procedure jLocation.SetGoogleMapsApiKey(_key: string);
+begin
+  //in designing component state: set value here...
+  FGoogleMapsApiKey:= _key;
+  if FInitialized then
+     jLocation_SetGoogleMapsApiKey(FjEnv, FjObject, _key);
 end;
 
 procedure jLocation.GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
@@ -1200,6 +1226,33 @@ begin
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'GetTimeToFirstFix', '()F');
   Result:= env^.CallFloatMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+{
+procedure jLocation_Listen(env: PJNIEnv; _jlocation: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'Listen', '()V');
+  env^.CallVoidMethod(env, _jlocation, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+}
+
+procedure jLocation_SetGoogleMapsApiKey(env: PJNIEnv; _jlocation: JObject; _key: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_key));
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetGoogleMapsApiKey', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

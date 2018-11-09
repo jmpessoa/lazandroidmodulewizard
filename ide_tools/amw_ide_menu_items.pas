@@ -1035,12 +1035,11 @@ begin
      listProjComp.Clear;
      for k:= 0 to unitsList.Count-1 do
      begin
-         listTemp.LoadFromFile(unitsList.Strings[k]);
-         p:= Pos(':', listTemp.Strings[0]);
-         listProjComp.Add(Trim(Copy(listTemp.Strings[0], p+3, MaxInt)));
-         FormImportLAMWStuff.ListBoxTarget.Items.Add(ExtractFileName(ChangeFileExt(unitsList.Strings[k], '')));
+       listTemp.LoadFromFile(unitsList.Strings[k]);
+       p:= Pos(':', listTemp.Strings[0]);  //object AndroidModule1: TAndroidModule1
+       listProjComp.Add(Trim(Copy(listTemp.Strings[0], p+3, MaxInt))); //AndroidModule1
+       FormImportLAMWStuff.ListBoxTarget.Items.Add(ExtractFileName(ChangeFileExt(unitsList.Strings[k], '')));
      end;
-     unitsList.Free;
 
      if FormImportLAMWStuff.ShowModal = mrOK then
      begin
@@ -1048,15 +1047,16 @@ begin
          listIndex:= FormImportLAMWStuff.ListBoxTarget.ItemIndex;
          if  listIndex >= 0 then
          begin
-            targetFormName:= listProjComp.Strings[listIndex]; //selected unit to be replaced...
-            fullPathToUnitTarget:= Project.Files[listIndex+1].Filename;
+            targetFormName:= listProjComp.Strings[listIndex]; //AndroidModule1 listIndex = selected unit to be replaced...
+            fullPathToUnitTarget:=  unitsList.Strings[listIndex]; //.lfm
+            fullPathToUnitTarget:= ChangeFileExt(fullPathToUnitTarget, '.pas');
             fullPathToUnitSourceLFM:= FormImportLAMWStuff.EditSource.Text;
             if fullPathToUnitSourceLFM <> '' then
             begin
               if FileExists(fullPathToUnitSourceLFM) then
               begin
                 listUnit.LoadFromFile(fullPathToUnitSourceLFM);
-                p:= Pos(':', listUnit.Strings[0]);
+                p:= Pos(':', listUnit.Strings[0]);   //object AndroidModule1: TAndroidModule1
                 sourceFormName:=  Trim(Copy(listUnit.Strings[0], p+3, MaxInt)); //AndroidModule1
                 for i:= 1 to listUnit.Count-1 do
                 begin
@@ -1071,11 +1071,11 @@ begin
                   end;
                 end;
               end;
-            end else ShowMessage('Fail. None LAMW Form were selected...');
+            end else ShowMessage('Fail. None [target] LAMW Form were selected...');
          end else ShowMessage('Fail. None [candidate] Unit were selected...');
 
-
      end;
+     unitsList.Free;
 
   end;
 
@@ -1093,14 +1093,12 @@ begin
     end;
 
     listTemp.Clear;
-    //CopyFile(fullPathToUnitSourceLFM, ChangeFileExt(fullPathToUnitTarget, '.lfm'));
     listTemp.LoadFromFile(fullPathToUnitSourceLFM);
     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
     listTemp.Text:= tempStr;
     listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
 
     listTemp.Clear;
-    //CopyFile(ChangeFileExt(fullPathToUnitSourceLFM, '.pas'), fullPathToUnitTarget);
     listTemp.LoadFromFile(ChangeFileExt(fullPathToUnitSourceLFM, '.pas'));
     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
     listTemp.Text:= tempStr;

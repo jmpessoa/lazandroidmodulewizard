@@ -79,6 +79,8 @@ public class jLocation /*extends ...*/ {
     private float mTimeToFirstFix = 0;
     public boolean mListening = false;
 
+    private String gmKey="";
+
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jLocation(Controls _ctrls, long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) { //Add more others news "_xxx" params if needed!
         //super(_ctrls.activity);
@@ -412,14 +414,14 @@ public class jLocation /*extends ...*/ {
     //https://developers.google.com/maps/documentation/staticmaps
     public String GetGoogleMapsUrl(double _latitude, double _longitude) {   //sensor=false ??        
       String url = "http://maps.googleapis.com/maps/api/staticmap?sensor=false&center="+_latitude + "," + _longitude+
-                    "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+_latitude + "," + _longitude;          		                         
+                    "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+_latitude + "," + _longitude+"&key="+gmKey;
       return url;
     }
     
     //http://maps.google.com/maps?f=d&daddr=" + fullAddress
     public String GetGoogleMapsUrl(String _fullAddress) {         //sensor=false ??
         String url = "http://maps.googleapis.com/maps/api/staticmap?f=d&daddr="+ _fullAddress +
-                      "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+ _fullAddress;          		                         
+                      "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+ _fullAddress+"&key="+gmKey;
         return url;
     }
            
@@ -434,7 +436,7 @@ public class jLocation /*extends ...*/ {
     	}
     	
         String url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path="+ path +
-                      "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+path;                        
+                      "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+path+"&key="+gmKey;
         return url;
     }
      
@@ -451,20 +453,19 @@ public class jLocation /*extends ...*/ {
     	
     	switch(_pathFlag) {
     	case 0: url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path=" + path +
-                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers=" +path; break;
+                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers=" +path+"&key="+gmKey; break;
                 
     	case 1: url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false"+
-                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+path; break;
+                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&markers="+path+"&key="+gmKey; break;
     	
     	case 2: url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path="+ path +
-                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType; break;   	
+                "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+"&key="+gmKey; break;
                 
     	}
     	
         return url;
     }
-    
-    
+
     public String GetGoogleMapsUrl(double[] _latitude, double[] _longitude, int _pathFlag, int _markerHighlightIndex) {
     	String path ="";
     	int count = _latitude.length;
@@ -473,13 +474,10 @@ public class jLocation /*extends ...*/ {
                        
         int flag = _pathFlag;             
         if (flag > 1) flag = 1;
-        
-        
-        
+
         if (index >= count) index = count-1;        
         String markerHighlight = String.valueOf(_latitude[index]) +","+ String.valueOf(_longitude[index]);
-        
-    	
+
     	path = String.valueOf(_latitude[0]) +","+ String.valueOf(_longitude[0]);    	
     	for (int i = 1; i < count; i++) {    		
     	   path = path + "|" + String.valueOf(_latitude[i]) +","+ String.valueOf(_longitude[i]);    		
@@ -488,13 +486,13 @@ public class jLocation /*extends ...*/ {
     	if (flag == 0)  {    
     	   url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false&path=" + path +
                 "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+
-                "&markers=color:"+mMarkerHighlightColor+"|"+markerHighlight+"&markers=" +path;
+                "&markers=color:"+mMarkerHighlightColor+"|"+markerHighlight+"&markers=" +path+"&key="+gmKey;
     	}        
                 
     	if (flag == 1)  {
     	  url = "http://maps.googleapis.com/maps/api/staticmap?f=d&sensor=false"+
                 "&zoom="+mMapZoom+"&size="+mMapSizeW+"x"+mMapSizeH+"&maptype="+mMapType+
-                "&markers=color:"+mMarkerHighlightColor+"|"+markerHighlight+"&markers="+path;
+                "&markers=color:"+mMarkerHighlightColor+"|"+markerHighlight+"&markers="+path+"&key="+gmKey;
     	}
     	
         return url;
@@ -676,6 +674,10 @@ public class jLocation /*extends ...*/ {
     
     public float GetTimeToFirstFix() {
     	return mTimeToFirstFix;
+    }
+
+    public void SetGoogleMapsApiKey(String _key) {
+        gmKey = _key;
     }
     
 }

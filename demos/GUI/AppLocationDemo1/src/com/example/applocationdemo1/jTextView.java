@@ -9,6 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.RadialGradient;
@@ -476,8 +479,8 @@ public class jTextView extends TextView {
 		LAMWCommon.WrapParent();		
 	}		
 	
-	public void SetContentDescription(String _description) {		
-		this.setContentDescription(_description);
+	public void SetContentDescription(String _description) {
+	    this.setContentDescription(_description);
 	}
-	
+
 }

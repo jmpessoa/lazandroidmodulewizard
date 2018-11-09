@@ -1099,22 +1099,17 @@ begin
   begin
      queryValue:= '26';
      if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 26',
-                   '[Suggestion] Change Target API to [or up]:', queryValue) then
+                   '[Suggestion] Change Target API to 26'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
      begin
        manifestTargetApi:= StrToInt(queryValue);
-
-       if manifestTargetApi <= 26 then
+       if manifestTargetApi < 26 then
        begin
           if not LamwGlobalSettings.KeepManifestTargetApi  then
-             buildTool:= '25.0.3'
+             buildTool:= '26.0.2'
           else
              buildTool:= GetBuildTool(manifestTargetApi);
        end
-       else
-       begin
-           buildTool:= GetBuildTool(manifestTargetApi);
-       end;
-
+       else buildTool:= GetBuildTool(manifestTargetApi);
      end;
   end
   else

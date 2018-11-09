@@ -54,6 +54,7 @@ implementation
 
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
+
   if not Self.isConnected() then
   begin //try wifi
     if Self.SetWifiEnabled(True) then
@@ -140,6 +141,17 @@ procedure TAndroidModule1.jLocation1LocationChanged(Sender: TObject;
 var
   urlLocation: string;
 begin
+
+  //jLocation1.SetGoogleMapsApiKey('mykey');    // << ----------  IMPORTANT !!!!
+
+  if jLocation1.GoogleMapsApiKey = '' then
+  begin
+    ShowMessage('Found address='+ address);
+    ShowMessage('Sorry .... Google Static Maps API needs an apikey...');
+    jLocation1.StopTracker();
+    Exit;
+  end;
+
   urlLocation:= jLocation1.GetGoogleMapsUrl(latitude, longitude);
   jWebView1.Navigate(urlLocation);
 
@@ -181,6 +193,15 @@ var
   //ll: TDynArrayOfDouble;
   urlLocation: string;
 begin
+
+  //jLocation1.SetGoogleMapsApiKey('mykey');    // << ----------  IMPORTANT !!!!
+
+  if jLocation1.GoogleMapsApiKey = '' then
+  begin
+    ShowMessage('warning: Google Static Maps API needs an apikey. Look at the https://developers.google.com/maps/documentation/static-maps');
+    Exit;
+  end;
+
   //jLocation1.MapType:= mtHybrid;     // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
 
   (* TEST 1       //'UFMT,  Barra do Garças, Mato Grosso, Brasil'

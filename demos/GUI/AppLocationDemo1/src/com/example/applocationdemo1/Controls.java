@@ -1,6 +1,6 @@
 package com.example.applocationdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.2 - 21 August  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.2.3  - 23 October  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -286,42 +286,60 @@ public  void Close2() {
   controls.pOnClose(PasObj);
 }
 
-public boolean IsConnected(){ // by renabor
-   boolean r = false;	
+public boolean IsConnected(){ //by TR3E
+
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-   if (cm == null) return r;   
-   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-   if (activeNetwork == null) return r;   
-   return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+   if (cm != null) {
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+    if (activeNetwork != null)
+     return (activeNetwork.isAvailable() && activeNetwork.isConnected());
+   }
+
+   return false;
 }
 
-public boolean IsConnectedWifi(){ // by renabor
-   boolean r = false;
+public boolean IsConnectedWifi(){ // by TR3E
+
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-   if (cm == null) return r;   
-   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-   if (activeNetwork == null) return r;   
-   return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+
+   if (cm != null)
+   {
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+    if (activeNetwork != null)
+     return (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI);
+   }
+
+   return false;
 }
 
-public boolean IsConnectedTo(int _connectionType) {	   
-	   int r = -1;
-	   if (!IsConnected()) return false;	   
-	   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);	   
-	   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();	   
-	   if (activeNetwork != null) {   	   
-		  switch (activeNetwork.getType()){
-		  case ConnectivityManager.TYPE_MOBILE: r = 0; break;  //0
-		  case ConnectivityManager.TYPE_WIFI: r = 1; break;  //1
- 		  case ConnectivityManager.TYPE_BLUETOOTH: r = 2; break; //7
-		  case ConnectivityManager.TYPE_ETHERNET: r = 3; break; //9		  
-		  }	      
-	   }	   
-	   if (r == _connectionType)  
-		   return true;
-	   else 
-		  return false;
-	   
+public boolean IsConnectedTo(int _connectionType) { // by TR3E
+
+           ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+           if( cm != null )
+           {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            int result = -1;
+
+            if (activeNetwork != null)
+             if (activeNetwork.isAvailable() && activeNetwork.isConnected());
+             {
+                  switch (activeNetwork.getType()){
+                   case ConnectivityManager.TYPE_MOBILE:    result = 0; break; //0
+                   case ConnectivityManager.TYPE_WIFI:      result = 1; break; //1
+                   case ConnectivityManager.TYPE_BLUETOOTH: result = 2; break; //7
+                   case ConnectivityManager.TYPE_ETHERNET:  result = 3; break; //9
+                  }
+             }
+
+            return (result == _connectionType);
+           }
+
+           return false;
 }
 
 public void ShowMessage(String msg){
@@ -679,8 +697,10 @@ public String GetStringResourceByName(String _resName) {
 	return value;
 }   
 
-public ActionBar GetActionBar() { 
-    return this.controls.activity.getActionBar();
+public ActionBar GetActionBar() {
+    if (! jCommons.IsAppCompatProject() ) {
+		return (controls.activity).getActionBar();
+	} else return null;
 }
 
 /*
@@ -690,82 +710,70 @@ public ActionBar GetActionBar() {
  */
 
 public void HideActionBar() {
- ActionBar actionBar = this.controls.activity.getActionBar(); 
- actionBar.hide();          
+	jCommons.ActionBarHide(controls);
 }
 
-public void ShowActionBar() {	         
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.show();
+public void ShowActionBar() {
+	jCommons.ActionBarShow(controls);
 }
 
 //Hide the title label
 public void ShowTitleActionBar(boolean _value) {
-	ActionBar actionBar = this.controls.activity.getActionBar();
-    actionBar.setDisplayShowTitleEnabled(_value);
+	jCommons.ActionBarShowTitle(controls, _value);
 }
 
 //Hide the logo = false
-public void ShowLogoActionBar(boolean _value) { 
-   ActionBar actionBar = this.controls.activity.getActionBar();	    
-   actionBar.setDisplayShowHomeEnabled(_value);
+public void ShowLogoActionBar(boolean _value) {
+	jCommons.ActionBarShowLogo(controls, _value);
 }
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetTitleActionBar(String _title) {
-	ActionBar actionBar = this.controls.activity.getActionBar();   	
-    actionBar.setTitle(_title);    
+	jCommons.SetActionBarTitle(controls, _title);
 }
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetSubTitleActionBar(String _subtitle) {
-   ActionBar actionBar = this.controls.activity.getActionBar();    
-   actionBar.setSubtitle(_subtitle);
-   //actionBar.setDisplayHomeAsUpEnabled(true);  
+   jCommons.SetActionBarSubTitle(controls, _subtitle);
 }
 
 //forward [<] activity! // If your minSdkVersion is 11 or higher!
 /*.*/public void SetDisplayHomeAsUpEnabledActionBar(boolean _value) {
-   ActionBar actionBar = this.controls.activity.getActionBar();    
-   actionBar.setDisplayHomeAsUpEnabled(_value);
+	jCommons.ActionBarDisplayHomeAsUpEnabled(controls, _value);
 }	
 
 public void SetIconActionBar(String _iconIdentifier) {
 //[ifdef_api14up]
-  ActionBar actionBar = this.controls.activity.getActionBar();   	
-  actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
+	jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
 }
 
 public void SetTabNavigationModeActionBar(){
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	//API 11
-	actionBar.setSelectedNavigationItem(0);
+	jCommons.ActionBarSetTabNavigationMode(controls);
 }
 
 //This method remove all tabs from the action bar and deselect the current tab
 public void RemoveAllTabsActionBar() {
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.removeAllTabs();
-    this.controls.activity.invalidateOptionsMenu(); // by renabor
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
+	jCommons.ActionBarRemoveAllTabs(controls);
 }
 
 //Calculate ActionBar height
 //ref http://stackoverflow.com/questions/12301510/how-to-get-the-actionbar-height
 public int GetActionBarHeight() {
-int actionBarHeight = 0;
-TypedValue tv = new TypedValue();
-if (controls.activity.getActionBar().isShowing()) {  
-   if (controls.activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-      actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,controls.activity.getResources().getDisplayMetrics());
-   }
-}
-return actionBarHeight;
+  return jCommons.ActionGetBarBarHeight(controls);
 }
 
 public boolean ActionBarIsShowing() {
-  return controls.activity.getActionBar().isShowing();
+	return jCommons.ActionBarIsShowing(controls);
+}
+
+public boolean HasActionBar() {
+	return jCommons.HasActionBar(controls);
+}
+
+public boolean IsAppCompatProject () {
+	return jCommons.IsAppCompatProject();
 }
 
 public boolean IsPackageInstalled(String _packagename) {
@@ -1360,6 +1368,23 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 
 	public void RequestRuntimePermission(String _androidPermission, int _requestCode) {  //"android.permission.CAMERA"
 		jCommons.RequestRuntimePermission(controls, _androidPermission, _requestCode);
+	}
+
+	public void RequestRuntimePermission(String[] _androidPermissions, int _requestCode) {  //"android.permission.CAMERA"
+		jCommons.RequestRuntimePermission(controls, _androidPermissions, _requestCode);
+	}
+
+	//by TR3E
+	public int getScreenWidth( ){
+		return this.controls.activity.getResources().getDisplayMetrics().widthPixels;
+	}
+	//by TR3E
+	public int getScreenHeight( ){
+		return this.controls.activity.getResources().getDisplayMetrics().heightPixels;
+	}
+	//by TR3E
+	public String getSystemVersionString(){
+		return android.os.Build.VERSION.RELEASE;
 	}
 }
 //**class entrypoint**//please, do not remove/change this line!
