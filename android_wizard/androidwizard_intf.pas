@@ -920,7 +920,7 @@ var
   tempStr: string;
   linuxPathToAdbBin: string;
   linuxPathToAntBin: string;
-  dummy, strText: string;
+  apk_aliaskey, strText: string;
   strPack: string;
   sdkBuildTools, pluginVersion: string;
   compileSdkVersion: string;
@@ -1313,7 +1313,7 @@ begin
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('call ant clean -Dtouchtest.enabled=true debug');
           strList.Add('if errorlevel 1 pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-debug.bat'); //build Apk using "Ant"
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-build-debug.bat'); //build Apk using "Ant"
 
           strList.Clear;
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !
@@ -1321,7 +1321,7 @@ begin
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('call ant clean release');
           strList.Add('if errorlevel 1 pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-release.bat'); //build Apk using "Ant"
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-build-release.bat'); //build Apk using "Ant"
 
               //*.bat utils...
           CreateDir(FAndroidProjectName+ DirectorySeparator + 'utils');
@@ -1332,24 +1332,24 @@ begin
           strList.Add('android list targets');
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list_target.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list-target.bat');
 
           //need to pause on double-click use...
           strList.Clear;
-          strList.Add('cmd /K list_target.bat');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_list_target.bat');
+          strList.Add('cmd /K list-target.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused-list-target.bat');
 
           strList.Clear;
           strList.Add('cd '+FPathToAndroidSDK+'tools');
           strList.Add('android create avd -n avd_default -t 1 -c 32M');
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create_avd_default.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create-avd-default.bat');
 
           //need to pause on double-click use...
           strList.Clear;
-          strList.Add('cmd /k create_avd_default.bat');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused_create_avd_default.bat');
+          strList.Add('cmd /k create-avd-default.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused-create-avd-default.bat');
 
           strList.Clear;
           strList.Add('cd '+FPathToAndroidSDK+'tools');
@@ -1358,7 +1358,7 @@ begin
           else
             strList.Add('tools emulator -avd avd_api_'+FMinApi + ' &');
           strList.Add('cd '+FAndroidProjectName);
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_avd_default.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch-avd-default.bat');
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
@@ -1366,7 +1366,7 @@ begin
                      DirectorySeparator+'adb install -r '+FSmallProjName+'-'+FAntBuildMode+'.apk');
           strList.Add('cd ..');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'install.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-install-'+FAntBuildMode+'.bat');
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
@@ -1384,13 +1384,13 @@ begin
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_error.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat-error.bat');
 
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+DirectorySeparator+
                      'adb logcat ActivityManager:I '+FSmallProjName+'-'+FAntBuildMode+'.apk:D *:S');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat_app_perform.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat-app-perform.bat');
 
           (*//causes instability in the simulator! why ?
           strList.Clear;
@@ -1398,7 +1398,7 @@ begin
           strList.Add(FPathToAndroidSDK+'platform-tools'+DirectorySeparator+
                      'adb shell am start -a android.intent.action.MAIN -n '+
                       FAntPackageName+'.'+LowerCase(projName)+'/.'+FMainActivity);
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch_apk.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch-apk.bat');
           *)
 
           strList.Clear;
@@ -1480,16 +1480,16 @@ begin
           strList.Add(' ');
           strList.Add('   NEW! Go to Lazarus IDE menu "Run--> [LAMW] Build and Run"! Thanks to Anton!!!');
           strList.Add(' ');
-          strList.Add('1. Double click "build-debug.bat [.sh]" to build Apk');
+          strList.Add('1. Double click "ant-build-debug.bat [.sh]" to build Apk');
           strList.Add(' ');
           strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
-          strList.Add('   2.1 double click "install.bat" to install the Apk on the Emulator [or real device]');
+          strList.Add('   2.1 double click "install-'+FAntBuildMode+'.bat" to install the Apk on the Emulator [or real device]');
           strList.Add('   2.2 look for the App "'+FSmallProjName+'" in the Emulator [or real device] and click it!');
           strList.Add(' ');
           strList.Add('3. If AVD/Emulator is NOT running:');
           strList.Add('   3.1 If AVD/Emulator NOT exist:');
-          strList.Add('        3.1.1 double click "paused_create_avd_default.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
-          strList.Add('   3.2 double click "launch_avd_default.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
+          strList.Add('        3.1.1 double click "paused_create-avd-default.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
+          strList.Add('   3.2 double click "launch-avd-default.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
           strList.Add('   3.3 look for the App "'+FSmallProjName+'" in the Emulator and click it!');
           strList.Add(' ');
           strList.Add('4. Log/Debug');
@@ -1509,16 +1509,16 @@ begin
           strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
           strList.Add(' ');
           strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target. ex. "android-18" or "android-19" etc.');
-          strList.Add('   WARNING: Yes, if after run  "build.*" the folder "...\bin" is still empty then try another target!' );
+          strList.Add('   WARNING: Yes, if after run  "ant-build-debug.*" the folder "...\bin" is still empty then try another target!' );
           strList.Add('   WARNING: If you changed the target in "build.xml" change it in "AndroidManifest.xml" too!' );
           strList.Add(' ');
-          strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "build.bat" and "install.bat" !');
+          strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "ant-build-debug.bat" and "install.bat" !');
           strList.Add(' ');
-          strList.Add('12. Linux users: use "build.sh" , "install.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
+          strList.Add('12. Linux users: use "ant-build-debug.sh" , "install-'+FAntBuildMode+'.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
           strList.Add('    WARNING: All demos Apps was generate on my windows system! So, please,  edit its to correct paths...!');
           strList.Add(' ');
-          strList.Add('13. WARNING, before to execute "build-release.bat [.sh]"  you need execute "release.keystore.bat [.sh]"!');
-          strList.Add('    Please, read "readme-keytool-input.txt!"');
+          strList.Add('13. WARNING, before to execute "ant-build-release.bat [.sh]"  you need execute "release-keystore.bat [.sh]"!');
+          strList.Add('    Please, read "How_to_get_your_signed_release_Apk.txt"');
           strList.Add(' ');
           strList.Add('14. Please, for more info, look for "How to use the Demos" in "LAMW: Lazarus Android Module Wizard" readme.txt!!');
           strList.Add(' ');
@@ -1528,27 +1528,34 @@ begin
           strList.Add(' ');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
 
-          dummy:= LowerCase(FSmallProjName);
+          apk_aliaskey:= LowerCase(FSmallProjName)+'.keyalias';
+
           strList.Clear;
-          strList.Add('key.store='+dummy+'-release.keystore');
-          strList.Add('key.alias='+dummy+'aliaskey');
+          strList.Add('key.store='+LowerCase(FSmallProjName)+'-release.keystore');
+          strList.Add('key.alias='+apk_aliaskey);
           strList.Add('key.store.password=123456');
           strList.Add('key.alias.password=123456');
-
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant.properties');
+
+          strList.Clear;  //if need, hiden info in "build.grade" source
+          //strList.Add('MYAPP_RELEASE_STORE_FILE='+LowerCase(FSmallProjName)+'-release.keystore');
+          //strList.Add('MYAPP_RELEASE_KEY_ALIAS='+apk_aliaskey);
+          //strList.Add('MYAPP_RELEASE_STORE_PASSWORD=123456');
+          //strList.Add('MYAPP_RELEASE_KEY_PASSWORD=123456');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle.properties');  //if need configure proxy here, too
 
           //keytool input [dammy] data!
           strList.Clear;
           strList.Add('123456');             //Enter keystore password:
           strList.Add('123456');             //Re-enter new password:
           strList.Add('MyFirstName MyLastName'); //What is your first and last name?
-          strList.Add('MyDevelopmentUnit');        //What is the name of your organizational unit?
-          strList.Add('MyExampleCompany');   //What is the name of your organization?
+          strList.Add('MyDevelopmentUnitName');        //What is the name of your organizational unit?
+          strList.Add('MyCompanyName');   //What is the name of your organization?
           strList.Add('MyCity');             //What is the name of your City or Locality?
-          strList.Add('AA');                 //What is the name of your State or Province?
-          strList.Add('BB');                 //What is the two-letter country code for this unit?
+          strList.Add('MT');                 //What is the name of your State or Province?
+          strList.Add('BR');                 //What is the two-letter country code for this unit?
           strList.Add('y');  //Is <CN=FirstName LastName, OU=Development, O=MyExampleCompany, L=MyCity, ST=AK, C=WZ> correct?[no]:  y
-          strList.Add('123456'); //Enter key password for <aliasKey> <RETURN if same as keystore password>:
+          strList.Add('123456'); //Enter key password for the Apk <aliasKey> <RETURN if same as keystore password>:
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
 
           strList.Clear;
@@ -1557,7 +1564,7 @@ begin
           strList.Add('set PATH=%JAVA_HOME%'+PathDelim+'bin;%PATH%');
           strList.Add('set JAVA_TOOL_OPTIONS=-Duser.language=en');
           strList.Add('cd '+FAndroidProjectName);
-          strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
+          strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
                       FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'release-keystore.bat');
 
@@ -1570,45 +1577,53 @@ begin
 
           strList.Clear;
 
-          strList.Add('Tutorial: How to get your keystore to Apk release:');
+          strList.Add('Tutorial: How to get your signed release Apk');
+          strList.Add('          warning: you need a google developer account!');
+          strList.Add(' ');
+          strList.Add('1)Edit/change the project file "keytool_input.txt" to representative information:"');
           strList.Add('');
-          strList.Add('1. Edit "keytool_input.txt" to more representative information!"');
-          strList.Add('2. You need answer the prompts:');
+          strList.Add('Your google account keystore password: 123456');
+          strList.Add('        Re-enter the password: 123456');
+          strList.Add(' ');
+          strList.Add('Your first and last name: MyFirstName MyLastName');
           strList.Add('');
-          strList.Add('Enter keystore password: 123456');
-          strList.Add('Re-enter new password: 123456');
-          strList.Add('What is your first and last name?');
-          strList.Add('  [Unknown]:  MyFirstName MyLastName');
-          strList.Add('What is the name of your organizational unit?');
-          strList.Add('  [Unknown]:  MyDevelopmentUnit');
-          strList.Add('What is the name of your organization?');
-          strList.Add('  [Unknown]:  MyExampleCompany');
-          strList.Add('What is the name of your City or Locality?');
-          strList.Add('  [Unknown]:  MyCity');
-          strList.Add('What is the name of your State or Province?');
-          strList.Add('  [Unknown]:  AA');
-          strList.Add('What is the two-letter country code for this unit?');
-          strList.Add('  [Unknown]:  BB');
-          strList.Add('Is <CN=MyFirstName MyLastName, OU=MyDevelopmentUnit, O=MyExampleCompany,');
-          strList.Add('    L=MyCity, ST=AA, C=BB> correct?');
-          strList.Add('  [no]:  y');
-          strList.Add('Enter key password for <'+dummy+'aliaskey> <RETURN if same as keystore password>: 123456');
+          strList.Add('Your Organizational unit: MyDevelopmentUnit');
           strList.Add('');
-          strList.Add('3. Execute "release-keystore.bat" [.sh]');
-          strList.Add('            warning: well, before execute, you can change/edit the [param] -alias '+dummy+'aliaskey');
-          strList.Add('              ex.  -alias www.mycompany.com ');
-          strList.Add('              Please, change/edit/Sync [key.alias='+dummy+'aliaskey] "ant.properties" too!');
+          strList.Add('Your Organization name: MyCompany');
           strList.Add('');
-          strList.Add('4. Edit [notepad like] "ant.properties" to more representative information!"');
-          strList.Add('        warning: "key.alias='+dummy+'aliaskey" need be the same as in "release-keystore.bat [.sh]"');
+          strList.Add('Your City or Locality: MyCity');
           strList.Add('');
-
-          strList.Add('Yes, you got his [renowned] keystore!');
+          strList.Add('Your State or Province: MT' );
           strList.Add('');
-          strList.Add('....  Thank you!');
+          strList.Add('The two-letter country code: BR');
+          strList.Add('');
+          strList.Add('All correct: y');
+          strList.Add('');
+          strList.Add('Your key password for this Apk alias-key : 123456');
+          strList.Add('');
+          strList.Add('');
+          strList.Add('2)If you are using "Ant" then edit/change "ant.properties" according too!');
+          strList.Add('');
+          strList.Add('');
+          strList.Add('3) Execute the [project] command "release-keystore.bat" or "release-keystore.sh" or "release-keystore-macos.sh" to get the "'+Lowercase(FSmallProjName)+'-release.keystore"');
+          strList.Add('            warning: the file "'+Lowercase(FSmallProjName)+'-release.keystore" should be created only once [per application] otherwise it will fail!');
+          strList.Add(' ');
+          strList.Add('');
+          strList.Add('4 [Gradle]: execute the [project] command "gradle-local-apksigner.bat" [or .sh] to get the [release] signed Apk! (thanks to TR3E!)');
+          strList.Add('            hint: look for [project] folder "...\build\outputs\apk\release"');
+          strList.Add(' ');
+          strList.Add('');
+          strList.Add('4 [Ant]: execute the [project] command "ant-build-release.bat [.sh] to get the [release] signed Apk!"');
+          strList.Add('         hint: look for [project] folder "...\bin"');
+          strList.Add('');
+          strList.Add('');
+          strList.Add('Success! You can now upload your nice "'+Lowercase(FSmallProjName)+'-release.apk" to "Google Play" store!');
+          strList.Add('');
+          strList.Add('....  Thanks to All!');
+          strList.Add('....  Special thanks to TR3E!');
           strList.Add('');
           strList.Add('....  by jmpessoa_hotmail_com');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme-keytool-input.txt');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'How_to_get_your_signed_release_Apk.txt');
 
           linuxDirSeparator:= DirectorySeparator;
           linuxPathToJavaJDK:= FPathToJavaJDK;
@@ -1653,7 +1668,7 @@ begin
              strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
              strList.Add('cd '+linuxAndroidProjectName);
              strList.Add('ant -Dtouchtest.enabled=true debug');
-             SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-debug.sh');
+             SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-build-debug.sh');
           end;
 
           //MacOs
@@ -1665,7 +1680,7 @@ begin
             strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
             strList.Add('cd '+linuxAndroidProjectName);
             strList.Add('ant -Dtouchtest.enabled=true debug');
-            SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-debug-macos.sh');
+            SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-build-debug-macos.sh');
           end;
 
           strList.Clear;
@@ -1675,7 +1690,7 @@ begin
              strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
              strList.Add('cd '+linuxAndroidProjectName);
              strList.Add('ant clean release');
-             SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-release.sh');
+             SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-build-release.sh');
           end;
 
           //MacOs
@@ -1687,7 +1702,7 @@ begin
             strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
             strList.Add('cd '+linuxAndroidProjectName);
             strList.Add('ant clean release');
-            SaveShellScript(strList, FAndroidProjectName+PathDelim+'build-release-macos.sh');
+            SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-build-release-macos.sh');
           end;
 
           linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
@@ -1700,7 +1715,7 @@ begin
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+FAntBuildMode+'.apk');
 
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'install.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-install-'+FAntBuildMode+'.sh');
 
           //linux uninstall  - thanks to Stephano!
           strList.Clear;
@@ -1715,17 +1730,17 @@ begin
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
-          strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
-                       linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
+          strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
+                       linuxAndroidProjectName+'/keytool_input.txt');
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'release-keystore.sh');
 
           //MacOs
           strList.Clear;
-          strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');
           strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
           strList.Add('cd '+linuxAndroidProjectName);
-          strList.Add('keytool -genkey -v -keystore '+FSmallProjName+'-release.keystore -alias '+dummy+'aliaskey -keyalg RSA -keysize 2048 -validity 10000 < '+
-                       linuxAndroidProjectName+linuxDirSeparator+dummy+'keytool_input.txt');
+          strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
+                       linuxAndroidProjectName+'/keytool_input.txt');
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'release-keystore-macos.sh');
 
           strList.Clear;
@@ -1948,9 +1963,6 @@ begin
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'build.gradle');
 
                 strList.Clear;
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle.properties');  //dummy to configure proxy
-
-                strList.Clear;
                 strList.Add(' ');
                 strList.Add(' ');
                 strList.Add('HOW TO use "gradle.build" file');
@@ -2061,13 +2073,15 @@ begin
                 strList.Add('Congratulation!');
                 strList.Add(' ');
                 strList.Add('    :: Where is my Apk? here: "'+FAndroidProjectName+'\build\outputs\apk"!');
+                strList.Add('       IMPORTANT: You need to sign your [release] apk for "Google Play" store!');
+                strList.Add('                  Please, read the "How_to_get_your_signed_release_Apk.txt"');
                 strList.Add(' ');
                 strList.Add('hint: you can try edit and run:');
-                strList.Add('[windows] "gradle_local_build.bat"');
-                strList.Add('[linux] "gradle_local_build.sh"');
+                strList.Add('[windows] "gradle-local-build.bat"');
+                strList.Add('[linux] "gradle-local-build.sh"');
 
-                strList.Add('[windows] "gradle_local_run.bat"');
-                strList.Add('[linux] "gradle_local__run.sh"');
+                strList.Add('[windows] "gradle-local-run.bat"');
+                strList.Add('[linux] "gradle-local-run.sh"');
 
                 strList.Add(' ');
                 strList.Add(' ');
@@ -2083,11 +2097,11 @@ begin
                 strList.Add('./gradle wrapper');
                 strList.Add(' ');
                 strList.Add('hint: you can try edit and run:');
-                strList.Add('[windows] "gradle_making_wrapper.bat"');
-                strList.Add('[linux] "gradle_making_wrapper.sh"');
+                strList.Add('[windows] "gradle-making-wrapper.bat"');
+                strList.Add('[linux] "gradle-making-wrapper.sh"');
 
                 strList.Add(' ');
-                strList.Add('(2) Building your project with "gradlew"');
+                strList.Add('(2) Building your project with "gradlew" [gradle wrapper]');
                 strList.Add(' ');
                 strList.Add('[windows] cmd line prompt:');
                 strList.Add('gradlew build');
@@ -2096,8 +2110,8 @@ begin
                 strList.Add('./gradlew build');
                 strList.Add(' ');
                 strList.Add('hint: you can try edit and "build" with gradle wrapper:');
-                strList.Add('[windows] "gradle_w_build.bat"');
-                strList.Add('[linux] "gradle_w_build.sh"');
+                strList.Add('      [windows] "gradlew-build.bat"');
+                strList.Add('      [linux]   "gradlew-build.sh"');
                 strList.Add(' ');
                 strList.Add('(3) Installing and Runing Apk');
                 strList.Add(' ');
@@ -2109,13 +2123,18 @@ begin
                 strList.Add(' ');
                 strList.Add('Congratulation!');
                 strList.Add(' ');
-                strList.Add('    :: Where is my Apk? here: "'+FAndroidProjectName+'\build\outputs\apk"!');
+                strList.Add('hint: where is my Apk? here: "'+FAndroidProjectName+'\build\outputs\apk"');
                 strList.Add(' ');
                 strList.Add('hint: you can try edit and "run" with gradle wrapper:');
-                strList.Add('[windows] "gradle_w_run.bat"');
-                strList.Add('[linux] "gradle_w_run.sh"');
+                strList.Add('      [windows] "gradlew-run.bat"');
+                strList.Add('      [linux] "gradlew-run.sh"');
                 strList.Add(' ');
                 strList.Add(' ');
+                strList.Add('hint: how can I  produce a signed release Apk? read "How_to_get_your_signed_release_Apk.txt');
+                strList.Add(' ');
+                strList.Add('Thanks to All!');
+                strList.Add(' ');
+                strList.Add('by jmpessoa_hotmail_com');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_readme.txt');
 
                 //Drafts Making gradlew (= gradle warapper)
@@ -2127,7 +2146,7 @@ begin
                   strList.Add('set GRADLE_HOME='+FPathToGradle);
                 strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
                 strList.Add('gradle wrapper');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_making_wrapper.bat');
+                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-making-wrapper.bat');
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2137,9 +2156,9 @@ begin
                   strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
-                strList.Add('./gradle wrapper');
-                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_making_wrapper.sh');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_making_wrapper.sh');
+                //strList.Add('./gradle wrapper');
+                strList.Add('gradle wrapper');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-making-wrapper.sh');
 
                 //Drafts Method II
 
@@ -2152,7 +2171,7 @@ begin
                   strList.Add('set GRADLE_HOME='+ FPathToGradle);
                 strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
                 strList.Add('gradlew build');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_w_build.bat');
+                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradlew-build.bat');
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2162,9 +2181,9 @@ begin
                    strList.Add('export GRADLE_HOME='+linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
-                strList.Add('./gradlew build');
-                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_w_build.sh');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_w_build.sh');
+                //strList.Add('./gradlew build');
+                strList.Add('gradlew build');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-build.sh');
 
                 //run
                 strList.Clear;
@@ -2175,7 +2194,7 @@ begin
                   strList.Add('set GRADLE_HOME='+ FPathToGradle);
                 strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
                 strList.Add('gradlew run');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_w_run.bat');
+                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradlew-run.bat');
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2185,9 +2204,9 @@ begin
                    strList.Add('export GRADLE_HOME='+linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
-                strList.Add('./gradlew run');
-                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_w_run.sh');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_w_run.sh');
+                //strList.Add('./gradlew run');
+                strList.Add('gradlew run');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-run.sh');
 
                 //Drafts Method I
 
@@ -2199,7 +2218,18 @@ begin
                   strList.Add('set GRADLE_HOME='+ FPathToGradle);
                 strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
                 strList.Add('gradle clean build --info');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_build.bat');
+                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build.bat');
+
+                //thanks to TR3E!
+                strList.Clear;
+                sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
+                strList.Clear;
+                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools;'+FPathToAndroidSDK+'build-tools\'+sdkBuildTools);
+                strList.Add('set GRADLE_HOME='+FPathToGradle);
+                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+                strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release-unsigned-aligned.apk');
+                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-apksigner.bat');
 
                 strList.Clear;
                 strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
@@ -2209,7 +2239,7 @@ begin
                   strList.Add('set GRADLE_HOME='+ FPathToGradle);
                 strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
                 strList.Add('gradle run');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_run.bat');
+                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-run.bat');
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2221,10 +2251,17 @@ begin
 
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
-                //strList.Add('.\gradle clean build --info');
                 strList.Add('gradle clean build --info');
-                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_build.sh');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_local_build.sh');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build.sh');
+
+                strList.Clear;
+                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+                strList.Add('export PATH='+linuxPathToAndroidSDK+'build-tools/'+sdkBuildTools+':$PATH');
+                strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+                strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned-aligned.apk');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-apksigner.sh');
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2238,8 +2275,7 @@ begin
                 strList.Add('source ~/.bashrc');
                 //strList.Add('.\gradle run');
                 strList.Add('gradle run');
-                //strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_local_run.sh');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle_local_run.sh');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-run.sh');
             end  //gradle support ...
             else
             begin
@@ -3041,7 +3077,7 @@ begin
   auxList.Add(' ');
   auxList.Add('3. Repeat for others "build_*.txt" if needed...');
   auxList.Add(' ');
-  auxList.Add('4. Execute [double click] the "build.bat" [or .sh] file to get the Apk !');
+  auxList.Add('4. [Ant users] Execute [double click] the "ant-build-debug.bat" [or .sh] file to get the Apk !');
 
   if FProjectModel = 'Eclipse' then
   begin
