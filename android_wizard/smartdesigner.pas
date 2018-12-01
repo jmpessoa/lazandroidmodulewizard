@@ -784,7 +784,7 @@ begin
       strList.Add('set GRADLE_HOME='+ FPathToGradle);
     strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
     strList.Add('gradle clean build --info');
-    strList.SaveToFile(FPathToAndroidProject+'gradle_local_build.bat');
+    strList.SaveToFile(FPathToAndroidProject+'gradle-local-build.bat');
 
     strList.Clear;
     strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
@@ -794,7 +794,7 @@ begin
       strList.Add('set GRADLE_HOME='+ FPathToGradle);
     strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
     strList.Add('gradle run');
-    strList.SaveToFile(FPathToAndroidProject+'gradle_local_run.bat');
+    strList.SaveToFile(FPathToAndroidProject+'gradle-local-run.bat');
 
     linuxDirSeparator:= DirectorySeparator;
     linuxPathToAndroidSdk:= FPathToAndroidSDK;
@@ -823,7 +823,7 @@ begin
     strList.Add('source ~/.bashrc');
     //strList.Add('.\gradle clean build --info');
     strList.Add('gradle clean build --info');
-    SaveShellScript(strList, FPathToAndroidProject+'gradle_local_build.sh');
+    SaveShellScript(strList, FPathToAndroidProject+'gradle-local-build.sh');
 
     strList.Clear;
     strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -837,7 +837,7 @@ begin
     strList.Add('source ~/.bashrc');
     //strList.Add('.\gradle run');
     strList.Add('gradle run');
-    SaveShellScript(strList, FPathToAndroidProject+'gradle_local_run.sh');
+    SaveShellScript(strList, FPathToAndroidProject+'gradle-local-run.sh');
 
     if not FileExists(FPathToAndroidProject + 'gradle.properties') then
     begin
