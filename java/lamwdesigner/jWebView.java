@@ -38,13 +38,60 @@ class jWebClient extends WebViewClient {
         handler.proceed(mUsername, mPassword);
     }
 
-    @Override
+    /*@Override
     public  boolean shouldOverrideUrlLoading(WebView view, String url) {
         int rtn = controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnBefore,url);
         if (rtn == WVConst.WebView_Act_Continue)
         { view.loadUrl(url);
             return true; }
         else { return true; }
+    }*/
+    
+    @Override
+    public  boolean shouldOverrideUrlLoading(WebView view, String url) {
+    	    	
+        int rtn = controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnBefore,url);
+        
+        if (rtn == WVConst.WebView_Act_Continue)
+        { 
+        	
+        	if (url.startsWith("intent://")) {
+                try {
+                    
+                    Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+
+                    if (intent != null) {
+                        view.stopLoading();                                                                    
+
+                        PackageManager packageManager = controls.activity.getPackageManager();
+                        ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                        
+                        if (info != null) {
+                        	 controls.activity.startActivity(intent);
+                        	 
+                        	 if(view.canGoBack())
+                             	view.goBack();   
+                        } else {                        	
+                            String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                            view.loadUrl(fallbackUrl);                            
+                        }
+
+                        return true;
+                    }
+                } catch (Throwable e) {
+                   //if (GeneralData.DEBUG) {
+                   //     Log.e(TAG, "Can't resolve intent://", e);
+                    
+                }
+        		
+            }else{
+            	view.loadUrl(url);	
+            }                
+        	         
+        }  
+         
+        return true; 
+        
     }
 
     @Override
