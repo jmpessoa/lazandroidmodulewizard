@@ -155,6 +155,8 @@ uses
 
    Procedure Java_Event_pOnCustomCameraSurfaceCreated(env: PJNIEnv; this: jobject; Obj: TObject);
    Procedure Java_Event_pOnCustomCameraSurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
+   Procedure Java_Event_pOnCustomCameraPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject; picture: JObject;  fullPath: JString);
+
 
    Procedure Java_Event_pOnCalendarSelectedDayChange(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
 
@@ -163,6 +165,7 @@ uses
    Procedure Java_Event_pOnSearchViewQueryTextChange(env: PJNIEnv; this: jobject; Obj: TObject; newText: JString );
 
    Procedure Java_Event_pOnTelephonyCallStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; state: integer; phoneNumber: JString );
+
 
 
 implementation
@@ -1823,6 +1826,26 @@ begin
   begin
     jForm(jCustomCamera(Obj).Owner).UpdateJNI(gApp);
     jCustomCamera(Obj).GenEvent_OnCustomCameraSurfaceChanged(Obj, width, height);
+  end;
+end;
+
+Procedure Java_Event_pOnCustomCameraPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject; picture: JObject; fullPath: JString);
+var
+  pasfullPath: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jCustomCamera then
+  begin
+    pasfullPath := '';
+    if fullPath <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasfullPath:= string( env^.GetStringUTFChars(env,fullPath,@_jBoolean) );
+    end;
+    jForm(jCustomCamera(Obj).Owner).UpdateJNI(gApp);
+    jCustomCamera(Obj).GenEvent_OnCustomCameraPictureTaken(Obj, picture, pasfullPath);
   end;
 end;
 

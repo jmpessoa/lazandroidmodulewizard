@@ -93,6 +93,7 @@ type
   // tk ReplaceChar made public
   function ReplaceChar(const query: string; oldchar, newchar: char): string;
   // end tk
+  function IsAllCharNumber(pcString: PChar): Boolean;
 
 var
   LamwSmartDesigner: TLamwSmartDesigner;
@@ -144,6 +145,17 @@ begin
   Result := query;
   for i := 1 to Length(Result) do
     if Result[i] = oldchar then Result[i] := newchar;
+end;
+
+function IsAllCharNumber(pcString: PChar): Boolean;
+begin
+  Result := False;
+  while pcString^ <> #0 do // 0 indicates the end of a PChar string
+  begin
+    if not (pcString^ in ['0'..'9']) then Exit;
+    Inc(pcString);
+  end;
+  Result := True;
 end;
 
 function GetPathToSDKFromBuildXML(fullPathToBuildXML: string): string;
@@ -232,14 +244,13 @@ begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
        if auxStr <> '' then
        begin
-         if Pos('android-P', auxStr) <= 0  then  //skip android-P
+         auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
+         if IsAllCharNumber(PChar(auxStr))  then  //skip android-P
          begin
-           auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
            intAux:= StrToInt(auxStr);
            if Result < intAux then
                 Result:= intAux;
          end;
-
        end;
     end;
   end;
@@ -267,16 +278,11 @@ begin
        strApi:= ExtractFileName(lisDir.Strings[i]);   //android-21
        if strApi <> '' then
        begin
-         if Pos('android-P', strApi) <= 0  then  //skip android-P
+         strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+         if IsAllCharNumber(PChar(strApi))  then  //skip android-P
          begin
-            if Pos('android-W', strApi) <= 0 then
-            begin
-              strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
               intApi:= StrToInt(strApi);
-
-              if FCandidateSdkPlatform < intApi then
-                   FCandidateSdkPlatform:= intApi;
-
+              if FCandidateSdkPlatform < intApi then FCandidateSdkPlatform:= intApi;
               if Result < intApi then
               begin
                 if HasBuildTools(intApi, tempOutBuildTool) then
@@ -285,7 +291,6 @@ begin
                    outBuildTool:= tempOutBuildTool;  //26.0.2
                 end;
               end;
-            end;
          end;
        end;
     end;
@@ -2582,6 +2587,7 @@ begin
 
   Result:= True;
 end;
+
 
 initialization
   LamwSmartDesigner := TLamwSmartDesigner.Create;

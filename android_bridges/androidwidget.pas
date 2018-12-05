@@ -1057,6 +1057,7 @@ end;
     FOnRequestPermissionResult: TOnRequestPermissionResult;
     //FOnNewIntent: TOnNewIntent;
     FLayoutVisibility: boolean;
+    FBackgroundImageIdentifier: string;
 
     Procedure SetColor   (Value : TARGBColorBridge);
 
@@ -1254,6 +1255,8 @@ end;
     function GetSystemVersionString(): string;
     //end TR3E
 
+    procedure SetBackgroundImageIdentifier(_imageIdentifier: string);
+
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
@@ -1284,6 +1287,7 @@ end;
     property Text: string read GetText write SetText;
     property ActivityMode  : TActivityMode read FActivityMode write FActivityMode;
     property BackgroundColor: TARGBColorBridge  read FColor write SetColor;
+    property BackgroundImageIdentifier: string read FBackgroundImageIdentifier write SetBackgroundImageIdentifier;
     property ActionBarTitle: TActionBarTitle read FActionBarTitle write FActionBarTitle;
 
     // Event
@@ -1681,6 +1685,7 @@ function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_getScreenWidth(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
+procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string);
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -2766,8 +2771,11 @@ begin
     FjPRLayout:= FjPRLayoutHome; //base appLayout
 
     //thierrydijoux - if backgroundColor is set to black, no theme ...
-    if  FColor <> colbrDefault then
+    if FColor <> colbrDefault then
        View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
+
+    if FBackgroundImageIdentifier <> '' then
+        jForm_SetBackgroundImage(FjEnv, FjObject, FBackgroundImageIdentifier);
 
     FInitialized:= True;
 
@@ -2834,6 +2842,7 @@ begin
     FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout} //GetView
     FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin
     FjPRLayout:= FjPRLayoutHome;  //base appLayout
+
     FInitialized:= True;
 
     for i:= (Self.ComponentCount-1) downto 0 do
@@ -3992,6 +4001,14 @@ begin
    exit;
  end;
  Result := true;
+end;
+
+procedure jForm.SetBackgroundImageIdentifier(_imageIdentifier: string);
+begin
+  //in designing component state: set value here...
+ FBackgroundImageIdentifier:= _imageIdentifier;
+  if FInitialized then
+     jForm_SetBackgroundImage(FjEnv, FjObject, _imageIdentifier);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -5698,6 +5715,20 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageIdentifier));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundImage', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

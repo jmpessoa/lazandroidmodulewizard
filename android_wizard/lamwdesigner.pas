@@ -296,6 +296,7 @@ type
     procedure UpdateLayout; override;
   end;
 
+
   { TDraftImageView }
 
   TDraftImageView = class(TDraftWidget)
@@ -700,8 +701,8 @@ uses
   customcamera, sadmob, calendarview, searchview;
 
 const
-  DrawableSearchPaths: array [0..3] of string = (
-    'drawable-mdpi', 'drawable-ldpi', 'drawable-hdpi', 'drawable-xhdpi'
+  DrawableSearchPaths: array [0..4] of string = (
+    'drawable-mdpi', 'drawable-ldpi', 'drawable-hdpi', 'drawable-xhdpi', 'drawable'
   );
 
 var
@@ -791,9 +792,13 @@ begin
   o := GetComponent(0);
   if not (o is TComponent) then
     Exit;
-  o := TComponent(o).Owner;
-  if not (o is TAndroidForm) then
-    Exit;
+
+  if not (o is TAndroidForm)  then  //so we can use for "jForm" BackgrounImageIdentifier property
+  begin
+    o := TComponent(o).Owner;
+    if not (o is TAndroidForm) then Exit;
+  end;
+
   d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
 
   imgs := TStringList.Create;
@@ -1714,6 +1719,7 @@ begin
   FSelection := TFPList.Create;
 
   FImageCache := TImageCache.Create;
+
 end;
 
 destructor TAndroidWidgetMediator.Destroy;
@@ -2002,6 +2008,11 @@ var
     fpcolor: TFPColor;
     fWidget: TDraftWidget;
     fWidgetClass: TDraftWidgetClass;
+    saveW: integer;
+    saveColor: TColor;
+    dsgnMediator: TAndroidWidgetMediator;
+    fbkImage: TPortableNetworkGraphic;
+    strImage: string;
   begin
 
     if FDone.IndexOf(AWidget) >= 0 then Exit;
@@ -2012,13 +2023,12 @@ var
       Abort;
     end;
     FStarted.Add(AWidget);
-
     with LCLForm.Canvas do begin
       //fill background
-
       Brush.Style:= bsSolid;
       Brush.Color:= Self.FDefaultBrushColor;
       Pen.Color:= Self.FDefaultPenColor;      //MedGray...
+      saveColor:= Pen.Color;
       Font.Color:= Self.FDefaultFontColor;
 
       if AWidget is jVisualControl then
@@ -2041,16 +2051,32 @@ var
         begin
           fpcolor:= ToTFPColor(jForm(AWidget).BackgroundColor);
           Brush.Color:= FPColorToTColor(fpcolor);
-          Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
+          //Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
         end
         else
         begin
           Brush.Color := FDefaultBrushColor;
           GradientFill(Rect(0,0,AWidget.Width,AWidget.Height),
             BlendColors(FDefaultBrushColor, 0.92, 0, 0, 0),
-            BlendColors(FDefaultBrushColor, 0.81, 255, 255, 255),
-            gdVertical);
+            BlendColors(FDefaultBrushColor, 0.81, 255, 255, 255),gdVertical);
+            Pen.Color:= clDkGray;
         end;
+
+        saveW:= Pen.Width;
+        Pen.Width:= 10;
+        Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
+        Pen.Width:= saveW;
+        Pen.Color:= saveColor;
+
+        strImage:= jForm(AWidget).BackgroundImageIdentifier;
+        if strImage <> '' then
+        begin
+           dsgnMediator := TAndroidForm(AWidget).Designer as TAndroidWidgetMediator;
+           fbkImage:= dsgnMediator.ImageCache.GetImageAsPNG(dsgnMediator.FindDrawable(strImage));
+           //StretchDraw(Rect(0,0,AWidget.Width,AWidget.Height), fbkImage);
+           Draw(0, 0, fbkImage);
+        end;
+
       end else
       // generic
       begin
@@ -2064,7 +2090,7 @@ var
           fWidget.Draw;
           fWidget.Free;
         end
-        //// default drawing: rect with Text
+        // default drawing: rect with Text
         else if (AWidget is jVisualControl) then
         begin
           Brush.Color:= Self.FDefaultBrushColor;
@@ -2074,6 +2100,7 @@ var
           Font.Color:= clMedGray;
           TextOut(5,4,AWidget.Text);
         end;
+
       end;
 
       if AWidget.AcceptChildrenAtDesignTime then
@@ -2161,6 +2188,7 @@ begin
   FStarted.Clear;
   FDone.Clear;
   FCustomDialogs.Clear; // jCustomDialogs are drawn after all other components
+
   PaintWidget(AndroidForm);
   for i := 0 to FCustomDialogs.Count - 1 do
     PaintCustomDialog(jCustomDialog(FCustomDialogs[i]));
@@ -3481,6 +3509,8 @@ end;
 
 function TDraftImageView.GetImage: TPortableNetworkGraphic;
 begin
+
+  (*
   if FImage <> nil then
     Result := FImage
   else
@@ -3492,6 +3522,26 @@ begin
         Result := FImage;
       end else
         Result := nil;
+   *)
+
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jImageView(FAndroidWidget) do
+    begin
+      if ImageIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageIdentifier));
+        Result := FImage;
+      end else
+      if (Images <> nil)
+      and (ImageIndex >= 0) and (ImageIndex < Images.Count) then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.AssetsDir + Images.Images[ImageIndex]);
+        Result := FImage;
+      end else
+        Result := nil;
+    end;
 end;
 
 constructor TDraftImageView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -4227,6 +4277,10 @@ initialization
   RegisterPropertyEditor(TypeInfo(jImageList), nil, '', TImageListPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jImageBtn, 'ImageUpIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jImageBtn, 'ImageDownIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jImageView, 'ImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jListView, 'ImageItemIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jForm, 'BackgroundImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jBitmap, 'ImageIdentifier', TImageIdentifierPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
@@ -4249,6 +4303,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jDBListView, TDraftDBListView);
   RegisterAndroidWidgetDraftClass(jTreeListView, TDraftTreeListView);
   RegisterAndroidWidgetDraftClass(jImageBtn, TDraftImageBtn);
+
   RegisterAndroidWidgetDraftClass(jImageView, TDraftImageView);
   RegisterAndroidWidgetDraftClass(jSurfaceView, TDraftSurfaceView);
  // RegisterAndroidWidgetDraftClass(jGL2SurfaceView, TDraftGL2SurfaceView);
