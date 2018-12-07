@@ -464,8 +464,13 @@ type
   { TDraftSFloatingButton }
 
   TDraftSFloatingButton = class(TDraftWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
   public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftSBottomNavigationView }
@@ -1281,22 +1286,6 @@ begin
   begin
     if jFrameLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
       Brush.Color := ToTColor(jFrameLayout(FAndroidWidget).BackgroundColor)
-    else begin
-      Brush.Color:= clNone;
-      Brush.Style:= bsClear;
-    end;
-    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-  end;
-end;
-
-{ TDraftSFloatingButton }
-
-procedure TDraftSFloatingButton.Draw;
-begin
-  with Fcanvas do
-  begin
-    if jsFloatingButton(FAndroidWidget).BackgroundColor <> colbrDefault then
-      Brush.Color := ToTColor(jsFloatingButton(FAndroidWidget).BackgroundColor)
     else begin
       Brush.Color:= clNone;
       Brush.Style:= bsClear;
@@ -3582,6 +3571,64 @@ begin
   inherited UpdateLayout;
 end;
 
+{ TDraftSFloatingButton }
+
+function TDraftSFloatingButton.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jsFloatingButton(FAndroidWidget) do
+    begin
+      if ImageIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageIdentifier));
+        Result := FImage;
+      end else
+      Result := nil;
+    end;
+end;
+
+constructor TDraftSFloatingButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+
+  Color := jsFloatingButton(AWidget).BackgroundColor;
+  FontColor:= colbrGray;
+  BackGroundColor:= clActiveCaption; //clMenuHighlight;
+
+  if jsFloatingButton(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
+procedure TDraftSFloatingButton.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jsFloatingButton(FAndroidWidget).BackgroundColor <> colbrDefault then
+    begin
+      Brush.Color := ToTColor(jsFloatingButton(FAndroidWidget).BackgroundColor)
+    end
+    else
+    begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    //Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+    Ellipse(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+    if GetImage <> nil then
+    begin
+      Draw(0, 0, GetImage);
+    end;
+  end;
+end;
+
+procedure TDraftSFloatingButton.UpdateLayout;
+begin
+  inherited UpdateLayout;
+end;
+
+
 { TDrafDrawingView }
 
 constructor TDraftDrawingView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -4281,6 +4328,7 @@ initialization
   RegisterPropertyEditor(TypeInfo(string), jListView, 'ImageItemIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jForm, 'BackgroundImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jBitmap, 'ImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jsFloatingButton, 'ImageIdentifier', TImageIdentifierPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget

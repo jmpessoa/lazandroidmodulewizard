@@ -11,7 +11,8 @@ uses
   amw_ide_menu_items, AndroidProjOptions, ApkBuild, uFormBuildFPCCross, 
   uFormGetFPCSource, uformsettingspaths, uFormStartEmulator, ufrmCompCreate, 
   ufrmEditor, uimportcstuff, uimportjavastuff, uimportjavastuffchecked, 
-  uregistercompform, uformimportlamwstuff, LazarusPackageIntf;
+  uregistercompform, uformimportlamwstuff, unitformimportpicture, 
+  LazarusPackageIntf;
 
 implementation
 

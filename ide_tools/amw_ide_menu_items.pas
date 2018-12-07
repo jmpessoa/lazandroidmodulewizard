@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, FileUtil, Dialogs, IDECommands, MenuIntf, Forms,
   uformsettingspaths{, lazandroidtoolsexpert}, ufrmEditor, ufrmCompCreate,
   uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked,
-  uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff;
+  uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff, unitformimportpicture;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
@@ -974,6 +974,59 @@ begin
     ShowMessage('Sorry, the active project is not a LAMW project!');
 end;
 
+function ReplaceChar(const query: string; oldchar, newchar: char): string;
+var
+  i: Integer;
+begin
+  Result := query;
+  for i := 1 to Length(Result) do
+    if Result[i] = oldchar then Result[i] := newchar;
+end;
+
+procedure StartImportPictureStuff(Sender: TObject);
+var
+  Project: TLazProject;
+  FormImportPicture: TFormImportPicture;
+  i, count, p: integer;
+  hasCopied: boolean;
+  pathToProject, importedFile, checkedTarget: string;
+begin
+  Project:= LazarusIDE.ActiveProject;
+
+  if not Assigned(Project) then Exit;
+
+  if Project.CustomData.Values['LAMW'] = 'GUI' then
+  begin
+     FormImportPicture:= TFormImportPicture.Create(Application);
+     if FormImportPicture.ShowModal = mrOK then
+     begin
+       p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
+       pathToProject:= Copy(Project.ProjectInfoFile, 1, p);  //C:\lamw\workspace\AppLAMWProject2\
+       importedFile:= ExtractFileName(FormImportPicture.PictureFile);
+
+       hasCopied:= False;
+       if FormImportPicture.CheckGroupTarget.Checked[0] then  //assets
+       begin
+          CopyFile(FormImportPicture.PictureFile, pathToProject+'assets'+PathDelim+ReplaceChar(importedFile, '-', '_'));
+          hasCopied:= True;
+       end;
+
+       count:= FormImportPicture.CheckGroupTarget.Items.Count;
+       for i:= 1 to count-1 do
+       begin
+          if FormImportPicture.CheckGroupTarget.Checked[i] then
+          begin
+             checkedTarget:= FormImportPicture.CheckGroupTarget.Items.Strings[i];
+             CopyFile(FormImportPicture.PictureFile, pathToProject+'res'+PathDelim+checkedTarget+PathDelim+ReplaceChar(importedFile, '-', '_'));
+             hasCopied:= True;
+          end;
+       end;
+       ShowMessage('Sucess! "'+importedFile+'" copied to targets folders...');
+
+     end;
+  end;
+end;
+
 procedure StartImportLAMWStuff(Sender: TObject);
 var
   Project: TLazProject;
@@ -1015,7 +1068,6 @@ begin
       package:= Project.CustomData.Values['Package'];
 
       p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
-
       pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
       pathToJavasSrc:= pathToProject+'src'+DirectorySeparator+StringReplace(package,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
 
@@ -1389,6 +1441,9 @@ begin
 
   //Adding 12a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportLAMWForm', 'Use/Import LAMW Stuff...', nil, @StartImportLAMWStuff);
+
+  //Adding 13a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportPictureForm', 'Use/Import Image/Picture...', nil, @StartImportPictureStuff);
 
   // And so on...
 

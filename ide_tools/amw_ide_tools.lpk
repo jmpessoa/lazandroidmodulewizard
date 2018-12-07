@@ -16,7 +16,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="26">
+    <Files Count="29">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -122,6 +122,17 @@
         <Filename Value="uformimportlamwstuff.lfm"/>
         <Type Value="LFM"/>
       </Item26>
+      <Item27>
+        <HasRegisterProc Value="True"/>
+      </Item27>
+      <Item28>
+        <Filename Value="unitformimportpicture.pas"/>
+        <UnitName Value="unitformimportpicture"/>
+      </Item28>
+      <Item29>
+        <Filename Value="unitformimportpicture.lfm"/>
+        <Type Value="LFM"/>
+      </Item29>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
