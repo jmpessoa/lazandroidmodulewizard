@@ -271,8 +271,14 @@ type
   { TDraftListView }
 
   TDraftListView = class(TDraftWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
   public
+    FDrfCount: integer;
+    FDrfItems: TStringList;
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    destructor Destroy; override;
     procedure Draw; override;
   end;
 
@@ -3343,13 +3349,36 @@ begin
   Color := jListView(AWidget).BackgroundColor;
   FontColor := jListView(AWidget).FontColor; //colbrBlack;
 
+  FDrfItems:= TStringList.Create;
+
+  FDrfItems.Text:= jListView(AWidget).Items.Text;
+
+  FDrfCount:=  jListView(AWidget).Items.Count;
+
   if jListView(AWidget).BackgroundColor = colbrDefault then
     Color := GetParentBackgroundColor;
 end;
 
+function TDraftListView.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jListView(FAndroidWidget) do
+    begin
+      if ImageItemIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageItemIdentifier));
+        Result := FImage;
+      end else
+      Result := nil;
+    end;
+end;
+
 procedure TDraftListView.Draw;
 var
-  i, k: integer;
+  i, k,  count: integer;
+  r: TRect;
 begin
   Fcanvas.Brush.Color:= Self.BackGroundColor;
   Fcanvas.Pen.Color:= clActiveCaption;
@@ -3360,20 +3389,42 @@ begin
       // outer frame
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
 
-  Fcanvas.Brush.Style:= bsSolid;
+  count:= FDrfItems.Count;
 
   Fcanvas.Pen.Color:= clSilver;
-  k:= Trunc(Self.Height/20);
+  Fcanvas.Font.Color:= Self.TextColor;
+
+  k:= Trunc(Self.Height/30);
+
   for i:= 1 to k-1 do
   begin
-    Fcanvas.MoveTo(Self.Width{-Self.MarginRight+10}, {x2} Self.MarginTop+i*20); {y1}
-    Fcanvas.LineTo(0,Self.MarginTop+i*20);  {x1, y1}
+    Fcanvas.MoveTo(Self.Width, {x2} Self.MarginTop+i*30); {y1}
+    Fcanvas.LineTo(0,Self.MarginTop+i*30);  {x1, y1}
+    if i <= count then
+    begin
+       if GetImage <> nil then
+       begin
+           r := Rect(5, 3 + Self.MarginTop+(i-1)*30, 24, Self.MarginTop+(i-1)*30 + 24);
+           Fcanvas.StretchDraw(r, GetImage);
+           Fcanvas.TextOut(40, 3 + Self.MarginTop+(i-1)*30, FDrfItems.Strings[i-1]);
+       end
+       else
+          Fcanvas.TextOut(5, 3 + Self.MarginTop+(i-1)*30, FDrfItems.Strings[i-1]);
+    end;
   end;
 
   //canvas.Brush.Style:= bsClear;
   //canvas.Font.Color:= Self.TextColor;
   //canvas.TextOut(5,4, txt);
 
+  Fcanvas.Brush.Style:= bsSolid;
+
+end;
+
+destructor TDraftListView.Destroy;
+begin
+  FDrfItems.Free;
+  inherited;
 end;
 
 { TDraftExpandableListView }
@@ -3402,16 +3453,15 @@ begin
       // outer frame
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
 
-  Fcanvas.Brush.Style:= bsSolid;
-
   Fcanvas.Pen.Color:= clSilver;
-  k:= Trunc(Self.Height/20);
+  k:= Trunc(Self.Height/30);
   for i:= 1 to k-1 do
   begin
-    Fcanvas.MoveTo(Self.Width{-Self.MarginRight+10}, {x2} Self.MarginTop+i*20); {y1}
-    Fcanvas.LineTo(0,Self.MarginTop+i*20);  {x1, y1}
+    Fcanvas.MoveTo(Self.Width{-Self.MarginRight+10}, {x2} Self.MarginTop+i*30); {y1}
+    Fcanvas.LineTo(0,Self.MarginTop+i*30);  {x1, y1}
   end;
 
+  Fcanvas.Brush.Style:= bsSolid;
   //canvas.Brush.Style:= bsClear;
   //canvas.Font.Color:= Self.TextColor;
   //canvas.TextOut(5,4, txt);

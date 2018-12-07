@@ -1002,12 +1002,14 @@ begin
      begin
        p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
        pathToProject:= Copy(Project.ProjectInfoFile, 1, p);  //C:\lamw\workspace\AppLAMWProject2\
+
        importedFile:= ExtractFileName(FormImportPicture.PictureFile);
+       importedFile:= Lowercase(ReplaceChar(importedFile, '-', '_'));
 
        hasCopied:= False;
        if FormImportPicture.CheckGroupTarget.Checked[0] then  //assets
        begin
-          CopyFile(FormImportPicture.PictureFile, pathToProject+'assets'+PathDelim+ReplaceChar(importedFile, '-', '_'));
+          CopyFile(FormImportPicture.PictureFile, pathToProject+'assets'+PathDelim+importedFile);
           hasCopied:= True;
        end;
 
@@ -1017,7 +1019,7 @@ begin
           if FormImportPicture.CheckGroupTarget.Checked[i] then
           begin
              checkedTarget:= FormImportPicture.CheckGroupTarget.Items.Strings[i];
-             CopyFile(FormImportPicture.PictureFile, pathToProject+'res'+PathDelim+checkedTarget+PathDelim+ReplaceChar(importedFile, '-', '_'));
+             CopyFile(FormImportPicture.PictureFile, pathToProject+'res'+PathDelim+checkedTarget+PathDelim+importedFile);
              hasCopied:= True;
           end;
        end;
