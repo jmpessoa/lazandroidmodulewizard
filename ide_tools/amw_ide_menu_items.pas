@@ -1027,7 +1027,7 @@ begin
          end;
 
          if hasCopied then
-           ShowMessage('Sucess! "'+importedFile+'" copied to targets folders...')
+           ShowMessage('Success! "'+importedFile+'" copied to targets folders...')
          else
            ShowMessage('Fail! None target folder  checked...')
 

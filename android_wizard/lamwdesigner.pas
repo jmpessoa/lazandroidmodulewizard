@@ -3728,7 +3728,7 @@ begin
     Ellipse(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
     if GetImage <> nil then
     begin
-      r := Rect(0, 0, 24, 24);
+      r := Rect(0, 0, 48, 48);
       StretchDraw(r, GetImage);
       //Draw(0, 0, GetImage);
     end;
