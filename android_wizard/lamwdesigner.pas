@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
   ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, Laz_And_Controls,
-  Dialogs, Forms, AndroidThemes, ImgCache,  LCLVersion;
+  Dialogs, Forms, AndroidThemes, ImgCache,  LCLVersion, Math;
 
 type
   TDraftWidget = class;
@@ -3504,30 +3504,45 @@ begin
 end;
 
 procedure TDraftImageBtn.Draw;
+var
+  r: TRect;
+  w, h: integer;
 begin
-  if GetImage <> nil then
-    Fcanvas.Brush.Color := BackGroundColor
-  else
-    Fcanvas.Brush.Color := clSilver; //clMedGray;
-  Fcanvas.Pen.Color := clWhite;
-  if Self.BackGroundColor <> clNone then
-    Fcanvas.FillRect(Rect(0, 0, Width, Height));
-  if GetImage <> nil then
-    Fcanvas.Brush.Style := bsClear;
-  // outer frame
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
-  Fcanvas.Pen.Color := clWindowFrame;
-  Fcanvas.Line(Self.Width-Self.MarginRight+3,   {x2}
-               Self.MarginTop-3,                {y1}
-               Self.Width-Self.MarginRight+3,   {x2}
-               Self.Height-Self.MarginBottom+3);{y2}
 
-  Fcanvas.Line(Self.Width-Self.MarginRight+3,   {x2}
-               Self.Height-Self.MarginBottom+3, {y2}
-               Self.MarginLeft-4,               {x1}
-               Self.Height-Self.MarginBottom+3);{y2}
+  if Color <> colbrDefault then
+     Fcanvas.Brush.Color := ToTColor(Color)
+  else
+  begin
+     Fcanvas.Brush.Color:= clNone;
+     Fcanvas.Brush.Style:= bsClear;
+  end;
+
   if GetImage <> nil then
-    Fcanvas.Draw(1, 1, GetImage);
+  begin
+
+    w:= Trunc(FImage.Width/3);
+    h:= Trunc(FImage.Height/3);
+
+    w:= Max(w,h);
+    h:= w;
+
+    if w < 64 then
+    begin
+      w:= 64;
+      h:= 64;
+    end;
+
+    Fcanvas.RoundRect(0, 0, w+8, h+8, 12, 12);    // outer frame
+
+    r:= Rect(4, 4, w+4, h+4);
+    Fcanvas.StretchDraw(r, GetImage);
+  end
+  else
+  begin
+    Fcanvas.RoundRect(0, 0, 72, 72, 12,12);  //outer frame
+    Fcanvas.Ellipse(4,4,68,68);            //inner
+  end;
+
 end;
 
 procedure TDraftImageBtn.UpdateLayout;
@@ -3535,11 +3550,22 @@ var
   im: TPortableNetworkGraphic;
 begin
   im := GetImage;
-  if im <> nil then
+  if im <> nil  then
     with jImageBtn(FAndroidWidget) do
     begin
-      FMinHeight := im.Height + 3;
-      FMinWidth := im.Width + 3;
+
+      FMinWidth:= Trunc(FImage.Width/3);
+      FMinHeight:= Trunc(FImage.Height/3);
+
+      FMinWidth:= Max(FMinWidth,FMinHeight) + 8;
+      FMinHeight:= FMinWidth;
+
+      if FMinWidth < 72 then
+      begin
+        FMinWidth:= 72;
+        FMinHeight:= FMinWidth;
+      end;
+
     end;
   inherited UpdateLayout;
 end;
@@ -3548,21 +3574,6 @@ end;
 
 function TDraftImageView.GetImage: TPortableNetworkGraphic;
 begin
-
-  (*
-  if FImage <> nil then
-    Result := FImage
-  else
-    with jImageView(FAndroidWidget) do
-      if (Images <> nil)
-      and (ImageIndex >= 0) and (ImageIndex < Images.Count) then
-      begin
-        FImage := Designer.ImageCache.GetImageAsPNG(Designer.AssetsDir + Images.Images[ImageIndex]);
-        Result := FImage;
-      end else
-        Result := nil;
-   *)
-
   if FImage <> nil then
     Result := FImage
   else
@@ -3596,11 +3607,45 @@ begin
 end;
 
 procedure TDraftImageView.Draw;
+var
+  r: TRect;
+  w, h: integer;
 begin
-  if GetImage <> nil then
-    Fcanvas.Draw(0, 0, GetImage)
+
+  if Color <> colbrDefault then
+     Fcanvas.Brush.Color := ToTColor(Color)
   else
-    inherited Draw;
+  begin
+     Fcanvas.Brush.Color:= clNone;
+     Fcanvas.Brush.Style:= bsClear;
+  end;
+
+  if GetImage <> nil then
+  begin
+
+    w:= Trunc(FImage.Width/3);
+    h:= Trunc(FImage.Height/3);
+
+    w:= Max(w,h);
+    h:= w;
+
+    if w < 64 then
+    begin
+      w:= 64;
+      h:= 64;
+    end;
+
+    Fcanvas.Rectangle(0, 0, w+8, h+8);    // outer frame
+
+    r:= Rect(4, 4, w+4, h+4);
+    Fcanvas.StretchDraw(r, GetImage);
+
+  end
+  else
+  begin
+    Fcanvas.Rectangle(0, 0, 72, 72);  //outer frame
+    Fcanvas.RoundRect(4, 4, 68, 68, 12,12);  //inner frame
+  end;
 end;
 
 procedure TDraftImageView.UpdateLayout;
@@ -3608,14 +3653,27 @@ var
   im: TPortableNetworkGraphic;
 begin
   im := GetImage;
-  with jImageView(FAndroidWidget) do
+  if im <> nil then
   begin
-    if im <> nil then
+    with jImageView(FAndroidWidget) do
     begin
-      if LayoutParamHeight = lpWrapContent then
-        FMinHeight := im.Height;
-      if LayoutParamWidth = lpWrapContent then
-        FMinWidth := im.Width;
+        (*
+        if LayoutParamHeight = lpWrapContent then
+          FMinHeight := im.Height;
+        if LayoutParamWidth = lpWrapContent then
+          FMinWidth := im.Width;
+        *)
+        FMinWidth:= Trunc(FImage.Width/3);
+        FMinHeight:= Trunc(FImage.Height/3);
+
+        FMinWidth:= Max(FMinWidth,FMinHeight) + 8;
+        FMinHeight:= FMinWidth;
+
+        if FMinWidth < 72 then
+        begin
+          FMinWidth:= 72;
+          FMinHeight:= FMinWidth;
+        end;
     end;
   end;
   inherited UpdateLayout;
@@ -3652,6 +3710,8 @@ begin
 end;
 
 procedure TDraftSFloatingButton.Draw;
+var
+  r: TRect;
 begin
   with Fcanvas do
   begin
@@ -3668,7 +3728,9 @@ begin
     Ellipse(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
     if GetImage <> nil then
     begin
-      Draw(0, 0, GetImage);
+      r := Rect(0, 0, 24, 24);
+      StretchDraw(r, GetImage);
+      //Draw(0, 0, GetImage);
     end;
   end;
 end;

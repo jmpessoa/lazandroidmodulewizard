@@ -6368,8 +6368,8 @@ begin
   FImageIndex:= -1;
   FLParamWidth := lpWrapContent; //lpMatchParent;
   FLParamHeight:= lpWrapContent;
-  FHeight:= 48;
-  FWidth:= 48;
+  FHeight:= 72;
+  FWidth:= 72;
   //FIsBackgroundImage:= False;
   FFilePath:= fpathData;
   FImageScaleType:= scaleCenter;
@@ -11138,8 +11138,8 @@ begin
   FMarginTop    := 5;
   FMarginBottom := 5;
   FMarginRight  := 5;
-  FWidth        := 48;
-  FHeight       := 48;
+  FWidth        := 72;
+  FHeight       := 72;
 end;
 
 Destructor jImageBtn.Destroy;

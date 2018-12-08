@@ -1000,31 +1000,38 @@ begin
      FormImportPicture:= TFormImportPicture.Create(Application);
      if FormImportPicture.ShowModal = mrOK then
      begin
-       p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
-       pathToProject:= Copy(Project.ProjectInfoFile, 1, p);  //C:\lamw\workspace\AppLAMWProject2\
-
        importedFile:= ExtractFileName(FormImportPicture.PictureFile);
-       importedFile:= Lowercase(ReplaceChar(importedFile, '-', '_'));
-
-       hasCopied:= False;
-       if FormImportPicture.CheckGroupTarget.Checked[0] then  //assets
+       if importedFile <> '' then
        begin
-          CopyFile(FormImportPicture.PictureFile, pathToProject+'assets'+PathDelim+importedFile);
-          hasCopied:= True;
-       end;
+         p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
+         pathToProject:= Copy(Project.ProjectInfoFile, 1, p);  //C:\lamw\workspace\AppLAMWProject2\
 
-       count:= FormImportPicture.CheckGroupTarget.Items.Count;
-       for i:= 1 to count-1 do
-       begin
-          if FormImportPicture.CheckGroupTarget.Checked[i] then
-          begin
-             checkedTarget:= FormImportPicture.CheckGroupTarget.Items.Strings[i];
-             CopyFile(FormImportPicture.PictureFile, pathToProject+'res'+PathDelim+checkedTarget+PathDelim+importedFile);
-             hasCopied:= True;
-          end;
-       end;
-       ShowMessage('Sucess! "'+importedFile+'" copied to targets folders...');
+         importedFile:= Lowercase(ReplaceChar(importedFile, '-', '_'));
 
+         hasCopied:= False;
+         if FormImportPicture.CheckGroupTarget.Checked[0] then  //assets
+         begin
+            CopyFile(FormImportPicture.PictureFile, pathToProject+'assets'+PathDelim+importedFile);
+            hasCopied:= True;
+         end;
+
+         count:= FormImportPicture.CheckGroupTarget.Items.Count;
+         for i:= 1 to count-1 do
+         begin
+            if FormImportPicture.CheckGroupTarget.Checked[i] then
+            begin
+               checkedTarget:= FormImportPicture.CheckGroupTarget.Items.Strings[i];
+               CopyFile(FormImportPicture.PictureFile, pathToProject+'res'+PathDelim+checkedTarget+PathDelim+importedFile);
+               hasCopied:= True;
+            end;
+         end;
+
+         if hasCopied then
+           ShowMessage('Sucess! "'+importedFile+'" copied to targets folders...')
+         else
+           ShowMessage('Fail! None target folder  checked...')
+
+       end;
      end;
   end;
 end;
