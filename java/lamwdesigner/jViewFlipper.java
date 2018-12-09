@@ -26,8 +26,7 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
    private Boolean enabled  = true;           // click-touch enabled!
       
    float initialXPoint = 0;
-   Animation slide_in_left, slide_out_right;
-   
+
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jViewFlipper(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
 	   
@@ -40,9 +39,6 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
 
       //detector = new GestureDetector(controls.activity, new SwipeGestureDetector() );
 
-      slide_in_left = AnimationUtils.loadAnimation(controls.activity, android.R.anim.slide_in_left);
-      slide_out_right = AnimationUtils.loadAnimation(controls.activity, android.R.anim.slide_out_right);
-      
       onClickListener = new OnClickListener(){
       /*.*/public void onClick(View view){     // *.* is a mask to future parse...;
              if (enabled) {
@@ -52,8 +48,6 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
       };
       setOnClickListener(onClickListener);
             
-      this.setInAnimation(slide_in_left);
-      this.setOutAnimation(slide_out_right);	  
       this.setAutoStart(false); // set true value for auto start the flipping between views
 	  	        
    } //end constructor   
@@ -202,17 +196,28 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
           this.stopFlipping();
 	   }
    }
-   
+
    public void AddView(View _layout) {
       this.addView(_layout);
    }
-   
-   public void Next() {
-	 this.showNext();	
-   }	   
+
+ //https://stackoverflow.com/questions/25781003/android-simple-fade-out-and-fade-in-animation-for-viewflipper
+    //http://www.learn-android-easily.com/2013/06/android-viewflipper-example.html
+    public void Next() {
+        // set the required Animation type to ViewFlipper
+        // The Next screen will come in form Left and current Screen will go OUT from Right
+        this.setInAnimation(controls.activity, R.anim.in_from_left);
+        this.setOutAnimation(controls.activity, R.anim.out_to_right);
+        // Show the next Screen
+       this.showNext();
+   }
 
    public void Previous() {
-	 this.showPrevious();
+       // set the required Animation type to ViewFlipper
+       // The Next screen will come in form Right and current Screen will go OUT from Left
+       this.setInAnimation(controls.activity, R.anim.in_from_right);
+       this.setOutAnimation(controls.activity, R.anim.out_to_left);
+       this.showPrevious();
    }	   
    
 }

@@ -1007,6 +1007,7 @@ begin
          pathToProject:= Copy(Project.ProjectInfoFile, 1, p);  //C:\lamw\workspace\AppLAMWProject2\
 
          importedFile:= Lowercase(ReplaceChar(importedFile, '-', '_'));
+         importedFile:= ReplaceChar(importedFile, ' ', '_');
 
          hasCopied:= False;
          if FormImportPicture.CheckGroupTarget.Checked[0] then  //assets
