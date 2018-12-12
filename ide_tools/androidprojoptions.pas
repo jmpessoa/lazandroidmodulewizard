@@ -205,6 +205,17 @@ begin
   c.Free;
 end;
 
+function IsAllCharNumber(pcString: PChar): Boolean;
+begin
+  Result := False;
+  while pcString^ <> #0 do // 0 indicates the end of a PChar string
+  begin
+    if not (pcString^ in ['0'..'9']) then Exit;
+    Inc(pcString);
+  end;
+  Result := True;
+end;
+
 { TMyCanvas }
 
 procedure TMyCanvas.SetColor(x, y: integer; const Value: TFPColor);
@@ -1004,14 +1015,11 @@ begin
       strApi := ExtractFileName(sl[i]);
       if strApi <> '' then
       begin
-        if Pos('android-P', strApi) <= 0  then  //skip android-P
+        strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+        if IsAllCharNumber(PChar(strApi))  then  //skip android-P
         begin
-          if Pos('android-W', strApi) <= 0  then  //skip android-W
-          begin
-            strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
             if StrToInt(strApi) >= 14 then
                seTargetSdkVersion.Items.Add(strApi);
-          end;
         end;
       end;
     end;

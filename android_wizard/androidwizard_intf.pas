@@ -650,7 +650,6 @@ function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode(projectType: in
 var
   frm: TFormAndroidProject;
 begin
-
   Result := False;
   FModuleType:= projectType; //0:GUI <--> 1:NoGUI <--> 2:NoGUI console Exe
   frm:= TFormAndroidProject.Create(nil);  //Create Form
@@ -939,7 +938,7 @@ begin
     strList:= TStringList.Create;
     frm.LoadSettings(SettingsFilename);
 
-    frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwGUIProject', frm.ComboSelectProjectName.Items);
+    frm.ComboSelectProjectName.Text:= MakeUniqueName('AppLAMWProject', frm.ComboSelectProjectName.Items);
 
     frm.LabelTheme.Caption:= 'Android Theme:';
     frm.ComboBoxTheme.Visible:= True;
@@ -953,9 +952,9 @@ begin
       frm.Color:= clWhite;
       frm.PanelButtons.Color:= clWhite;
 
-      frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwNoGUIProject', frm.ComboSelectProjectName.Items);
+      frm.ComboSelectProjectName.Text:= MakeUniqueName('AppLAMWNoGUIProject', frm.ComboSelectProjectName.Items);
 
-      frm.LabelTheme.Caption:= 'LAMW [NoGUI] Project';
+      frm.LabelTheme.Caption:= 'App LAMW [NoGUI] Project';
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
     end;
@@ -970,7 +969,7 @@ begin
 
       frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwConsoleApp', frm.ComboSelectProjectName.Items);
 
-      frm.LabelTheme.Caption:= 'LAMW [NoGUI] Android Console/Executable Project';
+      frm.LabelTheme.Caption:= 'App LAMW [NoGUI] Android Console/Executable Project';
       frm.EditPackagePrefaceName.Visible:= False;
 
       frm.EditPackagePrefaceName.Text:= '';
@@ -1073,6 +1072,8 @@ begin
             end;
 
             CreateDir(FAndroidProjectName+DirectorySeparator+'res');
+
+            ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'drawable');
 
             ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'drawable-hdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png',

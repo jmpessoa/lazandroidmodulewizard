@@ -179,6 +179,7 @@ type
   function SplitStr(var theString: string; delimiter: string): string;
   function GetFiles(const StartDir: String; const List: TStrings): Boolean;
   function ReplaceChar(const query: string; oldchar, newchar: char): string;
+  function IsAllCharNumber(pcString: PChar): Boolean;
 
 var
    FormWorkspace: TFormWorkspace;
@@ -215,17 +216,15 @@ begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
        if auxStr <> '' then
        begin
-         if Pos('android-P', auxStr) <= 0  then  //skip android-P
+         auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
+         if IsAllCharNumber(PChar(auxStr))  then  //skip android-P
          begin
-           auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
            intAux:= StrToInt(auxStr);
-
            if (intAux > 13) and (intAux < 27)  then
            begin
               ListBoxNdkPlatform.Items.Add(auxStr);
               count:= count + 1;
            end;
-
            if Result < intAux then
            begin
              if intAux < 23 then
@@ -234,7 +233,6 @@ begin
                 index:= count - 1;
              end;
            end;
-
          end;
        end;
     end;
@@ -265,23 +263,16 @@ begin
        strApi:= ExtractFileName(lisDir.Strings[i]);
        if strApi <> '' then
        begin
-         if Pos('android-P', strApi) <= 0  then  //skip android-P
+         strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+         if IsAllCharNumber(PChar(strApi))   then  //skip android-P
          begin
-           if Pos('android-W', strApi) <= 0  then  //skip android-W
-           begin
-             strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
              intApi:= StrToInt(strApi);
-
-             if FCandidateSdkPlatform < intApi then
-                 FCandidateSdkPlatform:= intApi;
-
+             if FCandidateSdkPlatform < intApi then FCandidateSdkPlatform:= intApi;
              if Result < intApi then
              begin
                FCandidateSdkPlatform:= intApi;
                if HasBuildTools(intApi, outBuildTool) then Result:= intApi;
              end;
-
-           end;
          end;
        end;
     end;
@@ -1198,11 +1189,9 @@ begin
        strApi:= ExtractFileName(lisDir.Strings[i]);
        if strApi <> '' then
        begin
-         if Pos('android-P', strApi) <= 0  then  //skip android-P
+         strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+         if IsAllCharNumber(PChar(strApi))  then  //skip android-P
          begin
-           if Pos('android-W', strApi) <= 0  then  //skip android-W
-           begin
-             strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
              intApi:= StrToInt(strApi);
              if intApi > 0 then
              begin
@@ -1211,7 +1200,6 @@ begin
                   ListBoxTargetAPI.Items.Add(strApi);
                end;
              end;
-           end;
          end;
        end;
     end;
@@ -1506,6 +1494,17 @@ begin
   Result := query;
   for i := 1 to Length(Result) do
     if Result[i] = oldchar then Result[i] := newchar;
+end;
+
+function IsAllCharNumber(pcString: PChar): Boolean;
+begin
+  Result := False;
+  while pcString^ <> #0 do // 0 indicates the end of a PChar string
+  begin
+    if not (pcString^ in ['0'..'9']) then Exit;
+    Inc(pcString);
+  end;
+  Result := True;
 end;
 
 end.

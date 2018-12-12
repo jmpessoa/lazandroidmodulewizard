@@ -1,6 +1,6 @@
-package org.lamw.apptelephonymanagerdemo1;
+package org.lamw.applamwproject3;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.2.3  - 23 October  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.2.4  - 04 December  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -70,6 +70,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.os.Build;
@@ -104,6 +105,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
@@ -668,20 +670,32 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
-	    
-	        Drawable res = null;	    
-		if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21		
+        Drawable res = null;
+
+        if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21
  			res = this.controls.activity.getResources().getDrawable(_resID);
  		}
- 	
-                //[ifdef_api21up]	 		
+
+ 		//[ifdef_api21up]
  		if(Build.VERSION.SDK_INT >= 21) {  			
  		   res = this.controls.activity.getResources().getDrawable(_resID, null);
- 		} 
-                //[endif_api21up]			
+ 		}//[endif_api21up]
 
  		return res;
 }
+
+	public void SetBackgroundImage(String _imageIdentifier) {
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
+		ImageView image = new ImageView(controls.activity);
+        LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        image.setLayoutParams(param);
+		image.setImageResource(android.R.color.transparent);
+		image.setImageDrawable(d);
+		//image.invalidate();
+		layout.addView(image);
+	}
+
 
 //by  thierrydijoux
 public String GetQuantityStringByName(String _resName, int _quantity) {
@@ -1532,6 +1546,27 @@ public  void classChkNull (Class<?> object) {
 
 public Context GetContext() {   
    return this.activity; 
+}
+
+//by TR3E Software
+public int getContextTop(){
+ ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
+ 
+ if( view != null)
+ 	return view.getTop();
+ else
+ 	return 0;
+	
+}
+
+//by  TR3E Software
+public int getStatusBarHeight() {
+	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+	
+	if ( resourceId > 0 )
+		return this.activity.getResources().getDimensionPixelSize(resourceId);
+	else
+		return 0;
 }
 
 //by  thierrydijoux

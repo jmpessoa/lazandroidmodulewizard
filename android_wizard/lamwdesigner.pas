@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, FormEditingIntf, PropEdits,
   ComponentEditors, ProjectIntf, Laz2_DOM, AndroidWidget, Laz_And_Controls,
-  Dialogs, Forms, AndroidThemes, ImgCache,  LCLVersion;
+  Dialogs, Forms, AndroidThemes, ImgCache,  LCLVersion, Math;
 
 type
   TDraftWidget = class;
@@ -271,8 +271,14 @@ type
   { TDraftListView }
 
   TDraftListView = class(TDraftWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
   public
+    FDrfCount: integer;
+    FDrfItems: TStringList;
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    destructor Destroy; override;
     procedure Draw; override;
   end;
 
@@ -295,6 +301,7 @@ type
     procedure Draw; override;
     procedure UpdateLayout; override;
   end;
+
 
   { TDraftImageView }
 
@@ -463,8 +470,13 @@ type
   { TDraftSFloatingButton }
 
   TDraftSFloatingButton = class(TDraftWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
   public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
+    procedure UpdateLayout; override;
   end;
 
   { TDraftSBottomNavigationView }
@@ -700,8 +712,8 @@ uses
   customcamera, sadmob, calendarview, searchview;
 
 const
-  DrawableSearchPaths: array [0..3] of string = (
-    'drawable-mdpi', 'drawable-ldpi', 'drawable-hdpi', 'drawable-xhdpi'
+  DrawableSearchPaths: array [0..4] of string = (
+    'drawable-mdpi', 'drawable-ldpi', 'drawable-hdpi', 'drawable-xhdpi', 'drawable'
   );
 
 var
@@ -791,9 +803,13 @@ begin
   o := GetComponent(0);
   if not (o is TComponent) then
     Exit;
-  o := TComponent(o).Owner;
-  if not (o is TAndroidForm) then
-    Exit;
+
+  if not (o is TAndroidForm)  then  //so we can use for "jForm" BackgrounImageIdentifier property
+  begin
+    o := TComponent(o).Owner;
+    if not (o is TAndroidForm) then Exit;
+  end;
+
   d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
 
   imgs := TStringList.Create;
@@ -1284,22 +1300,6 @@ begin
   end;
 end;
 
-{ TDraftSFloatingButton }
-
-procedure TDraftSFloatingButton.Draw;
-begin
-  with Fcanvas do
-  begin
-    if jsFloatingButton(FAndroidWidget).BackgroundColor <> colbrDefault then
-      Brush.Color := ToTColor(jsFloatingButton(FAndroidWidget).BackgroundColor)
-    else begin
-      Brush.Color:= clNone;
-      Brush.Style:= bsClear;
-    end;
-    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-  end;
-end;
-
 { TDraftSBottomNavigationView }
 
 procedure TDraftSBottomNavigationView.Draw;
@@ -1714,6 +1714,7 @@ begin
   FSelection := TFPList.Create;
 
   FImageCache := TImageCache.Create;
+
 end;
 
 destructor TAndroidWidgetMediator.Destroy;
@@ -2002,6 +2003,11 @@ var
     fpcolor: TFPColor;
     fWidget: TDraftWidget;
     fWidgetClass: TDraftWidgetClass;
+    saveW: integer;
+    saveColor: TColor;
+    dsgnMediator: TAndroidWidgetMediator;
+    fbkImage: TPortableNetworkGraphic;
+    strImage: string;
   begin
 
     if FDone.IndexOf(AWidget) >= 0 then Exit;
@@ -2012,13 +2018,12 @@ var
       Abort;
     end;
     FStarted.Add(AWidget);
-
     with LCLForm.Canvas do begin
       //fill background
-
       Brush.Style:= bsSolid;
       Brush.Color:= Self.FDefaultBrushColor;
       Pen.Color:= Self.FDefaultPenColor;      //MedGray...
+      saveColor:= Pen.Color;
       Font.Color:= Self.FDefaultFontColor;
 
       if AWidget is jVisualControl then
@@ -2041,16 +2046,32 @@ var
         begin
           fpcolor:= ToTFPColor(jForm(AWidget).BackgroundColor);
           Brush.Color:= FPColorToTColor(fpcolor);
-          Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
+          //Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
         end
         else
         begin
           Brush.Color := FDefaultBrushColor;
           GradientFill(Rect(0,0,AWidget.Width,AWidget.Height),
             BlendColors(FDefaultBrushColor, 0.92, 0, 0, 0),
-            BlendColors(FDefaultBrushColor, 0.81, 255, 255, 255),
-            gdVertical);
+            BlendColors(FDefaultBrushColor, 0.81, 255, 255, 255),gdVertical);
+            Pen.Color:= clDkGray;
         end;
+
+        saveW:= Pen.Width;
+        Pen.Width:= 10;
+        Rectangle(0,0,AWidget.Width,AWidget.Height); // outer frame
+        Pen.Width:= saveW;
+        Pen.Color:= saveColor;
+
+        strImage:= jForm(AWidget).BackgroundImageIdentifier;
+        if strImage <> '' then
+        begin
+           dsgnMediator := TAndroidForm(AWidget).Designer as TAndroidWidgetMediator;
+           fbkImage:= dsgnMediator.ImageCache.GetImageAsPNG(dsgnMediator.FindDrawable(strImage));
+           //StretchDraw(Rect(0,0,AWidget.Width,AWidget.Height), fbkImage);
+           Draw(0, 0, fbkImage);
+        end;
+
       end else
       // generic
       begin
@@ -2064,7 +2085,7 @@ var
           fWidget.Draw;
           fWidget.Free;
         end
-        //// default drawing: rect with Text
+        // default drawing: rect with Text
         else if (AWidget is jVisualControl) then
         begin
           Brush.Color:= Self.FDefaultBrushColor;
@@ -2074,6 +2095,7 @@ var
           Font.Color:= clMedGray;
           TextOut(5,4,AWidget.Text);
         end;
+
       end;
 
       if AWidget.AcceptChildrenAtDesignTime then
@@ -2161,6 +2183,7 @@ begin
   FStarted.Clear;
   FDone.Clear;
   FCustomDialogs.Clear; // jCustomDialogs are drawn after all other components
+
   PaintWidget(AndroidForm);
   for i := 0 to FCustomDialogs.Count - 1 do
     PaintCustomDialog(jCustomDialog(FCustomDialogs[i]));
@@ -3326,13 +3349,36 @@ begin
   Color := jListView(AWidget).BackgroundColor;
   FontColor := jListView(AWidget).FontColor; //colbrBlack;
 
+  FDrfItems:= TStringList.Create;
+
+  FDrfItems.Text:= jListView(AWidget).Items.Text;
+
+  FDrfCount:=  jListView(AWidget).Items.Count;
+
   if jListView(AWidget).BackgroundColor = colbrDefault then
     Color := GetParentBackgroundColor;
 end;
 
+function TDraftListView.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jListView(FAndroidWidget) do
+    begin
+      if ImageItemIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageItemIdentifier));
+        Result := FImage;
+      end else
+      Result := nil;
+    end;
+end;
+
 procedure TDraftListView.Draw;
 var
-  i, k: integer;
+  i, k,  count: integer;
+  r: TRect;
 begin
   Fcanvas.Brush.Color:= Self.BackGroundColor;
   Fcanvas.Pen.Color:= clActiveCaption;
@@ -3343,20 +3389,42 @@ begin
       // outer frame
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
 
-  Fcanvas.Brush.Style:= bsSolid;
+  count:= FDrfItems.Count;
 
   Fcanvas.Pen.Color:= clSilver;
-  k:= Trunc(Self.Height/20);
+  Fcanvas.Font.Color:= Self.TextColor;
+
+  k:= Trunc(Self.Height/30);
+
   for i:= 1 to k-1 do
   begin
-    Fcanvas.MoveTo(Self.Width{-Self.MarginRight+10}, {x2} Self.MarginTop+i*20); {y1}
-    Fcanvas.LineTo(0,Self.MarginTop+i*20);  {x1, y1}
+    Fcanvas.MoveTo(Self.Width, {x2} Self.MarginTop+i*30); {y1}
+    Fcanvas.LineTo(0,Self.MarginTop+i*30);  {x1, y1}
+    if i <= count then
+    begin
+       if GetImage <> nil then
+       begin
+           r := Rect(5, 3 + Self.MarginTop+(i-1)*30, 24, Self.MarginTop+(i-1)*30 + 24);
+           Fcanvas.StretchDraw(r, GetImage);
+           Fcanvas.TextOut(40, 3 + Self.MarginTop+(i-1)*30, FDrfItems.Strings[i-1]);
+       end
+       else
+          Fcanvas.TextOut(5, 3 + Self.MarginTop+(i-1)*30, FDrfItems.Strings[i-1]);
+    end;
   end;
 
   //canvas.Brush.Style:= bsClear;
   //canvas.Font.Color:= Self.TextColor;
   //canvas.TextOut(5,4, txt);
 
+  Fcanvas.Brush.Style:= bsSolid;
+
+end;
+
+destructor TDraftListView.Destroy;
+begin
+  FDrfItems.Free;
+  inherited;
 end;
 
 { TDraftExpandableListView }
@@ -3385,16 +3453,15 @@ begin
       // outer frame
   Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
 
-  Fcanvas.Brush.Style:= bsSolid;
-
   Fcanvas.Pen.Color:= clSilver;
-  k:= Trunc(Self.Height/20);
+  k:= Trunc(Self.Height/30);
   for i:= 1 to k-1 do
   begin
-    Fcanvas.MoveTo(Self.Width{-Self.MarginRight+10}, {x2} Self.MarginTop+i*20); {y1}
-    Fcanvas.LineTo(0,Self.MarginTop+i*20);  {x1, y1}
+    Fcanvas.MoveTo(Self.Width{-Self.MarginRight+10}, {x2} Self.MarginTop+i*30); {y1}
+    Fcanvas.LineTo(0,Self.MarginTop+i*30);  {x1, y1}
   end;
 
+  Fcanvas.Brush.Style:= bsSolid;
   //canvas.Brush.Style:= bsClear;
   //canvas.Font.Color:= Self.TextColor;
   //canvas.TextOut(5,4, txt);
@@ -3437,30 +3504,45 @@ begin
 end;
 
 procedure TDraftImageBtn.Draw;
+var
+  r: TRect;
+  w, h: integer;
 begin
-  if GetImage <> nil then
-    Fcanvas.Brush.Color := BackGroundColor
-  else
-    Fcanvas.Brush.Color := clSilver; //clMedGray;
-  Fcanvas.Pen.Color := clWhite;
-  if Self.BackGroundColor <> clNone then
-    Fcanvas.FillRect(Rect(0, 0, Width, Height));
-  if GetImage <> nil then
-    Fcanvas.Brush.Style := bsClear;
-  // outer frame
-  Fcanvas.Rectangle(0,0,Self.Width,Self.Height);
-  Fcanvas.Pen.Color := clWindowFrame;
-  Fcanvas.Line(Self.Width-Self.MarginRight+3,   {x2}
-               Self.MarginTop-3,                {y1}
-               Self.Width-Self.MarginRight+3,   {x2}
-               Self.Height-Self.MarginBottom+3);{y2}
 
-  Fcanvas.Line(Self.Width-Self.MarginRight+3,   {x2}
-               Self.Height-Self.MarginBottom+3, {y2}
-               Self.MarginLeft-4,               {x1}
-               Self.Height-Self.MarginBottom+3);{y2}
+  if Color <> colbrDefault then
+     Fcanvas.Brush.Color := ToTColor(Color)
+  else
+  begin
+     Fcanvas.Brush.Color:= clNone;
+     Fcanvas.Brush.Style:= bsClear;
+  end;
+
   if GetImage <> nil then
-    Fcanvas.Draw(1, 1, GetImage);
+  begin
+
+    w:= Trunc(FImage.Width/3);
+    h:= Trunc(FImage.Height/3);
+
+    w:= Max(w,h);
+    h:= w;
+
+    if w < 64 then
+    begin
+      w:= 64;
+      h:= 64;
+    end;
+
+    Fcanvas.RoundRect(0, 0, w+8, h+8, 12, 12);    // outer frame
+
+    r:= Rect(4, 4, w+4, h+4);
+    Fcanvas.StretchDraw(r, GetImage);
+  end
+  else
+  begin
+    Fcanvas.RoundRect(0, 0, 72, 72, 12,12);  //outer frame
+    Fcanvas.Ellipse(4,4,68,68);            //inner
+  end;
+
 end;
 
 procedure TDraftImageBtn.UpdateLayout;
@@ -3468,11 +3550,22 @@ var
   im: TPortableNetworkGraphic;
 begin
   im := GetImage;
-  if im <> nil then
+  if im <> nil  then
     with jImageBtn(FAndroidWidget) do
     begin
-      FMinHeight := im.Height + 3;
-      FMinWidth := im.Width + 3;
+
+      FMinWidth:= Trunc(FImage.Width/3);
+      FMinHeight:= Trunc(FImage.Height/3);
+
+      FMinWidth:= Max(FMinWidth,FMinHeight) + 8;
+      FMinHeight:= FMinWidth;
+
+      if FMinWidth < 72 then
+      begin
+        FMinWidth:= 72;
+        FMinHeight:= FMinWidth;
+      end;
+
     end;
   inherited UpdateLayout;
 end;
@@ -3485,6 +3578,12 @@ begin
     Result := FImage
   else
     with jImageView(FAndroidWidget) do
+    begin
+      if ImageIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageIdentifier));
+        Result := FImage;
+      end else
       if (Images <> nil)
       and (ImageIndex >= 0) and (ImageIndex < Images.Count) then
       begin
@@ -3492,6 +3591,7 @@ begin
         Result := FImage;
       end else
         Result := nil;
+    end;
 end;
 
 constructor TDraftImageView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -3507,11 +3607,45 @@ begin
 end;
 
 procedure TDraftImageView.Draw;
+var
+  r: TRect;
+  w, h: integer;
 begin
-  if GetImage <> nil then
-    Fcanvas.Draw(0, 0, GetImage)
+
+  if Color <> colbrDefault then
+     Fcanvas.Brush.Color := ToTColor(Color)
   else
-    inherited Draw;
+  begin
+     Fcanvas.Brush.Color:= clNone;
+     Fcanvas.Brush.Style:= bsClear;
+  end;
+
+  if GetImage <> nil then
+  begin
+
+    w:= Trunc(FImage.Width/3);
+    h:= Trunc(FImage.Height/3);
+
+    w:= Max(w,h);
+    h:= w;
+
+    if w < 64 then
+    begin
+      w:= 64;
+      h:= 64;
+    end;
+
+    Fcanvas.Rectangle(0, 0, w+8, h+8);    // outer frame
+
+    r:= Rect(4, 4, w+4, h+4);
+    Fcanvas.StretchDraw(r, GetImage);
+
+  end
+  else
+  begin
+    Fcanvas.Rectangle(0, 0, 72, 72);  //outer frame
+    Fcanvas.RoundRect(4, 4, 68, 68, 12,12);  //inner frame
+  end;
 end;
 
 procedure TDraftImageView.UpdateLayout;
@@ -3519,18 +3653,93 @@ var
   im: TPortableNetworkGraphic;
 begin
   im := GetImage;
-  with jImageView(FAndroidWidget) do
+  if im <> nil then
   begin
-    if im <> nil then
+    with jImageView(FAndroidWidget) do
     begin
-      if LayoutParamHeight = lpWrapContent then
-        FMinHeight := im.Height;
-      if LayoutParamWidth = lpWrapContent then
-        FMinWidth := im.Width;
+        (*
+        if LayoutParamHeight = lpWrapContent then
+          FMinHeight := im.Height;
+        if LayoutParamWidth = lpWrapContent then
+          FMinWidth := im.Width;
+        *)
+        FMinWidth:= Trunc(FImage.Width/3);
+        FMinHeight:= Trunc(FImage.Height/3);
+
+        FMinWidth:= Max(FMinWidth,FMinHeight) + 8;
+        FMinHeight:= FMinWidth;
+
+        if FMinWidth < 72 then
+        begin
+          FMinWidth:= 72;
+          FMinHeight:= FMinWidth;
+        end;
     end;
   end;
   inherited UpdateLayout;
 end;
+
+{ TDraftSFloatingButton }
+
+function TDraftSFloatingButton.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jsFloatingButton(FAndroidWidget) do
+    begin
+      if ImageIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageIdentifier));
+        Result := FImage;
+      end else
+      Result := nil;
+    end;
+end;
+
+constructor TDraftSFloatingButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+
+  Color := jsFloatingButton(AWidget).BackgroundColor;
+  FontColor:= colbrGray;
+  BackGroundColor:= clActiveCaption; //clMenuHighlight;
+
+  if jsFloatingButton(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
+procedure TDraftSFloatingButton.Draw;
+var
+  r: TRect;
+begin
+  with Fcanvas do
+  begin
+    if jsFloatingButton(FAndroidWidget).BackgroundColor <> colbrDefault then
+    begin
+      Brush.Color := ToTColor(jsFloatingButton(FAndroidWidget).BackgroundColor)
+    end
+    else
+    begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    //Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+    Ellipse(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+    if GetImage <> nil then
+    begin
+      r := Rect(0, 0, 48, 48);
+      StretchDraw(r, GetImage);
+      //Draw(0, 0, GetImage);
+    end;
+  end;
+end;
+
+procedure TDraftSFloatingButton.UpdateLayout;
+begin
+  inherited UpdateLayout;
+end;
+
 
 { TDrafDrawingView }
 
@@ -4227,6 +4436,11 @@ initialization
   RegisterPropertyEditor(TypeInfo(jImageList), nil, '', TImageListPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jImageBtn, 'ImageUpIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jImageBtn, 'ImageDownIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jImageView, 'ImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jListView, 'ImageItemIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jForm, 'BackgroundImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jBitmap, 'ImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jsFloatingButton, 'ImageIdentifier', TImageIdentifierPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
@@ -4249,6 +4463,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jDBListView, TDraftDBListView);
   RegisterAndroidWidgetDraftClass(jTreeListView, TDraftTreeListView);
   RegisterAndroidWidgetDraftClass(jImageBtn, TDraftImageBtn);
+
   RegisterAndroidWidgetDraftClass(jImageView, TDraftImageView);
   RegisterAndroidWidgetDraftClass(jSurfaceView, TDraftSurfaceView);
  // RegisterAndroidWidgetDraftClass(jGL2SurfaceView, TDraftGL2SurfaceView);

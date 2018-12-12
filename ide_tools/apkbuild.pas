@@ -141,6 +141,17 @@ begin
   end;
 end;
 
+function IsAllCharNumber(pcString: PChar): Boolean;
+begin
+  Result := False;
+  while pcString^ <> #0 do // 0 indicates the end of a PChar string
+  begin
+    if not (pcString^ in ['0'..'9']) then Exit;
+    Inc(pcString);
+  end;
+  Result := True;
+end;
+
 { TGradleParser }
 
 procedure TGradleParser.InitReading;
@@ -477,7 +488,7 @@ var
   xml: TXMLDocument;
   WasChanged: Boolean;
   i: Integer;
-  str, sval: string;
+  str, sval, temp: string;
   sl: TStringList;
   outIndex: integer;
 begin
@@ -533,8 +544,17 @@ begin
                   if MessageDlg('build.xml',
                                 'Change target to "' + str + '"?',
                                 mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Continue;
-                  TDOMElement(Item[i]).AttribStrings['value'] := str;
-                  WasChanged := True;
+
+                  temp:= Copy(str, LastDelimiter('-', str) + 1, MaxInt);
+                  if IsAllCharNumber(PChar(temp)) then
+                  begin
+                      TDOMElement(Item[i]).AttribStrings['value'] := str;
+                      WasChanged := True;
+                  end
+                  else
+                      ShowMessage('Sorry... Fail to change "build.xml" SDK TargetApi...');
+
+
                 end else
                 if (sl.IndexOf(sval) >= 0) and (sval <> str) then
                 begin
@@ -544,7 +564,12 @@ begin
                                 mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Continue;
                   str := sval;
                   Delete(str, 1, 8);
-                  SetManifestSdkTarget(str);
+
+                  if IsAllCharNumber(PChar(str)) then
+                      SetManifestSdkTarget(str)
+                  else
+                      ShowMessage('Sorry... Fail to change Manifest SDK TargetApi...');
+
                 end else
                 if sl.IndexOf(sval) < 0 then
                 begin
@@ -554,13 +579,22 @@ begin
                                   'You have only installed "' + sl[0] + '" SDK. ' +
                                   'Do you want to use it?',
                                   mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Continue;
+
                     str := sl[0];
                   end else
                     if not ChooseDlg('Target SDK', 'Choose target SDK:', sl, str) then Continue;
-                  TDOMElement(Item[i]).AttribStrings['value'] := str;
-                  WasChanged := True;
-                  Delete(str, 1, 8);
-                  SetManifestSdkTarget(str);
+
+                  temp:= Copy(str, LastDelimiter('-', str) + 1, MaxInt);
+                  if IsAllCharNumber(PChar(temp)) then
+                  begin
+                    TDOMElement(Item[i]).AttribStrings['value'] := str;
+                    WasChanged := True;
+                    Delete(str, 1, 8);
+                    SetManifestSdkTarget(str);
+                  end
+                  else
+                      ShowMessage('Sorry... Fail to change Manifest SDK TargetApi...');
+
                 end;
               finally
                 sl.Free

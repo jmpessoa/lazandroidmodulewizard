@@ -1,5 +1,8 @@
-package org.lamw.appmapsdemo1;
+package com.example.appdemo1;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.util.Log;
 import android.view.View;
 import android.webkit.HttpAuthHandler;

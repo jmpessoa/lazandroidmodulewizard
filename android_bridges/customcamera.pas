@@ -11,6 +11,7 @@ type
 
 TCustomCameraSurfaceCreated = Procedure(Sender: TObject) of object;
 TCustomCameraSurfaceChanged = Procedure(Sender: TObject; width: integer; height: integer) of object;
+TCustomCameraPictureTaken = Procedure(Sender: TObject; bitmapPicture: jObject; fullPath: string) of object;
 
 {Draft Component code by "Lazarus Android Module Wizard" [4/18/2018 16:53:34]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -24,8 +25,9 @@ jCustomCamera = class(jVisualControl)
     FColor: TARGBColorBridge;
     FOnClick: TOnNotify;
 
-    FOnSurfaceCreated: TCustomCameraSurfaceCreated;
+    //FOnSurfaceCreated: TCustomCameraSurfaceCreated;
     FOnSurfaceChanged: TCustomCameraSurfaceChanged;
+    FOnPictureTaken: TCustomCameraPictureTaken;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -37,7 +39,6 @@ jCustomCamera = class(jVisualControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
 
-
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
@@ -46,6 +47,7 @@ jCustomCamera = class(jVisualControl)
     procedure GenEvent_OnClick(Obj: TObject);
     procedure GenEvent_OnCustomCameraSurfaceCreated(Obj: TObject);
     procedure GenEvent_OnCustomCameraSurfaceChanged(Obj: TObject; width: integer; height: integer);
+    procedure GenEvent_OnCustomCameraPictureTaken(Obj: TObject; picture: jObject; fullPath: string);
 
     function jCreate(): jObject;
     procedure jFree();
@@ -68,13 +70,20 @@ jCustomCamera = class(jVisualControl)
     procedure TakePicture(); overload;
     procedure TakePicture(_filename: string); overload;
 
-    procedure SetEnvironmentStorage(_environmentDir: integer; _folderName: string);
+    procedure SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string); overload;
+    procedure SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string; _fileName: string); overload;
+
+    procedure SaveToMediaStore(_title: string; _description: string);
+    function GetImage(_width: integer; _height: integer): jObject; overload;
+    function GetImage(): jObject; overload;
+
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
-    property OnSurfaceCreated: TCustomCameraSurfaceCreated read FOnSurfaceCreated write FOnSurfaceCreated;
+    //property OnSurfaceCreated: TCustomCameraSurfaceCreated read FOnSurfaceCreated write FOnSurfaceCreated;
     property OnSurfaceChanged: TCustomCameraSurfaceChanged read FOnSurfaceChanged write FOnSurfaceChanged;
+    property OnPictureTaken: TCustomCameraPictureTaken read FOnPictureTaken write FOnPictureTaken;
 
 end;
 
@@ -96,9 +105,13 @@ procedure jCustomCamera_AddLParamsParentRule(env: PJNIEnv; _jcustomcamera: JObje
 procedure jCustomCamera_SetLayoutAll(env: PJNIEnv; _jcustomcamera: JObject; _idAnchor: integer);
 procedure jCustomCamera_ClearLayoutAll(env: PJNIEnv; _jcustomcamera: JObject);
 procedure jCustomCamera_SetId(env: PJNIEnv; _jcustomcamera: JObject; _id: integer);
-procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject);  overload;
-procedure jCustomCamera_SetEnvironmentStorage(env: PJNIEnv; _jcustomcamera: JObject; _environmentDir: integer; _folderName: string);
-procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject; _filename: string);  overload;
+procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject); overload;
+procedure jCustomCamera_TakePicture(env: PJNIEnv; _jcustomcamera: JObject; _filename: string); overload;
+procedure jCustomCamera_SetEnvironmentStorage(env: PJNIEnv; _jcustomcamera: JObject; _environmentDir: integer; _folderName: string); overload;
+procedure jCustomCamera_SetEnvironmentStorage(env: PJNIEnv; _jcustomcamera: JObject; _environmentDir: integer; _folderName: string; _fileName: string); overload;
+procedure jCustomCamera_SaveToMediaStore(env: PJNIEnv; _jcustomcamera: JObject; _title: string; _description: string);
+function jCustomCamera_GetImage(env: PJNIEnv; _jcustomcamera: JObject; _width: integer; _height: integer): jObject; overload;
+function jCustomCamera_GetImage(env: PJNIEnv; _jcustomcamera: JObject): jObject; overload;
 
 implementation
 
@@ -379,13 +392,18 @@ end;
 
 procedure jCustomCamera.GenEvent_OnCustomCameraSurfaceCreated(Obj: TObject);
 begin
-  if Assigned(FOnSurfaceCreated) then FOnSurfaceCreated(Obj);
+  //if Assigned(FOnSurfaceCreated) then FOnSurfaceCreated(Obj);
 end;
 
 procedure jCustomCamera.GenEvent_OnCustomCameraSurfaceChanged(Obj: TObject;
   width: integer; height: integer);
 begin
    if Assigned(FOnSurfaceChanged) then FOnSurfaceChanged(Obj, width, height);
+end;
+
+procedure jCustomCamera.GenEvent_OnCustomCameraPictureTaken(Obj: TObject; picture: jObject; fullPath: string);
+begin
+   if Assigned(FOnPictureTaken) then FOnPictureTaken(Obj, picture, fullPath);
 end;
 
 function jCustomCamera.jCreate(): jObject;
@@ -526,11 +544,39 @@ begin
      jCustomCamera_TakePicture(FjEnv, FjObject, _filename);
 end;
 
-procedure jCustomCamera.SetEnvironmentStorage(_environmentDir: integer; _folderName: string);
+procedure jCustomCamera.SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetEnvironmentStorage(FjEnv, FjObject, _environmentDir ,_folderName);
+     jCustomCamera_SetEnvironmentStorage(FjEnv, FjObject, Ord(_environmentDir) ,_folderName);
+end;
+
+procedure jCustomCamera.SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string; _fileName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCustomCamera_SetEnvironmentStorage(FjEnv, FjObject, Ord(_environmentDir) ,_folderName ,_fileName);
+end;
+
+procedure jCustomCamera.SaveToMediaStore(_title: string; _description: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCustomCamera_SaveToMediaStore(FjEnv, FjObject, _title ,_description);
+end;
+
+function jCustomCamera.GetImage(_width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCustomCamera_GetImage(FjEnv, FjObject, _width ,_height);
+end;
+
+function jCustomCamera.GetImage(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCustomCamera_GetImage(FjEnv, FjObject);
 end;
 
 {-------- jCustomCamera_JNI_Bridge ----------}
@@ -814,6 +860,65 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'TakePicture', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jcustomcamera, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCustomCamera_SetEnvironmentStorage(env: PJNIEnv; _jcustomcamera: JObject; _environmentDir: integer; _folderName: string; _fileName: string);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _environmentDir;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_folderName));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_fileName));
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetEnvironmentStorage', '(ILjava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jcustomcamera, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCustomCamera_SaveToMediaStore(env: PJNIEnv; _jcustomcamera: JObject; _title: string; _description: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_description));
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToMediaStore', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jcustomcamera, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jCustomCamera_GetImage(env: PJNIEnv; _jcustomcamera: JObject; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _width;
+  jParams[1].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetImage', '(II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jcustomcamera, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jCustomCamera_GetImage(env: PJNIEnv; _jcustomcamera: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetImage', '()Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethod(env, _jcustomcamera, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

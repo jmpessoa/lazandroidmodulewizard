@@ -1,0 +1,3 @@
+public native void pOnCustomCameraSurfaceCreated(long pasobj);
+public native void pOnCustomCameraSurfaceChanged(long pasobj, int width, int height);
+public native void pOnCustomCameraPictureTaken(long pasobj, Bitmap picture, String fullPath);

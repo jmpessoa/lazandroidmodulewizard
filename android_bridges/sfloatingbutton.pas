@@ -119,8 +119,8 @@ begin
   FMarginTop    := 10;
   FMarginBottom := 10;
   FMarginRight  := 10;
-  FHeight       := 48; //??
-  FWidth        := 48; //??
+  FHeight       := 56;
+  FWidth        := 56;
   FLParamWidth  := lpWrapContent;
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= False;
