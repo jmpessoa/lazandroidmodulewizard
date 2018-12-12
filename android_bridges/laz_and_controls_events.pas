@@ -7,6 +7,13 @@ interface
 uses
    Classes, SysUtils, And_jni;
 
+   // AdMob Events
+   procedure Java_Event_pOnAdMobLoaded(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnAdMobFailedToLoad(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
+   procedure Java_Event_pOnAdMobOpened(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnAdMobLeftApplication(env: PJNIEnv; this: jobject; Obj: TObject);
+
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDeviceFound(env: PJNIEnv; this: jobject; Obj: TObject; deviceName: JString; deviceAddress: JString );
@@ -179,7 +186,7 @@ uses
    autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
-   customcamera, calendarview, searchview, telephonymanager;
+   customcamera, calendarview, searchview, telephonymanager, sadmob;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -451,6 +458,66 @@ begin
   begin
     jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
     jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketAcceptTimeout(Obj);
+  end;
+end;
+
+procedure Java_Event_pOnAdMobLoaded(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jsAdMob then
+  begin
+     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
+     jsAdMob(Obj).GenEvent_OnAdMobLoaded(Obj);
+  end;
+end;
+
+procedure Java_Event_pOnAdMobFailedToLoad(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jsAdMob then
+  begin
+     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
+     jsAdMob(Obj).GenEvent_OnAdMobFailedToLoad(Obj, errorCode);
+  end;
+end;
+
+procedure Java_Event_pOnAdMobOpened(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jsAdMob then
+  begin
+     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
+     jsAdMob(Obj).GenEvent_OnAdMobOpened(Obj);
+  end;
+end;
+
+procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jsAdMob then
+  begin
+     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
+     jsAdMob(Obj).GenEvent_OnAdMobClosed(Obj);
+  end;
+end;
+
+procedure Java_Event_pOnAdMobLeftApplication(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jsAdMob then
+  begin
+     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
+     jsAdMob(Obj).GenEvent_OnAdMobLeftApplication(Obj);
   end;
 end;
 
