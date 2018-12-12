@@ -9,6 +9,12 @@ uses
 
 type
 
+TOnAdMobLoaded = procedure(Sender: TObject) of Object;
+TOnAdMobFailedToLoad = procedure(Sender: TObject;  errorCode: integer) of Object;
+TOnAdMobOpened = procedure(Sender: TObject) of Object;
+TOnAdMobClosed = procedure(Sender: TObject) of Object;
+TOnAdMobLeftApplication = procedure(Sender: TObject) of Object;
+
 {Draft Component code by "Lazarus Android Module Wizard" [12/13/2017 17:22:00]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -16,11 +22,14 @@ type
 
 jsAdMob = class(jVisualControl)
  private
+    FOnAdMobLoaded:          TOnAdMobLoaded;
+    FOnAdMobFailedToLoad:    TOnAdMobFailedToLoad;
+    FOnAdMobOpened:          TOnAdMobOpened;
+    FOnAdMobClosed:          TOnAdMobClosed;
+    FOnAdMobLeftApplication: TOnAdMobLeftApplication;
+
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
-    procedure TryNewParent(refApp: jApp);
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -30,15 +39,24 @@ jsAdMob = class(jVisualControl)
     procedure ClearLayout;
 
     procedure GenEvent_OnClick(Obj: TObject);
+    procedure GenEvent_OnAdMobLoaded(Obj: TObject);
+    procedure GenEvent_OnAdMobFailedToLoad(Obj: TObject; errorCode: integer);
+    procedure GenEvent_OnAdMobOpened(Obj: TObject);
+    procedure GenEvent_OnAdMobClosed(Obj: TObject);
+    procedure GenEvent_OnAdMobLeftApplication(Obj: TObject);
+
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetViewParent(): jObject;  override;
     procedure RemoveFromViewParent(); override;
-    procedure SetAdMobId(_admobid: string);
-    function  GetAdMobId(): string;
-    //procedure InitAdMob();
-    procedure Run();
+
+    procedure AdMobSetId(_admobid: string);
+    function  AdMobGetId(): string;
+    procedure AdMobInit();
+    procedure AdMobFree();
+    procedure AdMobRun();
+
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
@@ -57,6 +75,13 @@ jsAdMob = class(jVisualControl)
 
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
 
+    property OnAdMobLoaded      :   TOnAdMobLoaded read FOnAdMobLoaded write FOnAdMobLoaded;
+    property OnAdMobFailedToLoad:   TOnAdMobFailedToLoad read FOnAdMobFailedToLoad write FOnAdMobFailedToLoad;
+    property OnAdMobOpened      :   TOnAdMobOpened read FOnAdMobOpened write FOnAdMobOpened;
+    property OnAdMobClosed      :   TOnAdMobClosed read FOnAdMobClosed write FOnAdMobClosed;
+    property OnAdMobLeftApplication  :   TOnAdMobLeftApplication read FOnAdMobLeftApplication write FOnAdMobLeftApplication;
+
+
 end;
 
 function jsAdMob_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -64,10 +89,13 @@ procedure jsAdMob_jFree(env: PJNIEnv; _jadmob: JObject);
 procedure jsAdMob_SetViewParent(env: PJNIEnv; _jadmob: JObject; _viewgroup: jObject);
 function jsAdMob_GetParent(env: PJNIEnv; _jadmob: JObject): jObject;
 procedure jsAdMob_RemoveFromViewParent(env: PJNIEnv; _jadmob: JObject);
+
 procedure jsAdMob_AdMobSetId(env: PJNIEnv; _jadmob: JObject; _admobid: string);
 function jsAdMob_AdMobGetId(env: PJNIEnv; _jadmob: JObject): string;
-//procedure jsAdMob_AdMobInit(env: PJNIEnv; _jadmob: JObject);
+procedure jsAdMob_AdMobInit(env: PJNIEnv; _jadmob: JObject);
+procedure jsAdMob_AdMobFree(env: PJNIEnv; _jadmob: JObject);
 procedure jsAdMob_AdMobRun(env: PJNIEnv; _jadmob: JObject);
+
 function jsAdMob_GetView(env: PJNIEnv; _jadmob: JObject): jObject;
 procedure jsAdMob_SetLParamWidth(env: PJNIEnv; _jadmob: JObject; _w: integer);
 procedure jsAdMob_SetLParamHeight(env: PJNIEnv; _jadmob: JObject; _h: integer);
@@ -121,124 +149,35 @@ begin
   inherited Destroy;
 end;
 
-procedure jsAdMob.TryNewParent(refApp: jApp);
-begin
-  if FParent is jPanel then
-  begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end else
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end else
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end  else
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end else
-  if FParent is jViewFlipper then
-  begin
-    jViewFlipper(FParent).Init(refApp);
-    FjPRLayout:= jViewFlipper(FParent).View;
-  end else
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end  else
-  if FParent is jsToolbar then
-  begin
-    jsToolbar(FParent).Init(refApp);
-    FjPRLayout:= jsToolbar(FParent).View;
-  end  else
-  if FParent is jsCoordinatorLayout then
-  begin
-    jsCoordinatorLayout(FParent).Init(refApp);
-    FjPRLayout:= jsCoordinatorLayout(FParent).View;
-  end else
-  if FParent is jFrameLayout then
-  begin
-    jFrameLayout(FParent).Init(refApp);
-    FjPRLayout:= jFrameLayout(FParent).View;
-  end else
-  if FParent is jLinearLayout then
-  begin
-    jLinearLayout(FParent).Init(refApp);
-    FjPRLayout:= jLinearLayout(FParent).View;
-  end else
-  if FParent is jsDrawerLayout then
-  begin
-    jsDrawerLayout(FParent).Init(refApp);
-    FjPRLayout:= jsDrawerLayout(FParent).View;
-  end  else
-  if FParent is jsCardView then
-  begin
-      jsCardView(FParent).Init(refApp);
-      FjPRLayout:= jsCardView(FParent).View;
-  end else
-  if FParent is jsAppBarLayout then
-  begin
-      jsAppBarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsAppBarLayout(FParent).View;
-  end else
-  if FParent is jsTabLayout then
-  begin
-      jsTabLayout(FParent).Init(refApp);
-      FjPRLayout:= jsTabLayout(FParent).View;
-  end else
-  if FParent is jsCollapsingToolbarLayout then
-  begin
-      jsCollapsingToolbarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
-  end else
-  if FParent is jsNestedScrollView then
-  begin
-      jsNestedScrollView(FParent).Init(refApp);
-      FjPRLayout:= jsNestedScrollView(FParent).View;
-  end else
-  if FParent is jsViewPager then
-  begin
-      jsViewPager(FParent).Init(refApp);
-      FjPRLayout:= jsViewPager(FParent).View;
-  end;
-end;
-
 procedure jsAdMob.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
+  aWidth, aHeight : DWORD;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
-
-  if FParent <> nil then
+  if not FInitialized  then
   begin
-    TryNewParent(refApp);
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
+   FInitialized:= True;
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+
+   jsAdMob_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jsAdMob_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  FjPRLayoutHome:= FjPRLayout;
+  if LayoutParamWidth  = lpExact then aWidth  := FWidth  else aWidth  := GetLayoutParams(gApp, FLParamWidth, sdW);
+  if LayoutParamHeight = lpExact then aHeight := FHeight else aHeight := GetLayoutParams(gApp, FLParamHeight, sdH);
 
-  jsAdMob_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jsAdMob_SetId(FjEnv, FjObject, Self.Id);
   jsAdMob_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
-  end;
+                        aWidth,
+                        aHeight);
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -278,57 +217,16 @@ begin
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jsAdMob.UpdateLParamWidth;
-var
-  side: TSide;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jsAdMob_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jsAdMob_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jsAdMob_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jsAdMob.UpdateLParamHeight;
-var
-  side: TSide;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jsAdMob_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jsAdMob_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jsAdMob_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
 
 procedure jsAdMob.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jsAdMob_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayoutAll();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jsAdMob.Refresh;
@@ -359,6 +257,31 @@ end;
 procedure jsAdMob.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+procedure jsAdMob.GenEvent_OnAdMobLoaded(Obj: TObject);
+begin
+  if Assigned(FOnAdMobLoaded) then FOnAdMobLoaded(Obj);
+end;
+
+procedure jsAdMob.GenEvent_OnAdMobFailedToLoad(Obj: TObject; errorCode: integer);
+begin
+  if Assigned(FOnAdMobFailedToLoad) then FOnAdMobFailedToLoad(Obj, errorCode);
+end;
+
+procedure jsAdMob.GenEvent_OnAdMobOpened(Obj: TObject);
+begin
+  if Assigned(FOnAdMobOpened) then FOnAdMobOpened(Obj);
+end;
+
+procedure jsAdMob.GenEvent_OnAdMobClosed(Obj: TObject);
+begin
+  if Assigned(FOnAdMobClosed) then FOnAdMobClosed(Obj);
+end;
+
+procedure jsAdMob.GenEvent_OnAdMobLeftApplication(Obj: TObject);
+begin
+  if Assigned(FOnAdMobLeftApplication) then FOnAdMobLeftApplication(Obj);
 end;
 
 function jsAdMob.jCreate(): jObject;
@@ -394,30 +317,35 @@ begin
      jsAdMob_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
-procedure jsAdMob.SetAdMobId(_admobid: string);
+procedure jsAdMob.AdMobSetId(_admobid: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
      jsAdMob_AdMobSetId(FjEnv, FjObject, _admobid);
 end;
 
-function jsAdMob.GetAdMobId(): string;
+function jsAdMob.AdMobGetId(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jsAdMob_AdMobGetId(FjEnv, FjObject);
 end;
 
-{
 procedure jsAdMob.AdMobInit();
 begin
   //in designing component state: set value here...
   if FInitialized then
      jsAdMob_AdMobInit(FjEnv, FjObject);
 end;
-}
 
-procedure jsAdMob.Run();
+procedure jsAdMob.AdMobFree();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsAdMob_AdMobFree(FjEnv, FjObject);
+end;
+
+procedure jsAdMob.AdMobRun();
 begin
   //in designing component state: set value here...
   if FInitialized then
@@ -625,7 +553,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-{
 procedure jsAdMob_AdMobInit(env: PJNIEnv; _jadmob: JObject);
 var
   jMethod: jMethodID=nil;
@@ -636,7 +563,17 @@ begin
   env^.CallVoidMethod(env, _jadmob, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
-}
+
+procedure jsAdMob_AdMobFree(env: PJNIEnv; _jadmob: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jadmob);
+  jMethod:= env^.GetMethodID(env, jCls, 'AdMobFree', '()V');
+  env^.CallVoidMethod(env, _jadmob, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure jsAdMob_AdMobRun(env: PJNIEnv; _jadmob: JObject);
 var

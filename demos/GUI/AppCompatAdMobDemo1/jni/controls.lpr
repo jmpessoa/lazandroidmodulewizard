@@ -336,7 +336,59 @@ begin
   Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
 end;
 
-const NativeMethods: array[0..36] of JNINativeMethod = (
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobLoaded
+  Signature: (J)V }
+procedure pOnAdMobLoaded(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnAdMobLoaded(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobFailedToLoad
+  Signature: (JI)V }
+procedure pOnAdMobFailedToLoad(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  errorCode: JInt); cdecl;
+begin
+  Java_Event_pOnAdMobFailedToLoad(PEnv, this, TObject(pasobj), errorCode);
+end;
+
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobOpened
+  Signature: (J)V }
+procedure pOnAdMobOpened(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnAdMobOpened(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobClosed
+  Signature: (J)V }
+procedure pOnAdMobClosed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnAdMobClosed(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobLeftApplication
+  Signature: (J)V }
+procedure pOnAdMobLeftApplication(PEnv: PJNIEnv; this: JObject; pasobj: JLong);
+  cdecl;
+begin
+  Java_Event_pOnAdMobLeftApplication(PEnv, this, TObject(pasobj));
+end;
+
+const NativeMethods: array[0..42] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -448,7 +500,25 @@ const NativeMethods: array[0..36] of JNINativeMethod = (
     fnPtr: @pOnAfterDispatchDraw; ),
    (name: 'pOnLayouting';
     signature: '(JZ)V';
-    fnPtr: @pOnLayouting; )
+    fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
+   (name: 'pOnAdMobLoaded';
+    signature: '(J)V';
+    fnPtr: @pOnAdMobLoaded; ),
+   (name: 'pOnAdMobFailedToLoad';
+    signature: '(JI)V';
+    fnPtr: @pOnAdMobFailedToLoad; ),
+   (name: 'pOnAdMobOpened';
+    signature: '(J)V';
+    fnPtr: @pOnAdMobOpened; ),
+   (name: 'pOnAdMobClosed';
+    signature: '(J)V';
+    fnPtr: @pOnAdMobClosed; ),
+   (name: 'pOnAdMobLeftApplication';
+    signature: '(J)V';
+    fnPtr: @pOnAdMobLeftApplication; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
@@ -563,7 +633,19 @@ exports
     +'pOnBeforeDispatchDraw',
   pOnAfterDispatchDraw name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
     +'pOnAfterDispatchDraw',
-  pOnLayouting name 'Java_org_lamw_appcompatadmobdemo1_Controls_pOnLayouting';
+  pOnLayouting name 'Java_org_lamw_appcompatadmobdemo1_Controls_pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_org_lamw_appcompatadmobdemo1_'
+    +'Controls_pAppOnRequestPermissionResult',
+  pOnAdMobLoaded name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
+    +'pOnAdMobLoaded',
+  pOnAdMobFailedToLoad name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
+    +'pOnAdMobFailedToLoad',
+  pOnAdMobOpened name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
+    +'pOnAdMobOpened',
+  pOnAdMobClosed name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
+    +'pOnAdMobClosed',
+  pOnAdMobLeftApplication name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
+    +'pOnAdMobLeftApplication';
 
 {%endregion}
   
