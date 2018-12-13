@@ -2321,6 +2321,10 @@ begin
 
   Form.UpdateJNI(gApp);
 
+  // Update width and height when rotating
+  gApp.Screen.WH  := jSysInfo_ScreenWH(env, this, gApp.GetContext);
+  Form.ScreenWH   := gApp.Screen.WH;
+
   if rotate = 1 then
      rotOrientation:= ssPortrait
   else if rotate = 2 then

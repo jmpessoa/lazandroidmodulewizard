@@ -1266,7 +1266,7 @@ end;
 
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
     property Animation    : TAnimation     read FAnimation      write FAnimation;
-    property ScreenWH      : TWH read FScreenWH;
+    property ScreenWH      : TWH read FScreenWH write FScreenWH;
 
     property CallBackDataString: string read FCBDataString write FCBDataString;
     property CallBackDataInteger: integer read FCBDataInteger write FCBDataInteger;
