@@ -1548,6 +1548,27 @@ public Context GetContext() {
    return this.activity; 
 }
 
+//by TR3E Software
+public int getContextTop(){
+ ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
+ 
+ if( view != null)
+ 	return view.getTop();
+ else
+ 	return 0;
+	
+}
+
+//by  TR3E Software
+public int getStatusBarHeight() {
+	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+	
+	if ( resourceId > 0 )
+		return this.activity.getResources().getDimensionPixelSize(resourceId);
+	else
+		return 0;
+}
+
 //by  thierrydijoux
 public String getQuantityStringByName(String _resName, int _quantity) {
 	int id = this.activity.getResources().getIdentifier(_resName, "plurals", this.activity.getPackageName());

@@ -827,6 +827,9 @@ type
 
     procedure Finish;
     function  GetContext: jObject;
+    function  GetContextTop: integer;
+    function  GetStatusBarHeight : integer;
+    function  GetActionBarHeight : integer;
     function GetControlsVersionInfo: string;
     function GetControlsVersionFeatures: string; //sorry!
 
@@ -1263,7 +1266,7 @@ end;
 
     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
     property Animation    : TAnimation     read FAnimation      write FAnimation;
-    property ScreenWH      : TWH read FScreenWH;
+    property ScreenWH      : TWH read FScreenWH write FScreenWH;
 
     property CallBackDataString: string read FCBDataString write FCBDataString;
     property CallBackDataInteger: integer read FCBDataInteger write FCBDataInteger;
@@ -1596,7 +1599,10 @@ Procedure jApp_Finish                  (env:PJNIEnv;this:jobject);
 //by jmpessoa
 Procedure jApp_Finish2                  (env:PJNIEnv;this:jobject);
 function  jApp_GetContext               (env:PJNIEnv;this:jobject): jObject;
-function jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
+function  jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
+
+function  jApp_GetContextTop(env:PJNIEnv; this:jobject): integer;
+function  jApp_GetStatusBarHeight(env:PJNIEnv; this:jobject): integer;
 
 function  jForm_GetOnViewClickListener        (env:PJNIEnv; Form: jObject): jObject;
 function  jForm_GetOnListItemClickListener    (env:PJNIEnv; Form: jObject): jObject;
@@ -5898,6 +5904,21 @@ begin
   Result:= jApp_GetContext(Self.Jni.jEnv, Self.Jni.jThis);
 end;
 
+function jApp.GetContextTop: integer;
+begin
+  Result:= jApp_GetContextTop(Self.Jni.jEnv, Self.Jni.jThis);
+end;
+
+function jApp.GetStatusBarHeight: integer;
+begin
+  Result:= jApp_GetStatusBarHeight(Self.Jni.jEnv, Self.Jni.jThis);
+end;
+
+function jApp.GetActionBarHeight: integer;
+begin
+  Result := GetContextTop - GetStatusBarHeight;
+end;
+
 function jApp.GetControlsVersionInfo: string;
 begin
    Result:= jApp_GetControlsVersionInfo(Self.Jni.jEnv, Self.Jni.jThis); //"ver&rev|newFeature;ver$rev|newfeature2"
@@ -6839,6 +6860,28 @@ begin
   cls := env^.GetObjectClass(env, this);
   method:= env^.GetMethodID(env, cls, 'GetContext', '()Landroid/content/Context;');
   Result:= env^.CallObjectMethod(env, this, method);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+function jApp_GetContextTop(env: PJNIEnv; this: JObject): integer;
+var
+  cls: jClass = nil;
+  method: jmethodID = nil;
+begin
+  cls    := env^.GetObjectClass(env, this);
+  method := env^.GetMethodID(env, cls, 'getContextTop', '()I');
+  Result := env^.CallIntMethod(env, this, method);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+function jApp_GetStatusBarHeight(env: PJNIEnv; this: JObject): integer;
+var
+  cls: jClass = nil;
+  method: jmethodID = nil;
+begin
+  cls    := env^.GetObjectClass(env, this);
+  method := env^.GetMethodID(env, cls, 'getStatusBarHeight', '()I');
+  Result := env^.CallIntMethod(env, this, method);
   env^.DeleteLocalRef(env, cls);
 end;
 

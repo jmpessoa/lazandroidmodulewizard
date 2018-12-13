@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 //   Native Android Controls for Pascal
 
@@ -2034,6 +2034,8 @@ type
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 
+  procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
+
   procedure DBListView_Log (msg: string);
 
 implementation
@@ -2044,6 +2046,91 @@ uses
   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
   stoolbar, stablayout, snestedscrollview, sviewpager, radiogroup;
   {,And_log_h}  {for test}
+
+ procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
+ begin
+
+  if FParent is jPanel then
+  begin
+    if not jVisualControl(FParent).Initialized then jPanel(FParent).Init(refApp);
+    FjPRLayout:= jPanel(FParent).View;
+  end else
+  if FParent is jScrollView then
+  begin
+    if not jVisualControl(FParent).Initialized then jScrollView(FParent).Init(refApp);
+    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+  end else
+  if FParent is jHorizontalScrollView then
+  begin
+    if not jVisualControl(FParent).Initialized then jHorizontalScrollView(FParent).Init(refApp);
+    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+  end  else
+  if FParent is jCustomDialog then
+  begin
+    if not jVisualControl(FParent).Initialized then jCustomDialog(FParent).Init(refApp);
+    FjPRLayout:= jCustomDialog(FParent).View;
+  end else
+  if FParent is jViewFlipper then
+  begin
+    if not jVisualControl(FParent).Initialized then jViewFlipper(FParent).Init(refApp);
+    FjPRLayout:= jViewFlipper(FParent).View;
+  end else
+  if FParent is jToolbar then
+  begin
+    if not jVisualControl(FParent).Initialized then jToolbar(FParent).Init(refApp);
+    FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsCoordinatorLayout then
+  begin
+    if not jVisualControl(FParent).Initialized then jsCoordinatorLayout(FParent).Init(refApp);
+    FjPRLayout:= jsCoordinatorLayout(FParent).View;
+  end else
+  if FParent is jFrameLayout then
+  begin
+    if not jVisualControl(FParent).Initialized then jFrameLayout(FParent).Init(refApp);
+    FjPRLayout:= jFrameLayout(FParent).View;
+  end else
+  if FParent is jLinearLayout then
+  begin
+    if not jVisualControl(FParent).Initialized then jLinearLayout(FParent).Init(refApp);
+    FjPRLayout:= jLinearLayout(FParent).View;
+  end else
+  if FParent is jsDrawerLayout then
+  begin
+    if not jVisualControl(FParent).Initialized then jsDrawerLayout(FParent).Init(refApp);
+    FjPRLayout:= jsDrawerLayout(FParent).View;
+  end  else
+  if FParent is jsCardView then
+  begin
+      if not jVisualControl(FParent).Initialized then jsCardView(FParent).Init(refApp);
+      FjPRLayout:= jsCardView(FParent).View;
+  end else
+  if FParent is jsAppBarLayout then
+  begin
+      if not jVisualControl(FParent).Initialized then jsAppBarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsAppBarLayout(FParent).View;
+  end else
+  if FParent is jsTabLayout then
+  begin
+      if not jVisualControl(FParent).Initialized then jsTabLayout(FParent).Init(refApp);
+      FjPRLayout:= jsTabLayout(FParent).View;
+  end else
+  if FParent is jsCollapsingToolbarLayout then
+  begin
+      if not jVisualControl(FParent).Initialized then jsCollapsingToolbarLayout(FParent).Init(refApp);
+      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
+  end else
+  if FParent is jsNestedScrollView then
+  begin
+      if not jVisualControl(FParent).Initialized then jsNestedScrollView(FParent).Init(refApp);
+      FjPRLayout:= jsNestedScrollView(FParent).View;
+  end else
+  if FParent is jsViewPager then
+  begin
+      if not jVisualControl(FParent).Initialized then jsViewPager(FParent).Init(refApp);
+      FjPRLayout:= jsViewPager(FParent).View;
+  end;
+ end;
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -2233,6 +2320,10 @@ begin
   if not Assigned(Form) then Exit;
 
   Form.UpdateJNI(gApp);
+
+  // Update width and height when rotating
+  gApp.Screen.WH  := jSysInfo_ScreenWH(env, this, gApp.GetContext);
+  Form.ScreenWH   := gApp.Screen.WH;
 
   if rotate = 1 then
      rotOrientation:= ssPortrait
