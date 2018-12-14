@@ -596,8 +596,6 @@ function jScrollView_GetBottom(env: PJNIEnv; _jscrollview: JObject): integer;
 function jScrollView_GetTop(env: PJNIEnv; _jscrollview: JObject): integer;
 function jScrollView_GetLeft(env: PJNIEnv; _jscrollview: JObject): integer;
 function jScrollView_GetRight(env: PJNIEnv; _jscrollview: JObject): integer;
-function jScrollView_getLParamWidth(env: PJNIEnv; _jscrollview: JObject): integer;
-function jScrollView_getLParamHeight(env: PJNIEnv; _jscrollview: JObject): integer;
 procedure jScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jscrollview: JObject; _value: boolean);
 
 { jPanel }
@@ -6232,28 +6230,6 @@ var
 begin
   jCls:= env^.GetObjectClass(env, _jscrollview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetRight', '()I');
-  Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jScrollView_getLParamWidth(env: PJNIEnv; _jscrollview: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscrollview);
-  jMethod:= env^.GetMethodID(env, jCls, 'getLParamWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jScrollView_getLParamHeight(env: PJNIEnv; _jscrollview: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscrollview);
-  jMethod:= env^.GetMethodID(env, jCls, 'getLParamHeight', '()I');
   Result:= env^.CallIntMethod(env, _jscrollview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;

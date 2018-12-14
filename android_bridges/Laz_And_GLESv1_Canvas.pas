@@ -1130,23 +1130,17 @@ end;
 function jCanvasES1.GetWidth: integer;
 begin
    Result:= FWidth;
-   if not FInitialized then exit;
-
-   Result:= jGLSurfaceView_getLParamWidth(FjEnv, FjObject );
-
-   if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+   if FInitialized then
+   begin
+      Result:= jGLSurfaceView_getLParamWidth(FjEnv, FjObject )
+   end;
 end;
 
 function jCanvasES1.GetHeight: integer;
 begin
    Result:= FHeight;
-   if not FInitialized then exit;
-
-   Result:= jGLSurfaceView_getLParamHeight(FjEnv, FjObject );
-
-   if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+   if FInitialized then
+      Result:= jGLSurfaceView_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jCanvasES1.UpdateLayout;

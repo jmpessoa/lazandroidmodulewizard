@@ -194,15 +194,7 @@ public class jScrollView extends ScrollView {
     
     public int GetRight() {
         return this.getRight();
-    }
-    
-    public int getLParamHeight() {
-		return  LAMWCommon.getLParamHeight();
-	}
-
-	public int getLParamWidth() {		
-	   return LAMWCommon.getLParamWidth();
-	}
+    }    
     
     public void DispatchOnScrollChangedEvent(boolean _value) {
     	mDispacthScrollChanged = _value;

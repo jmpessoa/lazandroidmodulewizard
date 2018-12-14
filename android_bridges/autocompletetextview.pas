@@ -768,23 +768,47 @@ end;
 function jAutoTextView.GetWidth: integer;
 begin
   Result:= FWidth;
-  if not FInitialized then exit;
-
-  Result:= jAutoTextView_GetLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetWidthOfParent(FParent);
+  if FInitialized then
+  begin
+     Result:= jAutoTextView_GetLParamWidth(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+           Result:= (FParent as jForm).ScreenWH.Width
+         else
+           Result:= (FParent as jForm).ScreenWH.Height;
+       end
+       else
+       begin
+           Result:= (FParent as jVisualControl).GetWidth;
+       end;
+     end;
+  end;
 end;
 
 function jAutoTextView.GetHeight: integer;
 begin
   Result:= FHeight;
-  if not FInitialized then exit;
-
-  Result:= jAutoTextView_GetLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+  if FInitialized then
+  begin
+     Result:= jAutoTextView_GetLParamHeight(FjEnv, FjObject );
+     if Result = -1 then //lpMatchParent
+     begin
+       if FParent is jForm then
+       begin
+          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
+             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
+          else
+             Result:= (FParent as jForm).ScreenWH.Width;
+       end
+       else
+       begin
+          Result:= (FParent as jVisualControl).GetHeight;
+       end;
+     end;
+  end;
 end;
 
 procedure jAutoTextView.ShowSoftInput();

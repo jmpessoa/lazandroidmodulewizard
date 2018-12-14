@@ -39,8 +39,8 @@ jsCoordinatorLayout = class(jVisualControl)
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
-    function GetWidth(): integer; override;
-    function GetHeight(): integer; override;
+    function GetLParamWidth(): integer;
+    function GetLParamHeight(): integer;
     procedure SetLGravity(_gravity: TLayoutGravity);
     procedure SetLWeight(_w: single);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -421,26 +421,18 @@ begin
      jsCoordinatorLayout_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
-function jsCoordinatorLayout.GetWidth(): integer;
+function jsCoordinatorLayout.GetLParamWidth(): integer;
 begin
-  Result:= FWidth;
-  if not FInitialized then exit;
-
-  Result:= jsCoordinatorLayout_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jsCoordinatorLayout_GetLParamWidth(FjEnv, FjObject);
 end;
 
-function jsCoordinatorLayout.GetHeight(): integer;
+function jsCoordinatorLayout.GetLParamHeight(): integer;
 begin
-  Result:= FHeight;
-  if not FInitialized then exit;
-
-  Result:= jsCoordinatorLayout_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jsCoordinatorLayout_GetLParamHeight(FjEnv, FjObject);
 end;
 
 procedure jsCoordinatorLayout.SetLGravity(_gravity: TLayoutGravity);

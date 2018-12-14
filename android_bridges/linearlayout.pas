@@ -40,8 +40,8 @@ jLinearLayout = class(jVisualControl)
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
-    function GetWidth(): integer; override;
-    function GetHeight(): integer; override;
+    function GetLParamWidth(): integer;
+    function GetLParamHeight(): integer;
     procedure SetLGravity(_gravity: TLayoutGravity);
     procedure SetLWeight(_w: single);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -423,26 +423,18 @@ begin
      jLinearLayout_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
-function jLinearLayout.GetWidth(): integer;
+function jLinearLayout.GetLParamWidth(): integer;
 begin
-  Result:= FWidth;
-  if not FInitialized then exit;
-
-  Result:= jLinearLayout_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent); 
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jLinearLayout_GetLParamWidth(FjEnv, FjObject);
 end;
 
-function jLinearLayout.GetHeight(): integer;
+function jLinearLayout.GetLParamHeight(): integer;
 begin
-  Result:= FHeight;
-  if not FInitialized then exit;
-
-  Result:= jLinearLayout_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jLinearLayout_GetLParamHeight(FjEnv, FjObject);
 end;
 
 procedure jLinearLayout.SetLGravity(_gravity: TLayoutGravity);
