@@ -39,8 +39,8 @@ jsAppBarLayout = class(jVisualControl)
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
-    function GetLParamWidth(): integer;
-    function GetLParamHeight(): integer;
+    function GetWidth(): integer; override;
+    function GetHeight(): integer; override;
     procedure SetLGravity(_g: integer);
     procedure SetLWeight(_w: single);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -418,18 +418,26 @@ begin
      jsAppBarLayout_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
-function jsAppBarLayout.GetLParamWidth(): integer;
+function jsAppBarLayout.GetWidth(): integer;
 begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jsAppBarLayout_GetLParamWidth(FjEnv, FjObject);
+  Result:= FWidth;
+  if not FInitialized then exit;
+
+  Result:= jsAppBarLayout_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetWidthOfParent(FParent);
 end;
 
-function jsAppBarLayout.GetLParamHeight(): integer;
+function jsAppBarLayout.GetHeight(): integer;
 begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jsAppBarLayout_GetLParamHeight(FjEnv, FjObject);
+  Result:= FHeight;
+  if not FInitialized then exit;
+
+  Result:= jsAppBarLayout_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jsAppBarLayout.SetLGravity(_g: integer);

@@ -1602,18 +1602,24 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
+
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp);  override;
+
     procedure SetFillViewport(fillenabled: boolean);
     procedure ScrollTo(_x: integer; _y: integer);
     procedure SmoothScrollTo(_x: integer; _y: integer);
     procedure SmoothScrollBy(_x: integer; _y: integer);
+    
     function GetScrollX(): integer;
     function GetScrollY(): integer;
     function GetBottom(): integer;
     function GetTop(): integer;
     function GetLeft(): integer;
     function GetRight(): integer;
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
+
     procedure DispatchOnScrollChangedEvent(_value: boolean);
     procedure GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
     procedure SetViewParent(Value: jObject);  override;
@@ -2035,6 +2041,8 @@ type
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 
   procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
+  function  sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
+  function  sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
 
   procedure DBListView_Log (msg: string);
 
@@ -2046,6 +2054,22 @@ uses
   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
   stoolbar, stablayout, snestedscrollview, sviewpager, radiogroup;
   {,And_log_h}  {for test}
+
+ function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
+ begin
+       if FParent is jForm then
+          Result:= (FParent as jForm).ScreenWH.Height - gapp.GetContextTop
+       else
+          Result:= (FParent as jVisualControl).GetHeight;
+ end;
+
+ function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
+ begin
+       if FParent is jForm then
+         Result:= (FParent as jForm).ScreenWH.Width
+       else
+         Result:= (FParent as jVisualControl).GetWidth;
+ end;
 
  procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
  begin
@@ -3786,47 +3810,23 @@ end;
 function jTextView.GetWidth: integer;
 begin
   Result:= FWidth;
-  if FInitialized then
-  begin
-     Result:= jTextView_getLParamWidth(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-           Result:= (FParent as jForm).ScreenWH.Width
-         else
-           Result:= (FParent as jForm).ScreenWH.Height;
-       end
-       else
-       begin
-           Result:= (FParent as jVisualControl).GetWidth;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jTextView_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetWidthOfParent(FParent);
 end;
 
 function jTextView.GetHeight: integer;
 begin
   Result:= FHeight;
-  if FInitialized then
-  begin
-     Result:= jTextView_getLParamHeight(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
-          else
-             Result:= (FParent as jForm).ScreenWH.Width;
-       end
-       else
-       begin
-          Result:= (FParent as jVisualControl).GetHeight;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jTextView_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jTextView.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
@@ -4716,47 +4716,23 @@ end;
 function jEditText.GetWidth: integer;
 begin
   Result:= FWidth;
-  if FInitialized then
-  begin
-     Result:= jEditText_getLParamWidth(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-           Result:= (FParent as jForm).ScreenWH.Width
-         else
-           Result:= (FParent as jForm).ScreenWH.Height;
-       end
-       else
-       begin
-          Result:= (FParent as jVisualControl).GetWidth;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jEditText_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetWidthOfParent(FParent);
 end;
 
 function jEditText.GetHeight: integer;
 begin
   Result:= FHeight;
-  if FInitialized then
-  begin
-     Result:= jEditText_getLParamHeight(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
-          else
-             Result:= (FParent as jForm).ScreenWH.Width;
-       end
-       else
-       begin
-          Result:= (FParent as jVisualControl).GetHeight;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jEditText_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jEditText.SetFontFromAssets(_fontName: string);
@@ -5216,47 +5192,23 @@ end;
 function jButton.GetWidth: integer;
 begin
   Result:= FWidth;
-  if FInitialized then
-  begin
-     Result:= jButton_getLParamWidth(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-           Result:= (FParent as jForm).ScreenWH.Width
-         else
-           Result:= (FParent as jForm).ScreenWH.Height;
-       end
-       else
-       begin
-           Result:= (FParent as jVisualControl).GetWidth;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jButton_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetWidthOfParent(FParent);
 end;
 
 function jButton.GetHeight: integer;
 begin
   Result:= FHeight;
-  if FInitialized then
-  begin
-     Result:= jButton_getLParamHeight(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
-          else
-             Result:= (FParent as jForm).ScreenWH.Width;
-       end
-       else
-       begin
-          Result:= (FParent as jVisualControl).GetHeight;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jButton_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
@@ -6828,47 +6780,23 @@ end;
 function jImageView.GetWidth: integer;
 begin
   Result:= FWidth;
-  if FInitialized then
-  begin
-     Result:= jImageView_getLParamWidth(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-           Result:= (FParent as jForm).ScreenWH.Width
-         else
-           Result:= (FParent as jForm).ScreenWH.Height;
-       end
-       else
-       begin
-           Result:= (FParent as jVisualControl).GetWidth;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jImageView_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetWidthOfParent(FParent);
 end;
 
 function jImageView.GetHeight: integer;
 begin
   Result:= FHeight;
-  if FInitialized then
-  begin
-     Result:= jImageView_getLParamHeight(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
-          else
-             Result:= (FParent as jForm).ScreenWH.Width;
-       end
-       else
-       begin
-          Result:= (FParent as jVisualControl).GetHeight;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jImageView_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jImageView.ResetAllRules();
@@ -8694,47 +8622,24 @@ end;
 function jListView.GetWidth: integer;
 begin
   Result:= FWidth;
-  if FInitialized then
-  begin
-     Result:= jListView_getLParamWidth(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-           Result:= (FParent as jForm).ScreenWH.Width
-         else
-           Result:= (FParent as jForm).ScreenWH.Height;
-       end
-       else
-       begin
-           Result:= (FParent as jVisualControl).GetWidth;
-       end;
-     end;
-  end;
+
+  if not FInitialized then exit;
+
+  Result:= jListView_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetWidthOfParent(FParent);
 end;
 
 function jListView.GetHeight: integer;
 begin
   Result:= FHeight;
-  if FInitialized then
-  begin
-     Result:= jListView_getLParamHeight(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-             Result:= (FParent as jForm).ScreenWH.Height   //take from start!
-          else
-             Result:= (FParent as jForm).ScreenWH.Width;
-       end
-       else
-       begin
-          Result:= (FParent as jVisualControl).GetHeight;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jListView_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetHeightOfParent(FParent);
 end;
 
 function jListView.GetTotalHeight: integer;
@@ -9293,6 +9198,28 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jScrollView_GetRight(FjEnv, FjObject);
+end;
+
+function jScrollView.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if not FInitialized then exit;
+
+  Result:= jScrollView_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetWidthOfParent(FParent);
+end;
+
+function jScrollView.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if not FInitialized then exit;
+
+  Result:= jScrollView_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jScrollView.DispatchOnScrollChangedEvent(_value: boolean);
@@ -10919,27 +10846,23 @@ end;
 function jView.GetWidth: integer;
 begin
    Result:= FWidth;
-   if FInitialized then
-   begin
-      Result:= jView_getLParamWidth(FjEnv, FjObject );
-      if Result = -1 then //lpMatchParent
-      begin
-          if FParent is jForm then Result:= (FParent as jForm).ScreenWH.Width
-          else Result:= Self.Parent.Width;
-      end;
-   end;
+   if not FInitialized then exit;
+
+   Result:= jView_getLParamWidth(FjEnv, FjObject );
+
+   if Result = -1 then //lpMatchParent
+    Result := sysGetWidthOfParent(FParent);
 end;
 
 function jView.GetHeight: integer;
 begin
    Result:= FHeight;
-   if FInitialized then
-      Result:= jView_getLParamHeight(FjEnv, FjObject );
+   if not FInitialized then exit;
+
+   Result:= jView_getLParamHeight(FjEnv, FjObject );
+
    if Result = -1 then //lpMatchParent
-   begin
-       if FParent is jForm then Result:= (FParent as jForm).ScreenWH.Height
-       else Result:= Self.Parent.Height;
-   end;
+    Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -12516,47 +12439,23 @@ end;
 function jPanel.GetWidth: integer;
 begin
   Result:= FWidth;
-  if FInitialized then
-  begin
-     Result:= jPanel_getLParamWidth(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-         if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-             Result:= (FParent as jForm).ScreenWH.Width
-         else
-             Result:= (FParent as jForm).ScreenWH.Height;
-       end
-       else
-       begin
-          Result:= (FParent as jVisualControl).GetWidth;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jPanel_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetWidthOfParent(FParent);
 end;
 
 function jPanel.GetHeight: integer;
 begin
   Result:= FHeight;
-  if FInitialized then
-  begin
-     Result:= jPanel_getLParamHeight(FjEnv, FjObject );
-     if Result = -1 then //lpMatchParent
-     begin
-       if FParent is jForm then
-       begin
-          if (FParent as jForm).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-             Result:= (FParent as jForm).ScreenWH.Height
-          else
-             Result:= (FParent as jForm).ScreenWH.Width;
-       end
-       else
-       begin
-          Result:= (FParent as jVisualControl).GetHeight;
-       end;
-     end;
-  end;
+  if not FInitialized then exit;
+
+  Result:= jPanel_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jPanel.ResetAllRules;

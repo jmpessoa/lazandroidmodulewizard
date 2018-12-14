@@ -6078,27 +6078,27 @@ begin
   case lpParam of
      lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];  //-1
      lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];  //-2
-     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide(paren, side)-14);
-     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide(paren, side)-14);
+     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide(paren, side));
+     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide(paren, side));
 
-     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide(paren, side)-14);
+     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide(paren, side));
 
-     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide(paren, side)-14);
-     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide(paren, side)-14);
-     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide(paren, side)-14);
-     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide(paren, side)-14);
-     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide(paren, side)-14);
-     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide(paren, side)-14);
-     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide(paren, side)-14);
+     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide(paren, side));
+     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide(paren, side));
+     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide(paren, side));
+     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide(paren, side));
+     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide(paren, side));
+     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide(paren, side));
+     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide(paren, side));
 
-     lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamByParentSide(paren, side)-14); //0.375
-     lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamByParentSide(paren, side)-14); //0.625
-     lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamByParentSide(paren, side)-14); //0.875
-     lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide(paren, side)-14); //0.167
-     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide(paren, side)-14); //0.833
-     lpNineTenthsOfParent:   Result:= Trunc((9/10)*GetParamByParentSide(paren, side)-14); //0.90
-     lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamByParentSide(paren, side)-14); //0.95
-     lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamByParentSide(paren, side)-14); //0.99
+     lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamByParentSide(paren, side)); //0.375
+     lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamByParentSide(paren, side)); //0.625
+     lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamByParentSide(paren, side)); //0.875
+     lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide(paren, side)); //0.167
+     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide(paren, side)); //0.833
+     lpNineTenthsOfParent:   Result:= Trunc((9/10)*GetParamByParentSide(paren, side)); //0.90
+     lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamByParentSide(paren, side)); //0.95
+     lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamByParentSide(paren, side)); //0.99
 
      lp16px: Result:= 16;
      lp24px: Result:= 24;
@@ -6124,27 +6124,27 @@ begin
   case lpParam of
      lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
      lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];
-     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide2(paren, side)-14); //0.66
-     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide2(paren, side)-14); //0.33
-     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide2(paren, side)-14); //0.50
+     lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide2(paren, side)); //0.66
+     lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide2(paren, side)); //0.33
+     lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide2(paren, side)); //0.50
 
-     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide2(paren, side)-14); //0.25
-     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide2(paren, side)-14); //0.125
-     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide2(paren, side)-14);  //0.20
-     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide2(paren, side)-14);  //0.40
-     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide2(paren, side)-14);  //0.60
+     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide2(paren, side)); //0.25
+     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide2(paren, side)); //0.125
+     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide2(paren, side));  //0.20
+     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide2(paren, side));  //0.40
+     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide2(paren, side));  //0.60
 
-     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide2(paren, side)-14); //0.75
-     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide2(paren, side)-14); //0.80
+     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide2(paren, side)); //0.75
+     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide2(paren, side)); //0.80
 
-     lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamByParentSide2(paren, side)-14); //0.375
-     lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamByParentSide2(paren, side)-14); //0.625
-     lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamByParentSide2(paren, side)-14); //0.875
-     lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide2(paren, side)-14); //0.167
-     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide2(paren, side)-14); //0.833
-     lpNineTenthsOfParent:    Result:= Trunc((9/10)*GetParamByParentSide2(paren, side)-14); //0.90
-     lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamByParentSide2(paren, side)-14);
-     lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamByParentSide2(paren, side)-14);
+     lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamByParentSide2(paren, side)); //0.375
+     lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamByParentSide2(paren, side)); //0.625
+     lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamByParentSide2(paren, side)); //0.875
+     lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamByParentSide2(paren, side)); //0.167
+     lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamByParentSide2(paren, side)); //0.833
+     lpNineTenthsOfParent:    Result:= Trunc((9/10)*GetParamByParentSide2(paren, side)); //0.90
+     lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamByParentSide2(paren, side));
+     lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamByParentSide2(paren, side));
 
      lp16px: Result:= 16;
      lp24px: Result:= 24;
@@ -6168,7 +6168,7 @@ function GetParamBySide(App:jApp; side: TSide): DWord;
 begin
    case side of
      sdW: Result:= App.Screen.WH.Width;
-     sdH: Result:= App.Screen.WH.Height;
+     sdH: Result:= App.Screen.WH.Height - app.GetContextTop;
    end;
 end;
 
@@ -6224,28 +6224,28 @@ begin
 
    lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
    lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];
-   lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamBySide(App, side)-14);
-   lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamBySide(App, side)-14);
+   lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamBySide(App, side));
+   lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamBySide(App, side));
 
-   lpHalfOfParent:         Result:= Trunc((1/2)*GetParamBySide(App, side)-14);
+   lpHalfOfParent:         Result:= Trunc((1/2)*GetParamBySide(App, side));
 
-   lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamBySide(App, side)-14);
-   lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamBySide(App, side)-14);
-   lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamBySide(App, side)-14);
-   lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamBySide(App, side)-14);
-   lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamBySide(App, side)-14);
-   lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamBySide(App, side)-14);
-   lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamBySide(App, side)-14);
+   lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamBySide(App, side));
+   lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamBySide(App, side));
+   lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamBySide(App, side));
+   lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamBySide(App, side));
+   lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamBySide(App, side));
+   lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamBySide(App, side));
+   lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamBySide(App, side));
 
-   lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamBySide(App, side)-14); //0.375
-   lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamBySide(App, side)-14); //0.625
-   lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamBySide(App, side)-14); //0.875
-   lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamBySide(App, side)-14); //0.167
-   lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamBySide(App, side)-14); //0.833
-   lpNineTenthsOfParent:   Result:= Trunc((9/10)*GetParamBySide(App, side)-14); //0.90
+   lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamBySide(App, side)); //0.375
+   lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamBySide(App, side)); //0.625
+   lpSevenEighthOfParent:  Result:= Trunc((7/8)*GetParamBySide(App, side)); //0.875
+   lpOneSixthOfParent:     Result:= Trunc((1/6)*GetParamBySide(App, side)); //0.167
+   lpFiveSixthOfParent:    Result:= Trunc((5/6)*GetParamBySide(App, side)); //0.833
+   lpNineTenthsOfParent:   Result:= Trunc((9/10)*GetParamBySide(App, side)); //0.90
 
-   lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamBySide(App, side)-14);
-   lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamBySide(App, side)-14);
+   lp95PercentOfParent:   Result:= Trunc((9.5/10)*GetParamBySide(App, side));
+   lp99PercentOfParent:   Result:= Trunc((9.9/10)*GetParamBySide(App, side));
 
    lp16px: Result:= 16;
    lp24px: Result:= 24;
@@ -6270,28 +6270,28 @@ begin
 
    lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
    lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];
-   lpTwoThirdOfParent:     Result:= Trunc((2/3)*L-14);
-   lpOneThirdOfParent:     Result:= Trunc((1/3)*L-14);
+   lpTwoThirdOfParent:     Result:= Trunc((2/3)*L);
+   lpOneThirdOfParent:     Result:= Trunc((1/3)*L);
 
-   lpHalfOfParent:         Result:= Trunc((1/2)*L-14);
+   lpHalfOfParent:         Result:= Trunc((1/2)*L);
 
-   lpOneQuarterOfParent:   Result:= Trunc((1/4)*L-14);
-   lpOneEighthOfParent:    Result:= Trunc((1/8)*L-14);
-   lpOneFifthOfParent:     Result:= Trunc((1/5)*L-14);
-   lpTwoFifthOfParent:     Result:= Trunc((2/5)*L-14);
-   lpThreeFifthOfParent:   Result:= Trunc((3/5)*L-14);
-   lpThreeQuarterOfParent: Result:= Trunc((3/4)*L-14);
-   lpFourFifthOfParent:    Result:= Trunc((4/5)*L-14);
+   lpOneQuarterOfParent:   Result:= Trunc((1/4)*L);
+   lpOneEighthOfParent:    Result:= Trunc((1/8)*L);
+   lpOneFifthOfParent:     Result:= Trunc((1/5)*L);
+   lpTwoFifthOfParent:     Result:= Trunc((2/5)*L);
+   lpThreeFifthOfParent:   Result:= Trunc((3/5)*L);
+   lpThreeQuarterOfParent: Result:= Trunc((3/4)*L);
+   lpFourFifthOfParent:    Result:= Trunc((4/5)*L);
 
-   lpThreeEighthOfParent:  Result:= Trunc((3/8)*L-14); //0.375
-   lpFiveEighthOfParent:   Result:= Trunc((5/8)*L-14); //0.625
-   lpSevenEighthOfParent:  Result:= Trunc((7/8)*L-14); //0.875
-   lpOneSixthOfParent:     Result:= Trunc((1/6)*L-14); //0.167
-   lpFiveSixthOfParent:    Result:= Trunc((5/6)*L-14); //0.833
-   lpNineTenthsOfParent:   Result:= Trunc((9/10)*L-14); //0.90
+   lpThreeEighthOfParent:  Result:= Trunc((3/8)*L); //0.375
+   lpFiveEighthOfParent:   Result:= Trunc((5/8)*L); //0.625
+   lpSevenEighthOfParent:  Result:= Trunc((7/8)*L); //0.875
+   lpOneSixthOfParent:     Result:= Trunc((1/6)*L); //0.167
+   lpFiveSixthOfParent:    Result:= Trunc((5/6)*L); //0.833
+   lpNineTenthsOfParent:   Result:= Trunc((9/10)*L); //0.90
 
-   lp95PercentOfParent:   Result:= Trunc((9.5/10)*L-14); //0.95
-   lp99PercentOfParent:   Result:= Trunc((9.9/10)*L-14); //0.99
+   lp95PercentOfParent:   Result:= Trunc((9.5/10)*L); //0.95
+   lp99PercentOfParent:   Result:= Trunc((9.9/10)*L); //0.99
 
    lp16px: Result:= 16;
    lp24px: Result:= 24;
