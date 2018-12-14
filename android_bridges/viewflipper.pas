@@ -42,8 +42,8 @@ jViewFlipper = class(jVisualControl)
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
-    function GetLParamWidth(): integer;
-    function GetLParamHeight(): integer;
+    function GetWidth(): integer; override;
+    function GetHeight(): integer; override;
     procedure SetLGravity(_g: integer);
     procedure SetLWeight(_w: single);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -425,18 +425,26 @@ begin
      jViewFlipper_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
-function jViewFlipper.GetLParamWidth(): integer;
+function jViewFlipper.GetWidth(): integer;
 begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jViewFlipper_GetLParamWidth(FjEnv, FjObject);
+  Result:= FWidth;
+  if not FInitialized then exit;
+
+  Result:= jViewFlipper_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetWidthOfParent(FParent);
 end;
 
-function jViewFlipper.GetLParamHeight(): integer;
+function jViewFlipper.GetHeight(): integer;
 begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jViewFlipper_GetLParamHeight(FjEnv, FjObject);
+  Result:= FHeight;
+  if not FInitialized then exit;
+
+  Result:= jViewFlipper_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jViewFlipper.SetLGravity(_g: integer);

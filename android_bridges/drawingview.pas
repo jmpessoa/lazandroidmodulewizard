@@ -595,37 +595,25 @@ begin
 end;
 
 function jDrawingView.GetWidth(): integer;
-var
-   r: DWord;
 begin
-   r:= FWidth;
-   if FInitialized then
-   begin
-      r:= jDrawingView_GetWidth(FjEnv, FjObject );
-      if r = TLayoutParamsArray[altMATCHPARENT] then //lpMatchParent
-      begin
-          if FParent is jForm then r:= (FParent as jForm).ScreenWH.Width
-          else r:= Self.Parent.Width;
-      end;
-   end;
-   Result:= r;
+  Result:= FWidth;
+  if not FInitialized then exit;
+
+  Result:= jDrawingView_GetWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetWidthOfParent(FParent);
 end;
 
 function jDrawingView.GetHeight(): integer;
-var
-  r: DWord;
 begin
-   r:= FHeight;
-   if FInitialized then
-   begin
-     r:= jDrawingView_GetHeight(FjEnv, FjObject );
-     if r = TLayoutParamsArray[altMATCHPARENT] then //lpMatchParent
-     begin
-       if FParent is jForm then r:= (FParent as jForm).ScreenWH.Height
-       else r:= Self.Parent.Height;
-     end;
-   end;
-   Result:= r;
+  Result:= FHeight;
+  if not FInitialized then exit;
+
+  Result:= jDrawingView_GetHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+   Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jDrawingView.DrawBitmap(_bitmap: jObject; _width: integer; _height: integer);

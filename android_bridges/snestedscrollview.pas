@@ -39,8 +39,8 @@ jsNestedScrollView = class(jVisualControl)
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
-    function GetLParamWidth(): integer;
-    function GetLParamHeight(): integer;
+    function GetWidth(): integer; override;
+    function GetHeight(): integer; override;
     procedure SetLGravity(_gravity: integer);
     procedure SetLWeight(_w: single);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -419,18 +419,26 @@ begin
      jsNestedScrollView_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
-function jsNestedScrollView.GetLParamWidth(): integer;
+function jsNestedScrollView.GetWidth(): integer;
 begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jsNestedScrollView_GetLParamWidth(FjEnv, FjObject);
+  Result:= FWidth;
+  if not FInitialized then exit;
+
+  Result:= jsNestedScrollView_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetWidthOfParent(FParent);
 end;
 
-function jsNestedScrollView.GetLParamHeight(): integer;
+function jsNestedScrollView.GetHeight(): integer;
 begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jsNestedScrollView_GetLParamHeight(FjEnv, FjObject);
+  Result:= FHeight;
+  if not FInitialized then exit;
+
+  Result:= jsNestedScrollView_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jsNestedScrollView.SetLGravity(_gravity: integer);
