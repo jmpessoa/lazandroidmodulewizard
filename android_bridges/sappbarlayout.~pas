@@ -1,4 +1,4 @@
-unit framelayout;
+unit sappbarlayout;
 
 {$mode delphi}
 
@@ -9,13 +9,14 @@ uses
 
 type
 
-{Draft Component code by "Lazarus Android Module Wizard" [12/13/2017 17:22:00]}
+{Draft Component code by "Lazarus Android Module Wizard" [1/3/2018 18:07:27]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
 {jVisualControl template}
 
-jFrameLayout = class(jVisualControl)
+jsAppBarLayout = class(jVisualControl)
  private
+    FFitsSystemWindows: boolean;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
@@ -29,12 +30,12 @@ jFrameLayout = class(jVisualControl)
     procedure UpdateLayout; override;
     procedure ClearLayout;
 
-    procedure GenEvent_OnClick(Obj: TObject);
+//    procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
-    function GetViewParent(): jObject;  override;
-    procedure RemoveFromViewParent(); override;
+    function GetParent(): jObject;
+    procedure RemoveFromViewParent();  override;
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
     procedure SetLParamHeight(_h: integer);
@@ -48,58 +49,63 @@ jFrameLayout = class(jVisualControl)
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayoutAll();
     procedure SetId(_id: integer);
+    procedure SetFitsSystemWindows(_value: boolean);
+    procedure SetBackgroundToPrimaryColor();
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
-    property OnClick: TOnNotify read FOnClick write FOnClick;
+    property FitsSystemWindows: boolean read FFitsSystemWindows write SetFitsSystemWindows;
+    //property OnClick: TOnNotify read FOnClick write FOnClick;
 
 end;
 
-function jFrameLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jFrameLayout_jFree(env: PJNIEnv; _jframelayout: JObject);
-procedure jFrameLayout_SetViewParent(env: PJNIEnv; _jframelayout: JObject; _viewgroup: jObject);
-function jFrameLayout_GetParent(env: PJNIEnv; _jframelayout: JObject): jObject;
-procedure jFrameLayout_RemoveFromViewParent(env: PJNIEnv; _jframelayout: JObject);
-function jFrameLayout_GetView(env: PJNIEnv; _jframelayout: JObject): jObject;
-procedure jFrameLayout_SetLParamWidth(env: PJNIEnv; _jframelayout: JObject; _w: integer);
-procedure jFrameLayout_SetLParamHeight(env: PJNIEnv; _jframelayout: JObject; _h: integer);
-function jFrameLayout_GetLParamWidth(env: PJNIEnv; _jframelayout: JObject): integer;
-function jFrameLayout_GetLParamHeight(env: PJNIEnv; _jframelayout: JObject): integer;
-procedure jFrameLayout_SetLGravity(env: PJNIEnv; _jframelayout: JObject; _g: integer);
-procedure jFrameLayout_SetLWeight(env: PJNIEnv; _jframelayout: JObject; _w: single);
-procedure jFrameLayout_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jframelayout: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jFrameLayout_AddLParamsAnchorRule(env: PJNIEnv; _jframelayout: JObject; _rule: integer);
-procedure jFrameLayout_AddLParamsParentRule(env: PJNIEnv; _jframelayout: JObject; _rule: integer);
-procedure jFrameLayout_SetLayoutAll(env: PJNIEnv; _jframelayout: JObject; _idAnchor: integer);
-procedure jFrameLayout_ClearLayoutAll(env: PJNIEnv; _jframelayout: JObject);
-procedure jFrameLayout_SetId(env: PJNIEnv; _jframelayout: JObject; _id: integer);
+function jsAppBarLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+procedure jsAppBarLayout_jFree(env: PJNIEnv; _jsappbarlayout: JObject);
+procedure jsAppBarLayout_SetViewParent(env: PJNIEnv; _jsappbarlayout: JObject; _viewgroup: jObject);
+function jsAppBarLayout_GetParent(env: PJNIEnv; _jsappbarlayout: JObject): jObject;
+procedure jsAppBarLayout_RemoveFromViewParent(env: PJNIEnv; _jsappbarlayout: JObject);
+function jsAppBarLayout_GetView(env: PJNIEnv; _jsappbarlayout: JObject): jObject;
+procedure jsAppBarLayout_SetLParamWidth(env: PJNIEnv; _jsappbarlayout: JObject; _w: integer);
+procedure jsAppBarLayout_SetLParamHeight(env: PJNIEnv; _jsappbarlayout: JObject; _h: integer);
+function jsAppBarLayout_GetLParamWidth(env: PJNIEnv; _jsappbarlayout: JObject): integer;
+function jsAppBarLayout_GetLParamHeight(env: PJNIEnv; _jsappbarlayout: JObject): integer;
+procedure jsAppBarLayout_SetLGravity(env: PJNIEnv; _jsappbarlayout: JObject; _g: integer);
+procedure jsAppBarLayout_SetLWeight(env: PJNIEnv; _jsappbarlayout: JObject; _w: single);
+procedure jsAppBarLayout_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jsappbarlayout: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+procedure jsAppBarLayout_AddLParamsAnchorRule(env: PJNIEnv; _jsappbarlayout: JObject; _rule: integer);
+procedure jsAppBarLayout_AddLParamsParentRule(env: PJNIEnv; _jsappbarlayout: JObject; _rule: integer);
+procedure jsAppBarLayout_SetLayoutAll(env: PJNIEnv; _jsappbarlayout: JObject; _idAnchor: integer);
+procedure jsAppBarLayout_ClearLayoutAll(env: PJNIEnv; _jsappbarlayout: JObject);
+procedure jsAppBarLayout_SetId(env: PJNIEnv; _jsappbarlayout: JObject; _id: integer);
+procedure jsAppBarLayout_SetFitsSystemWindows(env: PJNIEnv; _jsappbarlayout: JObject; _value: boolean);
+procedure jsAppBarLayout_SetBackgroundToPrimaryColor(env: PJNIEnv; _jsappbarlayout: JObject);
 
 
 implementation
 
 uses
-   customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
-   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
-   stoolbar, stablayout, snestedscrollview, sviewpager;
+  customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
+  sdrawerlayout, scollapsingtoolbarlayout, scardview,
+  stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;
 
-{---------  jFrameLayout  --------------}
+{---------  jsAppBarLayout  --------------}
 
-constructor jFrameLayout.Create(AOwner: TComponent);
+constructor jsAppBarLayout.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FMarginLeft   := 10;
-  FMarginTop    := 10;
-  FMarginBottom := 10;
-  FMarginRight  := 10;
-  FHeight       := 96; //??
-  FWidth        := 192; //??
+  FMarginLeft   := 0;
+  FMarginTop    := 0;
+  FMarginBottom := 0;
+  FMarginRight  := 0;
+  FHeight       := 40; //??
+  FWidth        := 100; //??
   FLParamWidth  := lpMatchParent;  //lpWrapContent
-  FLParamHeight := lpMatchParent;
+  FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= True;
 //your code here....
 end;
 
-destructor jFrameLayout.Destroy;
+destructor jsAppBarLayout.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
@@ -113,7 +119,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jFrameLayout.TryNewParent(refApp: jApp);
+procedure jsAppBarLayout.TryNewParent(refApp: jApp);
 begin
   if FParent is jPanel then
   begin
@@ -202,7 +208,7 @@ begin
   end;
 end;
 
-procedure jFrameLayout.Init(refApp: jApp);
+procedure jsAppBarLayout.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -220,9 +226,9 @@ begin
 
   FjPRLayoutHome:= FjPRLayout;
 
-  jFrameLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jFrameLayout_SetId(FjEnv, FjObject, Self.Id);
-  jFrameLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  jsAppBarLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
+  jsAppBarLayout_SetId(FjEnv, FjObject, Self.Id);
+  jsAppBarLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         GetLayoutParams(gApp, FLParamWidth, sdW),
                         GetLayoutParams(gApp, FLParamHeight, sdH));
@@ -236,41 +242,44 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jFrameLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsAppBarLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jFrameLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsAppBarLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jFrameLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsAppBarLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
+  if FFitsSystemWindows  then
+     jsAppBarLayout_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+
   View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 
-procedure jFrameLayout.SetColor(Value: TARGBColorBridge);
+procedure jsAppBarLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
-procedure jFrameLayout.SetVisible(Value : Boolean);
+procedure jsAppBarLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jFrameLayout.UpdateLParamWidth;
+procedure jsAppBarLayout.UpdateLParamWidth;
 var
   side: TSide;
 begin
@@ -279,19 +288,19 @@ begin
     if Self.Parent is jForm then
     begin
       if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jFrameLayout_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jsAppBarLayout_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
     end
     else
     begin
       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jFrameLayout_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
+        jsAppBarLayout_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
       else //lpMatchParent or others
-        jFrameLayout_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
+        jsAppBarLayout_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
     end;
   end;
 end;
 
-procedure jFrameLayout.UpdateLParamHeight;
+procedure jsAppBarLayout.UpdateLParamHeight;
 var
   side: TSide;
 begin
@@ -300,194 +309,203 @@ begin
     if Self.Parent is jForm then
     begin
       if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jFrameLayout_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jsAppBarLayout_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
     end
     else
     begin
       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jFrameLayout_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
+        jsAppBarLayout_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
       else //lpMatchParent and others
-        jFrameLayout_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
+        jsAppBarLayout_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
   end;
 end;
 
-procedure jFrameLayout.UpdateLayout;
+procedure jsAppBarLayout.UpdateLayout;
 begin
   if FInitialized then
   begin
     inherited UpdateLayout;
     UpdateLParamWidth;
     UpdateLParamHeight;
-  jFrameLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsAppBarLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
   end;
 end;
 
-procedure jFrameLayout.Refresh;
+procedure jsAppBarLayout.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jFrameLayout.ClearLayout;
+procedure jsAppBarLayout.ClearLayout;
 var
    rToP: TPositionRelativeToParent;
    rToA: TPositionRelativeToAnchorID;
 begin
- jFrameLayout_ClearLayoutAll(FjEnv, FjObject );
+ jsAppBarLayout_ClearLayoutAll(FjEnv, FjObject );
    for rToP := rpBottom to rpCenterVertical do
    begin
       if rToP in FPositionRelativeToParent then
-        jFrameLayout_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+        jsAppBarLayout_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
    end;
    for rToA := raAbove to raAlignRight do
    begin
      if rToA in FPositionRelativeToAnchor then
-       jFrameLayout_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       jsAppBarLayout_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
    end;
 end;
 
 //Event : Java -> Pascal
-procedure jFrameLayout.GenEvent_OnClick(Obj: TObject);
+(*
+procedure jsAppBarLayout.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
+*)
 
-function jFrameLayout.jCreate(): jObject;
+function jsAppBarLayout.jCreate(): jObject;
 begin
-   Result:= jFrameLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsAppBarLayout_jCreate(FjEnv, int64(Self), FjThis);
 end;
 
-procedure jFrameLayout.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jFrameLayout_jFree(FjEnv, FjObject);
-end;
-
-procedure jFrameLayout.SetViewParent(_viewgroup: jObject);
+procedure jsAppBarLayout.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsAppBarLayout_jFree(FjEnv, FjObject);
 end;
 
-function jFrameLayout.GetViewParent(): jObject;
+procedure jsAppBarLayout.SetViewParent(_viewgroup: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsAppBarLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+end;
+
+function jsAppBarLayout.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jFrameLayout_GetParent(FjEnv, FjObject);
+   Result:= jsAppBarLayout_GetParent(FjEnv, FjObject);
 end;
 
-procedure jFrameLayout.RemoveFromViewParent();
+procedure jsAppBarLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_RemoveFromViewParent(FjEnv, FjObject);
+     jsAppBarLayout_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
-function jFrameLayout.GetView(): jObject;
+function jsAppBarLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jFrameLayout_GetView(FjEnv, FjObject);
+   Result:= jsAppBarLayout_GetView(FjEnv, FjObject);
 end;
 
-procedure jFrameLayout.SetLParamWidth(_w: integer);
+procedure jsAppBarLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLParamWidth(FjEnv, FjObject, _w);
+     jsAppBarLayout_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
-procedure jFrameLayout.SetLParamHeight(_h: integer);
+procedure jsAppBarLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLParamHeight(FjEnv, FjObject, _h);
+     jsAppBarLayout_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
-function jFrameLayout.GetWidth(): integer;
+function jsAppBarLayout.GetWidth(): integer;
 begin
-  Result:= FWidth;
-  if not FInitialized then exit;
-
-  Result:= jFrameLayout_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jsAppBarLayout_GetLParamWidth(FjEnv, FjObject);
 end;
 
-function jFrameLayout.GetHeight(): integer;
+function jsAppBarLayout.GetHeight(): integer;
 begin
-  Result:= FHeight;
-  if not FInitialized then exit;
-
-  Result:= jFrameLayout_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jsAppBarLayout_GetLParamHeight(FjEnv, FjObject);
 end;
 
-procedure jFrameLayout.SetLGravity(_g: integer);
+procedure jsAppBarLayout.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLGravity(FjEnv, FjObject, _g);
+     jsAppBarLayout_SetLGravity(FjEnv, FjObject, _g);
 end;
 
-procedure jFrameLayout.SetLWeight(_w: single);
+procedure jsAppBarLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLWeight(FjEnv, FjObject, _w);
+     jsAppBarLayout_SetLWeight(FjEnv, FjObject, _w);
 end;
 
-procedure jFrameLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+procedure jsAppBarLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsAppBarLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
-procedure jFrameLayout.AddLParamsAnchorRule(_rule: integer);
+procedure jsAppBarLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsAppBarLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
-procedure jFrameLayout.AddLParamsParentRule(_rule: integer);
+procedure jsAppBarLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsAppBarLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
-procedure jFrameLayout.SetLayoutAll(_idAnchor: integer);
+procedure jsAppBarLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsAppBarLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jFrameLayout.ClearLayoutAll();
+procedure jsAppBarLayout.ClearLayoutAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_ClearLayoutAll(FjEnv, FjObject);
+     jsAppBarLayout_ClearLayoutAll(FjEnv, FjObject);
 end;
 
-procedure jFrameLayout.SetId(_id: integer);
+procedure jsAppBarLayout.SetId(_id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetId(FjEnv, FjObject, _id);
+     jsAppBarLayout_SetId(FjEnv, FjObject, _id);
 end;
 
-{-------- jFrameLayout_JNI_Bridge ----------}
+procedure jsAppBarLayout.SetFitsSystemWindows(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FFitsSystemWindows:= _value;
+  if FInitialized then
+     jsAppBarLayout_SetFitsSystemWindows(FjEnv, FjObject, _value);
+end;
 
-function jFrameLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+procedure jsAppBarLayout.SetBackgroundToPrimaryColor();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsAppBarLayout_SetBackgroundToPrimaryColor(FjEnv, FjObject);
+end;
+
+{-------- jsAppBarLayout_JNI_Bridge ----------}
+
+function jsAppBarLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -495,165 +513,155 @@ var
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFrameLayout_jCreate', '(J)Ljava/lang/Object;');
+  jMethod:= env^.GetMethodID(env, jCls, 'jsAppBarLayout_jCreate', '(J)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
-(*
-//Please, you need insert:
 
-public java.lang.Object jFrameLayout_jCreate(long _Self) {
-  return (java.lang.Object)(new jFrameLayout(this,_Self));
-}
-
-//to end of "public class Controls" in "Controls.java"
-*)
-
-
-procedure jFrameLayout_jFree(env: PJNIEnv; _jframelayout: JObject);
+procedure jsAppBarLayout_jFree(env: PJNIEnv; _jsappbarlayout: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jframelayout, jMethod);
+  env^.CallVoidMethod(env, _jsappbarlayout, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_SetViewParent(env: PJNIEnv; _jframelayout: JObject; _viewgroup: jObject);
+procedure jsAppBarLayout_SetViewParent(env: PJNIEnv; _jsappbarlayout: JObject; _viewgroup: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-function jFrameLayout_GetParent(env: PJNIEnv; _jframelayout: JObject): jObject;
+function jsAppBarLayout_GetParent(env: PJNIEnv; _jsappbarlayout: JObject): jObject;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-  Result:= env^.CallObjectMethod(env, _jframelayout, jMethod);
+  Result:= env^.CallObjectMethod(env, _jsappbarlayout, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_RemoveFromViewParent(env: PJNIEnv; _jframelayout: JObject);
+procedure jsAppBarLayout_RemoveFromViewParent(env: PJNIEnv; _jsappbarlayout: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jframelayout, jMethod);
+  env^.CallVoidMethod(env, _jsappbarlayout, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-function jFrameLayout_GetView(env: PJNIEnv; _jframelayout: JObject): jObject;
+function jsAppBarLayout_GetView(env: PJNIEnv; _jsappbarlayout: JObject): jObject;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jframelayout, jMethod);
+  Result:= env^.CallObjectMethod(env, _jsappbarlayout, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_SetLParamWidth(env: PJNIEnv; _jframelayout: JObject; _w: integer);
+procedure jsAppBarLayout_SetLParamWidth(env: PJNIEnv; _jsappbarlayout: JObject; _w: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_SetLParamHeight(env: PJNIEnv; _jframelayout: JObject; _h: integer);
+procedure jsAppBarLayout_SetLParamHeight(env: PJNIEnv; _jsappbarlayout: JObject; _h: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-function jFrameLayout_GetLParamWidth(env: PJNIEnv; _jframelayout: JObject): integer;
+function jsAppBarLayout_GetLParamWidth(env: PJNIEnv; _jsappbarlayout: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'GetLParamWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jframelayout, jMethod);
+  Result:= env^.CallIntMethod(env, _jsappbarlayout, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-function jFrameLayout_GetLParamHeight(env: PJNIEnv; _jframelayout: JObject): integer;
+function jsAppBarLayout_GetLParamHeight(env: PJNIEnv; _jsappbarlayout: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'GetLParamHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jframelayout, jMethod);
+  Result:= env^.CallIntMethod(env, _jsappbarlayout, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_SetLGravity(env: PJNIEnv; _jframelayout: JObject; _g: integer);
+procedure jsAppBarLayout_SetLGravity(env: PJNIEnv; _jsappbarlayout: JObject; _g: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].i:= _g;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_SetLWeight(env: PJNIEnv; _jframelayout: JObject; _w: single);
+procedure jsAppBarLayout_SetLWeight(env: PJNIEnv; _jsappbarlayout: JObject; _w: single);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].f:= _w;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLWeight', '(F)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jframelayout: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+procedure jsAppBarLayout_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jsappbarlayout: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 var
   jParams: array[0..5] of jValue;
   jMethod: jMethodID=nil;
@@ -665,80 +673,102 @@ begin
   jParams[3].i:= _bottom;
   jParams[4].i:= _w;
   jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_AddLParamsAnchorRule(env: PJNIEnv; _jframelayout: JObject; _rule: integer);
+procedure jsAppBarLayout_AddLParamsAnchorRule(env: PJNIEnv; _jsappbarlayout: JObject; _rule: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_AddLParamsParentRule(env: PJNIEnv; _jframelayout: JObject; _rule: integer);
+procedure jsAppBarLayout_AddLParamsParentRule(env: PJNIEnv; _jsappbarlayout: JObject; _rule: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_SetLayoutAll(env: PJNIEnv; _jframelayout: JObject; _idAnchor: integer);
+procedure jsAppBarLayout_SetLayoutAll(env: PJNIEnv; _jsappbarlayout: JObject; _idAnchor: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_ClearLayoutAll(env: PJNIEnv; _jframelayout: JObject);
+procedure jsAppBarLayout_ClearLayoutAll(env: PJNIEnv; _jsappbarlayout: JObject);
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jframelayout, jMethod);
+  env^.CallVoidMethod(env, _jsappbarlayout, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jFrameLayout_SetId(env: PJNIEnv; _jframelayout: JObject; _id: integer);
+procedure jsAppBarLayout_SetId(env: PJNIEnv; _jsappbarlayout: JObject; _id: integer);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jframelayout);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
-  env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jsAppBarLayout_SetFitsSystemWindows(env: PJNIEnv; _jsappbarlayout: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
+procedure jsAppBarLayout_SetBackgroundToPrimaryColor(env: PJNIEnv; _jsappbarlayout: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroudToPrimaryColor', '()V');
+  env^.CallVoidMethod(env, _jsappbarlayout, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.
