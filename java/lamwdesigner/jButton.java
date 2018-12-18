@@ -1,4 +1,4 @@
-package org.lamw.apptextureviewdemo1;
+package org.lamw.appeq2g;
 
 import java.lang.reflect.Field;
 
@@ -16,6 +16,7 @@ import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -335,6 +336,7 @@ public class jButton extends Button {
 		if  (this != null) {
 		   //mBackgroundColor = _color;
 	  	   this.setBackgroundColor(_color);
+	  	   //this.setAlpha(0.5f);
 		}   
 	}
 	
@@ -344,7 +346,8 @@ public class jButton extends Button {
     this.getBackground().setColorFilter(_color, android.graphics.PorterDuff.Mode.MULTIPLY);  
     //Set the color of the text displayed inside the button  
     //this.setTextColor(0xFF0000FF);  
-    //Render this Button again  
+    //Render this Button again 
+    //this.setAlpha(0.5f);
     this.invalidate();  
 	}
 	
@@ -392,4 +395,20 @@ public class jButton extends Button {
 		mEnable = _value;
 		this.setEnabled(_value);		
 	}
+
+  /* Pascal:
+     TFrameGravity = (fgNone,
+                   fgTopLeft, fgTopCenter, fgTopRight,
+                   fgBottomLeft, fgBottomCenter, fgBottomRight,
+                   fgCenter,
+                   fgCenterVerticalLeft, fgCenterVerticalRight
+                   );     
+   */
+   public void SetFrameGravity(int _value) {	   
+      LAMWCommon.setLGravity(_value);
+   }
+
+   public void SetFocus() {
+   	  this.requestFocus();
+   }
 }
