@@ -812,7 +812,7 @@ begin
   jListView_BT_connect.Visible := False;
   //jListView_BT_connect.UpdateLayout();
   jTV_BT_list.Visible := False;
-  //jTV_BT_list.ResetAllRules();
+  //jTV_BT_list.ClearLayout();
   //jTV_BT_list.UpdateLayout;
 end;
 
@@ -821,7 +821,7 @@ begin
   jListView_BT_connect.Visible := True;
   //jListView_BT_connect.UpdateLayout();
   jTV_BT_list.Visible := True;
-  //jTV_BT_list.ResetAllRules();
+  //jTV_BT_list.ClearLayout();
   //jTV_BT_list.UpdateLayout;
 end;
 

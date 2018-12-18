@@ -48,8 +48,9 @@ jGL2SurfaceView = class(jVisualControl)
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     procedure Refresh;
+
+    procedure ClearLayout();
     procedure UpdateLayout; override;
-    procedure ClearLayout;
 
     //procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
@@ -68,7 +69,6 @@ jGL2SurfaceView = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
     procedure SetId(_id: integer);
     procedure Pause();
     procedure Resume();
@@ -346,24 +346,6 @@ begin
   end
 end;
 
-procedure jGL2SurfaceView.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jGL2SurfaceView_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jGL2SurfaceView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jGL2SurfaceView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
-end;
-
 //Event : Java -> Pascal
 {
 procedure jGL2SurfaceView.GenEvent_OnClick(Obj: TObject);
@@ -481,11 +463,24 @@ begin
      jGL2SurfaceView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jGL2SurfaceView.ClearLayoutAll();
+procedure jGL2SurfaceView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jGL2SurfaceView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jGL2SurfaceView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jGL2SurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jGL2SurfaceView.SetId(_id: integer);

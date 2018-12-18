@@ -37,8 +37,7 @@ jsRecyclerView = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnRecyclerViewItemClick(Obj: TObject; itemIndex: integer; arrayContentCount: integer);
     //function jCreate(): jObject;
     function jCreate( _mode: integer; _direction: integer; _cols: integer): jObject;
@@ -57,7 +56,7 @@ jsRecyclerView = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure SetItemContentFormat(_delimitedContentFormat: string; _delimiter: string); overload;
     procedure SetItemContentFormat(_contentFormat: string); overload;
@@ -378,24 +377,6 @@ begin
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jsRecyclerView.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jsRecyclerView_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jsRecyclerView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jsRecyclerView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
-end;
-
 //Event : Java -> Pascal
 
 procedure jsRecyclerView.GenEvent_OnRecyclerViewItemClick(Obj: TObject; itemIndex: integer; arrayContentCount: integer);
@@ -519,11 +500,24 @@ begin
      jsRecyclerView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jsRecyclerView.ClearLayoutAll();
+procedure jsRecyclerView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jsRecyclerView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jsRecyclerView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jsRecyclerView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jsRecyclerView.SetId(_id: integer);

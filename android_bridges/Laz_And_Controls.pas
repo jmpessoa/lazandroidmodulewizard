@@ -178,7 +178,7 @@ type
      function GetWidth: integer;  override;
      function GetHeight: integer; override;
 
-     procedure ResetAllRules;
+     procedure ClearLayout;
      procedure RemoveFromViewParent;  override;
      procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
      procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
@@ -806,8 +806,9 @@ type
     destructor Destroy; override;
     procedure Init(refApp: jApp); override;
     procedure Refresh;
+    
+    procedure ClearLayout();
     procedure UpdateLayout; override;
-    procedure ClearLayout;
 
     procedure GenEvent_OnClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
     procedure GenEvent_OnLongClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
@@ -826,7 +827,7 @@ type
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+
     procedure SetId(_id: integer);
     function GetItemIndex(): integer;
     function GetItemCaption(): string;
@@ -910,7 +911,7 @@ type
     procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
     procedure MatchParent();
     procedure WrapParent();
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent; override;
@@ -1052,7 +1053,7 @@ type
     procedure LoadFromFile(_filename: string);  overload;
     procedure SaveToFile(_path: string; _filename: string);  overload;
     procedure SaveToFile(_filename: string); overload;
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -1137,7 +1138,7 @@ type
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetFontFromAssets(_fontName: string);
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -1184,7 +1185,7 @@ type
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetFontFromAssets(_fontName: string);
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -1227,7 +1228,7 @@ type
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetFontFromAssets(_fontName: string);
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -1266,7 +1267,10 @@ type
     Constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
     Procedure Refresh;
+
+    procedure ClearLayout;
     Procedure UpdateLayout(); override;
+    
     procedure Init(refApp: jApp); override;
     procedure Stop;
     procedure Start;
@@ -1325,7 +1329,7 @@ type
     function GetWidth: integer;     override;
 
     //by tre3
-    procedure ResetAllRules;
+    procedure ClearLayout;
 
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
@@ -1459,6 +1463,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Refresh;
+
+    procedure ClearLayout;
     procedure UpdateLayout(); override;
     procedure Init(refApp: jApp);  override;
 
@@ -1603,6 +1609,7 @@ type
     Destructor  Destroy; override;
     Procedure Refresh;
 
+    procedure ClearLayout;
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp);  override;
 
@@ -1648,7 +1655,10 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
+
+    procedure ClearLayout();
     Procedure UpdateLayout(); override;
+    
     procedure Init(refApp: jApp);  override;
     procedure ScrollTo(_x: integer; _y: integer);
     procedure SmoothScrollTo(_x: integer; _y: integer);
@@ -1694,6 +1704,8 @@ type
     Destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
+
+    procedure ClearLayout;
     Procedure UpdateLayout(); override;
 
     Procedure Navigate(url: string);
@@ -1803,6 +1815,8 @@ type
     function GetHeight: integer; override;
     procedure SetViewParent(Value: jObject);   override;
     procedure RemoveFromViewParent;  override;
+
+    procedure ClearLayout();
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
     Procedure SaveToFile(fileName:String);
@@ -1850,7 +1864,10 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
+
+    procedure ClearLayout;
     Procedure UpdateLayout(); override;
+    
     procedure Init(refApp: jApp); override;
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject); override;
@@ -3949,7 +3966,7 @@ begin
      jTextView_WrapParent(FjEnv, FjObject);
 end;
 
-procedure jTextView.ResetAllRules();
+procedure jTextView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -4795,7 +4812,7 @@ begin
      jEditText_SaveToFile(FjEnv, FjObject, _filename);
 end;
 
-procedure jEditText.ResetAllRules();
+procedure jEditText.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -5254,7 +5271,7 @@ begin
      jButton_SetEnabled(FjEnv, FjObject, Value);
 end;
 
-procedure jButton.ResetAllRules();
+procedure jButton.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -5633,7 +5650,7 @@ begin
      jCheckBox_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
-procedure jCheckBox.ResetAllRules();
+procedure jCheckBox.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -6037,7 +6054,7 @@ begin
      jRadioButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
-procedure jRadioButton.ResetAllRules();
+procedure jRadioButton.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -6377,6 +6394,29 @@ begin
       else //lpMatchParent and others
          jProgressBar_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jProgressBar.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jProgressBar_ClearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jProgressBar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jProgressBar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -6799,7 +6839,7 @@ begin
    Result := sysGetHeightOfParent(FParent);
 end;
 
-procedure jImageView.ResetAllRules();
+procedure jImageView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -8416,6 +8456,29 @@ begin
   end;
 end;
 
+procedure jListView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jListView_ClearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end;  
+
 procedure jListView.UpdateLayout();
 begin
   if FInitialized then
@@ -9117,6 +9180,29 @@ begin
   end;
 end;
 
+procedure jScrollView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+    //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jScrollView_ClearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end;
+
 procedure jScrollView.UpdateLayout();
 begin
   if FInitialized then
@@ -9479,6 +9565,29 @@ begin
        else //lpMatchParent and others
           jHorizontalScrollView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jHorizontalScrollView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jHorizontalScrollView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jHorizontalScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jHorizontalScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -9846,6 +9955,29 @@ begin
        else //lpMatchParent and others
           jWebView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jWebView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jWebView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jWebView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jWebView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -10832,6 +10964,28 @@ begin
   end;
 end;
 
+procedure jView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jView_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end; 
+
 procedure jView.UpdateLayout();
 begin
   if FInitialized then
@@ -11447,6 +11601,28 @@ begin
        else //lpMatchParent and others
           jImageBtn_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jImageBtn.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jImageBtn_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jImageBtn_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jImageBtn_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -12458,7 +12634,7 @@ begin
     Result := sysGetHeightOfParent(FParent);
 end;
 
-procedure jPanel.ResetAllRules;
+procedure jPanel.ClearLayout;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -13068,26 +13244,6 @@ begin
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jDBListView.ClearLayout;
-var
-  rToP: TPositionRelativeToParent;
-  rToA: TPositionRelativeToAnchorID;
-begin
-  jDBListView_ClearLayoutAll(FjEnv, FjObject);
-  for rToP := rpBottom to rpCenterVertical do
-  begin
-    if rToP in FPositionRelativeToParent then
-      jDBListView_AddLParamsParentRule(FjEnv, FjObject,
-        GetPositionRelativeToParent(rToP));
-  end;
-  for rToA := raAbove to raAlignRight do
-  begin
-    if rToA in FPositionRelativeToAnchor then
-      jDBListView_AddLParamsAnchorRule(FjEnv, FjObject,
-        GetPositionRelativeToAnchor(rToA));
-  end;
-end;
-
 //Event : Java -> Pascal
 procedure jDBListView.GenEvent_OnClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
 begin
@@ -13200,11 +13356,24 @@ begin
     jDBListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jDBListView.ClearLayoutAll();
+procedure jDBListView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jDBListView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jDBListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jDBListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jDBListView.SetId(_id: integer);

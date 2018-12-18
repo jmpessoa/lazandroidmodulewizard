@@ -31,8 +31,7 @@ jChronometer = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClick(Obj: TObject);
     procedure GenEvent_OnChronometerTick(Obj: TObject; elapsedTimeMillis: int64);
 
@@ -47,7 +46,7 @@ jChronometer = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure SetBaseElapsedRealtime();  overload;
     procedure SetBaseElapsedRealtime(_elapsedMillis: int64); overload;
@@ -349,24 +348,6 @@ begin
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jChronometer.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jChronometer_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jChronometer_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jChronometer_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
-end;
-
 //Event : Java -> Pascal
 procedure jChronometer.GenEvent_OnClick(Obj: TObject);
 begin
@@ -453,11 +434,24 @@ begin
      jChronometer_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jChronometer.ClearLayoutAll();
+procedure jChronometer.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jChronometer_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jChronometer_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jChronometer_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jChronometer.SetId(_id: integer);

@@ -146,9 +146,9 @@ begin
     ;
 
   end;
-  jPanel1.ResetAllRules;
-  jPanel2.ResetAllRules;
-  jPanel3.ResetAllRules;
+  jPanel1.ClearLayout;
+  jPanel2.ClearLayout;
+  jPanel3.ClearLayout;
 
   Self.UpdateLayout;
   jEditText1.SetFocus;
@@ -223,10 +223,10 @@ begin
 
   if rotate in [ssLandscape, ssPortrait] then
   begin
-    jPanel1.ResetAllRules;
-    jPanel2.ResetAllRules;
-    jPanel3.ResetAllRules;
-    jPanel5.ResetAllRules;
+    jPanel1.ClearLayout;
+    jPanel2.ClearLayout;
+    jPanel3.ClearLayout;
+    jPanel5.ClearLayout;
     Self.UpdateLayout;
   end;
 

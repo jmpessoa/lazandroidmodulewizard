@@ -34,8 +34,7 @@ jRatingBar = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnRatingBarChanged(Obj: TObject; rating: single);
 
     function jCreate( _numStars: integer; _step: single): jObject;
@@ -49,7 +48,7 @@ jRatingBar = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     function GetRating(): single;
     procedure SetRating(_rating: single);
@@ -360,24 +359,6 @@ begin
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jRatingBar.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jRatingBar_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jRatingBar_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jRatingBar_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
-end;
-
 //Event : Java -> Pascal
 
 procedure jRatingBar.GenEvent_OnRatingBarChanged(Obj: TObject; rating: single);
@@ -460,11 +441,24 @@ begin
      jRatingBar_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jRatingBar.ClearLayoutAll();
+procedure jRatingBar.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jRatingBar_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jRatingBar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jRatingBar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jRatingBar.SetId(_id: integer);

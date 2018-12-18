@@ -72,7 +72,7 @@ begin
      jPanel1.LayoutParamHeight:= lpOneQuarterOfParent; //lpOneThirdOfParent;
      jPanel1.LayoutParamWidth:= lpMatchParent;
      jPanel2.PosRelativeToAnchor:= [raBelow];
-     jPanel2.ResetAllRules;
+     jPanel2.ClearLayout;
   end
   else if  rotate = ssLandscape then//2 --> device on horizontal
   begin
@@ -80,7 +80,7 @@ begin
      jPanel1.LayoutParamHeight:= lpMatchParent;
      jPanel1.LayoutParamWidth:= lpOneThirdOfParent; //lpOneFifthOfParent; //lpOneThirdOfParent;
      jPanel2.PosRelativeToAnchor:= [raToRightOf,raAlignBaseline];
-     jPanel2.ResetAllRules;
+     jPanel2.ClearLayout;
   end;
 
   Self.UpdateLayout;

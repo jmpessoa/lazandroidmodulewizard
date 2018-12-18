@@ -28,8 +28,7 @@ jsBottomNavigationView = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClickNavigationViewItem(Sender: TObject; itemIndex: integer; itemCaption: string);
     function jCreate(): jObject;
     procedure jFree();
@@ -47,7 +46,7 @@ jsBottomNavigationView = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
 
     function GetMenu(): jObject;
@@ -373,24 +372,6 @@ begin
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jsBottomNavigationView.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jsBottomNavigationView_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jsBottomNavigationView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jsBottomNavigationView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
-end;
-
 //Event : Java -> Pascal
 procedure jsBottomNavigationView.GenEvent_OnClickNavigationViewItem(Sender: TObject; itemIndex: integer; itemCaption: string);
 begin
@@ -508,11 +489,24 @@ begin
      jsBottomNavigationView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jsBottomNavigationView.ClearLayoutAll();
+procedure jsBottomNavigationView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jsBottomNavigationView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jsBottomNavigationView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jsBottomNavigationView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jsBottomNavigationView.SetId(_id: integer);

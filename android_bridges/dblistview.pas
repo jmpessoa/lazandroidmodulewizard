@@ -47,8 +47,7 @@ type
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClickDBListItem(Obj: TObject; position: integer);
     procedure GenEvent_OnLongClickDBListItem(Obj: TObject; position: integer);
     function jCreate(): jObject;
@@ -66,7 +65,7 @@ type
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure UpdateView;
     //procedure SetItemsLayout(_value: integer);
@@ -483,26 +482,6 @@ begin
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jDBListView.ClearLayout;
-var
-  rToP: TPositionRelativeToParent;
-  rToA: TPositionRelativeToAnchorID;
-begin
-  jDBListView_ClearLayoutAll(FjEnv, FjObject);
-  for rToP := rpBottom to rpCenterVertical do
-  begin
-    if rToP in FPositionRelativeToParent then
-      jDBListView_AddLParamsParentRule(FjEnv, FjObject,
-        GetPositionRelativeToParent(rToP));
-  end;
-  for rToA := raAbove to raAlignRight do
-  begin
-    if rToA in FPositionRelativeToAnchor then
-      jDBListView_AddLParamsAnchorRule(FjEnv, FjObject,
-        GetPositionRelativeToAnchor(rToA));
-  end;
-end;
-
 //Event : Java -> Pascal
 procedure jDBListView.GenEvent_OnClickDBListItem(Obj: TObject; position: integer);
 begin
@@ -615,11 +594,24 @@ begin
     jDBListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jDBListView.ClearLayoutAll();
+procedure jDBListView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jDBListView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jDBListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jDBListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jDBListView.SetId(_id: integer);

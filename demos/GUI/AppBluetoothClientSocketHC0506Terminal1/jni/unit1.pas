@@ -193,24 +193,24 @@ end;
 procedure TAndroidModule1.Hide_BT_panel;
 begin
   jPanel_BT_connect.Visible := False;
-  jPanel_BT_connect.ResetAllRules;
+  jPanel_BT_connect.ClearLayout();
   jPanel_BT_connect.UpdateLayout();
   jTextView_Send.Anchor := nil;
   jTextView_Send.PosRelativeToParent := [rpTop, rpLeft];
   jTextView_Send.PosRelativeToAnchor := [];
-  jTextView_Send.ResetAllRules();
+  jTextView_Send.ClearLayout();
   jTextView_Send.UpdateLayout;
 end;
 
 procedure TAndroidModule1.Show_BT_panel;
 begin
   jPanel_BT_connect.Visible := True;
-  jPanel_BT_connect.ResetAllRules;
+  jPanel_BT_connect.ClearLayout;
   jPanel_BT_connect.UpdateLayout();
   jTextView_Send.Anchor := jPanel_BT_connect;
   jTextView_Send.PosRelativeToParent := [rpLeft];
   jTextView_Send.PosRelativeToAnchor := [raAlignBottom];
-  jTextView_Send.ResetAllRules();
+  jTextView_Send.ClearLayout();
   jTextView_Send.UpdateLayout;
 end;
 

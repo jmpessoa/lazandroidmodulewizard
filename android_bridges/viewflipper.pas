@@ -29,8 +29,7 @@ jViewFlipper = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClick(Obj: TObject);
     procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
 
@@ -50,7 +49,7 @@ jViewFlipper = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure SetAutoStart(_value: boolean);
     procedure SetFlipInterval(_milliseconds: integer);
@@ -347,24 +346,6 @@ begin
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jViewFlipper.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jViewFlipper_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jViewFlipper_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jViewFlipper_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
-end;
-
 //Event : Java -> Pascal
 procedure jViewFlipper.GenEvent_OnClick(Obj: TObject);
 begin
@@ -489,11 +470,24 @@ begin
      jViewFlipper_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jViewFlipper.ClearLayoutAll();
+procedure jViewFlipper.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jViewFlipper_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jViewFlipper_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jViewFlipper_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jViewFlipper.SetId(_id: integer);

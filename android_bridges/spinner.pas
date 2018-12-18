@@ -49,7 +49,10 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     procedure Refresh;
+
+    procedure ClearLayout();
     procedure UpdateLayout; override;
+    
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
@@ -130,6 +133,7 @@ procedure jSpinner_SetLParamHeight(env: PJNIEnv; _jspinner: JObject; _h: integer
 procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 procedure jSpinner_AddLParamsAnchorRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
 procedure jSpinner_AddLParamsParentRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
+procedure jSpinner_ClearLayoutAll(env: PJNIEnv; _JSpinner: JObject);
 procedure jSpinner_SetLayoutAll(env: PJNIEnv; _jspinner: JObject; _idAnchor: integer);
 procedure jSpinner_SetId(env: PJNIEnv; _jspinner: JObject; _id: integer);
 function jSpinner_GetSelectedItemPosition(env: PJNIEnv; _jspinner: JObject): integer;
@@ -463,6 +467,26 @@ begin
       else //lpMatchParent and others
          jSpinner_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jSpinner.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jSpinner_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jSpinner_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jSpinner_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -953,6 +977,16 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jSpinner_ClearLayoutAll(env: PJNIEnv; _JSpinner: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'clearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _jspinner, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure jSpinner_SetLayoutAll(env: PJNIEnv; _jspinner: JObject; _idAnchor: integer);
 var

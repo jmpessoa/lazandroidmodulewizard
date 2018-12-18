@@ -28,8 +28,7 @@ jsNestedScrollView = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     //procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
@@ -47,7 +46,7 @@ jsNestedScrollView = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure SetAppBarLayoutScrollingViewBehavior();
     procedure SetFitsSystemWindows(_value: boolean);
@@ -339,24 +338,6 @@ begin
     View_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jsNestedScrollView.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jsNestedScrollView_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jsNestedScrollView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jsNestedScrollView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
-end;
-
 //Event : Java -> Pascal
 (*
 procedure jsNestedScrollView.GenEvent_OnClick(Obj: TObject);
@@ -483,11 +464,24 @@ begin
      jsNestedScrollView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jsNestedScrollView.ClearLayoutAll();
+procedure jsNestedScrollView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jsNestedScrollView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jsNestedScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jsNestedScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jsNestedScrollView.SetId(_id: integer);
