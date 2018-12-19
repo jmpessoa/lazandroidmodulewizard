@@ -171,9 +171,6 @@ procedure jGL2SurfaceView_RequestRender(env: PJNIEnv; _jgl2surfaceview: JObject)
 
 implementation
 
-uses
-   customdialog;
-
 {---------  jGL2SurfaceView  --------------}
 
 constructor jGL2SurfaceView.Create(AOwner: TComponent);
@@ -212,28 +209,8 @@ begin
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
   if FParent <> nil then
-  begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-  end;
+   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
   jGL2SurfaceView_SetViewParent(FjEnv, FjObject, FjPRLayout);
   jGL2SurfaceView_SetId(FjEnv, FjObject, Self.Id);
   jGL2SurfaceView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,

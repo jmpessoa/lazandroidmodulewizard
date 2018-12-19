@@ -735,15 +735,6 @@ begin
   listPascal.Add(' ');
 
   listPascal.Add('implementation');
-  listPascal.Add(' ');
-  if Pos('jVisualControl', FProjectModel) > 0  then
-  begin
-  listPascal.Add('uses');
-  listPascal.Add('   customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,');
-  listPascal.Add('   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,');
-  listPascal.Add('   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;');
-  end;
-
   listPascal.Add('  ');
   listPascal.Add('{---------  '+  FJavaClassName +'  --------------}');
   listPascal.Add(' ');

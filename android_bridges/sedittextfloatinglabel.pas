@@ -76,9 +76,6 @@ procedure jsEditTextFloatingLabel_SetId(env: PJNIEnv; _jsedittextfloatinglabel: 
 
 implementation
 
-uses
-   customdialog;
-
 {---------  jsEditTextFloatingLabel  --------------}
 
 constructor jsEditTextFloatingLabel.Create(AOwner: TComponent);

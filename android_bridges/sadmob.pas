@@ -112,11 +112,6 @@ procedure jsAdMob_SetId(env: PJNIEnv; _jadmob: JObject; _id: integer);
 
 implementation
 
-uses
-   customdialog, viewflipper, toolbar, scoordinatorlayout,
-   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
-   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout, linearlayout;
-
 {---------  jFrameLayout  --------------}
 
 constructor jsAdMob.Create(AOwner: TComponent);
