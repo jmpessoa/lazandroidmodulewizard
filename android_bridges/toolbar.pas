@@ -34,8 +34,7 @@ jToolbar = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
@@ -53,7 +52,7 @@ jToolbar = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
 
     procedure SetTitle(_title: string);
@@ -330,15 +329,12 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jToolbar.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jToolbar_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jToolbar_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -351,15 +347,12 @@ begin
 end;
 
 procedure jToolbar.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jToolbar_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+     jToolbar_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -386,24 +379,6 @@ procedure jToolbar.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jToolbar.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jToolbar_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jToolbar_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jToolbar_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 //Event : Java -> Pascal
@@ -523,11 +498,24 @@ begin
      jToolbar_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jToolbar.ClearLayoutAll();
+procedure jToolbar.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jToolbar_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jToolbar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jToolbar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jToolbar.SetId(_id: integer);

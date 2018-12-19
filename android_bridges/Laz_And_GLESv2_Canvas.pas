@@ -301,6 +301,8 @@ Type
    Constructor Create(AOwner: TComponent); override;
    Destructor  Destroy; override;
    procedure Init(refApp: jApp); override;
+
+   procedure ClearLayout();
    Procedure UpdateLayout; override;
 
    function GetWidth: integer;  override;
@@ -2161,26 +2163,13 @@ end;
 
 (*
 procedure jCanvasES2.UpdateLParamWidth;
-var
-   side: TSide;
 begin
-  if jForm(Owner).ScreenStyle = gApp.Orientation then
-      side:= sdW
-  else
-      side:= sdH;
-
-  jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+  jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
 end;
 
 procedure jCanvasES2.UpdateLParamHeight;
-var
-   side: TSide;
 begin
-  if jForm(Owner).ScreenStyle = gApp.Orientation then
-    side:= sdH
-  else
-    side:= sdW;
-  jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+  jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
 end;
 
 function jCanvasES2.GetWidth: integer;
@@ -2200,15 +2189,12 @@ end;
 
 
 procedure jCanvasES2.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -2221,15 +2207,12 @@ begin
 end;
 
 procedure jCanvasES2.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -2261,6 +2244,25 @@ begin
 
   if Result = -1 then //lpMatchParent
    Result := sysGetHeightOfParent(FParent);
+end;
+
+procedure jCanvasES2.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if not FInitialized then exit;
+
+  jGLSurfaceView_ClearLayoutAll(FjEnv, FjObject);
+
+  for rToP := rpBottom to rpCenterVertical do
+    if rToP in FPositionRelativeToParent then
+       jGLSurfaceView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+  for rToA := raAbove to raAlignRight do
+    if rToA in FPositionRelativeToAnchor then
+       jGLSurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 end;
 
 procedure jCanvasES2.UpdateLayout();

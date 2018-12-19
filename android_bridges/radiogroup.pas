@@ -35,8 +35,7 @@ jRadioGroup = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
@@ -48,7 +47,7 @@ jRadioGroup = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure Check(_id: integer);
     procedure ClearCheck();
@@ -322,15 +321,12 @@ begin
 end;
 
 procedure jRadioGroup.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jRadioGroup_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jRadioGroup_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -343,15 +339,12 @@ begin
 end;
 
 procedure jRadioGroup.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jRadioGroup_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jRadioGroup_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -378,24 +371,6 @@ procedure jRadioGroup.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jRadioGroup.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jRadioGroup_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jRadioGroup_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jRadioGroup_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 //Event : Java -> Pascal
@@ -482,11 +457,24 @@ begin
      jRadioGroup_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jRadioGroup.ClearLayoutAll();
+procedure jRadioGroup.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jRadioGroup_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jRadioGroup_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jRadioGroup_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jRadioGroup.SetId(_id: integer);

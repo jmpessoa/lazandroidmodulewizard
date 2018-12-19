@@ -29,8 +29,7 @@ jViewFlipper = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClick(Obj: TObject);
     procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
 
@@ -50,7 +49,7 @@ jViewFlipper = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure SetAutoStart(_value: boolean);
     procedure SetFlipInterval(_milliseconds: integer);
@@ -289,15 +288,12 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jViewFlipper.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jViewFlipper_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jViewFlipper_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -310,15 +306,12 @@ begin
 end;
 
 procedure jViewFlipper.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jViewFlipper_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jViewFlipper_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -345,24 +338,6 @@ procedure jViewFlipper.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jViewFlipper.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jViewFlipper_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jViewFlipper_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jViewFlipper_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 //Event : Java -> Pascal
@@ -489,11 +464,24 @@ begin
      jViewFlipper_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jViewFlipper.ClearLayoutAll();
+procedure jViewFlipper.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jViewFlipper_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jViewFlipper_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jViewFlipper_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jViewFlipper.SetId(_id: integer);

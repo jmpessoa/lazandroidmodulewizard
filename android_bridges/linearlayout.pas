@@ -28,8 +28,9 @@ jLinearLayout = class(jVisualControl)
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     procedure Refresh;
+
+    procedure ClearLayout();
     procedure UpdateLayout; override;
-    procedure ClearLayout;
 
     //procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
@@ -48,7 +49,7 @@ jLinearLayout = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+
     procedure SetId(_id: integer);
     procedure SetOrientation(_orientation: TLinearLayoutOrientation);
 
@@ -285,15 +286,12 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jLinearLayout.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jLinearLayout_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jLinearLayout_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -306,15 +304,12 @@ begin
 end;
 
 procedure jLinearLayout.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jLinearLayout_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jLinearLayout_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -341,24 +336,6 @@ procedure jLinearLayout.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jLinearLayout.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jLinearLayout_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jLinearLayout_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jLinearLayout_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 (*
@@ -488,11 +465,24 @@ begin
      jLinearLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jLinearLayout.ClearLayoutAll();
+procedure jLinearLayout.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jLinearLayout_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jLinearLayout_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jLinearLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jLinearLayout.SetId(_id: integer);

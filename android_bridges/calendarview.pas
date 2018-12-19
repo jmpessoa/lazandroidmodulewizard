@@ -40,8 +40,7 @@ jCalendarView = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
@@ -59,7 +58,7 @@ jCalendarView = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure SetFirstDayOfWeek(_firstDayOfWeek: integer);
     function GetFirstDayOfWeek(): integer;
@@ -345,15 +344,12 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jCalendarView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jCalendarView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jCalendarView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -366,15 +362,12 @@ begin
 end;
 
 procedure jCalendarView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jCalendarView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jCalendarView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -401,24 +394,6 @@ procedure jCalendarView.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jCalendarView.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jCalendarView_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jCalendarView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jCalendarView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 //Event : Java -> Pascal
@@ -537,18 +512,44 @@ begin
      jCalendarView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jCalendarView.ClearLayoutAll();
+procedure jCalendarView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jCalendarView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jCalendarView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jCalendarView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jCalendarView.SetId(_id: integer);
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetId(FjEnv, FjObject, _id);
+  begin
+     jCalendarView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jCalendarView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jCalendarView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jCalendarView.SetFirstDayOfWeek(_firstDayOfWeek: integer);

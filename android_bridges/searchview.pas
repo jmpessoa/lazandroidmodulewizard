@@ -37,8 +37,7 @@ jSearchView = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
@@ -56,7 +55,7 @@ jSearchView = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     function GetQuery(): string;
     function GetQueryHint(): string;
@@ -298,15 +297,12 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jSearchView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jSearchView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jSearchView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -319,15 +315,12 @@ begin
 end;
 
 procedure jSearchView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jSearchView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jSearchView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -354,24 +347,6 @@ procedure jSearchView.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jSearchView.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jSearchView_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jSearchView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jSearchView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 //Event : Java -> Pascal
@@ -490,11 +465,24 @@ begin
      jSearchView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jSearchView.ClearLayoutAll();
+procedure jSearchView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jSearchView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jSearchView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jSearchView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jSearchView.SetId(_id: integer);

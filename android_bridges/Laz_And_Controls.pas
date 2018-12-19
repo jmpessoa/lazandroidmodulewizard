@@ -178,7 +178,7 @@ type
      function GetWidth: integer;  override;
      function GetHeight: integer; override;
 
-     procedure ResetAllRules;
+     procedure ClearLayout;
      procedure RemoveFromViewParent;  override;
      procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
      procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
@@ -806,8 +806,9 @@ type
     destructor Destroy; override;
     procedure Init(refApp: jApp); override;
     procedure Refresh;
+    
+    procedure ClearLayout();
     procedure UpdateLayout; override;
-    procedure ClearLayout;
 
     procedure GenEvent_OnClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
     procedure GenEvent_OnLongClickDBListItem(Obj: TObject; position: integer; itemCaption: string);
@@ -826,7 +827,7 @@ type
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+
     procedure SetId(_id: integer);
     function GetItemIndex(): integer;
     function GetItemCaption(): string;
@@ -910,7 +911,7 @@ type
     procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
     procedure MatchParent();
     procedure WrapParent();
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent; override;
@@ -1052,7 +1053,7 @@ type
     procedure LoadFromFile(_filename: string);  overload;
     procedure SaveToFile(_path: string; _filename: string);  overload;
     procedure SaveToFile(_filename: string); overload;
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -1137,7 +1138,7 @@ type
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetFontFromAssets(_fontName: string);
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -1184,7 +1185,7 @@ type
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetFontFromAssets(_fontName: string);
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -1227,7 +1228,7 @@ type
     procedure SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide); overload;
     procedure SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide); overload;
     procedure SetFontFromAssets(_fontName: string);
-    procedure ResetAllRules();
+    procedure ClearLayout();
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -1266,7 +1267,10 @@ type
     Constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
     Procedure Refresh;
+
+    procedure ClearLayout;
     Procedure UpdateLayout(); override;
+    
     procedure Init(refApp: jApp); override;
     procedure Stop;
     procedure Start;
@@ -1325,7 +1329,7 @@ type
     function GetWidth: integer;     override;
 
     //by tre3
-    procedure ResetAllRules;
+    procedure ClearLayout;
 
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
@@ -1459,6 +1463,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Refresh;
+
+    procedure ClearLayout;
     procedure UpdateLayout(); override;
     procedure Init(refApp: jApp);  override;
 
@@ -1603,6 +1609,7 @@ type
     Destructor  Destroy; override;
     Procedure Refresh;
 
+    procedure ClearLayout;
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp);  override;
 
@@ -1648,7 +1655,10 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
+
+    procedure ClearLayout();
     Procedure UpdateLayout(); override;
+    
     procedure Init(refApp: jApp);  override;
     procedure ScrollTo(_x: integer; _y: integer);
     procedure SmoothScrollTo(_x: integer; _y: integer);
@@ -1694,6 +1704,8 @@ type
     Destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     Procedure Refresh;
+
+    procedure ClearLayout;
     Procedure UpdateLayout(); override;
 
     Procedure Navigate(url: string);
@@ -1803,6 +1815,8 @@ type
     function GetHeight: integer; override;
     procedure SetViewParent(Value: jObject);   override;
     procedure RemoveFromViewParent;  override;
+
+    procedure ClearLayout();
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
     Procedure SaveToFile(fileName:String);
@@ -1850,7 +1864,10 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     Procedure Refresh;
+
+    procedure ClearLayout;
     Procedure UpdateLayout(); override;
+    
     procedure Init(refApp: jApp); override;
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject); override;
@@ -2103,6 +2120,11 @@ uses
   begin
     if not jVisualControl(FParent).Initialized then jToolbar(FParent).Init(refApp);
     FjPRLayout:= jToolbar(FParent).View;
+  end  else
+  if FParent is jsToolbar then
+  begin
+    jsToolbar(FParent).Init(refApp);
+    FjPRLayout:= jsToolbar(FParent).View;
   end  else
   if FParent is jsCoordinatorLayout then
   begin
@@ -3679,15 +3701,12 @@ begin
 end;
 
 procedure jTextView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -3700,15 +3719,12 @@ begin
 end;
 
 procedure jTextView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -3949,7 +3965,7 @@ begin
      jTextView_WrapParent(FjEnv, FjObject);
 end;
 
-procedure jTextView.ResetAllRules();
+procedure jTextView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -4499,15 +4515,12 @@ begin
 end;
 
 procedure jEditText.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -4524,15 +4537,12 @@ begin
 end;
 
 procedure jEditText.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -4795,7 +4805,7 @@ begin
      jEditText_SaveToFile(FjEnv, FjObject, _filename);
 end;
 
-procedure jEditText.ResetAllRules();
+procedure jEditText.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -5084,15 +5094,12 @@ begin
 end;
 
 procedure jButton.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW));
     end
     else
     begin
@@ -5105,15 +5112,12 @@ begin
 end;
 
 procedure jButton.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH));
     end
     else
     begin
@@ -5254,7 +5258,7 @@ begin
      jButton_SetEnabled(FjEnv, FjObject, Value);
 end;
 
-procedure jButton.ResetAllRules();
+procedure jButton.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -5546,15 +5550,12 @@ begin
 end;
 
 procedure jCheckBox.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -5567,15 +5568,12 @@ begin
 end;
 
 procedure jCheckBox.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -5633,7 +5631,7 @@ begin
      jCheckBox_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
-procedure jCheckBox.ResetAllRules();
+procedure jCheckBox.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -5950,15 +5948,12 @@ begin
 end;
 
 procedure jRadioButton.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -5971,15 +5966,12 @@ begin
 end;
 
 procedure jRadioButton.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -6037,7 +6029,7 @@ begin
      jRadioButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
-procedure jRadioButton.ResetAllRules();
+procedure jRadioButton.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -6338,15 +6330,12 @@ begin
 end;
 
 procedure jProgressBar.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-        jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -6360,15 +6349,12 @@ begin
 end;
 
 procedure jProgressBar.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -6377,6 +6363,29 @@ begin
       else //lpMatchParent and others
          jProgressBar_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jProgressBar.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jProgressBar_ClearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jProgressBar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jProgressBar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -6734,15 +6743,12 @@ begin
 end;
 
 procedure jImageView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -6755,15 +6761,12 @@ begin
 end;
 
 procedure jImageView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdH else side:= sdW;
-      jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+       jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -6799,7 +6802,7 @@ begin
    Result := sysGetHeightOfParent(FParent);
 end;
 
-procedure jImageView.ResetAllRules();
+procedure jImageView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -8375,15 +8378,12 @@ begin
 end;
 
 procedure jListView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -8396,15 +8396,12 @@ begin
 end;
 
 procedure jListView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -8415,6 +8412,29 @@ begin
     end;
   end;
 end;
+
+procedure jListView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jListView_ClearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end;  
 
 procedure jListView.UpdateLayout();
 begin
@@ -9076,15 +9096,12 @@ begin
 end;
 
 procedure jScrollView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+       jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -9097,15 +9114,12 @@ begin
 end;
 
 procedure jScrollView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+       jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -9114,6 +9128,29 @@ begin
        else //lpMatchParent and others
           jScrollView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jScrollView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+    //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jScrollView_ClearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -9441,15 +9478,12 @@ begin
 end;
 
 procedure jHorizontalScrollView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -9462,15 +9496,12 @@ begin
 end;
 
 procedure jHorizontalScrollView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -9479,6 +9510,29 @@ begin
        else //lpMatchParent and others
           jHorizontalScrollView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jHorizontalScrollView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jHorizontalScrollView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jHorizontalScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jHorizontalScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -9808,15 +9862,12 @@ begin
 end;
 
 procedure jWebView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -9829,15 +9880,12 @@ begin
 end;
 
 procedure jWebView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -9846,6 +9894,29 @@ begin
        else //lpMatchParent and others
           jWebView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jWebView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jWebView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jWebView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jWebView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -10791,15 +10862,12 @@ begin
 end;
 
 procedure jView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -10812,15 +10880,12 @@ begin
 end;
 
 procedure jView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -10831,6 +10896,28 @@ begin
     end;
   end;
 end;
+
+procedure jView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jView_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
+  end;
+end; 
 
 procedure jView.UpdateLayout();
 begin
@@ -11409,15 +11496,12 @@ begin
 end;
 
 procedure jImageBtn.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -11430,15 +11514,12 @@ begin
 end;
 
 procedure jImageBtn.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -11447,6 +11528,28 @@ begin
        else //lpMatchParent and others
           jImageBtn_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jImageBtn.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jImageBtn_ClearLayoutAll(FjEnv, FjObject);
+     for rToP := rpBottom to rpCenterVertical do
+     begin
+        if rToP in FPositionRelativeToParent then
+          jImageBtn_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+     end;
+     for rToA := raAbove to raAlignRight do
+     begin
+       if rToA in FPositionRelativeToAnchor then
+         jImageBtn_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     end;
   end;
 end;
 
@@ -12382,15 +12485,12 @@ begin
 end;
 
 procedure jPanel.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -12416,15 +12516,12 @@ begin
 end;
 
 procedure jPanel.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-       if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-       jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+       jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -12458,7 +12555,7 @@ begin
     Result := sysGetHeightOfParent(FParent);
 end;
 
-procedure jPanel.ResetAllRules;
+procedure jPanel.ClearLayout;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -12998,19 +13095,13 @@ begin
 end;
 
 procedure jDBListView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-        side := sdW
-      else
-        side := sdH;
       jDBListView_SetLParamWidth(FjEnv, FjObject,
-        GetLayoutParams(gApp, FLParamWidth, side));
+        GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -13025,19 +13116,13 @@ begin
 end;
 
 procedure jDBListView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-        side := sdH
-      else
-        side := sdW;
       jDBListView_SetLParamHeight(FjEnv, FjObject,
-        GetLayoutParams(gApp, FLParamHeight, side));
+        GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -13066,26 +13151,6 @@ procedure jDBListView.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jDBListView.ClearLayout;
-var
-  rToP: TPositionRelativeToParent;
-  rToA: TPositionRelativeToAnchorID;
-begin
-  jDBListView_ClearLayoutAll(FjEnv, FjObject);
-  for rToP := rpBottom to rpCenterVertical do
-  begin
-    if rToP in FPositionRelativeToParent then
-      jDBListView_AddLParamsParentRule(FjEnv, FjObject,
-        GetPositionRelativeToParent(rToP));
-  end;
-  for rToA := raAbove to raAlignRight do
-  begin
-    if rToA in FPositionRelativeToAnchor then
-      jDBListView_AddLParamsAnchorRule(FjEnv, FjObject,
-        GetPositionRelativeToAnchor(rToA));
-  end;
 end;
 
 //Event : Java -> Pascal
@@ -13200,11 +13265,24 @@ begin
     jDBListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jDBListView.ClearLayoutAll();
+procedure jDBListView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jDBListView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jDBListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jDBListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jDBListView.SetId(_id: integer);

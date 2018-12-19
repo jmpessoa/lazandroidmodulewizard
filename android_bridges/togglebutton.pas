@@ -30,7 +30,6 @@ type
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
     procedure GenEvent_OnClickToggleButton(Obj: TObject; state: boolean);
     function jCreate(): jObject;
     procedure jFree();
@@ -43,7 +42,7 @@ type
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure SetChecked(_value: boolean);
     procedure DispatchOnToggleEvent(_value: boolean);
@@ -294,15 +293,12 @@ begin
 end;
 
 procedure jToggleButton.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jToggleButton_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+       jToggleButton_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -315,15 +311,12 @@ begin
 end;
 
 procedure jToggleButton.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jToggleButton_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jToggleButton_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -350,24 +343,6 @@ procedure jToggleButton.Refresh;
 begin
   if FInitialized then
      View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jToggleButton.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jToggleButton_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jToggleButton_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jToggleButton_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 //Event : Java -> Pascal
@@ -458,11 +433,24 @@ begin
      jToggleButton_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jToggleButton.ClearLayoutAll();
+procedure jToggleButton.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jToggleButton_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jToggleButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jToggleButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jToggleButton.SetId(_id: integer);
