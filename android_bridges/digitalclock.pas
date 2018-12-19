@@ -284,15 +284,12 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jDigitalClock.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jDigitalClock_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jDigitalClock_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -305,15 +302,12 @@ begin
 end;
 
 procedure jDigitalClock.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jDigitalClock_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jDigitalClock_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin

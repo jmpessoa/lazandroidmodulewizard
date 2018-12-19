@@ -488,19 +488,13 @@ end;
 //==== end added by tintinux
 
 procedure jGridView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then
-        side := sdW
-      else
-        side := sdH;
       jGridView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp,
-        FLParamWidth, side));
+        FLParamWidth, sdw));
     end
     else
     begin
@@ -515,19 +509,13 @@ begin
 end;
 
 procedure jGridView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then
-        side := sdH
-      else
-        side := sdW;
       jGridView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp,
-        FLParamHeight, side));
+        FLParamHeight, sdh));
     end
     else
     begin

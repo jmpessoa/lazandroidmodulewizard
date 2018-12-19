@@ -893,15 +893,12 @@ begin
    listPascal.Add('end;');
 
    listPascal.Add('procedure '+FJavaClassName+'.UpdateLParamWidth;');
-   listPascal.Add('var');
-   listPascal.Add('  side: TSide;');
    listPascal.Add('begin');
    listPascal.Add('  if FInitialized then');
    listPascal.Add('  begin');
    listPascal.Add('    if Self.Parent is jForm then');
    listPascal.Add('    begin');
-   listPascal.Add('      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;');
-   listPascal.Add('      '+FJavaClassName+'_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));');
+   listPascal.Add('      '+FJavaClassName+'_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW));');
    listPascal.Add('    end');
    listPascal.Add('    else');
    listPascal.Add('    begin');
@@ -916,15 +913,12 @@ begin
    listPascal.Add('end;');
    listPascal.Add('   ');
    listPascal.Add('procedure '+FJavaClassName+'.UpdateLParamHeight;');
-   listPascal.Add('var');
-   listPascal.Add('  side: TSide;');
    listPascal.Add('begin');
    listPascal.Add('  if FInitialized then');
    listPascal.Add('  begin');
    listPascal.Add('    if Self.Parent is jForm then');
    listPascal.Add('    begin');
-   listPascal.Add('      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;');
-   listPascal.Add('      '+FJavaClassName+'_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));');
+   listPascal.Add('      '+FJavaClassName+'_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH));');
    listPascal.Add('    end');
    listPascal.Add('    else');
    listPascal.Add('    begin');

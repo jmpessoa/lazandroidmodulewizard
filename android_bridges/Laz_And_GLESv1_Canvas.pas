@@ -1108,25 +1108,13 @@ begin
 end;
 
 procedure jCanvasES1.UpdateLParamWidth;
-var
-   side: TSide;
 begin
-    if jForm(Owner).ScreenStyle = gApp.Orientation then
-      side:= sdW
-   else
-      side:= sdH;
-   jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+   jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
 end;
 
 procedure jCanvasES1.UpdateLParamHeight;
-var
-   side: TSide;
 begin
-   if jForm(Owner).ScreenStyle = gApp.Orientation then
-      side:= sdH
-   else
-      side:= sdW;
-  jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+  jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
 end;
 
 function jCanvasES1.GetWidth: integer;

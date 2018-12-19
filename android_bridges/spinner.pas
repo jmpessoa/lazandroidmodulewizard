@@ -429,15 +429,12 @@ begin
 end;
 
 procedure jSpinner.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -450,15 +447,12 @@ begin
 end;
 
 procedure jSpinner.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
