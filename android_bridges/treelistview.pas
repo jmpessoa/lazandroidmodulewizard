@@ -35,7 +35,7 @@ type
     function GetParentNode(id: integer): integer;
     function GetNodeData(id: integer): string;
     procedure SetNodeCaption(id: integer; caption: string);
-    procedure TryNewParent(refApp: jApp);
+    
  protected
      FjPRLayoutHome: jObject; //Save parent origin
  public
@@ -120,11 +120,7 @@ function jTreeListView_GetParentNode(env: PJNIEnv; _jtreelistview: JObject; _id:
 
 implementation
 
-uses
 
-   customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
-   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
-   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout{,And_log_h}  {for test};
 //-----------------------------------------------------------------------------
 //  For debug
 //-----------------------------------------------------------------------------
@@ -169,95 +165,6 @@ begin
   inherited Destroy;
 end;
 
-procedure jTreeListView.TryNewParent(refApp: jApp);
-begin
-  if FParent is jPanel then
-  begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end else
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end else
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end  else
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end else
-  if FParent is jViewFlipper then
-  begin
-    jViewFlipper(FParent).Init(refApp);
-    FjPRLayout:= jViewFlipper(FParent).View;
-  end else
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end  else
-  if FParent is jsToolbar then
-  begin
-    jsToolbar(FParent).Init(refApp);
-    FjPRLayout:= jsToolbar(FParent).View;
-  end  else
-  if FParent is jsCoordinatorLayout then
-  begin
-    jsCoordinatorLayout(FParent).Init(refApp);
-    FjPRLayout:= jsCoordinatorLayout(FParent).View;
-  end else
-  if FParent is jFrameLayout then
-  begin
-    jFrameLayout(FParent).Init(refApp);
-    FjPRLayout:= jFrameLayout(FParent).View;
-  end else
-  if FParent is jLinearLayout then
-  begin
-    jLinearLayout(FParent).Init(refApp);
-    FjPRLayout:= jLinearLayout(FParent).View;
-  end else
-  if FParent is jsDrawerLayout then
-  begin
-    jsDrawerLayout(FParent).Init(refApp);
-    FjPRLayout:= jsDrawerLayout(FParent).View;
-  end  else
-  if FParent is jsCardView then
-  begin
-      jsCardView(FParent).Init(refApp);
-      FjPRLayout:= jsCardView(FParent).View;
-  end else
-  if FParent is jsAppBarLayout then
-  begin
-      jsAppBarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsAppBarLayout(FParent).View;
-  end else
-  if FParent is jsTabLayout then
-  begin
-      jsTabLayout(FParent).Init(refApp);
-      FjPRLayout:= jsTabLayout(FParent).View;
-  end else
-  if FParent is jsCollapsingToolbarLayout then
-  begin
-      jsCollapsingToolbarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
-  end else
-  if FParent is jsNestedScrollView then
-  begin
-      jsNestedScrollView(FParent).Init(refApp);
-      FjPRLayout:= jsNestedScrollView(FParent).View;
-  end else
-  if FParent is jsViewPager then
-  begin
-      jsViewPager(FParent).Init(refApp);
-      FjPRLayout:= jsViewPager(FParent).View;
-  end;
-end;
-
 procedure jTreeListView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -270,9 +177,7 @@ begin
   FInitialized:= True;
 
   if FParent <> nil then
-  begin
-    TryNewParent(refApp);
-  end;
+   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
   FjPRLayoutHome:= FjPRLayout;
   jTreeListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
