@@ -989,7 +989,7 @@ var
   FormImportPicture: TFormImportPicture;
   i, count, p: integer;
   hasCopied: boolean;
-  pathToProject, importedFile, checkedTarget: string;
+  pathToProject, importedFile, checkedTarget, strTemp, imageExt: string;
 begin
   Project:= LazarusIDE.ActiveProject;
 
@@ -1008,6 +1008,19 @@ begin
 
          importedFile:= Lowercase(ReplaceChar(importedFile, '-', '_'));
          importedFile:= ReplaceChar(importedFile, ' ', '_');
+
+         if not (importedFile[1] in ['a'..'z', 'A'..'Z']) then
+         begin
+           importedFile:= 'im_'+ importedFile;  //the file name can not be init by number...
+         end;
+
+         if Length(importedFile) > 20 then
+         begin
+           p:= LastDelimiter('.', importedFile);
+           imageExt:= Copy(importedFile, p, MaxInt);
+           strTemp:= Copy(importedFile, 1, p-1);
+           importedFile:= Copy(strTemp, 1, 16) + imageExt;
+         end;
 
          hasCopied:= False;
          if FormImportPicture.CheckGroupTarget.Checked[0] then  //assets
@@ -1028,7 +1041,7 @@ begin
          end;
 
          if hasCopied then
-           ShowMessage('Success! "'+importedFile+'" copied to targets folders...')
+           ShowMessage('Success! "'+importedFile+'" copied/imported to targets folders...')
          else
            ShowMessage('Fail! None target folder  checked...')
 

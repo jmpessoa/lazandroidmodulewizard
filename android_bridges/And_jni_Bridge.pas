@@ -321,6 +321,7 @@ procedure jButton_SetEnabled(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 procedure jButton_ClearLayoutAll(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetFrameGravity(env: PJNIEnv; _jbutton: JObject; _value: integer);
 procedure jButton_RemoveFromViewParent(env: PJNIEnv; _jbutton: JObject);
+procedure jButton_SetFocus(env: PJNIEnv; _jbutton: JObject);
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -3305,6 +3306,17 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
  env^.CallVoidMethod(env,_jbutton,_jMethod);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jButton_SetFocus(env: PJNIEnv; _jbutton: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFocus', '()V');
+  env^.CallVoidMethod(env, _jbutton, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

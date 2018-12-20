@@ -1138,6 +1138,7 @@ type
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
     procedure ResetViewParent();  override;
+    procedure SetFocus();
 
   published
     property Text: string read GetText write SetText;
@@ -4996,6 +4997,13 @@ begin
   FGravityInParent:= _value;
   if FInitialized then
      jButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
+
+procedure jButton.SetFocus();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_SetFocus(FjEnv, FjObject);
 end;
 
 //------------------------------------------------------------------------------
