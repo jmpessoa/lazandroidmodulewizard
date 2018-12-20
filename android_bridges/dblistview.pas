@@ -37,7 +37,7 @@ type
     procedure SetVisible(Value: boolean);
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-    procedure TryNewParent(refApp: jApp);
+   
   protected
     FjPRLayoutHome: jObject; //Save parent origin
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -47,8 +47,7 @@ type
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClickDBListItem(Obj: TObject; position: integer);
     procedure GenEvent_OnLongClickDBListItem(Obj: TObject; position: integer);
     function jCreate(): jObject;
@@ -66,7 +65,7 @@ type
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     procedure UpdateView;
     //procedure SetItemsLayout(_value: integer);
@@ -128,11 +127,6 @@ procedure DBListView_Log (msg: string);
 
 implementation
 
-uses
-  customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
-  sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
-  stoolbar, stablayout, snestedscrollview, sviewpager, framelayout{,And_log_h}  {for test};
-
 //-----------------------------------------------------------------------------
 //  For debug
 //-----------------------------------------------------------------------------
@@ -178,95 +172,6 @@ begin
   inherited Destroy;
 end;
 
-procedure jDBListView.TryNewParent(refApp: jApp);
-begin
-  if FParent is jPanel then
-  begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end else
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end else
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end  else
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end else
-  if FParent is jViewFlipper then
-  begin
-    jViewFlipper(FParent).Init(refApp);
-    FjPRLayout:= jViewFlipper(FParent).View;
-  end else
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end  else
-  if FParent is jsToolbar then
-  begin
-    jsToolbar(FParent).Init(refApp);
-    FjPRLayout:= jsToolbar(FParent).View;
-  end  else
-  if FParent is jsCoordinatorLayout then
-  begin
-    jsCoordinatorLayout(FParent).Init(refApp);
-    FjPRLayout:= jsCoordinatorLayout(FParent).View;
-  end else
-  if FParent is jFrameLayout then
-  begin
-    jFrameLayout(FParent).Init(refApp);
-    FjPRLayout:= jFrameLayout(FParent).View;
-  end else
-  if FParent is jLinearLayout then
-  begin
-    jLinearLayout(FParent).Init(refApp);
-    FjPRLayout:= jLinearLayout(FParent).View;
-  end else
-  if FParent is jsDrawerLayout then
-  begin
-    jsDrawerLayout(FParent).Init(refApp);
-    FjPRLayout:= jsDrawerLayout(FParent).View;
-  end  else
-  if FParent is jsCardView then
-  begin
-      jsCardView(FParent).Init(refApp);
-      FjPRLayout:= jsCardView(FParent).View;
-  end else
-  if FParent is jsAppBarLayout then
-  begin
-      jsAppBarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsAppBarLayout(FParent).View;
-  end else
-  if FParent is jsTabLayout then
-  begin
-      jsTabLayout(FParent).Init(refApp);
-      FjPRLayout:= jsTabLayout(FParent).View;
-  end else
-  if FParent is jsCollapsingToolbarLayout then
-  begin
-      jsCollapsingToolbarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
-  end else
-  if FParent is jsNestedScrollView then
-  begin
-      jsNestedScrollView(FParent).Init(refApp);
-      FjPRLayout:= jsNestedScrollView(FParent).View;
-  end else
-  if FParent is jsViewPager then
-  begin
-      jsViewPager(FParent).Init(refApp);
-      FjPRLayout:= jsViewPager(FParent).View;
-  end;
-end;
-
 procedure jDBListView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -299,9 +204,8 @@ begin
 
   FInitialized := True;
   if FParent <> nil then
-  begin
-    TryNewParent(refApp);
-  end;
+   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
   FjPRLayoutHome:= FjPRLayout;
 
   jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
@@ -413,19 +317,13 @@ begin
 end;
 
 procedure jDBListView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-        side := sdW
-      else
-        side := sdH;
       jDBListView_SetLParamWidth(FjEnv, FjObject,
-        GetLayoutParams(gApp, FLParamWidth, side));
+        GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -440,19 +338,13 @@ begin
 end;
 
 procedure jDBListView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then
-        side := sdH
-      else
-        side := sdW;
       jDBListView_SetLParamHeight(FjEnv, FjObject,
-        GetLayoutParams(gApp, FLParamHeight, side));
+        GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -481,26 +373,6 @@ procedure jDBListView.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jDBListView.ClearLayout;
-var
-  rToP: TPositionRelativeToParent;
-  rToA: TPositionRelativeToAnchorID;
-begin
-  jDBListView_ClearLayoutAll(FjEnv, FjObject);
-  for rToP := rpBottom to rpCenterVertical do
-  begin
-    if rToP in FPositionRelativeToParent then
-      jDBListView_AddLParamsParentRule(FjEnv, FjObject,
-        GetPositionRelativeToParent(rToP));
-  end;
-  for rToA := raAbove to raAlignRight do
-  begin
-    if rToA in FPositionRelativeToAnchor then
-      jDBListView_AddLParamsAnchorRule(FjEnv, FjObject,
-        GetPositionRelativeToAnchor(rToA));
-  end;
 end;
 
 //Event : Java -> Pascal
@@ -615,11 +487,24 @@ begin
     jDBListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jDBListView.ClearLayoutAll();
+procedure jDBListView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jDBListView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jDBListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jDBListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jDBListView.SetId(_id: integer);

@@ -176,8 +176,8 @@ begin
        jPanel2.LayoutParamWidth:= lpTwoThirdOfParent;
        jPanel2.PosRelativeToAnchor:= [raToRightOf];
 
-       jPanel1.ResetAllRules;
-       jPanel2.ResetAllRules;
+       jPanel1.ClearLayout;
+       jPanel2.ClearLayout;
 
        Self.UpdateLayout;
     end;
@@ -203,8 +203,8 @@ begin
       jPanel2.LayoutParamWidth:= lpTwoThirdOfParent;
       jPanel2.PosRelativeToAnchor:= [raToRightOf];
 
-      jPanel1.ResetAllRules;
-      jPanel2.ResetAllRules;
+      jPanel1.ClearLayout;
+      jPanel2.ClearLayout;
 
     end
     else if rotate = ssPortrait  then //device is on Verical
@@ -216,8 +216,8 @@ begin
       jPanel2.LayoutParamWidth:= lpMatchParent;
       jPanel2.PosRelativeToAnchor:= [raBelow];
 
-      jPanel1.ResetAllRules;
-      jPanel2.ResetAllRules;
+      jPanel1.ClearLayout;
+      jPanel2.ClearLayout;
     end;
  end;
 

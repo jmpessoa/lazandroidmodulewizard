@@ -405,6 +405,7 @@ Procedure jProgressBar_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         ProgressBar : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jProgressBar_addLParamsParentRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 Procedure jProgressBar_addLParamsAnchorRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
+procedure jProgressBar_ClearLayoutAll(env: PJNIEnv; ProgressBar: JObject);
 Procedure jProgressBar_setLayoutAll(env:PJNIEnv; ProgressBar : jObject;  idAnchor: DWord);
 procedure jProgressBar_SetFrameGravity(env: PJNIEnv; ProgressBar: JObject; _value: integer);
 
@@ -512,6 +513,7 @@ Procedure jListView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         ListView : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jListView_addLParamsParentRule(env:PJNIEnv; ListView : jObject; rule: DWord);
 Procedure jListView_addLParamsAnchorRule(env:PJNIEnv; ListView : jObject; rule: DWord);
+procedure jListView_ClearLayoutAll(env: PJNIEnv; ListView: JObject);
 Procedure jListView_setLayoutAll(env:PJNIEnv; ListView : jObject;  idAnchor: DWord);
 procedure jListView_SetHighLightSelectedItemColor(env: PJNIEnv;  _jlistview: JObject; _color: integer);
 function jListView_GetItemIndex(env: PJNIEnv; _jlistview: JObject): integer;
@@ -585,6 +587,7 @@ Procedure jScrollView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 
 Procedure jScrollView_addLParamsParentRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jScrollView_addLParamsAnchorRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
+procedure jScrollView_clearLayoutAll(env: PJNIEnv; ScrollView: JObject);
 Procedure jScrollView_setLayoutAll(env:PJNIEnv; ScrollView : jObject;  idAnchor: DWord);
 //thanks to DonAlfredo
 Procedure jScrollView_setFillViewport  (env:PJNIEnv; ScrollView : jObject; fillenabled : boolean);
@@ -666,6 +669,7 @@ Procedure jHorizontalScrollView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 Procedure jHorizontalScrollView_addLParamsParentRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jHorizontalScrollView_addLParamsAnchorRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jHorizontalScrollView_setLayoutAll(env:PJNIEnv; ScrollView : jObject;  idAnchor: DWord);
+procedure jHorizontalScrollView_clearLayoutAll(env: PJNIEnv; _jhorizontalscrollview: JObject);
 
 procedure jHorizontalScrollView_ScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
 procedure jHorizontalScrollView_SmoothScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
@@ -694,6 +698,7 @@ Procedure jWebView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         WebView: jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jWebView_addLParamsParentRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 Procedure jWebView_addLParamsAnchorRule(env:PJNIEnv; WebView : jObject; rule: DWord);
+procedure jWebView_clearLayoutAll(env: PJNIEnv; WebView: JObject);
 Procedure jWebView_setLayoutAll(env:PJNIEnv; WebView : jObject;  idAnchor: DWord);
 procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject; _hostName: string; _hostDomain: string; _username: string; _password: string);
 procedure jWebView_LoadFromHtmlString(env: PJNIEnv; _jwebview: JObject; _htmlString: string);
@@ -791,6 +796,7 @@ Procedure jGLSurfaceView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         GLSurfaceView : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jGLSurfaceView_addLParamsParentRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
 Procedure jGLSurfaceView_addLParamsAnchorRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
+procedure jGLSurfaceView_ClearLayoutAll(env: PJNIEnv; GLSurfaceView: JObject);
 Procedure jGLSurfaceView_setLayoutAll(env:PJNIEnv; GLSurfaceView : jObject;  idAnchor: DWord);
 procedure jGLSurfaceView_Pause(env: PJNIEnv; _jglsurfaceview: JObject);
 procedure jGLSurfaceView_Resume(env: PJNIEnv; _jglsurfaceview: JObject);
@@ -816,6 +822,7 @@ Procedure jView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
 Procedure jView_addLParamsParentRule(env:PJNIEnv; View : jObject; rule: DWord);
 Procedure jView_addLParamsAnchorRule(env:PJNIEnv; View : jObject; rule: DWord);
 Procedure jView_setLayoutAll(env:PJNIEnv; View : jObject;  idAnchor: DWord);
+procedure jView_clearLayoutAll(env: PJNIEnv; View: JObject);
 function jView_getLParamHeight(env:PJNIEnv; View : jObject ): integer;
 function jView_getLParamWidth(env:PJNIEnv; View : jObject): integer;
 function jView_GetBitmap(env: PJNIEnv; _jview: JObject): jObject;
@@ -874,6 +881,7 @@ Procedure jImageBtn_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
                                         ImageBtn : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jImageBtn_addLParamsParentRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 Procedure jImageBtn_addLParamsAnchorRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
+procedure jImageBtn_ClearLayoutAll(env: PJNIEnv; _imagebtn: JObject);
 Procedure jImageBtn_setLayoutAll(env:PJNIEnv; ImageBtn : jObject;  idAnchor: DWord);
 procedure jImageBtn_SetFrameGravity(env: PJNIEnv; ImageBtn: JObject; _value: integer);
 procedure jImageBtn_RemoveFromViewParent(env: PJNIEnv; ImageBtn: JObject);
@@ -4152,6 +4160,17 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jProgressBar_ClearLayoutAll(env: PJNIEnv; ProgressBar: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, ProgressBar);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, ProgressBar, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 Procedure jProgressBar_setLayoutAll(env:PJNIEnv; ProgressBar : jObject;  idAnchor: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -5223,6 +5242,17 @@ _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsAnchorRule', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jListView_ClearLayoutAll(env: PJNIEnv; ListView: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, ListView);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, ListView, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 Procedure jListView_setLayoutAll(env:PJNIEnv; ListView : jObject;  idAnchor: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -6110,6 +6140,17 @@ _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jScrollView_clearLayoutAll(env: PJNIEnv; ScrollView: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, ScrollView);
+  jMethod:= env^.GetMethodID(env, jCls, 'clearLayoutAll', '()V');
+  env^.CallVoidMethod(env, ScrollView, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 Procedure jScrollView_setLayoutAll(env:PJNIEnv; ScrollView : jObject;  idAnchor: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -6889,6 +6930,17 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLayoutAll', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jHorizontalScrollView_clearLayoutAll(env: PJNIEnv; _jhorizontalscrollview: JObject);
+   var
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+   begin
+     jCls := env^.GetObjectClass(env, _jhorizontalscrollview);
+     jMethod := env^.GetMethodID(env, jCls, 'clearLayoutAll', '()V');
+     env^.CallVoidMethod(env, _jhorizontalscrollview, jMethod);
+     env^.DeleteLocalRef(env, jCls);
+end;
+
 procedure jHorizontalScrollView_ScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
 var
   jParams: array[0..1] of jValue;
@@ -7188,6 +7240,17 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
  env^.CallVoidMethodA(env,WebView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jWebView_clearLayoutAll(env: PJNIEnv; WebView: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, WebView);
+  jMethod:= env^.GetMethodID(env, jCls, 'clearLayoutAll', '()V');
+  env^.CallVoidMethod(env, WebView, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 Procedure jWebView_setLayoutAll(env:PJNIEnv; WebView : jObject;  idAnchor: DWord);
@@ -8172,6 +8235,17 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jGLSurfaceView_ClearLayoutAll(env: PJNIEnv; GLSurfaceView: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, GLSurfaceView);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, GLSurfaceView, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 Procedure jGLSurfaceView_setLayoutAll(env:PJNIEnv; GLSurfaceView : jObject;  idAnchor: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -8427,6 +8501,17 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
  env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jView_clearLayoutAll(env: PJNIEnv; View: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, View);
+  jMethod:= env^.GetMethodID(env, jCls, 'clearLayoutAll', '()V');
+  env^.CallVoidMethod(env, View, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jView_setLayoutAll(env:PJNIEnv; View : jObject;  idAnchor: DWord);
@@ -8991,6 +9076,17 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'addLParamsAnchorRule', '(I)V');
  env^.CallVoidMethodA(env,ImageBtn,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jImageBtn_ClearLayoutAll(env: PJNIEnv; _imagebtn: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _imagebtn);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _imagebtn, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 Procedure jImageBtn_setLayoutAll(env:PJNIEnv; ImageBtn : jObject;  idAnchor: DWord);

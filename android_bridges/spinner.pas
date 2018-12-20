@@ -43,13 +43,16 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
     //procedure ListViewChange  (Sender: TObject);  //TODO
-    procedure TryNewParent(refApp: jApp);
+    
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
     procedure Refresh;
+
+    procedure ClearLayout();
     procedure UpdateLayout; override;
+    
     function jCreate(): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
@@ -130,6 +133,7 @@ procedure jSpinner_SetLParamHeight(env: PJNIEnv; _jspinner: JObject; _h: integer
 procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 procedure jSpinner_AddLParamsAnchorRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
 procedure jSpinner_AddLParamsParentRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
+procedure jSpinner_ClearLayoutAll(env: PJNIEnv; _JSpinner: JObject);
 procedure jSpinner_SetLayoutAll(env: PJNIEnv; _jspinner: JObject; _idAnchor: integer);
 procedure jSpinner_SetId(env: PJNIEnv; _jspinner: JObject; _id: integer);
 function jSpinner_GetSelectedItemPosition(env: PJNIEnv; _jspinner: JObject): integer;
@@ -165,12 +169,6 @@ procedure jSpinner_SetFrameGravity(env: PJNIEnv; _jspinner: JObject; _value: int
 function jSpinner_GetParent(env: PJNIEnv; _jspinner: JObject): jObject;
 
 implementation
-
-uses
-   customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
-   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
-   stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;
-
 
 {---------  jSpinner  --------------}
 
@@ -224,95 +222,6 @@ begin
   inherited Destroy;
 end;
 
-procedure jSpinner.TryNewParent(refApp: jApp);
-begin
-  if FParent is jPanel then
-  begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end else
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end else
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end  else
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end else
-  if FParent is jViewFlipper then
-  begin
-    jViewFlipper(FParent).Init(refApp);
-    FjPRLayout:= jViewFlipper(FParent).View;
-  end else
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end  else
-  if FParent is jsToolbar then
-  begin
-    jsToolbar(FParent).Init(refApp);
-    FjPRLayout:= jsToolbar(FParent).View;
-  end  else
-  if FParent is jsCoordinatorLayout then
-  begin
-    jsCoordinatorLayout(FParent).Init(refApp);
-    FjPRLayout:= jsCoordinatorLayout(FParent).View;
-  end else
-  if FParent is jFrameLayout then
-  begin
-    jFrameLayout(FParent).Init(refApp);
-    FjPRLayout:= jFrameLayout(FParent).View;
-  end else
-  if FParent is jLinearLayout then
-  begin
-    jLinearLayout(FParent).Init(refApp);
-    FjPRLayout:= jLinearLayout(FParent).View;
-  end else
-  if FParent is jsDrawerLayout then
-  begin
-    jsDrawerLayout(FParent).Init(refApp);
-    FjPRLayout:= jsDrawerLayout(FParent).View;
-  end  else
-  if FParent is jsCardView then
-  begin
-      jsCardView(FParent).Init(refApp);
-      FjPRLayout:= jsCardView(FParent).View;
-  end else
-  if FParent is jsAppBarLayout then
-  begin
-      jsAppBarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsAppBarLayout(FParent).View;
-  end else
-  if FParent is jsTabLayout then
-  begin
-      jsTabLayout(FParent).Init(refApp);
-      FjPRLayout:= jsTabLayout(FParent).View;
-  end else
-  if FParent is jsCollapsingToolbarLayout then
-  begin
-      jsCollapsingToolbarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
-  end else
-  if FParent is jsNestedScrollView then
-  begin
-      jsNestedScrollView(FParent).Init(refApp);
-      FjPRLayout:= jsNestedScrollView(FParent).View;
-  end else
-  if FParent is jsViewPager then
-  begin
-      jsViewPager(FParent).Init(refApp);
-      FjPRLayout:= jsViewPager(FParent).View;
-  end;
-end;
-
 procedure jSpinner.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -326,9 +235,7 @@ begin
   FInitialized:= True;
 
   if FParent <> nil then
-  begin
-    TryNewParent(refApp);
-  end;
+   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
   FjPRLayoutHome:= FjPRLayout;
 
@@ -425,15 +332,12 @@ begin
 end;
 
 procedure jSpinner.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdW else side:= sdH;
-      jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, side));
+      jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -446,15 +350,12 @@ begin
 end;
 
 procedure jSpinner.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = gApp.Orientation then side:= sdH else side:= sdW;
-      jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, side));
+      jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -463,6 +364,26 @@ begin
       else //lpMatchParent and others
          jSpinner_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
     end;
+  end;
+end;
+
+procedure jSpinner.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jSpinner_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jSpinner_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jSpinner_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -953,6 +874,16 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jSpinner_ClearLayoutAll(env: PJNIEnv; _JSpinner: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  jMethod:= env^.GetMethodID(env, jCls, 'clearLayoutAll', '()V');
+  env^.CallVoidMethod(env, _jspinner, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure jSpinner_SetLayoutAll(env: PJNIEnv; _jspinner: JObject; _idAnchor: integer);
 var

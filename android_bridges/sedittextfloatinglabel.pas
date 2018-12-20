@@ -27,8 +27,7 @@ jsEditTextFloatingLabel = class(jVisualControl)
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
@@ -46,7 +45,7 @@ jsEditTextFloatingLabel = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
 
  published
@@ -76,9 +75,6 @@ procedure jsEditTextFloatingLabel_SetId(env: PJNIEnv; _jsedittextfloatinglabel: 
 
 
 implementation
-
-uses
-   customdialog;
 
 {---------  jsEditTextFloatingLabel  --------------}
 
@@ -195,15 +191,12 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jsEditTextFloatingLabel.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jsEditTextFloatingLabel_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jsEditTextFloatingLabel_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -216,15 +209,12 @@ begin
 end;
 
 procedure jsEditTextFloatingLabel.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jsEditTextFloatingLabel_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jsEditTextFloatingLabel_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -251,24 +241,6 @@ procedure jsEditTextFloatingLabel.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jsEditTextFloatingLabel.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jsEditTextFloatingLabel_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jsEditTextFloatingLabel_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jsEditTextFloatingLabel_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 //Event : Java -> Pascal
@@ -387,11 +359,24 @@ begin
      jsEditTextFloatingLabel_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jsEditTextFloatingLabel.ClearLayoutAll();
+procedure jsEditTextFloatingLabel.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsEditTextFloatingLabel_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jsEditTextFloatingLabel_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jsEditTextFloatingLabel_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jsEditTextFloatingLabel_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jsEditTextFloatingLabel.SetId(_id: integer);

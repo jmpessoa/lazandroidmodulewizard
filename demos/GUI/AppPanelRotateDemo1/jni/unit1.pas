@@ -86,10 +86,10 @@ begin
   if rotate in [ssLandscape, ssPortrait] then
   begin
 
-    jPanel1.ResetAllRules;
-    jPanel2.ResetAllRules;
-    jPanel3.ResetAllRules;
-    jPanel4.ResetAllRules;
+    jPanel1.ClearLayout;
+    jPanel2.ClearLayout;
+    jPanel3.ClearLayout;
+    jPanel4.ClearLayout;
 
     Self.UpdateLayout;
   end;

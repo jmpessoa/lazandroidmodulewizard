@@ -113,13 +113,13 @@ begin
 
      jPanel2.PosRelativeToAnchor:= [raBelow];
 
-     jPanel1.ResetAllRules;
-     jPanel2.ResetAllRules;
+     jPanel1.ClearLayout;
+     jPanel2.ClearLayout;
 
      jPanel4.PosRelativeToParent:= [rpBottom,rpLeft];
      jPanel5.PosRelativeToParent:= [rpBottom,rpRight];
-     jPanel4.ResetAllRules;
-     jPanel5.ResetAllRules;
+     jPanel4.ClearLayout;
+     jPanel5.ClearLayout;
 
    end;
    if rotate = 2 then
@@ -130,13 +130,13 @@ begin
 
      jPanel2.PosRelativeToAnchor:= [raToRightOf];
 
-     jPanel1.ResetAllRules;
-     jPanel2.ResetAllRules;
+     jPanel1.ClearLayout;
+     jPanel2.ClearLayout;
 
      jPanel4.PosRelativeToParent:= [rpCenterVertical,rpLeft];
      jPanel5.PosRelativeToParent:= [rpCenterVertical,rpRight];
-     jPanel4.ResetAllRules;
-     jPanel5.ResetAllRules;
+     jPanel4.ClearLayout;
+     jPanel5.ClearLayout;
 
    end;
    Self.UpdateLayout;

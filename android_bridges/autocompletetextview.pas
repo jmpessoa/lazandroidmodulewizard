@@ -31,7 +31,6 @@ jAutoTextView = class(jVisualControl)
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure UpdateLParamHeight;
     procedure UpdateLParamWidth;
-    procedure TryNewParent(refApp: jApp);
  protected
     //
  public
@@ -44,8 +43,7 @@ jAutoTextView = class(jVisualControl)
 
     procedure Refresh;
     procedure UpdateLayout; override;
-    procedure ClearLayout;
-
+    
     procedure GenEvent_OnClick(Obj: TObject);
     function jCreate(): jObject;
     procedure jFree();
@@ -59,7 +57,7 @@ jAutoTextView = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayoutAll();
+    procedure ClearLayout();
     procedure SetId(_id: integer);
     function GetItemIndex(): integer;
 
@@ -181,11 +179,6 @@ procedure jAutoTextView_SetFrameGravity(env: PJNIEnv; _jautotextview: JObject; _
 
 implementation
 
-uses
-  customdialog, viewflipper, toolbar, scoordinatorlayout, linearlayout,
-  sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
-  stoolbar, stablayout, snestedscrollview, sviewpager, framelayout;
-
 {---------  jAutoTextView  --------------}
 
 constructor jAutoTextView.Create(AOwner: TComponent);
@@ -229,95 +222,6 @@ begin
   inherited Destroy;
 end;
 
-procedure jAutoTextView.TryNewParent(refApp: jApp);
-begin
-  if FParent is jPanel then
-  begin
-    jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end else
-  if FParent is jScrollView then
-  begin
-    jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end else
-  if FParent is jHorizontalScrollView then
-  begin
-    jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end  else
-  if FParent is jCustomDialog then
-  begin
-    jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end else
-  if FParent is jViewFlipper then
-  begin
-    jViewFlipper(FParent).Init(refApp);
-    FjPRLayout:= jViewFlipper(FParent).View;
-  end else
-  if FParent is jToolbar then
-  begin
-    jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end  else
-  if FParent is jsToolbar then
-  begin
-    jsToolbar(FParent).Init(refApp);
-    FjPRLayout:= jsToolbar(FParent).View;
-  end  else
-  if FParent is jsCoordinatorLayout then
-  begin
-    jsCoordinatorLayout(FParent).Init(refApp);
-    FjPRLayout:= jsCoordinatorLayout(FParent).View;
-  end else
-  if FParent is jFrameLayout then
-  begin
-    jFrameLayout(FParent).Init(refApp);
-    FjPRLayout:= jFrameLayout(FParent).View;
-  end else
-  if FParent is jLinearLayout then
-  begin
-    jLinearLayout(FParent).Init(refApp);
-    FjPRLayout:= jLinearLayout(FParent).View;
-  end else
-  if FParent is jsDrawerLayout then
-  begin
-    jsDrawerLayout(FParent).Init(refApp);
-    FjPRLayout:= jsDrawerLayout(FParent).View;
-  end  else
-  if FParent is jsCardView then
-  begin
-      jsCardView(FParent).Init(refApp);
-      FjPRLayout:= jsCardView(FParent).View;
-  end else
-  if FParent is jsAppBarLayout then
-  begin
-      jsAppBarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsAppBarLayout(FParent).View;
-  end else
-  if FParent is jsTabLayout then
-  begin
-      jsTabLayout(FParent).Init(refApp);
-      FjPRLayout:= jsTabLayout(FParent).View;
-  end else
-  if FParent is jsCollapsingToolbarLayout then
-  begin
-      jsCollapsingToolbarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
-  end else
-  if FParent is jsNestedScrollView then
-  begin
-      jsNestedScrollView(FParent).Init(refApp);
-      FjPRLayout:= jsNestedScrollView(FParent).View;
-  end else
-  if FParent is jsViewPager then
-  begin
-      jsViewPager(FParent).Init(refApp);
-      FjPRLayout:= jsViewPager(FParent).View;
-  end;
-end;
-
 procedure jAutoTextView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
@@ -331,9 +235,7 @@ begin
   FInitialized:= True;
 
   if FParent <> nil then
-  begin
-    TryNewParent(refApp);
-  end;
+   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
   FjPRLayoutHome:= FjPRLayout;
 
@@ -413,15 +315,12 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 procedure jAutoTextView.UpdateLParamWidth;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart  then side:= sdW else side:= sdH;
-      jAutoTextView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, side));
+      jAutoTextView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
     end
     else
     begin
@@ -434,15 +333,12 @@ begin
 end;
 
 procedure jAutoTextView.UpdateLParamHeight;
-var
-  side: TSide;
 begin
   if FInitialized then
   begin
     if Self.Parent is jForm then
     begin
-      if jForm(Owner).ScreenStyle = (FParent as jForm).ScreenStyleAtStart then side:= sdH else side:= sdW;
-      jAutoTextView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, side));
+      jAutoTextView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
     end
     else
     begin
@@ -469,24 +365,6 @@ procedure jAutoTextView.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
-end;
-
-procedure jAutoTextView.ClearLayout;
-var
-   rToP: TPositionRelativeToParent;
-   rToA: TPositionRelativeToAnchorID;
-begin
- jAutoTextView_ClearLayoutAll(FjEnv, FjObject );
-   for rToP := rpBottom to rpCenterVertical do
-   begin
-      if rToP in FPositionRelativeToParent then
-        jAutoTextView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-   end;
-   for rToA := raAbove to raAlignRight do
-   begin
-     if rToA in FPositionRelativeToAnchor then
-       jAutoTextView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-   end;
 end;
 
 //Event : Java -> Pascal
@@ -570,11 +448,24 @@ begin
      jAutoTextView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
-procedure jAutoTextView.ClearLayoutAll();
+procedure jAutoTextView.ClearLayout();
+var
+  rToP: TPositionRelativeToParent;
+  rToA: TPositionRelativeToAnchorID;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_ClearLayoutAll(FjEnv, FjObject);
+  begin
+     jAutoTextView_clearLayoutAll(FjEnv, FjObject);
+
+     for rToP := rpBottom to rpCenterVertical do
+        if rToP in FPositionRelativeToParent then
+          jAutoTextView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+
+     for rToA := raAbove to raAlignRight do
+       if rToA in FPositionRelativeToAnchor then
+         jAutoTextView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+  end;
 end;
 
 procedure jAutoTextView.SetId(_id: integer);
