@@ -1,6 +1,7 @@
 package com.example.appsharefiledemo1;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -122,22 +123,27 @@ public class jTextFileManager /*extends ...*/ {
    }
      
    public String LoadFromFile(String _path, String _filename) {
-	     char buf[] = new char[512];
-	     FileReader rdr;
-	     String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
-	     try {                  // Environment.getExternalStorageDirectory().getPath() --> /sdcard
-	         rdr = new FileReader(_path+"/"+_filename);
-	         int s = rdr.read(buf);
-	         for(int k = 0; k < s; k++){
-	             contents+=buf[k];
-	         }
-	         
-	         rdr.close();
-	     } catch (Exception e) {
-	         e.printStackTrace();
-	     }
-	     return contents;
-	   }
+	   File file = new File(_path, _filename);
+	   if(file.exists())  {
+             //Read text from file
+           StringBuilder text = new StringBuilder();
+           try {
+               BufferedReader br = new BufferedReader(new FileReader(file));
+               String line;
+
+               while ((line = br.readLine()) != null) {
+                   text.append(line);
+                   text.append('\n');
+               }
+               br.close();
+           }
+           catch (IOException e) {
+               //You'll need to add proper error handling here
+           }
+           return text.toString();       
+       }
+	   else return "";
+	}
    
    //http://manojprasaddevelopers.blogspot.com.br/search/label/Write%20and%20ReadFile
       
@@ -154,22 +160,29 @@ public class jTextFileManager /*extends ...*/ {
       }
    }
    
-   public String LoadFromSdCard(String _filename){
-     char buf[] = new char[512];
-     FileReader rdr;
-     String contents = "";  //new File(Environment.getExternalStorageDirectory(), "alert.txt");
-     try {  // Environment.getExternalStorageDirectory().getPath() --> /sdcard
-         rdr = new FileReader(Environment.getExternalStorageDirectory().getPath()+"/"+_filename);
-         int s = rdr.read(buf);
-         for(int k = 0; k < s; k++){
-             contents+=buf[k];
-         }
-         
-         rdr.close();
-     } catch (Exception e) {
-         e.printStackTrace();
-     }
-     return contents;
+   public String LoadFromSdCard(String _filename){	   
+	   File sdcard = Environment.getExternalStorageDirectory();
+ 	   //Get the text file
+	   File file = new File(sdcard,_filename);	   
+	   if(file.exists())  {
+             //Read text from file
+           StringBuilder text = new StringBuilder();
+           try {
+               BufferedReader br = new BufferedReader(new FileReader(file));
+               String line;
+
+               while ((line = br.readLine()) != null) {
+                   text.append(line);
+                   text.append('\n');
+               }
+               br.close();
+           }
+           catch (IOException e) {        	  
+               //You'll need to add proper error handling here
+           }
+           return text.toString();       
+       }
+	   else return "";
    }
    
    //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/    

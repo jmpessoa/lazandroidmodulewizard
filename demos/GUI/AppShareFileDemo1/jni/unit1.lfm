@@ -1,28 +1,32 @@
 object AndroidModule1: TAndroidModule1
-  Left = 498
-  Top = 74
+  Left = 355
+  Top = 92
   Width = 300
-  Height = 600
+  Height = 650
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jButton1: jButton
     Left = 2
-    Top = 76
-    Width = 294
-    Height = 40
+    Top = 82
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jCheckBox1
+    Id = 6773564
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -32,20 +36,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
-    Id = 6773564
   end
   object jButton2: jButton
     Left = 2
-    Top = 124
-    Width = 294
-    Height = 40
+    Top = 147
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton1
+    Id = 8260831
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -55,44 +61,47 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
-    Id = 8260831
   end
   object jTextView1: jTextView
-    Left = 90
+    Left = 67
     Top = 5
-    Width = 119
-    Height = 20
+    Width = 165
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 2106793
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App ShareFile Demo'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrTomato
     FontSize = 0
     TextTypeFace = tfBold
     FontSizeUnit = unitDefault
-    Id = 2106793
+    GravityInParent = lgNone
   end
   object jButton3: jButton
     Left = 2
-    Top = 172
-    Width = 294
-    Height = 40
+    Top = 212
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton2
+    Id = 9840640
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -102,20 +111,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton3Click
-    Id = 9840640
   end
   object jButton4: jButton
     Left = 2
-    Top = 220
-    Width = 294
-    Height = 40
+    Top = 277
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton3
+    Id = 8892839
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -125,20 +136,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton4Click
-    Id = 8892839
   end
   object jButton5: jButton
     Left = 2
-    Top = 268
-    Width = 294
-    Height = 40
+    Top = 342
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton4
+    Id = 6449156
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -148,20 +161,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton5Click
-    Id = 6449156
   end
   object jButton6: jButton
     Left = 2
-    Top = 316
-    Width = 294
-    Height = 40
+    Top = 407
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton5
+    Id = 9882314
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -171,37 +186,44 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton6Click
-    Id = 9882314
   end
   object jImageView1: jImageView
     Tag = 1
     Left = 126
-    Top = 411
+    Top = 533
     Width = 48
     Height = 48
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jButton7
+    Id = 1233699
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    ImageIndex = -1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 1233699
+    GravityInParent = lgNone
   end
   object jButton7: jButton
     Left = 2
-    Top = 364
-    Width = 294
-    Height = 40
+    Top = 472
+    Width = 296
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton6
+    Id = 4929774
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -211,36 +233,43 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton7Click
-    Id = 4929774
   end
   object jImageView2: jImageView
     Left = 126
-    Top = 465
+    Top = 581
     Width = 48
     Height = 48
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jImageView1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    ImageIndex = -1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
-    Id = 0
+    GravityInParent = lgNone
   end
   object jCheckBox1: jCheckBox
     Left = 5
-    Top = 35
-    Width = 61
+    Top = 41
+    Width = 68
     Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 6706055
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -252,7 +281,6 @@ object AndroidModule1: TAndroidModule1
     Checked = False
     FontSizeUnit = unitDefault
     OnClick = jCheckBox1Click
-    Id = 6706055
   end
   object jTextFileManager1: jTextFileManager
     left = 40
@@ -261,7 +289,7 @@ object AndroidModule1: TAndroidModule1
   object jShareFile1: jShareFile
     TransitoryEnvironmentDirectory = dirDownloads
     left = 32
-    top = 504
+    top = 552
   end
   object jImageFileManager1: jImageFileManager
     left = 232
