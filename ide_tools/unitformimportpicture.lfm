@@ -7,13 +7,14 @@ object FormImportPicture: TFormImportPicture
   ClientHeight = 399
   ClientWidth = 430
   DesignTimePPI = 120
+  OnActivate = FormActivate
   LCLVersion = '1.8.0.6'
   object Label1: TLabel
     Left = 18
     Height = 20
     Top = 24
-    Width = 131
-    Caption = 'Select a Picture File:'
+    Width = 174
+    Caption = 'Select a Picture File [.png]:'
     ParentColor = False
   end
   object Edit1: TEdit

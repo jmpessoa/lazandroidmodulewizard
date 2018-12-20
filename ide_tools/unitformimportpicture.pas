@@ -21,6 +21,7 @@ type
     OpenDialog1: TOpenDialog;
     SpeedButton1: TSpeedButton;
     StatusBar1: TStatusBar;
+    procedure FormActivate(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
   private
 
@@ -44,6 +45,11 @@ begin
       PictureFile:=  OpenDialog1.FileName;
       Edit1.Text:= PictureFile;
     end;
+end;
+
+procedure TFormImportPicture.FormActivate(Sender: TObject);
+begin
+  Self.CheckGroupTarget.Checked[1]:= True;
 end;
 
 end.
