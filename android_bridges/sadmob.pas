@@ -147,15 +147,13 @@ procedure jsAdMob.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
-  aWidth, aHeight : DWORD;
 begin
   if not FInitialized  then
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject:= jCreate(); //jSelf !
-   FInitialized:= True;
-
+   
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
@@ -165,13 +163,10 @@ begin
    jsAdMob_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  if LayoutParamWidth  = lpExact then aWidth  := FWidth  else aWidth  := GetLayoutParams(gApp, FLParamWidth, sdW);
-  if LayoutParamHeight = lpExact then aHeight := FHeight else aHeight := GetLayoutParams(gApp, FLParamHeight, sdH);
-
-  jsAdMob_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        aWidth,
-                        aHeight);
+  jsAdMob_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -193,10 +188,14 @@ begin
 
   jsAdMob_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jsAdMob.SetColor(Value: TARGBColorBridge);

@@ -26,8 +26,6 @@ type
     FCancelable: boolean;
 
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     procedure SetIconIdentifier(_iconIdentifier: string);
 
   protected
@@ -142,44 +140,25 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-
-  FjObject:= jCreate();   //jSelf/View
-  FInitialized:= True;
-
-  if FParent <> nil then
+  if not FInitialized  then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf); //FjPRLayout:= jScrollView(FParent).View;
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+
+   FjObject:= jCreate();   //jSelf/View
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   jCustomDialog_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jCustomDialog_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  jCustomDialog_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jCustomDialog_SetId(FjEnv, FjObject, Self.Id);
-  jCustomDialog_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
-  end;
-
+  jCustomDialog_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
+                  
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
@@ -199,21 +178,26 @@ begin
 
   jCustomDialog_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{wiew!}, GetARGB(FCustomColor, FColor));
 
-  {
-  if not FCloseOnBackKeyPressed then
+   {
+   if not FCloseOnBackKeyPressed then
     jCustomDialog_SetCloseOnBackKeyPressed(FjEnv, FjObject, FCloseOnBackKeyPressed);
 
-  if not CanceledOnTouchOutside then
+   if not CanceledOnTouchOutside then
      jCustomDialog_SetCanceledOnTouchOutside(FjEnv, FjObject, FCanceledOnTouchOutside);
    }
 
    if not FCancelable then
       jCustomDialog_SetCancelable(FjEnv, FjObject, FCancelable);
 
-  View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
+  end;
 end;
 
 procedure jCustomDialog.SetColor(Value: TARGBColorBridge);
@@ -223,51 +207,15 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject {FjRLayout}{view!}, GetARGB(FCustomColor, FColor)); // @@
 end;
 
-procedure jCustomDialog.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jCustomDialog_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-          jCustomDialog_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-       else //lpMatchParent or others
-          jCustomDialog_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jCustomDialog.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jCustomDialog_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jCustomDialog_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-         jCustomDialog_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jCustomDialog.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jCustomDialog_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jCustomDialog.Refresh;

@@ -161,8 +161,7 @@ type
      FMaxZoomFactor: single;
 
      Procedure SetColor(Value : TARGBColorBridge); //background
-     procedure UpdateLParamHeight;
-     procedure UpdateLParamWidth;
+     
    protected
 
      procedure SetParamHeight(Value: TLayoutParams); override;
@@ -794,8 +793,7 @@ type
     procedure SetFontSize(_size: DWord);
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetVisible(Value: boolean);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
     FjPRLayoutHome: jObject; //Save parent origin
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -857,8 +855,7 @@ type
     Procedure SetFontSize (Value : DWord  );
 
     Procedure SetTextAlignment(Value: TTextAlignment);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+   
   protected
     Procedure SetEnabled  (Value : Boolean); override;
     Function  GetText: string;   override;
@@ -975,8 +972,7 @@ type
     Procedure SetMaxLines(Value : DWord);
     procedure SetVerticalScrollBar(Value: boolean);
     procedure SetHorizontalScrollBar(Value: boolean);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
     Procedure SetText(Value: string ); override;
     Function  GetText: string; override;
@@ -1102,8 +1098,7 @@ type
 
     Procedure SetFontColor(Value : TARGBColorBridge);
     Procedure SetFontSize (Value : DWord  );
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
     Procedure GenEvent_OnClick(Obj: TObject);
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
@@ -1161,8 +1156,7 @@ type
     Procedure SetFontSize (Value : DWord  );
     Function  GetChecked         : boolean;
     Procedure SetChecked  (Value : boolean);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string;    override;   //by thierry
@@ -1205,8 +1199,7 @@ type
     Procedure SetFontSize (Value : DWord  );
     Function  GetChecked         : boolean;
     Procedure SetChecked  (Value : boolean);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
     Procedure GenEvent_OnClick(Obj: TObject);
     Function  GetText            : string; override;
@@ -1252,8 +1245,7 @@ type
     procedure SetMax (Value : integer);  //by jmpessoa
 
     Procedure SetStyle(Value : TProgressBarStyle);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
      //
   public
@@ -1301,8 +1293,7 @@ type
     function GetCount: integer;
     procedure SetImageName(Value: string);
     procedure SetImageIndex(Value: TImageListIndex);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+
   protected
     procedure SetParamWidth(Value: TLayoutParams); override;
     procedure SetParamHeight(Value: TLayoutParams); override;
@@ -1428,8 +1419,6 @@ type
     procedure SetWidget(Value: TWidgetItem);
     procedure SetImage(Value: jBitmap);
     function GetCount: integer;
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetFontFace(AValue: TFontFace);
 
@@ -1589,8 +1578,7 @@ type
 
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
     function GetView: jObject; override;
     //procedure SetParamWidth(Value: TLayoutParams); override; TODO
@@ -1636,8 +1624,7 @@ type
 
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
     function GetView: jObject; override;
   public
@@ -1683,8 +1670,7 @@ type
     Procedure SetColor     (Value : TARGBColorBridge);
     Procedure SetZoomControl(Value : Boolean);
     Procedure SetJavaScript(Value : Boolean);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+   
   protected
      //
   public
@@ -1788,8 +1774,7 @@ type
 
     Procedure SetColor    (Value : TARGBColorBridge);
     procedure SetjCanvas(Value: jCanvas);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
   protected
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnDraw(Obj: TObject);
@@ -1840,8 +1825,6 @@ type
     procedure SetImageDownByRes(imgResIdentifief: string); //  ../res/drawable
     procedure SetImageUpByRes(imgResIdentifief: string);   //  ../res/drawable
 
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
   protected
     Procedure SetEnabled  (Value : Boolean); override;
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -2042,6 +2025,7 @@ type
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 
   procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
+  function  sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide): integer;
   function  sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
   function  sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
 
@@ -2055,6 +2039,18 @@ uses
   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
   stoolbar, stablayout, snestedscrollview, sviewpager, radiogroup;
   {,And_log_h}  {for test}
+
+ function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide): integer;
+ begin
+
+    if layoutParam = lpExact then
+     Result := data
+    else if parent is jForm then
+     Result := GetLayoutParams(gApp, layoutParam, sd)
+    else
+     Result := GetLayoutParamsByParent((parent as jVisualControl), layoutParam, sd);
+
+ end;
 
  function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
  begin
@@ -2433,12 +2429,18 @@ var
   prepareItems: boolean;
 begin
   prepareItems:= False;
+
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
   Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+
   if not Assigned(Form) then Exit;
+
   Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnPrepareOptionsMenu) then Form.OnPrepareOptionsMenu(Form, jObjMenu, menuSize, prepareItems);
+
   Result:= JBool(prepareItems);
 end;
 
@@ -3442,35 +3444,30 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
+  if not FInitialized then
+  begin
+   inherited Init(refApp);
 
-  inherited Init(refApp);
+   FjObject := jTextView_Create(FjEnv, FjThis, Self);
 
-  FjObject := jTextView_Create(FjEnv, FjThis, Self);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FInitialized:= True;
+   FjPRLayoutHome:= FjPRLayout;
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-  FjPRLayoutHome:= FjPRLayout;
-
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  jTextView_setParent(FjEnv, FjObject , FjPRLayout);
+   jTextView_setParent(FjEnv, FjObject , FjPRLayout);
 
-  jTextView_setId(FjEnv, FjObject, Self.Id);
+   jTextView_setId(FjEnv, FjObject, Self.Id);
+  end;
 
   jTextView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
-
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
+                  
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
@@ -3492,28 +3489,33 @@ begin
 
   jTextView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  if  FFontColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if  FFontColor <> colbrDefault then
     jTextView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
      jTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then
+   if FFontSize > 0 then
     jTextView_setTextSize(FjEnv, FjObject , FFontSize);
 
-  jTextView_setText(FjEnv, FjObject , FText);
+   jTextView_setText(FjEnv, FjObject , FText);
 
-  jTextView_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
+   jTextView_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
 
-  if FColor <> colbrDefault then
+   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  if FEnabled =  False then
+   if FEnabled =  False then
      jTextView_setEnabled(FjEnv, FjObject , False);
 
-  jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 
 end;
 
@@ -3593,51 +3595,15 @@ begin
     jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
-procedure jTextView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-          jTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-       else //lpMatchParent or others
-          jTextView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jTextView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-         jTextView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jTextView.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-   inherited UpdateLayout();
-   UpdateLParamWidth;
-   UpdateLParamHeight;
-   jTextView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 // LORDMAN 2013-08-12
@@ -3944,33 +3910,29 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
 
-  inherited Init(refApp);
+   FjObject := jEditText_Create(FjEnv, FjThis, Self);
 
-  FjObject := jEditText_Create(FjEnv, FjThis, Self);
-  FInitialized:= True;
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   FjPRLayoutHome:= FjPRLayout;
 
-  FjPRLayoutHome:= FjPRLayout;
-
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
     jEditText_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-  jEditText_setParent(FjEnv, FjObject , FjPRLayout);
+   jEditText_setParent(FjEnv, FjObject , FjPRLayout);
 
-  jEditText_setId(FjEnv, FjObject , Self.Id);
+   jEditText_setId(FjEnv, FjObject , Self.Id);
+  end;
 
   jEditText_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -3993,69 +3955,73 @@ begin
 
   jEditText_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+  if not FInitialized then
+  begin
+   FInitialized:= True;
 
-  if  FHint <> '' then
+   jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+
+   if  FHint <> '' then
     jEditText_setHint(FjEnv, FjObject , FHint);
 
-  if FFontColor <> colbrDefault then
+   if FFontColor <> colbrDefault then
     jEditText_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
      jEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then
+   if FFontSize > 0 then
     jEditText_setTextSize(FjEnv, FjObject , FFontSize);
 
-  jEditText_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
+   jEditText_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
 
-  if FMaxTextLength >= 0 then
+   if FMaxTextLength >= 0 then
     jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
 
-  jEditText_setScroller(FjEnv, FjObject );
+   jEditText_setScroller(FjEnv, FjObject );
 
-  jEditText_setHorizontalScrollBarEnabled(FjEnv, FjObject , FHorizontalScrollBar);
-  jEditText_setVerticalScrollBarEnabled(FjEnv, FjObject , FVerticalScrollBar);
+   jEditText_setHorizontalScrollBarEnabled(FjEnv, FjObject , FHorizontalScrollBar);
+   jEditText_setVerticalScrollBarEnabled(FjEnv, FjObject , FVerticalScrollBar);
 
-  jEditText_setHorizontallyScrolling(FjEnv, FjObject , FWrappingLine);
+   jEditText_setHorizontallyScrolling(FjEnv, FjObject , FWrappingLine);
 
-  if FCapSentence then
+   if FCapSentence then
     jEditText_SetCapSentence(FjEnv, FjObject, FCapSentence);
 
-  jEditText_setSingleLine(FjEnv, FjObject , True);
+   jEditText_setSingleLine(FjEnv, FjObject , True);
 
-  if  FText <> '' then
+   if  FText <> '' then
     jEditText_setText(FjEnv, FjObject , FText);
 
-  if FEditable = False then
+   if FEditable = False then
      jEditText_SetEditable(FjEnv, FjObject, FEditable);
 
-  if FHintTextColor <> colbrDefault then
+   if FHintTextColor <> colbrDefault then
      jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
 
-  if not FCloseSoftInputOnEnter then
+   if not FCloseSoftInputOnEnter then
     jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
 
-  jEditText_editInputType2(FjEnv, FjObject , InputTypeToStrEx(FInputTypeEx));
+   jEditText_editInputType2(FjEnv, FjObject , InputTypeToStrEx(FInputTypeEx));
 
-  if FInputTypeEx = itxMultiLine then
-  begin
+   if FInputTypeEx = itxMultiLine then
+   begin
     jEditText_setSingleLine(FjEnv, FjObject , False);
     if FMaxLines = 1 then  FMaxLines:= 3;   // visibles lines!
     jEditText_setMaxLines(FjEnv, FjObject , FMaxLines);
 
     if FScrollBarStyle <> scrNone then
          jEditText_setScrollBarStyle(FjEnv, FjObject , GetScrollBarStyle(FScrollBarStyle));
-  end;
+   end;
 
-  if FColor <> colbrDefault then
+   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv,  FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
-  jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
-  jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
-
+   jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
+   jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
+  end;
 end;
 
 Procedure jEditText.SetViewParent(Value: jObject);
@@ -4316,55 +4282,15 @@ begin
   if Assigned(FOnLostFocus) then FOnLostFocus(Obj, txt);
 end;
 
-procedure jEditText.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-       begin
-          jEditText_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-       end
-       else //lpMatchParent or others
-       begin
-          jEditText_setLParamWidth(FjEnv,FjObject, GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-       end;
-    end;
-  end;
-end;
-
-procedure jEditText.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jEditText_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jEditText_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jEditText.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jEditText_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jEditText.AllCaps;
@@ -4673,33 +4599,29 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp); // set FjPRLayout:= jForm.View [default] ...
 
-  inherited Init(refApp); // set FjPRLayout:= jForm.View [default] ...
+   FjObject := jButton_Create(FjEnv,FjThis,Self);
 
-  FjObject := jButton_Create(FjEnv,FjThis,Self);
-  FInitialized:= True;
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   FjPRLayoutHome:= FjPRLayout;
 
-  FjPRLayoutHome:= FjPRLayout;
-
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-  jButton_setParent(FjEnv, FjObject , FjPRLayout);
+   jButton_setParent(FjEnv, FjObject , FjPRLayout);
 
-  jButton_setId(FjEnv, FjObject , Self.Id);
+   jButton_setId(FjEnv, FjObject , Self.Id);
+  end;
 
   jButton_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                            GetLayoutParams(gApp, FLParamWidth, sdW),
-                                            GetLayoutParams(gApp, FLParamHeight, sdH));
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -4722,25 +4644,29 @@ begin
 
   jButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  if FFontColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   
+   if FFontColor <> colbrDefault then
      jButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
      jButton_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then //not default...
+   if FFontSize > 0 then //not default...
      jButton_setTextSize(FjEnv, FjObject , FFontSize);
 
-  jButton_setText(FjEnv, FjObject , FText);
+   jButton_setText(FjEnv, FjObject , FText);
 
-  if FColor <> colbrDefault then
+   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
-  if FEnabled = False then
+   if FEnabled = False then
      jButton_SetEnabled(FjEnv, FjObject , False);
-
+  end;
 end;
 
 Procedure jButton.SetViewParent(Value: jObject);
@@ -4804,51 +4730,15 @@ begin
      jButton_setTextSize(FjEnv, FjObject , FFontSize);
 end;
 
-procedure jButton.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-         jButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-         jButton_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jButton.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-         jButton_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jButton.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jButton.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -5043,31 +4933,28 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
 
-  inherited Init(refApp);
+   FjObject  := jCheckBox_Create(FjEnv, FjThis, self);
 
-  FjObject  := jCheckBox_Create(FjEnv, FjThis, self);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   FjPRLayoutHome:= FjPRLayout;
 
-  FjPRLayoutHome:= FjPRLayout;
-
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jCheckBox_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
-  jCheckBox_setId(FjEnv, FjObject , Self.Id);
+   jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
+   jCheckBox_setId(FjEnv, FjObject , Self.Id);
+  end;
+
   jCheckBox_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-  FInitialized:= True;
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -5087,24 +4974,29 @@ begin
   else Self.AnchorId:= 0;
 
   jCheckBox_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  jCheckBox_setText(FjEnv, FjObject , FText);
 
-  if FFontColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   jCheckBox_setText(FjEnv, FjObject , FText);
+
+   if FFontColor <> colbrDefault then
      jCheckBox_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
       jCheckBox_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then
+   if FFontSize > 0 then
      jCheckBox_setTextSize(FjEnv, FjObject , FFontSize);
 
-  jCheckBox_setText(FjEnv, FjObject , FText);
+   jCheckBox_setText(FjEnv, FjObject , FText);
 
-  if FColor <> colbrDefault then
+   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-  jCheckBox_setChecked(FjEnv, FjObject, FChecked);
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   jCheckBox_setChecked(FjEnv, FjObject, FChecked);
+  end;
 end;
 
 Procedure jCheckBox.SetViewParent(Value: jObject);
@@ -5175,51 +5067,15 @@ begin
      jCheckBox_setChecked(FjEnv, FjObject , FChecked);
 end;
 
-procedure jCheckBox.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-           jCheckBox_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-           jCheckBox_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jCheckBox.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jCheckBox_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jCheckBox_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jCheckBox.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jCheckBox_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jCheckBox.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -5326,48 +5182,45 @@ var
   flag: boolean;
 begin
   flag:= False;
-  if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject := jRadioButton_Create(FjEnv, FjThis, Self);
-  FInitialized:= True;
 
-  if FParent <> nil then
+  if not FInitialized  then
   begin
+   inherited Init(refApp);
+   FjObject := jRadioButton_Create(FjEnv, FjThis, Self);
+
+   if FParent <> nil then
+   begin
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
     if FParent is jRadioGroup then flag:= True;
-  end;
+   end;
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jRadioButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  if not flag then
-  begin
+   if not flag then
+   begin
     jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
-  end
-  else
-  begin
+   end
+   else
+   begin
     jRadioButton_setParent2(FjEnv, FjObject , FjPRLayout);
-  end;
+   end;
 
-  // tk
-  if (Self.Id = 0) or Self.IDExistsInParent then
+   // tk
+   if (Self.Id = 0) or Self.IDExistsInParent then
     Self.AssignNewId;
-  //if  Self.Id = 0 then Self.Id:= Random(10000000);
-  // end tk
+   //if  Self.Id = 0 then Self.Id:= Random(10000000);
+   // end tk
 
-  jRadioButton_setId(FjEnv, FjObject , Self.Id);
+   jRadioButton_setId(FjEnv, FjObject , Self.Id);
+  end;
 
   jRadioButton_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -5390,24 +5243,28 @@ begin
    if not flag then
      jRadioButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  if FFontColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if FFontColor <> colbrDefault then
      jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
       jRadioButton_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then
+   if FFontSize > 0 then
      jRadioButton_setTextSize(FjEnv, FjObject , FFontSize);
 
-  jRadioButton_setText(FjEnv, FjObject , FText);
+   jRadioButton_setText(FjEnv, FjObject , FText);
 
-  jRadioButton_setChecked(FjEnv, FjObject , FChecked);
+   jRadioButton_setChecked(FjEnv, FjObject , FChecked);
 
-  if FColor <> colbrDefault then
+   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 end;
 
 Procedure jRadioButton.SetViewParent(Value: jObject);
@@ -5478,51 +5335,15 @@ begin
      jRadioButton_setChecked(FjEnv, FjObject , FChecked);
 end;
 
-procedure jRadioButton.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-           jRadioButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-           jRadioButton_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jRadioButton.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jRadioButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jRadioButton_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jRadioButton.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jRadioButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jRadioButton.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -5632,31 +5453,27 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject := jProgressBar_Create(FjEnv, FjThis, Self, GetProgressBarStyle(FStyle));
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
+   FjObject := jProgressBar_Create(FjEnv, FjThis, Self, GetProgressBarStyle(FStyle));
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jProgressBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  jProgressBar_setParent(FjEnv, FjObject , FjPRLayout);
-  jProgressBar_setId(FjEnv, FjObject , Self.Id);
+   jProgressBar_setParent(FjEnv, FjObject , FjPRLayout);
+   jProgressBar_setId(FjEnv, FjObject , Self.Id);
+  end;
 
   jProgressBar_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  FInitialized:= True;
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -5672,17 +5489,23 @@ begin
        jProgressBar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
+  
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jProgressBar_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  jProgressBar_setProgress(FjEnv, FjObject , FProgress);
-  jProgressBar_setMax(FjEnv, FjObject , FMax);  //by jmpessoa
 
-  if FColor <> colbrDefault then
+  jProgressBar_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   jProgressBar_setProgress(FjEnv, FjObject , FProgress);
+   jProgressBar_setMax(FjEnv, FjObject , FMax);  //by jmpessoa
+
+   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-  FInitialized:= True;
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 end;
 
 Procedure jProgressBar.SetViewParent(Value: jObject);
@@ -5768,43 +5591,6 @@ begin
      Result:= jProgressBar_getMax(FjEnv, FjObject );
 end;
 
-procedure jProgressBar.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-         jProgressBar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-         jProgressBar_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jProgressBar.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jProgressBar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-         jProgressBar_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jProgressBar.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
@@ -5830,13 +5616,13 @@ end;
 
 procedure jProgressBar.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jProgressBar_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jProgressBar.SetLGravity(_value: TLayoutGravity);
@@ -5884,31 +5670,28 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
 
-  FjObject := jImageView_Create(FjEnv, FjThis, Self);
-  FInitialized:= True;
+   FjObject := jImageView_Create(FjEnv, FjThis, Self);
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jImageView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  jImageView_setParent(FjEnv,FjObject , FjPRLayout);
-  jImageView_setId(FjEnv, FjObject , Self.Id);
+   jImageView_setParent(FjEnv,FjObject , FjPRLayout);
+   jImageView_setId(FjEnv, FjObject , Self.Id);
+  end;
 
   jImageView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -5924,13 +5707,14 @@ begin
        jImageView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
+
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
   if FColor <> colbrDefault then
-      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  if FImageName <> '' then
+  if (FImageName <> '') and (FImageIndex < 0) then
      jImageView_SetImageByResIdentifier(FjEnv, FjObject , FImageName);
 
   if FImageList <> nil then
@@ -5943,10 +5727,16 @@ begin
   end;
 
   if  FImageScaleType <> scaleCenter  then
-     jImageView_SetScaleType(FjEnv, FjObject, Ord(FImageScaleType));;
+    jImageView_SetScaleType(FjEnv, FjObject, Ord(FImageScaleType));;
 
   jImageView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
+
 end;
 
 procedure jImageView.SetViewParent(Value: jObject);
@@ -6012,7 +5802,7 @@ end;
 
 Procedure jImageView.SetImageByIndex(Value: integer);
 begin
-   if not Self.Initialized then Exit;
+
    if FImageList = nil then Exit;
 
    if (Value >= 0) and (Value < FImageList.Images.Count) then
@@ -6089,44 +5879,6 @@ begin
    end;
 end;
 
-procedure jImageView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-         jImageView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else
-        jImageView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jImageView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-       jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jImageView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else if (Self.Parent is jPanel) then //lpMatchParent and others
-             jImageView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jPanel), FLParamHeight, sdH))
-           else
-             jImageView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 function jImageView.GetWidth: integer;
 begin
   Result:= FWidth;
@@ -6173,13 +5925,13 @@ end;
 
 procedure jImageView.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jImageView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 // Event : Java -> Pascal
@@ -7270,10 +7022,11 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
-  if FImageItem <> nil then
+  if not FInitialized  then
   begin
+   inherited Init(refApp);
+   if FImageItem <> nil then
+   begin
     FImageItem.Init(refApp);
 
     FjObject := jListView_Create2(FjEnv, FjThis, Self,
@@ -7310,14 +7063,14 @@ begin
         jListView_add22(FjEnv, FjObject , FItems.Strings[i], FDelimiter, FImageItem.GetImage);
     end;
 
-  end
-  else
-  begin
+   end
+   else
+   begin
     FjObject := jListView_Create3(FjEnv, FjThis, Self,
                                Ord(FWidgetItem), FWidgetText,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
 
-   if FWidgetTextColor <> colbrDefault then
+    if FWidgetTextColor <> colbrDefault then
       jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
 
     if FFontColor <> colbrDefault then
@@ -7350,25 +7103,21 @@ begin
          jListView_add2(FjEnv, FjObject , FItems.Strings[i], FDelimiter);
     end;
 
+   end;
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+
+   jListView_setParent(FjEnv, FjObject , FjPRLayout);
+   jListView_setId(FjEnv, FjObject , Self.Id);
   end;
-
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-  FjPRLayoutHome:= FjPRLayout;
-
-  jListView_setParent(FjEnv, FjObject , FjPRLayout);
-  jListView_setId(FjEnv, FjObject , Self.Id);
 
   jListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-  FInitialized:= True;
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -7391,11 +7140,15 @@ begin
 
   jListView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-
-  if FHighLightSelectedItemColor <> colbrDefault then
+  if not FInitialized then
   begin
+   FInitialized:= True;
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+
+   if FHighLightSelectedItemColor <> colbrDefault then
+   begin
     jListView_SetHighLightSelectedItemColor(FjEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedItemColor));
+   end;
   end;
 
 end;
@@ -7633,42 +7386,6 @@ begin
   end; }
 end;
 
-procedure jListView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-          jListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-       else //lpMatchParent or others
-          jListView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jListView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jListView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jListView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
@@ -7694,13 +7411,13 @@ end;
 
 procedure jListView.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jListView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jListView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -8165,29 +7882,26 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
 
-  FjObject := jScrollView_Create(FjEnv,  FjThis, Self); //View  !!!
-  FInitialized:= True;
-  //FjRLayout:= jScrollView_getView(FjEnv, FjObject ); //Self.View
+   FjObject := jScrollView_Create(FjEnv,  FjThis, Self); //View  !!!
+   //FjRLayout:= jScrollView_getView(FjEnv, FjObject ); //Self.View
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
-  jScrollView_setId(FjEnv, FjObject , Self.Id);
+   jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
+   jScrollView_setId(FjEnv, FjObject , Self.Id);
+  end;
+
   jScrollView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-  FInitialized:= True;
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -8208,16 +7922,19 @@ begin
 
   jScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  jScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   jScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
 
-  if FFillViewportEnabled then
+   if FFillViewportEnabled then
       jScrollView_setFillViewport(FjEnv, FjObject, FFillViewportEnabled);
 
-  if FColor <> colbrDefault then
+   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 end;
 
 procedure jScrollView.SetViewParent(Value: jObject);
@@ -8259,42 +7976,6 @@ begin
      jScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
 end;
 
-procedure jScrollView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-       jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-           jScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-           jScrollView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jScrollView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-       jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jScrollView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jScrollView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
@@ -8320,13 +8001,13 @@ end;
 
 procedure jScrollView.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jScrollView.SetFillViewport(fillenabled: boolean);
@@ -8470,23 +8151,26 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);                   //fix create
-  FjObject  := jHorizontalScrollView_Create(FjEnv, FjThis, Self);
-  FInitialized:= True;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);                   //fix create
+   FjObject  := jHorizontalScrollView_Create(FjEnv, FjThis, Self);
+   FInitialized:= True;
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
-  jHorizontalScrollView_setId(FjEnv, FjObject , Self.Id);
+   jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
+   jHorizontalScrollView_setId(FjEnv, FjObject , Self.Id);
+  end;
+
   jHorizontalScrollView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
+                  
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
@@ -8501,13 +8185,20 @@ begin
        jHorizontalScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
+
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
+
   jHorizontalScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  jHorizontalScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
-  if FColor <> colbrDefault then
+
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   jHorizontalScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
+   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 
 end;
 
@@ -8550,42 +8241,6 @@ begin
      jHorizontalScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
 end;
 
-procedure jHorizontalScrollView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-           jHorizontalScrollView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-           jHorizontalScrollView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jHorizontalScrollView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jHorizontalScrollView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jHorizontalScrollView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jHorizontalScrollView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
@@ -8611,13 +8266,13 @@ end;
 
 procedure jHorizontalScrollView.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jHorizontalScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jHorizontalScrollView.ScrollTo(_x: integer; _y: integer);
@@ -8729,29 +8384,26 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject := jWebView_Create(FjEnv, FjThis, Self);
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
+   FjObject := jWebView_Create(FjEnv, FjThis, Self);
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  jWebView_setParent(FjEnv, FjObject , FjPRLayout);
-  jWebView_setId(FjEnv, FjObject , Self.Id);
+   jWebView_setParent(FjEnv, FjObject , FjPRLayout);
+   jWebView_setId(FjEnv, FjObject , Self.Id);
+  end;
+
   jWebView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
+                  
   jWebView_SetZoomControl(FjEnv, FjObject, FZoomControl);
-
-  FInitialized:= True;
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -8773,14 +8425,17 @@ begin
 
   jWebView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  jWebView_SetJavaScript(FjEnv, FjObject , FJavaScript);
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   jWebView_SetJavaScript(FjEnv, FjObject , FJavaScript);
 
-  if FColor <> colbrDefault then
+   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 
-  FInitialized:= True;
 end;
 
 procedure jWebView.SetViewParent(Value: jObject);
@@ -8843,42 +8498,6 @@ begin
      jWebView_LoadFromHtmlString(FjEnv, FjObject, _htmlString);
 end;
 
-procedure jWebView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-           jWebView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-           jWebView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jWebView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jWebView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jWebView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jWebView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
@@ -8904,13 +8523,13 @@ end;
 
 procedure jWebView.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jWebView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 
@@ -9642,33 +9261,31 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
-
-  FjObject  := jView_Create(FjEnv, FjThis, Self);
-  FInitialized:= True;
-
-  if  FjCanvas <> nil then
+  if not FInitialized  then
   begin
+   inherited Init(refApp);
+
+   FjObject  := jView_Create(FjEnv, FjThis, Self);
+
+   if  FjCanvas <> nil then
+   begin
     FjCanvas.Init(refApp);
     jView_setjCanvas(FjEnv,FjObject ,FjCanvas.JavaObj);
+   end;
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+   jView_setParent(FjEnv,FjObject , FjPRLayout);
+
+   jView_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-  FjPRLayoutHome:= FjPRLayout;
-  jView_setParent(FjEnv,FjObject , FjPRLayout);
-
-  jView_setId(FjEnv, FjObject , Self.Id);
   jView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -9687,9 +9304,16 @@ begin
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
   jView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  if FColor <> colbrDefault then
+
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 
 end;
 
@@ -9752,42 +9376,6 @@ begin
   if Assigned(FOnDraw) then FOnDraw(Obj);
 end;
 
-procedure jView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-           jView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-           jView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
@@ -9812,13 +9400,13 @@ end;
 
 procedure jView.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 function jView.GetWidth: integer;
@@ -10152,30 +9740,27 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject := jImageBtn_Create(FjEnv, FjThis, Self);
-  FInitialized:= True;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
+   FjObject := jImageBtn_Create(FjEnv, FjThis, Self);
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jImageBtn_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
-  jImageBtn_setId(FjEnv, FjObject , Self.Id);
+   jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
+   jImageBtn_setId(FjEnv, FjObject , Self.Id);
+  end;
+
   jImageBtn_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           GetLayoutParams(gApp, FLParamWidth, sdW),
-                                           GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -10195,13 +9780,14 @@ begin
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jImageBtn_SetEnabled(FjEnv, FjObject ,FEnabled);
+  if not FInitialized then
+   jImageBtn_SetEnabled(FjEnv, FjObject ,FEnabled);
 
-  if FImageDownName <> '' then
-      jImageBtn_setButtonDownByRes(FjEnv, FjObject , FImageDownName);
+  if (FImageDownName <> '') and (FImageDownIndex < 0) then
+     jImageBtn_setButtonDownByRes(FjEnv, FjObject , FImageDownName);
 
-  if FImageUpName <> '' then
-     jImageBtn_setButtonUpByRes(FjEnv, FjObject , FImageUpName);
+  if (FImageUpName <> '') and (FImageUpIndex < 0) then
+    jImageBtn_setButtonUpByRes(FjEnv, FjObject , FImageUpName);
 
   if FImageList <> nil then
   begin
@@ -10215,10 +9801,15 @@ begin
 
   jImageBtn_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  if FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   
+   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 end;
 
 procedure jImageBtn.SetViewParent(Value: jObject);
@@ -10257,7 +9848,7 @@ end;
 
 Procedure jImageBtn.SetImageDownByIndex(Value: integer);
 begin
-   if not FInitialized then Exit;
+
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
       FImageDownName:= Trim(FImageList.Images.Strings[Value]);
@@ -10270,7 +9861,7 @@ end;
 
 Procedure jImageBtn.SetImageUpByIndex(Value: integer);
 begin
-   if not FInitialized then Exit;
+   
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
       FImageUpName:= Trim(FImageList.Images.Strings[Value]);
@@ -10293,42 +9884,6 @@ begin
   FImageUpName:=  imgResIdentifief;
   if FInitialized then
     jImageBtn_setButtonUpByRes(FjEnv, FjObject , imgResIdentifief);
-end;
-
-procedure jImageBtn.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-           jImageBtn_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-           jImageBtn_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jImageBtn.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jImageBtn_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-          jImageBtn_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
 end;
 
 procedure jImageBtn.ClearLayout();
@@ -10355,13 +9910,13 @@ end;
 
 procedure jImageBtn.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jImageBtn_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jImageBtn.Notification(AComponent: TComponent; Operation: TOperation);
@@ -11117,29 +10672,26 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
 
-  FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
-  FInitialized:= True;
+   FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  jPanel_setParent(FjEnv, FjObject , FjPRLayout);
+   jPanel_setParent(FjEnv, FjObject , FjPRLayout);
 
-  jPanel_setId(FjEnv, FjObject , Self.Id);
+   jPanel_setId(FjEnv, FjObject , Self.Id);
+  end;
 
   jPanel_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                          FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                          GetLayoutParams(gApp, FLParamWidth, sdW),
-                                          GetLayoutParams(gApp, FLParamHeight, sdH));
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout();
-  end;
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -11160,16 +10712,23 @@ begin
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  if FMinZoomFactor <> 0.25 then jPanel_SetMinZoomFactor(FjEnv, FjObject, FMinZoomFactor);
-  if FMaxZoomFactor <> 4.00 then jPanel_SetMaxZoomFactor(FjEnv, FjObject, FMaxZoomFactor);
+  if not FInitialized then
+  begin
+   if FMinZoomFactor <> 0.25 then jPanel_SetMinZoomFactor(FjEnv, FjObject, FMinZoomFactor);
+   if FMaxZoomFactor <> 4.00 then jPanel_SetMaxZoomFactor(FjEnv, FjObject, FMaxZoomFactor);
+  end;
 
   jPanel_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  if FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{!}, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
-
+   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
+  end;
+  
 end;
 
 Procedure jPanel.SetColor(Value: TARGBColorBridge);
@@ -11194,28 +10753,6 @@ begin
    end;
 end;
 
-procedure jPanel.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jPanel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-      begin
-         jPanel_setLParamWidth(FjEnv, FjObject ,GetLayoutParams(gApp, FLParamWidth, sdW));
-      end
-      else //lpMatchParent or others
-      begin
-         jPanel_setLParamWidth(FjEnv,FjObject, GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-      end;
-    end;
-  end;
-end;
-
 procedure jPanel.SetParamHeight(Value: TLayoutParams);
 begin
    inherited SetParamHeight(Value);
@@ -11223,24 +10760,6 @@ begin
    begin
      //
    end;
-end;
-
-procedure jPanel.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-       jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-       if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jPanel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-       else //lpMatchParent and others
-         jPanel_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
 end;
 
 function jPanel.GetWidth: integer;
@@ -11286,13 +10805,13 @@ end;
 
 procedure jPanel.UpdateLayout();
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout();
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jPanel_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jPanel.SetViewParent(Value: jObject);
@@ -11542,49 +11061,50 @@ var
   weights: TDynArrayOfSingle;
   names: TDynArrayOfString;
 begin
-  if FInitialized then Exit;
+  if not FInitialized then
+  begin
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject := jCreate();  //jSelf !
 
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject := jCreate();  //jSelf !
-
-  if FFontColor <> colbrDefault then
+   if FFontColor <> colbrDefault then
     jDBListView_setFontColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
     jDBListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then
+   if FFontSize > 0 then
     jDBListView_setFontSize(FjEnv, FjObject , FFontSize);
 
-  if FColWeights.Count > 0 then
-  begin
+   if FColWeights.Count > 0 then
+   begin
     SetLength(weights, FColWeights.Count);
     for i := 0 to FColWeights.Count-1 do
       weights[i] := StrToFloat(FColWeights[i]);
     jDBListView_SetColumnWeights(FjEnv, FjObject, weights{FColWeights});
-  end;
+   end;
 
-  if FColNames.Count > 0 then
-  begin
+   if FColNames.Count > 0 then
+   begin
     SetLength(names, FColNames.Count);
     for i := 0 to FColNames.Count-1 do
       names[i] := FColNames[i];
     jDBListView_SetColumnNames(FjEnv, FjObject, names{FColNames});
+   end;
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+
+   jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jDBListView_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  FInitialized := True;
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-   
-  FjPRLayoutHome:= FjPRLayout;
-
-  jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jDBListView_SetId(FjEnv, FjObject, Self.Id);
-  jDBListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-    FMarginLeft, FMarginTop, FMarginRight, FMarginBottom,
-    GetLayoutParams(gApp, FLParamWidth, sdW),
-    GetLayoutParams(gApp, FLParamHeight, sdH));
+  jDBListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   //if FColNames.Count > 0 then
   //begin
@@ -11594,10 +11114,6 @@ begin
   //  jDBListView_SetColumnNames(FjEnv, FjObject, names{FColNames});
   //end;
 
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
-  end;
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -11623,10 +11139,14 @@ begin
 
   jDBListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jDBListView.SetColor(Value: TARGBColorBridge);
@@ -11714,57 +11234,15 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 
-procedure jDBListView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jDBListView_SetLParamWidth(FjEnv, FjObject,
-        GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jDBListView_setLParamWidth(FjEnv, FjObject,
-          GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jDBListView_setLParamWidth(FjEnv, FjObject, GetLayoutParamsByParent(
-          (Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jDBListView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jDBListView_SetLParamHeight(FjEnv, FjObject,
-        GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jDBListView_setLParamHeight(FjEnv, FjObject,
-          GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jDBListView_setLParamHeight(FjEnv, FjObject, GetLayoutParamsByParent(
-          (Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jDBListView.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jDBListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jDBListView.Refresh;

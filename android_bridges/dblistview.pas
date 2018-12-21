@@ -35,9 +35,7 @@ type
     procedure SetFontSize(_size: DWord);
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetVisible(Value: boolean);
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
-   
+    
   protected
     FjPRLayoutHome: jObject; //Save parent origin
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -179,46 +177,43 @@ var
   i: integer;
   weights: TDynArrayOfSingle;
 begin
-  if FInitialized then Exit;
+  if not FInitialized then
+  begin
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject := jCreate();  //jSelf !
 
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject := jCreate();  //jSelf !
-
-  if FFontColor <> colbrDefault then
+   if FFontColor <> colbrDefault then
     jDBListView_setFontColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
     jDBListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then
+   if FFontSize > 0 then
     jDBListView_setFontSize(FjEnv, FjObject , FFontSize);
 
-  if FColWeights.Count > 0 then
-  begin
+   if FColWeights.Count > 0 then
+   begin
     SetLength(weights, FColWeights.Count);
     for i := 0 to FColWeights.Count-1 do
       weights[i] := StrToFloat(FColWeights[i]);
     jDBListView_SetColumnWeights(FjEnv, FjObject, weights);
+   end;
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+
+   jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jDBListView_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  FInitialized := True;
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+  jDBListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
-  FjPRLayoutHome:= FjPRLayout;
-
-  jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jDBListView_SetId(FjEnv, FjObject, Self.Id);
-  jDBListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-    FMarginLeft, FMarginTop, FMarginRight, FMarginBottom,
-    GetLayoutParams(gApp, FLParamWidth, sdW),
-    GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
-  end;
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -244,10 +239,15 @@ begin
 
   jDBListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   
+   if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jDBListView.SetColor(Value: TARGBColorBridge);
@@ -316,57 +316,15 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 
-procedure jDBListView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jDBListView_SetLParamWidth(FjEnv, FjObject,
-        GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jDBListView_setLParamWidth(FjEnv, FjObject,
-          GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jDBListView_setLParamWidth(FjEnv, FjObject, GetLayoutParamsByParent(
-          (Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jDBListView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jDBListView_SetLParamHeight(FjEnv, FjObject,
-        GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jDBListView_setLParamHeight(FjEnv, FjObject,
-          GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jDBListView_setLParamHeight(FjEnv, FjObject, GetLayoutParamsByParent(
-          (Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jDBListView.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jDBListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jDBListView.Refresh;

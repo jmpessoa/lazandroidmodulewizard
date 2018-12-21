@@ -6064,10 +6064,10 @@ function GetParamByParentSide2(paren: TAndroidWidget; side: TSide): DWord;
 begin
    case side of
      sdW: begin
-               Result:= paren.Width;
+               Result:= paren.GetWidth;
           end;
      sdH: begin
-              Result:= paren.Height;
+              Result:= paren.GetHeight;
            end;
    end;
 end;

@@ -40,8 +40,6 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetFontFace(AValue: TFontFace);
     procedure SetTextTypeFace(Value: TTextTypeFace);
 
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     //procedure ListViewChange  (Sender: TObject);  //TODO
     
   public
@@ -228,31 +226,28 @@ var
   rToA: TPositionRelativeToAnchorID;
   i: integer;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);      //  <<--  FjPRLayout:= jForm.view [default]!
-  //your code here: set/initialize create params....
-  FjObject := jCreate();
-  FInitialized:= True;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);      //  <<--  FjPRLayout:= jForm.view [default]!
+   //your code here: set/initialize create params....
+   FjObject := jCreate();
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
     jSpinner_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  jSpinner_SetViewParent(FjEnv, FjObject , FjPRLayout);
-  jSpinner_SetId(FjEnv, FjObject , Self.Id);
-  jSpinner_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-     Self.UpdateLayout;
+   jSpinner_SetViewParent(FjEnv, FjObject , FjPRLayout);
+   jSpinner_SetId(FjEnv, FjObject , Self.Id);
   end;
+
+  jSpinner_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -274,54 +269,58 @@ begin
 
   jSpinner_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-  if FSelectedFontColor <> colbrDefault then
+   if FSelectedFontColor <> colbrDefault then
      Self.SetSelectedTextColor(GetARGB(FCustomColor, FSelectedFontColor));
 
-  if FDropListTextColor <> colbrDefault then
+   if FDropListTextColor <> colbrDefault then
       self.SetDropListTextColor(FDropListTextColor);
 
-  if FDropListBackgroundColor <> colbrDefault then
+   if FDropListBackgroundColor <> colbrDefault then
      Self.SetDropListBackgroundColor(FDropListBackgroundColor);
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
        jSpinner_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize <> 0 then
+   if FFontSize <> 0 then
      jSpinner_SetTextFontSize(FjEnv, FjObject , FFontSize);
 
-  jSpinner_SetTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
-  jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jSpinner_SetTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
+   jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
-  for i:= 0 to FItems.Count-1 do
-  begin
+   for i:= 0 to FItems.Count-1 do
+   begin
      jSpinner_Add(FjEnv, FjObject , FItems.Strings[i]);
-  end;
+   end;
 
-  if FItems.Count > 0 then
-  begin
+   if FItems.Count > 0 then
+   begin
      if FSelectedIndex <= -1  then  FSelectedIndex:= 0;
      if FSelectedIndex >= FItems.Count then FSelectedIndex:= FItems.Count-1;
-  end;
+   end;
 
-  if FLastItemAsPrompt then
-  begin
+   if FLastItemAsPrompt then
+   begin
      jSpinner_SetLastItemAsPrompt(FjEnv, FjObject , FLastItemAsPrompt);
      if (FSelectedIndex <> FItems.Count-1) then FSelectedIndex:= FItems.Count-1;
-  end;
+   end;
 
-  if FSelectedPaddingTop <> 15 then
+   if FSelectedPaddingTop <> 15 then
     jSpinner_SetSelectedPaddingTop(FjEnv, FjObject, FSelectedPaddingTop);
 
-  if FSelectedPaddingBottom <> 5 then
+   if FSelectedPaddingBottom <> 5 then
     jSpinner_SetSelectedPaddingBottom(FjEnv, FjObject, FSelectedPaddingBottom);
 
-  jSpinner_SetSelectedIndex(FjEnv, FjObject, FSelectedIndex);
+   jSpinner_SetSelectedIndex(FjEnv, FjObject, FSelectedIndex);
 
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 end;
 
 procedure jSpinner.SetColor(Value: TARGBColorBridge);
@@ -329,42 +328,6 @@ begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
-end;
-
-procedure jSpinner.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jSpinner_SetLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-          jSpinner_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-       else //lpMatchParent or others
-          jSpinner_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jSpinner.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jSpinner_SetLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jSpinner_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-         jSpinner_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
 end;
 
 procedure jSpinner.ClearLayout();
@@ -389,13 +352,13 @@ end;
 
 procedure jSpinner.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jSpinner_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jSpinner.Refresh;

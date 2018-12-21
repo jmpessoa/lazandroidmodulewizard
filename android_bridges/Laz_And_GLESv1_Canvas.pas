@@ -166,8 +166,7 @@ jCanvasES1 = class(jGLViewEvent)
 
   Procedure Texture_Load  ( var Texture : TxgElement; filename : String; lang : TLanguage = tJava);
   Procedure Texture_UnLoad( var Texture : TxgElement );
-  procedure UpdateLParamHeight;
-  procedure UpdateLParamWidth;
+  
  protected
   Procedure SetAlpha      ( alpha : Single      );
   Procedure SetVertex     ( ptr : Pointer       );
@@ -759,16 +758,19 @@ var
    rToP: TPositionRelativeToParent;
    rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject  := jGLSurfaceView_Create1(FjEnv, FjThis, Self, cjOpenGLESv1);
-  jGLSurfaceView_setParent(FjEnv, FjObject , FjPRLayout);
-  jGLSurfaceView_setId(FjEnv, FjObject , Self.Id);
+  if not FInitialized  then
+  begin
+   inherited Init(refApp);
+   FjObject  := jGLSurfaceView_Create1(FjEnv, FjThis, Self, cjOpenGLESv1);
+   jGLSurfaceView_setParent(FjEnv, FjObject , FjPRLayout);
+   jGLSurfaceView_setId(FjEnv, FjObject , Self.Id);
+  end;
 
-  jGLSurfaceView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                                                 FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                                 GetLayoutParams(gApp, FLParamWidth, sdW),
-                                                 GetLayoutParams(gApp, FLParamHeight, sdH));
+  jGLSurfaceView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
+
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
@@ -783,11 +785,19 @@ begin
        jGLSurfaceView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
-  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id;
+
+  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
+  else Self.AnchorId:= -1; //dummy
+
   jGLSurfaceView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
-  jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
-  View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-  FInitialized:= True;
+
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
+   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+  end;
 end;
 
 Procedure jCanvasES1.SetVisible  (Value : Boolean);
@@ -1107,16 +1117,6 @@ begin
   end;
 end;
 
-procedure jCanvasES1.UpdateLParamWidth;
-begin
-   jGLSurfaceView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdw));
-end;
-
-procedure jCanvasES1.UpdateLParamHeight;
-begin
-  jGLSurfaceView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdh));
-end;
-
 function jCanvasES1.GetWidth: integer;
 begin
    Result:= FWidth;
@@ -1160,10 +1160,13 @@ end;
 
 procedure jCanvasES1.UpdateLayout;
 begin
-   inherited UpdateLayout;
-   UpdateLParamWidth;
-   UpdateLParamHeight;
-   jGLSurfaceView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 end.

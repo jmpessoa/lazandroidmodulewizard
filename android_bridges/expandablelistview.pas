@@ -41,9 +41,7 @@ jExpandableListView = class(jVisualControl)
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
-
+    
     Procedure SetFontColor(_color: TARGBColorBridge);
     procedure SetFontChildColor(_color: TARGBColorBridge);
     procedure SetTextAlign(_align: TTextAlign);
@@ -224,28 +222,25 @@ var
   rToA: TPositionRelativeToAnchorID;
   i: integer;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
-
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-  FjPRLayoutHome:= FjPRLayout;
-
-  jExpandableListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jExpandableListView_SetId(FjEnv, FjObject, Self.Id);
-  jExpandableListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
+  if not FInitialized  then
   begin
-    Self.UpdateLayout;
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+
+   jExpandableListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jExpandableListView_SetId(FjEnv, FjObject, Self.Id);
   end;
+
+  jExpandableListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -262,46 +257,49 @@ begin
     end;
   end;
 
-  if FFontSizeUnit <> unitDefault then
+  if not FInitialized then
+  begin
+   if FFontSizeUnit <> unitDefault then
     jExpandableListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then
+   if FFontSize > 0 then
     jExpandableListView_SetFontSize(FjEnv, FjObject , FFontSize);
 
-  if FFontColor <> colbrDefault  then
+   if FFontColor <> colbrDefault  then
     jExpandableListView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
-  if FFontChildColor <> colbrDefault  then
+   if FFontChildColor <> colbrDefault  then
     jExpandableListView_SetFontChildColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontChildColor));
 
-  if FBackgroundChildColor <>  colbrDefault then
+   if FBackgroundChildColor <>  colbrDefault then
      jExpandableListView_SetBackgroundChild(FjEnv, FjObject, GetARGB(FCustomColor, FBackgroundChildColor));
 
-  if FTextAlign <> alLeft then
+   if FTextAlign <> alLeft then
     jExpandableListView_SetTextAlign(FjEnv, FjObject, Ord(FTextAlign));
 
-  if FTextChildAlign <> alLeft then
+   if FTextChildAlign <> alLeft then
     jExpandableListView_SetTextChildAlign(FjEnv, FjObject, Ord(FTextChildAlign));
 
-  if FFontFace <> ffNormal then
+   if FFontFace <> ffNormal then
     jExpandableListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
 
-  if FTextTypeFace <> tfNormal then
+   if FTextTypeFace <> tfNormal then
     jExpandableListView_SetTextTypeFace(FjEnv, FjObject, Ord(FTextTypeFace));
 
-  if FImageItemIdentifier <> '' then
+   if FImageItemIdentifier <> '' then
     jExpandableListView_SetImageItemIdentifier(FjEnv, FjObject, FImageItemIdentifier);
 
-  if FImageChildItemIdentifier <> '' then
+   if FImageChildItemIdentifier <> '' then
     jExpandableListView_SetImageChildItemIdentifier(FjEnv, FjObject, FImageChildItemIdentifier);
 
-  if FHighLightSelectedChildItemColor <> colbrDefault then
+   if FHighLightSelectedChildItemColor <> colbrDefault then
       jExpandableListView_SetHighLightSelectedChildItemColor(FjEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedChildItemColor));
 
-  for i:= 0 to FItems.Count - 1 do
-  begin
+   for i:= 0 to FItems.Count - 1 do
+   begin
     if FItems.Strings[i] <> '' then
          jExpandableListView_Add(FjEnv, FjObject , FItems.Strings[i], FGroupItemDelimiter, FChildItemDelimiter);
+   end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
@@ -309,10 +307,14 @@ begin
 
   jExpandableListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jExpandableListView.SetColor(Value: TARGBColorBridge);
@@ -327,51 +329,16 @@ begin
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jExpandableListView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jExpandableListView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jExpandableListView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jExpandableListView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jExpandableListView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jExpandableListView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jExpandableListView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jExpandableListView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
 
 procedure jExpandableListView.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jExpandableListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jExpandableListView.Refresh;
