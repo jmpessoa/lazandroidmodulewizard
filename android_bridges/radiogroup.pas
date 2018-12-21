@@ -25,8 +25,6 @@ jRadioGroup = class(jVisualControl)
     FItems: TStrings;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     
  public
     constructor Create(AOwner: TComponent); override;
@@ -153,28 +151,25 @@ var
   rToA: TPositionRelativeToAnchorID;
   i: integer;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
-
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-  FjPRLayoutHome:= FjPRLayout;
-
-  jRadioGroup_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jRadioGroup_SetId(FjEnv, FjObject, Self.Id);
-  jRadioGroup_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
+  if not FInitialized  then
   begin
-    Self.UpdateLayout;
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+
+   jRadioGroup_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jRadioGroup_SetId(FjEnv, FjObject, Self.Id);
   end;
+
+  jRadioGroup_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -196,17 +191,22 @@ begin
 
   jRadioGroup_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
 
-  for i:= 0 to FItems.Count-1 do
-  begin
+   for i:= 0 to FItems.Count-1 do
+   begin
     if FItems.Strings[i] <> '' then
         jRadioGroup_Add(FjEnv, FjObject , FItems.Strings[i]);
-  end;
+   end;
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jRadioGroup.SetColor(Value: TARGBColorBridge);
@@ -223,51 +223,15 @@ begin
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 
-procedure jRadioGroup.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jRadioGroup_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-          jRadioGroup_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-       else //lpMatchParent or others
-          jRadioGroup_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jRadioGroup.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jRadioGroup_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jRadioGroup_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-         jRadioGroup_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jRadioGroup.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jRadioGroup_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jRadioGroup.Refresh;

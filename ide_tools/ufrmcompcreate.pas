@@ -669,8 +669,6 @@ begin
   begin
    listPascal.Add('    procedure SetVisible(Value: Boolean);');
    listPascal.Add('    procedure SetColor(Value: TARGBColorBridge); //background');
-   listPascal.Add('    procedure UpdateLParamHeight;');
-   listPascal.Add('    procedure UpdateLParamWidth;');
   end;
 
   listPascal.Add(' ');
@@ -796,7 +794,15 @@ begin
   end;
 
   listPascal.Add('begin');
-  listPascal.Add('  if FInitialized  then Exit;');
+  listPascal.Add('   ');
+
+  if Pos('jVisualControl', FProjectModel) > 0  then
+  begin
+   listPascal.Add(' if not FInitialized then');
+   listPascal.Add(' begin');
+  end else
+   listPascal.Add('  if FInitialized  then Exit;');
+
   listPascal.Add('  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!');
   listPascal.Add('  //your code here: set/initialize create params....');
 
@@ -817,7 +823,6 @@ begin
   end;
 
   listProperties.Free;
-  listPascal.Add('  FInitialized:= True;');
 
   if Pos('jVisualControl', FProjectModel) > 0  then
   begin
@@ -828,16 +833,13 @@ begin
    listPascal.Add(' ');
    listPascal.Add('  '+FJavaClassName+'_SetViewParent(FjEnv, FjObject, FjPRLayout);');
    listPascal.Add('  '+FJavaClassName+'_SetId(FjEnv, FjObject, Self.Id);');
+   listPascal.Add(' end;');
+   listPascal.Add(' ');
    listPascal.Add('  '+FJavaClassName+'_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,');
    listPascal.Add('                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,');
-   listPascal.Add('                        GetLayoutParams(gApp, FLParamWidth, sdW),');
-   listPascal.Add('                        GetLayoutParams(gApp, FLParamHeight, sdH));');
+   listPascal.Add('                        sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),');
+   listPascal.Add('                        sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));');
 
-   listPascal.Add('  ');
-   listPascal.Add('  if FParent is jPanel then');
-   listPascal.Add('  begin');
-   listPascal.Add('    Self.UpdateLayout;');
-   listPascal.Add('  end;');
    listPascal.Add('  ');
 
    listPascal.Add('  for rToA := raAbove to raAlignRight do');
@@ -860,10 +862,15 @@ begin
    listPascal.Add('  ');
    listPascal.Add('  '+FJavaClassName+'_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);');
    listPascal.Add('  ');
+   listPascal.Add(' if not FInitialized then');
+   listPascal.Add(' begin');
+   listPascal.Add('  FInitialized := true;');
+   listPascal.Add('  ');
    listPascal.Add('  if  FColor <> colbrDefault then');
    listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));');
    listPascal.Add('  ');
    listPascal.Add('  View_SetVisible(FjEnv, FjObject, FVisible);');
+   listPascal.Add(' end;');
   end;
   listPascal.Add('end;');
   listPascal.Add('  ');
@@ -882,56 +889,18 @@ begin
    listPascal.Add('  if FInitialized then');
    listPascal.Add('    View_SetVisible(FjEnv, FjObject, FVisible);');
    listPascal.Add('end;');
-
-   listPascal.Add('procedure '+FJavaClassName+'.UpdateLParamWidth;');
-   listPascal.Add('begin');
-   listPascal.Add('  if FInitialized then');
-   listPascal.Add('  begin');
-   listPascal.Add('    if Self.Parent is jForm then');
-   listPascal.Add('    begin');
-   listPascal.Add('      '+FJavaClassName+'_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdW));');
-   listPascal.Add('    end');
-   listPascal.Add('    else');
-   listPascal.Add('    begin');
-
-   listPascal.Add('      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then');
-   listPascal.Add('        '+FJavaClassName+'_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))');
-   listPascal.Add('      else //lpMatchParent or others');
-   listPascal.Add('        '+FJavaClassName+'_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));');
-
-   listPascal.Add('    end;');
-   listPascal.Add('  end;');
-   listPascal.Add('end;');
-   listPascal.Add('   ');
-   listPascal.Add('procedure '+FJavaClassName+'.UpdateLParamHeight;');
-   listPascal.Add('begin');
-   listPascal.Add('  if FInitialized then');
-   listPascal.Add('  begin');
-   listPascal.Add('    if Self.Parent is jForm then');
-   listPascal.Add('    begin');
-   listPascal.Add('      '+FJavaClassName+'_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdH));');
-   listPascal.Add('    end');
-   listPascal.Add('    else');
-   listPascal.Add('    begin');
-
-   listPascal.Add('      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then');
-   listPascal.Add('        '+FJavaClassName+'_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))');
-   listPascal.Add('      else //lpMatchParent and others');
-   listPascal.Add('        '+FJavaClassName+'_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));');
-
-   listPascal.Add('    end;');
-   listPascal.Add('  end;');
-   listPascal.Add('end;');
    listPascal.Add('   ');
    listPascal.Add('procedure '+FJavaClassName+'.UpdateLayout;');
    listPascal.Add('begin');
-   listPascal.Add('  if FInitialized then');
-   listPascal.Add('  begin');
-   listPascal.Add('    inherited UpdateLayout;');
-   listPascal.Add('    UpdateLParamWidth;');
-   listPascal.Add('    UpdateLParamHeight;');
-   listPascal.Add('  '+FJavaClassName+'_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);');
-   listPascal.Add('  end;');
+   listPascal.Add('   ');
+   listPascal.Add('  if not FInitialized then exit;');
+   listPascal.Add('   ');
+   listPascal.Add('  ClearLayout();');
+   listPascal.Add('   ');
+   listPascal.Add('  inherited UpdateLayout;');
+   listPascal.Add('   ');
+   listPascal.Add('  init(gApp);');
+   listPascal.Add('   ');
    listPascal.Add('end;');
    listPascal.Add('   ');
    listPascal.Add('procedure '+FJavaClassName+'.Refresh;');

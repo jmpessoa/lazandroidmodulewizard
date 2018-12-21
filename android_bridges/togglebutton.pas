@@ -21,8 +21,6 @@ type
     FToggleState: TToggleState;
     FOnToggle: TOnClickToggleButton;
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     
   public
     constructor Create(AOwner: TComponent); override;
@@ -127,31 +125,28 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jToggleButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-  jToggleButton_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jToggleButton_SetId(FjEnv, FjObject, Self.Id);
-  jToggleButton_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
+   jToggleButton_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jToggleButton_SetId(FjEnv, FjObject, Self.Id);
   end;
+
+  jToggleButton_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -172,21 +167,26 @@ begin
 
   jToggleButton_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  if FTextOff <> 'OFF' then
+   if FTextOff <> 'OFF' then
     jToggleButton_SetTextOff(FjEnv, FjObject, FTextOff);
 
-  if FTextOn <> 'ON' then
+   if FTextOn <> 'ON' then
     jToggleButton_SetTextOn(FjEnv, FjObject, FTextOn);
 
-  if FToggleState <> tsOff then
+   if FToggleState <> tsOff then
      jToggleButton_SetChecked(FjEnv, FjObject, True);
 
-  jToggleButton_DispatchOnToggleEvent(FjEnv, FjObject, True);
+   jToggleButton_DispatchOnToggleEvent(FjEnv, FjObject, True);
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jToggleButton.SetColor(Value: TARGBColorBridge);
@@ -196,51 +196,15 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 
-procedure jToggleButton.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-       jToggleButton_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-          jToggleButton_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-       else //lpMatchParent or others
-          jToggleButton_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jToggleButton.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jToggleButton_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-         jToggleButton_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-         jToggleButton_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
-
 procedure jToggleButton.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jToggleButton_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jToggleButton.Refresh;

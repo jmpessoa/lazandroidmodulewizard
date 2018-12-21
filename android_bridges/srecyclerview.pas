@@ -28,8 +28,6 @@ jsRecyclerView = class(jVisualControl)
     FOnItemClick: TRecyclerViewOnItemClick;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     
  public
     constructor Create(AOwner: TComponent); override;
@@ -155,34 +153,30 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  //FjObject:= jCreate(); //jSelf !
-  FjObject:= jCreate(Ord(FLayoutModel), Ord(FLayoutOrientation), FColumns); //jSelf !
+  if not FInitialized  then
+  begin
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   //FjObject:= jCreate(); //jSelf !
+   FjObject:= jCreate(Ord(FLayoutModel), Ord(FLayoutOrientation), FColumns); //jSelf !
 
-  FInitialized:= True;
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
 
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
      jsRecyclerView_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  jsRecyclerView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jsRecyclerView_SetId(FjEnv, FjObject, Self.Id);
-  jsRecyclerView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
+   jsRecyclerView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jsRecyclerView_SetId(FjEnv, FjObject, Self.Id);
   end;
+
+  jsRecyclerView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -204,10 +198,15 @@ begin
 
   jsRecyclerView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jsRecyclerView.SetColor(Value: TARGBColorBridge);
@@ -222,51 +221,16 @@ begin
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jsRecyclerView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jsRecyclerView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jsRecyclerView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jsRecyclerView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jsRecyclerView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-       jsRecyclerView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jsRecyclerView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jsRecyclerView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
 
 procedure jsRecyclerView.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jsRecyclerView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jsRecyclerView.Refresh;

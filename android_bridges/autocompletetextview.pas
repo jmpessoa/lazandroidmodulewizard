@@ -29,8 +29,7 @@ jAutoTextView = class(jVisualControl)
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
+    
  protected
     //
  public
@@ -228,33 +227,29 @@ var
   rToA: TPositionRelativeToAnchorID;
   i: integer;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
     jAutoTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-  jAutoTextView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jAutoTextView_SetId(FjEnv, FjObject, Self.Id);
-  jAutoTextView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
+   jAutoTextView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jAutoTextView_SetId(FjEnv, FjObject, Self.Id);
   end;
 
+  jAutoTextView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
+                  
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
@@ -275,31 +270,35 @@ begin
 
   jAutoTextView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  if  FFontColor <> colbrDefault then
+   if  FFontColor <> colbrDefault then
     jAutoTextView_SetTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
-  if FFontSizeUnit <> unitDefault then
+   if FFontSizeUnit <> unitDefault then
      jAutoTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
-  if FFontSize > 0 then
+   if FFontSize > 0 then
     jAutoTextView_SetTextSize(FjEnv, FjObject , FFontSize);
 
-  jAutoTextView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jAutoTextView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
-  if not FCloseSoftInputOnEnter then
+   if not FCloseSoftInputOnEnter then
     jAutoTextView_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
 
-  if FHint <> '' then
+   if FHint <> '' then
      jAutoTextView_SetHint(FjEnv, FjObject, FHint);
 
-  for i:= 0 to FItems.Count-1 do
+   for i:= 0 to FItems.Count-1 do
      jAutoTextView_Add(FjEnv, FjObject , FItems.Strings[i]);
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
-
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jAutoTextView.SetColor(Value: TARGBColorBridge);
@@ -314,51 +313,16 @@ begin
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jAutoTextView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jAutoTextView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jAutoTextView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jAutoTextView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jAutoTextView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jAutoTextView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jAutoTextView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jAutoTextView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
 
 procedure jAutoTextView.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jAutoTextView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jAutoTextView.Refresh;

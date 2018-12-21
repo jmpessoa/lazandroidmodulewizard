@@ -34,8 +34,6 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     function GetCanvas(): jObject;
  public
     constructor Create(AOwner: TComponent); override;
@@ -219,35 +217,26 @@ procedure jDrawingView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
-  aWidth,aHeight:DWORD;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
-
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-  FjPRLayoutHome:= FjPRLayout;
-
-  jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jDrawingView_SetId(FjEnv, FjObject, Self.Id);
-
-  aWidth  := GetLayoutParams(gApp, FLParamWidth, sdW);
-  aHeight := GetLayoutParams(gApp, FLParamHeight, sdH);
-  if LayoutParamWidth = lpExact then aWidth := FWidth;
-  if LayoutParamHeight = lpExact then aHeight := FHeight;
-  jDrawingView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        aWidth,
-                        aHeight);
-
-  if FParent is jPanel then
+  if not FInitialized  then
   begin
-    Self.UpdateLayout;
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+
+   jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jDrawingView_SetId(FjEnv, FjObject, Self.Id);
   end;
+
+  jDrawingView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -269,19 +258,24 @@ begin
 
   jDrawingView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  jDrawingView_SetPaintWidth(FjEnv, FjObject, FPaintStrokeWidth);
-  jDrawingView_SetPaintStyle(FjEnv, FjObject, ord(FPaintStyle));
-  jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
-  jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
-  jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   
+   jDrawingView_SetPaintWidth(FjEnv, FjObject, FPaintStrokeWidth);
+   jDrawingView_SetPaintStyle(FjEnv, FjObject, ord(FPaintStyle));
+   jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
+   jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
+   jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
 
-  if FImageIdentifier <> '' then
+   if FImageIdentifier <> '' then
      jDrawingView_SetImageByResourceIdentifier(FjEnv, FjObject , FImageIdentifier);
 
-  if  FColor <> colbrDefault then
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jDrawingView.SetColor(Value: TARGBColorBridge);
@@ -296,63 +290,16 @@ begin
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jDrawingView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-
-    if LayoutParamWidth = lpExact then jDrawingView_setLParamWidth(FjEnv, FjObject , FWidth) else
-    begin
-
-      if Self.Parent is jForm then
-      begin
-        jDrawingView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-      end
-      else
-      begin
-        if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-          jDrawingView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-        else //lpMatchParent or others
-          jDrawingView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-      end;
-
-    end;
-  end;
-end;
-
-procedure jDrawingView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-
-    if LayoutParamHeight = lpExact then jDrawingView_setLParamHeight(FjEnv, FjObject , FHeight) else
-    begin
-
-      if Self.Parent is jForm then
-      begin
-        jDrawingView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-      end
-      else
-      begin
-        if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-          jDrawingView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-        else //lpMatchParent and others
-          jDrawingView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-      end;
-
-    end;
-  end;
-end;
 
 procedure jDrawingView.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-    jDrawingView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jDrawingView.Refresh;

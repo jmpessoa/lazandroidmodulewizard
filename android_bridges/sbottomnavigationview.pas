@@ -19,8 +19,6 @@ jsBottomNavigationView = class(jVisualControl)
     FOnClickItem: TOnClickNavigationViewItem;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     
  public
     constructor Create(AOwner: TComponent); override;
@@ -149,32 +147,28 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
+  if not FInitialized  then
+  begin
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
 
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-  FjPRLayoutHome:= FjPRLayout;
+   FjPRLayoutHome:= FjPRLayout;
 
-
-  if FGravityInParent <> lgNone then
+   if FGravityInParent <> lgNone then
     jsBottomNavigationView_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-  jsBottomNavigationView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jsBottomNavigationView_SetId(FjEnv, FjObject, Self.Id);
-  jsBottomNavigationView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
+   jsBottomNavigationView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jsBottomNavigationView_SetId(FjEnv, FjObject, Self.Id);
   end;
+
+  jsBottomNavigationView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -196,13 +190,18 @@ begin
 
   jsBottomNavigationView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if FFontColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if FFontColor <> colbrDefault then
      jsBottomNavigationView_SetItemTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
-  if  FColor <> colbrDefault then
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jsBottomNavigationView.SetColor(Value: TARGBColorBridge);
@@ -217,51 +216,16 @@ begin
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jsBottomNavigationView.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jsBottomNavigationView_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jsBottomNavigationView_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jsBottomNavigationView_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jsBottomNavigationView.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jsBottomNavigationView_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jsBottomNavigationView_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jsBottomNavigationView_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
 
 procedure jsBottomNavigationView.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jsBottomNavigationView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jsBottomNavigationView.Refresh;

@@ -25,8 +25,6 @@ jToolbar = class(jVisualControl)
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
     
  public
     constructor Create(AOwner: TComponent); override;
@@ -151,28 +149,25 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
-
-  if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-  FjPRLayoutHome:= FjPRLayout;
-
-  jToolbar_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jToolbar_SetId(FjEnv, FjObject, Self.Id);
-  jToolbar_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
-
-  if FParent is jPanel then
+  if not FInitialized  then
   begin
-    Self.UpdateLayout;
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
+
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   FjPRLayoutHome:= FjPRLayout;
+
+   jToolbar_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jToolbar_SetId(FjEnv, FjObject, Self.Id);
   end;
+
+  jToolbar_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -194,30 +189,35 @@ begin
 
   jToolbar_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  if FNavigationIcon <> '' then
+   if FNavigationIcon <> '' then
      jToolbar_SetNavigationIcon(FjEnv, FjObject, FNavigationIcon);
 
-  if  FTitle <> '' then
+   if  FTitle <> '' then
     jToolbar_SetTitle(FjEnv, FjObject, FTitle);
 
-  if FLogoIcon <> '' then
+   if FLogoIcon <> '' then
     jToolbar_SetLogo(FjEnv, FjObject, FLogoIcon);
 
-  {
-  if FAsActionBar then
+   {
+   if FAsActionBar then
     jToolbar_SetAsActionBar(FjEnv, FjObject, FAsActionBar);
 
-  if (FAsActionBar) and (FSubtitle <> '') then
+   if (FAsActionBar) and (FSubtitle <> '') then
     jToolbar_SetSubtitle(FjEnv, FjObject, FSubtitle);
 
-  if FAsActionBar then
+   if FAsActionBar then
     jToolbar_SetHomeButtonEnabled(FjEnv, FjObject, FHomeButtonEnabled);
-  }
+   }
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jToolbar.SetColor(Value: TARGBColorBridge);
@@ -232,51 +232,16 @@ begin
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jToolbar.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jToolbar_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jToolbar_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jToolbar_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jToolbar.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-     jToolbar_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jToolbar_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jToolbar_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
 
 procedure jToolbar.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jToolbar_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jToolbar.Refresh;

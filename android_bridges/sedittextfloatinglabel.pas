@@ -18,9 +18,7 @@ jsEditTextFloatingLabel = class(jVisualControl)
  private
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    procedure UpdateLParamHeight;
-    procedure UpdateLParamWidth;
-
+    
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -112,45 +110,23 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-  FInitialized:= True;
-  if FParent <> nil then
+  if not FInitialized  then
   begin
-    if FParent is jPanel then
-    begin
-      jPanel(FParent).Init(refApp);
-      FjPRLayout:= jPanel(FParent).View;
-    end;
-    if FParent is jScrollView then
-    begin
-      jScrollView(FParent).Init(refApp);
-      FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-    end;
-    if FParent is jHorizontalScrollView then
-    begin
-      jHorizontalScrollView(FParent).Init(refApp);
-      FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-    end;
-    if FParent is jCustomDialog then
-    begin
-      jCustomDialog(FParent).Init(refApp);
-      FjPRLayout:= jCustomDialog(FParent).View;
-    end;
-  end;
-  jsEditTextFloatingLabel_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jsEditTextFloatingLabel_SetId(FjEnv, FjObject, Self.Id);
-  jsEditTextFloatingLabel_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        GetLayoutParams(gApp, FLParamWidth, sdW),
-                        GetLayoutParams(gApp, FLParamHeight, sdH));
+   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   //your code here: set/initialize create params....
+   FjObject:= jCreate(); //jSelf !
 
-  if FParent is jPanel then
-  begin
-    Self.UpdateLayout;
+   if FParent <> nil then
+    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+
+   jsEditTextFloatingLabel_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   jsEditTextFloatingLabel_SetId(FjEnv, FjObject, Self.Id);
   end;
+
+  jsEditTextFloatingLabel_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -172,10 +148,14 @@ begin
 
   jsEditTextFloatingLabel_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
-  if  FColor <> colbrDefault then
+  if not FInitialized then
+  begin
+   FInitialized:= True;
+   if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(FjEnv, FjObject, FVisible);
+  end;
 end;
 
 procedure jsEditTextFloatingLabel.SetColor(Value: TARGBColorBridge);
@@ -190,51 +170,16 @@ begin
   if FInitialized then
     View_SetVisible(FjEnv, FjObject, FVisible);
 end;
-procedure jsEditTextFloatingLabel.UpdateLParamWidth;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jsEditTextFloatingLabel_SetLParamWidth(FjEnv, FjObject, GetLayoutParams(gApp, FLParamWidth, sdw));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamWidth = lpWrapContent then
-        jsEditTextFloatingLabel_setLParamWidth(FjEnv, FjObject , GetLayoutParams(gApp, FLParamWidth, sdW))
-      else //lpMatchParent or others
-        jsEditTextFloatingLabel_setLParamWidth(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamWidth, sdW));
-    end;
-  end;
-end;
-
-procedure jsEditTextFloatingLabel.UpdateLParamHeight;
-begin
-  if FInitialized then
-  begin
-    if Self.Parent is jForm then
-    begin
-      jsEditTextFloatingLabel_SetLParamHeight(FjEnv, FjObject, GetLayoutParams(gApp, FLParamHeight, sdh));
-    end
-    else
-    begin
-      if (Self.Parent as jVisualControl).LayoutParamHeight = lpWrapContent then
-        jsEditTextFloatingLabel_setLParamHeight(FjEnv, FjObject , GetLayoutParams(gApp, FLParamHeight, sdH))
-      else //lpMatchParent and others
-        jsEditTextFloatingLabel_setLParamHeight(FjEnv,FjObject,GetLayoutParamsByParent((Self.Parent as jVisualControl), FLParamHeight, sdH));
-    end;
-  end;
-end;
 
 procedure jsEditTextFloatingLabel.UpdateLayout;
 begin
-  if FInitialized then
-  begin
-    inherited UpdateLayout;
-    UpdateLParamWidth;
-    UpdateLParamHeight;
-  jsEditTextFloatingLabel_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
-  end;
+  if not FInitialized then exit;
+
+  ClearLayout();
+
+  inherited UpdateLayout;
+
+  init(gApp);
 end;
 
 procedure jsEditTextFloatingLabel.Refresh;
