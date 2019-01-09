@@ -290,7 +290,7 @@ var
   auxList: TStringList;
   flag: boolean;
   i, p1: integer;
-  mylib: string;
+  mylib, strAux: string;
   methodName: string;
   auxSignature: string;
   foundResult: string;
@@ -298,7 +298,6 @@ var
   len: integer;
   index_TYPE_line: integer;
   index_IFDEF_line: integer;
-
   new_TYPE: string;
 begin
   mylib:= 'lib'+libName+'.so';
@@ -368,6 +367,12 @@ begin
              end;
 
            end;
+         end;
+
+         if Pos('{$include ', auxList.Strings[i]) > 0 then
+         begin
+           strAux:= auxList.Strings[i];
+           auxList.Strings[i]:= StringReplace(strAux, '{$include ' , '//include ', [rfIgnoreCase]);
          end;
 
          if Pos('cdecl', auxList.Strings[i]) > 0 then
@@ -1185,9 +1190,11 @@ begin
     Project.Files[listIndex+1].CustomData['jControls']:= listComponent.DelimitedText;
 
     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
-                'Hint: "Run --> Build" and accept [Reload checked files from disk]!' + sLineBreak +
-                '[Close](Re)"Open" the project to update the form display content ...' + sLineBreak +
-                'Or close the form unit tab and reopen it [Project Inspector...] to see the content changes...');
+                'Hints:'+ sLineBreak +
+                '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
+                '.(Re)"Open" the project to update the form display content ...' + sLineBreak +
+                '      Or close the form unit tab and reopen it [Project Inspector...]'+ sLineBreak +
+                '      to see the content changes...');
   end;
 
   listTemp.Free;

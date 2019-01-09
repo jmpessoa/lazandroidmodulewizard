@@ -9,9 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.RadialGradient;
@@ -26,7 +23,6 @@ import android.text.method.LinkMovementMethod;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
 //import android.text.util.Linkify;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -480,12 +476,8 @@ public class jTextView extends TextView {
 		LAMWCommon.WrapParent();		
 	}		
 	
-	public void SetContentDescription(String _description) {
-	    this.setContentDescription(_description);
+	public void SetContentDescription(String _description) {		
+		this.setContentDescription(_description);
 	}
-
-	public void SetScrollingMovement() {  //TODO Pascal
-		this.setMovementMethod(new ScrollingMovementMethod());
-	}
-
+	
 }

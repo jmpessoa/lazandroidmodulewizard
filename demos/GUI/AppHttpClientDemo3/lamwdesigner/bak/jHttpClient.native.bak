@@ -1,0 +1,4 @@
+public native void pOnHttpClientContentResult(long pasobj, String content);
+public native void pOnHttpClientCodeResult(long pasobj, int code);
+public native void pOnHttpClientUploadProgress(long pasobj, long progress);
+public native void pOnHttpClientUploadFinished(long pasobj, int connectionStatusCode, String connectionStatusMessage, String fullFileName);
