@@ -837,8 +837,8 @@ begin
    listPascal.Add(' ');
    listPascal.Add('  '+FJavaClassName+'_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,');
    listPascal.Add('                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,');
-   listPascal.Add('                        sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),');
-   listPascal.Add('                        sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));');
+   listPascal.Add('                        sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),');
+   listPascal.Add('                        sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));');
 
    listPascal.Add('  ');
 
