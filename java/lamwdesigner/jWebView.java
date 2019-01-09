@@ -235,4 +235,28 @@ public class jWebView extends WebView {
     public void LoadFromHtmlString(String _htmlString) {  //thanks to Anton!
        loadDataWithBaseURL(null, _htmlString, null, null, null);
     }
+    
+    public boolean CanGoBack(){
+    	return this.canGoBack();
+    }
+    
+    public boolean CanGoBackOrForward(int _steps){
+    	return this.canGoBackOrForward(_steps);
+    }    
+
+    public boolean CanGoForward(){
+    	return this.canGoForward();
+    }
+    
+    public void GoBack(){
+        this.goBack();	
+    }    
+
+    public void	GoBackOrForward(int steps){
+    	this.goBackOrForward(steps);
+    }    
+
+    public void	GoForward(){
+    	this.goForward();
+    }
 }

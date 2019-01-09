@@ -1691,6 +1691,13 @@ type
     procedure SetViewParent(Value: jObject); override;
     procedure RemoveFromViewParent;  override;
 
+    function CanGoBack(): boolean;
+    function CanGoBackOrForward(_steps: integer): boolean;
+    function CanGoForward(): boolean;
+    procedure GoBack();
+    procedure GoBackOrForward(steps: integer);
+    procedure GoForward();
+
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
@@ -8521,6 +8528,48 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jWebView_LoadFromHtmlString(FjEnv, FjObject, _htmlString);
+end;
+
+function jWebView.CanGoBack(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWebView_CanGoBack(FjEnv, FjObject);
+end;
+
+function jWebView.CanGoBackOrForward(_steps: integer): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWebView_CanGoBackOrForward(FjEnv, FjObject, _steps);
+end;
+
+function jWebView.CanGoForward(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWebView_CanGoForward(FjEnv, FjObject);
+end;
+
+procedure jWebView.GoBack();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_GoBack(FjEnv, FjObject);
+end;
+
+procedure jWebView.GoBackOrForward(steps: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_GoBackOrForward(FjEnv, FjObject, steps);
+end;
+
+procedure jWebView.GoForward();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_GoForward(FjEnv, FjObject);
 end;
 
 procedure jWebView.ClearLayout();
