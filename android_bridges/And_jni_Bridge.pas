@@ -703,6 +703,13 @@ Procedure jWebView_setLayoutAll(env:PJNIEnv; WebView : jObject;  idAnchor: DWord
 procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject; _hostName: string; _hostDomain: string; _username: string; _password: string);
 procedure jWebView_LoadFromHtmlString(env: PJNIEnv; _jwebview: JObject; _htmlString: string);
 
+function  jWebView_CanGoBack(env: PJNIEnv; _jwebview: JObject): boolean;
+function  jWebView_CanGoBackOrForward(env: PJNIEnv; _jwebview: JObject; _steps: integer): boolean;
+function  jWebView_CanGoForward(env: PJNIEnv; _jwebview: JObject): boolean;
+procedure jWebView_GoBack(env: PJNIEnv; _jwebview: JObject);
+procedure jWebView_GoBackOrForward(env: PJNIEnv; _jwebview: JObject; steps: integer);
+procedure jWebView_GoForward(env: PJNIEnv; _jwebview: JObject);
+
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
                                         this:jobject; SelfObj : TObject) : jObject;
@@ -7171,6 +7178,86 @@ begin
   env^.CallVoidMethodA(env,WebView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
+end;
+
+function jWebView_CanGoBack(env: PJNIEnv; _jwebview: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'CanGoBack', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jwebview, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jWebView_CanGoBackOrForward(env: PJNIEnv; _jwebview: JObject; _steps: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _steps;
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'CanGoBackOrForward', '(I)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jwebview, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jWebView_CanGoForward(env: PJNIEnv; _jwebview: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'CanGoForward', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jwebview, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jWebView_GoBack(env: PJNIEnv; _jwebview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GoBack', '()V');
+  env^.CallVoidMethod(env, _jwebview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jWebView_GoBackOrForward(env: PJNIEnv; _jwebview: JObject; steps: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= steps;
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GoBackOrForward', '(I)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jWebView_GoForward(env: PJNIEnv; _jwebview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GoForward', '()V');
+  env^.CallVoidMethod(env, _jwebview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //by jmpessoa

@@ -142,8 +142,8 @@ begin
 
   jLinearLayout_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH ));
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
   begin
