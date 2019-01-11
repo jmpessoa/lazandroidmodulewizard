@@ -32,6 +32,8 @@ type
       requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
     procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1PrepareOptionsMenu(Sender: TObject;
+      jObjMenu: jObject; menuSize: integer; out prepareItems: boolean);
     procedure AndroidModule1RequestPermissionResult(Sender: TObject;
       requestCode: integer; manifestPermission: string;
       grantResult: TManifestPermissionResult);
@@ -170,6 +172,12 @@ begin
       SetLength(manifestPermissions, 0);
 
   end;
+end;
+
+procedure TAndroidModule1.AndroidModule1PrepareOptionsMenu(Sender: TObject;
+  jObjMenu: jObject; menuSize: integer; out prepareItems: boolean);
+begin
+  self.UpdateLayout;
 end;
 
 procedure TAndroidModule1.AndroidModule1RequestPermissionResult(

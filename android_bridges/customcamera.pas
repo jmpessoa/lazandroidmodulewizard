@@ -108,6 +108,7 @@ procedure jCustomCamera_SetEnvironmentStorage(env: PJNIEnv; _jcustomcamera: JObj
 procedure jCustomCamera_SaveToMediaStore(env: PJNIEnv; _jcustomcamera: JObject; _title: string; _description: string);
 function jCustomCamera_GetImage(env: PJNIEnv; _jcustomcamera: JObject; _width: integer; _height: integer): jObject; overload;
 function jCustomCamera_GetImage(env: PJNIEnv; _jcustomcamera: JObject): jObject; overload;
+procedure jCustomCamera_surfaceUpdate(env: PJNIEnv; _jcustomcamera: JObject);
 
 implementation
 
@@ -225,7 +226,11 @@ end;
 procedure jCustomCamera.Refresh;
 begin
   if FInitialized then
+  begin
+    jCustomCamera_surfaceUpdate( FjEnv, FjObject );
+
     View_Invalidate(FjEnv, FjObject);
+  end;
 end;
 
 //Event : Java -> Pascal
@@ -687,6 +692,17 @@ var
 begin
   jCls:= env^.GetObjectClass(env, _jcustomcamera);
   jMethod:= env^.GetMethodID(env, jCls, 'TakePicture', '()V');
+  env^.CallVoidMethod(env, _jcustomcamera, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCustomCamera_surfaceUpdate(env: PJNIEnv; _jcustomcamera: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'surfaceUpdate', '()V');
   env^.CallVoidMethod(env, _jcustomcamera, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;

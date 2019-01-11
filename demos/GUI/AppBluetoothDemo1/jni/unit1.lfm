@@ -7,44 +7,49 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   object jTextView1: jTextView
-    Left = 85
+    Left = 88
     Top = 5
-    Width = 129
-    Height = 20
+    Width = 123
+    Height = 19
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 2884513
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App Bluetooth Demo1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 2884513
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 2
-    Top = 34
+    Top = 33
     Width = 296
-    Height = 40
+    Height = 48
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 1768641
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -54,20 +59,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
-    Id = 1768641
   end
   object jButton2: jButton
     Left = 2
-    Top = 82
-    Width = 136
-    Height = 40
+    Top = 89
+    Width = 146
+    Height = 48
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton1
+    Id = 2680672
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -77,22 +84,24 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
-    Id = 2680672
   end
   object jButton3: jButton
-    Left = 142
-    Top = 82
-    Width = 136
-    Height = 40
+    Left = 152
+    Top = 89
+    Width = 146
+    Height = 48
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
-    Anchor = jButton2
-    PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
-    PosRelativeToParent = []
+    Anchor = jButton1
+    Id = 0
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
     Text = 'List Paired...'
@@ -100,20 +109,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton3Click
-    Id = 0
   end
   object jButton4: jButton
     Left = 2
-    Top = 297
+    Top = 295
     Width = 296
-    Height = 40
+    Height = 48
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jListView1
+    Id = 1423383
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -123,16 +134,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton4Click
-    Id = 1423383
   end
   object jListView1: jListView
-    Left = 9
-    Top = 160
-    Width = 279
-    Height = 130
+    Left = 0
+    Top = 141
+    Width = 300
+    Height = 150
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jButton2
+    Id = 4193543
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -151,19 +168,23 @@ object AndroidModule1: TAndroidModule1
     TextAlign = alLeft
     HighLightSelectedItemColor = colbrDefault
     FontSizeUnit = unitDefault
-    Id = 4193543
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
   end
   object jButton5: jButton
     Left = 2
-    Top = 345
+    Top = 351
     Width = 296
-    Height = 40
+    Height = 48
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton4
+    Id = 3487016
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -173,31 +194,32 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton5Click
-    Id = 3487016
   end
   object jImageBtn1: jImageBtn
     Left = 16
-    Top = 392
-    Width = 48
-    Height = 48
+    Top = 408
+    Width = 74
+    Height = 74
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton5
+    Id = 4193544
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
-    Enabled = True
     Images = jImageList1
     IndexImageUp = 0
     IndexImageDown = 1
+    GravityInParent = lgNone
     OnClick = jImageBtn1Click
-    Id = 0
   end
   object jBluetooth1: jBluetooth
     OnDeviceFound = jBluetooth1DeviceFound

@@ -13,11 +13,11 @@ android {
     lintOptions {
        abortOnError false
     }
-    compileSdkVersion 25
+    compileSdkVersion 28
     buildToolsVersion "25.0.3"
     defaultConfig {
             minSdkVersion 14
-            targetSdkVersion 25
+            targetSdkVersion 28
             versionCode 1
             versionName "1.0"
     }
