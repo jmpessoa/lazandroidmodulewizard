@@ -36,15 +36,22 @@ implementation
 
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+var
+  d, m, y, h, min, s : integer;
 begin
-  jCalendarView1.SetMinDate(2017, 1, 1);
-  jCalendarView1.SetMaxDate(2018, 12, 31);
-  //jCalendarView1.SetDate(2018, 9, 20);
+  self.GetDateTimeDecode(d, m, y, h, min, s);
+  jCalendarView1.SetMinDate(y-1, 1, 1);
+  jCalendarView1.SetMaxDate(y, 12, 31);
+
+  jCalendarView1.SetDate(y, m, d);
+
+  jTextView1.Text := intToStr(y) + '/' + intToStr(m) + '/' + intToStr(d);
 end;
 
 procedure TAndroidModule1.jCalendarView1SelectedDayChange(Sender: TObject;
   year: integer; monthOfYear: integer; dayOfMonth: integer);
 begin
+  jTextView1.Text := intToStr(year) + '/' + intToStr(monthOfYear) + '/' + intToStr(dayOfMonth);
    ShowMessage('Selected year='+IntToStr(year)+ ' month='+IntTostr(monthOfYear) + ' dayOfMonth='+ IntTostr(dayOfMonth));
 end;
 

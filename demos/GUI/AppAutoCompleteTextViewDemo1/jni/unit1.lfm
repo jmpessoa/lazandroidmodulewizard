@@ -51,7 +51,6 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpHalfOfParent
     LayoutParamHeight = lpWrapContent
-    Text = 'jAutoTextView1'
     Alignment = taLeft
     Enabled = True
     FontColor = colbrDefault

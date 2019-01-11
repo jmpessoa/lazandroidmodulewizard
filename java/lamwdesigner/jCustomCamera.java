@@ -38,7 +38,7 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     private Boolean enabled  = true;           // click-touch enabled!
 
     //private SurfaceHolder mHolder;
-    private Camera camera;
+    private Camera camera = null;
     private int cameraID  = -1;
 
     // private int seconds = 10; //THIS WILL RUN FOR 10 SECONDS
@@ -50,7 +50,7 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     private String mEnvDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
 
     //The "holder" is the underlying surface.
-    private SurfaceHolder surfaceHolder;
+    private SurfaceHolder surfaceHolder = null;
     private Bitmap mPicture = null;
     private boolean mAutoInit = true;
     private boolean mFlashModeOn = false;
@@ -100,6 +100,21 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
         updateCameraDisplayOrientation();
         // restart preview with new settings
         startCameraPreview(holder);
+    }
+    
+    public void surfaceUpdate() {
+        if (this.surfaceHolder.getSurface() == null) {
+            //surfaceHolder is null, nothing to do...
+            return;
+        }
+        
+        // stop preview before making changes!
+        stopCameraPreview();
+        // set preview size and make any resize, rotate or
+        // reformatting changes here
+        updateCameraDisplayOrientation();
+        // restart preview with new settings
+        startCameraPreview(surfaceHolder);
     }
 
     /**
@@ -175,10 +190,9 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     }
 
     private void setupCamera() {
-       Camera camera = this.getCamera();
-        if (camera == null) {
-            return;
-        }
+       
+        if (camera == null) return;
+            
         Camera.Parameters parameters = camera.getParameters();
         parameters.setPictureFormat(ImageFormat.JPEG); // JPEG for full resolution images
 
@@ -216,7 +230,11 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
      */
     private synchronized void startCameraPreview(SurfaceHolder holder) {
         //MainActivity parent = (MainActivity)this.getContext();
-        Camera camera = this.getCamera();
+    	
+    	if (camera == null) setCameraInstance();
+    	
+    	if (camera == null) return;
+        
         try {
             camera.setPreviewDisplay(holder);
             camera.startPreview();
@@ -230,7 +248,8 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
      */
     private synchronized void stopCameraPreview() {
         //MainActivity parent = (MainActivity)this.getContext();
-        Camera camera = this.getCamera();
+    	if (camera == null) return;
+    	        
         try {
             camera.stopPreview();
         } catch (Exception e){
@@ -243,11 +262,13 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
      * the surface needs to be rotated
      */
     private void updateCameraDisplayOrientation() {
-        Camera camera = this.getCamera();
+    	
+    	if (camera == null) setCameraInstance();
+    	
+    	if (camera == null) return;
+    	
         int cameraID = this.getCameraID();
-        if (camera == null) {
-            return;
-        }
+        
         int result = 0;
         int rotation = controls.activity.getWindowManager().getDefaultDisplay().getRotation();
         int degrees = 0;
@@ -473,6 +494,8 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     };
 
     public void TakePicture() {
+    	if(camera == null) return;
+    	
         camera.autoFocus(new Camera.AutoFocusCallback(){
             @Override
             public void onAutoFocus(boolean success, Camera arg1) {
@@ -486,6 +509,8 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     //ABOUT: https://stackoverflow.com/questions/19804233/android-autofocuscallback-is-not-being-called-or-not-returning
     // https://stackoverflow.com/questions/25321968/trouble-with-focus-mode-continuous-picture-on-galaxy-s5
     public void TakePicture(String _filename) {
+    	if(camera == null) return;
+    	
         mFileName = _filename;
         camera.autoFocus(new Camera.AutoFocusCallback(){
             					@Override

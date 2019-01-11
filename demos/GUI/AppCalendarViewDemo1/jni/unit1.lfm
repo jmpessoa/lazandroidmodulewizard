@@ -1,6 +1,6 @@
 object AndroidModule1: TAndroidModule1
-  Left = 378
-  Top = 152
+  Left = 290
+  Top = 149
   Width = 320
   Height = 400
   MarginLeft = 0
@@ -10,14 +10,14 @@ object AndroidModule1: TAndroidModule1
   Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
-  BackgroundColor = colbrDefault
+  BackgroundColor = colbrWhite
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 60
+    Left = 85
     Top = 5
-    Width = 200
-    Height = 26
+    Width = 149
+    Height = 19
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -32,7 +32,7 @@ object AndroidModule1: TAndroidModule1
     Text = 'App CalendarView Demo1'
     Alignment = taLeft
     BackgroundColor = colbrDefault
-    FontColor = colbrDefault
+    FontColor = colbrBlack
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
@@ -40,9 +40,9 @@ object AndroidModule1: TAndroidModule1
   end
   object jCalendarView1: jCalendarView
     Left = 10
-    Top = 46
+    Top = 39
     Width = 300
-    Height = 200
+    Height = 351
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -54,13 +54,13 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpWrapContent
-    BackgroundColor = colbrDefault
-    FocusedMonthDateColor = colbrDefault
+    LayoutParamHeight = lpMatchParent
+    BackgroundColor = colbrSilver
+    FocusedMonthDateColor = colbrBlack
     SelectedWeekBackgroundColor = colbrDefault
-    WeekSeparatorLineColor = colbrDefault
-    WeekNumberColor = colbrDefault
-    FirstDayOfWeek = 2
+    WeekSeparatorLineColor = colbrBlack
+    WeekNumberColor = colbrBlack
+    FirstDayOfWeek = 1
     OnSelectedDayChange = jCalendarView1SelectedDayChange
   end
 end
