@@ -1,7 +1,7 @@
 object AndroidModule1: TAndroidModule1
   Left = 307
   Top = 141
-  Width = 320
+  Width = 381
   Height = 439
   MarginLeft = 0
   MarginTop = 0
@@ -14,10 +14,10 @@ object AndroidModule1: TAndroidModule1
   ActionBarTitle = abtDefault
   OnRotate = AndroidModule1Rotate
   object jTextView1: jTextView
-    Left = 129
+    Left = 158
     Top = 5
-    Width = 61
-    Height = 20
+    Width = 64
+    Height = 19
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -36,12 +36,13 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 2
-    Top = 34
-    Width = 314
-    Height = 40
+    Top = 33
+    Width = 377
+    Height = 48
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
@@ -59,13 +60,14 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jPanel1: jPanel
-    Left = 8
-    Top = 82
-    Width = 304
-    Height = 153
+    Left = 4
+    Top = 89
+    Width = 373
+    Height = 159
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -82,10 +84,10 @@ object AndroidModule1: TAndroidModule1
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
     object jPanel2: jPanel
-      Left = 8
+      Left = 4
       Top = 4
-      Width = 288
-      Height = 89
+      Width = 365
+      Height = 88
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -103,8 +105,8 @@ object AndroidModule1: TAndroidModule1
       object jTextView2: jTextView
         Left = 5
         Top = 5
-        Width = 61
-        Height = 20
+        Width = 64
+        Height = 19
         MarginLeft = 5
         MarginTop = 5
         MarginRight = 5
@@ -123,12 +125,13 @@ object AndroidModule1: TAndroidModule1
         FontSize = 0
         TextTypeFace = tfNormal
         FontSizeUnit = unitDefault
+        GravityInParent = lgNone
       end
       object jTextView3: jTextView
-        Left = 158
+        Left = 193
         Top = 5
-        Width = 61
-        Height = 20
+        Width = 64
+        Height = 19
         MarginLeft = 5
         MarginTop = 5
         MarginRight = 5
@@ -148,11 +151,12 @@ object AndroidModule1: TAndroidModule1
         FontSize = 0
         TextTypeFace = tfNormal
         FontSizeUnit = unitDefault
+        GravityInParent = lgNone
       end
       object jEditText1: jEditText
         Left = 5
-        Top = 40
-        Width = 130
+        Top = 39
+        Width = 172
         Height = 39
         MarginLeft = 5
         MarginTop = 10
@@ -181,11 +185,14 @@ object AndroidModule1: TAndroidModule1
         WrappingLine = False
         Editable = True
         FontSizeUnit = unitDefault
+        CloseSoftInputOnEnter = True
+        CapSentence = False
+        GravityInParent = lgNone
       end
       object jEditText2: jEditText
-        Left = 153
-        Top = 40
-        Width = 130
+        Left = 188
+        Top = 39
+        Width = 172
         Height = 39
         MarginLeft = 5
         MarginTop = 10
@@ -214,13 +221,16 @@ object AndroidModule1: TAndroidModule1
         WrappingLine = False
         Editable = True
         FontSizeUnit = unitDefault
+        CloseSoftInputOnEnter = True
+        CapSentence = False
+        GravityInParent = lgNone
       end
     end
     object jPanel3: jPanel
-      Left = 8
-      Top = 101
-      Width = 288
-      Height = 48
+      Left = 4
+      Top = 100
+      Width = 365
+      Height = 55
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -237,11 +247,11 @@ object AndroidModule1: TAndroidModule1
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
       object jButton2: jButton
-        Left = 4
-        Top = 4
-        Width = 130
-        Height = 40
-        MarginLeft = 4
+        Left = 2
+        Top = 3
+        Width = 178
+        Height = 48
+        MarginLeft = 2
         MarginTop = 4
         MarginRight = 2
         MarginBottom = 4
@@ -257,15 +267,16 @@ object AndroidModule1: TAndroidModule1
         FontColor = colbrDefault
         FontSize = 0
         FontSizeUnit = unitDefault
+        GravityInParent = lgNone
       end
       object jButton3: jButton
-        Left = 154
-        Top = 4
-        Width = 130
-        Height = 40
+        Left = 185
+        Top = 3
+        Width = 178
+        Height = 48
         MarginLeft = 2
         MarginTop = 4
-        MarginRight = 4
+        MarginRight = 2
         MarginBottom = 4
         Enabled = True
         Visible = True
@@ -279,14 +290,15 @@ object AndroidModule1: TAndroidModule1
         FontColor = colbrDefault
         FontSize = 0
         FontSizeUnit = unitDefault
+        GravityInParent = lgNone
       end
     end
   end
   object jCustomDialog1: jCustomDialog
     Left = 5
-    Top = 266
-    Width = 310
-    Height = 168
+    Top = 136
+    Width = 371
+    Height = 166
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -299,16 +311,17 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     Text = 'jCustomDialog1'
-    BackgroundColor = colbrDefault
+    BackgroundColor = colbrMaroon
+    Cancelable = True
     OnShow = jCustomDialog1Show
     OnBackKeyPressed = jCustomDialog1BackKeyPressed
     left = 132
     top = 294
     object jPanel4: jPanel
-      Left = 22
-      Top = 7
-      Width = 265
-      Height = 153
+      Left = 23
+      Top = 3
+      Width = 325
+      Height = 159
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
@@ -320,14 +333,14 @@ object AndroidModule1: TAndroidModule1
       PosRelativeToParent = [rpCenterInParent]
       LayoutParamWidth = lpNineTenthsOfParent
       LayoutParamHeight = lpWrapContent
-      BackgroundColor = colbrDefault
+      BackgroundColor = colbrAquamarine
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
       object jPanel5: jPanel
-        Left = 7
+        Left = 4
         Top = 4
-        Width = 250
-        Height = 89
+        Width = 317
+        Height = 88
         MarginLeft = 4
         MarginTop = 4
         MarginRight = 4
@@ -345,8 +358,8 @@ object AndroidModule1: TAndroidModule1
         object jTextView4: jTextView
           Left = 5
           Top = 5
-          Width = 61
-          Height = 20
+          Width = 64
+          Height = 19
           MarginLeft = 5
           MarginTop = 5
           MarginRight = 5
@@ -365,12 +378,13 @@ object AndroidModule1: TAndroidModule1
           FontSize = 0
           TextTypeFace = tfNormal
           FontSizeUnit = unitDefault
+          GravityInParent = lgNone
         end
         object jTextView5: jTextView
-          Left = 139
+          Left = 169
           Top = 5
-          Width = 61
-          Height = 20
+          Width = 143
+          Height = 19
           MarginLeft = 5
           MarginTop = 5
           MarginRight = 5
@@ -390,11 +404,12 @@ object AndroidModule1: TAndroidModule1
           FontSize = 0
           TextTypeFace = tfNormal
           FontSizeUnit = unitDefault
+          GravityInParent = lgNone
         end
         object jEditText3: jEditText
           Left = 5
-          Top = 40
-          Width = 111
+          Top = 39
+          Width = 148
           Height = 39
           MarginLeft = 5
           MarginTop = 10
@@ -423,11 +438,14 @@ object AndroidModule1: TAndroidModule1
           WrappingLine = False
           Editable = True
           FontSizeUnit = unitDefault
+          CloseSoftInputOnEnter = True
+          CapSentence = False
+          GravityInParent = lgNone
         end
         object jEditText4: jEditText
-          Left = 134
-          Top = 40
-          Width = 111
+          Left = 164
+          Top = 39
+          Width = 148
           Height = 39
           MarginLeft = 5
           MarginTop = 10
@@ -456,13 +474,16 @@ object AndroidModule1: TAndroidModule1
           WrappingLine = False
           Editable = True
           FontSizeUnit = unitDefault
+          CloseSoftInputOnEnter = True
+          CapSentence = False
+          GravityInParent = lgNone
         end
       end
       object jPanel6: jPanel
-        Left = 7
-        Top = 101
-        Width = 250
-        Height = 48
+        Left = 4
+        Top = 100
+        Width = 317
+        Height = 55
         MarginLeft = 4
         MarginTop = 4
         MarginRight = 4
@@ -480,9 +501,9 @@ object AndroidModule1: TAndroidModule1
         MaxPinchZoomFactor = 4
         object jButton4: jButton
           Left = 2
-          Top = 4
-          Width = 111
-          Height = 40
+          Top = 3
+          Width = 154
+          Height = 48
           MarginLeft = 2
           MarginTop = 4
           MarginRight = 2
@@ -499,13 +520,14 @@ object AndroidModule1: TAndroidModule1
           FontColor = colbrDefault
           FontSize = 0
           FontSizeUnit = unitDefault
+          GravityInParent = lgNone
           OnClick = jButton4Click
         end
         object jButton5: jButton
-          Left = 137
-          Top = 4
-          Width = 111
-          Height = 40
+          Left = 161
+          Top = 3
+          Width = 154
+          Height = 48
           MarginLeft = 2
           MarginTop = 4
           MarginRight = 2
@@ -522,9 +544,17 @@ object AndroidModule1: TAndroidModule1
           FontColor = colbrDefault
           FontSize = 0
           FontSizeUnit = unitDefault
+          GravityInParent = lgNone
           OnClick = jButton5Click
         end
       end
     end
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer1Timer
+    left = 116
+    top = 347
   end
 end

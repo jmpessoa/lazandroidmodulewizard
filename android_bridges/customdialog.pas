@@ -54,6 +54,8 @@ type
     procedure Show(); overload;
     procedure Show(_title: string); overload;
     procedure Show(_title: string; _iconIdentifier: string); overload;
+    function  GetDialogWidth(): integer;
+    function  GetDialogHeight(): integer;
     procedure Close();
     //procedure SetCloseOnBackKeyPressed(_value: boolean);
     //procedure SetCanceledOnTouchOutside(_value: boolean);
@@ -89,6 +91,9 @@ procedure jCustomDialog_SetId(env: PJNIEnv; _jcustomdialog: JObject; _id: intege
 procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject);overload;
 procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string);overload;
 procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string; _iconIdentifier: string);overload;
+
+function  jCustomDialog_GetDialogWidth(env: PJNIEnv; _jcustomdialog: JObject): integer;
+function  jCustomDialog_GetDialogHeight(env: PJNIEnv; _jcustomdialog: JObject): integer;
 
 procedure jCustomDialog_SetTitle(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
 procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; _jcustomdialog: JObject; _iconIdentifier: string);
@@ -152,13 +157,15 @@ begin
 
    jCustomDialog_SetViewParent(FjEnv, FjObject, FjPRLayout);
    jCustomDialog_SetId(FjEnv, FjObject, Self.Id);
+
   end;
 
   jCustomDialog_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
-                  
+
+
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
@@ -211,17 +218,34 @@ procedure jCustomDialog.UpdateLayout;
 begin
   if not FInitialized then exit;
 
-  ClearLayout();
+  //ClearLayout();
 
   inherited UpdateLayout;
 
-  init(gApp);
+  if getDialogWidth()  > 0 then FWidth  := getDialogWidth()-FMarginLeft-FMarginRight-4;
+  //if getDialogHeight() > 0 then FHeight := getDialogHeight()-FMarginTop-FMarginBottom-10;
+
+  //init(gApp);
 end;
 
 procedure jCustomDialog.Refresh;
 begin
   if FInitialized then
     View_Invalidate(FjEnv, FjObject);
+end;
+
+function jCustomDialog.GetDialogWidth(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCustomDialog_GetDialogWidth(FjEnv, FjObject);
+end;
+
+function jCustomDialog.GetDialogHeight(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCustomDialog_GetDialogHeight(FjEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -641,6 +665,29 @@ begin
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jCustomDialog_GetDialogWidth(env: PJNIEnv; _jcustomdialog: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcustomdialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDialogWidth', '()I');
+  Result:= env^.CallIntMethod(env, _jcustomdialog, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jCustomDialog_GetDialogHeight(env: PJNIEnv; _jcustomdialog: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcustomdialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDialogHeight', '()I');
+  Result:= env^.CallIntMethod(env, _jcustomdialog, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

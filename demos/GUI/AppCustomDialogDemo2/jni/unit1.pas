@@ -34,12 +34,14 @@ type
     jTextView3: jTextView;
     jTextView4: jTextView;
     jTextView5: jTextView;
+    jTimer1: jTimer;
     procedure AndroidModule1Rotate(Sender: TObject; rotate: TScreenStyle);
     procedure jButton1Click(Sender: TObject);
     procedure jButton4Click(Sender: TObject);
     procedure jButton5Click(Sender: TObject);
     procedure jCustomDialog1BackKeyPressed(Sender: TObject; title: string);
     procedure jCustomDialog1Show(Sender: TObject; dialog: jObject; title: string);
+    procedure jTimer1Timer(Sender: TObject);
 
   private
     {private declarations}
@@ -64,13 +66,17 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+
    jCustomDialog1.Show('LAMW Custom Dialog');
+   jtimer1.Enabled:= true;
 end;
 
 procedure TAndroidModule1.jButton4Click(Sender: TObject);
 begin
+
   ShowMessage('Ok');
-  ShowMessage('Hint: jPanel4.LayoutParamWidth = lpNineTenthsOfParent');
+  showmessage('jCustomDialog size: ' + intToStr(jCustomDialog1.GetWidth) + 'x' + intToStr(jCustomDialog1.GetHeight) );
+  //ShowMessage('Hint: jPanel4.LayoutParamWidth = lpNineTenthsOfParent');
   jCustomDialog1.Close();
 end;
 
@@ -88,6 +94,12 @@ end;
 procedure TAndroidModule1.jCustomDialog1Show(Sender: TObject; dialog: jObject; title: string);
 begin
    ShowMessage('Hint: jPanel4.LayoutParamWidth = lpNineTenthsOfParent');
+end;
+
+procedure TAndroidModule1.jTimer1Timer(Sender: TObject);
+begin
+  jCustomDialog1.UpdateLayout;
+  self.UpdateLayout;
 end;
 
 end.
