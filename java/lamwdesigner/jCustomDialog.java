@@ -230,6 +230,7 @@ public class jCustomDialog extends RelativeLayout {
 									
 		mTitle = _title;
 		mIconIdentifier = _iconIdentifier;
+		
 		if (mDialog != null) {
 			mDialog.setTitle(mTitle);
 			controls.pOnCustomDialogShow(pascalObj, mDialog, _title);
@@ -239,13 +240,17 @@ public class jCustomDialog extends RelativeLayout {
 			if (this.getVisibility()==0) { //visible
 				this.setVisibility(android.view.View.INVISIBLE); //4
 			}
-			if (!mRemovedFromParent) {
+			
+			if (!mRemovedFromParent) {				
 				parent.removeView(this);
 				mRemovedFromParent = true;
 			}
+						
 			mDialog = new Dialog(this.controls.activity);
+			
 			mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-			mDialog.setContentView(this);
+			mDialog.setContentView(this);			
+			
 			mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
 			mDialog.setTitle(mTitle);			
 			//mDialog.setCanceledOnTouchOutside(mCanceledOnTouchOutside);
@@ -274,18 +279,35 @@ public class jCustomDialog extends RelativeLayout {
 					return false;
 				}
 			});
-			this.setVisibility(android.view.View.VISIBLE);  // //0: vis; 4: inv; 8: gone
+			this.setVisibility(android.view.View.VISIBLE);  // //0: vis; 4: inv; 8: gone						
+			
 			controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
 			mDialog.show();
 		}
 	}
+	
+	public int GetDialogWidth(){
+		if (mDialog == null) return 0;
+	 
+		return mDialog.getWindow().getDecorView().getWidth();
+	}
+	
+	public int GetDialogHeight(){
+		if (mDialog == null) return 0;
+		 
+	    return mDialog.getWindow().getDecorView().getHeight();
+	}
 
 	public void SetTitle(String _title) {
+		if (mDialog == null) return;
+		
 		mTitle = _title;
 		mDialog.setTitle(mTitle);
 	}
 
 	public void SetIconIdentifier(String _iconIdentifier) {   // ../res/drawable
+		if (mDialog == null) return;
+		
 		mIconIdentifier = _iconIdentifier;
 		mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
 		mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
