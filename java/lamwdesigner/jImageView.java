@@ -29,6 +29,9 @@ import android.widget.ImageView;
 import android.view.Gravity;
 import android.view.MotionEvent;
 
+import java.io.FileOutputStream;
+import java.io.File;
+
 public class jImageView extends ImageView {
 	//Pascal Interface
 	private long           PasObj   = 0;      // Pascal Obj
@@ -37,13 +40,13 @@ public class jImageView extends ImageView {
 	//
 	private OnClickListener onClickListener;   //
 	public  Bitmap          bmp      = null;   //
+	public  int             mAngle   = 0;
 	
 	Matrix mMatrix;
 	int mRadius = 20;
 
 	//Constructor
-	public  jImageView(android.content.Context context,
-					   Controls ctrls,long pasobj ) {
+	public  jImageView(android.content.Context context, Controls ctrls, long pasobj ) {
 		super(context);
 
 		//Connect Pascal I/F
@@ -431,6 +434,61 @@ public class jImageView extends ImageView {
 				        //[endif_api16up]			          
 			        }                		  	  
 		    }
+	}
+	
+	public void SetRotation( int angle ){
+		mAngle = angle;
+		this.setRotation(mAngle);
+	}
+	
+	public boolean SaveToJPG( String filePath, int cuality, int angle ){
+		
+		if( bmp == null ) return false;		
+
+		File file = new File(filePath);
+				
+		//Overwrite file
+		if( file.exists() ) if( !file.delete() ) return false;
+		
+		Matrix matrix = new Matrix();
+	    matrix.postRotate(angle);
+	    Bitmap bmpRot = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);			
+		
+		try {
+			FileOutputStream fOut = new FileOutputStream(file);
+			bmpRot.compress(Bitmap.CompressFormat.JPEG, cuality, fOut);
+		    fOut.flush();
+		    fOut.close();
+		    
+		    return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+    public boolean SaveToPNG( String filePath, int cuality, int angle ){
+		
+		if( bmp == null ) return false;		
+
+		File file = new File(filePath);
+		
+		//Overwrite file
+		if( file.exists() ) if( !file.delete() ) return false;
+		
+		Matrix matrix = new Matrix();
+	    matrix.postRotate(angle);
+	    Bitmap bmpRot = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);			
+		
+		try {
+			FileOutputStream fOut = new FileOutputStream(file);
+			bmpRot.compress(Bitmap.CompressFormat.PNG, cuality, fOut);
+		    fOut.flush();
+		    fOut.close();
+		    
+		    return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public void SetRadiusRoundCorner(int _radius) {
