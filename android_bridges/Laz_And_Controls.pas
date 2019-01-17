@@ -1336,6 +1336,10 @@ type
     function GetBitmapImage(): jObject;  //deprecated ..
     function GetImage(): jObject;
 
+    procedure SetRotation(angle: integer);
+    function SaveToJPG(filePath: string; cuality: integer; angle: integer): boolean;
+    function SaveToPNG(filePath: string; cuality: integer; angle: integer): boolean;
+
     procedure SetImageFromURI(_uri: jObject);
     procedure SetImageFromIntentResult(_intentData: jObject);
     procedure SetImageThumbnailFromCamera(_intentData: jObject);
@@ -5830,6 +5834,27 @@ Procedure jImageView.SetImage(_fullFilename: string);
 begin
    if Initialized then
       jImageView_setImage(FjEnv, FjObject , _fullFilename);
+end;
+
+procedure jImageView.SetRotation(angle: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetRotation(FjEnv, FjObject, angle);
+end;
+
+function jImageView.SaveToJPG(filePath: string; cuality: integer; angle: integer): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_SaveToJPG(FjEnv, FjObject, filePath ,cuality ,angle);
+end;
+
+function jImageView.SaveToPNG(filePath: string; cuality: integer; angle: integer): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_SaveToPNG(FjEnv, FjObject, filePath ,cuality ,angle);
 end;
 
 Procedure jImageView.SetImageByIndex(Value: integer);

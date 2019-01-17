@@ -452,6 +452,10 @@ procedure jImageView_SetVisibilityGone(env: PJNIEnv; _jimageview: JObject);
 procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _scaleX: single; _scaleY: single; _centerX: single; _centerY: single); overload;
 procedure jImageView_ClearLayoutAll(env: PJNIEnv; _jimageview: JObject);
 
+procedure jImageView_SetRotation(env: PJNIEnv; _jimageview: JObject; angle: integer);
+
+function  jImageView_SaveToJPG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
+function  jImageView_SaveToPNG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -4321,6 +4325,55 @@ Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
   env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
  end;
+
+procedure jImageView_SetRotation(env: PJNIEnv; _jimageview: JObject; angle: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= angle;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRotation', '(I)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jImageView_SaveToJPG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(filePath));
+  jParams[1].i:= cuality;
+  jParams[2].i:= angle;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToJPG', '(Ljava/lang/String;II)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jimageview, jMethod, @jParams);
+  Result:= boolean(jBoo);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jImageView_SaveToPNG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(filePath));
+  jParams[1].i:= cuality;
+  jParams[2].i:= angle;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToPNG', '(Ljava/lang/String;II)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jimageview, jMethod, @jParams);
+  Result:= boolean(jBoo);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 Procedure jImageView_setLParamWidth(env:PJNIEnv; ImageView : jObject; w: DWord);
 var
