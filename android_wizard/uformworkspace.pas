@@ -70,6 +70,7 @@ type
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButtonSDKPlusClick(Sender: TObject);
     procedure SpeedButtonHintThemeClick(Sender: TObject);
+    function IsLaz4Android(): boolean;
 
   private
     { private declarations }
@@ -354,8 +355,29 @@ begin
      ShowMessage('Warning: remember that the "google play" store now requires Target Api >= 26 !');
 end;
 
+function TFormWorkspace.IsLaz4Android(): boolean;
+var
+  pathToConfig, pathToLaz: string;
+  p: integer;
+begin
+ Result:= False;
+ pathToConfig:= LazarusIDE.GetPrimaryConfigPath();
+ p:= Pos('config',pathToConfig);
+ pathToLaz:= Copy(pathToConfig,1,p-1);
+ if FileExists(pathToLaz+'laz4android_readme.txt') then
+   Result:= True;
+end;
+
+
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
+
+  if (RGInstruction.ItemIndex = 2) and (IsLaz4Android) then
+  begin
+     ShowMessage('WARNING: "laz4Android" [by default] don''t support "ARMv7a+VFPv3"');
+     //RGInstruction.ItemIndex:= 1;
+  end;
+
   FInstructionSet:= 'x86';
   FFPUSet:= ''; //x86  or mipsel
 
@@ -1309,7 +1331,7 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by "AndroidWizard_inf.pas"
 var
-  indexInstructionSet: integer;
+  indexInstructionSet: string;
   tagVersion: integer;
   ndkIndex: integer;
 begin
@@ -1330,7 +1352,9 @@ begin
     FMainActivity:= ReadString('NewProject','MainActivity', '');  //dummy
     if FMainActivity = '' then FMainActivity:= 'App';
 
-    indexInstructionSet:= StrToIntDef(ReadString('NewProject','InstructionSet', ''), 0);
+    indexInstructionSet:= ReadString('NewProject','InstructionSet', '');
+
+    if indexInstructionSet =  '' then  indexInstructionSet:= '0';
 
     ComboSelectProjectName.Items.Clear;
     FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
@@ -1353,7 +1377,8 @@ begin
     Free;
   end;
 
-  RGInstruction.ItemIndex:= indexInstructionSet;
+  RGInstruction.ItemIndex:= StrToInt(indexInstructionSet);
+
   FInstructionSet:= 'x86'; //RGInstruction.Items[RGInstruction.ItemIndex];
   FFPUSet:= ''; //x86
 
@@ -1391,10 +1416,11 @@ begin
       WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
       WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
       WriteString('NewProject', 'PathToGradle', FPathToGradle);
+      //WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
       if FPrebuildOSYS = '' then
       begin
-          FPrebuildOSYS:= GetPrebuiltDirectory();
-          WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
+         FPrebuildOSYS:= GetPrebuiltDirectory();
+         WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
       end;
    finally
       Free;

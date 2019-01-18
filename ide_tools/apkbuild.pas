@@ -665,9 +665,13 @@ begin
 
     Tool.WorkingDirectory := FProjPath;
     Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
+
     if not FileExists(Tool.Executable) then
       raise Exception.CreateFmt('Ant bin (%s) not found! Check path settings', [Tool.Executable]);
+
     Tool.CmdLineParams := 'clean -Dtouchtest.enabled=true debug';
+
+
     // tk Required for Lazarus >=1.7 to capture output correctly
 {$if lcl_fullversion >= 1070000}
     Tool.ShowConsole := True;
@@ -799,6 +803,8 @@ end;
 function TApkBuilder.InstallByAnt: Boolean;
 var
   Tool: TIDEExternalToolOptions;
+  smallProjectName, auxPath: string;
+  p: integer;
 begin
   Result := False;
   if not CheckAvailableDevices then Exit;
@@ -817,8 +823,16 @@ begin
     {$endif}
 
     Tool.WorkingDirectory := FProjPath;
-    Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
-    Tool.CmdLineParams := 'installd';
+    auxPath:= Copy(FProjPath, 1, Length(FProjPath)-1);
+    p:= LastDelimiter(PathDelim,auxPath);
+    smallProjectName:= Copy(auxPath, p+1 , MaxInt);
+
+    //Tool.Executable := IncludeTrailingPathDelimiter(FAntPath) + 'ant'{$ifdef windows}+'.bat'{$endif};
+    //Tool.CmdLineParams := 'installd';
+
+    Tool.Executable := IncludeTrailingPathDelimiter(FSdkPath) +'platform-tools'+PathDelim+'adb'{$ifdef windows}+'.exe'{$endif};
+    Tool.CmdLineParams := 'install -r '+ FProjPath + 'bin'+ PathDelim + smallProjectName+'-debug.apk';
+
     // tk Required for Lazarus >=1.7 to capture output correctly
 {$if lcl_fullversion >= 1070000}
     Tool.ShowConsole := True;

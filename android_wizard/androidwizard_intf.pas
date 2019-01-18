@@ -1367,17 +1367,17 @@ begin
                      DirectorySeparator+'adb install -r '+FSmallProjName+'-'+FAntBuildMode+'.apk');
           strList.Add('cd ..');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-install-'+FAntBuildMode+'.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'adb-install-'+FAntBuildMode+'.bat');
 
           strList.Clear;
           strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'uninstall.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'adb-uninstall.bat');
 
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+
-                     DirectorySeparator+'adb logcat');
+                     DirectorySeparator+'adb logcat &');
           strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'logcat.bat');
 
@@ -1713,19 +1713,26 @@ begin
 
           //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
           //fix/sugestion by OsvaldoTCF - clear slash from /bin
-          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+FAntBuildMode+'.apk');
 
-          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-install-'+FAntBuildMode+'.sh');
+          tempStr:= FAndroidProjectName;
+          {$ifdef windows}
+          tempStr:= StringReplace(FAndroidProjectName,PathDelim,linuxDirSeparator, [rfReplaceAll]);
+          tempStr:= Copy(tempStr, 3, MaxInt); //drop C:
+          {$endif}
+
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr +
+                                  linuxDirSeparator+ 'bin' + linuxDirSeparator+FSmallProjName+'-'+FAntBuildMode+'.apk');
+          //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'adb-install-'+FAntBuildMode+'.sh');
 
           //linux uninstall  - thanks to Stephano!
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'uninstall.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'adb-uninstall.sh');
 
           //linux logcat  - thanks to Stephano!
           strList.Clear;
-          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'logcat.sh');
 
           strList.Clear;

@@ -2327,7 +2327,7 @@ begin
   strList.Add('cd '+androidProjectName);
   strList.Add('call ant clean -Dtouchtest.enabled=true debug');
   strList.Add('if errorlevel 1 pause');
-  strList.SaveToFile(androidProjectName+'build-debug.bat');
+  strList.SaveToFile(androidProjectName+'ant-build-debug.bat');
 
   strList.Clear;
   strList.Add('set Path=%PATH%;'+pathToAntBin);
@@ -2335,7 +2335,7 @@ begin
   strList.Add('cd '+androidProjectName);
   strList.Add('call ant clean release');
   strList.Add('if errorlevel 1 pause');
-  strList.SaveToFile(androidProjectName+'build-release.bat');
+  strList.SaveToFile(androidProjectName+'ant-build-release.bat');
 
   strList.Clear;
   strList.Add('cd '+androidProjectName+'bin');
@@ -2343,7 +2343,7 @@ begin
              DirectorySeparator+'adb install -r '+FSmallProjName+'-'+antBuildMode+'.apk');
   strList.Add('cd ..');
   strList.Add('pause');
-  strList.SaveToFile(androidProjectName+'install.bat');
+  strList.SaveToFile(androidProjectName+'adb-install.bat');
 
   linuxDirSeparator:= DirectorySeparator;
   linuxPathToJavaJDK:= pathToJavaJDK;
@@ -2381,7 +2381,7 @@ begin
   strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);
   strList.Add('cd '+linuxAndroidProjectName);
   strList.Add('ant -Dtouchtest.enabled=true debug');
-  SaveShellScript(strList, androidProjectName+'build-debug.sh');
+  SaveShellScript(strList, androidProjectName+'ant-build-debug.sh');
 
 
   //MacOs
@@ -2393,7 +2393,7 @@ begin
      strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
      strList.Add('cd '+linuxAndroidProjectName);
      strList.Add('ant -Dtouchtest.enabled=true debug');
-     SaveShellScript(strList, androidProjectName+'build-debug-macos.sh');
+     SaveShellScript(strList, androidProjectName+'ant-build-debug-macos.sh');
   end;
 
   strList.Clear;
@@ -2403,23 +2403,33 @@ begin
   strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
   strList.Add('cd '+linuxAndroidProjectName);
   strList.Add('ant clean release');
-  SaveShellScript(strList, androidProjectName+'build-release.sh');
+  SaveShellScript(strList, androidProjectName+'ant-build-release.sh');
 
   linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
 
   //linux install - thanks to Stephano!
   strList.Clear;
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
+  (*
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+antBuildMode+'.apk');
-  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-  SaveShellScript(strList, androidProjectName+'install.sh');
+  *)
+
+  tempStr:= androidProjectName;
+  {$ifdef windows}
+  tempStr:= StringReplace(androidProjectName,PathDelim,linuxDirSeparator, [rfReplaceAll]);
+  tempStr:= Copy(tempStr, 3, MaxInt); //drop C:
+  {$endif}
+
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr + 'bin' + linuxDirSeparator+FSmallProjName+'-'+antBuildMode+'.apk');
+  //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
+  SaveShellScript(strList, androidProjectName+'adb-install.sh');
 
   strList.Clear;
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
-  SaveShellScript(strList, androidProjectName+'uninstall.sh');
+  SaveShellScript(strList, androidProjectName+'adb-uninstall.sh');
 
   strList.Clear;
-  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
   SaveShellScript(strList, androidProjectName+'logcat.sh');
 
   strList.Free;
