@@ -361,13 +361,17 @@ var
   p: integer;
 begin
  Result:= False;
+ {$ifdef windows}
  pathToConfig:= LazarusIDE.GetPrimaryConfigPath();
  p:= Pos('config',pathToConfig);
- pathToLaz:= Copy(pathToConfig,1,p-1);
- if FileExists(pathToLaz+'laz4android_readme.txt') then
-   Result:= True;
+ if p > 0 then
+ begin
+   pathToLaz:= Copy(pathToConfig,1,p-1);
+   if FileExists(pathToLaz+'laz4android_readme.txt') then
+     Result:= True;
+ end;
+ {$endif}
 end;
-
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
 begin
