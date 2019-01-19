@@ -37,9 +37,9 @@ public class jBroadcastReceiver extends BroadcastReceiver {
 
    @Override
    /*.*/public void onReceive(Context arg0, Intent intent) { 
-	   mResultCode = -1;
+	   mResultCode = 0;
 	   switch (this.getResultCode()) {
-	        case Activity.RESULT_OK: mResultCode = 1; break;
+	        case Activity.RESULT_OK: mResultCode = -1; break;
 	        case Activity.RESULT_CANCELED: mResultCode = 0; break;  
 	   }	     	     	
 	   
@@ -80,6 +80,8 @@ public class jBroadcastReceiver extends BroadcastReceiver {
 	     case 7: controls.activity.registerReceiver(this, new IntentFilter(Intent.ACTION_SHUTDOWN));
 	     case 8: controls.activity.registerReceiver(this, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
 	     case 9: controls.activity.registerReceiver(this, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+	     case 10: controls.activity.registerReceiver(this, new IntentFilter("android.intent.action.PHONE_STATE"));	     
+	     case 11: controls.activity.registerReceiver(this, new IntentFilter("android.intent.action.NEW_OUTGOING_CALL"));	     	     
 	   }
    }
    

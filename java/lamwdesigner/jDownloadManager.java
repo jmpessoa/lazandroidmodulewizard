@@ -34,8 +34,8 @@ public class jDownloadManager /*extends ...*/ {
  String notifyTitle= "Downloading...";
  String notifyDescription = "Please, wait...";
  
- String mUrl = "//http://www.freemediagoo.com/free-media/wildlife/o_o_bird-med.jpg";
- String mFilename = "o_o_bird-med.jpg"; 
+ String mUrl = "http://clipart-library.com/images/6Tp5qzgnc.jpg";
+ String mFilename = "ship2.jpg";
  String mPath = Environment.DIRECTORY_DOWNLOADS; // default ...
  
  String mLocalFileName= "";

@@ -1,4 +1,4 @@
-package org.dummy.appdummy;
+package com.example.appdownloadservicedemo1;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-
-import org.apache.http.util.ByteArrayBuffer;
-
+import java.io.ByteArrayOutputStream;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -29,8 +27,8 @@ public class jDownloadService extends IntentService {
    
    private int result = 0; //0 = fail;  -1 = ok!
    
-   private String mURL = "http://www.freemediagoo.com/surreal-backgrounds/boat6-med.jpg";
-   private String mFileSaveAs = "boat6-med.jpg";
+   private String mURL = "http://clipart-library.com/images/8c65qk6ei.jpg";
+   private String mFileSaveAs = "ship2.jpg";
    
    private File filePath;   
    private String mFILEPATH;   
@@ -85,26 +83,25 @@ public class jDownloadService extends IntentService {
 	    try {
 
 	      URL url = new URL(urlPath);
-	      
 	      startTime = System.currentTimeMillis();
-	      
 	      URLConnection con = url.openConnection();
-	      
 	      stream = con.getInputStream();
-	      
-	     //InputStreamReader reader = new InputStreamReader(stream);   FAIL !!! FAIL!!!
-	      BufferedInputStream reader = new BufferedInputStream(stream);	      
-	       	      
-	      ByteArrayBuffer baf = new ByteArrayBuffer(50);
-	      
-          int current = 0;
-          while ((current = reader.read()) != -1) {
-             baf.append((byte) current);
-          }          
-          
-          fos = new FileOutputStream(output.getPath());
-          fos.write(baf.toByteArray());
-          fos.flush();
+
+			//https://stackoverflow.com/questions/32138739/bytearraybuffer-missing-in-sdk23
+			BufferedInputStream bis = new BufferedInputStream(stream);
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			//We create an array of bytes
+			byte[] data = new byte[50];
+			int current = 0;
+
+			while((current = bis.read(data,0,data.length)) != -1){
+				buffer.write(data,0,current);
+			}
+			fos = new FileOutputStream(output.getPath());
+			fos.write(buffer.toByteArray());
+			fos.flush();
+			//fos.close();
+
 	      // successfully finished
 	      result = -1; //Activity.RESULT_OK;
 	    } catch (Exception e) {
