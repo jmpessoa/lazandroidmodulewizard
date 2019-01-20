@@ -733,13 +733,16 @@ begin
          strList.Add('}');
 
          strList.Add('dependencies {');
-         if Pos('AppCompat', AndroidTheme) > 0 then
-         begin   //compile fileTree(dir: 'libs', include: ['*.jar'])
 
-            if androidPluginNumber < 300 then
-              directive:='compile'
-            else
-              directive:='implementation';
+         if androidPluginNumber < 300 then
+           directive:='compile'
+         else
+           directive:='implementation';
+
+         strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
+
+         if Pos('AppCompat', AndroidTheme) > 0 then
+         begin
 
             strList.Add('    '+directive+' ''com.android.support:appcompat-v7:'+compatVer+'''');
             strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');
@@ -1607,6 +1610,18 @@ begin
             FPathToAndroidProject+'res'+DirectorySeparator+'anim'+DirectorySeparator+auxList.Strings[i]);
      end;
    end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + jclassname+'.libjar') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + jclassname+'.libjar');
+     //ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'anim');
+     for i:= 0 to  auxList.Count-1 do
+     begin
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + 'libjar' + DirectorySeparator + auxList.Strings[i],
+            FPathToAndroidProject+'libs'+DirectorySeparator+auxList.Strings[i]);
+     end;
+   end;
+
    //-----
    //try fix "gradle.build"
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.dependencies') then

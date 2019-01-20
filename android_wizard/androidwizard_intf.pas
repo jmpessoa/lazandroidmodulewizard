@@ -1934,12 +1934,19 @@ begin
                 strList.Add('    }');
                 strList.Add('}');
                 strList.Add('dependencies {');
+
+                if androidPluginNumber < 300 then
+                  directive:='compile'
+                else
+                  directive:='implementation';
+
+                strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
+
                 if Pos('AppCompat', FAndroidTheme) > 0 then
-                begin   //compile fileTree(dir: 'libs', include: ['*.jar'])
-                    if androidPluginNumber < 300 then
-                      directive:='compile'
-                    else
-                      directive:='implementation';
+                begin
+
+
+                    //compile fileTree(include: ['*.jar'], dir: 'libs')
 
                     strList.Add('    '+directive+' ''com.android.support:appcompat-v7:'+compatVer+'''');
                     strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');

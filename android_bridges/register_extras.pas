@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  xlswriter,
   telephonymanager,
   smsmanager,
   modaldialog,
@@ -58,6 +59,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jxlswriter_icon.lrs}
   {$I jmodaldialog_icon.lrs}
   {$I jincomingcallwidgetprovider_icon.lrs}
   {$I jsmswidgetprovider_icon.lrs}
@@ -109,6 +111,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jXLSWriter,
       jModalDialog,
       jIncomingCallWidgetProvider,
       jSMSWidgetProvider,

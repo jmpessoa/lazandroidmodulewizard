@@ -809,7 +809,13 @@ begin
   listProperties:= TStringList.Create;
 
   if Pos('_', FHackCreateParam) > 0 then
-    listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !')   //** add F
+  begin
+    listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !');   //** add F
+
+    if Pos('jControl', FProjectModel) > 0  then
+       listPascal.Add('  FInitialized:= True;');
+
+  end
   else
   begin
     listProperties.StrictDelimiter:= True;
@@ -820,6 +826,10 @@ begin
       listProperties.Strings[i]:= 'FP'+Trim(listProperties.Strings[i]); //ReplaceCharFirst(Trim(listProperties.Strings[i]),'F')+';'; //** Add F
     end;
     listPascal.Add('  FjObject:= jCreate('+listProperties.DelimitedText+'); //jSelf !');   //** add F
+
+    if Pos('jControl', FProjectModel) > 0  then
+       listPascal.Add('  FInitialized:= True;');
+
   end;
 
   listProperties.Free;
