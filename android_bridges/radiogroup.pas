@@ -151,6 +151,7 @@ var
   rToA: TPositionRelativeToAnchorID;
   i: integer;
 begin
+
   if not FInitialized  then
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!

@@ -55,6 +55,7 @@ jViewFlipper = class(jVisualControl)
     procedure AddView(_layout: jObject);
     procedure Next();
     procedure Previous();
+    procedure AddImageView(_fullPath: string);
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
@@ -86,6 +87,8 @@ procedure jViewFlipper_StopFlipping(env: PJNIEnv; _jviewflipper: JObject);
 procedure jViewFlipper_AddView(env: PJNIEnv; _jviewflipper: JObject; _layout: jObject);
 procedure jViewFlipper_Next(env: PJNIEnv; _jviewflipper: JObject);
 procedure jViewFlipper_Previous(env: PJNIEnv; _jviewflipper: JObject);
+procedure jViewFlipper_AddImageView(env: PJNIEnv; _jviewflipper: JObject; _fullPath: string);
+
 
 implementation
 
@@ -391,6 +394,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jViewFlipper_AddView(FjEnv, FjObject, _layout);
+end;
+
+procedure jViewFlipper.AddImageView(_fullPath: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jViewFlipper_AddImageView(FjEnv, FjObject, _fullPath);
 end;
 
 procedure jViewFlipper.Next();
@@ -751,6 +761,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jviewflipper);
   jMethod:= env^.GetMethodID(env, jCls, 'Previous', '()V');
   env^.CallVoidMethod(env, _jviewflipper, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jViewFlipper_AddImageView(env: PJNIEnv; _jviewflipper: JObject; _fullPath: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPath));
+  jCls:= env^.GetObjectClass(env, _jviewflipper);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageView', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jviewflipper, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

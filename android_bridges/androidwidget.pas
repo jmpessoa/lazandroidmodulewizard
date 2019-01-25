@@ -1368,6 +1368,7 @@ end;
     FOnBeforeDispatchDraw: TOnBeforeDispatchDraw;
     FOnAfterDispatchDraw: TOnAfterDispatchDraw;
     FOnLayouting: TOnLayouting;
+    FMyClassParentName: string;
 
     procedure SetAnchor(Value: jVisualControl);
     procedure DefineProperties(Filer: TFiler); override;
@@ -1411,7 +1412,7 @@ end;
     property ScreenStyle   : TScreenStyle read FScreenStyle  write FScreenStyle   ;
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
     property View: jObject read GetView;     //FjObject; //View/Layout
-
+    property MyClassParentName: string read FMyClassParentName write FMyClassParentName;
   published
     property Visible: boolean read GetVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
@@ -1778,6 +1779,10 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
 
   procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject;  layout:jobject; intent: jobject);
 
+  function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
+  function  sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
+  function  sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
+
 var
   gApp:       jApp;       //global App !
   gVM         : PJavaVM;
@@ -1790,6 +1795,44 @@ var
 
 
 implementation
+
+function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
+begin
+
+   result := 0;
+
+   if layoutParam = lpExact then
+   begin
+    result := data;
+    exit;
+   end;
+
+   if parent is jForm then
+    Result := GetLayoutParams(gApp, layoutParam, sd)
+   else
+    if parent <> nil then
+     result := GetLayoutParamsByParent((parent as jVisualControl), layoutParam, sd);
+
+   if result > 0 then
+    result := result - margins;
+
+end;
+
+function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
+begin
+      if FParent is jForm then
+         Result:= (FParent as jForm).ScreenWH.Height - gapp.GetContextTop
+      else
+         Result:= (FParent as jVisualControl).GetHeight;
+end;
+
+function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
+begin
+      if FParent is jForm then
+        Result:= (FParent as jForm).ScreenWH.Width
+      else
+        Result:= (FParent as jVisualControl).GetWidth;
+end;
 
 procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject; layout:jobject; intent: jobject);
 begin
@@ -2368,12 +2411,16 @@ begin
   FjPRLayoutHome:= FjPRLayout;  //save origin
 
   FScreenStyle := jForm(Owner).ScreenStyle;
+
+  (*
   if (PosRelativeToAnchor = []) and (PosRelativeToParent = []) then
   begin
     //commented by jmpessoa: causing error to jPanel when used as a "flying" view [jActonBarTab, jRecyclerView...]
     //FMarginLeft := FLeft;
     //FMarginTop := FTop;
   end;
+  *)
+
 end;
 
 procedure jVisualControl.Notification(AComponent: TComponent; Operation: TOperation);

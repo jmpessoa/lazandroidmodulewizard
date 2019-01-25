@@ -1,12 +1,21 @@
-package com.example.appviewflipperdemo1;
+package org.lamw.appviewflipperdemo2;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ViewFlipper;
 
 /*Draft java code by "Lazarus Android Module Wizard" [2/5/2017 16:06:56]*/
@@ -218,6 +227,19 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
        this.setInAnimation(controls.activity, R.anim.in_from_right);
        this.setOutAnimation(controls.activity, R.anim.out_to_left);
        this.showPrevious();
-   }	   
-   
+   }
+
+    //RelativeLayout itemLayout = new RelativeLayout(ctx);
+    public  void AddImageView(String _fullPath) {
+        if (_fullPath.equals("")) { return; };
+        ImageView itemImage = new ImageView(controls.activity);
+        itemImage.setImageResource(android.R.color.transparent);
+        Bitmap bmp = BitmapFactory.decodeFile(_fullPath);
+        itemImage.setScaleType(ImageView.ScaleType.CENTER); //photo-viewing application
+        //itemImage.setScaleType(ImageView.ScaleType.FIT_CENTER); //photo-viewing application
+        itemImage.setImageBitmap(bmp);
+        itemImage.setFocusableInTouchMode(false);
+        //RelativeLayout.LayoutParams imgParam = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT); //w,h
+        this.addView(itemImage);
+    }
 }

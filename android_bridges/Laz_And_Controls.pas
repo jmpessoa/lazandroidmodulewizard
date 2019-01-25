@@ -2036,11 +2036,6 @@ type
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 
   procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
-  //function  sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide): integer;
-  function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
-
-  function  sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
-  function  sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
 
   procedure DBListView_Log (msg: string);
 
@@ -2051,60 +2046,13 @@ uses
   comboedittext, toolbar, scoordinatorlayout, framelayout, linearlayout,
   sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
   stoolbar, stablayout, snestedscrollview, sviewpager, radiogroup;
+
   {,And_log_h}  {for test}
-
- (*function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide): integer;
- begin
-
-    if layoutParam = lpExact then
-     Result := data
-    else if parent is jForm then
-     Result := GetLayoutParams(gApp, layoutParam, sd)
-    else
-     Result := GetLayoutParamsByParent((parent as jVisualControl), layoutParam, sd);
-
- end;*)
-
- function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
- begin
-
-    result := 0;
-
-    if layoutParam = lpExact then
-    begin
-     result := data;
-     exit;
-    end;
-
-    if parent is jForm then
-     Result := GetLayoutParams(gApp, layoutParam, sd)
-    else
-     if parent <> nil then
-      result := GetLayoutParamsByParent((parent as jVisualControl), layoutParam, sd);
-
-    if result > 0 then
-     result := result - margins;
-
-end;
-
- function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
- begin
-       if FParent is jForm then
-          Result:= (FParent as jForm).ScreenWH.Height - gapp.GetContextTop
-       else
-          Result:= (FParent as jVisualControl).GetHeight;
- end;
-
- function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
- begin
-       if FParent is jForm then
-         Result:= (FParent as jForm).ScreenWH.Width
-       else
-         Result:= (FParent as jVisualControl).GetWidth;
- end;
 
  procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
  begin
+
+  if FParent is jForm then Exit;  //default
 
   if FParent is jPanel then
   begin
@@ -2136,6 +2084,11 @@ end;
     if not jVisualControl(FParent).Initialized then jToolbar(FParent).Init(refApp);
     FjPRLayout:= jToolbar(FParent).View;
   end  else
+  if FParent is jRadioGroup then
+  begin
+      if not jVisualControl(FParent).Initialized then jRadioGroup(FParent).Init(refApp);
+      FjPRLayout:= jRadioGroup(FParent).View;
+  end else
   if FParent is jsToolbar then
   begin
     jsToolbar(FParent).Init(refApp);
@@ -5224,10 +5177,12 @@ begin
    inherited Init(refApp);
    FjObject := jRadioButton_Create(FjEnv, FjThis, Self);
 
+   if FParent <> nil then Self.MyClassParentName:= FParent.ClassName;
+
    if FParent <> nil then
    begin
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-    if FParent is jRadioGroup then flag:= True;
+     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+     if FParent is jRadioGroup then flag:= True;
    end;
 
    FjPRLayoutHome:= FjPRLayout;
