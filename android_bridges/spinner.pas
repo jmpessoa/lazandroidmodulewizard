@@ -5,7 +5,7 @@ unit Spinner;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, AndroidWidget;
+  Classes, SysUtils, And_jni, And_jni_Bridge, systryparent, AndroidWidget;
 
 type
 

@@ -141,7 +141,7 @@ uses
   SysUtils, Classes,
   And_jni, And_jni_Bridge,
   And_lib_Unzip, And_bitmap_h,
-  AndroidWidget;
+  AndroidWidget, systryparent;
 
 type
 
@@ -2035,20 +2035,19 @@ type
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 
-  procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
+  //procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
 
   procedure DBListView_Log (msg: string);
 
 implementation
 
+
 uses
-  customdialog, autocompletetextview, viewflipper,
-  comboedittext, toolbar, scoordinatorlayout, framelayout, linearlayout,
-  sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
-  stoolbar, stablayout, snestedscrollview, sviewpager, radiogroup;
+  autocompletetextview, viewflipper, comboedittext, radiogroup;
 
   {,And_log_h}  {for test}
 
+  (*
  procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
  begin
 
@@ -2145,6 +2144,7 @@ uses
       FjPRLayout:= jsViewPager(FParent).View;
   end;
  end;
+*)
 
 //-----------------------------------------------------------------------------
 // Asset
