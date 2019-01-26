@@ -5,7 +5,7 @@ unit LamwSettings;
 interface
 
 uses
-  Classes, SysUtils, ProjectIntf, Forms, IniFiles;
+  Classes, SysUtils, FileUtil, ProjectIntf, Forms, IniFiles;
 
 type
 
@@ -13,14 +13,15 @@ type
 
   TLamwGlobalSettings = class
   public const
-    Version = '0.8';
+    Version = '0.8.3';
   private const
-    IniFileName = 'JNIAndroidProject.ini';
+    IniFileName = 'LAMW.ini';
     IniFileSection = 'NewProject';
   private
     FIniFile: TIniFile;
     FQueryPaths: Boolean; // prompt dialog if path is empty
     FPathToJavaTemplates: string;
+    FPathToSmartDesigner: string; //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
     FPathToAndroidNDK: string;
     FPathToAndroidSDK: string;
     FPathToJavaJDK: string;
@@ -52,6 +53,10 @@ type
     function GetInstructionSet: string;
     function GetPrebuildOSYS: string;
     function GetKeepManifestTargetApi: boolean;
+
+    function DoPathToSmartDesigner(): string;
+    function GetPathToSmartDesigner(): string;
+
   public
     constructor Create;
     destructor Destroy; override;
@@ -77,6 +82,7 @@ type
 
     // volatile :: = 't'
     property KeepManifestTargetApi: boolean read GetKeepManifestTargetApi;
+    property PathToSmartDesigner: string read GetPathToSmartDesigner;
   end;
 
 var
@@ -84,7 +90,7 @@ var
 
 implementation
 
-uses LazIDEIntf, StdCtrls, EditBtn, Controls, ButtonPanel;
+uses PackageIntf, LazIDEIntf, StdCtrls, EditBtn, Controls, ButtonPanel;
 
 function QueryPath(APrompt: string; out Path: string;
   ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
@@ -152,34 +158,81 @@ end;
 function TLamwGlobalSettings.GetPathToJavaTemplates: string;
 begin
   Result := GetPath(FPathToJavaTemplates, 'PathToJavaTemplates',
-    'Path to Java templates: [ex. ..\LazAndroidWizard\java]');
+    'Path to Java templates: [ex. ..\LazAndroidWizard\android_wizard\smartdesigner\java]');
 end;
 
 function TLamwGlobalSettings.GetPath(var APath: string; const IniIdent, QueryPrompt: string): string;
 begin
-
   Result:= '';
-
   if APath = '' then ReloadPaths;
-
   if (APath = '') and FQueryPaths then
   begin
     QueryPath(QueryPrompt, APath);
   end;
-
   if APath <> '' then
   begin
     Result := IncludeTrailingPathDelimiter(APath);
     WriteIniString(IniIdent, APath);
   end
+end;
 
+function TLamwGlobalSettings.GetPathToSmartDesigner(): string;
+begin
+  Result:= IncludeTrailingPathDelimiter(FPathToSmartDesigner);
+end;
+
+function TLamwGlobalSettings.DoPathToSmartDesigner(): string;
+var
+  p: integer;
+  Pkg: TIDEPackage;
+  path: string;
+begin
+  Result:= '';
+  if FPathToSmartDesigner = '' then
+  begin
+    Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
+    if Pkg<>nil then
+    begin
+        FPathToSmartDesigner:= ExtractFilePath(Pkg.Filename);
+        FPathToSmartDesigner:= FPathToSmartDesigner + 'smartdesigner';
+        Result := FPathToSmartDesigner; //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+    end;
+  end
+  else Result:= FPathToSmartDesigner;
 end;
 
 procedure TLamwGlobalSettings.ReloadIni;
+var
+  flag: boolean;
 begin
+
+  flag:= false;
+  if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
+  begin
+    if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
+    begin
+       CopyFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini',
+                IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+       //DeleteFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+
+
+       //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+       FPathToSmartDesigner:= DoPathToSmartDesigner();
+
+       //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java
+       FPathToJavaTemplates:= FPathToSmartDesigner + pathDelim +'java';
+       flag:= True;
+    end;
+  end;
+
   FIniFile.Free;
   FIniFile := TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + IniFileName);
   FIniFile.CacheUpdates := False;
+  if flag then
+  begin
+    WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
+    WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
+  end;
 end;
 
 {
@@ -192,7 +245,7 @@ end;
 function TLamwGlobalSettings.GetPathToGradle: string;
 begin
   Result := GetPath(FPathToGradle, 'PathToGradle',
-    'Path to Gradle: [ex. C:\lamw\gradle-4.1]');
+    'Path to Gradle: [ex. C:\lamw\gradle-4.4.1]');
 end;
 
 function TLamwGlobalSettings.ReadIniString(const Key: string;
@@ -251,7 +304,7 @@ end;
 function TLamwGlobalSettings.GetPathToJavaJDK: string;
 begin
   Result := GetPath(FPathToJavaJDK, 'PathToJavaJDK',
-    'Path to Java JDK: [ex. C:\Program Files (x86)\Java\jdk1.7.0_21]');
+    'Path to Java JDK: [ex. C:\Program Files (x86)\Java\jdk1.8.xx]');
 end;
 
 function TLamwGlobalSettings.GetInstructionSet: string;
@@ -296,6 +349,7 @@ begin
   FPathToAndroidNDK    := ReadIniString('PathToAndroidNDK');
   FPathToAntBin        := ReadIniString('PathToAntBin');
   FPathToGradle        := ReadIniString('PathToGradle');
+  FPathToSmartDesigner := ReadIniString('PathToSmartDesigner');
 end;
 
 function TLamwGlobalSettings.GetNDK: string;

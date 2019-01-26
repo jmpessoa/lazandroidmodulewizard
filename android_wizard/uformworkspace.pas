@@ -80,6 +80,7 @@ type
     FFPUSet: string;              {Soft}
     FPathToJavaTemplates: string;
     FAndroidProjectName: string;
+    FPathToSmartDesigner: string;
 
     FPathToJavaJDK: string;
     FPathToAndroidSDK: string;
@@ -113,11 +114,16 @@ type
     FMaxNdkPlatform: integer;
     FCandidateSdkPlatform: integer;
     FHasSdkToolsAnt: boolean;
+    FIniFileSection: string;
+    FIniFileName: string;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
     function GetGradleVersion(out tagVersion: integer): string;
     function IsSdkToolsAntEnable: boolean;
+    procedure WriteIniString(Key, Value: string);
+    function GetPathToSmartDesigner(): string;
+    function DoNewPathToJavaTemplate(): string;
 
   public
     { public declarations }
@@ -132,7 +138,6 @@ type
     function GetPrebuiltDirectory: string;
     procedure LoadPathsSettings(const fileName: string);
     function GetEventSignature(nativeMethod: string): string;
-    function GetPathToTemplatePresumed(): string;
 
     function GetMaxSdkPlatform(): integer;
     function GetBuildTool(sdkApi: integer): string;
@@ -144,6 +149,7 @@ type
     property InstructionSet: string read FInstructionSet write FInstructionSet;
     property FPUSet: string  read FFPUSet write FFPUSet;
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
+    property PathToSmartDesigner: string  read GetPathToSmartDesigner write FPathToSmartDesigner;
     property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
 
     property PathToJavaJDK: string read FPathToJavaJDK write FPathToJavaJDK;
@@ -727,20 +733,80 @@ begin
   end;
 end;
 
+function TFormWorkspace.GetPathToSmartDesigner(): string;
+var
+  Pkg: TIDEPackage;
+begin
+  Result:= '';
+  if FPathToSmartDesigner = '' then
+  begin
+    Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
+    if Pkg<>nil then
+    begin
+        FPathToSmartDesigner:= ExtractFilePath(Pkg.Filename);
+        FPathToSmartDesigner:= FPathToSmartDesigner + 'smartdesigner';
+        Result:=FPathToSmartDesigner;
+        //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+    end;
+  end
+  else Result:= FPathToSmartDesigner;
+end;
+
+function TFormWorkspace.DoNewPathToJavaTemplate(): string;
+begin
+   FPathToJavaTemplates:= GetPathToSmartDesigner() + pathDelim +'java';
+   Result:=FPathToJavaTemplates;
+    //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java
+end;
+
+procedure TFormWorkspace.WriteIniString(Key, Value: string);
+var
+  FIniFile: TIniFile;
+begin
+  FIniFile := TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + FIniFileName);
+  if FIniFile <> nil then
+  begin
+    FIniFile.WriteString(FIniFileSection, Key, Value);
+    FIniFile.Free;
+  end;
+end;
+
 procedure TFormWorkspace.FormCreate(Sender: TObject);
 var
+  flag: boolean;
   fileName: string;
 begin
 
+  flag:= false;
+  if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
+  begin
+    if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
+    begin
+       FIniFileName:= 'LAMW.ini';
+       FIniFileSection:= 'NewProject';
+       CopyFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini',
+                IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+       //DeleteFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+       FPathToJavaTemplates:= DoNewPathToJavaTemplate();
+       FPathToSmartDesigner:= GetPathToSmartDesigner();
+       flag:= True;
+    end;
+  end;
+
+  if flag then
+  begin
+    WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
+    WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
+  end;
+
   //here ModuleType already is know!
-  fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+  fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
   if not FileExists(fileName) then
   begin
     SaveSettings(fileName);  //force to create empty/initial files!
   end;
 
 end;
-
 
 procedure TFormWorkspace.ListBoxMinSDKChange(Sender: TObject);
 var
@@ -812,19 +878,6 @@ begin
   if Pos('pAppOnCreate=', Result) > 0 then  Result:= Result +  'AndroidModule1.Init(gApp);';
 
   listParam.Free;
-end;
-
-function TFormWorkspace.GetPathToTemplatePresumed(): string;
-var
-  p: integer;
-  Pkg: TIDEPackage;
-begin
-  Pkg:=PackageEditingInterface.FindPackageWithName('amw_ide_tools');
-  if Pkg<>nil then
-  begin
-    p:= Pos('ide_tools', ExtractFilePath(Pkg.Filename));
-    Result:= Copy(ExtractFilePath(Pkg.Filename), 1, p-1) + 'java';
-  end;
 end;
 
 procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
@@ -926,38 +979,7 @@ begin
       FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
       if FPathToJavaTemplates = '' then
       begin
-        frm:= TFormPathMissing.Create(nil);
-        frm.LabelPathTo.Caption:= 'WARNING! Path [missing] to Java templates:';
-        frm.EditPath.Text:= GetPathToTemplatePresumed();
-        if frm.ShowModal = mrOK then
-        begin
-           FPathToJavaTemplates:= frm.PathMissing;
-           frm.Free;
-        end
-        else
-        begin
-           frm.Free;
-           Exit;
-        end;
-      end
-      else
-      begin
-        if FPathToJavaTemplates <> GetPathToTemplatePresumed() then
-        begin
-          frm:= TFormPathMissing.Create(nil);
-          frm.LabelPathTo.Caption:= 'WARNING! Path to Java templates was changed to:';
-          frm.EditPath.Text:= GetPathToTemplatePresumed();
-          if frm.ShowModal = mrOK then
-          begin
-            FPathToJavaTemplates:= frm.PathMissing;
-            frm.Free;
-          end
-          else
-          begin
-            frm.Free;
-            Exit;
-          end;
-        end;
+        DoNewPathToJavaTemplate();
       end;
 
       fileList:= TStringList.Create;

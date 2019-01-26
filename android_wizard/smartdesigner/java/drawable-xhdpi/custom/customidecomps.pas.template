@@ -1,0 +1,75 @@
+{
+ ***************************************************************************
+ *                                                                         *
+ *   This source is free software; you can redistribute it and/or modify   *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This code is distributed in the hope that it will be useful, but      *
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
+ *   General Public License for more details.                              *
+ *                                                                         *
+ *   A copy of the GNU General Public License is available on the World    *
+ *   Wide Web at <http://www.gnu.org/copyleft/gpl.html>. You can also      *
+ *   obtain it by writing to the Free Software Foundation,                 *
+ *   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.        *
+ *                                                                         *
+ ***************************************************************************
+
+  Author: Mattias Gaertner
+
+  THIS IS OBSOLETE.
+  
+  Use this unit to add components to the lazarus IDE.
+
+  For example:
+    To add TCheckBook from checkbook.pas to the IDE do the following:
+    1. If not already done, copy or rename this file to
+       components/custom/customidecomps.pas.
+    2. Copy checkbook.pas into the same directory.
+    3. Add checkbook to the uses section of the customidecomps.pas (*A).
+    4. Add the following line to RegisterCustomComponents (*B):
+       RegisterComponent('Extra','CheckBook',[TCheckBook]);
+    5. Add -dCustomIDEComps to Tools-> Configure "Build Lazarus" -> Options.
+       This flag will tell the compiler to use customidecomps.pas.
+    6. Rebuild lazarus.
+}
+unit CustomIDEComps;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes
+  { (*A) Add your units here }
+  ;
+
+
+type
+  TRegisterComponentProc = procedure(const Page, UnitName:ShortString;
+    ComponentClass: TComponentClass);
+
+// this procedure is called by the IDE on startup,
+// if it is compiled with -dCustomIDEComps
+procedure RegisterCustomComponents(RegisterComponent: TRegisterComponentProc);
+
+implementation
+
+procedure RegisterCustomComponents(RegisterComponent: TRegisterComponentProc);
+begin
+  { (*B) Add your component registrations here }
+
+  { Example:
+
+    RegisterComponent('PageName','UnitName',TCustomComp1);
+    RegisterComponent('Extra','CheckBook',TCheckBook);
+
+    For further examples see idecomp.pp -> RegisterStandardComponents
+  }
+end;
+
+end.
+

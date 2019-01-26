@@ -1,0 +1,1 @@
+public native void pOnSurfaceTextureAvailable(long pasobj, SurfaceTexture surface, int width, int height);

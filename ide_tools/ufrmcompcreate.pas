@@ -84,7 +84,6 @@ type
     function GetMethodNameHack(jType: string): string;
     function GetArrayTypeByFuncResultHack(funcResult: string): string;
     procedure TryInsertJavaCreate(txt: string);
-
     procedure LoadSettings(const fileName: string);
   public
     { public declarations }

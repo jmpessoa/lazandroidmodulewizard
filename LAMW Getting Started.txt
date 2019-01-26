@@ -89,14 +89,14 @@ I. Infrastructure
 	https://github.com/FlKo/LazarusDockedDesktops
 
 
-.[LAMW 0.8] "AppCompat" [material design] theme need:'+
+.[LAMW 0.8.3] "AppCompat" [material design] theme need:'+
 		1. Java JDK 1.8   
 		2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
 		3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 
 		4. Android SDK/Extra	"Support Repository"
 		5. Android SDK/Extra	"Support Library"
-		5. Android SDK/Extra	"Google Repository"
-		5. Android SDK/Extra	"Google Play Services"		
+		6. Android SDK/Extra	"Google Repository"
+		7. Android SDK/Extra	"Google Play Services"		
 
 II. LAMW:  Lazarus Android Module Wizard
 
@@ -153,6 +153,9 @@ III. USING LAMW
 	2.8-Select Architecture/Instruction: 
 
 		example: ARMv6
+		
+		NOTE: 	Laz4Android support  "ARMv6" and "ARMv7a + Soft"
+			Fpcupdeluxe support  ARMv7a + VFPv3
 		
         2.9.Select Android Theme
 

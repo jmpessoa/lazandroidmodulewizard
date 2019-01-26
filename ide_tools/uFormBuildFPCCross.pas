@@ -257,7 +257,7 @@ begin
      finally
        Tool.Free;
        Params.Free;
-       StatusBar1.SimpleText:='Success! FPC cross x86 [Android] was Build!';
+       StatusBar1.SimpleText:='Success! FPC cross Arm [Android] was Build!';
      end;
    end;
 

@@ -1,0 +1,3 @@
+public java.lang.Object jSDL2Surface_jCreate(long _Self) {
+  return (java.lang.Object)(new jSDL2Surface(this,_Self));
+}

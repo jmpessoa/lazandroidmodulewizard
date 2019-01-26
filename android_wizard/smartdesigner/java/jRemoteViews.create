@@ -1,0 +1,4 @@
+public java.lang.Object jRemoteViews_jCreate(long _Self, int _mode, int _direction, int _cols) {
+int _mode, int _direction, int _cols
+  return (java.lang.Object)(new jRemoteViews(this,_Self, _mode, _direction, _cols));
+}

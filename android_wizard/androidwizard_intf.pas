@@ -36,6 +36,7 @@ type
      FFPUSet: string;            {Soft}
 
      FPathToJavaTemplates: string;
+     FPathToSmartDesigner: string;
      FAndroidProjectName: string;
      FModuleType: integer;     {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
      FSyntaxMode: TSyntaxMode;   {}
@@ -73,6 +74,8 @@ type
      FBuildSystem: string;
      FMaxSdkPlatform: integer;
      FCandidateSdkBuild: string;
+     FIniFileName: string;
+     FIniFileSection: string;
 
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
@@ -86,6 +89,10 @@ type
      function GetBuildTool(sdkApi: integer): string;
      function HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
      function TryGradleCompatibility(plugin: string; gradleVers: string) : string;
+
+     function DoNewPathToJavaTemplate(): string;
+     function GetPathToSmartDesigner(): string;
+     procedure WriteIniString(Key, Value: string);
 
    public
      constructor Create; override;
@@ -158,7 +165,7 @@ implementation
 
 uses
    {$ifdef unix}BaseUnix,{$endif}
-   LazFileUtils, uJavaParser, LamwDesigner, SmartDesigner;
+   LazFileUtils, uJavaParser, LamwDesigner, SmartDesigner, IniFiles, PackageIntf;
 
 procedure Register;
 begin
@@ -418,11 +425,10 @@ begin
           SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
 
           Clear;
-          //LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'App.java');
           if Pos('AppCompat', FAndroidTheme) > 0 then
           begin
-             if FileExists(FPathToJavaTemplates + DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'App.java') then
-               LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'App.java');
+             if FileExists(FPathToJavaTemplates + DirectorySeparator + 'support'+DirectorySeparator+'App.java') then
+               LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'support'+DirectorySeparator+'App.java');
           end
           else
           begin
@@ -442,18 +448,18 @@ begin
 
           if Pos('AppCompat', FAndroidTheme) > 0 then
           begin
-            if FileExists(FPathToJavaTemplates+DirectorySeparator +'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java') then
+            if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jCommons.java') then
             begin
-              LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java');
+              LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jCommons.java');
               Strings[0] := 'package ' + strPack + ';';  //replace dummy
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
             end;
           end
           else
           begin
-            if FileExists(FPathToJavaTemplates+DirectorySeparator +'lamwdesigner'+DirectorySeparator+ 'jCommons.java') then
+            if FileExists(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java') then
             begin
-              LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'lamwdesigner'+DirectorySeparator+ 'jCommons.java');
+              LoadFromFile(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java');
               Strings[0] := 'package ' + strPack + ';';  //replace dummy
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
             end;
@@ -468,7 +474,7 @@ begin
       AndroidFileDescriptor.ModuleType:= 0;
 
       with TJavaParser.Create(FFullJavaSrcPath + DirectorySeparator+  'Controls.java') do
-      try
+      try         //produce helper file "ControlsEvents.txt"
         FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'ControlsEvents.txt');
       finally
         Free;
@@ -599,7 +605,7 @@ begin
       //AndroidManifest.xml creation:
       with TStringList.Create do
       try
-        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'AndroidManifest.txt');
+        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'androidmanifest.txt');
         strAfterReplace  := StringReplace(Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
 
         strPack:= strPack+'.'+FMainActivity; {gApp}
@@ -630,9 +636,71 @@ end;
 
 {TAndroidProjectDescriptor}
 
-function TAndroidProjectDescriptor.SettingsFilename: string;
+function TAndroidProjectDescriptor.GetPathToSmartDesigner(): string;
+var
+  Pkg: TIDEPackage;
 begin
-  Result := IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini'
+  Result:= '';
+  if FPathToSmartDesigner = '' then
+  begin
+    Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
+    if Pkg<>nil then
+    begin
+        FPathToSmartDesigner:= ExtractFilePath(Pkg.Filename);
+        FPathToSmartDesigner:= FPathToSmartDesigner + 'smartdesigner';
+        Result:=FPathToSmartDesigner;
+        //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+    end;
+  end
+  else Result:= FPathToSmartDesigner;
+end;
+
+function TAndroidProjectDescriptor.DoNewPathToJavaTemplate(): string;
+begin
+   FPathToJavaTemplates:= GetPathToSmartDesigner() + pathDelim +'java';
+   Result:=FPathToJavaTemplates;
+    //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java
+end;
+
+procedure TAndroidProjectDescriptor.WriteIniString(Key, Value: string);
+var
+  FIniFile: TIniFile;
+begin
+  FIniFile := TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + FIniFileName);
+  if FIniFile <> nil then
+  begin
+    FIniFile.WriteString(FIniFileSection, Key, Value);
+    FIniFile.Free;
+  end;
+end;
+
+
+function TAndroidProjectDescriptor.SettingsFilename: string;
+var
+    flag: boolean;
+begin
+    flag:= false;
+    if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
+    begin
+      if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
+      begin
+         FIniFileName:= 'LAMW.ini';
+         FIniFileSection:= 'NewProject';
+         CopyFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini',
+                  IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+         //DeleteFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+         FPathToJavaTemplates:= DoNewPathToJavaTemplate();
+         FPathToSmartDesigner:= GetPathToSmartDesigner();
+         flag:= True;
+      end;
+    end;
+
+    if flag then
+    begin
+      WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
+      WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
+    end;
+    Result := IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
 end;
 
 function TAndroidProjectDescriptor.GetPathToJNIFolder(fullPath: string): string;
@@ -1003,6 +1071,7 @@ begin
       FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
 
       FPathToJavaTemplates:= frm.PathToJavaTemplates;
+      FPathToSmartDesigner:= frm.PathToSmartDesigner;
       FPathToJavaJDK:= frm.PathToJavaJDK;
 
       FPathToAndroidSDK:= frm.PathToAndroidSDK;
@@ -1124,25 +1193,11 @@ begin
 
             CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
 
-            //replace "dummyTheme" ..res\values-v11
-            strList.Clear;
-            strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
-
             intTargetApi:= StrToInt(FTargetApi);
-
-            if (intTargetApi >= 11) and (intTargetApi < 14) then
-              strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.'+FAndroidTheme, [rfReplaceAll])
-            else
-              strText:= StringReplace(strList.Text,'dummyTheme', 'android:Theme.Holo.Light', [rfReplaceAll]); //default
-
-            strList.Text:= strText;
-            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11'+DirectorySeparator+'styles.xml');
-
+            if intTargetApi < 14 then   intTargetApi:= 14;
             CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
-
             //replace "dummyTheme" ..res\values-v14
             strList.Clear;
-
             strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
 
             if (intTargetApi >= 14) and (intTargetApi < 21) then

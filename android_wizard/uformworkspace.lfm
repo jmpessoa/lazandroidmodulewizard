@@ -5,7 +5,7 @@ object FormWorkspace: TFormWorkspace
   Width = 440
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
-  Caption = 'LAMW 0.8:  New Project'
+  Caption = 'LAMW 0.83:  New Project'
   ClientHeight = 641
   ClientWidth = 440
   Color = clGradientInactiveCaption

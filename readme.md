@@ -1,5 +1,5 @@
 
-	Lamw: Lazarus Android Module Wizard: 
+	LAMW: Lazarus Android Module Wizard: 
 		:: RAD Android! Form Designer and Components Development Model! 
 		
 	"A wizard to create JNI Android loadable module (.so) and Android Apk
@@ -43,7 +43,7 @@
 
 		-Stephano  - Many collaborations and suggestions!
 
-		-x2nie [Lazarus 1.3 patch to no LCL form designer!] 
+		-x2nie [Lazarus 1.3 patch to non LCL form designer!] 
 			http://github.com/x2nie/LiteZarus
 
 		-Fatih KILIÇ - How To Install!
@@ -87,45 +87,22 @@
 			
 		-Lazarus forum community!
 		
-	References:
-
-		Laz4Android
-			http://sourceforge.net/projects/laz4android/files/?source=navbar
-			:To Install [*.7z], please, read the "Laz4Android_readme.txt"
-
-		Android NDK-r10e
-			http://dl.google.com/android/ndk/android-ndk-r10e-windows-x86.exe
-
-		Ant	
-			http://ant.apache.org/bindownload.cgi 
-			Simply extract the zip file to a convenient location...
-
-		Gradle 4.1 [to build Apk with "AppCompat" [material] theme]
-			https://gradle.org/next-steps/?version=4.1&format=bin
-			Simply extract the zip file to a convenient location...
 
 	***************************************************************************************************
 	* How To Start:				
 	*	
-	*  "Getting Started.txt"				
+	*  "LAMW Getting Started.txt"				
 	*					
 	***************************************************************************************************
 
-	*Using [projects] demos :
-	*
-	*PANIC ? When prompt "Read error" [Unknown Property] just choice "Continue Loading" !
-	*
-	*PANIC ? Fail to build Apk. Change according your sdk system installation this properties:
-	*
-	*	"AndroidManifest.xml" 		
-	*		<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
-	*
-	*	"build.xml"	
-	*		<property name="target"  value="android-17"/>
-	*
-	*
-	****************************************************************************************************
+Version 0.8 - rev 03 - 26 - January- 2019
 
+	NEW "jXLSWriter" component
+
+	NEW demo "AppXLSWriterDemo1" 
+ 
+	Changed [intern] folder estructure! 
+	
 Version 0.8 - rev 02 - 21 - August - 2018
 
 	NEW!  jsAdMob component [thanks to TR3E]
