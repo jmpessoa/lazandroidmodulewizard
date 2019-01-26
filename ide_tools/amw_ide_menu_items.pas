@@ -496,7 +496,7 @@ begin
     p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
     pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
 
-    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
     with TIniFile.Create(fileName) do
     try
       pathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
@@ -543,8 +543,8 @@ begin
           list.Clear;
           list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'buildgradle.txt');
 
-          if StrToInt(targetApi) < 21 then targetApi:= '21';
-          if StrToInt(targetApi) > 25 then targetApi:= '25';
+          if StrToInt(targetApi) < 25 then targetApi:= '25';
+          //if StrToInt(targetApi) > 25 then targetApi:= '25';
 
           tmpStr:= StringReplace(list.Text,'#sdkapi', targetApi, [rfReplaceAll]);
           list.Text:= tmpStr;
@@ -634,7 +634,7 @@ begin
        end;
 
        pathToNdk:= Project.CustomData.Values['NdkPath'];  //<Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
-       ndkPlatform:= GetNdkPlatform(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+       ndkPlatform:= GetNdkPlatform(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
 
        p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
        pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
@@ -1101,7 +1101,7 @@ begin
 
       pathToProject:= Copy(Project.ProjectInfoFile, 1, p+3);
 
-      fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+      fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
       with TIniFile.Create(fileName) do
       try
         pathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
@@ -1215,7 +1215,7 @@ begin
   //Project := LazarusIDE.ActiveProject;
   {if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
   begin}
-    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
     with TIniFile.Create(fileName) do
     try
       setting:= ReadString('NewProject','CanUpdateJavaTemplate', '');

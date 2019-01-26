@@ -1125,7 +1125,7 @@ begin
            AProcess.CurrentDirectory:= FPathToLAMW+DirectorySeparator+'ide_tools';
            AProcess.Executable:= FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres.exe';
            {$IFDEF UNIX}
-              AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres';
+              AProcess.Executable:= FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres';
            {$Endif}
            AProcess.Parameters.Add(LowerCase(FJavaClassName)+'_icon.lrs');
            AProcess.Parameters.Add(LowerCase(FJavaClassName)+'.png');
