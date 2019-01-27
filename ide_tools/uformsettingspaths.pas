@@ -317,6 +317,8 @@ begin
     WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
   end;
 
+  LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+
   FOk:= False;
 
   {$ifdef windows}
@@ -513,6 +515,7 @@ procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
    indexNdk: integer;
 begin
+
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do

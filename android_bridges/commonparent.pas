@@ -7,14 +7,14 @@ interface
 uses
   Classes, AndroidWidget, And_jni, And_jni_Bridge;
 
-function tryCommonParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp): boolean;
+function tryCommonParent(var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp): boolean;
 
 implementation
 
 uses
   Laz_And_Controls, customdialog, viewflipper, toolbar, radiogroup, framelayout, linearlayout;
 
-function tryCommonParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp): boolean;
+function tryCommonParent(var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp): boolean;
 begin
 
  Result:= False;

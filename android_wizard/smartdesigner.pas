@@ -41,6 +41,7 @@ type
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
+    procedure AddSupportToFCLControls(chipArchitecture: string);
     function GetEventSignature(const nativeMethod: string): string;
     function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
     function TryAddJControl(jclassname: string; out nativeAdded: boolean): boolean;
@@ -88,7 +89,8 @@ type
     procedure Init4Project(AProject: TLazProject);
 
     // called from Designer
-    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
+    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
+    procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateProjectStartModule(const NewName: string);
 
   end;
@@ -1228,14 +1230,45 @@ begin
   for i := 0 to AndroidForm.ComponentCount - 1 do
   begin
     c := AndroidForm.Components[i];
-    if c is jControl then
-      jControls.Add(c.ClassName)
-    else if c.ClassName = 'TFPNoGUIGraphicsBridge' then
-      jControls.Add(c.ClassName);
+    if c is jControl then jControls.Add(c.ClassName);
+    //else if Pos(c.ClassName, fclList.Text) > 0 then jControls.Add(c.ClassName); //else if c.ClassName = 'TFPNoGUIGraphicsBridge' then
   end;
   jControls.Delimiter := ';';
   ProjFile.CustomData['jControls'] := jControls.DelimitedText;
   jControls.Free;
+end;
+
+procedure TLamwSmartDesigner.UpdateFCLControls(ProjFile: TLazProjectFile;
+  AndroidForm: TAndroidForm);
+var
+  fclControls: TStringList;
+  fclList: TStringList;
+  i: Integer;
+  c: TComponent;
+  pathToFclBridges: string;
+begin
+  if (ProjFile = nil) or (AndroidForm = nil) then Exit;
+
+  FPathToSmartDesigner:=  GetPathToSmartDesigner();
+  pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
+
+  fclList:=  TStringList.Create;
+
+  if FileExists(pathToFclBridges+'fcl_bridges.txt') then
+     fclList.LoadFromFile(pathToFclBridges+'fcl_bridges.txt');
+
+  fclControls := TStringList.Create;
+  fclControls.Sorted := True;
+  fclControls.Duplicates := dupIgnore;
+  for i := 0 to AndroidForm.ComponentCount - 1 do
+  begin
+    c := AndroidForm.Components[i];
+    if Pos(c.ClassName, fclList.Text) > 0 then fclControls.Add(c.ClassName);
+  end;
+  fclControls.Delimiter := ';';
+  ProjFile.CustomData['fclControls']:= fclControls.DelimitedText;
+  fclControls.Free;
+  fclList.Free;
 end;
 
 procedure TLamwSmartDesigner.UpdateProjectStartModule(const NewName: string);
@@ -1305,10 +1338,10 @@ end;
 
 procedure TLamwSmartDesigner.GetAllJControlsFromForms(jControlsList: TStrings);
 var
-  list, contentList: TStringList;
-  i, j, p1: integer;
-  aux: string;
+  list: TStringList;
+  i: integer;
 begin
+
   list := TStringList.Create;
   list.Delimiter := ';';
   with LazarusIDE.ActiveProject do
@@ -1318,31 +1351,96 @@ begin
       jControlsList.AddStrings(list);
     end;
   list.Free;
-  Exit;
+end;
 
-  //No need to create the stringlist...
-  if jControlsList <> nil then
-  begin
-    list:= TStringList.Create;
-    contentList := FindAllFiles(FPathToAndroidProject+'jni', '*.lfm', False);
-    for i:= 0 to contentList.Count-1 do
+procedure TLamwSmartDesigner.AddSupportToFCLControls(chipArchitecture: string);
+var
+  controlsList, auxList, fclList: TStringList;
+  i, j, p: integer;
+  pathToNdkApiPlatforms, pathToFclBridges, androidNdkApi, arch, aux: string;
+begin
+
+  FPathToSmartDesigner:=  GetPathToSmartDesigner();
+  pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
+
+  fclList:= TStringList.Create;
+  if FileExists(pathToFclBridges + 'fcl_bridges.txt') then
+    fclList.LoadFromFile(pathToFclBridges + 'fcl_bridges.txt');
+
+  auxList:= TStringList.Create;
+  controlsList := TStringList.Create;
+  controlsList.Delimiter := ';';
+  with LazarusIDE.ActiveProject do
+    for i := 0 to FileCount - 1 do
     begin
-      list.LoadFromFile(contentList.Strings[i]);
-      for j:= 1 to list.Count - 1 do  // "1" --> skip form
-      begin
-        aux:= list.Strings[j];
-        if Pos('object ', aux) > 0 then  //object jTextView1: jTextView
-        begin
-           p1:= Pos(':', aux);
-           aux:=  Copy(aux, p1+1, Length(aux));
-           jControlsList.Add(Trim(aux));
-        end;
-      end;
+      controlsList.DelimitedText := Files[i].CustomData['fclControls'];
     end;
-    list.Free;
-    contentList.Free;
+
+  for j:= 0 to fclList.Count - 1 do
+  begin
+     if controlsList.IndexOf(fclList.Strings[j]) >= 0 then  //TFPNoGUIGraphicsBridge
+     begin
+         if FileExists(pathToFclBridges + fclList.Strings[j] + '.libso') then //TFPNoGUIGraphicsBridge.libso
+         begin
+            auxList.LoadFromFile(pathToFclBridges + fclList.Strings[j]+'.libso');
+
+            CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],   //'libfreetype.so',
+                     FPathToAndroidProject+'libs'+PathDelim+
+                     chipArchitecture+PathDelim+auxList.Strings[0]); //'libfreetype.so'
+
+            //Added support to TFPNoGUIGraphicsBridge ... TMySQL57Bridge ... etc
+            androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-13 or android-14 or ... etc
+
+            if androidNdkApi <> '' then
+            begin
+
+              if Pos('armeabi', chipArchitecture) > 0 then arch:= 'arch-arm'
+              else if Pos('x86', chipArchitecture) > 0 then arch:= 'arch-x86'
+              else if Pos('mips', chipArchitecture) > 0 then arch:= 'arch-mips';
+
+              //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
+              pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                                      androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
+                                                      'usr'+DirectorySeparator+'lib';
+
+              //need by linker!  //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
+              CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],
+                     pathToNdkApiPlatforms+PathDelim+auxList.Strings[0]);
+
+              (*
+              //need by compiler
+              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetype.pp',
+                       FPathToAndroidProject+'jni'+PathDelim+ 'freetype.pp');
+              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetypeh.pp',
+                      FPathToAndroidProject+'jni'+PathDelim+ 'freetypeh.pp');
+              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'ftfont.pp',
+                       FPathToAndroidProject+'jni'+PathDelim+ 'ftfont.pp');
+              *)
+
+            end
+            else
+            begin
+              pathToNdkApiPlatforms:='';
+              aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+              p:= Pos(';', aux);
+              if p > 0 then
+              begin
+                 pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p));
+                 //need by linker!
+                 CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],
+                          pathToNdkApiPlatforms+auxList.Strings[0]);
+
+              end;
+            end;
+         end;
+
+     end;
+
   end;
 
+  controlsList.Free;
+  auxList.Free;
+  fclList.Free;
 end;
 
 function TLamwSmartDesigner.TryAddJControl(jclassname: string;
@@ -1981,11 +2079,12 @@ var
 begin
 
   fclList:=  TStringList.Create;
-
   FPathToSmartDesigner:=  GetPathToSmartDesigner();
 
   pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
-  fclList.LoadFromFile(pathToFclBridges+'fcl_bridges.txt');
+
+  if FileExists(pathToFclBridges+'fcl_bridges.txt') then
+     fclList.LoadFromFile(pathToFclBridges+'fcl_bridges.txt');
 
   jControls := TStringList.Create;
   jControls.Sorted := True;
@@ -2010,7 +2109,9 @@ begin
             begin
               str := Trim(Copy(str, k + 1, MaxInt)); //(str = 'TFPNoGUIGraphicsBridge')
               if  (Pos(str, fclList.Text) > 0) or FileExists(LamwGlobalSettings.PathToJavaTemplates + str + '.java') then
+              begin
                   jControls.Add(str);
+              end;
             end;
           end;
           CustomData['jControls'] := jControls.DelimitedText;
@@ -2025,16 +2126,13 @@ end;
 
 function TLamwSmartDesigner.OnProjectSavingAll(Sender: TObject): TModalResult;
 var
-  auxList, jcontrolsList, libList: TStringList;
+  auxList, controlsList, libList: TStringList;
   i, j, p: Integer;
   nativeExists: Boolean;
   aux, PathToJavaTemplates, chipArchitecture, LibPath: string;
-  pathToNdkApiPlatforms, androidNdkApi, arch: string;
   AndroidTheme: string;
   compoundList: TStringList;
   lprModuleName: string;
-  fclList: TStringList;
-  pathToFclBridges: string;
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
@@ -2058,6 +2156,8 @@ begin
   if Pos('-CpARMV6', aux) > 0 then chipArchitecture:= 'armeabi'
   else if Pos('-CpARMV7A', aux) > 0 then chipArchitecture:= 'armeabi-v7a'
   else if Pos('-XPmipsel', aux) > 0 then chipArchitecture:= 'mips';
+
+  AddSupportToFCLControls(chipArchitecture);
 
   if LamwGlobalSettings.CanUpdateJavaTemplate then
   begin
@@ -2145,153 +2245,35 @@ begin
        FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'Controls.native');
   end;
 
-  jcontrolsList := TStringList.Create;
-  jcontrolsList.Sorted := True;
-  jcontrolsList.Duplicates := dupIgnore;
-  GetAllJControlsFromForms(jcontrolsList);
+  controlsList := TStringList.Create;
+  controlsList.Sorted := True;
+  controlsList.Duplicates := dupIgnore;
+
+  GetAllJControlsFromForms(controlsList);
 
   compoundList:= TStringList.Create;
-  for i:= 0 to jcontrolsList.Count - 1 do       //Add component compound support
+  for i:= 0 to controlsList.Count - 1 do       //Add component compound support
   begin
-    if FileExists(PathToJavaTemplates+jcontrolsList.Strings[i]+'.compound') then
+    if FileExists(PathToJavaTemplates+controlsList.Strings[i]+'.compound') then
     begin
-      compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jcontrolsList.Strings[i]+'.compound');
+      compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+controlsList.Strings[i]+'.compound');
       for j:= 0 to compoundList.Count - 1 do
       begin
         if compoundList.Strings[j] <> '' then
-           jcontrolsList.Add(compoundList.Strings[j]);
+           controlsList.Add(compoundList.Strings[j]);
       end;
     end;
   end;
   compoundList.Free;
 
   //re-add all [updated] java code ...
-  for j:= 0 to jcontrolsList.Count - 1 do
+  for j:= 0 to controlsList.Count - 1 do
   begin
-    if FileExists(PathToJavaTemplates+jcontrolsList.Strings[j]+'.java') then
-       TryAddJControl(jcontrolsList.Strings[j], nativeExists);
+    if FileExists(PathToJavaTemplates+controlsList.Strings[j]+'.java') then
+       TryAddJControl(controlsList.Strings[j], nativeExists);
   end;
 
-  pathToFclBridges:= FPathToSmartDesigner + 'fcl' + PathDelim;
-  auxList.Clear;
-  fclList:= TStringList.Create;
-  fclList.LoadFromFile(pathToFclBridges + 'fcl_bridges.txt');
-  for j:= 0 to fclList.Count - 1 do
-  begin
-     if jcontrolsList.IndexOf(fclList.Strings[j]) >= 0 then  //TFPNoGUIGraphicsBridge
-     begin
-         if FileExists(pathToFclBridges + fclList.Strings[j] + '.libso') then //TFPNoGUIGraphicsBridge.libso
-         begin
-            auxList.LoadFromFile(pathToFclBridges + fclList.Strings[j]+'.libso');
-            CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],   //'libfreetype.so',
-                     FPathToAndroidProject+'libs'+PathDelim+
-                     chipArchitecture+PathDelim+auxList.Strings[0]); //'libfreetype.so'
-
-            //Added support to TFPNoGUIGraphicsBridge ... TMySQL57Bridge ... etc
-            androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-13 or android-14 or ... etc
-            if androidNdkApi <> '' then
-            begin
-
-              if Pos('armeabi', chipArchitecture) > 0 then arch:= 'arch-arm'
-              else if Pos('x86', chipArchitecture) > 0 then arch:= 'arch-x86'
-              else if Pos('mips', chipArchitecture) > 0 then arch:= 'arch-mips';
-
-              //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
-              pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
-                                                      androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
-                                                      'usr'+DirectorySeparator+'lib';
-              //need by linker!
-              CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],
-                     pathToNdkApiPlatforms+PathDelim+auxList.Strings[0]);
-
-              (*
-              //need by compiler
-              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetype.pp',
-                       FPathToAndroidProject+'jni'+PathDelim+ 'freetype.pp');
-              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetypeh.pp',
-                      FPathToAndroidProject+'jni'+PathDelim+ 'freetypeh.pp');
-              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'ftfont.pp',
-                       FPathToAndroidProject+'jni'+PathDelim+ 'ftfont.pp');
-              *)
-
-            end
-            else
-            begin
-              pathToNdkApiPlatforms:='';
-              aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
-              p:= Pos(';', aux);
-              if p > 0 then
-              begin
-                 pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p));
-                 //need by linker!
-                 CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],
-                          pathToNdkApiPlatforms+auxList.Strings[0]);
-
-              end;
-            end;
-         end;
-     end;
-  end;
-  fclList.Free;
-
-  (*
-  if jcontrolsList.IndexOf('TFPNoGUIGraphicsBridge') >= 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
-  begin                                                                         //lamwdesigner\libs\armeabi\libfreetype.so
-    if FileExists(PathToJavaTemplates+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so') then
-    begin
-      CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
-               FPathToAndroidProject+'libs'+PathDelim+
-               chipArchitecture+PathDelim+'libfreetype.so');
-
-      //Added support to TFPNoGUIGraphicsBridge ...
-      androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-13 or android-14 or ... etc
-      if androidNdkApi <> '' then
-      begin
-
-        if Pos('armeabi', chipArchitecture) > 0 then arch:= 'arch-arm'
-        else if Pos('x86', chipArchitecture) > 0 then arch:= 'arch-x86'
-        else if Pos('mips', chipArchitecture) > 0 then arch:= 'arch-mips';
-
-                                //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
-        pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
-                                                androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
-                                                'usr'+DirectorySeparator+'lib';
-
-        //need by linker!
-        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
-               pathToNdkApiPlatforms+PathDelim+'libfreetype.so');
-
-        {
-        //need by compiler
-        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetype.pp',
-                 FPathToAndroidProject+'jni'+PathDelim+ 'freetype.pp');
-        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetypeh.pp',
-                FPathToAndroidProject+'jni'+PathDelim+ 'freetypeh.pp');
-        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'ftfont.pp',
-                 FPathToAndroidProject+'jni'+PathDelim+ 'ftfont.pp');
-        }
-
-      end
-      else
-      begin
-        pathToNdkApiPlatforms:='';
-        aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
-        p:= Pos(';', aux);
-        if p > 0 then
-        begin
-           pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p-1));
-           //need by linker!
-           CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
-                    pathToNdkApiPlatforms+'libfreetype.so');
-        end;
-      end;
-
-    end;
-
-  end;
-  *)
-
-  jcontrolsList.Free;
+  controlsList.Free;
   auxList.Free;
 
   UpdateProjectLpr(lprModuleName, FStartModuleVarName);

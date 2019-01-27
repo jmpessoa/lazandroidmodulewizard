@@ -53,6 +53,7 @@ type
     //Smart Designer helpers
     procedure InitSmartDesignerHelpers;
     procedure UpdateJControlsList; inline;
+    procedure UpdateFCLControlsList; inline;
 
   protected
     //procedure OnDesignerModified(Sender: TObject);
@@ -1776,9 +1777,10 @@ begin
       jVisualControl(APersistent).Parent := AndroidForm;
 
   //smart designer helpers
-  if (APersistent is jControl)
-  and (jControl(APersistent).Owner = AndroidForm) then
-    UpdateJControlsList;
+  if (APersistent is jControl) and (jControl(APersistent).Owner = AndroidForm) then
+      UpdateJControlsList
+  else UpdateFCLControlsList;
+
 end;
 
 procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
@@ -1817,23 +1819,29 @@ end;
 
 procedure TAndroidWidgetMediator.InitSmartDesignerHelpers;
 begin
-  if (FProjFile<>nil)
-  and FProjFile.IsPartOfProject
-  and not FProjFile.CustomData.Contains('jControls') then
-    UpdateJControlsList;
+  if (FProjFile<>nil) and FProjFile.IsPartOfProject
+      and not FProjFile.CustomData.Contains('jControls') then
+        UpdateJControlsList;
 end;
 
 procedure TAndroidWidgetMediator.OnPersistentDeleting(APersistent: TPersistent);
 begin
   FjControlDeleted := (APersistent is jControl)
     and (Root <> nil) and (TComponent(APersistent).Owner = Root);
+
   if FjControlDeleted then
-    FShownCustomDialogs.Remove(APersistent);
+    FShownCustomDialogs.Remove(APersistent)
+  else UpdateFCLControlsList;
 end;
 
 procedure TAndroidWidgetMediator.UpdateJControlsList;
 begin
   LamwSmartDesigner.UpdateJControls(FProjFile, AndroidForm);
+end;
+
+procedure TAndroidWidgetMediator.UpdateFCLControlsList;
+begin
+  LamwSmartDesigner.UpdateFCLControls(FProjFile, AndroidForm);
 end;
 
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
