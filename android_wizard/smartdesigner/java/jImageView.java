@@ -1,4 +1,4 @@
-package org.lamw.appcompatnavigationdrawerdemo1;
+package org.lamw.appviewflipperdemo2;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -24,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 //import android.support.design.widget.CollapsingToolbarLayout;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -46,6 +47,8 @@ public class jImageView extends ImageView {
 	
 	Matrix mMatrix;
 	int mRadius = 20;
+
+	boolean mRounded = false;
 
 	//Constructor
 	public  jImageView(android.content.Context context, Controls ctrls, long pasobj ) {
@@ -201,7 +204,12 @@ public class jImageView extends ImageView {
 	public void SetBitmapImage(Bitmap _bitmap, int _width, int _height) {
 		this.setImageResource(android.R.color.transparent);
 		bmp = GetResizedBitmap(_bitmap, _width, _height);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+		    this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
@@ -214,7 +222,12 @@ public class jImageView extends ImageView {
 			//is is the case when the bitmap fails to load
 			int nh = (int) ( bm.getHeight() * (1024.0 / bm.getWidth()) );
 			Bitmap scaled = Bitmap.createScaledBitmap(bm,1024, nh, true);
-			this.setImageBitmap(scaled);
+
+			if (!mRounded)
+				this.setImageBitmap(scaled);
+			else
+				this.setImageBitmap(GetRoundedShape(scaled, 0));
+
 			bmp = scaled;
 		}
 		else{
@@ -228,7 +241,12 @@ public class jImageView extends ImageView {
 				bmp = bm;
 
 			} else {
-				this.setImageBitmap(bm);
+
+				if (!mRounded)
+					this.setImageBitmap(bm);
+				else
+					this.setImageBitmap(GetRoundedShape(bm, 0));
+
 				bmp = bm;
 			}
 		}
@@ -240,7 +258,12 @@ public class jImageView extends ImageView {
 		this.setImageResource(android.R.color.transparent);
 		if (fullPath.equals("null")) { this.setImageBitmap(null); return; };
 		bmp = BitmapFactory.decodeFile(fullPath);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
@@ -275,9 +298,14 @@ public class jImageView extends ImageView {
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
-		bmp = ((BitmapDrawable)d).getBitmap();
+		Bitmap b = ((BitmapDrawable)d).getBitmap();
+		bmp = GetResizedBitmap(b, b.getWidth(), b.getHeight());
 		this.setImageResource(android.R.color.transparent);
-		this.setImageDrawable(d);
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+		//this.setImageDrawable(d);
 		this.invalidate();
 	}
 
@@ -383,14 +411,24 @@ public class jImageView extends ImageView {
 		String picturePath = cursor.getString(columnIndex);
 		cursor.close();
 		bmp = BitmapFactory.decodeFile(picturePath);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
 	public void SetImageThumbnailFromCamera(Intent _intentData) {
 		Bundle extras = _intentData.getExtras();
 		bmp = (Bitmap) extras.get("data");
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
@@ -404,13 +442,23 @@ public class jImageView extends ImageView {
 			e.printStackTrace();
 		}
 		bmp = BitmapFactory.decodeStream(imageStream);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
 	public void SetImageFromByteArray(byte[] _image) {
 		bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
@@ -537,13 +585,68 @@ public class jImageView extends ImageView {
         }
 
         public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	 
-	  _byteBuffer.rewind();  //reset position
-	  bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
+	       _byteBuffer.rewind();  //reset position
+	       bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);
           bmp.copyPixelsFromBuffer(_byteBuffer); 	
           return bmp;
         }
+	/*
+	 * Making image in circular shape
+	 * http://www.androiddevelopersolutions.com/2012/09/crop-image-in-circular-shape-in-android.html
+	 */
+	private Bitmap GetRoundedShape(Bitmap _bitmapImage, int _diameter) {
+		// TODO Auto-generated method stub
+		Bitmap sourceBitmap = _bitmapImage;
+		Path path = new Path();
 
+		int dim;
+		if(_diameter == 0 ) {
+			dim = sourceBitmap.getHeight();
+			if (dim > sourceBitmap.getWidth()) dim = sourceBitmap.getWidth();
+		}
+		else {
+			dim = _diameter;
+			int min;
 
+			if (sourceBitmap.getWidth() <  sourceBitmap.getHeight())
+				min = sourceBitmap.getWidth();
+			else
+				min = sourceBitmap.getHeight();
+
+			if (dim > min) dim = min;
+		}
+
+		int targetWidth = dim;
+		int targetHeight = dim;
+
+		Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
+				targetHeight,Bitmap.Config.ARGB_8888);
+
+		Canvas canvas = new Canvas(targetBitmap);
+
+		path.addCircle(((float) targetWidth - 1) / 2,
+				((float) targetHeight - 1) / 2,
+				(Math.min(((float) targetWidth),
+						((float) targetHeight)) / 2),
+				Path.Direction.CCW);
+
+		canvas.clipPath(path);
+
+		canvas.drawBitmap(sourceBitmap,
+				new Rect(0, 0, sourceBitmap.getWidth(),
+						sourceBitmap.getHeight()),
+				new Rect(0, 0, targetWidth,
+						targetHeight), null);
+		return targetBitmap;
+	}
+
+	private Bitmap GetRoundedShape(Bitmap _bitmapImage) {
+		return GetRoundedShape(_bitmapImage, 0);
+	}
+
+	public void SetRoundedShape(boolean _value) {
+		mRounded = _value;
+	}
 }
 
 

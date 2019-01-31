@@ -458,6 +458,7 @@ function  jImageView_SaveToJPG(env: PJNIEnv; _jimageview: JObject; filePath: str
 function  jImageView_SaveToPNG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
 function  jImageView_GetByteBuffer(env: PJNIEnv; _jimageview: JObject; _width: integer; _height: integer): jObject;
 function  jImageView_GetBitmapFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _byteBuffer: jObject; _width: integer; _height: integer): jObject;
+procedure jImageView_SetRoundedShape(env: PJNIEnv; _jimageview: JObject; _value: boolean);
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -4759,6 +4760,19 @@ begin
   jCls:= env^.GetObjectClass(env, _jimageview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromByteBuffer', '(Ljava/nio/ByteBuffer;II)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetRoundedShape(env: PJNIEnv; _jimageview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundedShape', '(Z)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

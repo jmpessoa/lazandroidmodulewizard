@@ -4,18 +4,13 @@ package org.lamw.appviewflipperdemo2;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
+import android.graphics.Canvas;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.ViewFlipper;
 
 /*Draft java code by "Lazarus Android Module Wizard" [2/5/2017 16:06:56]*/
@@ -229,17 +224,86 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
        this.showPrevious();
    }
 
-    //RelativeLayout itemLayout = new RelativeLayout(ctx);
-    public  void AddImageView(String _fullPath) {
-        if (_fullPath.equals("")) { return; };
+    public  void AddView(String _fullPathToImage, int _scaleType, boolean _roundedShape) {
+
+       if (_fullPathToImage.equals("")) { return; };
+
         ImageView itemImage = new ImageView(controls.activity);
         itemImage.setImageResource(android.R.color.transparent);
-        Bitmap bmp = BitmapFactory.decodeFile(_fullPath);
-        itemImage.setScaleType(ImageView.ScaleType.CENTER); //photo-viewing application
-        //itemImage.setScaleType(ImageView.ScaleType.FIT_CENTER); //photo-viewing application
-        itemImage.setImageBitmap(bmp);
+        Bitmap bmp = BitmapFactory.decodeFile(_fullPathToImage);
+        switch(_scaleType) {
+            case 0: itemImage.setScaleType(ImageView.ScaleType.CENTER); break;
+            case 1: itemImage.setScaleType(ImageView.ScaleType.CENTER_CROP); break;
+            case 2: itemImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE); break;
+            case 3: itemImage.setScaleType(ImageView.ScaleType.FIT_CENTER); break;
+            case 4: itemImage.setScaleType(ImageView.ScaleType.FIT_END); break;
+            case 5: itemImage.setScaleType(ImageView.ScaleType.FIT_START); break;
+            case 6: itemImage.setScaleType(ImageView.ScaleType.FIT_XY); break;
+            case 7: itemImage.setScaleType(ImageView.ScaleType.MATRIX); break;
+        }
+
+        if (!_roundedShape)
+            itemImage.setImageBitmap(bmp);
+        else
+            itemImage.setImageBitmap(GetRoundedShape(bmp, 0));
+
         itemImage.setFocusableInTouchMode(false);
-        //RelativeLayout.LayoutParams imgParam = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT); //w,h
         this.addView(itemImage);
     }
+
+    /*
+     * Making image in circular shape
+     * http://www.androiddevelopersolutions.com/2012/09/crop-image-in-circular-shape-in-android.html
+     */
+    public Bitmap GetRoundedShape(Bitmap _bitmapImage, int _diameter) {
+        // TODO Auto-generated method stub
+        Bitmap sourceBitmap = _bitmapImage;
+        Path path = new Path();
+
+        int dim;
+        if(_diameter == 0 ) {
+            dim = sourceBitmap.getHeight();
+            if (dim > sourceBitmap.getWidth()) dim = sourceBitmap.getWidth();
+        }
+        else {
+            dim = _diameter;
+            int min;
+
+            if (sourceBitmap.getWidth() <  sourceBitmap.getHeight())
+                min = sourceBitmap.getWidth();
+            else
+                min = sourceBitmap.getHeight();
+
+            if (dim > min) dim = min;
+        }
+
+        int targetWidth = dim;
+        int targetHeight = dim;
+
+        Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
+                targetHeight,Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(targetBitmap);
+
+        path.addCircle(((float) targetWidth - 1) / 2,
+                ((float) targetHeight - 1) / 2,
+                (Math.min(((float) targetWidth),
+                        ((float) targetHeight)) / 2),
+                Path.Direction.CCW);
+
+        canvas.clipPath(path);
+
+        canvas.drawBitmap(sourceBitmap,
+                new Rect(0, 0, sourceBitmap.getWidth(),
+                        sourceBitmap.getHeight()),
+                new Rect(0, 0, targetWidth,
+                        targetHeight), null);
+        return targetBitmap;
+    }
+
+    public Bitmap GetRoundedShape(Bitmap _bitmapImage) {
+        return GetRoundedShape(_bitmapImage, 0);
+    }
+
 }
+

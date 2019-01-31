@@ -1286,6 +1286,7 @@ type
     FOnTouchMove : TOnTouchEvent;
     FOnTouchUp   : TOnTouchEvent;
     //end tr3e
+    FRoundedShape: boolean;
 
     Procedure SetColor    (Value : TARGBColorBridge);
 
@@ -1293,6 +1294,7 @@ type
     function GetCount: integer;
     procedure SetImageName(Value: string);
     procedure SetImageIndex(Value: TImageListIndex);
+    procedure SetRoundedShape(_value: boolean);
 
   protected
     procedure SetParamWidth(Value: TLayoutParams); override;
@@ -1371,7 +1373,7 @@ type
     property ImageIdentifier : string read FImageName write SetImageByResIdentifier;
     property ImageScaleType: TImageScaleType read FImageScaleType write SetScaleType;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
-
+    property RoundedShape: boolean read FRoundedShape write SetRoundedShape;
     // Events
      property OnClick: TOnNotify read FOnClick write FOnClick;
     //by tre3
@@ -5650,6 +5652,7 @@ begin
   //FIsBackgroundImage:= False;
   FFilePath:= fpathData;
   FImageScaleType:= scaleCenter;
+  FRoundedShape:= False;
 end;
 
 destructor jImageView.Destroy;
@@ -5713,6 +5716,9 @@ begin
 
   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+
+  if FRoundedShape <> False then
+    jImageView_SetRoundedShape(FjEnv, FjObject , FRoundedShape);
 
   if (FImageName <> '') and (FImageIndex < 0) then
      jImageView_SetImageByResIdentifier(FjEnv, FjObject , FImageName);
@@ -6159,6 +6165,13 @@ begin
    Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
 end;
 
+procedure jImageView.SetRoundedShape(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FRoundedShape:= _value;
+  if FInitialized then
+     jImageView_SetRoundedShape(FjEnv, FjObject, FRoundedShape);
+end;
 
 // Event : Java Event -> Pascal
 Procedure jImageView.GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
