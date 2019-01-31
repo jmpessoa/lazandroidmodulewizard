@@ -2,6 +2,7 @@ package org.lamw.appcompatnavigationdrawerdemo1;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.lang.reflect.Field;
 import javax.microedition.khronos.opengles.GL10;
 import android.content.Intent;
@@ -28,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.view.Gravity;
 import android.view.MotionEvent;
+
 
 import java.io.FileOutputStream;
 import java.io.File;
@@ -528,6 +530,19 @@ public class jImageView extends ImageView {
 	public void SetVisibilityGone() {
 		LAMWCommon.setVisibilityGone();
 	}
+
+        public ByteBuffer GetByteBuffer(int _width, int _height) {	  
+	    ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);    
+            return graphicBuffer;    
+        }
+
+        public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	 
+	  _byteBuffer.rewind();  //reset position
+	  bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
+          bmp.copyPixelsFromBuffer(_byteBuffer); 	
+          return bmp;
+        }
+
 
 }
 

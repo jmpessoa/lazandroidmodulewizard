@@ -456,6 +456,8 @@ procedure jImageView_SetRotation(env: PJNIEnv; _jimageview: JObject; angle: inte
 
 function  jImageView_SaveToJPG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
 function  jImageView_SaveToPNG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
+function  jImageView_GetByteBuffer(env: PJNIEnv; _jimageview: JObject; _width: integer; _height: integer): jObject;
+function  jImageView_GetBitmapFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _byteBuffer: jObject; _width: integer; _height: integer): jObject;
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -4730,6 +4732,36 @@ begin
   env^.CallVoidMethod(env, _jimageview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jImageView_GetByteBuffer(env: PJNIEnv; _jimageview: JObject; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _width;
+  jParams[1].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetByteBuffer', '(II)Ljava/nio/ByteBuffer;');
+  Result:= env^.CallObjectMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jImageView_GetBitmapFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _byteBuffer: jObject; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _byteBuffer;
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromByteBuffer', '(Ljava/nio/ByteBuffer;II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // ListView

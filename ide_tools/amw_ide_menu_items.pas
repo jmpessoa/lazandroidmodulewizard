@@ -1019,12 +1019,12 @@ begin
            importedFile:= 'im_'+ importedFile;  //the file name can not be init by number...
          end;
 
-         if Length(importedFile) > 20 then
+         if Length(importedFile) > 25 then
          begin
            p:= LastDelimiter('.', importedFile);
            imageExt:= Copy(importedFile, p, MaxInt);
            strTemp:= Copy(importedFile, 1, p-1);
-           importedFile:= Copy(strTemp, 1, 16) + imageExt;
+           importedFile:= Copy(strTemp, 1, 21) + imageExt;
          end;
 
          hasCopied:= False;
@@ -1033,6 +1033,8 @@ begin
             CopyFile(FormImportPicture.PictureFile, pathToProject+'assets'+PathDelim+importedFile);
             hasCopied:= True;
          end;
+
+         ForceDirectories(pathToProject+'res'+PathDelim+'drawable');
 
          count:= FormImportPicture.CheckGroupTarget.Items.Count;
          for i:= 1 to count-1 do

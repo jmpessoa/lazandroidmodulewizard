@@ -1,13 +1,13 @@
 object FormSettingsPaths: TFormSettingsPaths
   Left = 335
-  Height = 630
+  Height = 633
   Top = 214
-  Width = 524
+  Width = 519
   Anchors = []
   BorderStyle = bsSizeToolWin
   Caption = 'LAMW 0.8.3 : Paths/Settings'
-  ClientHeight = 630
-  ClientWidth = 524
+  ClientHeight = 633
+  ClientWidth = 519
   Color = clGradientInactiveCaption
   Constraints.MinHeight = 520
   Constraints.MinWidth = 430
@@ -157,9 +157,9 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 441
+    Left = 436
     Height = 30
-    Top = 558
+    Top = 561
     Width = 75
     Anchors = [akRight]
     BorderSpacing.Around = 8
@@ -173,9 +173,9 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Control = BitBtnOK
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = BitBtnOK
-    Left = 358
+    Left = 353
     Height = 30
-    Top = 558
+    Top = 561
     Width = 75
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -193,7 +193,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 28
     Top = 296
-    Width = 477
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 3
@@ -229,7 +229,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 28
     Top = 36
-    Width = 477
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 0
@@ -254,7 +254,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 28
     Top = 232
-    Width = 477
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 2
@@ -279,7 +279,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 28
     Top = 100
-    Width = 477
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 1
@@ -289,7 +289,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 493
+    Left = 488
     Height = 22
     Top = 39
     Width = 23
@@ -303,7 +303,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 493
+    Left = 488
     Height = 22
     Top = 235
     Width = 23
@@ -317,7 +317,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 493
+    Left = 488
     Height = 22
     Top = 103
     Width = 23
@@ -335,16 +335,17 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 2
     Top = 136
-    Width = 508
+    Width = 503
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
   end
   object RGNDKVersion: TRadioGroup
     AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = EditPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 61
-    Top = 336
+    Top = 332
     Width = 308
     AutoFill = True
     AutoSize = True
@@ -375,8 +376,8 @@ object FormSettingsPaths: TFormSettingsPaths
   object StatusBar1: TStatusBar
     Left = 0
     Height = 29
-    Top = 601
-    Width = 524
+    Top = 604
+    Width = 519
     Panels = <>
   end
   object GroupBoxPrebuild: TGroupBox
@@ -386,7 +387,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideBottom.Control = RGNDKVersion
     AnchorSideBottom.Side = asrBottom
     Left = 324
-    Height = 1
+    Height = 0
     Top = 396
     Width = 171
     Anchors = [akTop, akLeft, akBottom]
@@ -413,7 +414,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 189
-    Top = 405
+    Top = 401
     Width = 157
     AutoSize = True
     BorderSpacing.Around = 8
@@ -1538,13 +1539,13 @@ object FormSettingsPaths: TFormSettingsPaths
     }
   end
   object SpeedButtonInfo: TSpeedButton
-    AnchorSideLeft.Control = GroupBoxPrebuild
     AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = GroupBoxPrebuild
+    AnchorSideTop.Control = RGNDKVersion
+    AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 493
+    Left = 489
     Height = 22
-    Top = 403
+    Top = 339
     Width = 23
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 7
@@ -1591,7 +1592,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 493
+    Left = 488
     Height = 22
     Top = 299
     Width = 23
@@ -1619,7 +1620,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Height = 28
     Hint = 'Required by "AppCompat" [material] theme'
     Top = 168
-    Width = 477
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 16
     BorderSpacing.Around = 8
@@ -1627,7 +1628,7 @@ object FormSettingsPaths: TFormSettingsPaths
   end
   object SpBPathToGradle: TSpeedButton
     AnchorSideTop.Control = EditPathToGradle
-    Left = 493
+    Left = 488
     Height = 22
     Top = 168
     Width = 23
@@ -1636,7 +1637,7 @@ object FormSettingsPaths: TFormSettingsPaths
     OnClick = SpBPathToGradleClick
   end
   object SpeedButtonHelp: TSpeedButton
-    Left = 493
+    Left = 488
     Height = 22
     Top = 8
     Width = 23

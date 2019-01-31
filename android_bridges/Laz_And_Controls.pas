@@ -1358,6 +1358,9 @@ type
     procedure ResetViewParent();  override;
     procedure BringToFront();
     procedure SetVisibilityGone();
+    function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+    function GetByteBuffer(_width: integer; _height: integer): jObject;
+    function GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
 
     property Count: integer read GetCount;
   published
@@ -3069,6 +3072,12 @@ begin
   begin
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
+    Exit;
+  end;
+  if Obj is jImageView then
+  begin
+    jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
+    jImageView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
 end;
@@ -6130,6 +6139,26 @@ begin
   if FInitialized then
      jImageView_SetVisibilityGone(FjEnv, FjObject);
 end;
+
+function jImageView.GetByteBuffer(_width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_GetByteBuffer(FjEnv, FjObject, _width ,_height);
+end;
+
+function jImageView.GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_GetBitmapFromByteBuffer(FjEnv, FjObject, _byteBuffer ,_width ,_height);
+end;
+
+function jImageView.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+begin
+   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
+end;
+
 
 // Event : Java Event -> Pascal
 Procedure jImageView.GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);

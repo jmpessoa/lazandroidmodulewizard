@@ -1260,12 +1260,12 @@ begin
   fclControls := TStringList.Create;
   fclControls.Sorted := True;
   fclControls.Duplicates := dupIgnore;
-  for i := 0 to AndroidForm.ComponentCount - 1 do
+  fclControls.Delimiter := ';';
+  for i:= 0 to AndroidForm.ComponentCount - 1 do
   begin
-    c := AndroidForm.Components[i];
+    c:= AndroidForm.Components[i];
     if Pos(c.ClassName, fclList.Text) > 0 then fclControls.Add(c.ClassName);
   end;
-  fclControls.Delimiter := ';';
   ProjFile.CustomData['fclControls']:= fclControls.DelimitedText;
   fclControls.Free;
   fclList.Free;
@@ -1341,7 +1341,6 @@ var
   list: TStringList;
   i: integer;
 begin
-
   list := TStringList.Create;
   list.Delimiter := ';';
   with LazarusIDE.ActiveProject do
@@ -1355,7 +1354,7 @@ end;
 
 procedure TLamwSmartDesigner.AddSupportToFCLControls(chipArchitecture: string);
 var
-  controlsList, auxList, fclList: TStringList;
+  fileList, controlsList, auxList, fclList: TStringList;
   i, j, p: integer;
   pathToNdkApiPlatforms, pathToFclBridges, androidNdkApi, arch, aux: string;
 begin
@@ -1367,15 +1366,21 @@ begin
   if FileExists(pathToFclBridges + 'fcl_bridges.txt') then
     fclList.LoadFromFile(pathToFclBridges + 'fcl_bridges.txt');
 
-  auxList:= TStringList.Create;
+  fileList:= TStringList.Create;
+  fileList.Delimiter := ';';
+
   controlsList := TStringList.Create;
-  controlsList.Delimiter := ';';
+  controlsList.Sorted := True;
+  controlsList.Duplicates := dupIgnore;
+
   with LazarusIDE.ActiveProject do
     for i := 0 to FileCount - 1 do
     begin
-      controlsList.DelimitedText := Files[i].CustomData['fclControls'];
+      fileList.DelimitedText := Files[i].CustomData['fclControls'];
+      controlsList.AddStrings(fileList);
     end;
 
+  auxList:= TStringList.Create;
   for j:= 0 to fclList.Count - 1 do
   begin
      if controlsList.IndexOf(fclList.Strings[j]) >= 0 then  //TFPNoGUIGraphicsBridge
@@ -1433,14 +1438,13 @@ begin
               end;
             end;
          end;
-
      end;
-
   end;
 
   controlsList.Free;
   auxList.Free;
   fclList.Free;
+  fileList.Free;
 end;
 
 function TLamwSmartDesigner.TryAddJControl(jclassname: string;

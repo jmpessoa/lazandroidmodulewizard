@@ -3630,29 +3630,36 @@ begin
 
   if GetImage <> nil then
   begin
-
+    (*
     w:= Trunc(FImage.Width/3);
     h:= Trunc(FImage.Height/3);
-
     w:= Max(w,h);
     h:= w;
-
-    if w < 64 then
+    if w < {64} Self.Width then
     begin
-      w:= 64;
-      h:= 64;
+      w:= Self.Width; //64;
+      //h:= 64;
     end;
+    if h < {64} Self.Height then
+    begin
+     // w:= 64;
+      h:= Self.Height; //64;
+    end;
+    *)
+  //  Fcanvas.Brush.Color:= clNone;
+   // Fcanvas.Brush.Style:= bsClear;
 
-    Fcanvas.Rectangle(0, 0, w+8, h+8);    // outer frame
+    Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
+    Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
 
-    r:= Rect(4, 4, w+4, h+4);
+    //Fcanvas.Rectangle(0, 0, w+8, h+8);    // outer frame
+    r:= Rect(6, 6, Self.Width-6,Self.Height-6);
     Fcanvas.StretchDraw(r, GetImage);
-
   end
   else
   begin
-    Fcanvas.Rectangle(0, 0, 72, 72);  //outer frame
-    Fcanvas.RoundRect(4, 4, 68, 68, 12,12);  //inner frame
+    Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
+    Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
   end;
 end;
 
