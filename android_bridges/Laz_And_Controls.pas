@@ -1092,8 +1092,12 @@ type
 
   end;
 
+  { jButton }
+
   jButton = class(jVisualControl)
   private
+    FAllCaps: Boolean;
+    procedure SetAllCaps(AValue: Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -1143,6 +1147,7 @@ type
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property Enabled: boolean read FEnabled write SetEnabled;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
+    property AllCaps: Boolean read FAllCaps write SetAllCaps default False;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
@@ -4580,6 +4585,7 @@ begin
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
   FEnabled:= True;
+  FAllCaps := False;
 end;
 
 destructor jButton.Destroy;
@@ -4659,6 +4665,8 @@ begin
    if FFontSize > 0 then //not default...
      jButton_setTextSize(FjEnv, FjObject , FFontSize);
 
+   jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
+
    jButton_setText(FjEnv, FjObject , FText);
 
    if FColor <> colbrDefault then
@@ -4671,7 +4679,7 @@ begin
   end;
 end;
 
-Procedure jButton.SetViewParent(Value: jObject);
+procedure jButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -4691,41 +4699,63 @@ begin
      jButton_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
-Procedure jButton.SetColor(Value: TARGBColorBridge);
+procedure jButton.SetAllCaps(AValue: Boolean);
+var
+  _Text: String;
+begin
+
+  // AllCaps property
+  if(FAllCaps = AValue) then Exit;
+  FAllCaps := AValue;
+
+  // lazarus design side
+  _Text := GetText;
+  if(FAllCaps) then
+
+    _Text := UpperCase(_Text)
+  else _Text := LowerCase(_Text);
+
+  SetText(_Text);
+
+  // android runtime side
+  if(FInitialized) then jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
+end;
+
+procedure jButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
      View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
-Procedure jButton.Refresh;
+procedure jButton.Refresh;
 begin
   if not FInitialized then Exit;
      View_Invalidate(FjEnv, FjObject );
 end;
 
-Function jButton.GetText: string;
+function jButton.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
      Result:= jButton_getText(FjEnv, FjObject );
 end;
 
-Procedure jButton.SetText(Value: string);
+procedure jButton.SetText(Value: string);
 begin
   inherited SetText(Value); //by thierry
   if FInitialized then
     jButton_setText(FjEnv, FjObject , Value{FText}); //by thierry
 end;
 
-Procedure jButton.SetFontColor(Value : TARGBColorBridge);
+procedure jButton.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
      jButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 end;
 
-Procedure jButton.SetFontSize (Value : DWord);
+procedure jButton.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
@@ -4781,17 +4811,19 @@ begin
 end;
 
 // Event : Java -> Pascal
-Procedure jButton.GenEvent_OnClick(Obj: TObject);
+procedure jButton.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
-Procedure jButton.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+procedure jButton.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject;
+  tag: integer);
 begin
   if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
 end;
 
-Procedure jButton.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+procedure jButton.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject;
+  tag: integer);
 begin
   if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
 end;
@@ -4853,7 +4885,7 @@ begin
      jButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
-Procedure jButton.SetEnabled(Value: boolean);
+procedure jButton.SetEnabled(Value: boolean);
 begin
     //in designing component state: set value here...
   FEnabled:= Value;

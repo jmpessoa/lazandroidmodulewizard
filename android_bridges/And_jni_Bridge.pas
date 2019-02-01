@@ -320,6 +320,7 @@ procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: 
 procedure jButton_SetEnabled(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 procedure jButton_ClearLayoutAll(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetFrameGravity(env: PJNIEnv; _jbutton: JObject; _value: integer);
+procedure jButton_SetAllCaps(env: PJNIEnv; _jbutton: JObject; _value: Boolean);
 procedure jButton_RemoveFromViewParent(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetFocus(env: PJNIEnv; _jbutton: JObject);
 
@@ -3307,6 +3308,19 @@ begin
   jParams[0].i:= _value;
   jCls:= env^.GetObjectClass(env, _jbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jButton_SetAllCaps(env: PJNIEnv; _jbutton: JObject; _value: Boolean);
+var
+  jMethod: jMethodID = nil;
+  jParams: array[0..0] of jValue;
+  jCls: jClass = nil;
+begin
+  jParams[0].z := JBool(_value);
+  jCls := env^.GetObjectClass(env, _jbutton);
+  jMethod := env^.GetMethodID(env, jCls, 'SetAllCaps', '(Z)V');
   env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
