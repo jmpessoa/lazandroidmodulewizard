@@ -1349,6 +1349,8 @@ type
     procedure SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); overload; //deprecated
     procedure SetImage(_bitmap: jObject; _width: integer; _height: integer); overload;
     Procedure SetImage(_fullFilename: string); overload;
+    procedure SetImageFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer);
+
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetLGravity(_value: TLayoutGravity);
@@ -1361,8 +1363,8 @@ type
     procedure BringToFront();
     procedure SetVisibilityGone();
     function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
-    function GetByteBuffer(_width: integer; _height: integer): jObject;
-    function GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
+    function GetJByteBuffer(_width: integer; _height: integer): jObject;
+    function GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
 
     property Count: integer read GetCount;
   published
@@ -6146,18 +6148,18 @@ begin
      jImageView_SetVisibilityGone(FjEnv, FjObject);
 end;
 
-function jImageView.GetByteBuffer(_width: integer; _height: integer): jObject;
+function jImageView.GetJByteBuffer(_width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jImageView_GetByteBuffer(FjEnv, FjObject, _width ,_height);
 end;
 
-function jImageView.GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
+function jImageView.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageView_GetBitmapFromByteBuffer(FjEnv, FjObject, _byteBuffer ,_width ,_height);
+   Result:= jImageView_GetBitmapFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
 end;
 
 function jImageView.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
@@ -6171,6 +6173,13 @@ begin
   FRoundedShape:= _value;
   if FInitialized then
      jImageView_SetRoundedShape(FjEnv, FjObject, FRoundedShape);
+end;
+
+procedure jImageView.SetImageFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
 end;
 
 // Event : Java Event -> Pascal

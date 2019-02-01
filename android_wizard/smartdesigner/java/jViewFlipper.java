@@ -27,6 +27,7 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
    private Context context = null;
 
    private OnClickListener onClickListener;   // click event
+    private OnLongClickListener onLongClickListener;   // click event
    private Boolean enabled  = true;           // click-touch enabled!
       
    float initialXPoint = 0;
@@ -44,21 +45,33 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
       //detector = new GestureDetector(controls.activity, new SwipeGestureDetector() );
 
       onClickListener = new OnClickListener(){
-      /*.*/public void onClick(View view){     // *.* is a mask to future parse...;
+          /*.*/public void onClick(View view){     // *.* is a mask to future parse...;
              if (enabled) {
                 controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
              }
            };
       };
-      setOnClickListener(onClickListener);
-            
-      this.setAutoStart(false); // set true value for auto start the flipping between views
+
+       setOnClickListener(onClickListener);
+       onLongClickListener = new OnLongClickListener(){
+           /*.*/public boolean onLongClick(View view){     // *.* is a mask to future parse...;
+               if (enabled) {
+                   controls.pOnLongClick(pascalObj, Const.Click_Default); //JNI event onClick!
+               }
+               return true;
+           };
+       };
+
+       this.setOnLongClickListener(onLongClickListener);
+
+       this.setAutoStart(false); // set true value for auto start the flipping between views
 	  	        
    } //end constructor   
    
    public void jFree() {
       //free local objects...
-  	  setOnClickListener(null);  	
+  	  setOnClickListener(null);
+  	  this.setOnLongClickListener(null);
 	  LAMWCommon.free();
    }
  
@@ -303,6 +316,10 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
 
     public Bitmap GetRoundedShape(Bitmap _bitmapImage) {
         return GetRoundedShape(_bitmapImage, 0);
+    }
+
+    public void Clear() {
+        this.removeAllViews();
     }
 
 }

@@ -1,6 +1,6 @@
 package org.lamw.applamwproject3;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.3  - 26 Janyary- 2019 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.3.1  - 01 February- 2019 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1400,6 +1400,12 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	public String getSystemVersionString(){
 		return android.os.Build.VERSION.RELEASE;
 	}
+
+	public ByteBuffer GetJByteBuffer(int _width, int _height) {
+		ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);
+		return graphicBuffer;
+	}
+
 }
 //**class entrypoint**//please, do not remove/change this line!
 

@@ -57,7 +57,7 @@ jViewFlipper = class(jVisualControl)
     procedure Previous();
     procedure AddView(_fullPathToImage: string; _scaleType: TImageScaleType);  overload;
     procedure AddView(_fullPathToImage: string; _scaleType: TImageScaleType; _roundedShape: boolean); overload;
-
+    procedure Clear();
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -91,7 +91,7 @@ procedure jViewFlipper_AddView(env: PJNIEnv; _jviewflipper: JObject; _layout: jO
 procedure jViewFlipper_Next(env: PJNIEnv; _jviewflipper: JObject);
 procedure jViewFlipper_Previous(env: PJNIEnv; _jviewflipper: JObject);
 procedure jViewFlipper_AddView(env: PJNIEnv; _jviewflipper: JObject; _fullPathToImage: string; _scaleType: integer; _roundedShape: boolean); overload;
-
+procedure jViewFlipper_Clear(env: PJNIEnv; _jviewflipper: JObject);
 
 
 implementation
@@ -426,6 +426,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jViewFlipper_Previous(FjEnv, FjObject);
+end;
+
+procedure jViewFlipper.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jViewFlipper_Clear(FjEnv, FjObject);
 end;
 
 procedure jViewFlipper.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
@@ -788,6 +795,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'AddView', '(Ljava/lang/String;IZ)V');
   env^.CallVoidMethodA(env, _jviewflipper, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jViewFlipper_Clear(env: PJNIEnv; _jviewflipper: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jviewflipper);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _jviewflipper, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

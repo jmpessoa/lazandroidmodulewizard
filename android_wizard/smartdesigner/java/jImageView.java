@@ -590,6 +590,19 @@ public class jImageView extends ImageView {
           bmp.copyPixelsFromBuffer(_byteBuffer); 	
           return bmp;
         }
+
+	public void SetImageFromByteBuffer(ByteBuffer _jbyteBuffer, int _width, int _height) {
+		bmp = GetBitmapFromByteBuffer(_jbyteBuffer,_width,_height);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
+		this.invalidate();
+
+	}
+
 	/*
 	 * Making image in circular shape
 	 * http://www.androiddevelopersolutions.com/2012/09/crop-image-in-circular-shape-in-android.html

@@ -1259,6 +1259,8 @@ end;
     //end TR3E
 
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string);
+    function GetJByteBuffer(_width: integer; _height: integer): jObject;
+    function GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1693,6 +1695,7 @@ function jForm_getScreenWidth(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
 procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string);
+function jForm_GetJByteBuffer(env: PJNIEnv; _jform: JObject; _width: integer; _height: integer): jObject;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -4064,6 +4067,18 @@ begin
      jForm_SetBackgroundImage(FjEnv, FjObject, _imageIdentifier);
 end;
 
+function jForm.GetJByteBuffer(_width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetJByteBuffer(FjEnv, FjObject, _width ,_height);
+end;
+
+function jForm.GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
+begin
+   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,jbyteBuffer));
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -5784,6 +5799,21 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jForm_GetJByteBuffer(env: PJNIEnv; _jform: JObject; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _width;
+  jParams[1].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetJByteBuffer', '(II)Ljava/nio/ByteBuffer;');
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 
 //-----{ jApp } ------
