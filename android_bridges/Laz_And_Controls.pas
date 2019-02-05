@@ -541,13 +541,13 @@ type
     function GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject; overload;
     function GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject; overload;
 
-    function GetByteBuffer(_width: integer; _height: integer): jObject;
-    function GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject; overload;
-    function GetBitmapFromByteArray(var _image: TDynArrayOfJByte): jObject;
+    function GetJByteBuffer(_width: integer; _height: integer): jObject;
+    function GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject; overload;
+    function GetBitmapFromJByteArray(var _image: TDynArrayOfJByte): jObject;
 
-    function GetByteBufferFromBitmap(_bmap: jObject): jObject; overload;
-    function GetByteBufferFromBitmap(): jObject; overload;
-    function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+    function GetJByteBufferFromImage(_bmap: jObject): jObject; overload;
+    function GetJByteBufferFromImage(): jObject; overload;
+    function GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
     function GetImageFromFile(_fullFilename: string): jObject;
     function GetRoundedShape(_bitmapImage: jObject): jObject;   overload;
     function GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject; overload;
@@ -849,6 +849,7 @@ type
   private
     FTextAlignment: TTextAlignment;
     FTextTypeFace: TTextTypeFace;
+    FAllCaps: boolean;
 
     Procedure SetColor    (Value : TARGBColorBridge);
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -910,6 +911,7 @@ type
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent; override;
     procedure ResetViewParent();  override;
+    procedure SetAllCaps(_value: boolean);
 
   published
     property Text: string read GetText write SetText;
@@ -922,7 +924,7 @@ type
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
-
+    property AllCaps: boolean read FAllCaps write SetAllCaps default False;
     // Event - if enabled!
     property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
@@ -954,6 +956,7 @@ type
     FCloseSoftInputOnEnter: boolean;
     FCapSentence: boolean;
 
+    procedure AllCaps();
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -1011,7 +1014,6 @@ type
     Procedure ShowSoftInput();
 
     Procedure UpdateLayout; override;
-    procedure AllCaps;
     procedure DispatchOnChangeEvent(value: boolean);
     procedure DispatchOnChangedEvent(value: boolean);
 
@@ -1713,6 +1715,7 @@ type
     procedure GoBack();
     procedure GoBackOrForward(steps: integer);
     procedure GoForward();
+    procedure ScrollTo(_x, _y: integer);//by MB:
 
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
@@ -3502,6 +3505,9 @@ begin
    if  FFontColor <> colbrDefault then
     jTextView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
+    if FAllCaps <> False then
+     jTextView_SetAllCaps(FjEnv, FjObject, FAllCaps);
+
    if FFontSizeUnit <> unitDefault then
      jTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
@@ -3858,6 +3864,14 @@ begin
   FGravityInParent:= _value;
   if FInitialized then
      jTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+end;
+
+procedure jTextView.SetAllCaps(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FAllCaps:= _value;
+  if FInitialized then
+     jTextView_SetAllCaps(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------
@@ -4665,7 +4679,8 @@ begin
    if FFontSize > 0 then //not default...
      jButton_setTextSize(FjEnv, FjObject , FFontSize);
 
-   jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
+   if AllCaps <> false then
+      jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
 
    jButton_setText(FjEnv, FjObject , FText);
 
@@ -4703,22 +4718,9 @@ procedure jButton.SetAllCaps(AValue: Boolean);
 var
   _Text: String;
 begin
-
-  // AllCaps property
-  if(FAllCaps = AValue) then Exit;
   FAllCaps := AValue;
-
-  // lazarus design side
-  _Text := GetText;
-  if(FAllCaps) then
-
-    _Text := UpperCase(_Text)
-  else _Text := LowerCase(_Text);
-
-  SetText(_Text);
-
-  // android runtime side
-  if(FInitialized) then jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
+  if(FInitialized) then
+    jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
 end;
 
 procedure jButton.SetColor(Value: TARGBColorBridge);
@@ -8683,6 +8685,12 @@ begin
   if Assigned(FOnLongClick) then FOnLongClick(Obj);
 end;
 
+procedure jWebView.ScrollTo(_x, _y: integer);
+begin
+  if FInitialized then
+     jWebView_ScrollTo(FjEnv, FjObject, _x, _y);
+end;
+
 //------------------------------------------------------------------------------
 // jBitmap
 //------------------------------------------------------------------------------
@@ -9108,40 +9116,40 @@ begin
    Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject, _factorScaleX ,_factorScaleY);
 end;
 
-function jBitmap.GetByteBuffer(_width: integer; _height: integer): jObject;
+function jBitmap.GetJByteBuffer(_width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetByteBuffer(FjEnv, FjObject, _width ,_height);
 end;
 
-function jBitmap.GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
+function jBitmap.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetBitmapFromByteBuffer(FjEnv, FjObject, _byteBuffer ,_width ,_height);
+   Result:= jBitmap_GetBitmapFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
 end;
 
-function jBitmap.GetBitmapFromByteArray(var _image: TDynArrayOfJByte): jObject;
+function jBitmap.GetBitmapFromJByteArray(var _image: TDynArrayOfJByte): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetBitmapFromByteArray(FjEnv, FjObject, _image);
 end;
 
-function jBitmap.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+function jBitmap.GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
 begin
-   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
+   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,jbyteBuffer));
 end;
 
-function jBitmap.GetByteBufferFromBitmap(_bmap: jObject): jObject;
+function jBitmap.GetJByteBufferFromImage(_bmap: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject, _bmap);
 end;
 
-function jBitmap.GetByteBufferFromBitmap(): jObject;
+function jBitmap.GetJByteBufferFromImage(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then

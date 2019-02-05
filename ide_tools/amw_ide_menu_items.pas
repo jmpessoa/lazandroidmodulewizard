@@ -1138,6 +1138,7 @@ begin
               if FileExists(fullPathToUnitSourceLFM) then
               begin
                 listUnit.LoadFromFile(fullPathToUnitSourceLFM);
+
                 p:= Pos(':', listUnit.Strings[0]);   //object AndroidModule1: TAndroidModule1
                 sourceFormName:=  Trim(Copy(listUnit.Strings[0], p+3, MaxInt)); //AndroidModule1
                 for i:= 1 to listUnit.Count-1 do
@@ -1146,7 +1147,7 @@ begin
                   begin
                      p:= Pos(':', listUnit.Strings[i]);
                      compName:= Trim(Copy(listUnit.Strings[i], p+2, MaxInt));
-                     if FileExists(pathToJavaTemplates+PathDelim+'lamwdesigner'+PathDelim+compName+'.java')  then
+                     if FileExists(pathToJavaTemplates+PathDelim+'smartdesigner'+PathDelim+compName+'.java')  then
                      begin
                        listComponent.Add(compName);
                      end;
@@ -1168,7 +1169,7 @@ begin
     begin
        if not FileExists(pathToJavasSrc+PathDelim+listComponent.Strings[i]+'.java') then
        begin
-          listTemp.LoadFromFile(pathToJavaTemplates+PathDelim+'lamwdesigner'+PathDelim+listComponent.Strings[i]+'.java');
+          listTemp.LoadFromFile(pathToJavaTemplates+PathDelim+'smartdesigner'+PathDelim+listComponent.Strings[i]+'.java');
           listTemp.Strings[0]:= 'package '+ package +';';
           listTemp.SaveToFile(pathToJavasSrc+PathDelim+listComponent.Strings[i]+'.java');
        end;
@@ -1178,6 +1179,7 @@ begin
     listTemp.LoadFromFile(fullPathToUnitSourceLFM);
     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
     listTemp.Text:= tempStr;
+    ShowMessage(fullPathToUnitTarget);
     listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
 
     listTemp.Clear;
@@ -1192,6 +1194,30 @@ begin
     Project.Files[listIndex+1].CustomData['jControls']:= listComponent.DelimitedText;
 
     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
+                'Hints:'+ sLineBreak +
+                '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
+                '.(Re)"Open" the project to update the form display content ...' + sLineBreak +
+                '      Or close the form unit tab and reopen it [Project Inspector...]'+ sLineBreak +
+                '      to see the content changes...');
+  end
+  else
+  begin
+     listTemp.Clear;
+     listTemp.LoadFromFile(fullPathToUnitSourceLFM);
+     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
+     listTemp.Text:= tempStr;
+     ShowMessage(fullPathToUnitTarget);
+     listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
+
+     listTemp.Clear;
+     listTemp.LoadFromFile(ChangeFileExt(fullPathToUnitSourceLFM, '.pas'));
+     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
+     listTemp.Text:= tempStr;
+     listTemp.Strings[0]:= 'unit '+ChangeFileExt(ExtractFileName(fullPathToUnitTarget),'') +';';
+     listTemp.Strings[1]:='//';
+     listTemp.SaveToFile(fullPathToUnitTarget);
+
+     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
                 'Hints:'+ sLineBreak +
                 '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
                 '.(Re)"Open" the project to update the form display content ...' + sLineBreak +

@@ -2652,6 +2652,7 @@ var
   r: TRect;
   ts: TTextStyle;
   lastFontSize: Integer;
+  auxText: string;
 begin
   with Fcanvas do
   begin
@@ -2683,11 +2684,19 @@ begin
 
     Brush.Style := bsClear;
     lastFontSize := Font.Size;
-    Font.Size := AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 13);
+    Font.Size := AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 12);
     ts := TextStyle;
     ts.Layout := tlCenter;
     ts.Alignment := Classes.taCenter;
-    TextRect(r, r.Left, r.Top, FAndroidWidget.Text, ts);
+
+    auxText:= FAndroidWidget.Text;
+
+    if jButton(FAndroidWidget).AllCaps then
+    begin
+       auxText:= UpperCase(auxText);
+    end;
+
+    TextRect(r, r.Left, r.Top, auxText, ts);
     Font.Size := lastFontSize;
   end;
 end;
@@ -2749,6 +2758,7 @@ procedure TDraftTextView.Draw;
 var
   lastSize: Integer;
   fs: TFontStyles;
+  auxText: string;
 begin
   with Fcanvas do
   begin
@@ -2764,8 +2774,15 @@ begin
     else
       Brush.Style := bsClear;
 
+    auxText:= jTextView(FAndroidWidget).Text;
+
+    if jTextView(FAndroidWidget).AllCaps then
+    begin
+       auxText:= UpperCase(auxText);
+    end;
+
     Font.Color := TextColor;
-    TextOut(0, (Font.Size + 5) div 10, FAndroidWidget.Text);
+    TextOut(0, (Font.Size + 5) div 10, auxText);
 
     Font.Size := lastSize;
     Font.Style := fs;
@@ -2820,6 +2837,7 @@ procedure TDraftEditText.Draw;
 var
   ls: Integer;
   r: TRect;
+  auxText: string;
 begin
   with FCanvas do
   begin
@@ -2846,11 +2864,13 @@ begin
       end;
     end;
 
+    auxText:= jEditText(FAndroidWidget).Text;
+
     Font.Color := TextColor;
     Brush.Style := bsClear;
     ls := Font.Size;
-    Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 13);
-    TextOut(12, 9, jEditText(FAndroidWidget).Text);
+    Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 12);
+    TextOut(12, 9, auxText);
     Font.Size := ls;
   end;
 end;

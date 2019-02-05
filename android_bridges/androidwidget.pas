@@ -1260,7 +1260,9 @@ end;
 
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string);
     function GetJByteBuffer(_width: integer; _height: integer): jObject;
+    function GetJByteBufferFromImage(_bitmap: jObject): jObject;
     function GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
+    function GetJGlobalRef(jObj: jObject): jObject;
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1696,6 +1698,7 @@ function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
 procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string);
 function jForm_GetJByteBuffer(env: PJNIEnv; _jform: JObject; _width: integer; _height: integer): jObject;
+function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jObject): jObject;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -4079,6 +4082,18 @@ begin
    Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,jbyteBuffer));
 end;
 
+function jForm.GetJByteBufferFromImage(_bitmap: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetByteBufferFromImage(FjEnv, FjObject, _bitmap);
+end;
+
+function jForm.GetJGlobalRef(jObj: jObject): jObject;
+begin
+  Result := FjEnv^.NewGlobalRef(FjEnv,jObj);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
@@ -5814,6 +5829,18 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetByteBufferFromImage', '(Landroid/graphics/Bitmap;)Ljava/nio/ByteBuffer;');
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 
 //-----{ jApp } ------

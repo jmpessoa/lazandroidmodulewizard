@@ -1406,6 +1406,15 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 		return graphicBuffer;
 	}
 
+        public ByteBuffer GetByteBufferFromImage(Bitmap _bitmap) {
+           if (_bitmap == null) return null;
+           int w =  _bitmap.getWidth();
+           int h =_bitmap.getHeight();
+           ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);
+           _bitmap.copyPixelsToBuffer(graphicBuffer);
+           graphicBuffer.rewind();  //reset position
+           return graphicBuffer;
+        }
 }
 //**class entrypoint**//please, do not remove/change this line!
 

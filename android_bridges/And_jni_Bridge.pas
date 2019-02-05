@@ -185,6 +185,7 @@ procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_ClearLayoutAll(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetFrameGravity(env: PJNIEnv; _jtextview: JObject; _value: integer);
 procedure jTextView_RemoveFromViewParent(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_SetAllCaps(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -717,6 +718,7 @@ function  jWebView_CanGoForward(env: PJNIEnv; _jwebview: JObject): boolean;
 procedure jWebView_GoBack(env: PJNIEnv; _jwebview: JObject);
 procedure jWebView_GoBackOrForward(env: PJNIEnv; _jwebview: JObject; steps: integer);
 procedure jWebView_GoForward(env: PJNIEnv; _jwebview: JObject);
+procedure jWebView_ScrollTo(env: PJNIEnv; _jwebview: JObject; _x, _y: integer);
 
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
@@ -1945,6 +1947,19 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
  env^.CallVoidMethod(env,_jtextview,_jMethod);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jTextView_SetAllCaps(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAllCaps', '(Z)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------
@@ -7401,7 +7416,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jWebView_setLParamWidth(env:PJNIEnv; WebView : jObject; w: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7428,7 +7442,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jWebView_addLParamsParentRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7442,7 +7455,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jWebView_addLParamsAnchorRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7512,6 +7524,20 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromHtmlString', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jWebView_ScrollTo(env: PJNIEnv; _jwebview: JObject; _x, _y: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _x;
+  jParams[1].i:= _y;
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'scrollTo', '(II)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

@@ -1,4 +1,4 @@
-package org.lamw.applamwproject2;
+package org.lamw.appviewflipperdemo2;
 
 import java.lang.reflect.Field;
 
@@ -488,4 +488,7 @@ public class jTextView extends TextView {
 		this.setMovementMethod(new ScrollingMovementMethod());
 	}
 
+	public void SetAllCaps(boolean _value) {
+		this.setAllCaps(_value);
+	}
 }

@@ -1,4 +1,4 @@
-package org.lamw.appeq2g;
+package org.lamw.appviewflipperdemo2;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -629,6 +629,6 @@ public class jEditText extends EditText {
 		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
 		     }
     }
-	   
+
 }
 
