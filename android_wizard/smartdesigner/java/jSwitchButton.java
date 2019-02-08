@@ -1,7 +1,8 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import java.lang.reflect.Field;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +77,8 @@ public class jSwitchButton extends Switch /*API 14*/ { //please, fix what GUI ob
    }
 
    public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+       String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
+       this.setTag(tag);  //nedd by jsRecyclerView.java
 	   LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
    }
 
@@ -135,13 +138,17 @@ public class jSwitchButton extends Switch /*API 14*/ { //please, fix what GUI ob
          return drawableId;
       }
       catch (Exception e) {
-         Log.e("toglebutton", "Failure to get drawable id.", e);
+         Log.e("jSwitchButton", "Failure to get drawable id.", e);
          return 0;
       }
    }
 
    public void SetThumbIcon(String _thumbIconIdentifier) {	   //Api  16
-      this.setThumbResource(GetDrawableResourceId(_thumbIconIdentifier));
+      //[ifdef_api16up]
+      if (Build.VERSION.SDK_INT >= 16) {
+         this.setThumbResource(GetDrawableResourceId(_thumbIconIdentifier));
+      }
+      //[endif_api14up]
    }
 
    public void DispatchOnToggleEvent(boolean _value) {
@@ -150,8 +157,11 @@ public class jSwitchButton extends Switch /*API 14*/ { //please, fix what GUI ob
    
    /*
    public void SetShowText(boolean _state) {  //Api 21
-	  this.setShowText(_state);
-   }
+     //[ifdef_api21up]
+	  if (Build.VERSION.SDK_INT >= 21) {
+	    this.setShowText(_state);
+      }//[endif_api21up]
+    }
    */
 
 } //end class

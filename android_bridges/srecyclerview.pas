@@ -7,25 +7,42 @@ interface
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;
 
+Const
+  ItemContentFormatArray: array  [0..4] of string = ('TEXT','IMAGE', 'CHECK', 'RATING', 'SWITCH');
+
 type
+
+  TItemContentFormat = (cfText, cfImage, cfCheck, cfRating, cfSwitch);
+
+  TItemWidgetStatus = (wsNone, wsChecked);
+
 
   TRecyclerViewOnItemClick = procedure(Sender: TObject; itemPosition: integer; itemArrayOfStringCount: integer) of object;
 
+  TRecyclerViewOnItemWidgetClick = procedure(Sender: TObject; itemPosition: integer; widget: TItemContentFormat;
+                                               caption: string; status: TItemWidgetStatus) of object;
+
   TLayoutModel = (lmLinear, lmGrid, lmStaggeredGrid);
   TLayoutOrientation = (loVertical, loHorizontal);
+
 
 {Draft Component code by "Lazarus Android Module Wizard" [12/21/2017 0:30:02]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
 {jVisualControl template}
 
+{ jsRecyclerView }
+
 jsRecyclerView = class(jVisualControl)
  private
+    FItemContentDelimiter: string;
+    FItemContentFormat: TStringList; // IMAGE|TEXT|CHECK|TEXT|RATING|IMAGECHECK
     FLayoutModel: TLayoutModel;
     FLayoutOrientation: TLayoutOrientation;
     FColumns: integer;
     FFitsSystemWindows: boolean;
     FOnItemClick: TRecyclerViewOnItemClick;
+    FOnItemWidgetClick: TRecyclerViewOnItemWidgetClick;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     
@@ -37,7 +54,10 @@ jsRecyclerView = class(jVisualControl)
     procedure UpdateLayout; override;
     
     procedure GenEvent_OnRecyclerViewItemClick(Obj: TObject; itemIndex: integer; arrayContentCount: integer);
-    //function jCreate(): jObject;
+    procedure GenEvent_OnRecyclerViewItemWidgetClick(Obj: TObject; itemIndex: integer;
+                                                     widget: TItemContentFormat; caption: string; status: TItemWidgetStatus);
+
+
     function jCreate( _mode: integer; _direction: integer; _cols: integer): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
@@ -58,6 +78,8 @@ jsRecyclerView = class(jVisualControl)
     procedure SetId(_id: integer);
     procedure SetItemContentFormat(_delimitedContentFormat: string; _delimiter: string); overload;
     procedure SetItemContentFormat(_contentFormat: string); overload;
+    procedure SetItemContentFormat(); overload;
+
     procedure Add(_delimitedContent: string);
     function GetSelectedContent(_contentIndex: integer): string;
     procedure SetItemContentLayout(_itemViewLayout: jObject); overload;
@@ -68,6 +90,9 @@ jsRecyclerView = class(jVisualControl)
     function GetItemCount(): integer;
     procedure SetFitsSystemWindows(_value: boolean);
     procedure SetClipToPadding(_value: boolean);
+    procedure AddItemContentFormat(cf: TItemContentFormat);
+
+    procedure SetItemContentDelimiter(_delimiter: string);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -77,6 +102,7 @@ jsRecyclerView = class(jVisualControl)
     property Columns: integer read FColumns write FColumns;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     property OnItemClick: TRecyclerViewOnItemClick read FOnItemClick write FOnItemClick;
+    property OnItemWidgetClick: TRecyclerViewOnItemWidgetClick read FOnItemWidgetClick write FOnItemWidgetClick;
 
 end;
 
@@ -132,6 +158,10 @@ begin
   FLayoutModel:= lmLinear;
   FLayoutOrientation:= loVertical;
   FColumns:= 1;
+  FItemContentFormat:= TStringList.Create;
+  FItemContentDelimiter:= '|';
+  FItemContentFormat.Delimiter:='|';
+  FItemContentFormat.StrictDelimiter:= True;
 end;
 
 destructor jsRecyclerView.Destroy;
@@ -145,6 +175,7 @@ begin
      end;
   end;
   //you others free code here...'
+  FItemContentFormat.Free;
   inherited Destroy;
 end;
 
@@ -245,6 +276,13 @@ procedure jsRecyclerView.GenEvent_OnRecyclerViewItemClick(Obj: TObject; itemInde
 begin
   if Assigned(FOnItemClick) then FOnItemClick(Obj, itemIndex, arrayContentCount);
 end;
+
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemWidgetClick(Obj: TObject; itemIndex: integer;
+                                                 widget: TItemContentFormat; caption: string; status: TItemWidgetStatus);
+begin
+  if Assigned(FOnItemWidgetClick) then FOnItemWidgetClick(Obj, itemIndex, widget, caption, status);
+end;
+
 {
 function jsRecyclerView.jCreate(): jObject;
 begin
@@ -392,13 +430,20 @@ end;
 procedure jsRecyclerView.SetItemContentFormat(_delimitedContentFormat: string; _delimiter: string);
 begin
   //in designing component state: set value here...
+  FItemContentDelimiter:= _delimiter;
   if FInitialized then
      jsRecyclerView_SetItemContentDictionary(FjEnv, FjObject, _delimitedContentFormat ,_delimiter);
 end;
 
 procedure jsRecyclerView.SetItemContentFormat(_contentFormat: string);
 begin
-   SetItemContentFormat(_contentFormat, '|');
+   SetItemContentFormat(_contentFormat, FItemContentDelimiter);
+end;
+
+procedure jsRecyclerView.SetItemContentFormat();
+begin
+   if FItemContentFormat.Count > 0 then
+     SetItemContentFormat(FItemContentFormat.DelimitedText, FItemContentFormat.Delimiter);
 end;
 
 procedure jsRecyclerView.Add(_delimitedContent: string);
@@ -472,22 +517,18 @@ begin
      jsRecyclerView_SetClipToPadding(FjEnv, FjObject, _value);
 end;
 
-{-------- jsRecyclerView_JNI_Bridge ----------}
-
-{
-function jsRecyclerView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+procedure jsRecyclerView.AddItemContentFormat(cf: TItemContentFormat);
 begin
-  jParams[0].j:= _Self;
-  jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jsRecyclerView_jCreate', '(J)Ljava/lang/Object;');
-  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
+  FItemContentFormat.Add(ItemContentFormatArray[Ord(cf)]);
 end;
-}
+
+procedure jsRecyclerView.SetItemContentDelimiter(_delimiter: string);
+begin
+   FItemContentDelimiter:= _delimiter;
+   FItemContentFormat.Delimiter:= _delimiter[1];
+end;
+
+{-------- jsRecyclerView_JNI_Bridge ----------}
 
 function jsRecyclerView_jCreate(env: PJNIEnv;_Self: int64; _mode: integer; _direction: integer; _cols: integer; this: jObject): jObject;
 var

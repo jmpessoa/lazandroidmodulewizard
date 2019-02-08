@@ -173,6 +173,9 @@ uses
 
    Procedure Java_Event_pOnTelephonyCallStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; state: integer; phoneNumber: JString );
 
+   Procedure Java_Event_pOnRecyclerViewItemWidgetClick(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                       itemIndex: integer; widgetClass: integer;
+                                                        widgetCaption: JString; status: integer);
 
 
 implementation
@@ -1988,6 +1991,29 @@ begin
   end;
 end;
 
+
+Procedure Java_Event_pOnRecyclerViewItemWidgetClick(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                    itemIndex: integer; widgetClass: integer;
+                                                    widgetCaption: JString; status: integer);
+var
+  _jBoolean: JBoolean;
+  paswidgetCaption: string;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jsRecyclerView then
+  begin
+    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
+
+    paswidgetCaption := '';
+    if widgetCaption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      paswidgetCaption:= string( env^.GetStringUTFChars(env,widgetCaption,@_jBoolean) );
+    end;
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetClick(Obj,itemIndex, TItemContentFormat(widgetClass),paswidgetCaption, TItemWidgetStatus(status));
+  end;
+end;
 
 end.
 

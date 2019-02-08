@@ -1,4 +1,4 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import android.content.Context;
 import android.view.View;
@@ -94,6 +94,8 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
     }
 
     public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+        String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
+        this.setTag(tag);  //nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h); 
     }
 

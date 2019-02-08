@@ -1,4 +1,4 @@
-package org.lamw.appviewflipperdemo2;
+package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -140,7 +140,7 @@ public class jImageView extends ImageView {
 
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		 String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
-	         this.setTag(tag);
+	         this.setTag(tag);  //nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 

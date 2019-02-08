@@ -38,8 +38,8 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
       LAMWCommon = new jCommons(this,context,pascalObj);
 
      //https://www.101apps.co.za/index.php/articles/using-toolbars-in-your-apps.html
-     //you should call this first if you’re going to be adding logos and navigation icons 
-     //else they won’t show.       
+     //you should call this first if you are going to be adding logos and navigation icons
+     //else they won't show.
      if (_asActionBar == true)  {  
     	 IsActionBar = true;
          this.SetAsActionBar(true);    

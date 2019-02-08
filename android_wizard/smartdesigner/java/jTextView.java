@@ -1,4 +1,4 @@
-package org.lamw.appviewflipperdemo2;
+package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import java.lang.reflect.Field;
 
@@ -112,7 +112,7 @@ public class jTextView extends TextView {
 
 	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		String tag = ""+left+"|"+top+"|"+right+"|"+bottom;
-	    this.setTag(tag);
+	    this.setTag(tag); ////nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 		
