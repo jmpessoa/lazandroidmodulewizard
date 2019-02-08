@@ -63,7 +63,7 @@ public class jOpenDialog /*extends ...*/ {
               if ( chosenFile.isDirectory() ) {
                  refresh(chosenFile);
               } else {             	  
-                controls.pOnFileSelected(pascalObj, initDir.getPath(), chosenFile.getName());                          
+                controls.pOnFileSelected(pascalObj, currentPath.getPath() /*initDir.getPath()*/, chosenFile.getName());                          
                 dialog.dismiss();
               }              
         	}
@@ -114,12 +114,11 @@ public class jOpenDialog /*extends ...*/ {
    }
    
    public void SetFileExtension(String _fileExtension) {
-	   if ( !_fileExtension.equals("") ) { 
-        extension = _fileExtension.toLowerCase();
-	   } 
-	   else { 
-		   extension = null;
-	   }	   
+	   extension = _fileExtension;
+	   if (extension != null) {   
+	     if ( extension.equals("") )          
+		   extension = null;	   		 
+       }
    }
    
    public void Show(int _initialEnvDirectory, String _fileExtension) {			  
