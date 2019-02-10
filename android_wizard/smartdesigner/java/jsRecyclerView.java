@@ -1,4 +1,4 @@
-package org.lamw.appcompatcollapsingtoolbardemo1;
+package org.lamw.appcompatrecyclerviewdemo1;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -414,7 +414,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				String paddelimiter = "|";
 				String[] paddingValues = pad.split(Pattern.quote(paddelimiter));								
 				label[indexText].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]), 
-						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[2]));						                    						                   
+						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
 				
 				label[indexText].setTextColor(drafTextView.getCurrentTextColor());
 				
@@ -449,7 +449,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				String paddelimiter = "|";
 				String[] paddingValues = pad.split(Pattern.quote(paddelimiter));								
 				image[indexImage].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]), 
-						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[2]));
+						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
 				layout.addView(image[indexImage]);
 
 				indexImage++;
@@ -470,7 +470,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 
 			   String[] paddingValues = pad.split(Pattern.quote(paddelimiter));
 			   check[indexCheck].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]),
-					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[2]));
+					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
 
 			   layout.addView(check[indexCheck]);
 
@@ -483,16 +483,33 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 			   int idRat = Integer.valueOf(nameVal[1]);
 			   RatingBar draftRatingBar = (RatingBar)mDraftLayoutView.findViewById(idRat);
 
-			   rating[indexRating] = new RatingBar(context);
+			   String tagData = (String) draftRatingBar.getTag(); //seted in "jRatingBar.java"
+			   //String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom + "|" + smallStyle
+
+			   String paddelimiter = "|";
+			   String[] paddingValues = tagData.split(Pattern.quote(paddelimiter));
+
+			   if (Integer.valueOf(paddingValues[4]) == 1)    //smallStyle
+			       rating[indexRating] = new RatingBar(context, null, android.R.attr.ratingBarStyleSmall);
+			   else
+				   rating[indexRating] = new RatingBar(context, null, android.R.attr.ratingBarStyle);
+
 			   rating[indexRating].setId(idRat);
+			   rating[indexRating].setStepSize(draftRatingBar.getStepSize());
+     	       rating[indexRating].setIsIndicator(draftRatingBar.isIndicator());
+
 			   rating[indexRating].setLayoutParams(draftRatingBar.getLayoutParams());
 
-			   String pad = (String) draftRatingBar.getTag(); //seted in "jRatingBar.java"
-			   String paddelimiter = "|";
+			   /*need this.setPadding(_left,_top,_right, _bottom);//nedd by jRatingBar.java
+			   rating[indexRating].setPadding( draftRatingBar.getPaddingLeft(),
+					                           draftRatingBar.getPaddingTop(),
+			                                   draftRatingBar.getPaddingRight(),
+			                                   draftRatingBar.getPaddingBottom());
+			   */
 
-			   String[] paddingValues = pad.split(Pattern.quote(paddelimiter));
+			   //setPadding(int left, int top, int right, int bottom)  by force!!!
 			   rating[indexRating].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]),
-					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[2]));
+					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
 
 			   layout.addView(rating[indexRating]);
 
@@ -514,7 +531,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 
 			   String[] paddingValues = pad.split(Pattern.quote(paddelimiter));
 			   switchbtn[indexSwitchbtn].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]),
-					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[2]));
+					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
 
 			   layout.addView(switchbtn[indexSwitchbtn]);
 
@@ -691,17 +708,17 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				if ( words[i].contains("Rating") )	{
 					final String[] nameValueRating = words[i].split(Pattern.quote(delimiter)); //jRatingBar:6
 					int idRating = Integer.valueOf(nameValueRating[1]);
-					//Log.i("indexText="+ indexText , "idText="+idText);
 					rating[indexRating] = (RatingBar)itemLayoutView.findViewById(idRating);
-
 					rating[indexRating].setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() { //OnRatingBarChangeListener
 						@Override
 						public void onRatingChanged(RatingBar ratingBar, float rating,  boolean fromUser) {
-							float r = ((RatingBar)ratingBar).getRating();
-							String caption =  Float.toString(r);
-							//Pascal: TItemWidgetStatus = (wsNone=0, wsChecked=1);
-							//Pascal: TItemContentFormat = (cfText=0, cfImage=1, cfCheck=2, cfRating=3, cfSwitch);
-							controls.pOnRecyclerViewItemWidgetClick(pascalObject, getAdapterPosition(),3, caption, 0);
+							if (fromUser) {
+								float r = ((RatingBar) ratingBar).getRating();
+								String caption = Float.toString(r);
+								//Pascal: TItemWidgetStatus = (wsNone=0, wsChecked=1);
+								//Pascal: TItemContentFormat = (cfText=0, cfImage=1, cfCheck=2, cfRating=3, cfSwitch=4);
+								controls.pOnRecyclerViewItemWidgetClick(pascalObject, getAdapterPosition(), 3, caption, 0);
+							}
 						}
 					});
 

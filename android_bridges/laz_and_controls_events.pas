@@ -1241,7 +1241,6 @@ begin
   end;
 end;
 
-
 procedure Java_Event_pOnRatingBarChanged(env: PJNIEnv; this: jobject; Obj: TObject; rating: single);
 begin
   gApp.Jni.jEnv:= env;

@@ -1,10 +1,15 @@
-package org.lamw.appcompatcollapsingtoolbardemo1;
+package org.lamw.appcompatrecyclerviewdemo1;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.view.Gravity;
+
+import java.lang.reflect.Field;
 
 /*Draft java code by "Lazarus Android Module Wizard" [12/22/2015 20:35:59]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -22,10 +27,19 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
     
     private jCommons LAMWCommon;
 
+    private String smallStyle = "0";
+
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
-    public jRatingBar(Controls _ctrls, long _Self,  int _numStars, float _step) { //Add more others news "_xxx"p arams if needed!
-        super(_ctrls.activity);
+    public jRatingBar(Controls _ctrls, long _Self,  int _numStars, int _style, boolean _isIndicator) { //Add more others news "_xxx"p arams if needed!
+        super(_ctrls.activity,null, _style);
+        if (_style == android.R.attr.ratingBarStyleSmall ) smallStyle = "1";
+
+       // super(_ctrls.activity);
+        //android.R.attr.ratingBarStyleSmall  =  16843280;
+        //android.R.attr.ratingBarStyle = 16842876;
+        //android.R.attr.ratingBarStyleIndicator = 16843280;
+
         context   = _ctrls.activity;
         pascalObj = _Self;
         controls  = _ctrls;
@@ -33,13 +47,14 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
         
         onRatingBarChangeListener = new OnRatingBarChangeListener() {
             /*.*/public void onRatingChanged(RatingBar ratingBar, float rating,  boolean fromUser) {
-                controls.pOnRatingBarChanged(pascalObj, rating); 
+                if (fromUser) {
+                    controls.pOnRatingBarChanged(pascalObj, rating);
+                }
             }
         };
         setOnRatingBarChangeListener(onRatingBarChangeListener);
-
+        this.setIsIndicator(_isIndicator);
         this.setNumStars(_numStars);
-        this.setStepSize(_step);
     } //end constructor
 
     public void jFree() {
@@ -94,9 +109,10 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
     }
 
     public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-        String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
+        String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom + "|" + smallStyle;
         this.setTag(tag);  //nedd by jsRecyclerView.java
-		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h); 
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
+        //this.setPadding(_left,_top,_right, _bottom);//TODO nedd by jsRecyclerView.java
     }
 
     public void AddLParamsAnchorRule(int _rule) {
@@ -168,7 +184,8 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
    */
    public void SetFrameGravity(int _value) {	   
       LAMWCommon.setLGravity(_value);
-   }      
+   }
+
 } //end class
 
 
