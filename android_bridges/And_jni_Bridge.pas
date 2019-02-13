@@ -762,6 +762,7 @@ function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; _points: array of s
 procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle); overload;
 procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single); overload;
 procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _path: jObject);  overload;
+procedure jCanvas_DrawArc(env: PJNIEnv; _jcanvas: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
 
 
 // Bitmap
@@ -7949,6 +7950,26 @@ begin
   env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jCanvas_DrawArc(env: PJNIEnv; _jcanvas: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+var
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _leftRectF;
+  jParams[1].f:= _topRectF;
+  jParams[2].f:= _rightRectF;
+  jParams[3].f:= _bottomRectF;
+  jParams[4].f:= _startAngle;
+  jParams[5].f:= _sweepAngle;
+  jParams[6].z:= JBool(_useCenter);
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawArc', '(FFFFFFZ)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // Bitmap

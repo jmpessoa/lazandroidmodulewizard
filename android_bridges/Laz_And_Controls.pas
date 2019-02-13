@@ -1777,6 +1777,7 @@ type
     procedure DrawPath(var _points: TDynArrayOfSingle);  overload;
     procedure DrawPath(_points: array of single);  overload;
     procedure DrawPath(_path: jObject);  overload;
+    procedure DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
 
     procedure SetCanvas(_canvas: jObject);
     procedure DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
@@ -9416,6 +9417,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCanvas_DrawPath(FjEnv, FjObject, _path);
+end;
+
+procedure jCanvas.DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawArc(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF ,_startAngle ,_sweepAngle ,_useCenter);
 end;
 
 //------------------------------------------------------------------------------

@@ -122,6 +122,8 @@ jDrawingView = class(jVisualControl)    //jDrawingView
 
     procedure DrawTextAligned(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
+    procedure DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+    procedure DrawOval(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
 
     function GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer;
     function GetViewPortY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewPortHeight: integer): integer;
@@ -221,6 +223,8 @@ function jDrawingView_GetNewPath(env: PJNIEnv; _jdrawingview: JObject): jObject;
 function jDrawingView_AddPointsToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; var _points: TDynArrayOfSingle): jObject; overload;
 function jDrawingView_AddPointsToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _points: array of single): jObject; overload;
 function jDrawingView_AddPathToPath(env: PJNIEnv; _jdrawingview: JObject; _srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
+procedure jDrawingView_DrawArc(env: PJNIEnv; _jdrawingview: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+procedure jDrawingView_DrawOval(env: PJNIEnv; _jdrawingview: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
 procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _text: string; _horOffest: integer; _verOffeset: integer); overload;
 procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _text: string; _xOffest: integer; _yOffeset: integer); overload;
 
@@ -914,6 +918,21 @@ begin
   if FInitialized then
      jDrawingView_DrawTextOnPath(FjEnv, FjObject, _text ,_xOffest ,_yOffeset);
 end;
+
+procedure jDrawingView.DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawArc(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF ,_startAngle ,_sweepAngle ,_useCenter);
+end;
+
+procedure jDrawingView.DrawOval(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawOval(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF);
+end;
+
 
 function jDrawingView.GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer;
 var
@@ -1877,6 +1896,42 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'DrawTextOnPath', '(Ljava/lang/String;II)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawArc(env: PJNIEnv; _jdrawingview: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+var
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _leftRectF;
+  jParams[1].f:= _topRectF;
+  jParams[2].f:= _rightRectF;
+  jParams[3].f:= _bottomRectF;
+  jParams[4].f:= _startAngle;
+  jParams[5].f:= _sweepAngle;
+  jParams[6].z:= JBool(_useCenter);
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawArc', '(FFFFFFZ)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_DrawOval(env: PJNIEnv; _jdrawingview: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _leftRectF;
+  jParams[1].f:= _topRectF;
+  jParams[2].f:= _rightRectF;
+  jParams[3].f:= _bottomRectF;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawOval', '(FFFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

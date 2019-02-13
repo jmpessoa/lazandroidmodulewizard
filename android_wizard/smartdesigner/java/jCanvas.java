@@ -166,6 +166,13 @@ public class jCanvas {
 		//mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
 		canvas.drawPath(_path, paint);
 	}
+    
+    //https://thoughtbot.com/blog/android-canvas-drawarc-method-a-visual-guide
+    public void DrawArc(float _leftRectF, float _topRectF, float _rightRectF, float _bottomRectF, float _startAngle, float _sweepAngle, boolean _useCenter) {
+        RectF oval = new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF);
+        canvas.drawArc(oval, _startAngle, _sweepAngle, _useCenter, paint);
+    }
+
 
 }
 
