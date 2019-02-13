@@ -738,8 +738,8 @@ Procedure jCanvas_SetTypeface          (env:PJNIEnv;
                                         Canv : jObject; _typeface: integer);
 Procedure jCanvas_drawText             (env:PJNIEnv;
                                         Canv : jObject; const text : string; x, y : single);
-Procedure jCanvas_drawLine             (env:PJNIEnv;
-                                        Canv : jObject; x1,y1,x2,y2 : single);
+Procedure jCanvas_drawLine(env:PJNIEnv; Canv : jObject; x1,y1,x2,y2 : single); overload;
+procedure jCanvas_drawLine(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle);  overload;
 // LORDMAN 2013-08-13
 Procedure jCanvas_drawPoint            (env:PJNIEnv;
                                         Canv:jObject; x1,y1:single);
@@ -757,6 +757,12 @@ procedure jCanvas_drawBitmap           (env: PJNIEnv;
                                         _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
 procedure jCanvas_setCanvas(env: PJNIEnv; _jcanvas: JObject; _canvas: jObject);
 procedure jCanvas_drawTextAligned(env: PJNIEnv; Canv: jObject; const _text: string; _left, _top, _right, _bottom, _alignhorizontal , _alignvertical: single);
+function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle): jObject; overload;
+function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single): jObject; overload;
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle); overload;
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single); overload;
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _path: jObject);  overload;
+
 
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;
@@ -7683,6 +7689,25 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
+procedure jCanvas_drawLine(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'drawLine', '([F)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 // LORDMAN 2013-08-13
 
 Procedure jCanvas_drawPoint(env:PJNIEnv; Canv:jObject; x1,y1:single);
@@ -7832,6 +7857,97 @@ var
   env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
+end;
+
+
+function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetNewPath', '([F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetNewPath', '([F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '([F)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '([F)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _path: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _path;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '(Landroid/graphics/Path;)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

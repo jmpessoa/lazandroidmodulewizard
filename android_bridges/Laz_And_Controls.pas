@@ -1739,11 +1739,11 @@ type
     FPaintColor: TARGBColorBridge;
     FTypeface: TFontFace;
 
-    Procedure setStrokeWidth       (Value : single );
-    Procedure setStyle             (Value : TPaintStyle);
-    Procedure setColor             (Value : TARGBColorBridge);
-    Procedure setTextSize          (Value : single );
-    Procedure setTypeface          (Value : TFontFace);
+    Procedure SetStrokeWidth       (Value : single );
+    Procedure SetStyle             (Value : TPaintStyle);
+    Procedure SetColor             (Value : TARGBColorBridge);
+    Procedure SetTextSize          (Value : single );
+    Procedure SetTypeface          (Value : TFontFace);
 
   protected
   public
@@ -1753,16 +1753,18 @@ type
 
     procedure Init(refApp: jApp); override;
     //
-    Procedure drawLine             (x1,y1,x2,y2 : single);
-    // LORDMAN 2013-08-13
-    Procedure drawPoint            (x1,y1 : single);
-    Procedure drawText             (Text : String; x,y : single);
+    Procedure DrawLine(x1,y1,x2,y2 : single); overload;
+    procedure DrawLine(var _points: TDynArrayOfSingle);  overload;
 
-    procedure drawCircle(_cx: single; _cy: single; _radius: single);
-    procedure drawOval(_left, _top, _right, _bottom: single);
-    procedure drawBackground(_color: integer);
-    procedure drawRect(_left, _top, _right, _bottom: single);
-    procedure drawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
+    // LORDMAN 2013-08-13
+    Procedure DrawPoint            (x1,y1 : single);
+    Procedure DrawText             (Text : String; x,y : single);
+
+    procedure DrawCircle(_cx: single; _cy: single; _radius: single);
+    procedure DrawOval(_left, _top, _right, _bottom: single);
+    procedure DrawBackground(_color: integer);
+    procedure DrawRect(_left, _top, _right, _bottom: single);
+    procedure DrawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
 
     Procedure DrawBitmap(bmp: jObject; b,l,r,t: integer); overload;
     Procedure DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
@@ -1770,8 +1772,13 @@ type
     Procedure DrawBitmap(bmp: jBitmap; b,l,r,t: integer); overload;
     procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
 
+    function GetNewPath(var _points: TDynArrayOfSingle): jObject; overload;
+    function GetNewPath(_points: array of single): jObject;  overload;
+    procedure DrawPath(var _points: TDynArrayOfSingle);  overload;
+    procedure DrawPath(_points: array of single);  overload;
+    procedure DrawPath(_path: jObject);  overload;
+
     procedure SetCanvas(_canvas: jObject);
-    //procedure drawTextAligned(Text: string; _left, _top, _right, _bottom, _alignhorizontal, _alignvertical: single);
     procedure DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
     // Property
@@ -9264,6 +9271,13 @@ begin
      jCanvas_drawLine(FjEnv, FjObject ,x1,y1,x2,y2);
 end;
 
+procedure jCanvas.DrawLine(var _points: TDynArrayOfSingle);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_drawLine(FjEnv, FjObject, _points);
+end;
+
 Procedure jCanvas.DrawPoint(x1,y1 : single);
 begin
   if FInitialized then
@@ -9367,6 +9381,41 @@ begin
   begin
      jCanvas_drawTextAligned(FjEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer );
   end;
+end;
+
+function jCanvas.GetNewPath(var _points: TDynArrayOfSingle): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_GetNewPath(FjEnv, FjObject, _points);
+end;
+
+function jCanvas.GetNewPath(_points: array of single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_GetNewPath(FjEnv, FjObject, _points);
+end;
+
+procedure jCanvas.DrawPath(var _points: TDynArrayOfSingle);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawPath(FjEnv, FjObject, _points);
+end;
+
+procedure jCanvas.DrawPath(_points: array of single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawPath(FjEnv, FjObject, _points);
+end;
+
+procedure jCanvas.DrawPath(_path: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawPath(FjEnv, FjObject, _path);
 end;
 
 //------------------------------------------------------------------------------

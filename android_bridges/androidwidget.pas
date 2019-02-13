@@ -15,6 +15,10 @@ uses
   Classes, SysUtils, Math, types, And_jni, CustApp;
 
 type
+
+  TStrokeCap = (scDefault, scRound);
+  TStrokeJoin = (sjDefault, sjRound);
+
   TAndroidLayoutType = (altMATCHPARENT,altWRAPCONTENT);
   TViewVisibility = (vvVisible=0,  vvInvisible=4, vvGone=8);
 
@@ -307,6 +311,11 @@ type
  TOnPinchZoom = procedure(Sender: TObject; scaleFactor: single; scaleState: TPinchZoomScaleState) of Object;
 
  TTouchPoint = record
+       X: single;
+       Y: single;
+ end;
+
+ TSinglePoint = record
        X: single;
        Y: single;
  end;
@@ -1245,6 +1254,7 @@ end;
     function IsRuntimePermissionGranted(_manifestPermission: string): boolean;
     procedure RequestRuntimePermission(_manifestPermission: string; _requestCode: integer); overload;
     procedure RequestRuntimePermission(var _androidPermissions: TDynArrayOfString; _requestCode: integer); overload;
+    procedure RequestRuntimePermission(_androidPermissions: array of string; _requestCode: integer); overload;
 
     function HasActionBar(): boolean;
     function IsAppCompatProject(): boolean;
@@ -1689,6 +1699,7 @@ function jForm_IsRuntimePermissionNeed(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_IsRuntimePermissionGranted(env: PJNIEnv; _jform: JObject; _androidPermission: string): boolean;
 procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermission: string; _requestCode: integer);  overload;
 procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; var _androidPermissions: TDynArrayOfString; _requestCode: integer);  overload;
+procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermissions: array of string; _requestCode: integer);  overload;
 
 function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
@@ -4004,6 +4015,13 @@ begin
      jForm_RequestRuntimePermission(FjEnv, FjObject, _androidPermissions ,_requestCode);
 end;
 
+procedure jForm.RequestRuntimePermission(_androidPermissions: array of string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_RequestRuntimePermission(FjEnv, FjObject, _androidPermissions ,_requestCode);
+end;
+
 function jForm.HasActionBar(): boolean;
 begin
   //in designing component state: result value here...
@@ -5728,6 +5746,29 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermissions: array of string; _requestCode: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_androidPermissions);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_androidPermissions[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jParams[1].i:= _requestCode;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestRuntimePermission', '([Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 
 function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;

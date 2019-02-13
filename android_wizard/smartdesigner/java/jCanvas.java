@@ -1,10 +1,11 @@
-package org.lamw.apptextfilemanagerdemo1;
+package com.example.appdrawingviewdemo1;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -19,15 +20,12 @@ public class jCanvas {
 
 	//Constructor
 	public  jCanvas(Controls ctrls,long pasobj ) {
-
 		//Connect Pascal I/F
 		PasObj   = pasobj;
 		controls = ctrls;
-
 		//Init Class
 		paint   = new Paint();
-
-    paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        paint.setFlags(Paint.ANTI_ALIAS_FLAG);
 	}
 
 	public  void setCanvas(Canvas _canvas) {
@@ -147,6 +145,27 @@ public class jCanvas {
         float y = _top + (_bottom - _top  - bounds.height()) * _alignvertical + bounds.height();
         canvas.drawText(text,x,y,paint);                 
     }
+
+	public Path GetNewPath(float[] _points) { // path.reset();
+		int len = _points.length;
+		Path path = new Path();
+		path.moveTo(_points[0], _points[1]);
+		int i = 2;
+		while ((i + 1) < len) {
+			path.lineTo(_points[i], _points[i + 1]); //2,3  4,5
+			i = i + 2;
+		}
+		return path;
+	}
+	public void DrawPath(float[] _points) {
+		//mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
+		canvas.drawPath(GetNewPath(_points), paint);
+	}
+
+	public void DrawPath(Path _path) {
+		//mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
+		canvas.drawPath(_path, paint);
+	}
 
 }
 

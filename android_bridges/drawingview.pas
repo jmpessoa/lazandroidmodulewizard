@@ -9,14 +9,17 @@ uses
 
 type
 
- //TOnDrawing  = Procedure(Sender: TObject) of object;
+   //CCW - counter-clockwise
+   //CW - clockwise
+
+   TPathDirection = (pdClockwise, pdCounterClockwise);
 
 {Draft Component code by "Lazarus Android Module Wizard" [5/20/2016 4:14:09]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
 {jVisualControl template}
 
-jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
+jDrawingView = class(jVisualControl)    //jDrawingView
  private
     FOnDraw      : TOnTouchExtended;
     FOnTouchDown : TOnTouchExtended;
@@ -26,6 +29,8 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
     FPaintStrokeWidth: single;
     FPaintStyle: TPaintStyle;
     FPaintColor: TARGBColorBridge;
+    FPaintStrokeJoin: TStrokeJoin;
+    FPaintStrokeCap: TStrokeCap;
 
     FImageIdentifier: string;
 
@@ -71,9 +76,36 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
     procedure SetTextSize(_textsize: DWord);
 
     procedure DrawLine(_x1: single; _y1: single; _x2: single; _y2: single); overload;
-    procedure DrawText(_text: string; _x: single; _y: single);
-
     procedure DrawLine(var _points: TDynArrayOfSingle); overload;
+    procedure DrawLine(_points: array of single); overload;
+
+    function GetPath(var _points: TDynArrayOfSingle): jObject; overload;
+    function GetPath(_points: array of single): jObject; overload;
+
+    procedure DrawPath(_path: jObject); overload;
+    procedure DrawPath(var _points: TDynArrayOfSingle); overload;
+    procedure DrawPath(_points: array of single); overload;
+    procedure SetPaintStrokeJoin(_strokeJoin: TStrokeJoin);
+    procedure SetPaintStrokeCap(_strokeCap: TStrokeCap);
+    procedure SetPaintCornerPathEffect(_radius: single);
+    procedure SetPaintDashPathEffect(_lineDash: single; _dashSpace: single; _phase: single);
+    function GetPath(): jObject; overload;
+    function ResetPath(): jObject; overload;
+    function ResetPath(_path: jObject): jObject; overload;
+    procedure AddCircleToPath(_x: single; _y: single; _r: single; _pathDirection: TPathDirection); overload;
+    procedure AddCircleToPath(_path: jObject; _x: single; _y: single; _r: single; _pathDirection: TPathDirection); overload;
+    function GetNewPath(var _points: TDynArrayOfSingle): jObject; overload;
+    function GetNewPath(_points: array of single): jObject; overload;
+    function GetNewPath(): jObject; overload;
+    function AddPointsToPath(_path: jObject; var _points: TDynArrayOfSingle): jObject; overload;
+    function AddPointsToPath(_path: jObject; _points: array of single): jObject;  overload;
+    function AddPathToPath(_srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
+    procedure DrawTextOnPath(_path: jObject; _text: string; _horOffest: integer; _verOffeset: integer); overload;
+    procedure DrawTextOnPath(_text: string; _xOffest: integer; _yOffeset: integer);  overload;
+
+
+
+    procedure DrawText(_text: string; _x: single; _y: single);
     procedure DrawPoint(_x1: single; _y1: single);
     procedure DrawCircle(_cx: single; _cy: single; _radius: single);
     procedure DrawBackground(_color: integer);
@@ -90,6 +122,10 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
 
     procedure DrawTextAligned(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
+
+    function GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer;
+    function GetViewPortY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewPortHeight: integer): integer;
+
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 
@@ -104,6 +140,8 @@ jDrawingView = class(jVisualControl)    //jDrawingView   jGraphicsView
     property PaintStrokeWidth: single read FPaintStrokeWidth write SetPaintStrokeWidth;
     property PaintStyle: TPaintStyle read FPaintStyle write SetPaintStyle;
     property PaintColor: TARGBColorBridge read FPaintColor write SetPaintColor;
+    property PaintStrokeJoin: TStrokeJoin read FPaintStrokeJoin write SetPaintStrokeJoin;
+    property PaintStrokeCap: TStrokeCap read FPaintStrokeCap write SetPaintStrokeCap;
 
     property ImageIdentifier : string read FImageIdentifier write SetImageByResourceIdentifier;
 
@@ -148,6 +186,7 @@ procedure jDrawingView_DrawLine(env: PJNIEnv; _jdrawingview: JObject; _x1: singl
 procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single);
 
 procedure jDrawingView_DrawLine(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle); overload;
+procedure jDrawingView_DrawLine(env: PJNIEnv; _jdrawingview: JObject; var _points: array of single); overload;
 procedure jDrawingView_DrawPoint(env: PJNIEnv; _jdrawingview: JObject; _x1: single; _y1: single);
 procedure jDrawingView_DrawCircle(env: PJNIEnv; _jdrawingview: JObject; _cx: single; _cy: single; _radius: single);
 procedure jDrawingView_DrawBackground(env: PJNIEnv; _jdrawingview: JObject; _color: integer);
@@ -162,6 +201,29 @@ procedure jDrawingView_SetMaxZoomFactor(env: PJNIEnv; _jdrawingview: JObject; _m
 
 function jDrawingView_GetCanvas(env: PJNIEnv; _jdrawingview: JObject): jObject;
 procedure jDrawingView_DrawTextAligned(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single);
+function jDrawingView_GetPath(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle): jObject; overload;
+function jDrawingView_GetPath(env: PJNIEnv; _jdrawingview: JObject; _points: array of single): jObject; overload;
+procedure jDrawingView_DrawPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject); overload;
+procedure jDrawingView_DrawPath(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle);overload;
+procedure jDrawingView_DrawPath(env: PJNIEnv; _jdrawingview: JObject; _points: array of single);overload;
+procedure jDrawingView_SetPaintStrokeJoin(env: PJNIEnv; _jdrawingview: JObject; _strokeJoin: integer);
+procedure jDrawingView_SetPaintStrokeCap(env: PJNIEnv; _jdrawingview: JObject; _strokeCap: integer);
+procedure jDrawingView_SetPaintCornerPathEffect(env: PJNIEnv; _jdrawingview: JObject; _radius: single);
+procedure jDrawingView_SetPaintDashPathEffect(env: PJNIEnv; _jdrawingview: JObject; _lineDash: single; _dashSpace: single; _phase: single);
+function jDrawingView_GetPath(env: PJNIEnv; _jdrawingview: JObject): jObject; overload;
+function jDrawingView_ResetPath(env: PJNIEnv; _jdrawingview: JObject): jObject;  overload;
+function jDrawingView_ResetPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject): jObject;  overload;
+procedure jDrawingView_AddCircleToPath(env: PJNIEnv; _jdrawingview: JObject; _x: single; _y: single; _r: single; _pathDirection: integer); overload;
+procedure jDrawingView_AddCircleToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _x: single; _y: single; _r: single; _pathDirection: integer); overload;
+function jDrawingView_GetNewPath(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle): jObject; overload;
+function jDrawingView_GetNewPath(env: PJNIEnv; _jdrawingview: JObject; _points: array of single): jObject; overload;
+function jDrawingView_GetNewPath(env: PJNIEnv; _jdrawingview: JObject): jObject;  overload;
+function jDrawingView_AddPointsToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; var _points: TDynArrayOfSingle): jObject; overload;
+function jDrawingView_AddPointsToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _points: array of single): jObject; overload;
+function jDrawingView_AddPathToPath(env: PJNIEnv; _jdrawingview: JObject; _srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
+procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _text: string; _horOffest: integer; _verOffeset: integer); overload;
+procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _text: string; _xOffest: integer; _yOffeset: integer); overload;
+
 
 
 implementation
@@ -191,11 +253,14 @@ begin
   FFontFace:= ffNormal;
   FFontSize:= 20;
   FPaintStrokeWidth:= 1;
-  FPaintStyle:= psFillAndStroke;
+  FPaintStyle:= psStroke;
   FPaintColor:= colbrRed;
 
   FMinZoomFactor:= 1/4;
   FMaxZoomFactor:= 8/2;
+
+  FPaintStrokeJoin:= sjDefault;
+  FPaintStrokeCap:= scDefault;
 
 end;
 
@@ -267,6 +332,12 @@ begin
    jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
    jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
    jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
+
+   if FPaintStrokeJoin <>  sjDefault then
+        jDrawingView_SetPaintStrokeJoin(FjEnv, FjObject, Ord(FPaintStrokeJoin));
+
+   if FPaintStrokeCap <>  scDefault then
+        jDrawingView_SetPaintStrokeCap(FjEnv, FjObject, Ord(FPaintStrokeCap));
 
    if FImageIdentifier <> '' then
      jDrawingView_SetImageByResourceIdentifier(FjEnv, FjObject , FImageIdentifier);
@@ -568,6 +639,13 @@ begin
      jDrawingView_DrawLine(FjEnv, FjObject, _points);
 end;
 
+
+procedure jDrawingView.DrawLine(_points: array of single);
+begin
+  if FInitialized then
+     jDrawingView_DrawLine(FjEnv, FjObject, _points);
+end;
+
 procedure jDrawingView.DrawPoint(_x1: single; _y1: single);
 begin
   //in designing component state: set value here...
@@ -676,6 +754,188 @@ begin
   if FInitialized then
   begin
     jDrawingView_DrawTextAligned(FjEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer);
+  end;
+end;
+
+function jDrawingView.GetPath(var _points: TDynArrayOfSingle): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetPath(FjEnv, FjObject, _points);
+end;
+
+function jDrawingView.GetPath(_points: array of single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetPath(FjEnv, FjObject, _points);
+end;
+
+
+procedure jDrawingView.DrawPath(_path: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawPath(FjEnv, FjObject, _path);
+end;
+
+procedure jDrawingView.DrawPath(var _points: TDynArrayOfSingle);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawPath(FjEnv, FjObject, _points);
+end;
+
+procedure jDrawingView.DrawPath(_points: array of single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawPath(FjEnv, FjObject, _points);
+end;
+
+procedure jDrawingView.SetPaintStrokeJoin(_strokeJoin: TStrokeJoin);
+begin
+  //in designing component state: set value here...
+  FPaintStrokeJoin:= _strokeJoin;
+  if FInitialized then
+     jDrawingView_SetPaintStrokeJoin(FjEnv, FjObject, Ord(_strokeJoin));
+end;
+
+procedure jDrawingView.SetPaintStrokeCap(_strokeCap: TStrokeCap);
+begin
+  //in designing component state: set value here...
+  FPaintStrokeCap:= _strokeCap;
+  if FInitialized then
+     jDrawingView_SetPaintStrokeCap(FjEnv, FjObject, Ord(_strokeCap));
+end;
+
+procedure jDrawingView.SetPaintCornerPathEffect(_radius: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_SetPaintCornerPathEffect(FjEnv, FjObject, _radius);
+end;
+
+procedure jDrawingView.SetPaintDashPathEffect(_lineDash: single; _dashSpace: single; _phase: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_SetPaintDashPathEffect(FjEnv, FjObject, _lineDash ,_dashSpace ,_phase);
+end;
+
+function jDrawingView.GetPath(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetPath(FjEnv, FjObject);
+end;
+
+function jDrawingView.ResetPath(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_ResetPath(FjEnv, FjObject);
+end;
+
+function jDrawingView.ResetPath(_path: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_ResetPath(FjEnv, FjObject, _path);
+end;
+
+procedure jDrawingView.AddCircleToPath(_x: single; _y: single; _r: single; _pathDirection: TPathDirection);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_AddCircleToPath(FjEnv, FjObject, _x ,_y ,_r , Ord(_pathDirection));
+end;
+
+procedure jDrawingView.AddCircleToPath(_path: jObject; _x: single; _y: single; _r: single; _pathDirection: TPathDirection);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_AddCircleToPath(FjEnv, FjObject, _path ,_x ,_y ,_r ,Ord(_pathDirection));
+end;
+
+function jDrawingView.GetNewPath(var _points: TDynArrayOfSingle): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetNewPath(FjEnv, FjObject, _points);
+end;
+
+function jDrawingView.GetNewPath(_points: array of single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetNewPath(FjEnv, FjObject, _points);
+end;
+
+function jDrawingView.GetNewPath(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetNewPath(FjEnv, FjObject);
+end;
+
+function jDrawingView.AddPointsToPath(_path: jObject; var _points: TDynArrayOfSingle): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_AddPointsToPath(FjEnv, FjObject, _path ,_points);
+end;
+
+function jDrawingView.AddPointsToPath(_path: jObject; _points: array of single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_AddPointsToPath(FjEnv, FjObject, _path ,_points);
+end;
+
+function jDrawingView.AddPathToPath(_srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_AddPathToPath(FjEnv, FjObject, _srcPath ,_targetPath ,_dx ,_dy);
+end;
+
+
+procedure jDrawingView.DrawTextOnPath(_path: jObject; _text: string; _horOffest: integer; _verOffeset: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawTextOnPath(FjEnv, FjObject, _path ,_text ,_horOffest ,_verOffeset);
+end;
+
+procedure jDrawingView.DrawTextOnPath(_text: string; _xOffest: integer; _yOffeset: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawTextOnPath(FjEnv, FjObject, _text ,_xOffest ,_yOffeset);
+end;
+
+function jDrawingView.GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer;
+var
+  escX:real;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+  begin
+     escX:=(_viewPortWidth/(_maxWorldX-_minWorldX));
+     Result:=round(escX*(_worldX-_minWorldX));
+  end;
+end;
+
+function jDrawingView.GetViewPortY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewPortHeight: integer): integer;
+var
+  escY:real;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+  begin
+     escY:=-(_viewPortHeight-10)/(_maxWorldY-_minWorldY);
+     Result:= 10+round(escY*(_worldY-_maxWorldY));
   end;
 end;
 
@@ -1057,10 +1317,28 @@ begin
   jCls:= env^.GetObjectClass(env, _jdrawingview);
   jMethod:= env^.GetMethodID(env, jCls, 'DrawLine', '([F)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jDrawingView_DrawLine(env: PJNIEnv; _jdrawingview: JObject; var _points: array of single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawLine', '([F)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure jDrawingView_DrawPoint(env: PJNIEnv; _jdrawingview: JObject; _x1: single; _y1: single);
 var
@@ -1239,5 +1517,368 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jDrawingView_GetPath(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetPath', '([F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jDrawingView_GetPath(env: PJNIEnv; _jdrawingview: JObject; _points: array of single): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetPath', '([F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_DrawPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _path;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '(Landroid/graphics/Path;)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawPath(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '([F)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawPath(env: PJNIEnv; _jdrawingview: JObject; _points: array of single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '([F)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_SetPaintStrokeJoin(env: PJNIEnv; _jdrawingview: JObject; _strokeJoin: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _strokeJoin;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetPaintStrokeJoin', '(I)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_SetPaintStrokeCap(env: PJNIEnv; _jdrawingview: JObject; _strokeCap: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _strokeCap;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetPaintStrokeCap', '(I)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_SetPaintCornerPathEffect(env: PJNIEnv; _jdrawingview: JObject; _radius: single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _radius;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetPaintCornerPathEffect', '(F)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_SetPaintDashPathEffect(env: PJNIEnv; _jdrawingview: JObject; _lineDash: single; _dashSpace: single; _phase: single);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _lineDash;
+  jParams[1].f:= _dashSpace;
+  jParams[2].f:= _phase;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetPaintDashPathEffect', '(FFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_GetPath(env: PJNIEnv; _jdrawingview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetPath', '()Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethod(env, _jdrawingview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_ResetPath(env: PJNIEnv; _jdrawingview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ResetPath', '()Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethod(env, _jdrawingview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_ResetPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _path;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ResetPath', '(Landroid/graphics/Path;)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_AddCircleToPath(env: PJNIEnv; _jdrawingview: JObject; _x: single; _y: single; _r: single; _pathDirection: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _x;
+  jParams[1].f:= _y;
+  jParams[2].f:= _r;
+  jParams[3].i:= _pathDirection;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddCircleToPath', '(FFFI)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_AddCircleToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _x: single; _y: single; _r: single; _pathDirection: integer);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _path;
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _r;
+  jParams[4].i:= _pathDirection;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddCircleToPath', '(Landroid/graphics/Path;FFFI)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_GetNewPath(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetNewPath', '([F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jdrawingview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jDrawingView_GetNewPath(env: PJNIEnv; _jdrawingview: JObject; _points: array of single): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetNewPath', '([F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jdrawingview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_GetNewPath(env: PJNIEnv; _jdrawingview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetNewPath', '()Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethod(env, _jdrawingview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_AddPointsToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; var _points: TDynArrayOfSingle): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  jParams[0].l:= _path;
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[1].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddPointsToPath', '(Landroid/graphics/Path;[F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jDrawingView_AddPointsToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _points: array of single): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  jParams[0].l:= _path;
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[1].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddPointsToPath', '(Landroid/graphics/Path;[F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jDrawingView_AddPathToPath(env: PJNIEnv; _jdrawingview: JObject; _srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _srcPath;
+  jParams[1].l:= _targetPath;
+  jParams[2].f:= _dx;
+  jParams[3].f:= _dy;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddPathToPath', '(Landroid/graphics/Path;Landroid/graphics/Path;FF)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _text: string; _horOffest: integer; _verOffeset: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _path;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[2].i:= _horOffest;
+  jParams[3].i:= _verOffeset;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextOnPath', '(Landroid/graphics/Path;Ljava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _text: string; _xOffest: integer; _yOffeset: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].i:= _xOffest;
+  jParams[2].i:= _yOffeset;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextOnPath', '(Ljava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.
