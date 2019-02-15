@@ -1,7 +1,10 @@
-package org.lamw.apptextureviewdemo1;
+package com.example.appmediaplayerdemo1;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.SurfaceTexture;
@@ -11,6 +14,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.Settings;
 import android.view.Surface;
@@ -62,7 +66,7 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 	  }
 	      
 	  public void DeselectTrack(int _index){
-	  	this.mplayer.deselectTrack(_index);
+	  	//this.mplayer.deselectTrack(_index); //api 16
 	  }
 	  
 	  /*
@@ -85,13 +89,18 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 		  
 		  try {
 			 this.mplayer.setDataSource(_path + "/" + _filename);
+			  mplayer.prepare();
 	      }	            
 	      catch (IOException e) {
 	         e.printStackTrace();
 	      }		
 		 
 	  }
-	  	  
+
+	  public void LoadFromFile(String _path,  String _filename) {
+		  SetDataSource(_path,   _filename);
+	  }
+
 	  public void SetDataSource(String _path){
 		 
 		 if (this.mplayer != null) { 
@@ -107,6 +116,7 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 			  Uri uri0 = Uri.parse(_path);                //ex. "http://site.com/audio/audio.mp3"
 			  try{                                        //    "file:///sdcard/localfile.mp3" 
 			     this.mplayer.setDataSource(context, uri0);
+			     mplayer.prepare();
 			  }catch (IOException e){
 				 e.printStackTrace();	
 			  }
@@ -114,6 +124,7 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 			 //Log.i("jMediaPlayer", "DEFAULT_RINGTONE_URI");			 
 	         try{ 
 	              this.mplayer.setDataSource(context, Settings.System.DEFAULT_RINGTONE_URI);
+				  mplayer.prepare();
 	         }catch (IOException e){
 	        	  //Log.i("jMediaPlayer", "RINGTONE ERROR");
 	  	          e.printStackTrace();  	         
@@ -127,6 +138,7 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 			   newPath = sdPath +  _path.substring(p2);						  			   
 	  		    try{                                
 			       this.mplayer.setDataSource(newPath);  //    "/sdcard/music/tarck1.mp3"
+					mplayer.prepare();
 			    }catch (IOException e){
 		           e.printStackTrace();	
 	            }	           		   	  		   	  		   
@@ -138,6 +150,7 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 		    	 }		    	 		    	 
 	  		     try{                                
 		               this.mplayer.setDataSource(newPath);  //    "/sdcard/music/tarck1.mp3"
+					 mplayer.prepare();
 		 		 }catch (IOException e){
 		 	            e.printStackTrace();	
 		         }
@@ -147,7 +160,8 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 			 AssetFileDescriptor afd;
 			 try {
 			 	afd = controls.activity.getAssets().openFd(_path);
-			 	this.mplayer.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());  
+			 	this.mplayer.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+				 mplayer.prepare();
 			 } catch (IOException e1) {
 				e1.printStackTrace();
 			 }            	     
@@ -198,7 +212,8 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 	  }
 	  
 	  public void SelectTrack(int _index){	 //it selects a track for the specified index.
-		  this.mplayer.selectTrack(_index);
+
+		  //this.mplayer.selectTrack(_index); //api 16
 	  }
 	  
 	  public int GetCurrentPosition(){	 //returns the current playback position.
@@ -275,21 +290,41 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
   		  mplayer.prepareAsync();
   	  }
 
-	  public void LoadFromAssets(String _fileName) {	//big_buck_bunny.mp4	  
+	  public void LoadFromAssets(String _fileName) {	//big_buck_bunny.mp4
+		  if (this.mplayer != null) {
+			  this.mplayer.reset();  //the object is like being just created....
+			 /*
+			  * Resets the MediaPlayer to its uninitialized state. After calling this method,
+	            we will have to initialize it again by setting the data source and calling prepare().
+			  */
+		  } else {this.mplayer = new MediaPlayer();}
+
 		    AssetFileDescriptor afd;
 			try {
 				afd = controls.activity.getAssets().openFd(_fileName);
 				mplayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+				mplayer.prepare();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}	      		      
+			}
 	  }
 	  
 	  //https://www.w3schools.com/html/mov_bbb.mp4
 	  public void LoadFromURL(String _url) {	//big_buck_bunny.mp4
+
+		  if (this.mplayer != null) {
+			  this.mplayer.reset();  //the object is like being just created....
+			 /*
+			  * Resets the MediaPlayer to its uninitialized state. After calling this method,
+	            we will have to initialize it again by setting the data source and calling prepare().
+			  */
+		  } else {this.mplayer = new MediaPlayer();}
+
+		  new BackgroundAsyncTask().execute(_url); //"https://s3.amazonaws.com/TranscodeAppVideos/ocean.mp4"
+		  /*
 		  try {
-			mplayer.setDataSource(controls.activity.getApplicationContext(), Uri.parse(_url));			
+			mplayer.setDataSource(controls.activity.getApplicationContext(), Uri.parse(_url));
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -303,5 +338,61 @@ public class jMediaPlayer implements OnPreparedListener, OnVideoSizeChangedListe
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 	  }
+
+    /*
+    Params : The type of the parameters sent to the task upon execution  //ex. "https://s3.amazonaws.com/TranscodeAppVideos/ocean.mp4"
+    Progress : The type of the progress units published during the background computation
+    Result : The type of the result of the background computation
+     */
+	public class BackgroundAsyncTask extends AsyncTask<String, Uri, String> {
+		ProgressDialog dialog;
+    	protected void onPreExecute() {
+			dialog = new ProgressDialog(controls.activity);
+			dialog.setMessage("Loading, Please Wait...");
+			dialog.setCancelable(true);
+			dialog.show();
+		}
+
+		protected void onProgressUpdate(final Uri... uri) {
+			try {
+ 				mplayer.setDataSource(controls.activity, uri[0]);
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			try {
+				Uri uri = Uri.parse(params[0]);
+				publishProgress(uri);
+			} catch (Exception e) {
+				e.printStackTrace();
+
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String mens) {
+			dialog.dismiss();
+			try {
+				mplayer.prepare();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
 } 

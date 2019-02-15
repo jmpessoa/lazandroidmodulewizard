@@ -7,47 +7,52 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = AndroidModule1Create
   Text = 'AndroidModule1'
   ActivityMode = actMain
-  BackgroundColor = colbrBlack
+  BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 85
+    Left = 63
     Top = 5
-    Width = 150
-    Height = 20
+    Width = 194
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 2106566
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App Media Player Demo1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrLime
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 2106566
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 2
-    Top = 76
-    Width = 314
-    Height = 40
+    Top = 82
+    Width = 316
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jRadioButton1
+    Id = 8113041
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -57,20 +62,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrLightSlateBlue
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
-    Id = 8113041
   end
   object jRadioButton1: jRadioButton
     Left = 5
-    Top = 35
-    Width = 74
+    Top = 41
+    Width = 84
     Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 2222508
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -81,20 +88,22 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     Checked = False
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jRadioButton1Click
-    Id = 2222508
   end
   object jRadioButton2: jRadioButton
-    Left = 242
-    Top = 35
-    Width = 73
+    Left = 231
+    Top = 41
+    Width = 84
     Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpRight]
     LayoutParamWidth = lpWrapContent
@@ -105,20 +114,22 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     Checked = False
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jRadioButton2Click
-    Id = 0
   end
   object jButton2: jButton
     Left = 2
-    Top = 124
-    Width = 314
-    Height = 40
+    Top = 147
+    Width = 316
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton1
+    Id = 2034794
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -128,20 +139,22 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrLightSlateBlue
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
-    Id = 2034794
   end
   object jPanel1: jPanel
     Left = 4
-    Top = 172
-    Width = 308
-    Height = 274
+    Top = 212
+    Width = 312
+    Height = 288
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jButton2
+    Id = 8113042
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -149,17 +162,18 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrLightSlateBlue
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 0
     object jSurfaceView1: jSurfaceView
-      Left = 19
-      Top = 19
-      Width = 269
-      Height = 235
+      Left = 10
+      Top = 10
+      Width = 292
+      Height = 268
       MarginLeft = 10
       MarginTop = 10
       MarginRight = 10
       MarginBottom = 10
+      Enabled = True
       Visible = True
+      Id = 0
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterInParent]
       LayoutParamWidth = lpMatchParent
@@ -168,7 +182,6 @@ object AndroidModule1: TAndroidModule1
       PaintColor = colbrRed
       OnSurfaceCreated = jSurfaceView1SurfaceCreated
       OnSurfaceChanged = jSurfaceView1SurfaceChanged
-      Id = 0
     end
   end
   object jMediaPlayer1: jMediaPlayer

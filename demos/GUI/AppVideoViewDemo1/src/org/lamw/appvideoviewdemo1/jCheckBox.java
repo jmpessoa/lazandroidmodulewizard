@@ -1,7 +1,6 @@
 package org.lamw.appvideoviewdemo1;
 
 import java.lang.reflect.Field;
-
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -9,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CheckBox;
+import android.view.Gravity;
 
 public class jCheckBox extends CheckBox {
 	//Java-Pascal Interface
@@ -40,6 +40,8 @@ public class jCheckBox extends CheckBox {
 	}
 
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		String tag = ""+left+"|"+top+"|"+right+"|"+bottom;
+		this.setTag(tag); //nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 
@@ -63,7 +65,7 @@ public class jCheckBox extends CheckBox {
 		LAMWCommon.setLParamHeight(h);
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
@@ -120,16 +122,15 @@ public class jCheckBox extends CheckBox {
 		this.setText(t);
 	}
 
-	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitInches, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
+	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
 	public void SetFontSizeUnit(int _unit) {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);

@@ -1,7 +1,9 @@
-package org.lamw.appcompatcollapsingtoolbardemo1;
+package com.example.apploadimagevideosoundfrominternet;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.lang.reflect.Field;
 import javax.microedition.khronos.opengles.GL10;
@@ -20,6 +22,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -660,6 +663,72 @@ public class jImageView extends ImageView {
 	public void SetRoundedShape(boolean _value) {
 		mRounded = _value;
 	}
+
+	//https://www.androidhive.info/2012/07/android-loading-image-from-url-http/
+//http://www.viralandroid.com/2015/11/load-image-from-url-internet-in-android.html
+	   /*
+    Params : The type of the parameters sent to the task upon execution  //ex. "https://s3.amazonaws.com/TranscodeAppVideos/ocean.mp4"
+    Progress : The type of the progress units published during the background computation
+    Result : The type of the result of the background computation
+     */
+
+	public void LoadFromURL(String _url) {
+		new LoadImageTask(this).execute(_url);
+	}
+
+	class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
+		ImageView imgView;
+		public LoadImageTask(ImageView iv) {
+			imgView = iv;
+		}
+
+		@Override
+		protected Bitmap doInBackground(String... args) {
+			try {
+				return BitmapFactory.decodeStream((InputStream)new URL(args[0]).getContent());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap bitmap) {
+			if (bitmap != null) {
+				bmp = bitmap;
+				imgView.setImageResource(android.R.color.transparent);
+				if (!mRounded)
+					imgView.setImageBitmap(bmp);
+				else
+					imgView.setImageBitmap(GetRoundedShape(bmp, 0));
+				imgView.invalidate();
+			} else {
+				//
+			}
+		}
+	}
+
+	public void SaveToFile(String _filename) {
+		if (bmp == null) return;
+		Bitmap image = bmp.copy(Bitmap.Config.ARGB_8888, true);
+		Canvas c = new Canvas(image);
+		draw(c);
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(_filename);
+			if (fos != null) {
+				if (_filename.toLowerCase().contains(".jpg"))
+					image.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+				if (_filename.toLowerCase().contains(".png"))
+					image.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+				fos.close();
+			}
+		} catch (Exception e) {
+			Log.e("SaveToFile", "Exception: " + e.toString());
+		}
+	}
+
 }
 
 

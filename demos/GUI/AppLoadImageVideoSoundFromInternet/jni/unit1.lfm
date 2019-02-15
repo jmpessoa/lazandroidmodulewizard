@@ -1,52 +1,57 @@
 object AndroidModule1: TAndroidModule1
   Left = 285
   Top = 163
-  Width = 320
-  Height = 400
+  Width = 419
+  Height = 548
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 35
+    Left = 27
     Top = 5
-    Width = 249
-    Height = 20
+    Width = 365
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 7138094
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'App Get Image Video Sound From Internet'
+    Text = 'Loading Sound, Video and Image From Internet'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    Id = 7138094
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 2
-    Top = 76
-    Width = 92
-    Height = 40
+    Top = 82
+    Width = 139
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jCheckBox1
+    Id = 5324807
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpOneThirdOfParent
@@ -56,45 +61,24 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
-    Id = 5324807
   end
   object jButton2: jButton
-    Left = 114
-    Top = 76
-    Width = 92
-    Height = 40
+    Left = 140
+    Top = 82
+    Width = 139
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jCheckBox1
+    Id = 8462655
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
-    LayoutParamWidth = lpOneThirdOfParent
-    LayoutParamHeight = lpWrapContent
-    Text = 'Image'
-    BackgroundColor = colbrDefault
-    FontColor = colbrDefault
-    FontSize = 0
-    FontSizeUnit = unitDefault
-    OnClick = jButton2Click
-    Id = 8462655
-  end
-  object jButton3: jButton
-    Left = 226
-    Top = 76
-    Width = 92
-    Height = 40
-    MarginLeft = 2
-    MarginTop = 4
-    MarginRight = 2
-    MarginBottom = 4
-    Visible = True
-    Anchor = jCheckBox1
-    PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = [rpRight]
     LayoutParamWidth = lpOneThirdOfParent
     LayoutParamHeight = lpWrapContent
     Text = 'Video'
@@ -102,55 +86,91 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
-    OnClick = jButton3Click
+    GravityInParent = lgNone
+    OnClick = jButton2Click
+  end
+  object jButton3: jButton
+    Left = 278
+    Top = 82
+    Width = 139
+    Height = 57
+    MarginLeft = 2
+    MarginTop = 4
+    MarginRight = 2
+    MarginBottom = 4
+    Enabled = True
+    Visible = True
+    Anchor = jCheckBox1
     Id = 1641892
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Image'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton3Click
   end
   object jImageView1: jImageView
-    Left = 3
-    Top = 269
+    Left = 57
+    Top = 345
     Width = 304
     Height = 128
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
     Visible = True
+    Anchor = jSurfaceView1
+    Id = 1481240
     PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = [rpBottom]
+    PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    ImageIndex = -1
     BackgroundColor = colbrDefault
-    ImageScaleType = scaleCenter
-    Id = 1481240
+    ImageScaleType = scaleFitCenter
+    GravityInParent = lgNone
+    RoundedShape = False
+    OnClick = jImageView1Click
   end
   object jSurfaceView1: jSurfaceView
     Left = 10
-    Top = 130
-    Width = 306
-    Height = 119
+    Top = 153
+    Width = 399
+    Height = 182
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jButton1
+    Id = 3868251
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
-    LayoutParamWidth = lpWrapContent
+    LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneThirdOfParent
     BackgroundColor = colbrDefault
     PaintColor = colbrRed
     OnSurfaceCreated = jSurfaceView1SurfaceCreated
-    Id = 3868251
   end
   object jCheckBox1: jCheckBox
     Left = 5
-    Top = 35
-    Width = 64
+    Top = 41
+    Width = 72
     Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 7678907
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -161,28 +181,17 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     Checked = False
     FontSizeUnit = unitDefault
-    Id = 7678907
-  end
-  object jAsyncTask1: jAsyncTask
-    OnDoInBackground = jAsyncTask1DoInBackground
-    OnPostExecute = jAsyncTask1PostExecute
-    left = 248
-    top = 224
-  end
-  object jImageFileManager1: jImageFileManager
-    left = 136
-    top = 184
   end
   object jDialogProgress1: jDialogProgress
     Title = 'Lamw: Lazarus Android Module Wizard'
     Msg = 'Please, wait...'
-    left = 248
-    top = 168
+    left = 200
+    top = 200
   end
   object jMediaPlayer1: jMediaPlayer
     OnPrepared = jMediaPlayer1Prepared
     OnCompletion = jMediaPlayer1Completion
-    left = 40
-    top = 168
+    left = 64
+    top = 256
   end
 end

@@ -1372,6 +1372,8 @@ type
     function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
     function GetJByteBuffer(_width: integer; _height: integer): jObject;
     function GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
+    procedure LoadFromURL(_url: string);
+    procedure SaveToFile(_filename: string);
 
     property Count: integer read GetCount;
   published
@@ -6222,6 +6224,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jImageView_SetImageFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
+end;
+
+procedure jImageView.LoadFromURL(_url: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_LoadFromURL(FjEnv, FjObject, _url);
+end;
+
+procedure jImageView.SaveToFile(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SaveToFile(FjEnv, FjObject, _filename);
 end;
 
 // Event : Java Event -> Pascal

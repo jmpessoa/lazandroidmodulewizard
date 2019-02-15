@@ -2156,6 +2156,10 @@ public  java.lang.Object jButton_Create(long pasobj ) {
   return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
 
+public  java.lang.Object jCanvas_Create( long pasobj) {
+  return (java.lang.Object)( new jCanvas(this,pasobj));
+}
+
 public java.lang.Object jDrawingView_jCreate(long _Self) {
    return (java.lang.Object)(new jDrawingView(this,_Self));
 }   

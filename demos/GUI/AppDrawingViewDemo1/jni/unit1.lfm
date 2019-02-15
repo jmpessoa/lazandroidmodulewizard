@@ -152,4 +152,13 @@ object AndroidModule1: TAndroidModule1
     left = 224
     top = 56
   end
+  object jCanvas1: jCanvas
+    PaintStrokeWidth = 1
+    PaintStyle = psStroke
+    PaintTextSize = 20
+    PaintColor = colbrBlue
+    Typeface = ffNormal
+    left = 44
+    top = 306
+  end
 end

@@ -19,6 +19,8 @@ type
 
 {jVisualControl template}
 
+{ jDrawingView }
+
 jDrawingView = class(jVisualControl)    //jDrawingView
  private
     FOnDraw      : TOnTouchExtended;
@@ -36,6 +38,13 @@ jDrawingView = class(jVisualControl)    //jDrawingView
 
     FMinZoomFactor: single;
     FMaxZoomFactor: single;
+
+    FMinWorldX: single;
+    FMaxWorldX: single;
+    FMinWorldY: single;
+    FMaxWorldY: single;
+    FScaleX: single;
+    FScaleY: single;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -103,8 +112,6 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure DrawTextOnPath(_path: jObject; _text: string; _horOffest: integer; _verOffeset: integer); overload;
     procedure DrawTextOnPath(_text: string; _xOffest: integer; _yOffeset: integer);  overload;
 
-
-
     procedure DrawText(_text: string; _x: single; _y: single);
     procedure DrawPoint(_x1: single; _y1: single);
     procedure DrawCircle(_cx: single; _cy: single; _radius: single);
@@ -125,8 +132,17 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
     procedure DrawOval(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
 
-    function GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer;
-    function GetViewPortY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewPortHeight: integer): integer;
+    function GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer; overload;
+    function GetViewPortY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewPortHeight: integer): integer;  overload;
+
+    procedure SetViewPortScaleXY(minX: single; maxX: single; minY: single; maxY: single);
+    function GetViewPortY(_worldY: single): integer; overload;
+    function GetViewPortX(_worldX: single): integer; overload;
+
+    function GetWorldY(viewPortY:integer): single;
+    function GetWorldX(viewPortX:integer): single;
+
+
 
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
@@ -567,7 +583,7 @@ begin
      jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 end;
 
-procedure jDrawingView.SetTextSize(_textSize: DWord);
+procedure jDrawingView.SetTextSize(_textsize: DWord);
 begin
   //in designing component state: set value here...
   FFontSize:= _textSize;
@@ -609,8 +625,9 @@ begin
 end;
 *)
 
-Procedure jDrawingView.GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of single;
-                             fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
+procedure jDrawingView.GenEvent_OnDrawingViewTouch(Obj: TObject; Act,
+  Cnt: integer; X, Y: array of Single; fligGesture: integer;
+  pinchZoomGestureState: integer; zoomScaleFactor: single);
 begin
   case Act of
    cTouchDown : begin
@@ -629,8 +646,9 @@ begin
 end;
 // Event : Java Event -> Pascal
 
-Procedure jDrawingView.GenEvent_OnDrawingViewDraw(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
-                             fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
+procedure jDrawingView.GenEvent_OnDrawingViewDraw(Obj: TObject; Act,
+  Cnt: integer; X, Y: array of Single; fligGesture: integer;
+  pinchZoomGestureState: integer; zoomScaleFactor: single);
 begin
   if Assigned(FOnDraw) then
       FOnDraw(Obj,Cnt,X,Y,TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
@@ -933,6 +951,45 @@ begin
      jDrawingView_DrawOval(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF);
 end;
 
+procedure jDrawingView.SetViewPortScaleXY(minX: single; maxX: single; minY: single; maxY: single);
+begin
+    FMinWorldX:= minX;
+    FMaxWorldX:= maxX;
+    FMinWorldY:= minY;
+    FMaxWorldY:= maxY;
+    FScaleX:= 0;
+    if (maxX-minX) <> 0 then FScaleX:=  (Self.Width)/(maxX-minX);
+
+    FScaleY:= 0;
+    if (maxY-minY) <> 0 then FScaleY:= -(Self.Height-10)/(maxY-minY);
+end;
+
+function jDrawingView.GetViewPortX(_worldX: single): integer;
+begin
+  //in designing component state: result value here...
+  Result:=round(FScaleX*(_worldX - FMinWorldX));
+end;
+
+function jDrawingView.GetViewPortY(_worldY: single): integer;
+begin
+  //in designing component state: result value here...
+  Result:= 10+round(FScaleY*(_worldY - FMaxWorldY));
+end;
+
+function jDrawingView.GetWorldX(viewPortX:integer): single;
+begin
+   if FScaleX <> 0 then
+     Result:=(viewPortX+FScaleX*FMinWorldX)/FScaleX
+   else Result:= 0;
+end;
+
+function jDrawingView.GetWorldY(viewPortY:integer): single;
+begin
+   if FScaleY <> 0 then
+     Result:=(viewPortY+FScaleY*FMaxWorldY)/FScaleY
+   else Result:= 0;
+end;
+
 
 function jDrawingView.GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer;
 var
@@ -942,7 +999,7 @@ begin
   if FInitialized then
   begin
      escX:=(_viewPortWidth/(_maxWorldX-_minWorldX));
-     Result:=round(escX*(_worldX-_minWorldX));
+     Result:=round(escX*(_worldX - _minWorldX));
   end;
 end;
 
@@ -953,8 +1010,8 @@ begin
   //in designing component state: result value here...
   if FInitialized then
   begin
-     escY:=-(_viewPortHeight-10)/(_maxWorldY-_minWorldY);
-     Result:= 10+round(escY*(_worldY-_maxWorldY));
+     escY:= -(_viewPortHeight-10)/(_maxWorldY-_minWorldY);
+     Result:= 10+round(escY*(_worldY - _maxWorldY));
   end;
 end;
 

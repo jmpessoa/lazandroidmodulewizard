@@ -16,6 +16,7 @@ type
   TAndroidModule1 = class(jForm)
     jBitmap1: jBitmap;
     jButton1: jButton;
+    jCanvas1: jCanvas;
     jDrawingView1: jDrawingView;
     jImageView1: jImageView;
     jTextView1: jTextView;
@@ -81,6 +82,7 @@ var
    path: jObjectRef;
    i, j: integer;
    px, py: single;
+   scaleX,  scaleY: single;
 begin
    w1:= jDrawingView1.Width;
    h1:= jDrawingView1.Height;
@@ -94,44 +96,44 @@ begin
   }
    //or Frame
    path:= jDrawingView1.GetPath([
-                                0,0, //p1
-                                0,h1-1, //p2
+                                0,0,       //p1
+                                0,h1-1,    //p2
                                 w1-1,h1-1, //p3
-                                w1-1,0, //p4
-                                0,0 //p1
+                                w1-1,0,    //p4
+                                0,0        //p1
                                 ]);
    jDrawingView1.DrawPath(path);
    jDrawingView1.DrawTextOnPath(path, 'FRAME', 0, 0);
 
-   //draw function testF
-   SetLength(points, 18); //-4,-3,-2,-1, 0, 1,2,3,4
+   jDrawingView1.SetViewPortScaleXY(-4 {MinX},4{MaxX}, -5{MinY},5{MaxY});
+
+   //draw function MyFunc
+   SetLength(points, 2*9); //-4,-3,-2,-1, 0, 1,2,3,4   (x,y)
    i:=0;
    for j:= -4  to 4 do
    begin
       px:= j;
       py:= MyFunc(px);
-      points[i]:=   jDrawingView1.GetViewPortX(px, -4, 4, w1); //_minWorldX = -4, maxWorldX = 4
-      points[i+1]:= jDrawingView1.GetViewPortY(py, -5, 5, h1); //minWorldY = -5,  maxWorldY = 5
+      points[i]:= jDrawingView1.GetViewPortX(px);
+      points[i+1]:= jDrawingView1.GetViewPortY(py);
       i:= i + 2;
    end;
    path:=  jDrawingView1.GetPath(points);
 
    jDrawingView1.AddPointsToPath(path,  [  //axis x
-                                          jDrawingView1.GetViewPortX(-4, -4, 4, w1), jDrawingView1.GetViewPortY(0, -5, 5, h1),
-                                          jDrawingView1.GetViewPortX( 4, -4, 4, w1), jDrawingView1.GetViewPortY(0, -5, 5, h1)
+                                          jDrawingView1.GetViewPortX(-4), jDrawingView1.GetViewPortY(0), //p1
+                                          jDrawingView1.GetViewPortX( 4), jDrawingView1.GetViewPortY(0)  //p2
                                         ]);
 
    jDrawingView1.AddPointsToPath(path,  [  //axis y
-                                          jDrawingView1.GetViewPortX(0, -4, 4, w1), jDrawingView1.GetViewPortY(-5, -5, 5, h1),
-                                          jDrawingView1.GetViewPortX(0, -4, 4, w1), jDrawingView1.GetViewPortY(5, -5, 5, h1)
+                                          jDrawingView1.GetViewPortX(0), jDrawingView1.GetViewPortY(-5), //p1
+                                          jDrawingView1.GetViewPortX(0), jDrawingView1.GetViewPortY(5)   //p2
                                         ]);
 
    jDrawingView1.DrawPath(path);
    SetLength(points, 0);
 
-   jDrawingView1.DrawText('F(X) = X * X - 4',
-                           jDrawingView1.GetViewPortX(0, -4, 4, w1), jDrawingView1.GetViewPortY(0, -5, 5, h1)
-                           );
+   jDrawingView1.DrawText('F(X) = X * X - 4', jDrawingView1.GetViewPortX(0), jDrawingView1.GetViewPortY(0));
 
   //jView1.Canvas.PaintStyle:= psFillAndStroke;
   //jDrawingView1.PaintColor:= colbrRed;

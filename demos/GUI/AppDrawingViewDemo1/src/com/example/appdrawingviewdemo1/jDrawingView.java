@@ -15,9 +15,11 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
@@ -565,65 +567,75 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void SetPaintDashPathEffect(float _lineDash, float _dashSpace, float _phase) {
-        mPaint.setPathEffect(new DashPathEffect(new float[] {_lineDash, _dashSpace},_phase));
+        mPaint.setPathEffect(new DashPathEffect(new float[]{_lineDash, _dashSpace}, _phase));
     }
 
     public void SetPaintColor(int _color) {
-		mPaint.setColor(_color);
-	}
+        mPaint.setColor(_color);
+    }
 
-	public void SetTextSize(float _textSize) {
-		mPaint.setTextSize(_textSize);
-	}
+    public void SetTextSize(float _textSize) {
+        mPaint.setTextSize(_textSize);
+    }
 
-	public void SetTypeface(int _typeface) {
-		Typeface t = null;
-		switch (_typeface) {
-			case 0:
-				t = Typeface.DEFAULT;
-				break;
-			case 1:
-				t = Typeface.SANS_SERIF;
-				break;
-			case 2:
-				t = Typeface.SERIF;
-				break;
-			case 3:
-				t = Typeface.MONOSPACE;
-				break;
-		}
-		mPaint.setTypeface(t);
-	}
+    public void SetTypeface(int _typeface) {
+        Typeface t = null;
+        switch (_typeface) {
+            case 0:
+                t = Typeface.DEFAULT;
+                break;
+            case 1:
+                t = Typeface.SANS_SERIF;
+                break;
+            case 2:
+                t = Typeface.SERIF;
+                break;
+            case 3:
+                t = Typeface.MONOSPACE;
+                break;
+        }
+        mPaint.setTypeface(t);
+    }
 
-	public void DrawLine(float _x1, float _y1, float _x2, float _y2) {
-		mCanvas.drawLine(_x1, _y1, _x2, _y2, mPaint);
-	}
+    public void DrawLine(float _x1, float _y1, float _x2, float _y2) {
+        mCanvas.drawLine(_x1, _y1, _x2, _y2, mPaint);
+    }
 
-	public void DrawText(String _text, float _x, float _y) {
-		mCanvas.drawText(_text, _x, _y, mPaint);
-	}
+    public void DrawText(String _text, float _x, float _y) {
+        mCanvas.drawText(_text, _x, _y, mPaint);
+    }
 
-	public void DrawLine(float[] _points) {
-		mCanvas.drawLines(_points, mPaint);
-	}
+    public void DrawLine(float[] _points) {
+        mCanvas.drawLines(_points, mPaint);
+    }
 
-	public void DrawPoint(float _x1, float _y1) {
-		mCanvas.drawPoint(_x1, _y1, mPaint);
-	}
+    public void DrawPoint(float _x1, float _y1) {
+        mCanvas.drawPoint(_x1, _y1, mPaint);
+    }
 
-	public void DrawCircle(float _cx, float _cy, float _radius) {
-		mCanvas.drawCircle(_cx, _cy, _radius, mPaint);
-	}
+    public void DrawCircle(float _cx, float _cy, float _radius) {
+        mCanvas.drawCircle(_cx, _cy, _radius, mPaint);
+    }
 
-	public void DrawBackground(int _color) {
-		mCanvas.drawColor(_color);
-	}
+    public void DrawBackground(int _color) {
+        mCanvas.drawColor(_color);
+    }
 
-	public void DrawRect(float _left, float _top, float _right, float _bottom) {
-		mCanvas.drawRect(_left, _top, _right, _bottom, mPaint);
-	}
+    public void DrawRect(float _left, float _top, float _right, float _bottom) {
+        mCanvas.drawRect(_left, _top, _right, _bottom, mPaint);
+    }
 
-	private int GetDrawableResourceId(String _resName) {
+    //https://thoughtbot.com/blog/android-canvas-drawarc-method-a-visual-guide
+    public void DrawArc(float _leftRectF, float _topRectF, float _rightRectF, float _bottomRectF, float _startAngle, float _sweepAngle, boolean _useCenter) {
+        RectF oval = new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF);
+        mCanvas.drawArc(oval, _startAngle, _sweepAngle, _useCenter, mPaint);
+    }
+
+    public void DrawOval(float _leftRectF, float _topRectF, float _rightRectF, float _bottomRectF) {
+        mCanvas.drawOval(new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF), mPaint);
+    }
+
+    private int GetDrawableResourceId(String _resName) {
 		try {
 			Class<?> res = R.drawable.class;
 			Field field = res.getField(_resName);  //"drawableName"
