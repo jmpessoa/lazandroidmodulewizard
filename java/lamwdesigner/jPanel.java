@@ -137,7 +137,28 @@ public class jPanel extends RelativeLayout {
 		@Override
 		public boolean onDown(MotionEvent event) {
 			//Log.i("Down", "------------");
+			
 			return true;
+		}
+		
+		@Override
+		public boolean onSingleTapUp(MotionEvent e) {
+			//Log.i("Click", "------------");
+			controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
+			return true;
+		}
+		
+		@Override
+		public boolean onDoubleTap(MotionEvent e) {
+			//Log.i("DoubleTap", "------------");
+			
+			return true;
+		}
+		
+		@Override
+		public void onLongPress(MotionEvent e) {
+			//Log.i("LongPress", "------------");
+			
 		}
 
 		@Override
