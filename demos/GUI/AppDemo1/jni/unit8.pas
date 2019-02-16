@@ -53,10 +53,19 @@ procedure TAndroidModule8.jButton1Click(Sender: TObject);
 var
   filename : String;
 begin
-  filename := 'custom_view_test.png';
-  jView1.SaveToFile(filename);
-  showMessage('Save to '+fileName);
-  jImageView1.SetImage(jView1.GetImage());
+
+ jImageView1.SetImage(jView1.GetImage());
+
+  //hint: if you  get "write" permission then you have "read", too!
+ if IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
+ begin
+    filename := 'custom_view_test.png';
+    jView1.SaveToFile(GetFilePath(jView1.FilePath) + '/' + filename);   //intern app file...
+    jView1.SaveToFile(Self.GetEnvironmentDirectoryPath(dirDownloads) + '/custom_view_test.png');
+    showMessage('Save to [internal app storage and download] : '+fileName);
+ end
+ else  ShowMessage('Sorry... [android.permission.WRITE_EXTERNAL_STORAGE] denied... ' );
+
 end;
 
 procedure TAndroidModule8.jView1Draw(Sender: TObject);

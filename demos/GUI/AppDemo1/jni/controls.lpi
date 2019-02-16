@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -18,15 +18,13 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <VersionInfo>
-      <StringTable ProductVersion=""/>
-    </VersionInfo>
-    <CustomData Count="5">
-      <Item0 Name="LAMW" Value="GUI"/>
-      <Item1 Name="LamwVersion" Value="0.7"/>
-      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
-      <Item3 Name="Package" Value="com.example.appdemo1"/>
-      <Item4 Name="SdkPath" Value="C:\adt32\sdk\"/>
+    <CustomData Count="6">
+      <Item0 Name="BuildSystem" Value="Ant"/>
+      <Item1 Name="LAMW" Value="GUI"/>
+      <Item2 Name="LamwVersion" Value="0.8.3"/>
+      <Item3 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
+      <Item4 Name="Package" Value="com.example.appdemo1"/>
+      <Item5 Name="SdkPath" Value="C:\adt32\sdk\"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -57,7 +55,7 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jForm;jImageList;jImageView;jTextView;jTimer"/>
+          <Item0 Name="jControls" Value="jImageList;jImageView;jTextView;jTimer"/>
         </CustomData>
       </Unit1>
       <Unit2>
@@ -66,7 +64,7 @@
         <ComponentName Value="AndroidModule2"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jForm;jImageList;jImageView;jTextView"/>
+          <Item0 Name="jControls" Value="jButton;jImageList;jImageView;jTextView"/>
         </CustomData>
       </Unit2>
       <Unit3>
@@ -75,7 +73,7 @@
         <ComponentName Value="AndroidModule3"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCheckBox;jDialogProgress;jDialogYN;jEditText;jForm;jImageList;jImageView;jProgressBar;jRadioButton;jTextView;jTimer"/>
+          <Item0 Name="jControls" Value="jButton;jCheckBox;jDialogProgress;jDialogYN;jEditText;jImageList;jImageView;jProgressBar;jRadioButton;jTextView;jTimer"/>
         </CustomData>
       </Unit3>
       <Unit4>
@@ -102,7 +100,7 @@
         <ComponentName Value="AndroidModule6"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jBitmap;jButton;jEditText;jForm;jImageList;jListView;jTextView"/>
+          <Item0 Name="jControls" Value="jBitmap;jButton;jEditText;jImageList;jListView;jTextView"/>
         </CustomData>
       </Unit6>
       <Unit7>
@@ -111,7 +109,7 @@
         <ComponentName Value="AndroidModule7"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jForm;jImageBtn;jImageList;jImageView;jScrollView;jTextView"/>
+          <Item0 Name="jControls" Value="jImageBtn;jImageList;jImageView;jScrollView;jTextView"/>
         </CustomData>
       </Unit7>
       <Unit8>
@@ -120,7 +118,7 @@
         <ComponentName Value="AndroidModule8"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jBitmap;jButton;jCanvas;jForm;jImageList;jImageView;jTextView;jView"/>
+          <Item0 Name="jControls" Value="jBitmap;jButton;jCanvas;jImageList;jImageView;jTextView;jView"/>
         </CustomData>
       </Unit8>
       <Unit9>
@@ -129,7 +127,7 @@
         <ComponentName Value="AndroidModule9"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jBitmap;jButton;jCanvas;jForm;jImageList;jTextView;jView"/>
+          <Item0 Name="jControls" Value="jBitmap;jButton;jCanvas;jImageList;jTextView;jView"/>
         </CustomData>
       </Unit9>
       <Unit10>
@@ -138,7 +136,7 @@
         <ComponentName Value="AndroidModule10"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCanvasES1;jForm;jImageList;jTextView"/>
+          <Item0 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView"/>
         </CustomData>
       </Unit10>
       <Unit11>
@@ -147,7 +145,7 @@
         <ComponentName Value="AndroidModule11"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCanvasES2;jForm;jImageList;jTextView;jTimer"/>
+          <Item0 Name="jControls" Value="jButton;jCanvasES2;jImageList;jTextView;jTimer"/>
         </CustomData>
       </Unit11>
       <Unit12>
@@ -156,7 +154,7 @@
         <ComponentName Value="AndroidModule12"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCanvasES1;jForm;jImageList;jTextView"/>
+          <Item0 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView"/>
         </CustomData>
       </Unit12>
       <Unit13>
@@ -187,7 +185,7 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="..\libs\armeabi\libcontrols"/>
+      <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
       <Libraries Value="C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
@@ -214,7 +212,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\adt32\ndk10e\\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

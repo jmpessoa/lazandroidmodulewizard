@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
+import android.view.Gravity;
 
 public class jRadioButton extends RadioButton {
 	//Java-Pascal Interface
@@ -82,7 +83,7 @@ public class jRadioButton extends RadioButton {
 		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 

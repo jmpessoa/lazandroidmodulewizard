@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -18,15 +18,13 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <VersionInfo>
-      <StringTable ProductVersion=""/>
-    </VersionInfo>
-    <CustomData Count="5">
-      <Item0 Name="LAMW" Value="GUI"/>
-      <Item1 Name="LamwVersion" Value="0.7"/>
-      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
-      <Item3 Name="Package" Value="com.example.appdrawingviewdemo1"/>
-      <Item4 Name="SdkPath" Value="C:\adt32\sdk\"/>
+    <CustomData Count="6">
+      <Item0 Name="BuildSystem" Value="Ant"/>
+      <Item1 Name="LAMW" Value="GUI"/>
+      <Item2 Name="LamwVersion" Value="0.8.3"/>
+      <Item3 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
+      <Item4 Name="Package" Value="com.example.appdrawingviewdemo1"/>
+      <Item5 Name="SdkPath" Value="C:\adt32\sdk\"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -55,7 +53,7 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jBitmap;jButton;jDrawingView;jImageView;jTextView"/>
+          <Item0 Name="jControls" Value="jBitmap;jButton;jCanvas;jDrawingView;jForm;jImageView;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>
@@ -64,7 +62,7 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="..\libs\armeabi\libcontrols"/>
+      <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
       <Libraries Value="C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
@@ -96,7 +94,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\adt32\ndk10e\\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

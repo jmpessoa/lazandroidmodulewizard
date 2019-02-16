@@ -290,7 +290,7 @@ var
   auxList: TStringList;
   flag: boolean;
   i, p1: integer;
-  mylib: string;
+  mylib, strAux: string;
   methodName: string;
   auxSignature: string;
   foundResult: string;
@@ -298,7 +298,6 @@ var
   len: integer;
   index_TYPE_line: integer;
   index_IFDEF_line: integer;
-
   new_TYPE: string;
 begin
   mylib:= 'lib'+libName+'.so';
@@ -368,6 +367,12 @@ begin
              end;
 
            end;
+         end;
+
+         if Pos('{$include ', auxList.Strings[i]) > 0 then
+         begin
+           strAux:= auxList.Strings[i];
+           auxList.Strings[i]:= StringReplace(strAux, '{$include ' , '//include ', [rfIgnoreCase]);
          end;
 
          if Pos('cdecl', auxList.Strings[i]) > 0 then
@@ -491,7 +496,7 @@ begin
     p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
     pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
 
-    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
     with TIniFile.Create(fileName) do
     try
       pathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
@@ -538,8 +543,8 @@ begin
           list.Clear;
           list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'buildgradle.txt');
 
-          if StrToInt(targetApi) < 21 then targetApi:= '21';
-          if StrToInt(targetApi) > 25 then targetApi:= '25';
+          if StrToInt(targetApi) < 25 then targetApi:= '25';
+          //if StrToInt(targetApi) > 25 then targetApi:= '25';
 
           tmpStr:= StringReplace(list.Text,'#sdkapi', targetApi, [rfReplaceAll]);
           list.Text:= tmpStr;
@@ -629,7 +634,7 @@ begin
        end;
 
        pathToNdk:= Project.CustomData.Values['NdkPath'];  //<Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
-       ndkPlatform:= GetNdkPlatform(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+       ndkPlatform:= GetNdkPlatform(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
 
        p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
        pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
@@ -1014,12 +1019,12 @@ begin
            importedFile:= 'im_'+ importedFile;  //the file name can not be init by number...
          end;
 
-         if Length(importedFile) > 20 then
+         if Length(importedFile) > 25 then
          begin
            p:= LastDelimiter('.', importedFile);
            imageExt:= Copy(importedFile, p, MaxInt);
            strTemp:= Copy(importedFile, 1, p-1);
-           importedFile:= Copy(strTemp, 1, 16) + imageExt;
+           importedFile:= Copy(strTemp, 1, 21) + imageExt;
          end;
 
          hasCopied:= False;
@@ -1028,6 +1033,8 @@ begin
             CopyFile(FormImportPicture.PictureFile, pathToProject+'assets'+PathDelim+importedFile);
             hasCopied:= True;
          end;
+
+         ForceDirectories(pathToProject+'res'+PathDelim+'drawable');
 
          count:= FormImportPicture.CheckGroupTarget.Items.Count;
          for i:= 1 to count-1 do
@@ -1096,7 +1103,7 @@ begin
 
       pathToProject:= Copy(Project.ProjectInfoFile, 1, p+3);
 
-      fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+      fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
       with TIniFile.Create(fileName) do
       try
         pathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
@@ -1131,6 +1138,7 @@ begin
               if FileExists(fullPathToUnitSourceLFM) then
               begin
                 listUnit.LoadFromFile(fullPathToUnitSourceLFM);
+
                 p:= Pos(':', listUnit.Strings[0]);   //object AndroidModule1: TAndroidModule1
                 sourceFormName:=  Trim(Copy(listUnit.Strings[0], p+3, MaxInt)); //AndroidModule1
                 for i:= 1 to listUnit.Count-1 do
@@ -1139,7 +1147,7 @@ begin
                   begin
                      p:= Pos(':', listUnit.Strings[i]);
                      compName:= Trim(Copy(listUnit.Strings[i], p+2, MaxInt));
-                     if FileExists(pathToJavaTemplates+PathDelim+'lamwdesigner'+PathDelim+compName+'.java')  then
+                     if FileExists(pathToJavaTemplates+PathDelim+'smartdesigner'+PathDelim+compName+'.java')  then
                      begin
                        listComponent.Add(compName);
                      end;
@@ -1161,7 +1169,7 @@ begin
     begin
        if not FileExists(pathToJavasSrc+PathDelim+listComponent.Strings[i]+'.java') then
        begin
-          listTemp.LoadFromFile(pathToJavaTemplates+PathDelim+'lamwdesigner'+PathDelim+listComponent.Strings[i]+'.java');
+          listTemp.LoadFromFile(pathToJavaTemplates+PathDelim+'smartdesigner'+PathDelim+listComponent.Strings[i]+'.java');
           listTemp.Strings[0]:= 'package '+ package +';';
           listTemp.SaveToFile(pathToJavasSrc+PathDelim+listComponent.Strings[i]+'.java');
        end;
@@ -1171,6 +1179,7 @@ begin
     listTemp.LoadFromFile(fullPathToUnitSourceLFM);
     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
     listTemp.Text:= tempStr;
+    ShowMessage(fullPathToUnitTarget);
     listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
 
     listTemp.Clear;
@@ -1185,9 +1194,35 @@ begin
     Project.Files[listIndex+1].CustomData['jControls']:= listComponent.DelimitedText;
 
     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
-                'Hint: "Run --> Build" and accept [Reload checked files from disk]!' + sLineBreak +
-                '[Close](Re)"Open" the project to update the form display content ...' + sLineBreak +
-                'Or close the form unit tab and reopen it [Project Inspector...] to see the content changes...');
+                'Hints:'+ sLineBreak +
+                '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
+                '.(Re)"Open" the project to update the form display content ...' + sLineBreak +
+                '      Or close the form unit tab and reopen it [Project Inspector...]'+ sLineBreak +
+                '      to see the content changes...');
+  end
+  else
+  begin
+     listTemp.Clear;
+     listTemp.LoadFromFile(fullPathToUnitSourceLFM);
+     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
+     listTemp.Text:= tempStr;
+     ShowMessage(fullPathToUnitTarget);
+     listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
+
+     listTemp.Clear;
+     listTemp.LoadFromFile(ChangeFileExt(fullPathToUnitSourceLFM, '.pas'));
+     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
+     listTemp.Text:= tempStr;
+     listTemp.Strings[0]:= 'unit '+ChangeFileExt(ExtractFileName(fullPathToUnitTarget),'') +';';
+     listTemp.Strings[1]:='//';
+     listTemp.SaveToFile(fullPathToUnitTarget);
+
+     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
+                'Hints:'+ sLineBreak +
+                '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
+                '.(Re)"Open" the project to update the form display content ...' + sLineBreak +
+                '      Or close the form unit tab and reopen it [Project Inspector...]'+ sLineBreak +
+                '      to see the content changes...');
   end;
 
   listTemp.Free;
@@ -1208,7 +1243,7 @@ begin
   //Project := LazarusIDE.ActiveProject;
   {if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
   begin}
-    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+    fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
     with TIniFile.Create(fileName) do
     try
       setting:= ReadString('NewProject','CanUpdateJavaTemplate', '');

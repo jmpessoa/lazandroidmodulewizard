@@ -1,6 +1,6 @@
 package org.lamw.apphttpclientdemo3;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.2  - 21 August  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.2.5  - 13 December  - 2018 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -70,6 +70,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.os.Build;
@@ -104,6 +105,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
@@ -668,20 +670,32 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
-	    
-	        Drawable res = null;	    
-		if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21		
+        Drawable res = null;
+
+        if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21
  			res = this.controls.activity.getResources().getDrawable(_resID);
  		}
- 	
-                //[ifdef_api21up]	 		
+
+ 		//[ifdef_api21up]
  		if(Build.VERSION.SDK_INT >= 21) {  			
  		   res = this.controls.activity.getResources().getDrawable(_resID, null);
- 		} 
-                //[endif_api21up]			
+ 		}//[endif_api21up]
 
  		return res;
 }
+
+	public void SetBackgroundImage(String _imageIdentifier) {
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
+		ImageView image = new ImageView(controls.activity);
+        LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        image.setLayoutParams(param);
+		image.setImageResource(android.R.color.transparent);
+		image.setImageDrawable(d);
+		//image.invalidate();
+		layout.addView(image);
+	}
+
 
 //by  thierrydijoux
 public String GetQuantityStringByName(String _resName, int _quantity) {
@@ -697,8 +711,10 @@ public String GetStringResourceByName(String _resName) {
 	return value;
 }   
 
-public ActionBar GetActionBar() { 
-    return this.controls.activity.getActionBar();
+public ActionBar GetActionBar() {
+    if (! jCommons.IsAppCompatProject() ) {
+		return (controls.activity).getActionBar();
+	} else return null;
 }
 
 /*
@@ -708,82 +724,70 @@ public ActionBar GetActionBar() {
  */
 
 public void HideActionBar() {
- ActionBar actionBar = this.controls.activity.getActionBar(); 
- actionBar.hide();          
+	jCommons.ActionBarHide(controls);
 }
 
-public void ShowActionBar() {	         
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.show();
+public void ShowActionBar() {
+	jCommons.ActionBarShow(controls);
 }
 
 //Hide the title label
 public void ShowTitleActionBar(boolean _value) {
-	ActionBar actionBar = this.controls.activity.getActionBar();
-    actionBar.setDisplayShowTitleEnabled(_value);
+	jCommons.ActionBarShowTitle(controls, _value);
 }
 
 //Hide the logo = false
-public void ShowLogoActionBar(boolean _value) { 
-   ActionBar actionBar = this.controls.activity.getActionBar();	    
-   actionBar.setDisplayShowHomeEnabled(_value);
+public void ShowLogoActionBar(boolean _value) {
+	jCommons.ActionBarShowLogo(controls, _value);
 }
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetTitleActionBar(String _title) {
-	ActionBar actionBar = this.controls.activity.getActionBar();   	
-    actionBar.setTitle(_title);    
+	jCommons.SetActionBarTitle(controls, _title);
 }
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetSubTitleActionBar(String _subtitle) {
-   ActionBar actionBar = this.controls.activity.getActionBar();    
-   actionBar.setSubtitle(_subtitle);
-   //actionBar.setDisplayHomeAsUpEnabled(true);  
+   jCommons.SetActionBarSubTitle(controls, _subtitle);
 }
 
 //forward [<] activity! // If your minSdkVersion is 11 or higher!
 /*.*/public void SetDisplayHomeAsUpEnabledActionBar(boolean _value) {
-   ActionBar actionBar = this.controls.activity.getActionBar();    
-   actionBar.setDisplayHomeAsUpEnabled(_value);
+	jCommons.ActionBarDisplayHomeAsUpEnabled(controls, _value);
 }	
 
 public void SetIconActionBar(String _iconIdentifier) {
 //[ifdef_api14up]
-  ActionBar actionBar = this.controls.activity.getActionBar();   	
-  actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
+	jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
 }
 
 public void SetTabNavigationModeActionBar(){
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	//API 11
-	actionBar.setSelectedNavigationItem(0);
+	jCommons.ActionBarSetTabNavigationMode(controls);
 }
 
 //This method remove all tabs from the action bar and deselect the current tab
 public void RemoveAllTabsActionBar() {
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.removeAllTabs();
-    this.controls.activity.invalidateOptionsMenu(); // by renabor
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
+	jCommons.ActionBarRemoveAllTabs(controls);
 }
 
 //Calculate ActionBar height
 //ref http://stackoverflow.com/questions/12301510/how-to-get-the-actionbar-height
 public int GetActionBarHeight() {
-int actionBarHeight = 0;
-TypedValue tv = new TypedValue();
-if (controls.activity.getActionBar().isShowing()) {  
-   if (controls.activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-      actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,controls.activity.getResources().getDisplayMetrics());
-   }
-}
-return actionBarHeight;
+  return jCommons.ActionGetBarBarHeight(controls);
 }
 
 public boolean ActionBarIsShowing() {
-  return controls.activity.getActionBar().isShowing();
+	return jCommons.ActionBarIsShowing(controls);
+}
+
+public boolean HasActionBar() {
+	return jCommons.HasActionBar(controls);
+}
+
+public boolean IsAppCompatProject () {
+	return jCommons.IsAppCompatProject();
 }
 
 public boolean IsPackageInstalled(String _packagename) {
@@ -1379,6 +1383,23 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	public void RequestRuntimePermission(String _androidPermission, int _requestCode) {  //"android.permission.CAMERA"
 		jCommons.RequestRuntimePermission(controls, _androidPermission, _requestCode);
 	}
+
+	public void RequestRuntimePermission(String[] _androidPermissions, int _requestCode) {  //"android.permission.CAMERA"
+		jCommons.RequestRuntimePermission(controls, _androidPermissions, _requestCode);
+	}
+
+	//by TR3E
+	public int getScreenWidth( ){
+		return this.controls.activity.getResources().getDisplayMetrics().widthPixels;
+	}
+	//by TR3E
+	public int getScreenHeight( ){
+		return this.controls.activity.getResources().getDisplayMetrics().heightPixels;
+	}
+	//by TR3E
+	public String getSystemVersionString(){
+		return android.os.Build.VERSION.RELEASE;
+	}
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1525,6 +1546,27 @@ public  void classChkNull (Class<?> object) {
 
 public Context GetContext() {   
    return this.activity; 
+}
+
+//by TR3E Software
+public int getContextTop(){
+ ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
+ 
+ if( view != null)
+ 	return view.getTop();
+ else
+ 	return 0;
+	
+}
+
+//by  TR3E Software
+public int getStatusBarHeight() {
+	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+	
+	if ( resourceId > 0 )
+		return this.activity.getResources().getDimensionPixelSize(resourceId);
+	else
+		return 0;
 }
 
 //by  thierrydijoux

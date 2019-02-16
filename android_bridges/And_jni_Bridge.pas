@@ -185,6 +185,7 @@ procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_ClearLayoutAll(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetFrameGravity(env: PJNIEnv; _jtextview: JObject; _value: integer);
 procedure jTextView_RemoveFromViewParent(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_SetAllCaps(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -320,6 +321,7 @@ procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: 
 procedure jButton_SetEnabled(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 procedure jButton_ClearLayoutAll(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetFrameGravity(env: PJNIEnv; _jbutton: JObject; _value: integer);
+procedure jButton_SetAllCaps(env: PJNIEnv; _jbutton: JObject; _value: Boolean);
 procedure jButton_RemoveFromViewParent(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetFocus(env: PJNIEnv; _jbutton: JObject);
 
@@ -456,6 +458,12 @@ procedure jImageView_SetRotation(env: PJNIEnv; _jimageview: JObject; angle: inte
 
 function  jImageView_SaveToJPG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
 function  jImageView_SaveToPNG(env: PJNIEnv; _jimageview: JObject; filePath: string; cuality: integer; angle: integer): boolean;
+function  jImageView_GetByteBuffer(env: PJNIEnv; _jimageview: JObject; _width: integer; _height: integer): jObject;
+function  jImageView_GetBitmapFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _byteBuffer: jObject; _width: integer; _height: integer): jObject;
+procedure jImageView_SetRoundedShape(env: PJNIEnv; _jimageview: JObject; _value: boolean);
+procedure jImageView_SetImageFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _jbyteBuffer: jObject; _width: integer; _height: integer);
+procedure jImageView_LoadFromURL(env: PJNIEnv; _jimageview: JObject; _url: string);
+procedure jImageView_SaveToFile(env: PJNIEnv; _jimageview: JObject; _filename: string);
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -713,6 +721,7 @@ function  jWebView_CanGoForward(env: PJNIEnv; _jwebview: JObject): boolean;
 procedure jWebView_GoBack(env: PJNIEnv; _jwebview: JObject);
 procedure jWebView_GoBackOrForward(env: PJNIEnv; _jwebview: JObject; steps: integer);
 procedure jWebView_GoForward(env: PJNIEnv; _jwebview: JObject);
+procedure jWebView_ScrollTo(env: PJNIEnv; _jwebview: JObject; _x, _y: integer);
 
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
@@ -732,8 +741,8 @@ Procedure jCanvas_SetTypeface          (env:PJNIEnv;
                                         Canv : jObject; _typeface: integer);
 Procedure jCanvas_drawText             (env:PJNIEnv;
                                         Canv : jObject; const text : string; x, y : single);
-Procedure jCanvas_drawLine             (env:PJNIEnv;
-                                        Canv : jObject; x1,y1,x2,y2 : single);
+Procedure jCanvas_drawLine(env:PJNIEnv; Canv : jObject; x1,y1,x2,y2 : single); overload;
+procedure jCanvas_drawLine(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle);  overload;
 // LORDMAN 2013-08-13
 Procedure jCanvas_drawPoint            (env:PJNIEnv;
                                         Canv:jObject; x1,y1:single);
@@ -751,6 +760,13 @@ procedure jCanvas_drawBitmap           (env: PJNIEnv;
                                         _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
 procedure jCanvas_setCanvas(env: PJNIEnv; _jcanvas: JObject; _canvas: jObject);
 procedure jCanvas_drawTextAligned(env: PJNIEnv; Canv: jObject; const _text: string; _left, _top, _right, _bottom, _alignhorizontal , _alignvertical: single);
+function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle): jObject; overload;
+function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single): jObject; overload;
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle); overload;
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single); overload;
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _path: jObject);  overload;
+procedure jCanvas_DrawArc(env: PJNIEnv; _jcanvas: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+
 
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;
@@ -1941,6 +1957,19 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
  env^.CallVoidMethod(env,_jtextview,_jMethod);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jTextView_SetAllCaps(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAllCaps', '(Z)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------
@@ -3304,6 +3333,19 @@ begin
   jParams[0].i:= _value;
   jCls:= env^.GetObjectClass(env, _jbutton);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jButton_SetAllCaps(env: PJNIEnv; _jbutton: JObject; _value: Boolean);
+var
+  jMethod: jMethodID = nil;
+  jParams: array[0..0] of jValue;
+  jCls: jClass = nil;
+begin
+  jParams[0].z := JBool(_value);
+  jCls := env^.GetObjectClass(env, _jbutton);
+  jMethod := env^.GetMethodID(env, jCls, 'SetAllCaps', '(Z)V');
   env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -4730,6 +4772,92 @@ begin
   env^.CallVoidMethod(env, _jimageview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jImageView_GetByteBuffer(env: PJNIEnv; _jimageview: JObject; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _width;
+  jParams[1].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetByteBuffer', '(II)Ljava/nio/ByteBuffer;');
+  Result:= env^.CallObjectMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jImageView_GetBitmapFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _byteBuffer: jObject; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _byteBuffer;
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromByteBuffer', '(Ljava/nio/ByteBuffer;II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetRoundedShape(env: PJNIEnv; _jimageview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundedShape', '(Z)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetImageFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _jbyteBuffer: jObject; _width: integer; _height: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _jbyteBuffer;
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageFromByteBuffer', '(Ljava/nio/ByteBuffer;II)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_LoadFromURL(env: PJNIEnv; _jimageview: JObject; _url: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_url));
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromURL', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SaveToFile(env: PJNIEnv; _jimageview: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // ListView
@@ -7327,7 +7455,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jWebView_setLParamWidth(env:PJNIEnv; WebView : jObject; w: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7354,7 +7481,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'setLParamHeight', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jWebView_addLParamsParentRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7368,7 +7494,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'addLParamsParentRule', '(I)V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jWebView_addLParamsAnchorRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 var
  _jMethod : jMethodID = nil;
@@ -7438,6 +7563,20 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromHtmlString', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jWebView_ScrollTo(env: PJNIEnv; _jwebview: JObject; _x, _y: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _x;
+  jParams[1].i:= _y;
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'scrollTo', '(II)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -7581,6 +7720,25 @@ begin
  _jMethod:= env^.GetMethodID(env, cls, 'drawLine', '(FFFF)V');
  env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jCanvas_drawLine(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'drawLine', '([F)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 // LORDMAN 2013-08-13
@@ -7733,6 +7891,117 @@ var
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
+
+
+function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetNewPath', '([F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jCanvas_GetNewPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetNewPath', '([F)Landroid/graphics/Path;');
+  Result:= env^.CallObjectMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '([F)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _points: array of single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_points);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_points[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '([F)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _path: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _path;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '(Landroid/graphics/Path;)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_DrawArc(env: PJNIEnv; _jcanvas: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+var
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _leftRectF;
+  jParams[1].f:= _topRectF;
+  jParams[2].f:= _rightRectF;
+  jParams[3].f:= _bottomRectF;
+  jParams[4].f:= _startAngle;
+  jParams[5].f:= _sweepAngle;
+  jParams[6].z:= JBool(_useCenter);
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawArc', '(FFFFFFZ)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // Bitmap

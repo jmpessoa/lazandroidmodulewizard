@@ -5,7 +5,7 @@ unit radiogroup;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls;
+  Classes, SysUtils, And_jni, AndroidWidget, systryparent;
 
 type
 
@@ -151,6 +151,7 @@ var
   rToA: TPositionRelativeToAnchorID;
   i: integer;
 begin
+
   if not FInitialized  then
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!

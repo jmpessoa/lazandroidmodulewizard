@@ -1,6 +1,6 @@
 package com.example.appdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.7 - rev. 22 - 21 October - 2017
+//Lamw: Lazarus Android Module Wizard - version 0.8.3  - 26 January - 2019
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -21,9 +21,6 @@ package com.example.appdemo1;
 
 
 import java.lang.Override;
-
-
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -42,7 +39,7 @@ import android.util.Log;
 
 public class App extends Activity {
     
-	private Controls       controls;
+    private Controls       controls;
 	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,7 +75,17 @@ public class App extends Activity {
       
       //Log.i("jApp","03.Controls.jAppOnCreate");
     }
-       
+
+   //[ifdef_api23up]
+    @Override
+    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+        if ( (permissions.length > 0) && (grantResults.length > 0) ) {
+            for (int i = 0; i < permissions.length; i++) {
+                controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[i], grantResults[i]);
+            }
+        }
+    } //[endif_api23up]
+
     @Override    
     protected void onNewIntent(Intent intent) {
     	super.onNewIntent(intent);

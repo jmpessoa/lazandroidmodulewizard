@@ -2,148 +2,196 @@ package com.example.appopenfiledialogdemo1;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.lang.reflect.Field;
 import javax.microedition.khronos.opengles.GL10;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Path;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+//import android.support.design.widget.CollapsingToolbarLayout;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.view.Gravity;
+import android.view.MotionEvent;
 
+
+import java.io.FileOutputStream;
+import java.io.File;
 
 public class jImageView extends ImageView {
 	//Pascal Interface
 	private long           PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Cass for Event
+	private jCommons LAMWCommon;
 	//
-	private ViewGroup       parent   = null;   // parent view
-	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
 	private OnClickListener onClickListener;   //
 	public  Bitmap          bmp      = null;   //
-
-	//by jmpessoa
-	private int lparamsAnchorRule[] = new int[30];
-	int countAnchorRule = 0;
-
-	private int lparamsParentRule[] = new int[30];
-	int countParentRule = 0;
-
-	int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT; //h
-	int lparamW = android.view.ViewGroup.LayoutParams.WRAP_CONTENT; //w
-	int marginLeft = 5;
-	int marginTop = 5;
-	int marginRight = 5;
-	int marginBottom = 5;
- //[ifdef_api14up]
- private int lgravity = Gravity.TOP | Gravity.START;
- //[endif_api14up]
- /* //[endif_api14up]
- private int lgravity = Gravity.TOP | Gravity.LEFT;
- //[ifdef_api14up] */
-	private float lweight = 0;
-
+	public  int             mAngle   = 0;
+	
 	Matrix mMatrix;
+	int mRadius = 20;
 
-	//by jmpessoa
-	public void setMarginRight(int x) {
-		marginRight = x;
-	}
+	boolean mRounded = false;
 
-	//by jmpessoa
-	public void setMarginBottom(int y) {
-		marginBottom = y;
-	}
 	//Constructor
-	public  jImageView(android.content.Context context,
-					   Controls ctrls,long pasobj ) {
+	public  jImageView(android.content.Context context, Controls ctrls, long pasobj ) {
 		super(context);
 
 		//Connect Pascal I/F
 		PasObj   = pasobj;
 		controls = ctrls;
-
-		//Init Class
-		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
-
-		//setAdjustViewBounds(false);
+		LAMWCommon = new jCommons(this,context,pasobj);
+		
+		if (Build.VERSION.SDK_INT >= 21) {
+			//[ifdef_api21up]
+	     //this.setFitsSystemWindows(true);
+	     	//[endif_api21up]
+		}
+		
 		setScaleType(ImageView.ScaleType.CENTER);
 		mMatrix = new Matrix();
 
 		//Init Event
-		onClickListener = new OnClickListener() {
+		/*onClickListener = new OnClickListener() {
 			public  void onClick(View view) {
 				controls.pOnClick(PasObj,Const.Click_Default);
 			}
 		};
 
-		setOnClickListener(onClickListener);
-
-		//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux
+		setOnClickListener(onClickListener);*/
+		//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux			
+	}
+	
+	public  boolean onTouchEvent( MotionEvent event) {
+	      			
+		int act     = event.getAction() & MotionEvent.ACTION_MASK;
+		switch(act) {
+			case MotionEvent.ACTION_DOWN: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}	
+			case MotionEvent.ACTION_MOVE: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchMove,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchMove,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+			case MotionEvent.ACTION_UP: {
+				
+				controls.pOnClick(PasObj,Const.Click_Default);
+				
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+			case MotionEvent.ACTION_POINTER_DOWN: {
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchDown,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchDown,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+			case MotionEvent.ACTION_POINTER_UP  : {
+				
+				controls.pOnClick(PasObj,Const.Click_Default);
+				
+				switch (event.getPointerCount()) {
+					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
+							event.getX(0),event.getY(0),0,0); break; }
+					default: { controls.pOnTouch (PasObj,Const.TouchUp  ,2,
+							event.getX(0),event.getY(0),
+							event.getX(1),event.getY(1));     break; }
+				}
+				break;}
+		}
+		return true;
 	}
 
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-		marginLeft = _left;
-		marginTop = _top;
-		marginRight = _right;
-		marginBottom = _bottom;
-		lparamH = _h;
-		lparamW = _w;
+		 String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
+	         this.setTag(tag);  //nedd by jsRecyclerView.java
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
-	private static MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-		if (aparent instanceof FrameLayout) {
-			return new FrameLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof RelativeLayout) {
-			return new RelativeLayout.LayoutParams(baseparams);
-		} else if (aparent instanceof LinearLayout) {
-			return new LinearLayout.LayoutParams(baseparams);
-		} else if (aparent == null) {
-			throw new NullPointerException("Parent is null");
-		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ aparent.getClass().getName());
-		}
-	}
 
 	public  void setParent( android.view.ViewGroup _viewgroup ) {
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-
-		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		lparams = null;
-		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
+		LAMWCommon.setParent(_viewgroup);
 	}
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
-		if (parent != null) { parent.removeView(this); }
 		if (bmp    != null) { bmp.recycle(); }
 		bmp     = null;
 		setImageBitmap(null);
-		lparams = null;
 		setImageResource(0); //android.R.color.transparent;
 		onClickListener = null;
 		setOnClickListener(null);
 		mMatrix = null;
+		LAMWCommon.free();		
 	}
+	
+	// Bitmap scaling with smoothing
+	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){		
+		
+		 // Get current dimensions
+		 int width  = _bmp.getWidth();
+		 int height = _bmp.getHeight();
 
+		 // Determine how much to scale
+		 float xScale = ((float) _newWidth) / width;
+		 float yScale = ((float) _newHeight) / height;
+		 
+		// Create a matrix for the scaling and add the scaling data
+		 Matrix matrix = new Matrix();
+		 matrix.postScale(xScale, yScale);
 
-	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+		 // Create a new bitmap and convert it to a format understood by the ImageView
+		 Bitmap scaledBitmap = Bitmap.createBitmap(_bmp, 0, 0, width, height, matrix, true);
+		 BitmapDrawable result = new BitmapDrawable(scaledBitmap);
+		 width  = scaledBitmap.getWidth();
+		 height = scaledBitmap.getHeight();
+
+		 // Apply the scaled bitmap
+		 this.setImageDrawable(result);
+		 this.invalidate();
+		 
+		 Drawable drawing = this.getDrawable();
+		 Bitmap bitmap = ((BitmapDrawable)drawing).getBitmap();
+		 return bitmap;
+		}
+
+	/*private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
 		float factorH = _newHeight / (float)_bmp.getHeight();
 		float factorW = _newWidth / (float)_bmp.getWidth();
 		float factorToUse = (factorH > factorW) ? factorW : factorH;
@@ -151,12 +199,17 @@ public class jImageView extends ImageView {
 				(int) (_bmp.getWidth() * factorToUse),
 				(int) (_bmp.getHeight() * factorToUse),false);
 		return bm;
-	}
+	}*/
 
 	public void SetBitmapImage(Bitmap _bitmap, int _width, int _height) {
 		this.setImageResource(android.R.color.transparent);
 		bmp = GetResizedBitmap(_bitmap, _width, _height);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+		    this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
@@ -169,7 +222,12 @@ public class jImageView extends ImageView {
 			//is is the case when the bitmap fails to load
 			int nh = (int) ( bm.getHeight() * (1024.0 / bm.getWidth()) );
 			Bitmap scaled = Bitmap.createScaledBitmap(bm,1024, nh, true);
-			this.setImageBitmap(scaled);
+
+			if (!mRounded)
+				this.setImageBitmap(scaled);
+			else
+				this.setImageBitmap(GetRoundedShape(scaled, 0));
+
 			bmp = scaled;
 		}
 		else{
@@ -183,7 +241,12 @@ public class jImageView extends ImageView {
 				bmp = bm;
 
 			} else {
-				this.setImageBitmap(bm);
+
+				if (!mRounded)
+					this.setImageBitmap(bm);
+				else
+					this.setImageBitmap(GetRoundedShape(bm, 0));
+
 				bmp = bm;
 			}
 		}
@@ -195,11 +258,15 @@ public class jImageView extends ImageView {
 		this.setImageResource(android.R.color.transparent);
 		if (fullPath.equals("null")) { this.setImageBitmap(null); return; };
 		bmp = BitmapFactory.decodeFile(fullPath);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
-	//by jmpessoa
 	public int GetDrawableResourceId(String _resName) {
 		try {
 			Class<?> res = R.drawable.class;
@@ -213,61 +280,65 @@ public class jImageView extends ImageView {
 		}
 	}
 
-	//by jmpessoa
 	public Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+		
+		Drawable res = null;
+		
+		if (Build.VERSION.SDK_INT < 21 ) {
+			res = this.controls.activity.getResources().getDrawable(_resID);
+		}
+		
+		//[ifdef_api21up]
+		if(Build.VERSION.SDK_INT >= 21)
+			res = this.controls.activity.getResources().getDrawable(_resID, null);
+        //[endif_api21up]
+						
+		return res;
 	}
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
-		bmp = ((BitmapDrawable)d).getBitmap();
-		this.setImageDrawable(d);
+		Bitmap b = ((BitmapDrawable)d).getBitmap();
+		bmp = GetResizedBitmap(b, b.getWidth(), b.getHeight());
+		this.setImageResource(android.R.color.transparent);
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+		//this.setImageDrawable(d);
 		this.invalidate();
 	}
 
-	//by jmpessoa
 	public void setLParamWidth(int _w) {
-		lparamW = _w;
-		lparams.width = lparamW;
+		LAMWCommon.setLParamWidth(_w);
 	}
 
-	public void setLParamHeight(int _h) {
-		lparamH = _h;
-		lparams.height = lparamH;
+	public void setLParamHeight(int _h) {		
+		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public void setLGravity(int _g) {
-		lgravity = _g;
+	public void SetLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
 	}
 
 	public void setLWeight(float _w) {
-		lweight = _w;
+		LAMWCommon.setLWeight(_w);
 	}
 
 	public int getLParamHeight() {
-		int r = lparamH;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getHeight();
-		}		
-		return r;
+		return  LAMWCommon.getLParamHeight();
 	}
 
 	public int getLParamWidth() {				
-		int r = lparamW;		
-		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = this.getWidth();
-		}		
-		return r;		
+		return LAMWCommon.getLParamWidth();
 	}
 
-	//by jmpessoa
 	public int GetBitmapHeight() {
 		if (bmp != null) {
 			return this.bmp.getHeight();
 		} else return 0;
 	}
 
-	//by jmpessoa
 	public int GetBitmapWidth() {
 		if (bmp != null) {
 			return this.bmp.getWidth();
@@ -275,64 +346,19 @@ public class jImageView extends ImageView {
 	}
 
 	public void addLParamsAnchorRule(int rule) {
-		lparamsAnchorRule[countAnchorRule] = rule;
-		countAnchorRule = countAnchorRule + 1;
+		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
 	public void addLParamsParentRule(int rule) {
-		lparamsParentRule[countParentRule] = rule;
-		countParentRule = countParentRule + 1;
+		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	//by jmpessoa
 	public void setLayoutAll(int idAnchor) {
-		lparams.width  = lparamW; //matchParent;
-		lparams.height = lparamH; //wrapContent;
-		lparams.setMargins(marginLeft, marginTop,marginRight,marginBottom);
-
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			if (idAnchor > 0) {
-				for (int i = 0; i < countAnchorRule; i++) {
-					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
-				}
-			}
-
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-			}
-		}
-		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-		}
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}
-		//
-		setLayoutParams(lparams);
+		LAMWCommon.setLayoutAll(idAnchor);
 	}
 
 	public void ClearLayoutAll() {
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			for (int i = 0; i < countAnchorRule; i++) {
-//[ifdef_api17up]
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
- //[endif_api17up]
-	/* //[endif_api17up]
- 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], 0);
- //[ifdef_api17up] */
-				}
-
-			for (int j = 0; j < countParentRule; j++) {
-	 //[ifdef_api17up]
-				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
- //[endif_api17up]
- /* //[endif_api17up]
- 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[j], 0);
-	//[ifdef_api17up] */
-			}
-		}
-		countAnchorRule = 0;
-		countParentRule = 0;
+		LAMWCommon.clearLayoutAll();
 	}
 
 	/*
@@ -353,15 +379,22 @@ public class jImageView extends ImageView {
 			case 6: setScaleType(ImageView.ScaleType.FIT_XY); break;
 			case 7: setScaleType(ImageView.ScaleType.MATRIX); break;
 		}
+	}	
+	
+	public void SetImageMatrixScale(float _scaleX, float _scaleY, float _centerX, float _centerY ) {
+		
+		if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  
+			this.setScaleType(ImageView.ScaleType.MATRIX);
+		
+		mMatrix.setScale(_scaleX, _scaleY, _centerX, _centerY);
+		
+		this.setImageMatrix(mMatrix);		
+		this.invalidate();
 	}
 
 	public void SetImageMatrixScale(float _scaleX, float _scaleY ) {
-		if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  this.setScaleType(ImageView.ScaleType.MATRIX);
-		//Log.i("scaleX=" + _scaleX, "    scaleY= " + _scaleY);
-		mMatrix.setScale(_scaleX, _scaleY);
-		//mMatrix.postScale(_scaleX, _scaleX);
-		this.setImageMatrix(mMatrix);
-		this.invalidate();
+		
+		SetImageMatrixScale( _scaleX, _scaleY, 0, 0 );
 	}
 
 	public Bitmap GetBitmapImage() {
@@ -378,14 +411,24 @@ public class jImageView extends ImageView {
 		String picturePath = cursor.getString(columnIndex);
 		cursor.close();
 		bmp = BitmapFactory.decodeFile(picturePath);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
 	public void SetImageThumbnailFromCamera(Intent _intentData) {
 		Bundle extras = _intentData.getExtras();
 		bmp = (Bitmap) extras.get("data");
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
@@ -399,13 +442,23 @@ public class jImageView extends ImageView {
 			e.printStackTrace();
 		}
 		bmp = BitmapFactory.decodeStream(imageStream);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
 	public void SetImageFromByteArray(byte[] _image) {
 		bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
-		this.setImageBitmap(bmp);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
 		this.invalidate();
 	}
 
@@ -415,6 +468,198 @@ public class jImageView extends ImageView {
 		this.setDrawingCacheEnabled(false);
 		return b;
 	}
+	
+	public void SetRoundCorner() {
+		   if (this != null) {  		
+			        PaintDrawable  shape =  new PaintDrawable();
+			        shape.setCornerRadius(mRadius);                
+			        int color = Color.TRANSPARENT;
+			        Drawable background = this.getBackground();        
+			        if (background instanceof ColorDrawable) {
+			          color = ((ColorDrawable)this.getBackground()).getColor();
+				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
+				        //[ifdef_api16up]
+				  	    if(Build.VERSION.SDK_INT >= 16) 
+				             this.setBackground((Drawable)shape);
+				        //[endif_api16up]			          
+			        }                		  	  
+		    }
+	}
+	
+	public void SetRotation( int angle ){
+		mAngle = angle;
+		this.setRotation(mAngle);
+	}
+	
+	public boolean SaveToJPG( String filePath, int cuality, int angle ){
+		
+		if( bmp == null ) return false;		
 
+		File file = new File(filePath);
+				
+		//Overwrite file
+		if( file.exists() ) if( !file.delete() ) return false;
+		
+		Matrix matrix = new Matrix();
+	    matrix.postRotate(angle);
+	    Bitmap bmpRot = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);			
+		
+		try {
+			FileOutputStream fOut = new FileOutputStream(file);
+			bmpRot.compress(Bitmap.CompressFormat.JPEG, cuality, fOut);
+		    fOut.flush();
+		    fOut.close();
+		    
+		    return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+    public boolean SaveToPNG( String filePath, int cuality, int angle ){
+		
+		if( bmp == null ) return false;		
+
+		File file = new File(filePath);
+		
+		//Overwrite file
+		if( file.exists() ) if( !file.delete() ) return false;
+		
+		Matrix matrix = new Matrix();
+	    matrix.postRotate(angle);
+	    Bitmap bmpRot = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);			
+		
+		try {
+			FileOutputStream fOut = new FileOutputStream(file);
+			bmpRot.compress(Bitmap.CompressFormat.PNG, cuality, fOut);
+		    fOut.flush();
+		    fOut.close();
+		    
+		    return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public void SetRadiusRoundCorner(int _radius) {
+		mRadius =  _radius;
+	}
+		
+	public void SetCollapseMode(int _collapsemode) {  //called on JNIPrompt
+		LAMWCommon.setCollapseMode(_collapsemode);
+	}
+	
+    public void	SetFitsSystemWindows(boolean _value) {
+		LAMWCommon.setFitsSystemWindows(_value);
+    }
+
+    public void	SetScrollFlag(int _collapsingScrollFlag) {
+ 		LAMWCommon.setScrollFlag(_collapsingScrollFlag);
+    }
+    
+    /*
+    Change the view's z order in the tree, so it's on top of other sibling views.
+    Prior to KITKAT/4.4/Api 19 this method should be followed by calls to requestLayout() and invalidate()
+    on the view's parent to force the parent to redraw with the new child ordering.
+  */
+    
+	public void BringToFront() {
+	     this.bringToFront();
+	     if (Build.VERSION.SDK_INT < 19 ) {			
+		ViewGroup parent = LAMWCommon.getParent();
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+	     }	
+             this.setVisibility(android.view.View.VISIBLE);	
+	}
+
+	public void SetVisibilityGone() {
+		LAMWCommon.setVisibilityGone();
+	}
+
+        public ByteBuffer GetByteBuffer(int _width, int _height) {	  
+	    ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);    
+            return graphicBuffer;    
+        }
+
+        public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	 
+	       _byteBuffer.rewind();  //reset position
+	       bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);
+          bmp.copyPixelsFromBuffer(_byteBuffer); 	
+          return bmp;
+        }
+
+	public void SetImageFromByteBuffer(ByteBuffer _jbyteBuffer, int _width, int _height) {
+		bmp = GetBitmapFromByteBuffer(_jbyteBuffer,_width,_height);
+
+		if (!mRounded)
+			this.setImageBitmap(bmp);
+		else
+			this.setImageBitmap(GetRoundedShape(bmp, 0));
+
+		this.invalidate();
+
+	}
+
+	/*
+	 * Making image in circular shape
+	 * http://www.androiddevelopersolutions.com/2012/09/crop-image-in-circular-shape-in-android.html
+	 */
+	private Bitmap GetRoundedShape(Bitmap _bitmapImage, int _diameter) {
+		// TODO Auto-generated method stub
+		Bitmap sourceBitmap = _bitmapImage;
+		Path path = new Path();
+
+		int dim;
+		if(_diameter == 0 ) {
+			dim = sourceBitmap.getHeight();
+			if (dim > sourceBitmap.getWidth()) dim = sourceBitmap.getWidth();
+		}
+		else {
+			dim = _diameter;
+			int min;
+
+			if (sourceBitmap.getWidth() <  sourceBitmap.getHeight())
+				min = sourceBitmap.getWidth();
+			else
+				min = sourceBitmap.getHeight();
+
+			if (dim > min) dim = min;
+		}
+
+		int targetWidth = dim;
+		int targetHeight = dim;
+
+		Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
+				targetHeight,Bitmap.Config.ARGB_8888);
+
+		Canvas canvas = new Canvas(targetBitmap);
+
+		path.addCircle(((float) targetWidth - 1) / 2,
+				((float) targetHeight - 1) / 2,
+				(Math.min(((float) targetWidth),
+						((float) targetHeight)) / 2),
+				Path.Direction.CCW);
+
+		canvas.clipPath(path);
+
+		canvas.drawBitmap(sourceBitmap,
+				new Rect(0, 0, sourceBitmap.getWidth(),
+						sourceBitmap.getHeight()),
+				new Rect(0, 0, targetWidth,
+						targetHeight), null);
+		return targetBitmap;
+	}
+
+	private Bitmap GetRoundedShape(Bitmap _bitmapImage) {
+		return GetRoundedShape(_bitmapImage, 0);
+	}
+
+	public void SetRoundedShape(boolean _value) {
+		mRounded = _value;
+	}
 }
+
 

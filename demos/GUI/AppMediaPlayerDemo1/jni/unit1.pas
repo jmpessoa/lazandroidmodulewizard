@@ -24,6 +24,9 @@ type
     jTextView1: jTextView;
     procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
     procedure jMediaPlayer1Completion(Sender: TObject);
@@ -63,7 +66,28 @@ end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
- // FSaveBackColor:= jSurfaceView1.BackgroundColor;
+  //FSaveBackColor:= jSurfaceView1.BackgroundColor;
+  if IsRuntimePermissionNeed() then   // that is, target API >= 23  - Android 6
+  begin
+      ShowMessage('RequestRuntimePermission....');
+      //hint: if you  get "write" permission then you have "read", too!
+      Self.RequestRuntimePermission(['android.permission.WRITE_EXTERNAL_STORAGE'], 9001);  // some/any value...
+  end;
+
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+    case requestCode of
+     9001:begin
+              if grantResult = PERMISSION_GRANTED  then
+                ShowMessage('Success! ['+manifestPermission+'] Permission grant!!! ' )
+              else  //PERMISSION_DENIED
+                ShowMessage('Sorry... ['+manifestPermission+'] Permission not grant... ' );
+          end;
+   end;
 end;
 
 {others source options samples:
@@ -76,6 +100,13 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+  //hint: if you  get "write" permission then you have "read", too!
+   if not IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
+   begin
+       ShowMessage('Sorry... [android.permission.WRITE_EXTERNAL_STORAGE] denied... ' );
+       Exit;
+   end;
+
   //jMediaPlayer1.SeekTo(0);  //play from beginning ...
 
   if jButton1.Text = 'Play' then
@@ -92,19 +123,21 @@ begin
     if jRadioButton1.Checked then //music
     begin
        jRadioButton2.Checked:= False;
-       jMediaPlayer1.SetDataSource('pipershut2.mp3');  //from  .../assets
-       //jMediaPlayer1.SetDataSource(Self.GetEnvironmentDirectoryPath(dirDownloads), 'pipershut2.mp3');  //from download...
-       ShowMessage('Music "pipershut2.mp3" Loaded ...  Preparing.. ');
-       jMediaPlayer1.Prepare();  //Dispatch --> OnPrepared !
+       //jMediaPlayer1.SetDataSource('pipershut2.mp3');  //from  .../assets
+       jMediaPlayer1.LoadFromAssets('pipershut2.mp3');
+       //jMediaPlayer1.SetDataSource(Self.GetEnvironmentDirectoryPath(dirDownloads), 'pipershut2.mp3');  //put some file in download...
+       //jMediaPlayer1.LoadFromFile(Self.GetEnvironmentDirectoryPath(dirDownloads), 'pipershut2.mp3');   //put some file in download...
+       //jMediaPlayer1.LoadFromURL('http://www.hrupin.com/wp-content/uploads/mp3/testsong_20_sec.mp3');  //async
+       ShowMessage('Music "pipershut2.mp3" Loaded...  Preparing.. ');
     end;
 
     if jRadioButton2.Checked then //video
     begin
         jRadioButton1.Checked:= False;
-        //jMediaPlayer1.SetDataSource('http://bffmedia.com/bigbunny.mp4');
-        jMediaPlayer1.SetDataSource('bigbunny.mp4'); //from assets ...
+        //jMediaPlayer1.SetDataSource('http://www.hrupin.com/wp-content/uploads/mp3/testsong_20_sec.mp3');  // not async
+         jMediaPlayer1.LoadFromURL('http://docs.evostream.com/sample_content/assets/bun33s.mp4');  //async...
+        //jMediaPlayer1.SetDataSource('bigbunny.mp4'); //from assets ...
         ShowMessage('Video "bigbunny.mp4" Loaded ... Preparing.. ');
-        jMediaPlayer1.Prepare();  //Dispatch --> OnPrepared !
     end;
 
   end
@@ -162,7 +195,6 @@ end;
 
 procedure TAndroidModule1.jRadioButton2Click(Sender: TObject);
 begin
-
    if (jMediaPlayer1.IsPlaying()) or (jMediaPlayer1.IsPaused()) then
    begin
      jMediaPlayer1.Stop();
@@ -191,7 +223,7 @@ begin
     canv:= jSurfaceView1.GetLockedCanvas();
     jSurfaceView1.DrawBackground(canv, colbrLightCyan);
     jSurfaceView1.SetPaintTextSize(30);                 //
-    jSurfaceView1.DrawText(canv, 'Hello World!', 200,200);
+    jSurfaceView1.DrawText(canv, 'Hello World!!!', 200,200);
     jSurfaceView1.UnLockCanvas(canv);
 
     jMediaPlayer1.SetDisplay(surfaceHolder); //need to play video !

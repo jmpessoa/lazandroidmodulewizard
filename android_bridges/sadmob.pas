@@ -5,7 +5,7 @@ unit sadmob;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;
 
 type
 

@@ -1,0 +1,7 @@
+public native void pOpenGLSurfaceViewInitialized(long pasobj, GL10 gl, EGL10 egl, EGLDisplay eglDisplay, EGLSurface eglSurface, EGLContext eglContext, int width, int height);
+public native void pOpenGLSurfaceViewChanged(long pasobj, SurfaceHolder holder, int width, int height, int pixelFormat);
+public native void pOpenGLSurfaceViewDestroyed(long pasobj);
+public native boolean pOpenGLSurfaceViewThreadLooping(long pasobj, GL10 gl, EGL10 egl, EGLDisplay eglDisplay, EGLSurface eglSurface, EGLContext eglContext, int width, int height);
+public native void pOpenGLSurfaceViewThreadPrompt(long pasobj, GL10 gl, EGL10 egl, EGLDisplay eglDisplay, EGLSurface eglSurface, EGLContext eglContext, int width, int height);
+public native void pOpenGLSurfaceViewDraw(long pasobj, GL10 gl, EGL10 egl, EGLDisplay eglDisplay, EGLSurface eglSurface, EGLContext eglContext, int width, int height);
+public native void pOpenGLSurfaceViewTouch(long pasobj, int action, int countPoints, float[] arrayX, float[] arrayY, int flingGesture, int pinchZoomGestureState, float zoomScaleFactor);

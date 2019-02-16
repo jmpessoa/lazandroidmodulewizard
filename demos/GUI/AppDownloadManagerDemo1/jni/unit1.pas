@@ -21,6 +21,9 @@ type
     jImageView1: jImageView;
     jTextView1: jTextView;
     procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure jBroadcastReceiver1Receiver(Sender: TObject; intent: jObject);
     procedure jButton1Click(Sender: TObject);
   private
@@ -44,6 +47,13 @@ var
   res: TAndroidResult;
 begin
 
+    //hint: if you  get "write" permission then you have "read", too!
+   if not IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
+   begin
+     ShowMessage('Sorry... Some Runtime Permission NOT Granted ...');
+     Exit;
+   end;
+
    if not Self.isConnected() then
    begin
      ShowMessage('Sorry,  Device is not connected...');
@@ -52,8 +62,8 @@ begin
 
   jBroadcastReceiver1.RegisterIntentActionFilter(jDownloadManager1.GetActionDownloadComplete()); //'android.intent.action.DOWNLOAD_COMPLETE'
 
-  jDownloadManager1.SaveToFile(dirDownloads, 'plane-med.jpg');
-  res:= jDownloadManager1.Start('http://www.freemediagoo.com/free-media/aviation/plane-med.jpg');
+  jDownloadManager1.SaveToFile(dirDownloads, 'ship1.jpg');
+  res:= jDownloadManager1.Start('http://clipart-library.com/images/6Tp5qzgnc.jpg');
 
   if res = RESULT_OK then
     ShowMessage('OK!')
@@ -80,6 +90,8 @@ begin
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+var
+  manifestPermissions: array of string;
 begin
   if not Self.isConnected() then
   begin //try wifi
@@ -91,6 +103,35 @@ begin
   else
   begin
      if Self.isConnectedWifi() then jCheckBox1.Checked:= True
+  end;
+
+  if IsRuntimePermissionNeed() then   // that is, target API >= 23  - Android 6
+  begin
+     ShowMessage('RequestRuntimePermission....');
+
+     SetLength(manifestPermissions, 1);
+
+     //hint: if you  get "write" permission then you have "read", too!
+     manifestPermissions[0]:= 'android.permission.WRITE_EXTERNAL_STORAGE'; //from AndroodManifest.xml
+     Self.RequestRuntimePermission(manifestPermissions, 701);
+
+     SetLength(manifestPermissions, 0);
+  end;
+
+
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+  case requestCode of
+     701:begin
+              if grantResult = PERMISSION_GRANTED  then
+                ShowMessage('Success! ['+manifestPermission+'] Permission grant!!! ' )
+              else  //PERMISSION_DENIED
+                ShowMessage('Sorry... ['+manifestPermission+'] Permission not grant... ' );
+          end;
   end;
 end;
 

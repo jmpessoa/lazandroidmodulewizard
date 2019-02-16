@@ -337,6 +337,16 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     com_example_appdemo1_Controls
   Method:    pOnGLRenderer1
   Signature: (JIII)V }
 procedure pOnGLRenderer1(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -370,6 +380,26 @@ procedure pOnHttpClientCodeResult(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   code: JInt); cdecl;
 begin
   Java_Event_pOnHttpClientCodeResult(PEnv, this, TObject(pasobj), code);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnHttpClientUploadProgress
+  Signature: (JJ)V }
+procedure pOnHttpClientUploadProgress(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; progress: JLong); cdecl;
+begin
+  Java_Event_pOnHttpClientUploadProgress(PEnv, this, TObject(pasobj), progress);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnHttpClientUploadFinished
+  Signature: (JILjava/lang/String;Ljava/lang/String;)V }
+procedure pOnHttpClientUploadFinished(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; connectionStatusCode: JInt; connectionStatusMessage: JString;
+  fullFileName: JString); cdecl;
+begin
+  Java_Event_pOnHttpClientUploadFinished(PEnv, this, TObject(pasobj),
+    connectionStatusCode, connectionStatusMessage, fullFileName);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -492,7 +522,7 @@ begin
     url);
 end;
 
-const NativeMethods: array[0..52] of JNINativeMethod = (
+const NativeMethods: array[0..55] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -605,6 +635,9 @@ const NativeMethods: array[0..52] of JNINativeMethod = (
    (name: 'pOnLayouting';
     signature: '(JZ)V';
     fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
    (name: 'pOnGLRenderer1';
     signature: '(JIII)V';
     fnPtr: @pOnGLRenderer1; ),
@@ -617,6 +650,12 @@ const NativeMethods: array[0..52] of JNINativeMethod = (
    (name: 'pOnHttpClientCodeResult';
     signature: '(JI)V';
     fnPtr: @pOnHttpClientCodeResult; ),
+   (name: 'pOnHttpClientUploadProgress';
+    signature: '(JJ)V';
+    fnPtr: @pOnHttpClientUploadProgress; ),
+   (name: 'pOnHttpClientUploadFinished';
+    signature: '(JILjava/lang/String;Ljava/lang/String;)V';
+    fnPtr: @pOnHttpClientUploadFinished; ),
    (name: 'pOnClickWidgetItem';
     signature: '(JIZ)V';
     fnPtr: @pOnClickWidgetItem; ),
@@ -763,12 +802,18 @@ exports
   pOnAfterDispatchDraw name 'Java_com_example_appdemo1_Controls_'
     +'pOnAfterDispatchDraw',
   pOnLayouting name 'Java_com_example_appdemo1_Controls_pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_com_example_appdemo1_Controls_'
+    +'pAppOnRequestPermissionResult',
   pOnGLRenderer1 name 'Java_com_example_appdemo1_Controls_pOnGLRenderer1',
   pOnGLRenderer2 name 'Java_com_example_appdemo1_Controls_pOnGLRenderer2',
   pOnHttpClientContentResult name 'Java_com_example_appdemo1_Controls_'
     +'pOnHttpClientContentResult',
   pOnHttpClientCodeResult name 'Java_com_example_appdemo1_Controls_'
     +'pOnHttpClientCodeResult',
+  pOnHttpClientUploadProgress name 'Java_com_example_appdemo1_Controls_'
+    +'pOnHttpClientUploadProgress',
+  pOnHttpClientUploadFinished name 'Java_com_example_appdemo1_Controls_'
+    +'pOnHttpClientUploadFinished',
   pOnClickWidgetItem name 'Java_com_example_appdemo1_Controls_'
     +'pOnClickWidgetItem',
   pOnClickCaptionItem name 'Java_com_example_appdemo1_Controls_'

@@ -2,25 +2,27 @@ object AndroidModule7: TAndroidModule7
   Left = 322
   Top = 118
   Width = 300
-  Height = 600
+  Height = 745
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule7'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
   object jTextView1: jTextView
-    Left = 81
+    Left = 60
     Top = 10
-    Width = 137
-    Height = 20
+    Width = 179
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 69181
     PosRelativeToAnchor = []
@@ -29,42 +31,44 @@ object AndroidModule7: TAndroidModule7
     LayoutParamHeight = lpWrapContent
     Text = 'Extends Controls Demo'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jScrollView1: jScrollView
-    Left = 19
-    Top = 90
-    Width = 261
-    Height = 186
+    Left = 10
+    Top = 102
+    Width = 280
+    Height = 433
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView2
     Id = 23460
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpOneThirdOfParent
+    LayoutParamHeight = lpThreeFifthOfParent
     FillViewportEnabled = False
     ScrollSize = 800
     BackgroundColor = colbrLightSlateBlue
     object jImageView1: jImageView
       Tag = 1
-      Left = 82
+      Left = 104
       Top = 5
-      Width = 96
-      Height = 96
+      Width = 72
+      Height = 72
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Id = 7100012
       PosRelativeToAnchor = []
@@ -75,16 +79,18 @@ object AndroidModule7: TAndroidModule7
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
+      GravityInParent = lgNone
     end
     object jImageView2: jImageView
-      Left = 85
-      Top = 111
-      Width = 90
-      Height = 90
+      Left = 104
+      Top = 87
+      Width = 72
+      Height = 72
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Anchor = jImageView1
       Id = 3953947
@@ -96,17 +102,19 @@ object AndroidModule7: TAndroidModule7
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
+      GravityInParent = lgNone
     end
     object jImageView3: jImageView
       Tag = 1
-      Left = 30
-      Top = 211
-      Width = 200
-      Height = 200
+      Left = 103
+      Top = 169
+      Width = 74
+      Height = 74
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Anchor = jImageView2
       Id = 7668691
@@ -118,17 +126,19 @@ object AndroidModule7: TAndroidModule7
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
+      GravityInParent = lgNone
     end
     object jImageView4: jImageView
       Tag = 1
-      Left = 58
-      Top = 421
-      Width = 144
-      Height = 144
+      Left = 104
+      Top = 253
+      Width = 72
+      Height = 72
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Anchor = jImageView3
       Id = 3535108
@@ -140,17 +150,19 @@ object AndroidModule7: TAndroidModule7
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
+      GravityInParent = lgNone
     end
     object jImageView5: jImageView
       Tag = 1
-      Left = 30
-      Top = 575
-      Width = 200
-      Height = 200
+      Left = 103
+      Top = 335
+      Width = 74
+      Height = 74
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Anchor = jImageView4
       Id = 0
@@ -162,17 +174,19 @@ object AndroidModule7: TAndroidModule7
       Images = jImageList1
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
+      GravityInParent = lgNone
     end
   end
   object jTextView2: jTextView
-    Left = 57
-    Top = 50
-    Width = 185
-    Height = 20
+    Left = 30
+    Top = 56
+    Width = 240
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 10102
@@ -182,22 +196,23 @@ object AndroidModule7: TAndroidModule7
     LayoutParamHeight = lpWrapContent
     Text = 'hint: Scroll to see more images!'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jTextView3: jTextView
-    Left = 207
-    Top = 296
-    Width = 83
-    Height = 20
+    Left = 178
+    Top = 555
+    Width = 112
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jScrollView1
     Id = 0
@@ -207,22 +222,23 @@ object AndroidModule7: TAndroidModule7
     LayoutParamHeight = lpWrapContent
     Text = '<<---- Click it!'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jImageBtn1: jImageBtn
-    Left = 126
-    Top = 291
-    Width = 48
-    Height = 48
+    Left = 113
+    Top = 550
+    Width = 74
+    Height = 74
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jScrollView1
     Id = 1575872
@@ -231,9 +247,10 @@ object AndroidModule7: TAndroidModule7
     LayoutParamWidth = lp48px
     LayoutParamHeight = lp48px
     BackgroundColor = colbrDefault
-    Enabled = True
-    IndexImageUp = 0
-    IndexImageDown = 1
+    Images = jImageList1
+    IndexImageUp = 2
+    IndexImageDown = 4
+    GravityInParent = lgNone
     OnClick = jImageBtn1Click
   end
   object jImageList1: jImageList
@@ -246,9 +263,5 @@ object AndroidModule7: TAndroidModule7
     )
     left = 200
     top = 120
-  end
-  object jImageList3: jImageList
-    left = 141
-    top = 458
   end
 end

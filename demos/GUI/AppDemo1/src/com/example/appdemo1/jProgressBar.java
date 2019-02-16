@@ -2,6 +2,7 @@ package com.example.appdemo1;
 
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.view.Gravity;
 
 //Ref.
 //Style : http://developer.android.com/reference/android/R.attr.html
@@ -66,7 +67,7 @@ public class jProgressBar extends ProgressBar {
 		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
@@ -89,5 +90,16 @@ public class jProgressBar extends ProgressBar {
 	public void ClearLayoutAll() {
 		LAMWCommon.clearLayoutAll(); //TODO Pascal
 	}
-	
+
+  /* Pascal:
+     TFrameGravity = (fgNone,
+                   fgTopLeft, fgTopCenter, fgTopRight,
+                   fgBottomLeft, fgBottomCenter, fgBottomRight,
+                   fgCenter,
+                   fgCenterVerticalLeft, fgCenterVerticalRight
+                   );     
+   */
+   public void SetFrameGravity(int _value) {	   
+      LAMWCommon.setLGravity(_value);
+   }	
 }

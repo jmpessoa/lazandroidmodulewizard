@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas,
   Forms, Controls, Graphics, Dialogs, ExtCtrls, ComCtrls, Menus, Clipbrd,
   StdCtrls, Buttons, SynEditTypes, Process, uregistercompform, inifiles,
-  LazIDEIntf;
+  PackageIntf, LazIDEIntf;
 
 type
 
@@ -67,7 +67,7 @@ type
     FPathToJavaClass: string;
 
     FPathToJavaTemplates: string;
-    FPathToWizardCode: string;
+    FPathToLAMW: string;
     FFirstFocus: boolean;
 
     procedure DoJavaParse;
@@ -84,7 +84,6 @@ type
     function GetMethodNameHack(jType: string): string;
     function GetArrayTypeByFuncResultHack(funcResult: string): string;
     procedure TryInsertJavaCreate(txt: string);
-
     procedure LoadSettings(const fileName: string);
   public
     { public declarations }
@@ -621,18 +620,23 @@ var
   i: integer;
 begin
   listPascal:= TStringList.Create;
-  listPascal.Add('unit '+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+';');
+  listPascal.Add('unit '+Copy(LowerCase(FJavaClassName), 2, Length(FJavaClassName))+';');
   listPascal.Add(' ');
   listPascal.Add('{$mode delphi}');
   listPascal.Add(' ');
   listPascal.Add('interface');
   listPascal.Add(' ');
   listPascal.Add('uses');
-  listPascal.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls;'); //{,LResources}
+
+  if Pos('jVisualControl', FProjectModel) > 0  then
+    listPascal.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;')
+  else
+    listPascal.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget;');
+
   listPascal.Add(' ');
   listPascal.Add('type');
   listPascal.Add(' ');
-  listPascal.Add('{Draft Component code by "Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']}');
+  listPascal.Add('{Draft Component code by "LAMW: Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']}');
   listPascal.Add('{https://github.com/jmpessoa/lazandroidmodulewizard} ');
   listPascal.Add(' ');
   if Pos('jVisualControl', FProjectModel) > 0  then
@@ -755,6 +759,7 @@ begin
   listPascal.Add('//your code here....');
   listPascal.Add('end;');
   listPascal.Add(' ');
+
   {if Pos('jVisualControl', FProjectModel) > 0  then
   begin
     listPascal.Add('procedure '+FJavaClassName+'.SetParentComponent(Value: TComponent);');
@@ -770,6 +775,7 @@ begin
     listPascal.Add('end;');
     listPascal.Add(' ');
   end;}
+
   listPascal.Add('destructor '+FJavaClassName+'.Destroy;');
   listPascal.Add('begin');
   listPascal.Add('  if not (csDesigning in ComponentState) then');
@@ -809,7 +815,13 @@ begin
   listProperties:= TStringList.Create;
 
   if Pos('_', FHackCreateParam) > 0 then
-    listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !')   //** add F
+  begin
+    listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !');   //** add F
+
+    if Pos('jControl', FProjectModel) > 0  then
+       listPascal.Add('  FInitialized:= True;');
+
+  end
   else
   begin
     listProperties.StrictDelimiter:= True;
@@ -820,6 +832,10 @@ begin
       listProperties.Strings[i]:= 'FP'+Trim(listProperties.Strings[i]); //ReplaceCharFirst(Trim(listProperties.Strings[i]),'F')+';'; //** Add F
     end;
     listPascal.Add('  FjObject:= jCreate('+listProperties.DelimitedText+'); //jSelf !');   //** add F
+
+    if Pos('jControl', FProjectModel) > 0  then
+       listPascal.Add('  FInitialized:= True;');
+
   end;
 
   listProperties.Free;
@@ -1092,8 +1108,8 @@ begin
     end;
 
     frm:= TFormRegisterComp.Create(nil);
-    frm.OpenDialog2.InitialDir:= FPathToWizardCode+'android_bridges'+DirectorySeparator;
-    frm.Edit2.Text:= FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+'register_extras.pas';
+    frm.OpenDialog2.InitialDir:= FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator;
+    frm.Edit2.Text:= FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+'register_extras.pas';
     if frm.ShowModal = mrOK then
     begin
       iconPath:= frm.Edit1.Text;
@@ -1101,14 +1117,14 @@ begin
 
       if iconPath <> '' then
       begin
-         if iconPath <> FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'.png' then
-            CopyFile(iconPath,FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'.png');
+         if iconPath <> FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'.png' then
+            CopyFile(iconPath,FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'.png');
          try
            AProcess:= TProcess.Create(nil);
-           AProcess.CurrentDirectory:= FPathToWizardCode+DirectorySeparator+'ide_tools';
-           AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres.exe';
+           AProcess.CurrentDirectory:= FPathToLAMW+DirectorySeparator+'ide_tools';
+           AProcess.Executable:= FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres.exe';
            {$IFDEF UNIX}
-              AProcess.Executable:= FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres';
+              AProcess.Executable:= FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+'lazres';
            {$Endif}
            AProcess.Parameters.Add(LowerCase(FJavaClassName)+'_icon.lrs');
            AProcess.Parameters.Add(LowerCase(FJavaClassName)+'.png');
@@ -1163,14 +1179,14 @@ begin
            SynMemo2.CopyToClipboard;
            SynMemo2.ClearSelection;
            SynMemo2.PasteFromClipboard;
-           SynMemo2.Lines.SaveToFile(FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+           SynMemo2.Lines.SaveToFile(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
 
-           ShowMessage('Saved to: '+ FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+           ShowMessage('Saved to: '+ FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
 
-           if FileExists(FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs') then
+           if FileExists(FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs') then
            begin
-              CopyFile(FPathToWizardCode+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs',
-                       FPathToWizardCode+DirectorySeparator+'android_bridges'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs');
+              CopyFile(FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs',
+                       FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs');
            end;
 
          end; //finally
@@ -1190,7 +1206,7 @@ begin
     Memo2List:= TStringList.Create;
     FImportsList:= TStringLIst.Create;
     FImportsList.Sorted:=true;
-    Self.LoadSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
+    Self.LoadSettings(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
     FFirstFocus:= True;
     PageControl1.ActivePage:= TabSheet1;
 end;
@@ -1699,7 +1715,7 @@ begin
     end;
     listJCreate.Add('  return (java.lang.Object)(new '+FJavaClassName+'(this'+auxStr+'));');
     listJCreate.Add('}');
-    listJCreate.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator+FJavaClassName+'.create');
+    listJCreate.SaveToFile(FPathToJavaTemplates+DirectorySeparator+FJavaClassName+'.create');
     listJCreate.Free;
   end;
 
@@ -1818,9 +1834,24 @@ begin
     strOnLoadList.Free;
 end;
 
+function GetPathToWizard(): string;
+var
+  Pkg: TIDEPackage;
+begin
+  Result:= '';
+  Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
+  if Pkg<>nil then
+  begin
+      Result:= ExtractFilePath(Pkg.Filename);
+      Result:= Copy(Result, 1, Length(Result)-1);
+      //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\
+  end;
+end;
+
 procedure TFrmCompCreate.LoadSettings(const fileName: string);
 var
   k: integer;
+  pathToWizard: string;
 begin
   if FileExistsUTF8(fileName) then
   begin
@@ -1831,8 +1862,9 @@ begin
       Free;
     end;
   end;
-  k:= LastPos(DirectorySeparator, FPathToJavaTemplates);
-  FPathToWizardCode:= Copy(FPathToJavaTemplates, 1, k-1);
+  pathToWizard:= GetPathToWizard(); //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard
+  k:= LastPos(DirectorySeparator, pathToWizard);
+  FPathToLAMW:= Copy(pathToWizard, 1, k-1); //C:\laz4android18FPC304\components\androidmodulewizard
 end;
 
 //generics...

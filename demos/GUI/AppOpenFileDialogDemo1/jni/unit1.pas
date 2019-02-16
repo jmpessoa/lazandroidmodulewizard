@@ -22,6 +22,10 @@ type
     jOpenDialog1: jOpenDialog;
     jTextFileManager1: jTextFileManager;
     jTextView1: jTextView;
+    procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
     procedure jOpenDialog1FileSelected(Sender: TObject; path: string;
@@ -50,22 +54,60 @@ var
   saveData: TStringList;
 begin
 
-  saveData:= TStringList.Create;
-  saveData.Add('Hello World!');
-  saveData.SaveToFile(Self.GetEnvironmentDirectoryPath(dirDownloads) + '/' + 'myhello.txt');
-  saveData.Free;
+     //hint: if you  get "write" permission then you have "read", too!
+   if IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
+   begin
+      saveData:= TStringList.Create;
+      saveData.Add('Hello World!');
+      saveData.SaveToFile(Self.GetEnvironmentDirectoryPath(dirDownloads) + '/' + 'myhello.txt');
+      saveData.Free;
 
-  jImageFileManager1.SaveToFile(jBitmap1.GetImage(), Self.GetEnvironmentDirectoryPath(dirDownloads), 'ic_launcher.png');
+      jImageFileManager1.SaveToFile(jBitmap1.GetImage(), Self.GetEnvironmentDirectoryPath(dirDownloads), 'ic_launcher.png');
 
-  listFile:= Self.GetFileList(Self.GetEnvironmentDirectoryPath(dirDownloads)); //  or dirSdCard or ...
-  count:= Length(listFile);
-  for i:= 0 to count-1 do
-  begin
-    ShowMessage(listFile[i]);
-  end;
+      listFile:= Self.GetFileList(Self.GetEnvironmentDirectoryPath(dirDownloads)); //  or dirSdCard or ...
+      count:= Length(listFile);
+      for i:= 0 to count-1 do
+      begin
+        ShowMessage(listFile[i]);
+      end;
 
-  SetLength(listFile, 0);
+      SetLength(listFile, 0);
 
+   end;
+
+end;
+
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+var
+  manifestPermissions: array of string;
+begin
+    if IsRuntimePermissionNeed() then   // that is, target API >= 23  - Android 6
+   begin
+      ShowMessage('RequestRuntimePermission....');
+
+      SetLength(manifestPermissions, 1);
+
+      //hint: if you  get "write" permission then you have "read", too!
+      manifestPermissions[0]:= 'android.permission.WRITE_EXTERNAL_STORAGE'; //from AndroodManifest.xml
+      Self.RequestRuntimePermission(manifestPermissions, 6001);  // some/any value...
+
+      SetLength(manifestPermissions, 0);
+   end;
+
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+    case requestCode of
+     6001:begin
+              if grantResult = PERMISSION_GRANTED  then
+                ShowMessage('Success! ['+manifestPermission+'] Permission grant!!! ' )
+              else  //PERMISSION_DENIED
+                ShowMessage('Sorry... ['+manifestPermission+'] Permission not grant... ' );
+          end;
+    end;
 end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
@@ -79,11 +121,16 @@ begin
   ShowMessage(path);
   ShowMessage(fileName);
 
-  if Pos('.txt', filename) > 0 then
-     ShowMessage(jTextFileManager1.LoadFromFile(path, fileName));
+   //hint: if you  get "write" permission then you have "read", too!
+   if IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
+   begin
+      if Pos('.txt', filename) > 0 then
+         ShowMessage(jTextFileManager1.LoadFromFile(path, fileName));
 
-  if Pos('.png', filename) > 0 then
-   jImageView1.SetImage(jImageFileManager1.LoadFromFile(path, filename));
+      if Pos('.png', filename) > 0 then
+       jImageView1.SetImage(jImageFileManager1.LoadFromFile(path, filename));
+
+   end;
 
 end;
 

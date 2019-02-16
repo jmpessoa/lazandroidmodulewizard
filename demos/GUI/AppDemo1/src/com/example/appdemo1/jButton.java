@@ -16,6 +16,7 @@ import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -394,4 +395,25 @@ public class jButton extends Button {
 		mEnable = _value;
 		this.setEnabled(_value);		
 	}
+
+  /* Pascal:
+     TFrameGravity = (fgNone,
+                   fgTopLeft, fgTopCenter, fgTopRight,
+                   fgBottomLeft, fgBottomCenter, fgBottomRight,
+                   fgCenter,
+                   fgCenterVerticalLeft, fgCenterVerticalRight
+                   );     
+   */
+   public void SetFrameGravity(int _value) {	   
+      LAMWCommon.setLGravity(_value);
+   }
+   
+   public void SetAllCaps(boolean allCaps)
+   {
+	   this.setAllCaps(allCaps);
+   }
+
+   public void SetFocus() {
+   	  this.requestFocus();
+   }
 }

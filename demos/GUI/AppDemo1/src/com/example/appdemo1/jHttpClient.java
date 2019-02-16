@@ -2,6 +2,9 @@ package com.example.appdemo1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +31,7 @@ import java.util.StringTokenizer;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.PowerManager;
 import android.util.Base64;
 import android.util.Log;
 
@@ -37,6 +41,23 @@ import android.util.Log;
 
 //ref. http://www.javacodegeeks.com/2013/06/android-http-client-get-post-download-upload-multipart-request.html
 //ref http://lethargicpanda.tumblr.com/post/14784695735/oauth-login-on-your-android-app-the-github
+
+//by  Simon, Choi
+//https://blog.naver.com/simonsayz
+class LConst {
+    public static final String LogHeader                  = "LAMW_jHttpClient"; //AndCtrls_Java
+    public static final int Http_Act_Text                 =  0;
+    public static final int Http_Act_Download             =  1;
+    public static final int Http_Act_Upload               =  2;
+    //
+    public static final int Http_State_Xfer               =  0;
+    public static final int Http_State_Done               =  1;
+    public static final int Http_State_Error              =  2;
+    //
+    public static final String Http_Boundary              = "---------------------------7df9330d90b18";
+
+}
+
 public class jHttpClient /*extends ...*/ {
  
    private long     pascalObj = 0;      // Pascal Object
@@ -67,9 +88,15 @@ public class jHttpClient /*extends ...*/ {
     
     private int mConnectTimeout = 15000;  
     private int mReadTimeout = 15000;
-    
-    
-   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+
+    private String urlText;
+    private String localFileText;
+    private String formDataName = "lamwFormUpload";
+
+    int serverResponseCode;
+    String serverResponseMessage;
+
+    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
       //super(_ctrls.activity);
       context   = _ctrls.activity;
@@ -1096,6 +1123,178 @@ public class jHttpClient /*extends ...*/ {
     
     public int GetConnectionTimeout() {
     	return  mConnectTimeout;
+    }
+
+
+    //---------------------------------------------------------------------------
+    // Upload File  by Simon, Choi (simonsayz@naver.com)
+    // https://blog.naver.com/simonsayz
+
+    // http://www.cuelogic.com/blog/android-code-to-upload-download-large-files-to-server-2
+    // Test Server Code
+    // --------------------------------------------------------------------------
+    // <html>
+    // <head>
+    //	<title>Upload Test</title>
+    // </head>
+    // <body>
+    // <%
+    //    Dim Upload, UpForm
+    //    Set Upload = Server.CreateObject("TABSUpload4.Upload")
+    //    Upload.Start "E:\web\LocalUser\app\www\maxpaper"
+    //    Set UpForm = Upload.Form("lamwFormUpload")
+    //	UpForm.Save "E:\web\LocalUser\app\www\maxpaper\file", False
+    //	Response.Write "FileName:" & UpForm.FileName & "<br>"
+    //    Set Upload = Nothing
+    // %>
+    // </body>
+    // </html>
+    //
+
+    private class UploadTask extends AsyncTask<String, Integer, String> {
+
+        private Context context;
+        private PowerManager.WakeLock mWakeLock;
+        private String rst = "";
+
+        public UploadTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getName());
+            mWakeLock.acquire();
+        }
+
+        @Override
+        protected String doInBackground(String... sUrl) {
+            FileInputStream input  = null;
+            DataOutputStream output = null;
+            HttpURLConnection conn   = null;
+            rst = "";
+            try { URL url = new URL(sUrl[0]);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoInput        (true  );
+                conn.setDoOutput       (true  );
+                conn.setUseCaches      (false );
+
+                conn.setRequestMethod  ("POST");
+                conn.setRequestProperty("Connection","Keep-Alive");
+                conn.setRequestProperty("Content-Type","multipart/form-data; boundary="+LConst.Http_Boundary);
+                //
+                output = new DataOutputStream(conn.getOutputStream());
+                //
+                output.writeBytes("--" + LConst.Http_Boundary + "\r\n");
+
+                if (formDataName.equals("lamwFormUpload")) {
+                    output.writeBytes("Content-Disposition: form-data; name=\"lamwFormUpload\"; " +
+                            "filename=\"" + localFileText + "\"\r\n");
+                } else {
+                    output.writeBytes("Content-Disposition: form-data; name=\"" + formDataName + "\"; " +
+                            "filename=\"" + localFileText + "\"\r\n");
+                }
+                output.writeBytes("Content-Type: text/plain" + "\r\n\r\n");
+                //
+                input  = new FileInputStream (new File(localFileText));
+
+                int totalSize      = input.available();
+                int total          = 0;
+                int totalSav       = 0;
+                int curUpload      = 0;
+                int maxBufferSize  = 1 * 4096;
+                int bytesRead;
+                int bytesAvailable = input.available();
+                int bufferSize     = Math.min(bytesAvailable,maxBufferSize);
+                byte buffer[]      = new byte[4096];
+
+                // Read File
+                bytesRead = input.read(buffer,0,bufferSize);
+                try   { while(bytesRead >0) {
+                    try   { output.write(buffer,0,bufferSize);           }
+                    catch (OutOfMemoryError e) { return ("outOfMemory"); }
+                    bytesAvailable = input.available();
+
+                    // current upload
+                    curUpload = (totalSize-bytesAvailable);
+                    if ( (curUpload-totalSav) >= (100/totalSize)) {
+                        publishProgress((int) ( (curUpload * 100 / totalSize) ));
+                        totalSav = total;
+                    }
+
+                    bufferSize     = Math.min(bytesAvailable, maxBufferSize);
+                    bytesRead      = input.read(buffer,0,bufferSize); } }
+                catch (Exception e) { return ("error"); }
+                //
+                output.writeBytes("\r\n");
+                output.writeBytes("--" + LConst.Http_Boundary + "--"+"\r\n");
+
+                // Responses from the server (code and message)
+                serverResponseCode = conn.getResponseCode();
+                //serverResponseMessage = conn.getResponseMessage();
+                Log.d(LConst.LogHeader,"Server Connection Status Code " + " " + serverResponseCode);
+                Log.d(LConst.LogHeader,"Server Connection Status Message "+ serverResponseMessage);
+
+                input.close();
+                output.flush();
+
+                InputStream is = conn.getInputStream();
+                int ch;
+                StringBuffer b = new StringBuffer();
+                while (( ch = is.read() ) != -1) {b.append( (char)ch ); }
+
+                String response = b.toString();
+                Log.d(LConst.LogHeader,"Server Result: "+response);
+                serverResponseMessage = "[Connection Status: " + serverResponseMessage + "] Result: " +response;
+
+            }
+            catch (Exception e) { return e.toString(); }
+            finally {
+                try   { if ((output != null) && (input != null )) { rst = localFileText; }
+                    if (output != null) output.close();
+                    if (input  != null) input.close ();  }
+                catch (IOException ignored) {  }
+                if (conn != null) conn.disconnect();  }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            super.onProgressUpdate(progress);
+            //
+            controls.pOnHttpClientUploadProgress(pascalObj, progress[0].longValue());
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            mWakeLock.release();
+            controls.pOnHttpClientUploadFinished(pascalObj, serverResponseCode, serverResponseMessage, localFileText);
+        }
+
+    }
+
+    // Sample File /data/data/com.kredix/files/alex.jpg
+    public void UploadFile (String _url, String _fullFileName, String _uploadFormName) {
+        urlText       = _url;
+        localFileText = _fullFileName;
+        formDataName = _uploadFormName;
+        //
+        final UploadTask uploadTask = new UploadTask(controls.activity);
+        uploadTask.execute(_url);
+    }
+
+    public  void UploadFile (String _url, String _fullFileName) {
+        urlText       = _url;
+        localFileText = _fullFileName;
+        //
+        final UploadTask uploadTask = new UploadTask(controls.activity);
+        uploadTask.execute(_url);
+    }
+
+    public void SetUploadFormName(String _uploadFormName) {
+        formDataName = _uploadFormName;
     }
 }
 

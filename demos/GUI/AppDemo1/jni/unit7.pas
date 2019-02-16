@@ -15,7 +15,6 @@ type
   TAndroidModule7 = class(jForm)
       jImageBtn1: jImageBtn;
       jImageList1: jImageList;
-      jImageList3: jImageList;
       jImageView1: jImageView;
       jImageView2: jImageView;
       jImageView3: jImageView;
@@ -53,6 +52,7 @@ procedure TAndroidModule7.jImageBtn1Click(Sender: TObject);
 begin
    showMessage('ImageBtn : OnClick');
 end;
+
 
 
 end.

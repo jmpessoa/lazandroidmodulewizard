@@ -37,9 +37,11 @@ type
     FCandidateSdkPlatform: integer;
     FCandidateSdkBuild: string;
     FPathToGradle: string;
+    FPathToSmartDesigner: string;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
+    procedure AddSupportToFCLControls(chipArchitecture: string);
     function GetEventSignature(const nativeMethod: string): string;
     function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
     function TryAddJControl(jclassname: string; out nativeAdded: boolean): boolean;
@@ -76,6 +78,8 @@ type
     function IsSdkToolsAntEnable(path: string): boolean;
     procedure TryChangeDemoProjecAntBuildScripts();
 
+    function GetPathToSmartDesigner(): string;
+
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
@@ -85,7 +89,8 @@ type
     procedure Init4Project(AProject: TLazProject);
 
     // called from Designer
-    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
+    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
+    procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateProjectStartModule(const NewName: string);
 
   end;
@@ -104,7 +109,7 @@ uses
   {$ifdef unix}BaseUnix,{$endif}
   Controls, Dialogs, {SrcEditorIntf,} LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
   CodeCache, {SourceChanger,} LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
-  LazFileUtils, LamwSettings, uJavaParser, strutils;
+  LazFileUtils, LamwSettings, uJavaParser, strutils, PackageIntf;
 
 procedure SaveShellScript(script: TStringList; const AFileName: string);
 begin
@@ -733,13 +738,16 @@ begin
          strList.Add('}');
 
          strList.Add('dependencies {');
-         if Pos('AppCompat', AndroidTheme) > 0 then
-         begin   //compile fileTree(dir: 'libs', include: ['*.jar'])
 
-            if androidPluginNumber < 300 then
-              directive:='compile'
-            else
-              directive:='implementation';
+         if androidPluginNumber < 300 then
+           directive:='compile'
+         else
+           directive:='implementation';
+
+         strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
+
+         if Pos('AppCompat', AndroidTheme) > 0 then
+         begin
 
             strList.Add('    '+directive+' ''com.android.support:appcompat-v7:'+compatVer+'''');
             strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');
@@ -1010,6 +1018,7 @@ begin
    FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
    FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
    FPrebuildOSYS:= LamwGlobalSettings.PrebuildOSYS;
+   FPathToSmartDesigner:= LamwGlobalSettings.PathToSmartDesigner;
 
    //LAMW 0.8
   if  (androidTheme = '') or (Pos('AppCompat', androidTheme) <= 0) then
@@ -1221,14 +1230,45 @@ begin
   for i := 0 to AndroidForm.ComponentCount - 1 do
   begin
     c := AndroidForm.Components[i];
-    if c is jControl then
-      jControls.Add(c.ClassName)
-    else if c.ClassName = 'TFPNoGUIGraphicsBridge' then
-      jControls.Add(c.ClassName);
+    if c is jControl then jControls.Add(c.ClassName);
+    //else if Pos(c.ClassName, fclList.Text) > 0 then jControls.Add(c.ClassName); //else if c.ClassName = 'TFPNoGUIGraphicsBridge' then
   end;
   jControls.Delimiter := ';';
   ProjFile.CustomData['jControls'] := jControls.DelimitedText;
   jControls.Free;
+end;
+
+procedure TLamwSmartDesigner.UpdateFCLControls(ProjFile: TLazProjectFile;
+  AndroidForm: TAndroidForm);
+var
+  fclControls: TStringList;
+  fclList: TStringList;
+  i: Integer;
+  c: TComponent;
+  pathToFclBridges: string;
+begin
+  if (ProjFile = nil) or (AndroidForm = nil) then Exit;
+
+  FPathToSmartDesigner:=  GetPathToSmartDesigner();
+  pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
+
+  fclList:=  TStringList.Create;
+
+  if FileExists(pathToFclBridges+'fcl_bridges.txt') then
+     fclList.LoadFromFile(pathToFclBridges+'fcl_bridges.txt');
+
+  fclControls := TStringList.Create;
+  fclControls.Sorted := True;
+  fclControls.Duplicates := dupIgnore;
+  fclControls.Delimiter := ';';
+  for i:= 0 to AndroidForm.ComponentCount - 1 do
+  begin
+    c:= AndroidForm.Components[i];
+    if Pos(c.ClassName, fclList.Text) > 0 then fclControls.Add(c.ClassName);
+  end;
+  ProjFile.CustomData['fclControls']:= fclControls.DelimitedText;
+  fclControls.Free;
+  fclList.Free;
 end;
 
 procedure TLamwSmartDesigner.UpdateProjectStartModule(const NewName: string);
@@ -1278,7 +1318,7 @@ begin
           FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
 
     fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher]
-    if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + fileName) then
+    if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
       DeleteFile(contentList.Strings[i]);
 
   end;
@@ -1298,9 +1338,8 @@ end;
 
 procedure TLamwSmartDesigner.GetAllJControlsFromForms(jControlsList: TStrings);
 var
-  list, contentList: TStringList;
-  i, j, p1: integer;
-  aux: string;
+  list: TStringList;
+  i: integer;
 begin
   list := TStringList.Create;
   list.Delimiter := ';';
@@ -1311,31 +1350,101 @@ begin
       jControlsList.AddStrings(list);
     end;
   list.Free;
-  Exit;
+end;
 
-  //No need to create the stringlist...
-  if jControlsList <> nil then
-  begin
-    list:= TStringList.Create;
-    contentList := FindAllFiles(FPathToAndroidProject+'jni', '*.lfm', False);
-    for i:= 0 to contentList.Count-1 do
+procedure TLamwSmartDesigner.AddSupportToFCLControls(chipArchitecture: string);
+var
+  fileList, controlsList, auxList, fclList: TStringList;
+  i, j, p: integer;
+  pathToNdkApiPlatforms, pathToFclBridges, androidNdkApi, arch, aux: string;
+begin
+
+  FPathToSmartDesigner:=  GetPathToSmartDesigner();
+  pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
+
+  fclList:= TStringList.Create;
+  if FileExists(pathToFclBridges + 'fcl_bridges.txt') then
+    fclList.LoadFromFile(pathToFclBridges + 'fcl_bridges.txt');
+
+  fileList:= TStringList.Create;
+  fileList.Delimiter := ';';
+
+  controlsList := TStringList.Create;
+  controlsList.Sorted := True;
+  controlsList.Duplicates := dupIgnore;
+
+  with LazarusIDE.ActiveProject do
+    for i := 0 to FileCount - 1 do
     begin
-      list.LoadFromFile(contentList.Strings[i]);
-      for j:= 1 to list.Count - 1 do  // "1" --> skip form
-      begin
-        aux:= list.Strings[j];
-        if Pos('object ', aux) > 0 then  //object jTextView1: jTextView
-        begin
-           p1:= Pos(':', aux);
-           aux:=  Copy(aux, p1+1, Length(aux));
-           jControlsList.Add(Trim(aux));
-        end;
-      end;
+      fileList.DelimitedText := Files[i].CustomData['fclControls'];
+      controlsList.AddStrings(fileList);
     end;
-    list.Free;
-    contentList.Free;
+
+  auxList:= TStringList.Create;
+  for j:= 0 to fclList.Count - 1 do
+  begin
+     if controlsList.IndexOf(fclList.Strings[j]) >= 0 then  //TFPNoGUIGraphicsBridge
+     begin
+         if FileExists(pathToFclBridges + fclList.Strings[j] + '.libso') then //TFPNoGUIGraphicsBridge.libso
+         begin
+            auxList.LoadFromFile(pathToFclBridges + fclList.Strings[j]+'.libso');
+
+            CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],   //'libfreetype.so',
+                     FPathToAndroidProject+'libs'+PathDelim+
+                     chipArchitecture+PathDelim+auxList.Strings[0]); //'libfreetype.so'
+
+            //Added support to TFPNoGUIGraphicsBridge ... TMySQL57Bridge ... etc
+            androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-13 or android-14 or ... etc
+
+            if androidNdkApi <> '' then
+            begin
+
+              if Pos('armeabi', chipArchitecture) > 0 then arch:= 'arch-arm'
+              else if Pos('x86', chipArchitecture) > 0 then arch:= 'arch-x86'
+              else if Pos('mips', chipArchitecture) > 0 then arch:= 'arch-mips';
+
+              //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
+              pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                                      androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
+                                                      'usr'+DirectorySeparator+'lib';
+
+              //need by linker!  //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
+              CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],
+                     pathToNdkApiPlatforms+PathDelim+auxList.Strings[0]);
+
+              (*
+              //need by compiler
+              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetype.pp',
+                       FPathToAndroidProject+'jni'+PathDelim+ 'freetype.pp');
+              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetypeh.pp',
+                      FPathToAndroidProject+'jni'+PathDelim+ 'freetypeh.pp');
+              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'ftfont.pp',
+                       FPathToAndroidProject+'jni'+PathDelim+ 'ftfont.pp');
+              *)
+
+            end
+            else
+            begin
+              pathToNdkApiPlatforms:='';
+              aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+              p:= Pos(';', aux);
+              if p > 0 then
+              begin
+                 pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p));
+                 //need by linker!
+                 CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],
+                          pathToNdkApiPlatforms+auxList.Strings[0]);
+
+              end;
+            end;
+         end;
+     end;
   end;
 
+  controlsList.Free;
+  auxList.Free;
+  fclList.Free;
+  fileList.Free;
 end;
 
 function TLamwSmartDesigner.TryAddJControl(jclassname: string;
@@ -1360,15 +1469,15 @@ begin
    listRequirements:= TStringList.Create;  //android maninfest Requirements
    auxList:= TStringList.Create;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.java') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java') then
    begin
-     list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.java');
+     list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java');
      list.Strings[0]:= 'package '+FPackageName+';';
      list.SaveToFile(FPathToJavaSource+jclassname+'.java');
      //add class relational
-     if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.relational') then
+     if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational') then
      begin
-       list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.relational');
+       list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational');
        tempStr:= Copy(list.Strings[0], 3, 100);  //get file name...
        list.Strings[1]:= 'package '+FPackageName+';';
        list.SaveToFile(FPathToJavaSource + tempStr);
@@ -1376,19 +1485,19 @@ begin
      Result:= True;
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator+jclassname+'.native') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.native') then
    begin
-       CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator+jclassname+'.native',
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.native',
                 FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+jclassname+'.native');
         nativeAdded:= True;
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.create') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.create') then
    begin
-     list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.create');
+     list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.create');
      if FileExists(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+jclassname+'.native') then
      begin
-       auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.native');
+       auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.native');
        for i:= 0 to auxList.Count-1 do
        begin
          list.Add(auxList.Strings[i]);
@@ -1401,9 +1510,9 @@ begin
    end;
 
    //try insert reference required by the jControl in AndroidManifest ..
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.permission') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.permission');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission');
      if auxList.Count > 0 then
      begin
        insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
@@ -1440,9 +1549,9 @@ begin
      end;
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.feature') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.feature');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature');
      if auxList.Count > 0 then
      begin
        insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
@@ -1480,9 +1589,9 @@ begin
      end;
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.intentfilter') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.intentfilter') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.intentfilter');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.intentfilter');
      if auxList.Count > 0 then
      begin
        insertRef:= '<intent-filter>'; //insert reference point
@@ -1510,9 +1619,9 @@ begin
      end;
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.service') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.service') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.service');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.service');
      if auxList.Text <> '' then
      begin
        tempStr:= Trim(auxList.Text);
@@ -1530,9 +1639,9 @@ begin
      end;
    end;
    //-----
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.provider') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.provider') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.provider');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.provider');
      if auxList.Text <> '' then
      begin
        tempStr:= Trim(auxList.Text);
@@ -1551,9 +1660,9 @@ begin
      end;
    end;
    //-----
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.receiver') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.receiver') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.receiver');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.receiver');
      if auxList.Text <> '' then
      begin
        aux:= Trim(auxList.Text);
@@ -1572,9 +1681,9 @@ begin
      end;
    end;
    //-----
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.layout') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.layout') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.layout');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.layout');
      list.Clear;
      list.Delimiter:= DirectorySeparator;
      list.StrictDelimiter:= True;
@@ -1584,34 +1693,46 @@ begin
      auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+LowerCase(jclassname)+'_layout.xml');
    end;
    //-----
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.info') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.info') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.info');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.info');
      ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
      auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+LowerCase(jclassname)+'_info.xml');
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + jclassname+'.jpg') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.jpg') then
    begin
-     CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + jclassname+'.jpg',
+     CopyFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.jpg',
           FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+LowerCase(jclassname)+'_image.jpg');
    end;
    //-----
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + jclassname+'.anim') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.anim') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + jclassname+'.anim');
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.anim');
      ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'anim');
      for i:= 0 to  auxList.Count-1 do
      begin
-       CopyFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator + 'anim' + DirectorySeparator + auxList.Strings[i],
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'anim' + DirectorySeparator + auxList.Strings[i],
             FPathToAndroidProject+'res'+DirectorySeparator+'anim'+DirectorySeparator+auxList.Strings[i]);
      end;
    end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libjar') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libjar');
+     //ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'anim');
+     for i:= 0 to  auxList.Count-1 do
+     begin
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libjar' + DirectorySeparator + auxList.Strings[i],
+            FPathToAndroidProject+'libs'+DirectorySeparator+auxList.Strings[i]);
+     end;
+   end;
+
    //-----
    //try fix "gradle.build"
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.dependencies') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dependencies') then
    begin
-      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jclassname+'.dependencies');
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dependencies');
       if auxList.Text <> '' then
       begin
         manifestList.LoadFromFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
@@ -1934,17 +2055,47 @@ begin
   end;
 end;
 
+function TLamwSmartDesigner.GetPathToSmartDesigner(): string;
+var
+  Pkg: TIDEPackage;
+begin
+  Result:= '';
+  if FPathToSmartDesigner = '' then
+  begin
+    Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
+    if Pkg<>nil then
+    begin
+        FPathToSmartDesigner:= ExtractFilePath(Pkg.Filename);
+        FPathToSmartDesigner:= FPathToSmartDesigner + 'smartdesigner';
+        Result:=FPathToSmartDesigner;
+        //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+    end;
+  end
+  else Result:= FPathToSmartDesigner;
+end;
+
 procedure TLamwSmartDesigner.UpdateAllJControls(AProject: TLazProject);
 var
-  jControls, LFM: TStringList;
+  jControls, LFM, fclList: TStringList;
   lfmFileName, str: string;
   i, j, k: Integer;
+  pathToFclBridges: string;
 begin
+
+  fclList:=  TStringList.Create;
+  FPathToSmartDesigner:=  GetPathToSmartDesigner();
+
+  pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
+
+  if FileExists(pathToFclBridges+'fcl_bridges.txt') then
+     fclList.LoadFromFile(pathToFclBridges+'fcl_bridges.txt');
+
   jControls := TStringList.Create;
   jControls.Sorted := True;
   jControls.Duplicates := dupIgnore;
   jControls.Delimiter := ';';
   LFM := TStringList.Create;
+
   try
     for i := 0 to AProject.FileCount - 1 do
       with AProject.Files[i] do
@@ -1960,11 +2111,11 @@ begin
             k := Pos(':', str);
             if k > 0 then
             begin
-              str := Trim(Copy(str, k + 1, MaxInt));
-              if (str = 'TFPNoGUIGraphicsBridge')
-              or FileExists(LamwGlobalSettings.PathToJavaTemplates + 'lamwdesigner' + PathDelim + str + '.java')
-              then
+              str := Trim(Copy(str, k + 1, MaxInt)); //(str = 'TFPNoGUIGraphicsBridge')
+              if  (Pos(str, fclList.Text) > 0) or FileExists(LamwGlobalSettings.PathToJavaTemplates + str + '.java') then
+              begin
                   jControls.Add(str);
+              end;
             end;
           end;
           CustomData['jControls'] := jControls.DelimitedText;
@@ -1973,16 +2124,16 @@ begin
   finally
     LFM.Free;
     jControls.Free;
+    fclList.Free;
   end;
 end;
 
 function TLamwSmartDesigner.OnProjectSavingAll(Sender: TObject): TModalResult;
 var
-  auxList, jcontrolsList, libList: TStringList;
+  auxList, controlsList, libList: TStringList;
   i, j, p: Integer;
   nativeExists: Boolean;
   aux, PathToJavaTemplates, chipArchitecture, LibPath: string;
-  pathToNdkApiPlatforms, androidNdkApi, arch: string;
   AndroidTheme: string;
   compoundList: TStringList;
   lprModuleName: string;
@@ -1996,6 +2147,7 @@ begin
   AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
 
   PathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates; //included path delimiter
+  // C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java\
 
   //LAMW 0.8
   lprModuleName:= GetLprStartModuleVarName();
@@ -2008,6 +2160,8 @@ begin
   if Pos('-CpARMV6', aux) > 0 then chipArchitecture:= 'armeabi'
   else if Pos('-CpARMV7A', aux) > 0 then chipArchitecture:= 'armeabi-v7a'
   else if Pos('-XPmipsel', aux) > 0 then chipArchitecture:= 'mips';
+
+  AddSupportToFCLControls(chipArchitecture);
 
   if LamwGlobalSettings.CanUpdateJavaTemplate then
   begin
@@ -2060,8 +2214,8 @@ begin
     auxList.Clear;
     if Pos('AppCompat', AndroidTheme) > 0 then
     begin
-      if FileExists(PathToJavaTemplates + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'App.java') then
-        auxList.LoadFromFile(PathToJavaTemplates  + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'App.java');
+      if FileExists(PathToJavaTemplates +'support'+DirectorySeparator+'App.java') then
+        auxList.LoadFromFile(PathToJavaTemplates + 'support'+DirectorySeparator+'App.java');
     end
     else
     begin
@@ -2074,14 +2228,13 @@ begin
     auxList.Clear;
     if Pos('AppCompat', AndroidTheme) > 0 then
     begin
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates+
-                    'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java') then
-        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java');
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'jCommons.java') then
+        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'support'+DirectorySeparator+'jCommons.java');
     end
     else
     begin
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java') then
-        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +'jCommons.java');
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates+'jCommons.java') then
+        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'jCommons.java');
     end;
     auxList.Strings[0]:= 'package '+FPackageName+';';
     auxList.SaveToFile(FPathToJavaSource+'jCommons.java');
@@ -2093,92 +2246,38 @@ begin
   if FileExists(PathToJavaTemplates + 'Controls.native') then
   begin
     CopyFile(PathToJavaTemplates + 'Controls.native',
-       FPathToAndroidProject+'lamwdesigner'+PathDelim+'Controls.native');
+       FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'Controls.native');
   end;
 
-  jcontrolsList := TStringList.Create;
-  jcontrolsList.Sorted := True;
-  jcontrolsList.Duplicates := dupIgnore;
-  GetAllJControlsFromForms(jcontrolsList);
+  controlsList := TStringList.Create;
+  controlsList.Sorted := True;
+  controlsList.Duplicates := dupIgnore;
+
+  GetAllJControlsFromForms(controlsList);
 
   compoundList:= TStringList.Create;
-  for i:= 0 to jcontrolsList.Count - 1 do       //Add component compound support
+  for i:= 0 to controlsList.Count - 1 do       //Add component compound support
   begin
-    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+jcontrolsList.Strings[i]+'.compound') then
+    if FileExists(PathToJavaTemplates+controlsList.Strings[i]+'.compound') then
     begin
-      compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'lamwdesigner'+DirectorySeparator +jcontrolsList.Strings[i]+'.compound');
+      compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+controlsList.Strings[i]+'.compound');
       for j:= 0 to compoundList.Count - 1 do
       begin
         if compoundList.Strings[j] <> '' then
-           jcontrolsList.Add(compoundList.Strings[j]);
+           controlsList.Add(compoundList.Strings[j]);
       end;
     end;
   end;
   compoundList.Free;
 
   //re-add all [updated] java code ...
-  for j:= 0 to jcontrolsList.Count - 1 do
+  for j:= 0 to controlsList.Count - 1 do
   begin
-    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+jcontrolsList.Strings[j]+'.java') then
-       TryAddJControl(jcontrolsList.Strings[j], nativeExists);
+    if FileExists(PathToJavaTemplates+controlsList.Strings[j]+'.java') then
+       TryAddJControl(controlsList.Strings[j], nativeExists);
   end;
 
-  if jcontrolsList.IndexOf('TFPNoGUIGraphicsBridge') >= 0 then   //handle lib freetype need by TFPNoGUIGraphicsBridge
-  begin                                                                         //lamwdesigner\libs\armeabi\libfreetype.so
-    if FileExists(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so') then
-    begin
-      CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
-               FPathToAndroidProject+'libs'+PathDelim+
-               chipArchitecture+PathDelim+'libfreetype.so');
-
-      //Added support to TFPNoGUIGraphicsBridge ...
-      androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-13 or android-14 or ... etc
-      if androidNdkApi <> '' then
-      begin
-
-        if Pos('armeabi', chipArchitecture) > 0 then
-           arch:= 'arch-arm'
-        else if Pos('x86', chipArchitecture) > 0 then arch:= 'arch-x86'
-        else if Pos('mips', chipArchitecture) > 0 then arch:= 'arch-mips';
-
-                                //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
-        pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
-                                                androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
-                                                'usr'+DirectorySeparator+'lib';
-
-        //need by linker!
-        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
-               pathToNdkApiPlatforms+PathDelim+'libfreetype.so');
-
-        (*
-        //need by compiler
-        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetype.pp',
-                 FPathToAndroidProject+'jni'+PathDelim+ 'freetype.pp');
-        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetypeh.pp',
-                FPathToAndroidProject+'jni'+PathDelim+ 'freetypeh.pp');
-        CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'ftfont.pp',
-                 FPathToAndroidProject+'jni'+PathDelim+ 'ftfont.pp');
-        *)
-
-      end
-      else
-      begin
-        pathToNdkApiPlatforms:='';
-        aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
-        p:= Pos(';', aux);
-        if p > 0 then
-        begin
-           pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p-1));
-           //need by linker!
-           CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+chipArchitecture+PathDelim+'libfreetype.so',
-                    pathToNdkApiPlatforms+'libfreetype.so');
-        end;
-      end;
-
-    end;
-  end;
-
-  jcontrolsList.Free;
+  controlsList.Free;
   auxList.Free;
 
   UpdateProjectLpr(lprModuleName, FStartModuleVarName);
@@ -2327,7 +2426,7 @@ begin
   strList.Add('cd '+androidProjectName);
   strList.Add('call ant clean -Dtouchtest.enabled=true debug');
   strList.Add('if errorlevel 1 pause');
-  strList.SaveToFile(androidProjectName+'build-debug.bat');
+  strList.SaveToFile(androidProjectName+'ant-build-debug.bat');
 
   strList.Clear;
   strList.Add('set Path=%PATH%;'+pathToAntBin);
@@ -2335,7 +2434,7 @@ begin
   strList.Add('cd '+androidProjectName);
   strList.Add('call ant clean release');
   strList.Add('if errorlevel 1 pause');
-  strList.SaveToFile(androidProjectName+'build-release.bat');
+  strList.SaveToFile(androidProjectName+'ant-build-release.bat');
 
   strList.Clear;
   strList.Add('cd '+androidProjectName+'bin');
@@ -2343,7 +2442,7 @@ begin
              DirectorySeparator+'adb install -r '+FSmallProjName+'-'+antBuildMode+'.apk');
   strList.Add('cd ..');
   strList.Add('pause');
-  strList.SaveToFile(androidProjectName+'install.bat');
+  strList.SaveToFile(androidProjectName+'adb-install.bat');
 
   linuxDirSeparator:= DirectorySeparator;
   linuxPathToJavaJDK:= pathToJavaJDK;
@@ -2381,7 +2480,7 @@ begin
   strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);
   strList.Add('cd '+linuxAndroidProjectName);
   strList.Add('ant -Dtouchtest.enabled=true debug');
-  SaveShellScript(strList, androidProjectName+'build-debug.sh');
+  SaveShellScript(strList, androidProjectName+'ant-build-debug.sh');
 
 
   //MacOs
@@ -2393,7 +2492,7 @@ begin
      strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
      strList.Add('cd '+linuxAndroidProjectName);
      strList.Add('ant -Dtouchtest.enabled=true debug');
-     SaveShellScript(strList, androidProjectName+'build-debug-macos.sh');
+     SaveShellScript(strList, androidProjectName+'ant-build-debug-macos.sh');
   end;
 
   strList.Clear;
@@ -2403,23 +2502,33 @@ begin
   strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
   strList.Add('cd '+linuxAndroidProjectName);
   strList.Add('ant clean release');
-  SaveShellScript(strList, androidProjectName+'build-release.sh');
+  SaveShellScript(strList, androidProjectName+'ant-build-release.sh');
 
   linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
 
   //linux install - thanks to Stephano!
   strList.Clear;
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
+  (*
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+antBuildMode+'.apk');
-  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
-  SaveShellScript(strList, androidProjectName+'install.sh');
+  *)
+
+  tempStr:= androidProjectName;
+  {$ifdef windows}
+  tempStr:= StringReplace(androidProjectName,PathDelim,linuxDirSeparator, [rfReplaceAll]);
+  tempStr:= Copy(tempStr, 3, MaxInt); //drop C:
+  {$endif}
+
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr + 'bin' + linuxDirSeparator+FSmallProjName+'-'+antBuildMode+'.apk');
+  //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
+  SaveShellScript(strList, androidProjectName+'adb-install.sh');
 
   strList.Clear;
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
-  SaveShellScript(strList, androidProjectName+'uninstall.sh');
+  SaveShellScript(strList, androidProjectName+'adb-uninstall.sh');
 
   strList.Clear;
-  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat');
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
   SaveShellScript(strList, androidProjectName+'logcat.sh');
 
   strList.Free;

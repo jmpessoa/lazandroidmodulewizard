@@ -1,3 +1,0 @@
-public java.lang.Object jRatingBar_jCreate(long _Self,  int _numStars, float _step) {
-    return (java.lang.Object)(new jRatingBar(this,_Self,_numStars,_step));
-}

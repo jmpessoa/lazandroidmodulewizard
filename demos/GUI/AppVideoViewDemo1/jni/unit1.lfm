@@ -7,20 +7,23 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 92
+    Left = 72
     Top = 5
-    Width = 135
-    Height = 20
+    Width = 176
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Id = 1
     PosRelativeToAnchor = []
@@ -29,22 +32,23 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     Text = 'App VideoView Demo1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 2
-    Top = 34
-    Width = 314
-    Height = 40
+    Top = 40
+    Width = 316
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 3
@@ -57,17 +61,19 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jButton2: jButton
     Left = 2
-    Top = 124
-    Width = 314
-    Height = 40
+    Top = 147
+    Width = 316
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jCheckBox1
     Id = 4
@@ -80,17 +86,19 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
   end
   object jPanel1: jPanel
-    Left = 2
-    Top = 169
-    Width = 316
-    Height = 186
+    Left = 1
+    Top = 209
+    Width = 318
+    Height = 200
     MarginLeft = 1
     MarginTop = 1
     MarginRight = 1
     MarginBottom = 1
+    Enabled = True
     Visible = True
     Anchor = jButton2
     Id = 5
@@ -104,12 +112,13 @@ object AndroidModule1: TAndroidModule1
     object jVideoView1: jVideoView
       Left = 0
       Top = 0
-      Width = 316
-      Height = 186
+      Width = 318
+      Height = 200
       MarginLeft = 0
       MarginTop = 0
       MarginRight = 0
       MarginBottom = 0
+      Enabled = True
       Visible = True
       Id = 1
       PosRelativeToAnchor = []
@@ -121,13 +130,14 @@ object AndroidModule1: TAndroidModule1
   end
   object jCheckBox1: jCheckBox
     Left = 5
-    Top = 83
-    Width = 64
+    Top = 106
+    Width = 72
     Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 6

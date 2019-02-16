@@ -1,7 +1,6 @@
 package com.example.appdemo1;
 
 import java.lang.reflect.Field;
-
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -9,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CheckBox;
+import android.view.Gravity;
 
 public class jCheckBox extends CheckBox {
 	//Java-Pascal Interface
@@ -40,6 +40,8 @@ public class jCheckBox extends CheckBox {
 	}
 
 	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		String tag = ""+left+"|"+top+"|"+right+"|"+bottom;
+		this.setTag(tag); //nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 
@@ -63,7 +65,7 @@ public class jCheckBox extends CheckBox {
 		LAMWCommon.setLParamHeight(h);
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 

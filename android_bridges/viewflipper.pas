@@ -5,7 +5,7 @@ unit viewflipper;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls;
+  Classes, SysUtils, And_jni, AndroidWidget, systryparent;
 
 type
 
@@ -52,9 +52,13 @@ jViewFlipper = class(jVisualControl)
     procedure SetFlipInterval(_milliseconds: integer);
     procedure StartFlipping();
     procedure StopFlipping();
-    procedure AddView(_layout: jObject);
+    procedure AddView(_layout: jObject); overload;
     procedure Next();
     procedure Previous();
+    procedure AddView(_fullPathToImage: string; _scaleType: TImageScaleType);  overload;
+    procedure AddView(_fullPathToImage: string; _scaleType: TImageScaleType; _roundedShape: boolean); overload;
+    procedure Clear();
+
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
@@ -83,9 +87,12 @@ procedure jViewFlipper_SetAutoStart(env: PJNIEnv; _jviewflipper: JObject; _value
 procedure jViewFlipper_SetFlipInterval(env: PJNIEnv; _jviewflipper: JObject; _milliseconds: integer);
 procedure jViewFlipper_StartFlipping(env: PJNIEnv; _jviewflipper: JObject);
 procedure jViewFlipper_StopFlipping(env: PJNIEnv; _jviewflipper: JObject);
-procedure jViewFlipper_AddView(env: PJNIEnv; _jviewflipper: JObject; _layout: jObject);
+procedure jViewFlipper_AddView(env: PJNIEnv; _jviewflipper: JObject; _layout: jObject);  overload;
 procedure jViewFlipper_Next(env: PJNIEnv; _jviewflipper: JObject);
 procedure jViewFlipper_Previous(env: PJNIEnv; _jviewflipper: JObject);
+procedure jViewFlipper_AddView(env: PJNIEnv; _jviewflipper: JObject; _fullPathToImage: string; _scaleType: integer; _roundedShape: boolean); overload;
+procedure jViewFlipper_Clear(env: PJNIEnv; _jviewflipper: JObject);
+
 
 implementation
 
@@ -393,6 +400,20 @@ begin
      jViewFlipper_AddView(FjEnv, FjObject, _layout);
 end;
 
+procedure jViewFlipper.AddView(_fullPathToImage: string; _scaleType: TImageScaleType);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jViewFlipper_AddView(FjEnv, FjObject, _fullPathToImage, Ord(_scaleType), False);
+end;
+
+procedure jViewFlipper.AddView(_fullPathToImage: string; _scaleType: TImageScaleType; _roundedShape: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jViewFlipper_AddView(FjEnv, FjObject, _fullPathToImage, Ord(_scaleType) ,_roundedShape);
+end;
+
 procedure jViewFlipper.Next();
 begin
   //in designing component state: set value here...
@@ -405,6 +426,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jViewFlipper_Previous(FjEnv, FjObject);
+end;
+
+procedure jViewFlipper.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jViewFlipper_Clear(FjEnv, FjObject);
 end;
 
 procedure jViewFlipper.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
@@ -753,5 +781,33 @@ begin
   env^.CallVoidMethod(env, _jviewflipper, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jViewFlipper_AddView(env: PJNIEnv; _jviewflipper: JObject; _fullPathToImage: string; _scaleType: integer; _roundedShape: boolean);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPathToImage));
+  jParams[1].i:= _scaleType;
+  jParams[2].z:= JBool(_roundedShape);
+  jCls:= env^.GetObjectClass(env, _jviewflipper);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddView', '(Ljava/lang/String;IZ)V');
+  env^.CallVoidMethodA(env, _jviewflipper, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jViewFlipper_Clear(env: PJNIEnv; _jviewflipper: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jviewflipper);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _jviewflipper, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

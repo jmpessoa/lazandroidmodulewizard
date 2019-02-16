@@ -1,5 +1,11 @@
 package com.example.appdemo1;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +17,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -25,6 +33,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -68,7 +78,6 @@ class jListItemRow {
 	public  jListItemRow(Context context) {
 		ctx = context;
 		label = "";
-		//creating adapter for spinner
 	}
 	
 }
@@ -80,9 +89,10 @@ class jArrayAdapter extends ArrayAdapter {
 	private Controls        controls = null;   // Control Class for Event
 	private Context       ctx;
 	private int           id;
-	private List <jListItemRow> items ;
-	private ArrayAdapter thisAdapter;
-	
+
+	public List <jListItemRow> items;
+	public  ArrayAdapter thisAdapter;
+
 	private boolean mDispatchOnDrawItemTextColor;
 	private boolean mDrawAllItemPartsTextColor;
 	private boolean mDispatchOnDrawItemBitmap;
@@ -96,6 +106,58 @@ class jArrayAdapter extends ArrayAdapter {
     int mItemPaddingBottom = 40;
     Typeface mWidgetCustomFont = null;
 
+	public ValueFilter customFilter = null;
+	public int mFilterMode = 0;
+
+	private class ValueFilter extends Filter{
+
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
+			FilterResults results = new FilterResults();
+			// We implement here the filter logic
+			if (constraint == null || constraint.length() == 0) {
+				// No filter implemented we return all the list
+				results.values = null; //origItems;
+				results.count = 0;//origItems.size();
+			}
+			else {
+				// We perform filtering operation
+				ArrayList<jListItemRow> filteredList = new ArrayList<jListItemRow>();
+				for (jListItemRow p : items) {
+					if (mFilterMode == 0) {
+						if (p.label.toUpperCase().startsWith(constraint.toString().toUpperCase())) {
+							filteredList.add(p);
+						}
+					} else {
+						if (p.label.toUpperCase().contains(constraint.toString().toUpperCase())) {
+							filteredList.add(p);
+						}
+					}
+				}
+				results.values = filteredList;
+				results.count = filteredList.size();
+			}
+			return results;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected void publishResults(CharSequence constraint, FilterResults results) {
+			// Now we have to inform the adapter about the new list filtered
+			if (results.count == 0) {
+				thisAdapter.notifyDataSetInvalidated();
+			}
+			else {
+				items.clear();
+				for (jListItemRow p : (ArrayList<jListItemRow>)results.values) {
+						items.add(p);
+				}
+				thisAdapter.notifyDataSetChanged();
+			}
+		}
+	}
+
+	//constructor
 	public  jArrayAdapter(Context context, Controls ctrls,long pasobj, int textViewResourceId,
 						  List<jListItemRow> list) {
 		super(context, textViewResourceId, list);
@@ -104,6 +166,7 @@ class jArrayAdapter extends ArrayAdapter {
 		ctx   = context;
 		id    = textViewResourceId;
 		items = list;
+		//origItems = new ArrayList<jListItemRow>();
 		thisAdapter = this;
 		mDispatchOnDrawItemTextColor = true;
 		mDrawAllItemPartsTextColor = true;
@@ -134,7 +197,6 @@ class jArrayAdapter extends ArrayAdapter {
 	public void SetDispatchOnDrawItemTextColor(boolean _value) {
 		mDispatchOnDrawItemTextColor = _value;
 	}
-
 	
 	public void SetDispatchOnDrawItemWidgetTextColor(boolean _value) { //+++
 		mDispatchOnDrawItemWidgetTextColor = _value;
@@ -160,7 +222,6 @@ class jArrayAdapter extends ArrayAdapter {
 	   mItemPaddingBottom =  _itemPaddingBottom;
 	}
 
-	
     public void SetWidgetFontFromAssets(String _fontName) {			
          mWidgetCustomFont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);		
     }
@@ -173,7 +234,6 @@ class jArrayAdapter extends ArrayAdapter {
 	}
 	
 	//http://stackoverflow.com/questions/14569963/converting-pixel-values-to-mm-android
-	
 	public float pixelsToPT(Float px) {  //Scaled Pixels
 	    DisplayMetrics metrics = ctx.getResources().getDisplayMetrics();
 	    float dp = px / (metrics.xdpi * (1.0f/72) );
@@ -219,12 +279,29 @@ class jArrayAdapter extends ArrayAdapter {
 		     return 0;
 		  }
 	}
-		
+
+	public void setFilter(ArrayList<jListItemRow> list, String query) {
+        items = list;
+        thisAdapter.getFilter().filter((CharSequence) query);
+    }
+
+    public void setFilterMode(int mode) {
+		mFilterMode = mode;
+	}
+
+	@Override
+	public Filter getFilter() {
+		if (customFilter == null) {
+			customFilter = new ValueFilter();
+		}
+		return (ValueFilter)customFilter;
+	}
+
 	@Override
 	public  View getView(int position, View v, ViewGroup parent) {
 
-		if (position >= 0 && ( !items.get(position).label.equals("") ) ) {
-
+		if ( (position >= 0)   && ( position < items.size() ) ) {
+            //&& ( !items.get(position).label.equals("") )
 			LinearLayout listLayout = new LinearLayout(ctx);
 
 			listLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -503,7 +580,7 @@ class jArrayAdapter extends ArrayAdapter {
 
 			switch(items.get(position).widget) {   //0 == there is not a widget!
 				case 1:  itemWidget = new CheckBox(ctx);
-					((CheckBox)itemWidget).setId(position+6666);
+					((CheckBox)itemWidget).setId(position+6666); //dummy
 															
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
@@ -713,7 +790,7 @@ class jArrayAdapter extends ArrayAdapter {
 					items.get(position).jWidget = itemWidget;					
 					((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {
 						public void onFocusChange(View v, boolean hasFocus) {
-							final int index = v.getId() - 6666;
+							final int index = v.getId() - 6666; //dummy
 							final EditText caption = (EditText)v;
 							if (!hasFocus){
 								if (index >= 0) {
@@ -1022,13 +1099,14 @@ public class jListView extends ListView {
 	int textSizeDecorated;
 	int textAlign;
 
-	String delimiter;
+	String delimiter = "|";
 	String leftDelimiter = "(";
 	String rightDelimiter = ")";
 
-	private ArrayList<jListItemRow>    alist;
+	private ArrayList<jListItemRow> alist;
+	public  ArrayList<jListItemRow> orig_alist;
 
-	private jArrayAdapter        aadapter;
+	private jArrayAdapter  aadapter;
 
 	private OnItemClickListener  onItemClickListener;
 	private OnTouchListener onTouchListener;
@@ -1075,6 +1153,7 @@ public class jListView extends ListView {
 		setCacheColorHint(0);
 
 		alist = new ArrayList<jListItemRow>();
+		orig_alist = new ArrayList<jListItemRow>();
 		//simple_list_item_1
 		aadapter = new jArrayAdapter(context, controls, PasObj, android.R.layout.simple_list_item_1, alist);
 
@@ -1299,8 +1378,9 @@ public class jListView extends ListView {
     }
 	
 	
-	public  void add2(String item, String delimiter) {
+	public  void add2(String item, String _delimiter) {
 		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter;
 		info.label = item;
 		info.delimiter=  delimiter;
 		info.leftDelimiter = leftDelimiter;
@@ -1328,8 +1408,9 @@ public class jListView extends ListView {
 		aadapter.notifyDataSetChanged();
 	}
 
-	public  void add22(String item, String delimiter, Bitmap bm) {
+	public  void add22(String item, String _delimiter, Bitmap bm) {
 		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter; 
 		info.label = item;
 		info.delimiter=  delimiter;
 		info.leftDelimiter = leftDelimiter;
@@ -1357,8 +1438,9 @@ public class jListView extends ListView {
 
 	}
 
-	public  void add3(String item, String delimiter, int fontColor, int fontSize, int widgetItem, String wgtText, Bitmap img) {
+	public  void add3(String item, String _delimiter, int fontColor, int fontSize, int widgetItem, String wgtText, Bitmap img) {
 		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter;
 		info.label = item;
 		info.id = alist.size();
 		info.checked = false;
@@ -1385,8 +1467,10 @@ public class jListView extends ListView {
 		aadapter.notifyDataSetChanged();
 	}
 
-	public  void add4(String item, String delimiter, int fontColor, int fontSize, int widgetItem, String wgtText) {
+	
+	public  void add4(String item, String _delimiter, int fontColor, int fontSize, int widgetItem, String wgtText) {
 		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter;
 		info.label = item;
 		info.id = alist.size();
 		info.checked = false;
@@ -1769,5 +1853,153 @@ public class jListView extends ListView {
 	public int GetCheckedItemPosition() {
 		return this.getCheckedItemPosition();
 	}	
+
+	public void SetFitsSystemWindows(boolean _value) {
+		LAMWCommon.setFitsSystemWindows(_value);
+	}
 	
+	   /*
+    Change the view's z order in the tree, so it's on top of other sibling views.
+    Prior to KITKAT/4.4/Api 19 this method should be followed by calls to requestLayout() and invalidate()
+    on the view's parent to force the parent to redraw with the new child ordering.
+  */	
+	public void BringToFront() {
+		this.bringToFront();
+		if (Build.VERSION.SDK_INT < 19 ) {			
+			ViewGroup parent = LAMWCommon.getParent();
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+		}	
+		this.setVisibility(android.view.View.VISIBLE);
+	}
+	
+	public void SetVisibilityGone() {
+		LAMWCommon.setVisibilityGone();
+	}
+
+	
+	//TODO
+	public String GetEnvironmentDirectoryPath(int _directory) {
+		
+		File filePath= null;
+		String absPath="";   //fail!
+		  
+		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
+		if (_directory != 8) {		  	   	 
+		  switch(_directory) {	                       
+		    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break;	   
+		    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
+		    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
+		    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
+		    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
+		    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
+		    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
+		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+		    
+		    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
+		    case 10: absPath = this.controls.activity.getFilesDir().getPath();
+		             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
+		    case 11: absPath = this.controls.activity.getFilesDir().getPath();
+	                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             
+		           
+		  }
+		  	  
+		  //Make sure the directory exists.
+	      if (_directory < 8) { 
+	    	 filePath.mkdirs();
+	    	 absPath= filePath.getPath(); 
+	      }	        
+	      
+		}else {  //== 8 
+		    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
+		    	filePath = Environment.getExternalStorageDirectory();  //sdcard!
+		    	// Make sure the directory exists.
+		    	filePath.mkdirs();
+		   	    absPath= filePath.getPath();
+		    }
+		}    	
+		    		  
+		return absPath;
+	}
+		
+    private void SaveToFile(String _txtContent, String _filename) {	  	 
+		     try {
+		         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+		        		 controls.activity.openFileOutput(_filename, Context.MODE_PRIVATE));
+		         
+		         //outputStreamWriter.write("_header");
+		         outputStreamWriter.write(_txtContent);
+		         //outputStreamWriter.write("_footer");
+		         outputStreamWriter.close();
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
+		     }
+    }
+	
+	public void SaveToFile(String _appInternalFileName) {	
+		//create StringBuffer object
+		 StringBuffer sbf = new StringBuffer();				
+		 //StringBuffer contents		 
+		 //new line				
+		  int count = 	alist.size();
+		  for(int i=0; i < count; i++) {
+			  sbf.append(alist.get(i).label);
+			  sbf.append("\n");
+		  }	  		  
+		  SaveToFile(sbf.toString(), _appInternalFileName);		  
+	}
+    	
+	public String[] LoadFromFile(String _appInternalFileName) {
+		     ArrayList<String> Items = new ArrayList<String>();		     		   
+		     try {
+		         InputStream inputStream = controls.activity.openFileInput(_appInternalFileName);
+		         if ( inputStream != null ) {
+		        	 clear();
+		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		             String receiveString = "";		             
+		             while ( (receiveString = bufferedReader.readLine()) != null ) {		             
+		            	 Items.add(receiveString);		            	 
+		                 add2(receiveString, delimiter);		                
+		             }
+		             inputStream.close();
+		         }
+		     }
+		     catch (IOException e) {
+		        // Log.i("jListView", "LoadFromFile error: " + e.toString());
+		     }
+		     String sItems[] = Items.toArray(new String[Items.size()]);    	   
+		 	 return sItems; 
+	}
+
+	public void SetFilterQuery(String _query) {
+		orig_alist.clear();
+		for (jListItemRow p : alist) {
+			orig_alist.add(p);
+		}
+		aadapter.setFilter(alist, _query);
+	}
+
+	public void SetFilterQuery(String _query, int _filterMode) {
+		aadapter.setFilterMode(_filterMode);
+		SetFilterQuery(_query);
+	}
+
+	public void SetFilterMode(int _filterMode) {
+		aadapter.setFilterMode(_filterMode); //0=startsWith ... 1=contains
+	}
+
+    public void ClearFilterQuery() {
+	    if (orig_alist.size() > 0) {
+            alist.clear();
+            for (jListItemRow p : orig_alist) {
+                alist.add(p);
+            }
+            aadapter.notifyDataSetChanged();
+        }
+	}
+
 }

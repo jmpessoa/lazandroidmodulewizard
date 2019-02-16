@@ -76,6 +76,7 @@ type
     FPathToClassName: string;
 
     FPathToJavaTemplates: string;
+    FPathToSmartDesigner: string;
 
     FPathToWizardCode: string;
 
@@ -126,6 +127,7 @@ type
     property PathToJavaClass: string read FPathToJavaClass  write FPathToJavaClass;
     property JNIDecoratedMethodName: string read FJNIDecoratedMethodName write FJNIDecoratedMethodName;
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
+    property PathToSmartDesigner: string read FPathToSmartDesigner write FPathToSmartDesigner;
     property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
     property MainActivity: string read FMainActivity write FMainActivity;
     property MinApi: string  read FMinApi write FMinApi;
@@ -834,6 +836,7 @@ begin
 
    i:= LastPos(DirectorySeparator, FPathToJavaTemplates);
    FPathToWizardCode:= Copy(FPathToJavaTemplates, 1, i-1);
+   ShowMessage('**FPathToWizardCode = ' + FPathToWizardCode);
    FPathToJavaClass:= FFullJavaSrcPath+DirectorySeparator+FSmallProjName+'.java';
 
    pathList:= TStringList.Create;

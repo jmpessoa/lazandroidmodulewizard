@@ -139,12 +139,10 @@ public  void Free() {
 bmp = null;
 }
 
-//by jmpessoa
 public  Bitmap jInstance() {
 	  return this.bmp;
 }
 
-//by jmpessoa
 public byte[] GetByteArrayFromBitmap() {
   ByteArrayOutputStream stream = new ByteArrayOutputStream();
   this.bmp.compress(CompressFormat.PNG, 0, stream); //O: PNG will ignore the quality setting...
@@ -152,7 +150,6 @@ public byte[] GetByteArrayFromBitmap() {
   return stream.toByteArray();
 }
 
-//by jmpessoa
 public void SetByteArrayToBitmap(byte[] image) {
 	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
 	//Log.i("SetByteArrayToBitmap","size="+ image.length);
@@ -279,7 +276,6 @@ public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _h
     return bmp;
 }
 
-//by jmpessoa
 public Bitmap GetBitmapFromByteArray(byte[] _image) {
  //this.bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
 	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);

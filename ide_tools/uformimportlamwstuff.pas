@@ -21,7 +21,9 @@ type
     ListBoxTarget: TListBox;
     OpenDialog1: TOpenDialog;
     SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
     procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
   private
     //
   public
@@ -43,6 +45,13 @@ begin
   begin
     EditSource.Text:= OpenDialog1.FileName;
   end;
+end;
+
+procedure TFormImportLAMWStuff.SpeedButton2Click(Sender: TObject);
+begin
+  ShowMessage('how does it work?'+ sLineBreak +
+              'The [dummy] unit/form selected will be replaced'+sLineBreak+
+              'by the the imported unit/form!');
 end;
 
 

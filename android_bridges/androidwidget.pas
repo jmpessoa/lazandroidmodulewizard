@@ -15,6 +15,10 @@ uses
   Classes, SysUtils, Math, types, And_jni, CustApp;
 
 type
+
+  TStrokeCap = (scDefault, scRound);
+  TStrokeJoin = (sjDefault, sjRound);
+
   TAndroidLayoutType = (altMATCHPARENT,altWRAPCONTENT);
   TViewVisibility = (vvVisible=0,  vvInvisible=4, vvGone=8);
 
@@ -307,6 +311,11 @@ type
  TOnPinchZoom = procedure(Sender: TObject; scaleFactor: single; scaleState: TPinchZoomScaleState) of Object;
 
  TTouchPoint = record
+       X: single;
+       Y: single;
+ end;
+
+ TSinglePoint = record
        X: single;
        Y: single;
  end;
@@ -726,10 +735,11 @@ type
   {
   The first parameter is the JNI environment, frequently used with helper functions.
   The second parameter is the Java object that this function is a part of.
+
+  The folder "Digital Camera Image"-DCIM- store photographs from digital camera
   }
 
 
-  //by jmpessoa
   TEnvPath    = record
                  App         : string;    // /data/app/com.kredix-1.apk
                  Dat         : string;    // /data/data/com.kredix/files
@@ -738,10 +748,7 @@ type
                  DataBase    : string;
 
   end;
-  //The folder "Digital Camera Image"-DCIM- store photographs from digital camera
 
-
-  //by jmpessoa
   TFilePath = (fpathNone, fpathApp, fpathData, fpathExt, fpathDCIM, fpathDataBase);
 
 
@@ -1245,6 +1252,7 @@ end;
     function IsRuntimePermissionGranted(_manifestPermission: string): boolean;
     procedure RequestRuntimePermission(_manifestPermission: string; _requestCode: integer); overload;
     procedure RequestRuntimePermission(var _androidPermissions: TDynArrayOfString; _requestCode: integer); overload;
+    procedure RequestRuntimePermission(_androidPermissions: array of string; _requestCode: integer); overload;
 
     function HasActionBar(): boolean;
     function IsAppCompatProject(): boolean;
@@ -1259,6 +1267,10 @@ end;
     //end TR3E
 
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string);
+    function GetJByteBuffer(_width: integer; _height: integer): jObject;
+    function GetJByteBufferFromImage(_bitmap: jObject): jObject;
+    function GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
+    function GetJGlobalRef(jObj: jObject): jObject;
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1368,6 +1380,7 @@ end;
     FOnBeforeDispatchDraw: TOnBeforeDispatchDraw;
     FOnAfterDispatchDraw: TOnAfterDispatchDraw;
     FOnLayouting: TOnLayouting;
+    FMyClassParentName: string;
 
     procedure SetAnchor(Value: jVisualControl);
     procedure DefineProperties(Filer: TFiler); override;
@@ -1411,7 +1424,7 @@ end;
     property ScreenStyle   : TScreenStyle read FScreenStyle  write FScreenStyle   ;
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
     property View: jObject read GetView;     //FjObject; //View/Layout
-
+    property MyClassParentName: string read FMyClassParentName write FMyClassParentName;
   published
     property Visible: boolean read GetVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
@@ -1684,6 +1697,7 @@ function jForm_IsRuntimePermissionNeed(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_IsRuntimePermissionGranted(env: PJNIEnv; _jform: JObject; _androidPermission: string): boolean;
 procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermission: string; _requestCode: integer);  overload;
 procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; var _androidPermissions: TDynArrayOfString; _requestCode: integer);  overload;
+procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermissions: array of string; _requestCode: integer);  overload;
 
 function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
@@ -1692,6 +1706,8 @@ function jForm_getScreenWidth(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
 procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string);
+function jForm_GetJByteBuffer(env: PJNIEnv; _jform: JObject; _width: integer; _height: integer): jObject;
+function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jObject): jObject;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -1778,6 +1794,10 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
 
   procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject;  layout:jobject; intent: jobject);
 
+  function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
+  function  sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
+  function  sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
+
 var
   gApp:       jApp;       //global App !
   gVM         : PJavaVM;
@@ -1790,6 +1810,44 @@ var
 
 
 implementation
+
+function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
+begin
+
+   result := 0;
+
+   if layoutParam = lpExact then
+   begin
+    result := data;
+    exit;
+   end;
+
+   if parent is jForm then
+    Result := GetLayoutParams(gApp, layoutParam, sd)
+   else
+    if parent <> nil then
+     result := GetLayoutParamsByParent((parent as jVisualControl), layoutParam, sd);
+
+   if result > 0 then
+    result := result - margins;
+
+end;
+
+function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
+begin
+      if FParent is jForm then
+         Result:= (FParent as jForm).ScreenWH.Height - gapp.GetContextTop
+      else
+         Result:= (FParent as jVisualControl).GetHeight;
+end;
+
+function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
+begin
+      if FParent is jForm then
+        Result:= (FParent as jForm).ScreenWH.Width
+      else
+        Result:= (FParent as jVisualControl).GetWidth;
+end;
 
 procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject; layout:jobject; intent: jobject);
 begin
@@ -2368,12 +2426,16 @@ begin
   FjPRLayoutHome:= FjPRLayout;  //save origin
 
   FScreenStyle := jForm(Owner).ScreenStyle;
+
+  (*
   if (PosRelativeToAnchor = []) and (PosRelativeToParent = []) then
   begin
     //commented by jmpessoa: causing error to jPanel when used as a "flying" view [jActonBarTab, jRecyclerView...]
     //FMarginLeft := FLeft;
     //FMarginTop := FTop;
   end;
+  *)
+
 end;
 
 procedure jVisualControl.Notification(AComponent: TComponent; Operation: TOperation);
@@ -3951,6 +4013,13 @@ begin
      jForm_RequestRuntimePermission(FjEnv, FjObject, _androidPermissions ,_requestCode);
 end;
 
+procedure jForm.RequestRuntimePermission(_androidPermissions: array of string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_RequestRuntimePermission(FjEnv, FjObject, _androidPermissions ,_requestCode);
+end;
+
 function jForm.HasActionBar(): boolean;
 begin
   //in designing component state: result value here...
@@ -4015,6 +4084,30 @@ begin
  FBackgroundImageIdentifier:= _imageIdentifier;
   if FInitialized then
      jForm_SetBackgroundImage(FjEnv, FjObject, _imageIdentifier);
+end;
+
+function jForm.GetJByteBuffer(_width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetJByteBuffer(FjEnv, FjObject, _width ,_height);
+end;
+
+function jForm.GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
+begin
+   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,jbyteBuffer));
+end;
+
+function jForm.GetJByteBufferFromImage(_bitmap: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetByteBufferFromImage(FjEnv, FjObject, _bitmap);
+end;
+
+function jForm.GetJGlobalRef(jObj: jObject): jObject;
+begin
+  Result := FjEnv^.NewGlobalRef(FjEnv,jObj);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -5651,6 +5744,29 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermissions: array of string; _requestCode: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_androidPermissions);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_androidPermissions[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jParams[1].i:= _requestCode;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestRuntimePermission', '([Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 
 function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
@@ -5735,6 +5851,33 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundImage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_GetJByteBuffer(env: PJNIEnv; _jform: JObject; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _width;
+  jParams[1].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetJByteBuffer', '(II)Ljava/nio/ByteBuffer;');
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetByteBufferFromImage', '(Landroid/graphics/Bitmap;)Ljava/nio/ByteBuffer;');
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

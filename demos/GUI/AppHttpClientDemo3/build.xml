@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="AppHttpClientDemo3" default="help">
 <property name="sdk.dir" location="C:\adt32\sdk\"/>
-<property name="target" value="android-23"/>
+<property name="target" value="android-26"/>
 <property file="ant.properties"/>
 <fail message="sdk.dir is missing." unless="sdk.dir"/>
 
@@ -25,9 +25,9 @@
 <property name="api21" value="true"/>
 <property name="api22" value="true"/>
 <property name="api23" value="true"/>
-<property name="api24" value="false"/>
-<property name="api25" value="false"/>
-<property name="api26" value="false"/>
+<property name="api24" value="true"/>
+<property name="api25" value="true"/>
+<property name="api26" value="true"/>
 <property name="api27" value="false"/>
 <property name="api28" value="false"/>
 

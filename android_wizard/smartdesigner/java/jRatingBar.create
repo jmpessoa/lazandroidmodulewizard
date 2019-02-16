@@ -1,0 +1,6 @@
+public java.lang.Object jRatingBar_jCreate(long _Self,int _numStars,int _style,boolean _isIndicator) {
+    if (_style==0)
+        return (java.lang.Object)(new jRatingBar(this,_Self,_numStars,android.R.attr.ratingBarStyle, _isIndicator));
+    else //1
+        return (java.lang.Object)(new jRatingBar(this,_Self,_numStars,android.R.attr.ratingBarStyleSmall, _isIndicator));
+}

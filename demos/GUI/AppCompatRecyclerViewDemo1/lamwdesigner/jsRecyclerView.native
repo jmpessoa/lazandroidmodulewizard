@@ -1,0 +1,2 @@
+public native void pOnRecyclerViewItemClick(long pasobj, int itemIndex, int arrayContentCount);
+public native void pOnRecyclerViewItemWidgetClick(long pasobj, int itemIndex, int widgetClass, String widgetCaption, int status);									

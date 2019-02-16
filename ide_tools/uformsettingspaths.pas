@@ -19,7 +19,6 @@ type
     BitBtnCancel: TBitBtn;
     ComboBoxPrebuild: TComboBox;
     EditPathToGradle: TEdit;
-    EditPathToJavaTemplates: TEdit;
     EditPathToAndroidNDK: TEdit;
     EditPathToJavaJDK: TEdit;
     EditPathToAndroidSDK: TEdit;
@@ -27,20 +26,17 @@ type
     GroupBoxPrebuild: TGroupBox;
     Image1: TImage;
     LabelPathToGradle: TLabel;
-    LBPathToJavaTemplates: TLabel;
     LabelPathToAndroidNDK: TLabel;
     LabelPathToJavaJDK: TLabel;
     LabelPathToAndroidSDK: TLabel;
     LabelPathToAntBinary: TLabel;
     RGNDKVersion: TRadioGroup;
     SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog;
-    SelDirDlgPathToJavaTemplates: TSelectDirectoryDialog;
     SelDirDlgPathToJavaJDK: TSelectDirectoryDialog;
     SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog;
     SelDirDlgPathToAntBinary: TSelectDirectoryDialog;
     SelDirDlgPathToGradle: TSelectDirectoryDialog;
     SpBPathToAndroidNDK: TSpeedButton;
-    SpBPathToJavaTemplates: TSpeedButton;
     SpBPathToJavaJDK: TSpeedButton;
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
@@ -58,28 +54,29 @@ type
     procedure SpBPathToJavaJDKClick(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
-    procedure SpBPathToJavaTemplatesClick(Sender: TObject);
     procedure SpeedButtonHelpClick(Sender: TObject);
     procedure SpeedButtonInfoClick(Sender: TObject);
     function GetGradleVersion(out tagVersion: integer): string;
     function GetMaxSdkPlatform(): integer;
     function HasBuildTools(platform: integer): boolean;
-
+    function GetPathToSmartDesigner(): string;
   private
     { private declarations }
     FPathToJavaTemplates: string;
+    FPathToSmartDesigner: string;
     FPathToJavaJDK: string;
     FPathToAndroidSDK: string;
     FPathToAndroidNDK: string;
     FPathToAntBin: string;
     FPrebuildOSYS: string;
-    FPathToTemplatePresumed: string;
     FPathToGradle: string;
     //FGradleVersion: string;
+    procedure WriteIniString(Key, Value: string);
+
   public
     { public declarations }
     FOk: boolean;
-    FPathTemplatesEdited: boolean;
+    //FPathTemplatesEdited: boolean;
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
     function GetPrebuiltDirectory: string;
@@ -226,22 +223,12 @@ procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseA
 var
    fName: string;
 begin
-  fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini';
+  fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
   if FOk then
   begin
     SaveSettings(fName);
     LamwGlobalSettings.ReloadPaths;
-  end
-  else if FPathTemplatesEdited = True then
-       begin
-         with TInifile.Create(fName) do
-         try
-           if EditPathToJavaTemplates.Text <> '' then
-               WriteString('NewProject', 'PathToJavaTemplates', EditPathToJavaTemplates.Text);
-         finally
-           Free;
-         end;
-       end;
+  end;
 end;
 
 
@@ -275,29 +262,64 @@ begin
   lisDir.free;
 end;
 
-procedure TFormSettingsPaths.FormActivate(Sender: TObject);
+procedure TFormSettingsPaths.WriteIniString(Key, Value: string);
 var
-  p: integer;
+  FIniFile: TIniFile;
+begin
+  FIniFile := TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+  if FIniFile <> nil then
+  begin
+    FIniFile.WriteString('NewProject', Key, Value);
+    FIniFile.Free;
+  end;
+end;
+
+function TFormSettingsPaths.GetPathToSmartDesigner(): string;
+var
   Pkg: TIDEPackage;
 begin
-
-  FOk:= False;
-  FPathTemplatesEdited:= False;
-  LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
-  Pkg:=PackageEditingInterface.FindPackageWithName('amw_ide_tools');
-
+  Result:= '';
+  Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
   if Pkg<>nil then
-  begin // C:\laz4android\components\androidmodulewizard\ide_tools\  + amw_ide_tools.lpk
-    FPathToTemplatePresumed:= ExtractFilePath(Pkg.Filename);
-    p:= Pos('ide_tools', FPathToTemplatePresumed);
-    FPathToTemplatePresumed:= Copy(FPathToTemplatePresumed, 1, p-1) + 'java';
-    if EditPathToJavaTemplates.Text = '' then
+  begin
+      Result:= ExtractFilePath(Pkg.Filename);
+      Result:= Result + 'smartdesigner';
+      //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+  end;
+end;
+
+procedure TFormSettingsPaths.FormActivate(Sender: TObject);
+var
+ flag: boolean;
+begin
+
+  //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+  FPathToSmartDesigner:= GetPathToSmartDesigner();
+
+  //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java
+  FPathToJavaTemplates:= FPathToSmartDesigner  + PathDelim + 'java';
+
+  flag:= false;
+  if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
+  begin
+    if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
     begin
-      FPathToJavaTemplates:= FPathToTemplatePresumed;
-      EditPathToJavaTemplates.Text:= FPathToTemplatePresumed;
-      FPathTemplatesEdited:= True;
+       CopyFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini',
+                IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+       flag:= True;
+       //DeleteFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
     end;
   end;
+
+  if flag then  //exists  'LAMW.ini'
+  begin
+    WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
+    WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
+  end;
+
+  LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+
+  FOk:= False;
 
   {$ifdef windows}
   ComboBoxPrebuild.Items.Add('windows');
@@ -321,26 +343,6 @@ begin
   ComboBoxPrebuild.Items.Add('darwin-x86_64');
   ComboBoxPrebuild.Text:= 'darwin-x86_64';
   {$endif}
-
-  {
-  if EditPathToGradle.Text =  '' then
-  begin
-      ShowMessage('Warning/Recomendation:'+
-             sLineBreak+
-             sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
-             sLineBreak+' 1. Java JDK 1.8'+
-             sLineBreak+' 2. Gradle 4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]' +
-             sLineBreak+' 3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]'+
-             sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]'+
-             sLineBreak+' 3. Android SDK "plataforms" 27 + "build-tools" 27.0.3'+
-             sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
-             sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
-             sLineBreak+' '+
-             sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
-
-      EditPathToGradle.SetFocus;
-  end;
-  }
 
   EditPathToJavaJDK.SetFocus;
 
@@ -488,62 +490,46 @@ begin
   end;
 end;
 
-procedure TFormSettingsPaths.SpBPathToJavaTemplatesClick(Sender: TObject);
-begin
-  if SelDirDlgPathToJavaTemplates.Execute then
-  begin
-    EditPathToJavaTemplates.Text := SelDirDlgPathToJavaTemplates.FileName;
-    FPathToJavaTemplates:= SelDirDlgPathToJavaTemplates.FileName;
-  end;
-end;
-
 procedure TFormSettingsPaths.SpeedButtonHelpClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.3] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
-           sLineBreak+' 2. Gradle 4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]'+
-           sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]'+
-           sLineBreak+' 3. Android SDK "plataforms" 27 + "build-tools" 27.0.3'+
+           sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]' +
+           sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 [or up]'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
+           sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
+           sLineBreak+' 7. Android SDK/Extra  "Google Play Services"'+
            sLineBreak+' '+
            sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
 end;
 
 procedure TFormSettingsPaths.SpeedButtonInfoClick(Sender: TObject);
 begin
-  ShowMessage('All settings are stored in the file '+sLineBreak+'"JNIAndroidProject.ini" [lazarus/config]');
+  ShowMessage('All settings are stored in the file '+sLineBreak+'"LAMW.ini" [lazarus/config]');
 end;
 
 procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
    indexNdk: integer;
 begin
+
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try
       EditPathToAndroidNDK.Text := ReadString('NewProject','PathToAndroidNDK', '');
-      FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
-
-      if FPathToJavaTemplates = '' then
-      begin
-        FPathToJavaTemplates:= FPathToTemplatePresumed;
-      end;
-      EditPathToJavaTemplates.Text := FPathToJavaTemplates;
-
       EditPathToJavaJDK.Text := ReadString('NewProject','PathToJavaJDK', '');
       EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
       EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
       EditpathToGradle.Text :=  ReadString('NewProject','PathToGradle', '');
 
       if ReadString('NewProject','NDK', '') <> '' then
-          indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
+        indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
       else
-          indexNdk:= 3;  //ndk 10e
+        indexNdk:= 3;  //ndk 10e
 
       RGNDKVersion.ItemIndex:= indexNdk;
 
@@ -562,11 +548,11 @@ begin
                 ComboBoxPrebuild.Text:= FPrebuildOSYS;
           end;
       end;
-
     finally
       Free;
     end;
   end;
+
 end;
 
 procedure TFormSettingsPaths.SaveSettings(const fileName: string);
@@ -575,8 +561,8 @@ begin
   with TInifile.Create(fileName) do
   try
 
-    if EditPathToJavaTemplates.Text <> '' then
-      WriteString('NewProject', 'PathToJavaTemplates', EditPathToJavaTemplates.Text);
+    WriteString('NewProject', 'PathToSmartDesigner', FPathToSmartDesigner);
+    WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates);
 
     if EditPathToJavaJDK.Text <> '' then
       WriteString('NewProject', 'PathToJavaJDK', EditPathToJavaJDK.Text);
@@ -603,9 +589,7 @@ begin
              ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();   //try guess
       end;
     end;
-
     WriteString('NewProject', 'PrebuildOSYS', ComboBoxPrebuild.Text);
-
   finally
     Free;
   end;

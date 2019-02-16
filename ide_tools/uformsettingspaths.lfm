@@ -1,13 +1,13 @@
 object FormSettingsPaths: TFormSettingsPaths
-  Left = 281
-  Height = 699
-  Top = 65
-  Width = 522
+  Left = 335
+  Height = 633
+  Top = 214
+  Width = 519
   Anchors = []
   BorderStyle = bsSizeToolWin
-  Caption = 'LAMW 0.8 : Paths/Settings'
-  ClientHeight = 699
-  ClientWidth = 522
+  Caption = 'LAMW 0.8.3 : Paths/Settings'
+  ClientHeight = 633
+  ClientWidth = 519
   Color = clGradientInactiveCaption
   Constraints.MinHeight = 520
   Constraints.MinWidth = 430
@@ -157,9 +157,9 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 439
+    Left = 436
     Height = 30
-    Top = 621
+    Top = 561
     Width = 75
     Anchors = [akRight]
     BorderSpacing.Around = 8
@@ -167,15 +167,15 @@ object FormSettingsPaths: TFormSettingsPaths
     Default = True
     Kind = bkOK
     OnClick = BitBtnOKClick
-    TabOrder = 6
+    TabOrder = 5
   end
   object BitBtnCancel: TBitBtn
     AnchorSideTop.Control = BitBtnOK
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = BitBtnOK
-    Left = 356
+    Left = 353
     Height = 30
-    Top = 621
+    Top = 561
     Width = 75
     Anchors = [akTop, akRight]
     BorderSpacing.Around = 8
@@ -183,7 +183,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Caption = 'Cancel'
     Kind = bkCancel
     OnClick = BitBtnCancelClick
-    TabOrder = 7
+    TabOrder = 6
   end
   object EditPathToAndroidNDK: TEdit
     AnchorSideLeft.Control = Owner
@@ -193,7 +193,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 28
     Top = 296
-    Width = 475
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 3
@@ -229,7 +229,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 28
     Top = 36
-    Width = 475
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 0
@@ -254,7 +254,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 28
     Top = 232
-    Width = 475
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 2
@@ -279,7 +279,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 28
     Top = 100
-    Width = 475
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
     TabOrder = 1
@@ -289,7 +289,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 491
+    Left = 488
     Height = 22
     Top = 39
     Width = 23
@@ -303,7 +303,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 491
+    Left = 488
     Height = 22
     Top = 235
     Width = 23
@@ -317,7 +317,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 491
+    Left = 488
     Height = 22
     Top = 103
     Width = 23
@@ -335,17 +335,17 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 2
     Top = 136
-    Width = 506
+    Width = 503
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
   end
   object RGNDKVersion: TRadioGroup
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = EditPathToJavaTemplates
+    AnchorSideTop.Control = EditPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 61
-    Top = 396
+    Top = 332
     Width = 308
     AutoFill = True
     AutoSize = True
@@ -371,32 +371,31 @@ object FormSettingsPaths: TFormSettingsPaths
       '11c'
       '"> 11"'
     )
-    TabOrder = 5
+    TabOrder = 4
   end
   object StatusBar1: TStatusBar
     Left = 0
     Height = 29
-    Top = 670
-    Width = 522
+    Top = 604
+    Width = 519
     Panels = <>
   end
   object GroupBoxPrebuild: TGroupBox
     AnchorSideLeft.Control = RGNDKVersion
     AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = EditPathToJavaTemplates
     AnchorSideTop.Side = asrBottom
     AnchorSideBottom.Control = RGNDKVersion
     AnchorSideBottom.Side = asrBottom
     Left = 324
-    Height = 61
+    Height = 0
     Top = 396
     Width = 171
     Anchors = [akTop, akLeft, akBottom]
     AutoSize = True
     Caption = 'NDK [prebuild] System'
-    ClientHeight = 36
+    ClientHeight = 0
     ClientWidth = 167
-    TabOrder = 9
+    TabOrder = 8
     object ComboBoxPrebuild: TComboBox
       Left = 3
       Height = 28
@@ -415,7 +414,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 189
-    Top = 465
+    Top = 401
     Width = 157
     AutoSize = True
     BorderSpacing.Around = 8
@@ -1540,14 +1539,15 @@ object FormSettingsPaths: TFormSettingsPaths
     }
   end
   object SpeedButtonInfo: TSpeedButton
-    AnchorSideLeft.Control = GroupBoxPrebuild
     AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = GroupBoxPrebuild
+    AnchorSideTop.Control = RGNDKVersion
+    AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 502
+    Left = 489
     Height = 22
-    Top = 403
+    Top = 339
     Width = 23
+    Anchors = [akTop, akRight]
     BorderSpacing.Around = 7
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
@@ -1592,7 +1592,7 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 491
+    Left = 488
     Height = 22
     Top = 299
     Width = 23
@@ -1600,45 +1600,6 @@ object FormSettingsPaths: TFormSettingsPaths
     BorderSpacing.Around = 8
     Caption = '...'
     OnClick = SpBPathToAndroidNDKClick
-  end
-  object EditPathToJavaTemplates: TEdit
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = LBPathToJavaTemplates
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = SpBPathToJavaTemplates
-    Left = 8
-    Height = 28
-    Top = 360
-    Width = 475
-    Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Around = 8
-    TabOrder = 4
-  end
-  object LBPathToJavaTemplates: TLabel
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = EditPathToAndroidNDK
-    AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 20
-    Top = 332
-    Width = 211
-    BorderSpacing.Around = 8
-    Caption = 'Path to [LAMW] Java Templates:'
-    ParentColor = False
-  end
-  object SpBPathToJavaTemplates: TSpeedButton
-    AnchorSideTop.Control = EditPathToJavaTemplates
-    AnchorSideTop.Side = asrCenter
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    Left = 491
-    Height = 22
-    Top = 363
-    Width = 23
-    Anchors = [akTop, akRight]
-    BorderSpacing.Around = 8
-    Caption = '...'
-    OnClick = SpBPathToJavaTemplatesClick
   end
   object LabelPathToGradle: TLabel
     AnchorSideLeft.Control = Owner
@@ -1659,15 +1620,15 @@ object FormSettingsPaths: TFormSettingsPaths
     Height = 28
     Hint = 'Required by "AppCompat" [material] theme'
     Top = 168
-    Width = 475
+    Width = 472
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 16
     BorderSpacing.Around = 8
-    TabOrder = 10
+    TabOrder = 9
   end
   object SpBPathToGradle: TSpeedButton
     AnchorSideTop.Control = EditPathToGradle
-    Left = 491
+    Left = 488
     Height = 22
     Top = 168
     Width = 23
@@ -1676,9 +1637,9 @@ object FormSettingsPaths: TFormSettingsPaths
     OnClick = SpBPathToGradleClick
   end
   object SpeedButtonHelp: TSpeedButton
-    Left = 491
+    Left = 488
     Height = 22
-    Top = 6
+    Top = 8
     Width = 23
     Anchors = [akTop, akRight]
     Glyph.Data = {
@@ -1720,7 +1681,7 @@ object FormSettingsPaths: TFormSettingsPaths
     OnClick = SpeedButtonHelpClick
   end
   object SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog
-    left = 360
+    left = 184
     top = 272
   end
   object SelDirDlgPathToJavaJDK: TSelectDirectoryDialog
@@ -1734,10 +1695,6 @@ object FormSettingsPaths: TFormSettingsPaths
   object SelDirDlgPathToAntBinary: TSelectDirectoryDialog
     left = 224
     top = 64
-  end
-  object SelDirDlgPathToJavaTemplates: TSelectDirectoryDialog
-    left = 392
-    top = 336
   end
   object SelDirDlgPathToGradle: TSelectDirectoryDialog
     left = 160

@@ -5,7 +5,7 @@ unit ratingbar;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls;
+  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;
 
 type
 
@@ -14,6 +14,8 @@ type
 
 TOnRatingChanged = procedure(Sender: TObject; rating: single) of Object;
 
+TRatingBarStyle = (rbsDefault, rbsSmall);
+
 {jVisualControl template}
 
 jRatingBar = class(jVisualControl)
@@ -21,7 +23,8 @@ jRatingBar = class(jVisualControl)
     FNumStars: integer;
     FRating: single; // number of stars filled..
     FStep: single;  //The step size of this rating bar. For example, if half-star granularity is wanted, this would be 0.5
-
+    FStyle: TRatingBarStyle;
+    FIsIndicator: boolean;
     FOnRatingChanged: TOnRatingChanged;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -35,7 +38,7 @@ jRatingBar = class(jVisualControl)
     
     procedure GenEvent_OnRatingBarChanged(Obj: TObject; rating: single);
 
-    function jCreate( _numStars: integer; _step: single): jObject;
+    function jCreate( _numStars: integer; _style: integer; _isIndicator: boolean): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject);  override;
     procedure RemoveFromViewParent(); override;
@@ -56,20 +59,21 @@ jRatingBar = class(jVisualControl)
     procedure SetStepSize(_step: single);
     procedure SetIsIndicator(_isIndicator: boolean);
     procedure SetMax(_max: integer);
-    function IsIndicator(): boolean;
     procedure SetLGravity(_value: TLayoutGravity);
 
  published
     property NumStars: integer read FNumStars write SetNumStars;
+    property Rating: single read FRating write SetRating;
     property Step: single read FStep write SetStepSize;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
-
+    property Style: TRatingBarStyle read FStyle write FStyle;
+    property IsIndicator: boolean read FIsIndicator write SetIsIndicator;
     property OnRatingChanged: TOnRatingChanged read FOnRatingChanged write FOnRatingChanged;
 
 end;
 
-function jRatingBar_jCreate(env: PJNIEnv;_Self: int64; _numStars: integer; _step: single; this: jObject): jObject;
+function jRatingBar_jCreate(env: PJNIEnv;_Self: int64; _numStars: integer; _style: integer; _isIndicator: boolean; this: jObject): jObject;
 procedure jRatingBar_jFree(env: PJNIEnv; _jratingbar: JObject);
 procedure jRatingBar_SetViewParent(env: PJNIEnv; _jratingbar: JObject; _viewgroup: jObject);
 procedure jRatingBar_RemoveFromViewParent(env: PJNIEnv; _jratingbar: JObject);
@@ -94,7 +98,6 @@ function jRatingBar_IsIndicator(env: PJNIEnv; _jratingbar: JObject): boolean;
 procedure jRatingBar_SetFrameGravity(env: PJNIEnv; _jratingbar: JObject; _value: integer);
 
 
-
 implementation
 
 {---------  jRatingBar  --------------}
@@ -115,7 +118,8 @@ begin
   FNumStars:= 5;
   FRating:= 0; // number of stars filled..
   FStep:= 0.5;  //The step size of this rating bar. For example, if half-star granularity is wanted, this would be 0.5
-
+  FStyle:= rbsDefault;
+  FIsIndicator:= False;
 end;
 
 destructor jRatingBar.Destroy;
@@ -136,12 +140,14 @@ procedure jRatingBar.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
+  auxRating: single;
 begin
   if not FInitialized  then
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject:= jCreate(FnumStars, FStep); //jSelf !
+
+   FjObject:= jCreate(FnumStars, Ord(FStyle), FIsIndicator); //jSelf !
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -153,6 +159,7 @@ begin
 
    jRatingBar_SetViewParent(FjEnv, FjObject, FjPRLayout);
    jRatingBar_SetId(FjEnv, FjObject, Self.Id);
+
   end;
 
   jRatingBar_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -182,13 +189,24 @@ begin
 
   if not FInitialized then
   begin
-   FInitialized:= True;
+    FInitialized:= True;
 
-   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    if FRating < 0 then  FRating:= 0;
+    if FRating > FNumStars then  FRating:= FNumStars;
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+    jRatingBar_SetRating(FjEnv, FjObject, FRating);
+
+    if  FColor <> colbrDefault then
+      View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+
+    View_SetVisible(FjEnv, FjObject, FVisible);
+
+    if  FStep <> 0.5 then
+      jRatingBar_SetStepSize(FjEnv, FjObject, FStep);
+
   end;
+
+
 end;
 
 procedure jRatingBar.SetColor(Value: TARGBColorBridge);
@@ -228,9 +246,9 @@ begin
   if Assigned(FOnRatingChanged) then FOnRatingChanged(Obj, rating);
 end;
 
-function jRatingBar.jCreate( _numStars: integer; _step: single): jObject;
+function jRatingBar.jCreate( _numStars: integer;  _style: integer; _isIndicator: boolean): jObject;
 begin
-   Result:= jRatingBar_jCreate(FjEnv, int64(Self) ,_numStars, _step,  FjThis);
+   Result:= jRatingBar_jCreate(FjEnv, int64(Self) ,_numStars ,_style ,_isIndicator, FjThis);
 end;
 
 procedure jRatingBar.jFree();
@@ -326,6 +344,7 @@ end;
 procedure jRatingBar.SetId(_id: integer);
 begin
   //in designing component state: set value here...
+  FId:= _id;
   if FInitialized then
      jRatingBar_SetId(FjEnv, FjObject, _id);
 end;
@@ -333,6 +352,7 @@ end;
 function jRatingBar.GetRating(): single;
 begin
   //in designing component state: result value here...
+  Result:= FRating;
   if FInitialized then
    Result:= jRatingBar_GetRating(FjEnv, FjObject);
 end;
@@ -340,8 +360,10 @@ end;
 procedure jRatingBar.SetRating(_rating: single);
 begin
   //in designing component state: set value here...
+  FRating:= _rating;
+  if _rating > FNumStars then FRating:= FNumStars;
   if FInitialized then
-     jRatingBar_SetRating(FjEnv, FjObject, _rating);
+     jRatingBar_SetRating(FjEnv, FjObject, FRating);
 end;
 
 procedure jRatingBar.SetNumStars(_numStars: integer);
@@ -355,6 +377,7 @@ end;
 function jRatingBar.GetNumStars(): integer;
 begin
   //in designing component state: result value here...
+  Result:= FNumStars;
   if FInitialized then
    Result:= jRatingBar_GetNumStars(FjEnv, FjObject);
 end;
@@ -362,6 +385,7 @@ end;
 function jRatingBar.GetStepSize(): single;
 begin
   //in designing component state: result value here...
+  Result:= FStep;
   if FInitialized then
    Result:= jRatingBar_GetStepSize(FjEnv, FjObject);
 end;
@@ -377,6 +401,7 @@ end;
 procedure jRatingBar.SetIsIndicator(_isIndicator: boolean);
 begin
   //in designing component state: set value here...
+  FIsIndicator:= _isIndicator;
   if FInitialized then
      jRatingBar_SetIsIndicator(FjEnv, FjObject, _isIndicator);
 end;
@@ -388,12 +413,14 @@ begin
      jRatingBar_SetMax(FjEnv, FjObject, _max);
 end;
 
+(*
 function jRatingBar.IsIndicator(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jRatingBar_IsIndicator(FjEnv, FjObject);
 end;
+*)
 
 procedure jRatingBar.SetLGravity(_value: TLayoutGravity);
 begin
@@ -404,30 +431,21 @@ begin
 end;
 
 {-------- jRatingBar_JNI_Bridge ----------}
-function jRatingBar_jCreate(env: PJNIEnv;_Self: int64; _numStars: integer; _step: single; this: jObject): jObject;
+function jRatingBar_jCreate(env: PJNIEnv;_Self: int64; _numStars: integer; _style: integer; _isIndicator: boolean; this: jObject): jObject;
 var
-  jParams: array[0..2] of jValue;
+  jParams: array[0..3] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
   jParams[1].i:= _numStars;
-  jParams[2].f:= _step;
+  jParams[2].i:= _style;
+  jParams[3].z:= JBool(_isIndicator);
   jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jRatingBar_jCreate', '(JIF)Ljava/lang/Object;');
+  jMethod:= env^.GetMethodID(env, jCls, 'jRatingBar_jCreate', '(JIIZ)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
-(*
-//Please, you need insert:
-
-    public java.lang.Object jRatingBar_jCreate(long _Self,  int _numStars, float _step) {
-	      return (java.lang.Object)(new jRatingBar(this,_Self,_numStars,_step));
-   }
-
-//to end of "public class Controls" in "Controls.java"
-*)
-
 
 procedure jRatingBar_jFree(env: PJNIEnv; _jratingbar: JObject);
 var
@@ -725,7 +743,5 @@ begin
   env^.CallVoidMethodA(env, _jratingbar, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-
 
 end.

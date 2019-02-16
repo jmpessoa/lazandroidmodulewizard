@@ -53,6 +53,7 @@ type
     //Smart Designer helpers
     procedure InitSmartDesignerHelpers;
     procedure UpdateJControlsList; inline;
+    procedure UpdateFCLControlsList; inline;
 
   protected
     //procedure OnDesignerModified(Sender: TObject);
@@ -1776,9 +1777,10 @@ begin
       jVisualControl(APersistent).Parent := AndroidForm;
 
   //smart designer helpers
-  if (APersistent is jControl)
-  and (jControl(APersistent).Owner = AndroidForm) then
-    UpdateJControlsList;
+  if (APersistent is jControl) and (jControl(APersistent).Owner = AndroidForm) then
+      UpdateJControlsList
+  else UpdateFCLControlsList;
+
 end;
 
 procedure TAndroidWidgetMediator.OnSetSelection(const ASelection: TPersistentSelectionList);
@@ -1817,23 +1819,29 @@ end;
 
 procedure TAndroidWidgetMediator.InitSmartDesignerHelpers;
 begin
-  if (FProjFile<>nil)
-  and FProjFile.IsPartOfProject
-  and not FProjFile.CustomData.Contains('jControls') then
-    UpdateJControlsList;
+  if (FProjFile<>nil) and FProjFile.IsPartOfProject
+      and not FProjFile.CustomData.Contains('jControls') then
+        UpdateJControlsList;
 end;
 
 procedure TAndroidWidgetMediator.OnPersistentDeleting(APersistent: TPersistent);
 begin
   FjControlDeleted := (APersistent is jControl)
     and (Root <> nil) and (TComponent(APersistent).Owner = Root);
+
   if FjControlDeleted then
-    FShownCustomDialogs.Remove(APersistent);
+    FShownCustomDialogs.Remove(APersistent)
+  else UpdateFCLControlsList;
 end;
 
 procedure TAndroidWidgetMediator.UpdateJControlsList;
 begin
   LamwSmartDesigner.UpdateJControls(FProjFile, AndroidForm);
+end;
+
+procedure TAndroidWidgetMediator.UpdateFCLControlsList;
+begin
+  LamwSmartDesigner.UpdateFCLControls(FProjFile, AndroidForm);
 end;
 
 class function TAndroidWidgetMediator.CreateMediator(TheOwner, TheForm: TComponent): TDesignerMediator;
@@ -2644,6 +2652,7 @@ var
   r: TRect;
   ts: TTextStyle;
   lastFontSize: Integer;
+  auxText: string;
 begin
   with Fcanvas do
   begin
@@ -2675,11 +2684,19 @@ begin
 
     Brush.Style := bsClear;
     lastFontSize := Font.Size;
-    Font.Size := AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 13);
+    Font.Size := AndroidToLCLFontSize(jButton(FAndroidWidget).FontSize, 12);
     ts := TextStyle;
     ts.Layout := tlCenter;
     ts.Alignment := Classes.taCenter;
-    TextRect(r, r.Left, r.Top, FAndroidWidget.Text, ts);
+
+    auxText:= FAndroidWidget.Text;
+
+    if jButton(FAndroidWidget).AllCaps then
+    begin
+       auxText:= UpperCase(auxText);
+    end;
+
+    TextRect(r, r.Left, r.Top, auxText, ts);
     Font.Size := lastFontSize;
   end;
 end;
@@ -2741,6 +2758,7 @@ procedure TDraftTextView.Draw;
 var
   lastSize: Integer;
   fs: TFontStyles;
+  auxText: string;
 begin
   with Fcanvas do
   begin
@@ -2756,8 +2774,15 @@ begin
     else
       Brush.Style := bsClear;
 
+    auxText:= jTextView(FAndroidWidget).Text;
+
+    if jTextView(FAndroidWidget).AllCaps then
+    begin
+       auxText:= UpperCase(auxText);
+    end;
+
     Font.Color := TextColor;
-    TextOut(0, (Font.Size + 5) div 10, FAndroidWidget.Text);
+    TextOut(0, (Font.Size + 5) div 10, auxText);
 
     Font.Size := lastSize;
     Font.Style := fs;
@@ -2812,6 +2837,7 @@ procedure TDraftEditText.Draw;
 var
   ls: Integer;
   r: TRect;
+  auxText: string;
 begin
   with FCanvas do
   begin
@@ -2838,11 +2864,13 @@ begin
       end;
     end;
 
+    auxText:= jEditText(FAndroidWidget).Text;
+
     Font.Color := TextColor;
     Brush.Style := bsClear;
     ls := Font.Size;
-    Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 13);
-    TextOut(12, 9, jEditText(FAndroidWidget).Text);
+    Font.Size := AndroidToLCLFontSize(jEditText(FAndroidWidget).FontSize, 12);
+    TextOut(12, 9, auxText);
     Font.Size := ls;
   end;
 end;
@@ -3622,29 +3650,36 @@ begin
 
   if GetImage <> nil then
   begin
-
+    (*
     w:= Trunc(FImage.Width/3);
     h:= Trunc(FImage.Height/3);
-
     w:= Max(w,h);
     h:= w;
-
-    if w < 64 then
+    if w < {64} Self.Width then
     begin
-      w:= 64;
-      h:= 64;
+      w:= Self.Width; //64;
+      //h:= 64;
     end;
+    if h < {64} Self.Height then
+    begin
+     // w:= 64;
+      h:= Self.Height; //64;
+    end;
+    *)
+  //  Fcanvas.Brush.Color:= clNone;
+   // Fcanvas.Brush.Style:= bsClear;
 
-    Fcanvas.Rectangle(0, 0, w+8, h+8);    // outer frame
+    Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
+    Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
 
-    r:= Rect(4, 4, w+4, h+4);
+    //Fcanvas.Rectangle(0, 0, w+8, h+8);    // outer frame
+    r:= Rect(6, 6, Self.Width-6,Self.Height-6);
     Fcanvas.StretchDraw(r, GetImage);
-
   end
   else
   begin
-    Fcanvas.Rectangle(0, 0, 72, 72);  //outer frame
-    Fcanvas.RoundRect(4, 4, 68, 68, 12,12);  //inner frame
+    Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
+    Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
   end;
 end;
 

@@ -8,8 +8,8 @@ object LamwProjectOptions: TLamwProjectOptions
   DesignTimePPI = 120
   ParentFont = False
   TabOrder = 0
-  DesignLeft = 439
-  DesignTop = 228
+  DesignLeft = 519
+  DesignTop = 220
   object PageControl1: TPageControl
     Left = 0
     Height = 607
@@ -478,8 +478,8 @@ object LamwProjectOptions: TLamwProjectOptions
     end
     object tsMiscellaneous: TTabSheet
       Caption = 'Miscellaneous'
-      ClientHeight = 550
-      ClientWidth = 462
+      ClientHeight = 574
+      ClientWidth = 530
       object Label9: TLabel
         AnchorSideLeft.Control = tsMiscellaneous
         AnchorSideTop.Control = cbBuildSystem

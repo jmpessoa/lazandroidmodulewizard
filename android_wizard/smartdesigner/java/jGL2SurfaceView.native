@@ -1,0 +1,5 @@
+public native void pOnGL2SurfaceCreate(long pasobj);
+public native void pOnGL2SurfaceChanged(long pasobj, int width, int height);
+public native void pOnGL2SurfaceDrawFrame(long pasobj);
+public native void pOnGL2SurfaceTouch(long pasobj, int action, int countPoints, float[] arrayX, float[] arrayY, int flingGesture, int pinchZoomGestureState, float zoomScaleFactor);
+public native void pOnGL2SurfaceDestroyed(long pasobj);

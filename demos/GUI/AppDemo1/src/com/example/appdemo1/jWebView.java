@@ -1,5 +1,8 @@
 package com.example.appdemo1;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.util.Log;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
@@ -38,13 +41,60 @@ class jWebClient extends WebViewClient {
         handler.proceed(mUsername, mPassword);
     }
 
-    @Override
+    /*@Override
     public  boolean shouldOverrideUrlLoading(WebView view, String url) {
         int rtn = controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnBefore,url);
         if (rtn == WVConst.WebView_Act_Continue)
         { view.loadUrl(url);
             return true; }
         else { return true; }
+    }*/
+    
+    @Override
+    public  boolean shouldOverrideUrlLoading(WebView view, String url) {
+    	    	
+        int rtn = controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnBefore,url);
+        
+        if (rtn == WVConst.WebView_Act_Continue)
+        { 
+        	
+        	if (url.startsWith("intent://")) {
+                try {
+                    
+                    Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+
+                    if (intent != null) {
+                        view.stopLoading();                                                                    
+
+                        PackageManager packageManager = controls.activity.getPackageManager();
+                        ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                        
+                        if (info != null) {
+                        	 controls.activity.startActivity(intent);
+                        	 
+                        	 if(view.canGoBack())
+                             	view.goBack();   
+                        } else {                        	
+                            String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                            view.loadUrl(fallbackUrl);                            
+                        }
+
+                        return true;
+                    }
+                } catch (Throwable e) {
+                   //if (GeneralData.DEBUG) {
+                   //     Log.e(TAG, "Can't resolve intent://", e);
+                    
+                }
+        		
+            }else{
+            	view.loadUrl(url);	
+            }                
+        	         
+        }  
+         
+        return true; 
+        
     }
 
     @Override
@@ -184,5 +234,29 @@ public class jWebView extends WebView {
                
     public void LoadFromHtmlString(String _htmlString) {  //thanks to Anton!
        loadDataWithBaseURL(null, _htmlString, null, null, null);
+    }
+    
+    public boolean CanGoBack(){
+    	return this.canGoBack();
+    }
+    
+    public boolean CanGoBackOrForward(int _steps){
+    	return this.canGoBackOrForward(_steps);
+    }    
+
+    public boolean CanGoForward(){
+    	return this.canGoForward();
+    }
+    
+    public void GoBack(){
+        this.goBack();	
+    }    
+
+    public void	GoBackOrForward(int steps){
+    	this.goBackOrForward(steps);
+    }    
+
+    public void	GoForward(){
+    	this.goForward();
     }
 }
