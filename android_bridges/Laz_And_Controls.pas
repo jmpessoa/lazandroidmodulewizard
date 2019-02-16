@@ -178,6 +178,8 @@ type
 
      procedure ClearLayout;
      procedure RemoveFromViewParent;  override;
+
+     procedure GenEvent_OnClick(Obj: TObject);
      procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
      procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
 
@@ -208,9 +210,9 @@ type
      property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
      property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
 
+     property OnClick : TOnNotify read FOnClick write FOnClick;
      property OnFlingGesture: TOnFling read FOnFling write FOnFling;
      property OnPinchZoomGesture: TOnPinchZoom read FOnPinchGesture write FOnPinchGesture;
-
    end;
 
   jImageList = class(jControl)
@@ -2681,6 +2683,12 @@ begin
   begin
     jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
     jImageView(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+  if Obj is jPanel then
+  begin
+    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
+    jPanel(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 end;
@@ -11103,6 +11111,12 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jPanel_SetVisibilityGone(FjEnv, FjObject);
+end;
+
+// Event : Java -> Pascal
+Procedure jPanel.GenEvent_OnClick(Obj: TObject);
+begin
+  if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
 procedure jPanel.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
