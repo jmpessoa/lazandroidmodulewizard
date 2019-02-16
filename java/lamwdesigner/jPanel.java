@@ -144,7 +144,7 @@ public class jPanel extends RelativeLayout {
 		@Override
 		public boolean onSingleTapUp(MotionEvent e) {
 			//Log.i("Click", "------------");
-			controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
+			controls.pOnClick(PasObj, Const.Click_Default);
 			return true;
 		}
 		
