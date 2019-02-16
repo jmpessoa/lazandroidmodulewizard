@@ -141,7 +141,7 @@ uses
   SysUtils, Classes,
   And_jni, And_jni_Bridge,
   And_lib_Unzip, And_bitmap_h,
-  AndroidWidget;
+  AndroidWidget, systryparent;
 
 type
 
@@ -165,7 +165,7 @@ type
    protected
 
      procedure SetParamHeight(Value: TLayoutParams); override;
-     procedure SetParamWidth(Value: TLayoutParams); override;
+      procedure SetParamWidth(Value: TLayoutParams); override;
    public
      constructor Create(AOwner: TComponent); override;
      Destructor  Destroy; override;
@@ -179,7 +179,7 @@ type
      procedure ClearLayout;
      procedure RemoveFromViewParent;  override;
 
-     Procedure GenEvent_OnClick(Obj: TObject);
+     procedure GenEvent_OnClick(Obj: TObject);
      procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
      procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
 
@@ -543,13 +543,13 @@ type
     function GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject; overload;
     function GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject; overload;
 
-    function GetByteBuffer(_width: integer; _height: integer): jObject;
-    function GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject; overload;
-    function GetBitmapFromByteArray(var _image: TDynArrayOfJByte): jObject;
+    function GetJByteBuffer(_width: integer; _height: integer): jObject;
+    function GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject; overload;
+    function GetBitmapFromJByteArray(var _image: TDynArrayOfJByte): jObject;
 
-    function GetByteBufferFromBitmap(_bmap: jObject): jObject; overload;
-    function GetByteBufferFromBitmap(): jObject; overload;
-    function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+    function GetJByteBufferFromImage(_bmap: jObject): jObject; overload;
+    function GetJByteBufferFromImage(): jObject; overload;
+    function GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
     function GetImageFromFile(_fullFilename: string): jObject;
     function GetRoundedShape(_bitmapImage: jObject): jObject;   overload;
     function GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject; overload;
@@ -851,6 +851,7 @@ type
   private
     FTextAlignment: TTextAlignment;
     FTextTypeFace: TTextTypeFace;
+    FAllCaps: boolean;
 
     Procedure SetColor    (Value : TARGBColorBridge);
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -912,6 +913,7 @@ type
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent; override;
     procedure ResetViewParent();  override;
+    procedure SetAllCaps(_value: boolean);
 
   published
     property Text: string read GetText write SetText;
@@ -924,7 +926,7 @@ type
     property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
-
+    property AllCaps: boolean read FAllCaps write SetAllCaps default False;
     // Event - if enabled!
     property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
@@ -956,6 +958,7 @@ type
     FCloseSoftInputOnEnter: boolean;
     FCapSentence: boolean;
 
+    procedure AllCaps();
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -1013,7 +1016,6 @@ type
     Procedure ShowSoftInput();
 
     Procedure UpdateLayout; override;
-    procedure AllCaps;
     procedure DispatchOnChangeEvent(value: boolean);
     procedure DispatchOnChangedEvent(value: boolean);
 
@@ -1094,8 +1096,12 @@ type
 
   end;
 
+  { jButton }
+
   jButton = class(jVisualControl)
   private
+    FAllCaps: Boolean;
+    procedure SetAllCaps(AValue: Boolean);
     Procedure SetColor    (Value : TARGBColorBridge);
 
     Procedure SetFontColor(Value : TARGBColorBridge);
@@ -1145,6 +1151,7 @@ type
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property Enabled: boolean read FEnabled write SetEnabled;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
+    property AllCaps: Boolean read FAllCaps write SetAllCaps default False;
     // Event
     property OnClick   : TOnNotify read FOnClick   write FOnClick;
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
@@ -1288,6 +1295,7 @@ type
     FOnTouchMove : TOnTouchEvent;
     FOnTouchUp   : TOnTouchEvent;
     //end tr3e
+    FRoundedShape: boolean;
 
     Procedure SetColor    (Value : TARGBColorBridge);
 
@@ -1295,6 +1303,7 @@ type
     function GetCount: integer;
     procedure SetImageName(Value: string);
     procedure SetImageIndex(Value: TImageListIndex);
+    procedure SetRoundedShape(_value: boolean);
 
   protected
     procedure SetParamWidth(Value: TLayoutParams); override;
@@ -1349,6 +1358,8 @@ type
     procedure SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); overload; //deprecated
     procedure SetImage(_bitmap: jObject; _width: integer; _height: integer); overload;
     Procedure SetImage(_fullFilename: string); overload;
+    procedure SetImageFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer);
+
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetLGravity(_value: TLayoutGravity);
@@ -1360,6 +1371,11 @@ type
     procedure ResetViewParent();  override;
     procedure BringToFront();
     procedure SetVisibilityGone();
+    function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+    function GetJByteBuffer(_width: integer; _height: integer): jObject;
+    function GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
+    procedure LoadFromURL(_url: string);
+    procedure SaveToFile(_filename: string);
 
     property Count: integer read GetCount;
   published
@@ -1370,7 +1386,7 @@ type
     property ImageIdentifier : string read FImageName write SetImageByResIdentifier;
     property ImageScaleType: TImageScaleType read FImageScaleType write SetScaleType;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
-
+    property RoundedShape: boolean read FRoundedShape write SetRoundedShape;
     // Events
      property OnClick: TOnNotify read FOnClick write FOnClick;
     //by tre3
@@ -1703,6 +1719,7 @@ type
     procedure GoBack();
     procedure GoBackOrForward(steps: integer);
     procedure GoForward();
+    procedure ScrollTo(_x, _y: integer);//by MB:
 
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
@@ -1726,11 +1743,11 @@ type
     FPaintColor: TARGBColorBridge;
     FTypeface: TFontFace;
 
-    Procedure setStrokeWidth       (Value : single );
-    Procedure setStyle             (Value : TPaintStyle);
-    Procedure setColor             (Value : TARGBColorBridge);
-    Procedure setTextSize          (Value : single );
-    Procedure setTypeface          (Value : TFontFace);
+    Procedure SetStrokeWidth       (Value : single );
+    Procedure SetStyle             (Value : TPaintStyle);
+    Procedure SetColor             (Value : TARGBColorBridge);
+    Procedure SetTextSize          (Value : single );
+    Procedure SetTypeface          (Value : TFontFace);
 
   protected
   public
@@ -1740,16 +1757,18 @@ type
 
     procedure Init(refApp: jApp); override;
     //
-    Procedure drawLine             (x1,y1,x2,y2 : single);
-    // LORDMAN 2013-08-13
-    Procedure drawPoint            (x1,y1 : single);
-    Procedure drawText             (Text : String; x,y : single);
+    Procedure DrawLine(x1,y1,x2,y2 : single); overload;
+    procedure DrawLine(var _points: TDynArrayOfSingle);  overload;
 
-    procedure drawCircle(_cx: single; _cy: single; _radius: single);
-    procedure drawOval(_left, _top, _right, _bottom: single);
-    procedure drawBackground(_color: integer);
-    procedure drawRect(_left, _top, _right, _bottom: single);
-    procedure drawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
+    // LORDMAN 2013-08-13
+    Procedure DrawPoint            (x1,y1 : single);
+    Procedure DrawText             (Text : String; x,y : single);
+
+    procedure DrawCircle(_cx: single; _cy: single; _radius: single);
+    procedure DrawOval(_left, _top, _right, _bottom: single);
+    procedure DrawBackground(_color: integer);
+    procedure DrawRect(_left, _top, _right, _bottom: single);
+    procedure DrawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
 
     Procedure DrawBitmap(bmp: jObject; b,l,r,t: integer); overload;
     Procedure DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
@@ -1757,8 +1776,14 @@ type
     Procedure DrawBitmap(bmp: jBitmap; b,l,r,t: integer); overload;
     procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
 
+    function GetNewPath(var _points: TDynArrayOfSingle): jObject; overload;
+    function GetNewPath(_points: array of single): jObject;  overload;
+    procedure DrawPath(var _points: TDynArrayOfSingle);  overload;
+    procedure DrawPath(_points: array of single);  overload;
+    procedure DrawPath(_path: jObject);  overload;
+    procedure DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+
     procedure SetCanvas(_canvas: jObject);
-    //procedure drawTextAligned(Text: string; _left, _top, _right, _bottom, _alignhorizontal, _alignvertical: single);
     procedure DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
     // Property
@@ -1793,6 +1818,7 @@ type
     Procedure GenEvent_OnDraw(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
+
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
     Procedure Refresh;
@@ -1804,9 +1830,11 @@ type
     procedure ClearLayout();
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
-    Procedure SaveToFile(fileName:String);
+    Procedure SaveToFile(fullFileName:String);
     function GetDrawingCache(): jObject;
     function GetImage(): jObject;
+
+    property FilePath    : TFilePath read FFilePath write FFilePath;
 
   published
     property Canvas      : jCanvas read FjCanvas write SetjCanvas; // Java : jCanvas
@@ -2037,76 +2065,23 @@ type
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
   Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
 
-  procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
-  //function  sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide): integer;
-  function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
-
-  function  sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
-  function  sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
+  //procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
 
   procedure DBListView_Log (msg: string);
 
 implementation
 
+
 uses
-  customdialog, autocompletetextview, viewflipper,
-  comboedittext, toolbar, scoordinatorlayout, framelayout, linearlayout,
-  sdrawerlayout, scollapsingtoolbarlayout, scardview, sappbarlayout,
-  stoolbar, stablayout, snestedscrollview, sviewpager, radiogroup;
+  autocompletetextview, viewflipper, comboedittext, radiogroup;
+
   {,And_log_h}  {for test}
 
- (*function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide): integer;
- begin
-
-    if layoutParam = lpExact then
-     Result := data
-    else if parent is jForm then
-     Result := GetLayoutParams(gApp, layoutParam, sd)
-    else
-     Result := GetLayoutParamsByParent((parent as jVisualControl), layoutParam, sd);
-
- end;*)
-
- function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
- begin
-
-    result := 0;
-
-    if layoutParam = lpExact then
-    begin
-     result := data;
-     exit;
-    end;
-
-    if parent is jForm then
-     Result := GetLayoutParams(gApp, layoutParam, sd)
-    else
-     if parent <> nil then
-      result := GetLayoutParamsByParent((parent as jVisualControl), layoutParam, sd);
-
-    if result > 0 then
-     result := result - margins;
-
-end;
-
- function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
- begin
-       if FParent is jForm then
-          Result:= (FParent as jForm).ScreenWH.Height - gapp.GetContextTop
-       else
-          Result:= (FParent as jVisualControl).GetHeight;
- end;
-
- function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
- begin
-       if FParent is jForm then
-         Result:= (FParent as jForm).ScreenWH.Width
-       else
-         Result:= (FParent as jVisualControl).GetWidth;
- end;
-
+  (*
  procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
  begin
+
+  if FParent is jForm then Exit;  //default
 
   if FParent is jPanel then
   begin
@@ -2138,6 +2113,11 @@ end;
     if not jVisualControl(FParent).Initialized then jToolbar(FParent).Init(refApp);
     FjPRLayout:= jToolbar(FParent).View;
   end  else
+  if FParent is jRadioGroup then
+  begin
+      if not jVisualControl(FParent).Initialized then jRadioGroup(FParent).Init(refApp);
+      FjPRLayout:= jRadioGroup(FParent).View;
+  end else
   if FParent is jsToolbar then
   begin
     jsToolbar(FParent).Init(refApp);
@@ -2194,6 +2174,7 @@ end;
       FjPRLayout:= jsViewPager(FParent).View;
   end;
  end;
+*)
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -2905,7 +2886,7 @@ begin
     end;
     jListVIew(Obj).GenEvent_OnDrawItemCaptionColor(Obj, index, pasCaption, outColor);
   end;
-  Result:= outColor;
+  Result:= JInt(outColor);
 end;
 
 function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
@@ -2928,7 +2909,7 @@ begin
     end;
     jListVIew(Obj).GenEvent_OnDrawItemWidgetTextColor(Obj, index, pasCaption, outColor);
   end;
-  Result:= outColor;
+  Result:= JInt(outColor);
 end;
 
 
@@ -3124,6 +3105,12 @@ begin
   begin
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
+    Exit;
+  end;
+  if Obj is jImageView then
+  begin
+    jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
+    jImageView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
 end;
@@ -3539,6 +3526,9 @@ begin
    if  FFontColor <> colbrDefault then
     jTextView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
+    if FAllCaps <> False then
+     jTextView_SetAllCaps(FjEnv, FjObject, FAllCaps);
+
    if FFontSizeUnit <> unitDefault then
      jTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
 
@@ -3895,6 +3885,14 @@ begin
   FGravityInParent:= _value;
   if FInitialized then
      jTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+end;
+
+procedure jTextView.SetAllCaps(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FAllCaps:= _value;
+  if FInitialized then
+     jTextView_SetAllCaps(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------
@@ -4622,6 +4620,7 @@ begin
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
   FEnabled:= True;
+  FAllCaps := False;
 end;
 
 destructor jButton.Destroy;
@@ -4701,6 +4700,9 @@ begin
    if FFontSize > 0 then //not default...
      jButton_setTextSize(FjEnv, FjObject , FFontSize);
 
+   if AllCaps <> false then
+      jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
+
    jButton_setText(FjEnv, FjObject , FText);
 
    if FColor <> colbrDefault then
@@ -4713,7 +4715,7 @@ begin
   end;
 end;
 
-Procedure jButton.SetViewParent(Value: jObject);
+procedure jButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
@@ -4733,41 +4735,50 @@ begin
      jButton_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
-Procedure jButton.SetColor(Value: TARGBColorBridge);
+procedure jButton.SetAllCaps(AValue: Boolean);
+var
+  _Text: String;
+begin
+  FAllCaps := AValue;
+  if(FInitialized) then
+    jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
+end;
+
+procedure jButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
      View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
-Procedure jButton.Refresh;
+procedure jButton.Refresh;
 begin
   if not FInitialized then Exit;
      View_Invalidate(FjEnv, FjObject );
 end;
 
-Function jButton.GetText: string;
+function jButton.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
      Result:= jButton_getText(FjEnv, FjObject );
 end;
 
-Procedure jButton.SetText(Value: string);
+procedure jButton.SetText(Value: string);
 begin
   inherited SetText(Value); //by thierry
   if FInitialized then
     jButton_setText(FjEnv, FjObject , Value{FText}); //by thierry
 end;
 
-Procedure jButton.SetFontColor(Value : TARGBColorBridge);
+procedure jButton.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
      jButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 end;
 
-Procedure jButton.SetFontSize (Value : DWord);
+procedure jButton.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
@@ -4823,17 +4834,19 @@ begin
 end;
 
 // Event : Java -> Pascal
-Procedure jButton.GenEvent_OnClick(Obj: TObject);
+procedure jButton.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
-Procedure jButton.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+procedure jButton.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject;
+  tag: integer);
 begin
   if Assigned(FOnBeforeDispatchDraw) then FOnBeforeDispatchDraw(Obj, canvas, tag);
 end;
 
-Procedure jButton.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
+procedure jButton.GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject;
+  tag: integer);
 begin
   if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
 end;
@@ -4895,7 +4908,7 @@ begin
      jButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
 end;
 
-Procedure jButton.SetEnabled(Value: boolean);
+procedure jButton.SetEnabled(Value: boolean);
 begin
     //in designing component state: set value here...
   FEnabled:= Value;
@@ -5232,10 +5245,12 @@ begin
    inherited Init(refApp);
    FjObject := jRadioButton_Create(FjEnv, FjThis, Self);
 
+   if FParent <> nil then Self.MyClassParentName:= FParent.ClassName;
+
    if FParent <> nil then
    begin
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-    if FParent is jRadioGroup then flag:= True;
+     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+     if FParent is jRadioGroup then flag:= True;
    end;
 
    FjPRLayoutHome:= FjPRLayout;
@@ -5694,6 +5709,7 @@ begin
   //FIsBackgroundImage:= False;
   FFilePath:= fpathData;
   FImageScaleType:= scaleCenter;
+  FRoundedShape:= False;
 end;
 
 destructor jImageView.Destroy;
@@ -5757,6 +5773,9 @@ begin
 
   if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+
+  if FRoundedShape <> False then
+    jImageView_SetRoundedShape(FjEnv, FjObject , FRoundedShape);
 
   if (FImageName <> '') and (FImageIndex < 0) then
      jImageView_SetImageByResIdentifier(FjEnv, FjObject , FImageName);
@@ -6182,6 +6201,54 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jImageView_SetVisibilityGone(FjEnv, FjObject);
+end;
+
+function jImageView.GetJByteBuffer(_width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_GetByteBuffer(FjEnv, FjObject, _width ,_height);
+end;
+
+function jImageView.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_GetBitmapFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
+end;
+
+function jImageView.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+begin
+   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
+end;
+
+procedure jImageView.SetRoundedShape(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FRoundedShape:= _value;
+  if FInitialized then
+     jImageView_SetRoundedShape(FjEnv, FjObject, FRoundedShape);
+end;
+
+procedure jImageView.SetImageFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
+end;
+
+procedure jImageView.LoadFromURL(_url: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_LoadFromURL(FjEnv, FjObject, _url);
+end;
+
+procedure jImageView.SaveToFile(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SaveToFile(FjEnv, FjObject, _filename);
 end;
 
 // Event : Java Event -> Pascal
@@ -7562,9 +7629,11 @@ procedure jListView.GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer
 var
   outColor: TARGBColorBridge;
 begin
-  outColor:= Self.FontColor;
+  outColor:= colbrDefault;
   color:= 0; //default;
+
   if Assigned(FOnDrawItemTextColor) then FOnDrawItemTextColor(Obj,index,caption, outColor);
+
   if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
       color:= GetARGB(FCustomColor, outColor);
 end;
@@ -7573,11 +7642,14 @@ procedure jListView.GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: inte
 var
   outColor: TARGBColorBridge;
 begin
-  outColor:= Self.FontColor;
-  color:= 0; //default;
+  outColor:= colbrDefault;
+  color:= 0;    //default;
+
   if Assigned(FOnDrawItemWidgetTextColor) then FOnDrawItemWidgetTextColor(Obj,index,caption, outColor);
-  if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
-      color:= GetARGB(FCustomColor, outColor);
+
+  if(outColor <> colbrNone) and  (outColor <> colbrDefault) then
+     color:= GetARGB(FCustomColor, outColor);
+
 end;
 
 procedure jListView.GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
@@ -8653,6 +8725,12 @@ begin
   if Assigned(FOnLongClick) then FOnLongClick(Obj);
 end;
 
+procedure jWebView.ScrollTo(_x, _y: integer);
+begin
+  if FInitialized then
+     jWebView_ScrollTo(FjEnv, FjObject, _x, _y);
+end;
+
 //------------------------------------------------------------------------------
 // jBitmap
 //------------------------------------------------------------------------------
@@ -9078,40 +9156,40 @@ begin
    Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject, _factorScaleX ,_factorScaleY);
 end;
 
-function jBitmap.GetByteBuffer(_width: integer; _height: integer): jObject;
+function jBitmap.GetJByteBuffer(_width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetByteBuffer(FjEnv, FjObject, _width ,_height);
 end;
 
-function jBitmap.GetBitmapFromByteBuffer(_byteBuffer: jObject; _width: integer; _height: integer): jObject;
+function jBitmap.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetBitmapFromByteBuffer(FjEnv, FjObject, _byteBuffer ,_width ,_height);
+   Result:= jBitmap_GetBitmapFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
 end;
 
-function jBitmap.GetBitmapFromByteArray(var _image: TDynArrayOfJByte): jObject;
+function jBitmap.GetBitmapFromJByteArray(var _image: TDynArrayOfJByte): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetBitmapFromByteArray(FjEnv, FjObject, _image);
 end;
 
-function jBitmap.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
+function jBitmap.GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
 begin
-   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
+   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,jbyteBuffer));
 end;
 
-function jBitmap.GetByteBufferFromBitmap(_bmap: jObject): jObject;
+function jBitmap.GetJByteBufferFromImage(_bmap: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject, _bmap);
 end;
 
-function jBitmap.GetByteBufferFromBitmap(): jObject;
+function jBitmap.GetJByteBufferFromImage(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
@@ -9226,6 +9304,13 @@ begin
      jCanvas_drawLine(FjEnv, FjObject ,x1,y1,x2,y2);
 end;
 
+procedure jCanvas.DrawLine(var _points: TDynArrayOfSingle);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_drawLine(FjEnv, FjObject, _points);
+end;
+
 Procedure jCanvas.DrawPoint(x1,y1 : single);
 begin
   if FInitialized then
@@ -9329,6 +9414,48 @@ begin
   begin
      jCanvas_drawTextAligned(FjEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer );
   end;
+end;
+
+function jCanvas.GetNewPath(var _points: TDynArrayOfSingle): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_GetNewPath(FjEnv, FjObject, _points);
+end;
+
+function jCanvas.GetNewPath(_points: array of single): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_GetNewPath(FjEnv, FjObject, _points);
+end;
+
+procedure jCanvas.DrawPath(var _points: TDynArrayOfSingle);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawPath(FjEnv, FjObject, _points);
+end;
+
+procedure jCanvas.DrawPath(_points: array of single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawPath(FjEnv, FjObject, _points);
+end;
+
+procedure jCanvas.DrawPath(_path: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawPath(FjEnv, FjObject, _path);
+end;
+
+procedure jCanvas.DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawArc(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF ,_startAngle ,_sweepAngle ,_useCenter);
 end;
 
 //------------------------------------------------------------------------------
@@ -9446,17 +9573,20 @@ begin
 end;
 
 // LORDMAN 2013-08-14
-procedure jView.SaveToFile(fileName: string);
+procedure jView.SaveToFile(fullFileName: string);
 var
   str: string;
 begin
-  str:= fileName;
+  str:= fullFileName;
   if str = '' then str := 'null';
   if FInitialized then
   begin
      if str <> 'null' then
      begin
-        jView_viewSave(FjEnv, FjObject , GetFilePath(FFilePath)+'/'+str);
+        if  Pos('/', str) > 0  then
+          jView_viewSave(FjEnv, FjObject , str)
+        else
+          jView_viewSave(FjEnv, FjObject , GetFilePath(FFilePath)+'/'+str);  //intern app
      end;
   end;
 end;
@@ -10983,15 +11113,15 @@ begin
      jPanel_SetVisibilityGone(FjEnv, FjObject);
 end;
 
-procedure jPanel.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
-begin
-  if Assigned(FOnFling) then  FOnFling(Obj, TFlingGesture(direction));
-end;
-
 // Event : Java -> Pascal
 Procedure jPanel.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+procedure jPanel.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
+begin
+  if Assigned(FOnFling) then  FOnFling(Obj, TFlingGesture(direction));
 end;
 
 Procedure Java_Event_pOnFlingGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; direction: integer);
