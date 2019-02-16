@@ -7,6 +7,7 @@ object AndroidModule8: TAndroidModule8
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = DataModuleCreate
   Text = 'AndroidModule8'
   ActivityMode = actRecyclable
@@ -15,14 +16,15 @@ object AndroidModule8: TAndroidModule8
   OnCloseQuery = DataModuleCloseQuery
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 48
+    Left = 15
     Top = 10
-    Width = 204
-    Height = 20
+    Width = 269
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 22765
     PosRelativeToAnchor = []
@@ -31,22 +33,23 @@ object AndroidModule8: TAndroidModule8
     LayoutParamHeight = lpWrapContent
     Text = 'Custom View Demo: Drag the cube'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrMediumSpringGreen
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 5
-    Top = 351
-    Width = 285
-    Height = 40
+    Top = 371
+    Width = 290
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jView1
     Id = 8848063
@@ -59,18 +62,20 @@ object AndroidModule8: TAndroidModule8
     FontColor = colbrMediumSpringGreen
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jView1: jView
     Tag = 1
     Left = 10
-    Top = 50
-    Width = 270
-    Height = 286
+    Top = 56
+    Width = 280
+    Height = 300
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 75225
@@ -85,22 +90,25 @@ object AndroidModule8: TAndroidModule8
   end
   object jImageView1: jImageView
     Left = 126
-    Top = 401
+    Top = 438
     Width = 48
     Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 0
     PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = [rpCenterInParent]
+    PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
+    GravityInParent = lgNone
+    RoundedShape = False
   end
   object jBitmap1: jBitmap
     FilePath = fpathData

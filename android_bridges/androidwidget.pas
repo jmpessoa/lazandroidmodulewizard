@@ -735,10 +735,11 @@ type
   {
   The first parameter is the JNI environment, frequently used with helper functions.
   The second parameter is the Java object that this function is a part of.
+
+  The folder "Digital Camera Image"-DCIM- store photographs from digital camera
   }
 
 
-  //by jmpessoa
   TEnvPath    = record
                  App         : string;    // /data/app/com.kredix-1.apk
                  Dat         : string;    // /data/data/com.kredix/files
@@ -747,10 +748,7 @@ type
                  DataBase    : string;
 
   end;
-  //The folder "Digital Camera Image"-DCIM- store photographs from digital camera
 
-
-  //by jmpessoa
   TFilePath = (fpathNone, fpathApp, fpathData, fpathExt, fpathDCIM, fpathDataBase);
 
 

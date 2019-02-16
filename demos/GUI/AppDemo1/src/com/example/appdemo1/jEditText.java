@@ -97,12 +97,16 @@ public class jEditText extends EditText {
 		onKeyListener = new OnKeyListener() {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
 				//if (event.getAction() == KeyEvent.ACTION_UP) {
-					if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok						
+				    final EditText caption = (EditText)v;
+					//if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok
+				    if((event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
 						if (mCloseSoftInputOnEnter) {
 							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 						}
-						controls.pOnEnter(LAMWCommon.getPasObj());
+						if (! caption.getText().toString().equals("")){  //try fix program logic...
+							controls.pOnEnter(LAMWCommon.getPasObj());
+						}
 						return mCloseSoftInputOnEnter;
 					}
 				//}
@@ -626,6 +630,5 @@ public class jEditText extends EditText {
 		     }
     }
 
-	   
 }
 

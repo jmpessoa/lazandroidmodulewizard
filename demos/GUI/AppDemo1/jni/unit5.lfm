@@ -2,11 +2,12 @@ object AndroidModule5: TAndroidModule5
   Left = 376
   Top = 66
   Width = 300
-  Height = 600
+  Height = 735
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = DataModuleCreate
   Text = 'AndroidModule5'
   ActivityMode = actRecyclable
@@ -18,12 +19,13 @@ object AndroidModule5: TAndroidModule5
   object jTextView1: jTextView
     Left = 10
     Top = 10
-    Width = 93
-    Height = 20
+    Width = 122
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 72543
     PosRelativeToAnchor = []
@@ -32,22 +34,23 @@ object AndroidModule5: TAndroidModule5
     LayoutParamHeight = lpWrapContent
     Text = 'WebView Demo'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrTomato
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jPanel1: jPanel
     Left = 0
-    Top = 40
+    Top = 46
     Width = 300
-    Height = 136
+    Height = 183
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 7980347
@@ -60,14 +63,15 @@ object AndroidModule5: TAndroidModule5
     MaxPinchZoomFactor = 4
     object jEditText1: jEditText
       Tag = 1
-      Left = 10
-      Top = 40
-      Width = 280
+      Left = 5
+      Top = 46
+      Width = 290
       Height = 39
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 5
       MarginBottom = 10
+      Enabled = True
       Visible = True
       Anchor = jTextView2
       Id = 1944427
@@ -90,16 +94,20 @@ object AndroidModule5: TAndroidModule5
       WrappingLine = False
       Editable = True
       FontSizeUnit = unitDefault
+      CloseSoftInputOnEnter = True
+      CapSentence = False
+      GravityInParent = lgNone
     end
     object jTextView2: jTextView
       Left = 5
       Top = 5
-      Width = 60
-      Height = 20
+      Width = 79
+      Height = 26
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Id = 3092999
       PosRelativeToAnchor = []
@@ -108,22 +116,23 @@ object AndroidModule5: TAndroidModule5
       LayoutParamHeight = lpWrapContent
       Text = 'Enter URL:'
       Alignment = taLeft
-      Enabled = True
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
+      GravityInParent = lgNone
     end
     object jPanel3: jPanel
       Left = 4
-      Top = 93
-      Width = 288
-      Height = 47
+      Top = 99
+      Width = 292
+      Height = 64
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
+      Enabled = True
       Visible = True
       Anchor = jEditText1
       Id = 0
@@ -135,14 +144,15 @@ object AndroidModule5: TAndroidModule5
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
       object jButton1: jButton
-        Left = 4
+        Left = 2
         Top = 3
-        Width = 280
-        Height = 40
+        Width = 288
+        Height = 57
         MarginLeft = 2
         MarginTop = 4
         MarginRight = 2
         MarginBottom = 4
+        Enabled = True
         Visible = True
         Id = 0
         PosRelativeToAnchor = []
@@ -154,19 +164,21 @@ object AndroidModule5: TAndroidModule5
         FontColor = colbrDefault
         FontSize = 0
         FontSizeUnit = unitDefault
+        GravityInParent = lgNone
         OnClick = jButton1Click
       end
     end
   end
   object jPanel2: jPanel
     Left = 0
-    Top = 176
+    Top = 229
     Width = 300
-    Height = 424
+    Height = 506
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jPanel1
     Id = 0
@@ -179,14 +191,15 @@ object AndroidModule5: TAndroidModule5
     MaxPinchZoomFactor = 4
     object jWebView1: jWebView
       Tag = 1
-      Left = 4
-      Top = 8
-      Width = 286
-      Height = 406
+      Left = 5
+      Top = 5
+      Width = 290
+      Height = 496
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Id = 0
       PosRelativeToAnchor = []
@@ -195,8 +208,8 @@ object AndroidModule5: TAndroidModule5
       LayoutParamHeight = lpMatchParent
       JavaScript = False
       BackgroundColor = colbrDefault
-      OnStatus = jWebView1Status
       ZoomControl = False
+      OnStatus = jWebView1Status
     end
   end
 end

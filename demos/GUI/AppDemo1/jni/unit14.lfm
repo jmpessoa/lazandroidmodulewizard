@@ -2,25 +2,27 @@ object AndroidModule14: TAndroidModule14
   Left = 366
   Top = 68
   Width = 300
-  Height = 600
+  Height = 668
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule14'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 87
+    Left = 67
     Top = 10
-    Width = 126
-    Height = 20
+    Width = 166
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 41380
     PosRelativeToAnchor = []
@@ -29,22 +31,23 @@ object AndroidModule14: TAndroidModule14
     LayoutParamHeight = lpWrapContent
     Text = 'Http/Asyn Task Demo'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrOrange
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 5
-    Top = 87
-    Width = 285
-    Height = 40
+    Top = 93
+    Width = 290
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jCheckBox1
     Id = 67114
@@ -57,17 +60,19 @@ object AndroidModule14: TAndroidModule14
     FontColor = colbrSteelBlue
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jProgressBar1: jProgressBar
     Left = 10
-    Top = 142
-    Width = 270
+    Top = 165
+    Width = 280
     Height = 23
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = False
     Visible = False
     Anchor = jButton1
     Id = 24359
@@ -79,16 +84,18 @@ object AndroidModule14: TAndroidModule14
     BackgroundColor = colbrDefault
     Progress = 0
     Max = 100
+    GravityInParent = lgNone
   end
   object jTextView2: jTextView
     Left = 10
-    Top = 185
-    Width = 106
-    Height = 20
+    Top = 208
+    Width = 137
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jProgressBar1
     Id = 69640
@@ -98,22 +105,23 @@ object AndroidModule14: TAndroidModule14
     LayoutParamHeight = lpWrapContent
     Text = 'Memo auto scroll:'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jEditText1: jEditText
     Left = 10
-    Top = 225
-    Width = 270
-    Height = 136
+    Top = 254
+    Width = 280
+    Height = 153
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView2
     Id = 45472
@@ -136,16 +144,20 @@ object AndroidModule14: TAndroidModule14
     WrappingLine = True
     Editable = True
     FontSizeUnit = unitDefault
+    CloseSoftInputOnEnter = True
+    CapSentence = False
+    GravityInParent = lgNone
   end
   object jTextView3: jTextView
     Left = 10
-    Top = 381
-    Width = 128
-    Height = 20
+    Top = 427
+    Width = 168
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jEditText1
     Id = 47102
@@ -155,22 +167,23 @@ object AndroidModule14: TAndroidModule14
     LayoutParamHeight = lpWrapContent
     Text = 'Memo with ScrollView'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jScrollView1: jScrollView
     Left = 5
-    Top = 416
-    Width = 285
-    Height = 136
+    Top = 468
+    Width = 290
+    Height = 153
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView3
     Id = 0
@@ -182,14 +195,15 @@ object AndroidModule14: TAndroidModule14
     ScrollSize = 800
     BackgroundColor = colbrSkyBlue
     object jEditText2: jEditText
-      Left = 34
-      Top = 19
-      Width = 216
-      Height = 97
+      Left = 17
+      Top = 10
+      Width = 243
+      Height = 133
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 30
       MarginBottom = 10
+      Enabled = True
       Visible = True
       Id = 0
       PosRelativeToAnchor = []
@@ -211,17 +225,21 @@ object AndroidModule14: TAndroidModule14
       WrappingLine = False
       Editable = True
       FontSizeUnit = unitDefault
+      CloseSoftInputOnEnter = True
+      CapSentence = False
+      GravityInParent = lgNone
     end
   end
   object jCheckBox1: jCheckBox
     Left = 5
-    Top = 45
-    Width = 111
+    Top = 51
+    Width = 131
     Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 2231034
@@ -244,6 +262,9 @@ object AndroidModule14: TAndroidModule14
       'http://www.firemedia.de/'
     )
     AuthenticationMode = autNone
+    ResponseTimeout = 15000
+    ConnectionTimeout = 15000
+    UploadFormName = 'lamwFormUpload'
     OnContentResult = jHttpClient1ContentResult
     OnCodeResult = jHttpClient1CodeResult
     left = 160

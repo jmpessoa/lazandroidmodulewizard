@@ -2,25 +2,27 @@ object AndroidModule6: TAndroidModule6
   Left = 376
   Top = 66
   Width = 300
-  Height = 600
+  Height = 700
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule6'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
   OnCloseQuery = DataModuleCloseQuery
   object jTextView1: jTextView
-    Left = 105
+    Left = 91
     Top = 10
-    Width = 89
-    Height = 20
+    Width = 117
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 26515
     PosRelativeToAnchor = []
@@ -29,22 +31,23 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'List View Demo'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrYellow
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jTextView2: jTextView
     Left = 10
-    Top = 50
-    Width = 92
-    Height = 20
+    Top = 56
+    Width = 123
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 36024
@@ -54,23 +57,24 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'Enter New Item:'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jEditText1: jEditText
     Tag = 1
     Left = 5
-    Top = 90
+    Top = 102
     Width = 136
     Height = 39
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView2
     Id = 53166
@@ -93,16 +97,20 @@ object AndroidModule6: TAndroidModule6
     WrappingLine = True
     Editable = True
     FontSizeUnit = unitDefault
+    CloseSoftInputOnEnter = True
+    CapSentence = False
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 151
-    Top = 90
+    Top = 93
     Width = 136
-    Height = 40
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jEditText1
     Id = 0
@@ -115,17 +123,19 @@ object AndroidModule6: TAndroidModule6
     FontColor = colbrSlateBlue
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jEditText2: jEditText
     Left = 5
-    Top = 189
+    Top = 207
     Width = 136
     Height = 39
     MarginLeft = 5
     MarginTop = 10
     MarginRight = 5
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jTextView3
     Id = 80017
@@ -148,16 +158,20 @@ object AndroidModule6: TAndroidModule6
     WrappingLine = True
     Editable = True
     FontSizeUnit = unitDefault
+    CloseSoftInputOnEnter = True
+    CapSentence = False
+    GravityInParent = lgNone
   end
   object jTextView3: jTextView
     Left = 10
-    Top = 149
-    Width = 97
-    Height = 20
+    Top = 161
+    Width = 131
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jEditText1
     Id = 5036
@@ -167,22 +181,23 @@ object AndroidModule6: TAndroidModule6
     LayoutParamHeight = lpWrapContent
     Text = 'Enter Item Index:'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton2: jButton
     Left = 151
-    Top = 189
+    Top = 198
     Width = 136
-    Height = 40
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jEditText2
     Id = 63804
@@ -195,18 +210,20 @@ object AndroidModule6: TAndroidModule6
     FontColor = colbrSlateBlue
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
   end
   object jListView1: jListView
     Tag = 1
     Left = 10
-    Top = 288
-    Width = 270
-    Height = 286
+    Top = 323
+    Width = 280
+    Height = 336
     MarginLeft = 10
     MarginTop = 0
     MarginRight = 10
     MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jButton3
     Id = 8951
@@ -231,18 +248,22 @@ object AndroidModule6: TAndroidModule6
     TextAlign = alLeft
     HighLightSelectedItemColor = colbrRed
     FontSizeUnit = unitDefault
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
     OnClickItem = jListView1ClickItem
     OnClickWidgetItem = jListView1ClickWidgetItem
   end
   object jButton3: jButton
     Left = 5
-    Top = 243
-    Width = 285
-    Height = 40
+    Top = 261
+    Width = 290
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jEditText2
     Id = 3040099
@@ -255,6 +276,7 @@ object AndroidModule6: TAndroidModule6
     FontColor = colbrSlateBlue
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton3Click
   end
   object jBitmap1: jBitmap

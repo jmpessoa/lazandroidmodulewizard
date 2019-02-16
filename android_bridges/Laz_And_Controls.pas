@@ -1816,6 +1816,7 @@ type
     Procedure GenEvent_OnDraw(Obj: TObject);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
+
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
     Procedure Refresh;
@@ -1827,9 +1828,11 @@ type
     procedure ClearLayout();
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
-    Procedure SaveToFile(fileName:String);
+    Procedure SaveToFile(fullFileName:String);
     function GetDrawingCache(): jObject;
     function GetImage(): jObject;
+
+    property FilePath    : TFilePath read FFilePath write FFilePath;
 
   published
     property Canvas      : jCanvas read FjCanvas write SetjCanvas; // Java : jCanvas
@@ -9557,17 +9560,20 @@ begin
 end;
 
 // LORDMAN 2013-08-14
-procedure jView.SaveToFile(fileName: string);
+procedure jView.SaveToFile(fullFileName: string);
 var
   str: string;
 begin
-  str:= fileName;
+  str:= fullFileName;
   if str = '' then str := 'null';
   if FInitialized then
   begin
      if str <> 'null' then
      begin
-        jView_viewSave(FjEnv, FjObject , GetFilePath(FFilePath)+'/'+str);
+        if  Pos('/', str) > 0  then
+          jView_viewSave(FjEnv, FjObject , str)
+        else
+          jView_viewSave(FjEnv, FjObject , GetFilePath(FFilePath)+'/'+str);  //intern app
      end;
   end;
 end;

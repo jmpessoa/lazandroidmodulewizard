@@ -19,6 +19,9 @@ type
       jTextView1: jTextView;
       jTimer1: jTimer;
       procedure AndroidModule1CloseQuery(Sender: TObject; var CanClose: boolean);
+      procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+        requestCode: integer; manifestPermission: string;
+        grantResult: TManifestPermissionResult);
       procedure DataModuleClose(Sender: TObject);
       procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
@@ -59,8 +62,30 @@ begin
   ShowMessage('form 1 can close....')
 end;
 
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+    case requestCode of
+     2003:begin
+              if grantResult = PERMISSION_GRANTED  then
+                ShowMessage('Success! ['+manifestPermission+'] Permission grant!!! ' )
+              else  //PERMISSION_DENIED
+                ShowMessage('Sorry... ['+manifestPermission+'] Permission not grant... ' );
+          end;
+   end;
+end;
+
 procedure TAndroidModule1.DataModuleJNIPrompt(Sender: TObject);
 begin
+
+  if IsRuntimePermissionNeed() then   // that is, target API >= 23  - Android 6
+  begin
+      ShowMessage('RequestRuntimePermission....');
+      //hint: if you  get "write" permission then you have "read", too!
+      Self.RequestRuntimePermission(['android.permission.WRITE_EXTERNAL_STORAGE'], 2003);  // some/any value...
+  end;
+
   jTimer1.Enabled:= True
 end;
 
