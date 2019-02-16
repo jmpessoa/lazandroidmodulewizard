@@ -2878,7 +2878,7 @@ begin
     end;
     jListVIew(Obj).GenEvent_OnDrawItemCaptionColor(Obj, index, pasCaption, outColor);
   end;
-  Result:= outColor;
+  Result:= JInt(outColor);
 end;
 
 function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
@@ -2901,7 +2901,7 @@ begin
     end;
     jListVIew(Obj).GenEvent_OnDrawItemWidgetTextColor(Obj, index, pasCaption, outColor);
   end;
-  Result:= outColor;
+  Result:= JInt(outColor);
 end;
 
 
@@ -7621,9 +7621,11 @@ procedure jListView.GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer
 var
   outColor: TARGBColorBridge;
 begin
-  outColor:= Self.FontColor;
+  outColor:= colbrDefault;
   color:= 0; //default;
+
   if Assigned(FOnDrawItemTextColor) then FOnDrawItemTextColor(Obj,index,caption, outColor);
+
   if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
       color:= GetARGB(FCustomColor, outColor);
 end;
@@ -7632,11 +7634,14 @@ procedure jListView.GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: inte
 var
   outColor: TARGBColorBridge;
 begin
-  outColor:= Self.FontColor;
-  color:= 0; //default;
+  outColor:= colbrDefault;
+  color:= 0;    //default;
+
   if Assigned(FOnDrawItemWidgetTextColor) then FOnDrawItemWidgetTextColor(Obj,index,caption, outColor);
-  if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
-      color:= GetARGB(FCustomColor, outColor);
+
+  if(outColor <> colbrNone) and  (outColor <> colbrDefault) then
+     color:= GetARGB(FCustomColor, outColor);
+
 end;
 
 procedure jListView.GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
