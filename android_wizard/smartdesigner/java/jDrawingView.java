@@ -20,6 +20,9 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
@@ -46,6 +49,8 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     private Canvas mCanvas = null;
     private Paint mPaint = null;
+    private TextPaint textPaint = null;
+
     private Path mPath = null;
     private OnClickListener onClickListener;   // click event
     private GestureDetector gDetect;
@@ -78,6 +83,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         mPaint.setStyle(Paint.Style.STROKE);
         //this.setWillNotDraw(false); //fire OnDraw
         mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        textPaint = new TextPaint();
 
         mPath = new Path();
         mCountPoint = 0;
@@ -105,6 +111,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         mPaint = null;
         mCanvas = null;
         gDetect = null;
+        textPaint = null;
         setOnClickListener(null);
         scaleGestureDetector = null;
         LAMWCommon.free();
@@ -424,8 +431,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     /*.*/ public void onDraw(Canvas canvas) {
         mCanvas = canvas;
         controls.pOnDrawingViewDraw(pascalObj, Const.TouchUp, mActivePointers.size(),
-                mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
-
+                                    mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
     }
 
     public void SaveToFile(String _filename) {
@@ -496,8 +502,18 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         mCanvas.drawBitmap(bmp, null, rect, mPaint);
     }
 
-    //0 , 0, w, h //int left/b, int top/l, int right/r, int bottom/t)
-    public void DrawBitmap(Bitmap _bitmap, int _left, int _top, int _right, int _bottom) {  //int b, int l, int r, int t
+    public void DrawBitmap(Bitmap _bitmap, float _x, float _y, float _angleDegree) {
+        int  x = (int)_x;
+        int  y = (int)_y;
+
+        Bitmap bmp = GetResizedBitmap(_bitmap, _bitmap.getWidth(), _bitmap.getHeight());
+        mCanvas.save();
+        mCanvas.rotate(_angleDegree,  x+_bitmap.getWidth()/2, y+ _bitmap.getHeight()/2);
+        mCanvas.drawBitmap(bmp, x, y, null);
+        mCanvas.restore();
+    }
+
+    public void DrawBitmap(Bitmap _bitmap, int _left, int _top, int _right, int _bottom) {
         /* Figure out which way needs to be reduced less */
 			/*
 		    int scaleFactor = 1;
@@ -605,6 +621,28 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         mCanvas.drawText(_text, _x, _y, mPaint);
     }
 
+    //http://spacetech.dk/android-graphics-rotate-example.html
+    public void DrawText(String _text, float _x, float _y, float _angleDegree) {
+        DrawText( _text, _x, _y, _angleDegree,  false);
+    }
+
+    public void DrawText(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
+        // draw bounding rect before rotating text
+        Rect rect = new Rect();
+        mPaint.getTextBounds(_text, 0, _text.length(), rect);
+        mCanvas.save();
+        //rotate the canvas on center of the text to draw
+        if (_rotateCenter)
+           mCanvas.rotate(_angleDegree, _x + rect.exactCenterX(), _y + rect.exactCenterY());
+        else
+           mCanvas.rotate(_angleDegree, _x , _y );
+
+        mCanvas.drawText(_text, _x, _y, mPaint);
+
+        mCanvas.restore();
+    }
+
+
     public void DrawLine(float[] _points) {
         mCanvas.drawLines(_points, mPaint);
     }
@@ -664,16 +702,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 		Rect rect = new Rect(0, 0, w, h);
 		Bitmap bmp = GetResizedBitmap(_bitmap, w, h);
 		mCanvas.drawBitmap(bmp, null, rect, mPaint);
-		/*					  
-	    if ( (_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
-			int nh = (int) ( _bitmap.getHeight() * (512.0 / _bitmap.getWidth()) );	
-			Bitmap scaled = Bitmap.createScaledBitmap(_bitmap,512, nh, true);
-			mCanvas.drawBitmap(scaled,null,rect,mPaint);			
-		}
-		else {
-			mCanvas.drawBitmap(_bitmap,null,rect,mPaint);
-		}
-	    */
 	}
 
 	public void SetMinZoomFactor(float _minZoomFactor) {
@@ -794,16 +822,57 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 		mCanvas.drawPath(GetPath(_points), mPaint);
 	}
 
-	public void DrawTextOnPath(Path _path, String _text, int _horOffest, int _verOffeset) {
-        mCanvas.drawTextOnPath(_text, _path, _horOffest, _verOffeset, mPaint);
+	public void DrawTextOnPath(Path _path, String _text, float _xOffset, float _yOffset) {
+        mCanvas.drawTextOnPath(_text, _path, _xOffset, _yOffset, mPaint);
         //setLayerType(View.LAYER_TYPE_SOFTWARE, null); // Required for API level 11 or higher.
     }
 
-    public void DrawTextOnPath(String _text, int _xOffest, int _yOffeset) {
+    public void DrawTextOnPath(String _text, float _xOffset, float  _yOffset) {
 	    if (! mPath.isEmpty()) {
-            mCanvas.drawTextOnPath(_text, mPath, _xOffest, _yOffeset, mPaint);
+            mCanvas.drawTextOnPath(_text, mPath, _xOffset, _yOffset, mPaint);
             //setLayerType(View.LAYER_TYPE_SOFTWARE, null); // Required for API level 11 or higher.
         }
+    }
+
+    //https://blog.danlew.net/2013/10/03/centering_single_line_text_in_a_canvas/   TODO
+    //https://ivankocijan.xyz/android-drawing-multiline-text-on-canvas/
+    public void DrawTextMultiLine(String _text, float _left, float _top, float _right, float _bottom) {
+
+            Rect bounds = new Rect((int)_left, (int)_top,(int)_right, (int)_bottom);
+
+            //Set your own color, size etc.
+            textPaint.setTextSize(mPaint.getTextSize());
+            textPaint.setColor(mPaint.getColor());
+
+            //Static layout which will be drawn on canvas
+            //_text - text which will be drawn
+            //text paint - paint object
+            //bounds.width - width of the layout
+            //Layout.Alignment.ALIGN_CENTER - layout alignment
+            //1 - text spacing multiply
+            //1 - text spacing add
+            //true - include padding
+
+            StaticLayout sl = new StaticLayout(_text, textPaint, bounds.width(), Layout.Alignment.ALIGN_CENTER, 1, 1, true);
+            mCanvas.save();
+            //calculate X and Y coordinates - In this case we want to draw the text in the
+            //center of canvas so we calculate
+            //text height and number of lines to move Y coordinate to center.
+            float textHeight = getTextHeight(_text, textPaint);
+            int numberOfTextLines = sl.getLineCount();
+            float textYCoordinate = bounds.exactCenterY() - ((numberOfTextLines * textHeight) / 2);
+            //text will be drawn from left
+            float textXCoordinate = bounds.left;
+            mCanvas.translate(textXCoordinate, textYCoordinate);
+            //draws static layout on canvas
+            sl.draw(mCanvas);
+            mCanvas.restore();
+    }
+
+    private float getTextHeight(String text, Paint paint) {
+            Rect rect = new Rect();
+            paint.getTextBounds(text, 0, text.length(), rect);
+            return rect.height();
     }
 
     public int GetViewPortX(float _worldX, float _minWorldX, float _maxWorldX,  int  _viewPortWidth) {

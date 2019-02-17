@@ -109,10 +109,12 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     function AddPointsToPath(_path: jObject; var _points: TDynArrayOfSingle): jObject; overload;
     function AddPointsToPath(_path: jObject; _points: array of single): jObject;  overload;
     function AddPathToPath(_srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
-    procedure DrawTextOnPath(_path: jObject; _text: string; _horOffest: integer; _verOffeset: integer); overload;
-    procedure DrawTextOnPath(_text: string; _xOffest: integer; _yOffeset: integer);  overload;
+    procedure DrawTextOnPath(_path: jObject; _text: string; _xOffset: single; _yOffset: single); overload;
+    procedure DrawTextOnPath(_text: string; _xOffset: single; _yOffset: single); overload;
 
-    procedure DrawText(_text: string; _x: single; _y: single);
+    procedure DrawText(_text: string; _x: single; _y: single);  overload;
+    procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single); overload;
+
     procedure DrawPoint(_x1: single; _y1: single);
     procedure DrawCircle(_cx: single; _cy: single; _radius: single);
     procedure DrawBackground(_color: integer);
@@ -142,7 +144,9 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     function GetWorldY(viewPortY:integer): single;
     function GetWorldX(viewPortX:integer): single;
 
-
+    procedure DrawBitmap(_bitmap: jObject; _x: single; _y: single; _angleDegree: single); overload;
+    procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean); overload;
+    procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
 
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
@@ -201,7 +205,8 @@ procedure jDrawingView_SetPaintColor(env: PJNIEnv; _jdrawingview: JObject; _colo
 procedure jDrawingView_SetTextSize(env: PJNIEnv; _jdrawingview: JObject; _textSize: DWord);
 procedure jDrawingView_SetTypeface(env: PJNIEnv; _jdrawingview: JObject; _typeface: integer);
 procedure jDrawingView_DrawLine(env: PJNIEnv; _jdrawingview: JObject; _x1: single; _y1: single; _x2: single; _y2: single); overload;
-procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single);
+procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single); overload;
+procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angle: single); overload;
 
 procedure jDrawingView_DrawLine(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle); overload;
 procedure jDrawingView_DrawLine(env: PJNIEnv; _jdrawingview: JObject; var _points: array of single); overload;
@@ -230,7 +235,7 @@ procedure jDrawingView_SetPaintCornerPathEffect(env: PJNIEnv; _jdrawingview: JOb
 procedure jDrawingView_SetPaintDashPathEffect(env: PJNIEnv; _jdrawingview: JObject; _lineDash: single; _dashSpace: single; _phase: single);
 function jDrawingView_GetPath(env: PJNIEnv; _jdrawingview: JObject): jObject; overload;
 function jDrawingView_ResetPath(env: PJNIEnv; _jdrawingview: JObject): jObject;  overload;
-function jDrawingView_ResetPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject): jObject;  overload;
+function jDrawingView_ResetPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject): jObject; overload;
 procedure jDrawingView_AddCircleToPath(env: PJNIEnv; _jdrawingview: JObject; _x: single; _y: single; _r: single; _pathDirection: integer); overload;
 procedure jDrawingView_AddCircleToPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _x: single; _y: single; _r: single; _pathDirection: integer); overload;
 function jDrawingView_GetNewPath(env: PJNIEnv; _jdrawingview: JObject; var _points: TDynArrayOfSingle): jObject; overload;
@@ -241,9 +246,12 @@ function jDrawingView_AddPointsToPath(env: PJNIEnv; _jdrawingview: JObject; _pat
 function jDrawingView_AddPathToPath(env: PJNIEnv; _jdrawingview: JObject; _srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
 procedure jDrawingView_DrawArc(env: PJNIEnv; _jdrawingview: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
 procedure jDrawingView_DrawOval(env: PJNIEnv; _jdrawingview: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
-procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _text: string; _horOffest: integer; _verOffeset: integer); overload;
-procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _text: string; _xOffest: integer; _yOffeset: integer); overload;
+procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _text: string; _xOffset: single; _yOffset: single);overload;
+procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _text: string; _xOffset: single; _yOffset: single); overload;
 
+procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _x: single; _y: single; _angleDegree: single); overload;
+procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean); overload;
+procedure jDrawingView_DrawTextMultiLine(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single);
 
 
 implementation
@@ -271,7 +279,7 @@ begin
   FMouches.Mouch.Angle  := 0.0; *)
 
   FFontFace:= ffNormal;
-  FFontSize:= 20;
+  FFontSize:= 0;
   FPaintStrokeWidth:= 1;
   FPaintStyle:= psStroke;
   FPaintColor:= colbrRed;
@@ -346,12 +354,20 @@ begin
   if not FInitialized then
   begin
    FInitialized:= True;
-   
-   jDrawingView_SetPaintWidth(FjEnv, FjObject, FPaintStrokeWidth);
+
+   if FPaintStrokeWidth > 1 then
+     jDrawingView_SetPaintWidth(FjEnv, FjObject, FPaintStrokeWidth);
+
    jDrawingView_SetPaintStyle(FjEnv, FjObject, ord(FPaintStyle));
+
+   if  FPaintColor <> colbrDefault then
    jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
-   jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
-   jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
+
+   if FFontSize <> 0 then
+     jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
+
+   if FFontFace <> ffNormal then
+     jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
 
    if FPaintStrokeJoin <>  sjDefault then
         jDrawingView_SetPaintStrokeJoin(FjEnv, FjObject, Ord(FPaintStrokeJoin));
@@ -613,17 +629,26 @@ begin
      jDrawingView_DrawText(FjEnv, FjObject, _text ,_x ,_y);
 end;
 
-(*
-// Event : Java Event -> Pascal
-Procedure jDrawingView.GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
+procedure jDrawingView.DrawText(_text: string; _x: single; _y: single; _angleDegree: single);
 begin
-  case Act of
-   cTouchDown : VHandler_touchesBegan_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchDown,FMouches);
-   cTouchMove : VHandler_touchesMoved_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchMove,FMouches);
-   cTouchUp   : VHandler_touchesEnded_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchUp  ,FMouches);
-  end;
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawText(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree);
 end;
-*)
+
+procedure jDrawingView.DrawBitmap(_bitmap: jObject; _x: single; _y: single; _angleDegree: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawBitmap(FjEnv, FjObject, _bitmap ,_x ,_y ,_angleDegree);
+end;
+
+procedure jDrawingView.DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawText(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
+end;
 
 procedure jDrawingView.GenEvent_OnDrawingViewTouch(Obj: TObject; Act,
   Cnt: integer; X, Y: array of Single; fligGesture: integer;
@@ -922,19 +947,18 @@ begin
    Result:= jDrawingView_AddPathToPath(FjEnv, FjObject, _srcPath ,_targetPath ,_dx ,_dy);
 end;
 
-
-procedure jDrawingView.DrawTextOnPath(_path: jObject; _text: string; _horOffest: integer; _verOffeset: integer);
+procedure jDrawingView.DrawTextOnPath(_path: jObject; _text: string; _xOffset: single; _yOffset: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawTextOnPath(FjEnv, FjObject, _path ,_text ,_horOffest ,_verOffeset);
+     jDrawingView_DrawTextOnPath(FjEnv, FjObject, _path ,_text ,_xOffset ,_yOffset);
 end;
 
-procedure jDrawingView.DrawTextOnPath(_text: string; _xOffest: integer; _yOffeset: integer);
+procedure jDrawingView.DrawTextOnPath(_text: string; _xOffset: single; _yOffset: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawTextOnPath(FjEnv, FjObject, _text ,_xOffest ,_yOffeset);
+     jDrawingView_DrawTextOnPath(FjEnv, FjObject, _text ,_xOffset ,_yOffset);
 end;
 
 procedure jDrawingView.DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
@@ -949,6 +973,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jDrawingView_DrawOval(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF);
+end;
+
+procedure jDrawingView.DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawTextMultiLine(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
 end;
 
 procedure jDrawingView.SetViewPortScaleXY(minX: single; maxX: single; minY: single; maxY: single);
@@ -1374,7 +1405,24 @@ begin
   jCls:= env^.GetObjectClass(env, _jdrawingview);
   jMethod:= env^.GetMethodID(env, jCls, 'DrawText', '(Ljava/lang/String;FF)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angle: single);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _angle;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawText', '(Ljava/lang/String;FFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -1922,7 +1970,7 @@ begin
 end;
 
 
-procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _text: string; _horOffest: integer; _verOffeset: integer);
+procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _path: jObject; _text: string; _xOffset: single; _yOffset: single);
 var
   jParams: array[0..3] of jValue;
   jMethod: jMethodID=nil;
@@ -1930,31 +1978,32 @@ var
 begin
   jParams[0].l:= _path;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_text));
-  jParams[2].i:= _horOffest;
-  jParams[3].i:= _verOffeset;
+  jParams[2].f:= _xOffset;
+  jParams[3].f:= _yOffset;
   jCls:= env^.GetObjectClass(env, _jdrawingview);
-  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextOnPath', '(Landroid/graphics/Path;Ljava/lang/String;II)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextOnPath', '(Landroid/graphics/Path;Ljava/lang/String;FF)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _text: string; _xOffest: integer; _yOffeset: integer);
+procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _text: string; _xOffset: single; _yOffset: single);
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
-  jParams[1].i:= _xOffest;
-  jParams[2].i:= _yOffeset;
+  jParams[1].f:= _xOffset;
+  jParams[2].f:= _yOffset;
   jCls:= env^.GetObjectClass(env, _jdrawingview);
-  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextOnPath', '(Ljava/lang/String;II)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextOnPath', '(Ljava/lang/String;FF)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
 
 procedure jDrawingView_DrawArc(env: PJNIEnv; _jdrawingview: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
 var
@@ -1992,5 +2041,57 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _x: single; _y: single; _angleDegree: single);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _angleDegree;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawBitmap', '(Landroid/graphics/Bitmap;FFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _angleDegree;
+  jParams[4].z:= JBool(_rotateCenter);
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawText', '(Ljava/lang/String;FFFZ)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawTextMultiLine(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _left;
+  jParams[2].f:= _top;
+  jParams[3].f:= _right;
+  jParams[4].f:= _bottom;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextMultiLine', '(Ljava/lang/String;FFFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.
