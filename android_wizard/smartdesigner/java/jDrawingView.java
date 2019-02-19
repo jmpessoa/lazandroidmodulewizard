@@ -9,6 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.CornerPathEffect;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
@@ -25,6 +26,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -83,7 +85,13 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         mPaint.setStyle(Paint.Style.STROKE);
         //this.setWillNotDraw(false); //fire OnDraw
         mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+
+        float ts = mPaint.getTextSize();
+        float unit = controls.activity.getResources().getDisplayMetrics().density;
+
+        mPaint.setTextSize(ts*unit);
         textPaint = new TextPaint();
+        textPaint.setTextSize(ts*unit);
 
         mPath = new Path();
         mCountPoint = 0;
@@ -591,7 +599,8 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void SetTextSize(float _textSize) {
-        mPaint.setTextSize(_textSize);
+        float unit = controls.activity.getResources().getDisplayMetrics().density;
+        mPaint.setTextSize(_textSize*unit);
     }
 
     public void SetTypeface(int _typeface) {
@@ -875,7 +884,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
             return rect.height();
     }
 
-    public int GetViewPortX(float _worldX, float _minWorldX, float _maxWorldX,  int  _viewPortWidth) {
+    public int GetViewportX(float _worldX, float _minWorldX, float _maxWorldX,  int  _viewPortWidth) {
 	   float escX;
 	   int r;
 	   escX = _viewPortWidth/(_maxWorldX-_minWorldX);
@@ -884,7 +893,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 	   return r;
     }
 
-	public int GetViewPortY(float _worldY, float _minWorldY, float _maxWorldY, int  _viewPortHeight) {
+	public int GetViewportY(float _worldY, float _minWorldY, float _maxWorldY, int  _viewPortHeight) {
 		float escY;
 		int r;
 		escY = -(_viewPortHeight-10)/(_maxWorldY-_minWorldY);
