@@ -232,9 +232,10 @@ public class jCustomDialog extends RelativeLayout {
 		mIconIdentifier = _iconIdentifier;
 		
 		if (mDialog != null) {
-			mDialog.setTitle(mTitle);
-			controls.pOnCustomDialogShow(pascalObj, mDialog, _title);
+			mDialog.setTitle(mTitle);			
 			mDialog.show();
+						
+			controls.pOnCustomDialogShow(pascalObj, mDialog, _title);
 		}
 		else {
 			if (this.getVisibility()==0) { //visible
@@ -262,12 +263,7 @@ public class jCustomDialog extends RelativeLayout {
 				public  boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
 					if (event.getAction() == KeyEvent.ACTION_UP) {
 						if (keyCode == KeyEvent.KEYCODE_BACK) {
-							controls.pOnCustomDialogBackKeyPressed(pascalObj, mTitle);
-							/*
-							if (mDialog != null) { 
-								if (mCloseOnBackKeyPressed) mDialog.dismiss();
-							}
-							*/	
+							controls.pOnCustomDialogBackKeyPressed(pascalObj, mTitle);							
 							return false;
 						} else if (keyCode == KeyEvent.KEYCODE_ENTER) {
 							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -280,9 +276,10 @@ public class jCustomDialog extends RelativeLayout {
 				}
 			});
 			this.setVisibility(android.view.View.VISIBLE);  // //0: vis; 4: inv; 8: gone						
-			
-			controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
+						
 			mDialog.show();
+						
+			controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
 		}
 	}
 	
