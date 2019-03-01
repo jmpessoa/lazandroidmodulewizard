@@ -14,7 +14,6 @@ const
   cMinAPI = 10;
   cMaxAPI = 28;
 
-
 type
 
   { TLamwAndroidManifestOptions }
@@ -27,17 +26,17 @@ type
     FPermNames: TStringToStringTree;
     FUsesSDKNode: TDOMElement;
     FApplicationNode: TDOMElement;
-    FMinSdkVersion, FTargetSdkVersion: Integer;
+    FMinSdkVersion, FTargetSdkVersion: integer;
     FOldMinSdkVersion: integer;
-    FVersionCode: Integer;
+    FVersionCode: integer;
     FVersionName: string;
-    FLabelAvailable: Boolean;
+    FLabelAvailable: boolean;
     FLabel, FRealLabel: string;
     FIconFileName: string;
-    FTheme: string;
+    //FTheme: string;
 
-    function GetString(const XMLPath, Ref: string; out Res: string): Boolean;
-    function GetThemeName: string;
+    function GetString(const XMLPath, Ref: string; out Res: string): boolean;
+    //function GetThemeName: string;
     procedure SetString(const XMLPath, Ref, NewValue: string);
     procedure Clear;
     procedure UpdateBuildXML;
@@ -48,34 +47,20 @@ type
     procedure Load(AFileName: string);
     procedure Save;
 
-    function GetThemeName(API: Integer): string;
+    //function GetThemeName(API: integer): string;
 
     property Permissions: TStringList read FPermissions;
     property PermNames: TStringToStringTree read FPermNames;
-    property MinSDKVersion: Integer read FMinSdkVersion write FMinSdkVersion;
-    property TargetSDKVersion: Integer read FTargetSdkVersion write FTargetSdkVersion;
-    property VersionCode: Integer read FVersionCode write FVersionCode;
+    property MinSDKVersion: integer read FMinSdkVersion write FMinSdkVersion;
+    property TargetSDKVersion: integer read FTargetSdkVersion write FTargetSdkVersion;
+    property VersionCode: integer read FVersionCode write FVersionCode;
     property VersionName: string read FVersionName write FVersionName;
     property AppLabel: string read FRealLabel write FRealLabel;
     property IconFileName: string read FIconFileName;
-    property ThemeName: string read GetThemeName;
+    //property ThemeName: string read GetThemeName;
   end;
 
-implementation
-
-uses
-  {$if (lcl_fullversion >= 1090000)}
-  IDEOptEditorIntf,
-  {$endif}
-  LazIDEIntf, laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
-  CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
-  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
-
-{$R *.lfm}
-
-type
-
-  { TLamwProjectOptions }
+   { TLamwProjectOptions }
 
   TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
     cbTheme: TComboBox;
@@ -110,31 +95,35 @@ type
     tsMiscellaneous: TTabSheet;
     tsAppl: TTabSheet;
     tsManifest: TTabSheet;
+    procedure cbBuildSystemChange(Sender: TObject);
     procedure cbBuildSystemSelect(Sender: TObject);
     procedure cbLaunchIconSizeSelect(Sender: TObject);
-    procedure PermissonGridCheckboxToggled({%H-}sender: TObject; {%H-}aCol,
-      {%H-}aRow: Integer; {%H-}aState: TCheckboxState);
-    procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: Integer;
+    procedure cbThemeChange(Sender: TObject);
+    procedure PermissonGridCheckboxToggled({%H-}Sender: TObject; {%H-}aCol,
+    {%H-}aRow: integer; {%H-}aState: TCheckboxState);
+    procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: integer;
       aRect: TRect; {%H-}aState: TGridDrawState);
     procedure PermissonGridMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState; X,
-      Y: Integer);
+      Shift: TShiftState; X, Y: integer);
+    procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState;
+      X, Y: integer);
     procedure seTargetSdkVersionEditingDone(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButtonHintThemeClick(Sender: TObject);
   private
     { private declarations }
-    const
-      Drawable: array [0..4] of record
-        Size: Integer;
+  const
+    Drawable: array [0..4] of record
+        Size: integer;
         Suffix: string;
-      end = ((Size:36;  Suffix:'ldpi'),
-             (Size:48;  Suffix:'mdpi'),
-             (Size:72;  Suffix:'hdpi'),
-             (Size:96;  Suffix:'xhdpi'),
-             (Size:144; Suffix:'xxhdpi'));
+      end
+    = ((Size: 36; Suffix: 'ldpi'),
+      (Size: 48; Suffix: 'mdpi'),
+      (Size: 72; Suffix: 'hdpi'),
+      (Size: 96; Suffix: 'xhdpi'),
+      (Size: 144; Suffix: 'xxhdpi'));
   private
-    IsLamwProject: Boolean;
+    IsLamwProject: boolean;
     FManifest: TLamwAndroidManifestOptions;
     FIconsPath: string; // ".../res/drawable-"
     FChkBoxDrawData: array [TCheckBoxState] of record
@@ -142,32 +131,51 @@ type
       CSize: TSize;
     end;
     FBuildSystem: string;
+    FProjectPath: string;
+    FDefaultTheme: string;
+
     FAllPermissionsState: TCheckBoxState;
-    FAllPermissionsHot: Boolean;
+    FAllPermissionsHot: boolean;
     function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
     procedure ErrorMessage(const msg: string);
-    procedure FillPermissionGrid(Permissions: TStringList; PermNames: TStringToStringTree);
-    procedure SetControlsEnabled(ts: TTabSheet; en: Boolean);
+    procedure FillPermissionGrid(Permissions: TStringList;
+      PermNames: TStringToStringTree);
+    procedure SetControlsEnabled(ts: TTabSheet; en: boolean);
     procedure ShowLauncherIcon;
   private
     // gApp.Screen.Style := <orientation> statements
     function GetCurrentAppScreenStyle: string;
-    function FindAppScreenStyleStatement(out StartPos, ssConstStartPos,
-      EndPos: integer): boolean;
+    function FindAppScreenStyleStatement(
+      out StartPos, ssConstStartPos, EndPos: integer): boolean;
     function GetAppScreenStyleStatement(ssConstStartPos: integer;
       out ssConstVal: string): boolean;
     function SetAppScreenStyleStatement(const ssNewConstVal: string): boolean;
     function RemoveAppScreenStyleStatement: boolean;
+    procedure TryUpdateStyleXML();
   public
     { public declarations }
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function SupportedOptionsClass: TAbstractIDEOptionsClass; override;
-    function GetTitle: String; override;
+    function GetTitle: string; override;
     procedure Setup({%H-}ADialog: TAbstractOptionsEditorDialog); override;
     procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
     procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
   end;
+
+implementation
+
+uses
+  {$if (lcl_fullversion >= 1090000)}
+  IDEOptEditorIntf,
+  {$endif}
+  LazIDEIntf, laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
+  CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
+  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
+
+{$R *.lfm}
+
+type
 
   { TMyCanvas }
 
@@ -182,7 +190,7 @@ type
     property Image: TFPMemoryImage read FImage;
   end;
 
-procedure ResizePNG(p: TPortableNetworkGraphic; NeedSize: Integer);
+procedure ResizePNG(p: TPortableNetworkGraphic; NeedSize: integer);
 var
   ms: TMemoryStream;
   r: TFPReaderPNG;
@@ -192,7 +200,7 @@ begin
   ms := TMemoryStream.Create;
   p.SaveToStream(ms);
   ms.Position := 0;
-  mi := TFPMemoryImage.Create(0,0);
+  mi := TFPMemoryImage.Create(0, 0);
   r := TFPReaderPNG.Create;
   mi.LoadFromStream(ms, r);
   r.Free;
@@ -205,12 +213,13 @@ begin
   c.Free;
 end;
 
-function IsAllCharNumber(pcString: PChar): Boolean;
+function IsAllCharNumber(pcString: PChar): boolean;
 begin
   Result := False;
   while pcString^ <> #0 do // 0 indicates the end of a PChar string
   begin
-    if not (pcString^ in ['0'..'9']) then Exit;
+    if not (pcString^ in ['0'..'9']) then
+      Exit;
     Inc(pcString);
   end;
   Result := True;
@@ -226,7 +235,7 @@ end;
 constructor TMyCanvas.Create;
 begin
   inherited;
-  FImage := TFPMemoryImage.create(0,0);
+  FImage := TFPMemoryImage.Create(0, 0);
 end;
 
 destructor TMyCanvas.Destroy;
@@ -238,16 +247,17 @@ end;
 { TLamwAndroidManifestOptions }
 
 function TLamwAndroidManifestOptions.GetString(const XMLPath, Ref: string;
-  out Res: string): Boolean;
+  out Res: string): boolean;
 var
   x: TXMLDocument;
-  tag, name: string;
+  tag, Name: string;
   n: TDOMNode;
 begin
   Result := False;
   tag := Copy(Ref, 2, Pos('/', Ref) - 2);
-  name := Copy(Ref, Pos('/', Ref) + 1, MaxInt);
-  if not FileExists(XMLPath) then Exit;
+  Name := Copy(Ref, Pos('/', Ref) + 1, MaxInt);
+  if not FileExists(XMLPath) then
+    Exit;
   ReadXMLFile(x, XMLPath);
   try
     n := x.DocumentElement.FirstChild;
@@ -255,33 +265,35 @@ begin
     begin
       if (n is TDOMElement) then
         with TDOMElement(n) do
-          if (TagName = tag) and (AttribStrings['name'] = name) then
+          if (TagName = tag) and (AttribStrings['name'] = Name) then
           begin
             Res := TextContent;
             Result := True;
             Exit;
           end;
-      n := n.NextSibling
+      n := n.NextSibling;
     end;
   finally
     x.Free
   end;
 end;
 
+(*
 function TLamwAndroidManifestOptions.GetThemeName: string;
 begin
   Result := GetThemeName(FTargetSdkVersion);
 end;
+*)
 
 procedure TLamwAndroidManifestOptions.SetString(const XMLPath, Ref, NewValue: string);
 var
   x: TXMLDocument;
   n: TDOMNode;
-  tag, name: string;
-  Changed: Boolean;
+  tag, Name: string;
+  Changed: boolean;
 begin
   tag := Copy(Ref, 2, Pos('/', Ref) - 2);
-  name := Copy(Ref, Pos('/', Ref) + 1, MaxInt);
+  Name := Copy(Ref, Pos('/', Ref) + 1, MaxInt);
   ReadXMLFile(x, XMLPath);
   try
     n := x.DocumentElement.FirstChild;
@@ -290,7 +302,7 @@ begin
     begin
       if n is TDOMElement then
         with TDOMElement(n) do
-          if (TagName = tag) and (AttribStrings['name'] = name) then
+          if (TagName = tag) and (AttribStrings['name'] = Name) then
           begin
             TextContent := NewValue;
             Changed := True;
@@ -303,7 +315,7 @@ begin
       n := x.CreateElement(tag);
       with TDOMElement(n) do
       begin
-        AttribStrings['name'] := name;
+        AttribStrings['name'] := Name;
         TextContent := NewValue;
       end;
       x.DocumentElement.AppendChild(n);
@@ -338,10 +350,11 @@ var
   p: integer;
 begin
   fn := ExtractFilePath(FFileName) + 'build.xml';
-  if not FileExists(fn) then Exit;
+  if not FileExists(fn) then
+    Exit;
   ReadXMLFile(build, fn);
   try
-    smallProjName:= build.DocumentElement.AttribStrings['name'];
+    smallProjName := build.DocumentElement.AttribStrings['name'];
     n := build.DocumentElement.FirstChild;
     while n <> nil do
     begin
@@ -351,12 +364,12 @@ begin
 
           if (TagName = 'property') and (AttribStrings['name'] = 'sdk.dir') then
           begin
-              pathToAndroidSDK:= AttribStrings['location'];
+            pathToAndroidSDK := AttribStrings['location'];
           end;
 
           if (TagName = 'property') and (AttribStrings['name'] = 'target') then
           begin
-            oldTargetStr:= Copy (AttribStrings['value'], 9, 2);
+            oldTargetStr := Copy(AttribStrings['value'], 9, 2);
             {AttribStrings['value'] := 'android-' + IntToStr(FTargetSdkVersion);
              WriteXMLFile(build, fn);
              Break;}
@@ -364,8 +377,8 @@ begin
 
           if (TagName = 'property') and (AttribStrings['name'] = 'src.dir') then
           begin
-              locationSrc:= AttribStrings['location'];
-              Break;
+            locationSrc := AttribStrings['location'];
+            Break;
           end;
 
         end;
@@ -375,17 +388,18 @@ begin
     build.Free
   end;
 
-  strList:= TStringList.Create;
+  strList := TStringList.Create;
   strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
-  strList.Add('<project name="'+smallProjName+'" default="help">');
-  strList.Add('<property name="sdk.dir" location="'+pathToAndroidSDK+'"/>');
-  strList.Add('<property name="target" value="android-'+ IntToStr(FTargetSdkVersion) +'"/>');
+  strList.Add('<project name="' + smallProjName + '" default="help">');
+  strList.Add('<property name="sdk.dir" location="' + pathToAndroidSDK + '"/>');
+  strList.Add('<property name="target" value="android-' +
+    IntToStr(FTargetSdkVersion) + '"/>');
   strList.Add('<property file="ant.properties"/>');
   strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
   // tk Generate code to allow conditional compilation in our java sources
   strList.Add('');
   strList.Add('<!-- Tags required to enable conditional compilation in java sources -->');
-  strList.Add('<property name="src.dir" location="'+locationSrc+'"/>');
+  strList.Add('<property name="src.dir" location="' + locationSrc + '"/>');
   strList.Add('<property name="source.dir" value="${src.dir}/${target}" />');
   strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
 
@@ -394,23 +408,23 @@ begin
   for i := cMinAPI to cMaxAPI do
   begin
     if i <= FTargetSdkVersion then
-      strList.Add('<property name="api'+IntToStr(i)+'" value="true"/>')
+      strList.Add('<property name="api' + IntToStr(i) + '" value="true"/>')
     else
-      strList.Add('<property name="api'+IntToStr(i)+'" value="false"/>');
+      strList.Add('<property name="api' + IntToStr(i) + '" value="false"/>');
   end;
 
   strList.Add('');
   strList.Add('<!-- API conditions, do not modify -->');
   for i := cMinAPI to cMaxAPI do
   begin
-    strList.Add('<condition property="ifdef_api'+IntToStr(i)+'up" value="/*">');
-    strList.Add('  <equals arg1="${api'+IntToStr(i)+'}" arg2="false"/>');
+    strList.Add('<condition property="ifdef_api' + IntToStr(i) + 'up" value="/*">');
+    strList.Add('  <equals arg1="${api' + IntToStr(i) + '}" arg2="false"/>');
     strList.Add('</condition>');
-    strList.Add('<condition property="endif_api'+IntToStr(i)+'up" value="*/">');
-    strList.Add('  <equals arg1="${api'+IntToStr(i)+'}" arg2="false"/>');
+    strList.Add('<condition property="endif_api' + IntToStr(i) + 'up" value="*/">');
+    strList.Add('  <equals arg1="${api' + IntToStr(i) + '}" arg2="false"/>');
     strList.Add('</condition>');
-    strList.Add('<property name="ifdef_api'+IntToStr(i)+'up" value=""/>');
-    strList.Add('<property name="endif_api'+IntToStr(i)+'up" value=""/>');
+    strList.Add('<property name="ifdef_api' + IntToStr(i) + 'up" value=""/>');
+    strList.Add('<property name="endif_api' + IntToStr(i) + 'up" value=""/>');
   end;
 
   strList.Add('');
@@ -422,14 +436,16 @@ begin
   strList.Add('  <filterset begintoken="//[" endtoken="]">');
   for i := cMinAPI to cMaxAPI do
   begin
-    strList.Add('    <filter token="ifdef_api'+IntToStr(i)+'up" value="${ifdef_api'+IntToStr(i)+'up}"/>');
-    strList.Add('    <filter token="endif_api'+IntToStr(i)+'up" value="${endif_api'+IntToStr(i)+'up}"/>');
+    strList.Add('    <filter token="ifdef_api' + IntToStr(i) +
+      'up" value="${ifdef_api' + IntToStr(i) + 'up}"/>');
+    strList.Add('    <filter token="endif_api' + IntToStr(i) +
+      'up" value="${endif_api' + IntToStr(i) + 'up}"/>');
   end;
   strList.Add('  </filterset>');
   strList.Add('</copy>');
   // end tk
   strList.Add('</project>');
-  strList.SaveToFile(ExtractFilePath(FFileName)+'build.xml');
+  strList.SaveToFile(ExtractFilePath(FFileName) + 'build.xml');
 
   strList.Clear;
   strList.Add('# This file is automatically generated by Android Tools.');
@@ -441,39 +457,45 @@ begin
   strList.Add('# "ant.properties", and override values to adapt the script to your');
   strList.Add('# project structure.');
   strList.Add('#');
-  strList.Add('# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):');
-  strList.Add('#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
+  strList.Add(
+    '# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):');
+  strList.Add(
+    '#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
   strList.Add(' ');
   strList.Add('# Project target.');
-  strList.Add('target=android-'+IntToStr(FTargetSdkVersion));
-  strList.SaveToFile(ExtractFilePath(FFileName)+'project.properties');
+  strList.Add('target=android-' + IntToStr(FTargetSdkVersion));
+  strList.SaveToFile(ExtractFilePath(FFileName) + 'project.properties');
 
   strList.Clear;
-  if FileExists(ExtractFilePath(FFileName)+'build.gradle') then
+  if FileExists(ExtractFilePath(FFileName) + 'build.gradle') then
   begin
-    strList.LoadFromFile(ExtractFilePath(FFileName)+'build.gradle');
-    tempStr:=StringReplace(strList.Text, 'targetSdkVersion '+oldTargetStr, 'targetSdkVersion '+IntToStr(FTargetSdkVersion),[rfIgnoreCase]);  //targetSdkVersion 23
-    strList.Text:= tempStr;
+    strList.LoadFromFile(ExtractFilePath(FFileName) + 'build.gradle');
+    tempStr := StringReplace(strList.Text, 'targetSdkVersion ' + oldTargetStr,
+      'targetSdkVersion ' + IntToStr(FTargetSdkVersion), [rfIgnoreCase]);  //targetSdkVersion 23
+    strList.Text := tempStr;
 
     if FOldMinSdkVersion <> FMinSdkVersion then
     begin
-      tempStr:=StringReplace(strList.Text, 'minSdkVersion '+IntToStr(FOldMinSdkVersion), 'minSdkVersion '+IntToStr(FMinSdkVersion),[rfIgnoreCase]);  //minSdkVersion 14
-      strList.Text:= tempStr;
+      tempStr := StringReplace(strList.Text, 'minSdkVersion ' + IntToStr(FOldMinSdkVersion),
+        'minSdkVersion ' + IntToStr(FMinSdkVersion), [rfIgnoreCase]);  //minSdkVersion 14
+      strList.Text := tempStr;
     end;
 
-    p:= Pos('compileSdkVersion ', strList.Text);
-    tempStr:= Trim(Copy(strList.Text,p, Length('compileSdkVersion ')+ 2)); //compileSdkVersion 25
+    p := Pos('compileSdkVersion ', strList.Text);
+    tempStr := Trim(Copy(strList.Text, p, Length('compileSdkVersion ') + 2));
+    //compileSdkVersion 25
 
-    p:=  Pos(' ',tempStr);
-    oldCompileSdkVersion:= Trim(Copy(tempStr, p+1,2));
+    p := Pos(' ', tempStr);
+    oldCompileSdkVersion := Trim(Copy(tempStr, p + 1, 2));
 
-    if FTargetSdkVersion >  StrToInt(oldCompileSdkVersion) then
+    if FTargetSdkVersion > StrToInt(oldCompileSdkVersion) then
     begin
-      tempStr:=StringReplace(strList.Text, 'compileSdkVersion '+oldCompileSdkVersion, 'compileSdkVersion '+IntToStr(FTargetSdkVersion),[rfIgnoreCase]);
-      strList.Text:= tempStr;
+      tempStr := StringReplace(strList.Text, 'compileSdkVersion ' + oldCompileSdkVersion,
+        'compileSdkVersion ' + IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+      strList.Text := tempStr;
     end;
 
-    strList.SaveToFile(ExtractFilePath(FFileName)+'build.gradle');
+    strList.SaveToFile(ExtractFilePath(FFileName) + 'build.gradle');
   end;
 
   strList.Free;
@@ -485,8 +507,8 @@ constructor TLamwAndroidManifestOptions.Create;
   procedure AddPerm(PermVisibleName: string; android_name: string = '');
   begin
     if android_name = '' then
-      android_name := 'android.permission.'
-        + StringReplace(UpperCase(PermVisibleName), ' ', '_', [rfReplaceAll]);
+      android_name := 'android.permission.' +
+        StringReplace(UpperCase(PermVisibleName), ' ', '_', [rfReplaceAll]);
     FPermNames[android_name] := PermVisibleName;
   end;
 
@@ -595,14 +617,15 @@ end;
 
 procedure TLamwAndroidManifestOptions.Load(AFileName: string);
 var
-  i, j: Integer;
+  i, j: integer;
   s, v: string;
   n: TDOMNode;
 begin
   Clear;
   ReadXMLFile(xml, AFileName);
   FFileName := AFileName;
-  if (xml = nil) or (xml.DocumentElement = nil) then Exit;
+  if (xml = nil) or (xml.DocumentElement = nil) then
+    Exit;
   with xml.DocumentElement do
   begin
     FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
@@ -618,13 +641,15 @@ begin
         j := FPermissions.IndexOf(s);
         if j >= 0 then
           FPermissions.Objects[j] := TObject(PtrUInt(1))
-        else begin
+        else
+        begin
           v := Copy(s, RPos('.', s) + 1, MaxInt);
           FPermNames[s] := v;
           FPermissions.AddObject(s, TObject(PtrUInt(1)));
         end;
         xml.ChildNodes[0].DetachChild(Item[i]).Free;
-      end else
+      end
+      else
       if Item[i].NodeName = 'uses-sdk' then
       begin
         FUsesSDKNode := Item[i] as TDOMElement;
@@ -632,7 +657,7 @@ begin
         if Assigned(n) then
         begin
           FMinSdkVersion := StrToIntDef(n.TextContent, FMinSdkVersion);
-          FOldMinSdkVersion:= FMinSdkVersion;
+          FOldMinSdkVersion := FMinSdkVersion;
         end;
         n := FUsesSDKNode.Attributes.GetNamedItem('android:targetSdkVersion');
         if Assigned(n) then
@@ -649,28 +674,30 @@ begin
     begin
       // @string/app_name
       // <string name="app_name">LamwGUIProject1</string>
-      if not GetString(ExtractFilePath(FFileName) + PathDelim
-        + 'res' + PathDelim + 'values' + PathDelim + 'strings.xml', FLabel, FRealLabel)
-      then begin
+      if not GetString(ExtractFilePath(FFileName) + PathDelim +
+        'res' + PathDelim + 'values' + PathDelim + 'strings.xml', FLabel, FRealLabel) then
+      begin
         FRealLabel := '<null>';
         FLabelAvailable := False;
       end;
-    end else
+    end
+    else
       FRealLabel := FLabel;
 
-    FTheme := FApplicationNode.AttribStrings['android:theme'];
+    //FTheme := FApplicationNode.AttribStrings['android:theme'];  //@style/AppTheme
   end;
 end;
 
 procedure TLamwAndroidManifestOptions.Save;
 var
-  i: Integer;
+  i: integer;
   r: TDOMNode;
   n: TDOMElement;
   fn: string;
 begin
   // writing manifest
-  if not Assigned(xml) then Exit;
+  if not Assigned(xml) then
+    Exit;
 
   xml.DocumentElement.AttribStrings['android:versionCode'] := IntToStr(FVersionCode);
   xml.DocumentElement.AttribStrings['android:versionName'] := FVersionName;
@@ -704,8 +731,8 @@ begin
 
   UpdateBuildXML;
 
-  if FLabelAvailable and (FLabel <> '') and (FLabel[1] <> '@')
-  and (FApplicationNode <> nil) then
+  if FLabelAvailable and (FLabel <> '') and (FLabel[1] <> '@') and
+    (FApplicationNode <> nil) then
     FApplicationNode.AttribStrings['android:label'] := FLabel;
   WriteXMLFile(xml, FFileName);
 
@@ -714,28 +741,32 @@ begin
     fn := ExtractFilePath(FFileName) + PathDelim + 'res' + PathDelim;
     fn := fn + 'values' + PathDelim + 'strings.xml';
     if FileExists(fn) then
-      SetString(fn, FLabel, FRealLabel)
+      SetString(fn, FLabel, FRealLabel);
   end;
 
   // refresh theme
   with LazarusIDE do
     if (ActiveProject.FileCount > 1) and (ActiveProject.CustomData['LAMW'] = 'GUI') then
-      (TAndroidModule(GetDesignerWithProjectFile(ActiveProject.Files[1], True).LookupRoot).Designer as TAndroidWidgetMediator).UpdateTheme;
+      (TAndroidModule(GetDesignerWithProjectFile(ActiveProject.Files[1],
+        True).LookupRoot).Designer as TAndroidWidgetMediator).UpdateTheme;
 end;
 
-function TLamwAndroidManifestOptions.GetThemeName(API: Integer): string;
+(*
+function TLamwAndroidManifestOptions.GetThemeName(API: integer): string;
 var
   fn, base: string;
   x: TXMLDocument;
   n: TDOMNode;
 begin
-  Result := FTheme;
-  if Copy(FTheme, 1, 7) <> '@style/' then Exit;
+  Result := ''; //FTheme;   //"@style/AppTheme"
+  if Copy(FTheme, 1, 7) <> '@style/' then
+    Exit;
   Delete(Result, 1, 7);
   base := ExtractFilePath(FFileName) + 'res' + PathDelim + 'values';
   fn := base + PathDelim + 'styles.xml';
   repeat
-    if not FileExists(fn) then Exit;
+    if not FileExists(fn) then
+      Exit;
     ReadXMLFile(x, fn);
     try
       n := x.DocumentElement.FirstChild;
@@ -750,12 +781,14 @@ begin
                 Result := AttribStrings['parent'];
                 n := x.DocumentElement.FirstChild;
                 Continue;
-              end else
+              end
+              else
                 Exit;
           end;
         n := n.NextSibling;
       end;
-      if API <= 0 then Exit;
+      if API <= 0 then
+        Exit;
       repeat
         fn := base + '-v' + IntToStr(API) + PathDelim + 'styles.xml';
         Dec(API);
@@ -766,12 +799,13 @@ begin
   until strlcomp('android:', PChar(Result), 8) = 0;
   Delete(Result, 1, 8);
 end;
+*)
 
 { TLamwProjectOptions }
 
-procedure TLamwProjectOptions.SetControlsEnabled(ts: TTabSheet; en: Boolean);
+procedure TLamwProjectOptions.SetControlsEnabled(ts: TTabSheet; en: boolean);
 var
-  i: Integer;
+  i: integer;
 begin
   with ts do
     for i := 0 to ControlCount - 1 do
@@ -791,8 +825,8 @@ begin
     imLauncherIcon.Picture.Assign(p);
     Exit;
   end;
-  fn := FIconsPath + Drawable[cbLaunchIconSize.ItemIndex].Suffix + PathDelim
-    + FManifest.IconFileName + '.png';
+  fn := FIconsPath + Drawable[cbLaunchIconSize.ItemIndex].Suffix +
+    PathDelim + FManifest.IconFileName + '.png';
   if FileExists(fn) then
     imLauncherIcon.Picture.LoadFromFile(fn)
   else
@@ -813,7 +847,7 @@ function TLamwProjectOptions.FindAppScreenStyleStatement(
   out StartPos, ssConstStartPos, EndPos: integer): boolean;
 var
   MainBeginNode: TCodeTreeNode;
-  Position: Integer;
+  Position: integer;
 begin
   Result := False;
   StartPos := -1;
@@ -822,23 +856,26 @@ begin
   with CodeToolBoss do
   begin
     InitCurCodeTool(FindFile(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
-    if CurCodeTool = nil then Exit;
+    if CurCodeTool = nil then
+      Exit;
     with CurCodeTool do
     begin
       BuildTree(lsrEnd);
       MainBeginNode := FindMainBeginEndNode;
-      if MainBeginNode = nil then Exit;
+      if MainBeginNode = nil then
+        Exit;
       Position := MainBeginNode.StartPos;
-      if Position < 1 then Exit;
+      if Position < 1 then
+        Exit;
       MoveCursorToCleanPos(Position);
       repeat
         ReadNextAtom;
         if UpAtomIs('GAPP') then
         begin
           StartPos := CurPos.StartPos;
-          if ReadNextAtomIsChar('.') and ReadNextUpAtomIs('SCREEN')
-          and ReadNextUpAtomIs('.') and ReadNextUpAtomIs('STYLE')
-          and ReadNextUpAtomIs(':=') then
+          if ReadNextAtomIsChar('.') and ReadNextUpAtomIs('SCREEN') and
+            ReadNextUpAtomIs('.') and ReadNextUpAtomIs('STYLE') and
+            ReadNextUpAtomIs(':=') then
           begin
             // read till semicolon or end
             repeat
@@ -846,7 +883,8 @@ begin
               if ssConstStartPos < 1 then
                 ssConstStartPos := CurPos.StartPos;
               EndPos := CurPos.EndPos;
-              if CurPos.Flag in [cafEnd, cafSemicolon] then begin
+              if CurPos.Flag in [cafEnd, cafSemicolon] then
+              begin
                 Result := True;
                 Exit;
               end;
@@ -858,21 +896,24 @@ begin
   end;
 end;
 
-function TLamwProjectOptions.GetAppScreenStyleStatement(
-  ssConstStartPos: integer; out ssConstVal: string): boolean;
+function TLamwProjectOptions.GetAppScreenStyleStatement(ssConstStartPos: integer;
+  out ssConstVal: string): boolean;
 begin
   Result := False;
   ssConstVal := '';
   with CodeToolBoss do
   begin
     InitCurCodeTool(FindFile(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
-    if CurCodeTool = nil then Exit;
+    if CurCodeTool = nil then
+      Exit;
     with CurCodeTool do
     begin
-      if (ssConstStartPos < 1) or (ssConstStartPos > SrcLen) then Exit;
+      if (ssConstStartPos < 1) or (ssConstStartPos > SrcLen) then
+        Exit;
       MoveCursorToCleanPos(ssConstStartPos);
       ReadNextAtom;
-      if not AtomIsIdentifier then Exit;
+      if not AtomIsIdentifier then
+        Exit;
       ssConstVal := GetAtom;
       Result := True;
     end;
@@ -883,9 +924,9 @@ function TLamwProjectOptions.SetAppScreenStyleStatement(
   const ssNewConstVal: string): boolean;
 var
   StartPos, ssConstStartPos, EndPos: integer;
-  OldExists, Found: Boolean;
-  NewStatement: String;
-  Indent: Integer;
+  OldExists, Found: boolean;
+  NewStatement: string;
+  Indent: integer;
   MainBeginNode: TCodeTreeNode;
   Beauty: TBeautifyCodeOptions;
 begin
@@ -893,7 +934,8 @@ begin
   with CodeToolBoss do
   begin
     InitCurCodeTool(FindFile(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
-    if CurCodeTool = nil then Exit;
+    if CurCodeTool = nil then
+      Exit;
     with CurCodeTool do
     begin
       // search old Application.Title:= statement
@@ -903,11 +945,14 @@ begin
       begin
         // replace old statement
         Indent := 0;
-        Indent := Beauty.GetLineIndent(Src, StartPos)
-      end else begin
+        Indent := Beauty.GetLineIndent(Src, StartPos);
+      end
+      else
+      begin
         // insert as first line after "gApp := ...;" in program begin..end block
         MainBeginNode := FindMainBeginEndNode;
-        if MainBeginNode = nil then Exit;
+        if MainBeginNode = nil then
+          Exit;
         MoveCursorToNodeStart(MainBeginNode);
         Found := False;
         ReadNextAtom;
@@ -923,9 +968,11 @@ begin
                 Break;
               end;
             end;
-            if not Found then Exit;
+            if not Found then
+              Exit;
           end;
-          if Found then Break;
+          if Found then
+            Break;
           ReadNextAtom;
         until CurPos.StartPos > SrcLen;
         StartPos := CurPos.EndPos;
@@ -936,11 +983,11 @@ begin
       NewStatement := 'gApp.Screen.Style:=' + ssNewConstVal + ';';
       NewStatement := Beauty.BeautifyStatement(NewStatement, Indent);
       SourceChangeCache.MainScanner := Scanner;
-      if not SourceChangeCache.Replace(gtNewLine, gtNewLine, StartPos, EndPos,
-                                       NewStatement)
-      then
+      if not SourceChangeCache.Replace(gtNewLine, gtNewLine, StartPos,
+        EndPos, NewStatement) then
         Exit;
-      if not SourceChangeCache.Apply then Exit;
+      if not SourceChangeCache.Apply then
+        Exit;
       Result := True;
     end;
   end;
@@ -949,21 +996,23 @@ end;
 function TLamwProjectOptions.RemoveAppScreenStyleStatement: boolean;
 var
   StartPos, StringConstStartPos, EndPos: integer;
-  OldExists: Boolean;
-  FromPos: Integer;
-  ToPos: Integer;
+  OldExists: boolean;
+  FromPos: integer;
+  ToPos: integer;
 begin
   Result := False;
   // search old Application.Title:= statement
   OldExists := FindAppScreenStyleStatement(StartPos, StringConstStartPos, EndPos);
-  if not OldExists then begin
+  if not OldExists then
+  begin
     Result := True;
     Exit;
   end;
   with CodeToolBoss do
   begin
     InitCurCodeTool(FindFile(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
-    if CurCodeTool = nil then Exit;
+    if CurCodeTool = nil then
+      Exit;
     with CurCodeTool do
     begin
       // -> delete whole line
@@ -972,9 +1021,35 @@ begin
       SourceChangeCache.MainScanner := Scanner;
       if not SourceChangeCache.Replace(gtNone, gtNone, FromPos, ToPos, '') then
         Exit;
-      if not SourceChangeCache.Apply then Exit;
+      if not SourceChangeCache.Apply then
+        Exit;
       Result := True;
     end;
+  end;
+end;
+
+procedure TLamwProjectOptions.TryUpdateStyleXML();
+var
+  pathToFile, newTheme, strTemp: string;
+  list: TStringList;
+begin
+  newTheme:= cbTheme.Text;
+  if newTheme <> FDefaultTheme then;
+  begin
+     list:= TStringList.Create;
+
+     if Pos('AppCompat', newTheme) > 0 then   //AppCompat.Light.DarkActionBar   or  AppCompat.Light.NoActionBar
+       pathToFile:= FProjectPath + 'res'+PathDelim+'values'
+     else  //DeviceDefault   or  Holo.Light.DarkActionBar or Holo.Light.NoActionBar
+       pathToFile:= FProjectPath + 'res'+PathDelim+'values-v21';
+
+     list.LoadFromFile(pathToFile + PathDelim + 'styles.xml');
+     strTemp:= StringReplace(list.Text, FDefaultTheme,newTheme,[]); //rfReplaceAll, rfIgnoreCase
+     list.Text:= strTemp;
+     list.SaveToFile(pathToFile + PathDelim + 'styles.xml');
+     LazarusIDE.ActiveProject.CustomData['Theme']:= newTheme;
+
+     list.Free;
   end;
 end;
 
@@ -984,16 +1059,16 @@ const
     tbCheckBoxUncheckedNormal,
     tbCheckBoxCheckedNormal,
     tbCheckBoxMixedNormal
-  );
+    );
   chk_st_hot: array [TCheckboxState] of TThemedButton = (
     tbCheckBoxUncheckedHot,
     tbCheckBoxCheckedHot,
     tbCheckBoxMixedHot
-  );
+    );
 var
   s: TCheckBoxState;
   sl: TStringList;
-  i: Integer;
+  i: integer;
   strApi: string;
 begin
   inherited Create(AOwner);
@@ -1008,18 +1083,19 @@ begin
       CSize := ThemeServices.GetDetailSize(Details);
     end;
 
-  sl := FindAllDirectories(IncludeTrailingPathDelimiter(LamwGlobalSettings.PathToAndroidSDK) + 'platforms', False);
+  sl := FindAllDirectories(IncludeTrailingPathDelimiter(
+    LamwGlobalSettings.PathToAndroidSDK) + 'platforms', False);
   try
     for i := 0 to sl.Count - 1 do
     begin
       strApi := ExtractFileName(sl[i]);
       if strApi <> '' then
       begin
-        strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
-        if IsAllCharNumber(PChar(strApi))  then  //skip android-P
+        strApi := Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+        if IsAllCharNumber(PChar(strApi)) then  //skip android-P
         begin
-            if StrToInt(strApi) >= 14 then
-               seTargetSdkVersion.Items.Add(strApi);
+          if StrToInt(strApi) >= 14 then
+            seTargetSdkVersion.Items.Add(strApi);
         end;
       end;
     end;
@@ -1032,7 +1108,7 @@ end;
 
 destructor TLamwProjectOptions.Destroy;
 var
-  i: Integer;
+  i: integer;
 begin
   with cbLaunchIconSize.Items do
     for i := 0 to Count - 1 do
@@ -1046,23 +1122,40 @@ begin
   ShowLauncherIcon;
 end;
 
+procedure TLamwProjectOptions.cbThemeChange(Sender: TObject);
+begin
+  if cbTheme.Text = '' then cbTheme.Text:= FDefaultTheme;
+end;
+
 procedure TLamwProjectOptions.cbBuildSystemSelect(Sender: TObject);
 begin
   lblGradleHint.Visible := cbBuildSystem.Text = 'Gradle';
 end;
 
-procedure TLamwProjectOptions.PermissonGridCheckboxToggled(sender: TObject;
-  aCol, aRow: Integer; aState: TCheckboxState);
+procedure TLamwProjectOptions.cbBuildSystemChange(Sender: TObject);
+begin
+  if Pos('AppCompat', FDefaultTheme) > 0 then
+  begin
+    if Pos('Ant', cbBuildSystem.Text) > 0 then
+    begin
+       ShowMessage('Sorry... AppCompat theme need "Gradle" build system');
+       cbBuildSystem.Text:= 'Gradle';
+    end;
+  end;
+end;
+
+procedure TLamwProjectOptions.PermissonGridCheckboxToggled(Sender: TObject;
+  aCol, aRow: integer; aState: TCheckboxState);
 var
-  r: Integer;
+  r: integer;
 begin
   if PermissonGrid.Cells[1, 1] = '1' then
     FAllPermissionsState := cbChecked
   else
     FAllPermissionsState := cbUnchecked;
   for r := 2 to PermissonGrid.RowCount - 1 do
-    if (PermissonGrid.Cells[1, r] = '1') and (FAllPermissionsState = cbUnchecked)
-    or (PermissonGrid.Cells[1, r] = '0') and (FAllPermissionsState = cbChecked) then
+    if (PermissonGrid.Cells[1, r] = '1') and (FAllPermissionsState = cbUnchecked) or
+      (PermissonGrid.Cells[1, r] = '0') and (FAllPermissionsState = cbChecked) then
     begin
       FAllPermissionsState := cbGrayed;
       Break;
@@ -1070,8 +1163,8 @@ begin
   PermissonGrid.InvalidateCell(1, 0);
 end;
 
-procedure TLamwProjectOptions.PermissonGridDrawCell(Sender: TObject; aCol,
-  aRow: Integer; aRect: TRect; aState: TGridDrawState);
+procedure TLamwProjectOptions.PermissonGridDrawCell(Sender: TObject;
+  aCol, aRow: integer; aRect: TRect; aState: TGridDrawState);
 var
   d: TThemedElementDetails;
   r: TRect;
@@ -1083,30 +1176,33 @@ begin
       d := FChkBoxDrawData[FAllPermissionsState].DetailsHot
     else
       d := FChkBoxDrawData[FAllPermissionsState].Details;
-    ThemeServices.DrawElement(PermissonGrid.Canvas.Handle, d, r, nil)
+    ThemeServices.DrawElement(PermissonGrid.Canvas.Handle, d, r, nil);
   end;
- end;
+end;
 
 procedure TLamwProjectOptions.PermissonGridMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  c, r: Integer;
-  NewVal: Char;
+  c, r: integer;
+  NewVal: char;
 begin
-  if (Button = mbLeft) and ([ssShift,ssCtrl] * Shift = []) then
+  if (Button = mbLeft) and ([ssShift, ssCtrl] * Shift = []) then
   begin
     with PermissonGrid.MouseCoord(X, Y) do
     begin
-      c := X; r := Y;
+      c := X;
+      r := Y;
     end;
-    if (c = 1) and (r = 0)
-    and PtInRect(GetAllPermissonsCheckBoxBounds(PermissonGrid.CellRect(c, r)), Point(X, Y)) then
+    if (c = 1) and (r = 0) and
+      PtInRect(GetAllPermissonsCheckBoxBounds(PermissonGrid.CellRect(c, r)), Point(X, Y)) then
     begin
       if FAllPermissionsState = cbChecked then
       begin
         FAllPermissionsState := cbUnchecked;
         NewVal := '0';
-      end else begin
+      end
+      else
+      begin
         FAllPermissionsState := cbChecked;
         NewVal := '1';
       end;
@@ -1122,19 +1218,19 @@ begin
 end;
 
 procedure TLamwProjectOptions.PermissonGridMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+  Shift: TShiftState; X, Y: integer);
 var
-  c, r: LongInt;
-  b: Boolean;
+  c, r: longint;
+  b: boolean;
 begin
   with PermissonGrid.MouseCoord(X, Y) do
   begin
-    c := X; r := Y;
+    c := X;
+    r := Y;
   end;
   if (c = 1) and (r = 0) then
   begin
-    b := PtInRect(
-      GetAllPermissonsCheckBoxBounds(PermissonGrid.CellRect(c, r)),
+    b := PtInRect(GetAllPermissonsCheckBoxBounds(PermissonGrid.CellRect(c, r)),
       Point(X, Y));
     if FAllPermissionsHot <> b then
     begin
@@ -1146,27 +1242,27 @@ end;
 
 procedure TLamwProjectOptions.seTargetSdkVersionEditingDone(Sender: TObject);
 var
-  i: Integer;
+  i: integer;
 begin
   if not TryStrToInt(seTargetSdkVersion.Text, i) then
-    seTargetSdkVersion.Color := RGBToColor(255,205,205)
-  else begin
+    seTargetSdkVersion.Color := RGBToColor(255, 205, 205)
+  else
+  begin
     seTargetSdkVersion.Color := clDefault;
-    cbTheme.Text := FManifest.GetThemeName(i);
+    //cbTheme.Text := FManifest.GetThemeName(i);
   end;
 end;
 
 procedure TLamwProjectOptions.SpeedButton1Click(Sender: TObject);
 
-  function CreateAllIcons(p: TPortableNetworkGraphic; fname: string): Boolean;
+  function CreateAllIcons(p: TPortableNetworkGraphic; fname: string): boolean;
   var
-    i: Integer;
+    i: integer;
     p1: TPortableNetworkGraphic;
   begin
-    Result := MessageDlg(
-      Format('Do you want to prepare all other icons by resizing "%s"?',
-        [ExtractFileName(fname)]),
-      mtConfirmation, mbYesNo, 0) = mrYes;
+    Result := MessageDlg(Format(
+      'Do you want to prepare all other icons by resizing "%s"?',
+      [ExtractFileName(fname)]), mtConfirmation, mbYesNo, 0) = mrYes;
     if Result then
       with cbLaunchIconSize.Items do
       begin
@@ -1186,39 +1282,55 @@ var
   p: TPortableNetworkGraphic;
 begin
   with TOpenPictureDialog.Create(nil) do
-  try
-    Title := Format('%s (%s)', [GroupBox1.Caption, cbLaunchIconSize.Text]);
-    Filter := 'PNG|*.png';
-    if Execute then
-    begin
-      p := TPortableNetworkGraphic.Create;
-      p.LoadFromFile(FileName);
-      with Drawable[cbLaunchIconSize.ItemIndex] do
-        if (p.Width <> Size) or (p.Height <> Size) then
-          case MessageDlg(
-            Format('The size of "%s" is %dx%d but should be %dx%d. Do you want to resize?',
-              [ExtractFileName(FileName), p.Width, p.Height, Size, Size]),
-            mtConfirmation, mbYesNoCancel, 0) of
-          mrYes:
-            begin
-              if (p.Width = p.Height) and (p.Height > 90) then
-                if CreateAllIcons(p, FileName) then Exit;
-              ResizePNG(p, Size);
+    try
+      Title := Format('%s (%s)', [GroupBox1.Caption, cbLaunchIconSize.Text]);
+      Filter := 'PNG|*.png';
+      if Execute then
+      begin
+        p := TPortableNetworkGraphic.Create;
+        p.LoadFromFile(FileName);
+        with Drawable[cbLaunchIconSize.ItemIndex] do
+          if (p.Width <> Size) or (p.Height <> Size) then
+            case MessageDlg(Format(
+                'The size of "%s" is %dx%d but should be %dx%d. Do you want to resize?',
+                [ExtractFileName(FileName), p.Width, p.Height, Size, Size]),
+                mtConfirmation, mbYesNoCancel, 0) of
+              mrYes:
+              begin
+                if (p.Width = p.Height) and (p.Height > 90) then
+                  if CreateAllIcons(p, FileName) then
+                    Exit;
+                ResizePNG(p, Size);
+              end
+              else
+                p.Free;
+                Exit;
             end
           else
-            p.Free;
-            Exit;
-          end
-        else
           if (Size > 90) then
-            if CreateAllIcons(p, FileName) then Exit;
-      with cbLaunchIconSize do
-        Items.Objects[ItemIndex] := p;
+            if CreateAllIcons(p, FileName) then
+              Exit;
+        with cbLaunchIconSize do
+          Items.Objects[ItemIndex] := p;
+      end;
+    finally
+      Free;
+      ShowLauncherIcon;
     end;
-  finally
-    Free;
-    ShowLauncherIcon;
-  end;
+end;
+
+procedure TLamwProjectOptions.SpeedButtonHintThemeClick(Sender: TObject);
+begin
+  ShowMessage('Hint 1:'+ sLineBreak +
+               'You can "change" only to compatibles themes:' + sLineBreak +
+               'DeviceDefault <--> Holo.Light.NoActionBar' + sLineBreak +
+               'DeviceDefault <--> Holo.Light.DarkActionBar' + sLineBreak +
+               'Holo.Light.DarkActionBar <--> Holo.Light.NoActionBar' + sLineBreak + sLineBreak +
+               'AppCompat.Light.NoActionBar <--> AppCompat.Light.DarkActionBar'+ sLineBreak + sLineBreak+
+               'Hint 2:'+ sLineBreak +
+               'You can "convert" a project to  "AppCompat" [material] theme:'  + sLineBreak +
+               'Menu "Tools" --> "[LAMW]..." --> "Convert the project to AppCompat..."'
+               );
 end;
 
 function TLamwProjectOptions.GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
@@ -1243,7 +1355,7 @@ end;
 procedure TLamwProjectOptions.FillPermissionGrid(Permissions: TStringList;
   PermNames: TStringToStringTree);
 var
-  i: Integer;
+  i: integer;
   n: string;
 begin
   PermissonGrid.BeginUpdate;
@@ -1264,7 +1376,9 @@ begin
           if FAllPermissionsState = cbChecked then
             FAllPermissionsState := cbGrayed;
           Cells[1, i + 1] := '0';
-        end else begin
+        end
+        else
+        begin
           if i = 0 then
             FAllPermissionsState := cbChecked
           else
@@ -1297,18 +1411,20 @@ procedure TLamwProjectOptions.ReadSettings(AOptions: TAbstractIDEOptions);
 var
   proj: TLazProject;
   fn, s: string;
-  i: Integer;
+  i: integer;
 begin
   // reading manifest
   SetControlsEnabled(tsManifest, False);
   proj := LazarusIDE.ActiveProject;
-  if (proj = nil) or (proj.IsVirtual) then Exit;
+  if (proj = nil) or (proj.IsVirtual) then
+    Exit;
   FBuildSystem := proj.CustomData['BuildSystem'];
   i := cbBuildSystem.Items.IndexOf(FBuildSystem);
   if i >= 0 then
     cbBuildSystem.ItemIndex := i;
   fn := proj.MainFile.Filename;
   fn := Copy(fn, 1, Pos(PathDelim + 'jni' + PathDelim, fn));
+  FProjectPath:= fn;
   fn := fn + 'AndroidManifest.xml';
   IsLamwProject := False;
   if not FileExists(fn) then
@@ -1340,7 +1456,21 @@ begin
       Exit;
     end
   end;
-  cbTheme.Text := FManifest.ThemeName;
+
+  FDefaultTheme := LazarusIDE.ActiveProject.CustomData['Theme'];  //FManifest.ThemeName;
+  if Pos('AppCompat', FDefaultTheme) > 0 then
+  begin
+     cbTheme.Items.Add('AppCompat.Light.NoActionBar');
+     cbTheme.Items.Add('AppCompat.Light.DarkActionBar');
+  end
+  else
+  begin
+    cbTheme.Items.Add('DeviceDefault');
+    cbTheme.Items.Add('Holo.Light.NoActionBar');
+    cbTheme.Items.Add('Holo.Light.DarkActionBar');
+  end;
+  cbTheme.Text:= FDefaultTheme;
+
   s := GetCurrentAppScreenStyle;
   if SameText(s, 'ssPortrait') then
     rbOrientation.ItemIndex := 1
@@ -1356,12 +1486,13 @@ procedure TLamwProjectOptions.WriteSettings(AOptions: TAbstractIDEOptions);
 const
   ScreenStyles: array [0..2] of string = (
     'ssSensor', 'ssPortrait', 'ssLandscape'
-  );
+    );
 var
-  i: Integer;
+  i: integer;
   s: string;
 begin
-  if not IsLamwProject then Exit;
+  if not IsLamwProject then
+    Exit;
 
   with FManifest do
   begin
@@ -1378,7 +1509,8 @@ begin
   end;
 
   s := GetCurrentAppScreenStyle;
-  if s = '' then s := ScreenStyles[0];
+  if s = '' then
+    s := ScreenStyles[0];
   if s <> ScreenStyles[rbOrientation.ItemIndex] then
   begin
     if rbOrientation.ItemIndex = 0 then
@@ -1390,14 +1522,17 @@ begin
   with cbLaunchIconSize.Items do
     for i := 0 to Count - 1 do
       if Assigned(Objects[i]) then
-        TPortableNetworkGraphic(Objects[i]).SaveToFile(FIconsPath
-          + Drawable[i].Suffix + PathDelim + FManifest.IconFileName + '.png');
+        TPortableNetworkGraphic(Objects[i]).SaveToFile(FIconsPath +
+          Drawable[i].Suffix + PathDelim + FManifest.IconFileName + '.png');
 
-  LazarusIDE.ActiveProject.CustomData['BuildSystem'] := cbBuildSystem.Text;
+  if  cbBuildSystem.Text <> '' then
+    LazarusIDE.ActiveProject.CustomData['BuildSystem'] := cbBuildSystem.Text;
+
+  TryUpdateStyleXML();
+
 end;
 
 initialization
   RegisterIDEOptionsEditor(GroupProject, TLamwProjectOptions, 1000);
 
 end.
-

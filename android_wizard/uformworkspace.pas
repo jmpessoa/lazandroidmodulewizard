@@ -341,22 +341,34 @@ end;
 procedure TFormWorkspace.ListBoxNdkPlatformChange(Sender: TObject);
 var
   ndkApi: string;
+  intNdkApi: integer;
 begin
+
  ndkApi:= ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
+ if ndkApi = '' then Exit;
+
  FAndroidNdkPlatform:= 'android-'+ ndkApi;
  StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
- if StrToInt(ndkApi)  > 22 then
+
+ if IsAllCharNumber(PChar(ndkApi))  then  //skip android-P
+      intNdkApi:=StrToInt(ndkApi)
+ else
+     intNdkApi:= 22;
+
+ if intNdkApi  > 22 then
     ShowMessage('Warning: for compatibility with old devices [4.x, 5.x]'+sLIneBreak+
                 'is strongly recommended NDK API < 23!');
+
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIChange(Sender: TObject);
 begin
   if ListBoxTargetAPI.Text <> '' then
-  begin
      FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-     //FMaxSdkPlatform:= StrToInt(ListBoxTargetAPI.Text);
-  end;
+
+  if not IsAllCharNumber(PChar(FTargetApi))  then
+    FTargetApi:= '26';
+
   if StrToInt(FTargetApi) < 26 then
      ShowMessage('Warning: remember that the "google play" store now requires Target Api >= 26 !');
 end;
@@ -555,6 +567,9 @@ begin
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
+  if not IsAllCharNumber(PChar(FMinApi))  then FMinApi:= '14';
+  if not IsAllCharNumber(PChar(FTargetApi)) then FTargetApi:= '26';
+
   apiTarg:= StrToInt(FTargetApi);
   if StrToInt(FMinApi) > apiTarg then FMinApi:= IntToStr(apiTarg);
 
@@ -592,8 +607,8 @@ begin
 
   if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then
   begin
-     FProjectModel:= 'Ant';   //please, read as "project not exists"!
-     FSmallProjName:= Trim(ComboSelectProjectName.Text);
+     FProjectModel:= 'Ant';   //please, read as "project not exists or new project"!
+     FSmallProjName:= StringReplace(ComboSelectProjectName.Text,' ','',[rfReplaceAll]);
      FAndroidProjectName:= FPathToWorkspace + DirectorySeparator+ FSmallProjName;
        FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
        if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
@@ -811,14 +826,19 @@ end;
 procedure TFormWorkspace.ListBoxMinSDKChange(Sender: TObject);
 var
  tApi, mApi: integer;
+ strTApi, strMApi: string;
 begin
 
-  //if ListBoxTargetAPI.ItemIndex < 0 then ListBoxTargetAPI.ItemIndex:= 0;
-  tApi:= StrToInt(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
+  strTApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
+  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 26
+  else tApi:= StrToInt(strTApi);
 
-  mApi:= StrToInt(ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex]);
-  if  mApi > tApi then
-      ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.IndexOf(FTargetApi);
+  strMApi:= ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex];
+  if not IsAllCharNumber(PChar(strMApi))  then mApi:= 14
+  else mApi:= StrToInt(strMApi);
+
+  if mApi > tApi then
+    ListBoxMinSDK.ItemIndex:= ListBoxMinSDK.Items.IndexOf(FTargetApi);
 
   if ListBoxMinSDK.ItemIndex < 0 then ListBoxMinSDK.ItemIndex:= 1;
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
@@ -887,6 +907,7 @@ var
   //frmSys: TFormOSystem;
   nativeMethodList, tempList,  fileList: TStringList;
   i, j: integer;
+  strIndexNdk: string;
 begin
   if FileExists(fileName) then
   begin
@@ -966,7 +987,9 @@ begin
         if FPathToAndroidNDK <> '' then
            FPrebuildOSYS:= GetPrebuiltDirectory();
 
-      indexNdk:= StrToIntDef(ReadString('NewProject','NDK', ''), 3); //ndk 10e   ... default
+      strIndexNdk:= ReadString('NewProject','NDK', ''); //ndk 10e   ... default
+      if strIndexNdk = '' then strIndexNdk:= '5';
+      indexNdk:= StrToInt(strIndexNdk);
       case indexNdk of
          0: FNDK:= '7';
          1: FNDK:= '9';
@@ -1046,6 +1069,7 @@ var
   i, builderNumber: integer;
 begin
   Result:= False;
+  builderNumber:= 0;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
   FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
   if lisDir.Count > 0 then
@@ -1055,12 +1079,11 @@ begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
        if  auxStr <> '' then
        begin
-         if Pos('rc2', auxStr) = 0 then   //escape some alien...
-         begin
            numberAsString:= Copy(auxStr, 1 , 2);  //19
-           builderNumber:=  StrToInt(numberAsString);
+           if IsAllCharNumber(PChar(numberAsString)) then
+               builderNumber:=  StrToInt(numberAsString);
+
            if  platform = builderNumber then Result:= True;
-         end;
        end;
     end;
   end;

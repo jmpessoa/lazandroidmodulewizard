@@ -28,7 +28,7 @@ procedure Register;
 implementation
 
 uses LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf,
-  ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles, LCLType;
+  ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles, LCLType, PackageIntf{, IDEImagesIntf};
 
 procedure StartFPCTrunkSource(Sender: TObject);
 begin
@@ -1452,20 +1452,34 @@ Var
   ideMnuAMW: TIDEMenuSection;
   ideSubMnuAMW: TIDEMenuSection;
   ideSubMnuLog: TIDEMenuSection;
-
   ideSubMnuAppCompat: TIDEMenuSection;
+  ideMnuLAMWBuild: TIDEMenuCommand;
+
+  CmdMyTool: TIDECommand;
 
   Key: TIDEShortCut;
   Cat: TIDECommandCategory;
-  CmdMyTool: TIDECommand;
-
+  Pkg: TIDEPackage;
+  pathToLamwIcon: string;   //IDEImagesIntf
 begin
-  // Register main menu
-  ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'AMW');
+  pathToLamwIcon:= '';
+  Pkg:=PackageEditingInterface.FindPackageWithName('amw_ide_tools');
+  if Pkg<>nil then
+  begin
+      pathToLamwIcon:= ExtractFilePath(Pkg.Filename);
+      pathToLamwIcon:= pathToLamwIcon + 'lemurgreen.bmp';
+      if not FileExists(pathToLamwIcon) then pathToLamwIcon:= '';
+      //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+  end;
+  // Register main LAMW menu
+  ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'LAMW');
   // Register submenu
-  ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'AMW', '[LAMW] Android Module Wizard');
+  ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'LAMW', '[LAMW] Android Module Wizard');
+  if pathToLamwIcon <> '' then ideSubMnuAMW.Bitmap.LoadFromFile(pathToLamwIcon);
+
   // Adding first entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToolCmd', 'Paths Settings [Jdk, Sdk, Ndk, ...]', nil,@StartPathTool);
+
   //Adding second entry
   // Adding third entry
   //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathResEditorCmd', 'Resource Editor [strings.xml] ', nil,@StartResEditor);
@@ -1517,14 +1531,17 @@ begin
   RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcatd', 'Logcat -d [dump]', nil, @StartLogcatDump);
   RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcatc', 'Logcat -c [clear]', nil, @StartLogcatClear);
 
-  //Run
+  //Build apk/Run
    Key := IDEShortCut(VK_F1,[ssCtrl],VK_UNKNOWN,[]);
    Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
    CmdMyTool := RegisterIDECommand(Cat,'BuildApkAndRun', '[LAMW] Build Android Apk and Run', Key, nil, @BuildApkAndRun);
-   RegisterIDEMenuCommand(itmRunBuilding, 'LAMW Build Apk And Run', '[LAMW] Build Android Apk and Run', nil, nil, CmdMyTool);
-   //RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[LAMW] Build Android Apk and Run', nil, @BuildApkAndRun);
 
-  ApkBuild.RegisterExtToolParser;
+   //RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[LAMW] Build Android Apk and Run', nil, @BuildApkAndRun);
+   ideMnuLAMWBuild:= RegisterIDEMenuCommand(itmRunBuilding, 'LAMW Build Apk And Run', '[LAMW] Build Android Apk and Run', nil, nil, CmdMyTool);
+
+  if pathToLamwIcon <> '' then ideMnuLAMWBuild.Bitmap.LoadFromFile(pathToLamwIcon);
+
+   ApkBuild.RegisterExtToolParser;
 end;
 
 end.
