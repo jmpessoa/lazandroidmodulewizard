@@ -57,10 +57,9 @@ public class jImageBtn extends View {
 		  rect = new Rect(0, 0, bmpUp.getWidth(), bmpUp.getHeight());
 		  LAMWCommon.setLParamWidth(bmpUp.getWidth());
 		  LAMWCommon.setLParamHeight(bmpUp.getHeight());
+		  invalidate();
 		 }
 	    }
-	    
-		invalidate();		
 	}
 
 	public void setButtonDown( String filedn ) {  
@@ -72,11 +71,11 @@ public class jImageBtn extends View {
 	     
 	     bmpDn = BitmapFactory.decodeFile(filedn, bo);
 	     
-	     if( bmpDn != null )		 
-		  rect = new Rect(0, 0, bmpDn.getWidth(), bmpDn.getHeight());	     
+	     if( bmpDn != null ){		 
+		  rect = new Rect(0, 0, bmpDn.getWidth(), bmpDn.getHeight());
+		  invalidate();
+	     }
 	    }
-	    
-		invalidate();		
 	}
 
     private int GetDrawableResourceId(String _resName) {
@@ -97,6 +96,8 @@ public class jImageBtn extends View {
      }
     
      public Drawable GetDrawableResourceById(int _resID) {
+				
+		if( _resID == 0 ) return null;
 		
 		Drawable res = null;
 		
@@ -133,10 +134,9 @@ public class jImageBtn extends View {
 		  rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
 		  LAMWCommon.setLParamWidth(bmpUp.getWidth());
 		  LAMWCommon.setLParamHeight(bmpUp.getHeight());
+		  invalidate();
 		 }
-		}
-		
-		invalidate();
+		}				
 	}
 
 	public  void setButtonDownByRes(String resdn) {   // ..res/drawable
@@ -146,11 +146,12 @@ public class jImageBtn extends View {
 		if( d != null ){
 		 bmpDn  = ((BitmapDrawable)d).getBitmap();
 		 
-		 if(bmpDn != null)
-		  rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());
+		 if(bmpDn != null){
+		  rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());		  
+		  invalidate();
+		 }
 		}
-		
-		invalidate();
+				
 	}
 
 	//
