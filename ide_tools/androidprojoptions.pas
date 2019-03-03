@@ -5,8 +5,9 @@ unit AndroidProjOptions;
 interface
 
 uses
+
   Classes, SysUtils, Types, LazFileUtils, laz2_XMLRead, Laz2_DOM, LCLVersion,
-  AvgLvlTree, IDEOptionsIntf, ProjectIntf, SourceChanger, Forms, Controls,
+  AvgLvlTree, LazIDEIntf, IDEOptionsIntf, ProjectIntf, SourceChanger, Forms, Controls,
   Dialogs, Grids, StdCtrls, LResources, ExtCtrls, Spin, ComCtrls, Buttons,
   Themes;
 
@@ -60,122 +61,123 @@ type
     //property ThemeName: string read GetThemeName;
   end;
 
-   { TLamwProjectOptions }
-
-  TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
-    cbTheme: TComboBox;
-    cbLaunchIconSize: TComboBox;
-    cbBuildSystem: TComboBox;
-    edLabel: TEdit;
-    edVersionName: TEdit;
-    ErrorPanel: TPanel;
-    gbVersion: TGroupBox;
-    GroupBox1: TGroupBox;
-    ImageList1: TImageList;
-    imLauncherIcon: TImage;
-    Label1: TLabel;
-    lblGradleHint: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
-    lblErrorMessage: TLabel;
-    PageControl1: TPageControl;
-    PermissonGrid: TStringGrid;
-    rbOrientation: TRadioGroup;
-    seMinSdkVersion: TSpinEdit;
-    seTargetSdkVersion: TComboBox;
-    seVersionCode: TSpinEdit;
-    SpeedButton1: TSpeedButton;
-    SpeedButtonHintTheme: TSpeedButton;
-    tsMiscellaneous: TTabSheet;
-    tsAppl: TTabSheet;
-    tsManifest: TTabSheet;
-    procedure cbBuildSystemChange(Sender: TObject);
-    procedure cbBuildSystemSelect(Sender: TObject);
-    procedure cbLaunchIconSizeSelect(Sender: TObject);
-    procedure cbThemeChange(Sender: TObject);
-    procedure PermissonGridCheckboxToggled({%H-}Sender: TObject; {%H-}aCol,
-    {%H-}aRow: integer; {%H-}aState: TCheckboxState);
-    procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: integer;
-      aRect: TRect; {%H-}aState: TGridDrawState);
-    procedure PermissonGridMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: integer);
-    procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState;
-      X, Y: integer);
-    procedure seTargetSdkVersionEditingDone(Sender: TObject);
-    procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButtonHintThemeClick(Sender: TObject);
-  private
-    { private declarations }
-  const
-    Drawable: array [0..4] of record
-        Size: integer;
-        Suffix: string;
-      end
-    = ((Size: 36; Suffix: 'ldpi'),
-      (Size: 48; Suffix: 'mdpi'),
-      (Size: 72; Suffix: 'hdpi'),
-      (Size: 96; Suffix: 'xhdpi'),
-      (Size: 144; Suffix: 'xxhdpi'));
-  private
-    IsLamwProject: boolean;
-    FManifest: TLamwAndroidManifestOptions;
-    FIconsPath: string; // ".../res/drawable-"
-    FChkBoxDrawData: array [TCheckBoxState] of record
-      Details, DetailsHot: TThemedElementDetails;
-      CSize: TSize;
-    end;
-    FBuildSystem: string;
-    FProjectPath: string;
-    FDefaultTheme: string;
-
-    FAllPermissionsState: TCheckBoxState;
-    FAllPermissionsHot: boolean;
-    function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
-    procedure ErrorMessage(const msg: string);
-    procedure FillPermissionGrid(Permissions: TStringList;
-      PermNames: TStringToStringTree);
-    procedure SetControlsEnabled(ts: TTabSheet; en: boolean);
-    procedure ShowLauncherIcon;
-  private
-    // gApp.Screen.Style := <orientation> statements
-    function GetCurrentAppScreenStyle: string;
-    function FindAppScreenStyleStatement(
-      out StartPos, ssConstStartPos, EndPos: integer): boolean;
-    function GetAppScreenStyleStatement(ssConstStartPos: integer;
-      out ssConstVal: string): boolean;
-    function SetAppScreenStyleStatement(const ssNewConstVal: string): boolean;
-    function RemoveAppScreenStyleStatement: boolean;
-    procedure TryUpdateStyleXML();
-  public
-    { public declarations }
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    class function SupportedOptionsClass: TAbstractIDEOptionsClass; override;
-    function GetTitle: string; override;
-    procedure Setup({%H-}ADialog: TAbstractOptionsEditorDialog); override;
-    procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
-    procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
-  end;
-
 implementation
 
 uses
-  {$if (lcl_fullversion >= 1090000)}
+
+  {$if (lcl_fullversion > 1090000) }
   IDEOptEditorIntf,
   {$endif}
-  LazIDEIntf, laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
+  laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
   CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
   FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
 
 {$R *.lfm}
 
 type
+
+  { TLamwProjectOptions }
+
+ TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
+   cbTheme: TComboBox;
+   cbLaunchIconSize: TComboBox;
+   cbBuildSystem: TComboBox;
+   edLabel: TEdit;
+   edVersionName: TEdit;
+   ErrorPanel: TPanel;
+   gbVersion: TGroupBox;
+   GroupBox1: TGroupBox;
+   ImageList1: TImageList;
+   imLauncherIcon: TImage;
+   Label1: TLabel;
+   lblGradleHint: TLabel;
+   Label2: TLabel;
+   Label3: TLabel;
+   Label4: TLabel;
+   Label5: TLabel;
+   Label6: TLabel;
+   Label7: TLabel;
+   Label8: TLabel;
+   Label9: TLabel;
+   lblErrorMessage: TLabel;
+   PageControl1: TPageControl;
+   PermissonGrid: TStringGrid;
+   rbOrientation: TRadioGroup;
+   seMinSdkVersion: TSpinEdit;
+   seTargetSdkVersion: TComboBox;
+   seVersionCode: TSpinEdit;
+   SpeedButton1: TSpeedButton;
+   SpeedButtonHintTheme: TSpeedButton;
+   tsMiscellaneous: TTabSheet;
+   tsAppl: TTabSheet;
+   tsManifest: TTabSheet;
+   procedure cbBuildSystemChange(Sender: TObject);
+   procedure cbBuildSystemSelect(Sender: TObject);
+   procedure cbLaunchIconSizeSelect(Sender: TObject);
+   procedure cbThemeChange(Sender: TObject);
+   procedure PermissonGridCheckboxToggled({%H-}Sender: TObject; {%H-}aCol,
+   {%H-}aRow: integer; {%H-}aState: TCheckboxState);
+   procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: integer;
+     aRect: TRect; {%H-}aState: TGridDrawState);
+   procedure PermissonGridMouseDown(Sender: TObject; Button: TMouseButton;
+     Shift: TShiftState; X, Y: integer);
+   procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState;
+     X, Y: integer);
+   procedure seTargetSdkVersionEditingDone(Sender: TObject);
+   procedure SpeedButton1Click(Sender: TObject);
+   procedure SpeedButtonHintThemeClick(Sender: TObject);
+ private
+   { private declarations }
+ const
+   Drawable: array [0..4] of record
+       Size: integer;
+       Suffix: string;
+     end
+   = ((Size: 36; Suffix: 'ldpi'),
+     (Size: 48; Suffix: 'mdpi'),
+     (Size: 72; Suffix: 'hdpi'),
+     (Size: 96; Suffix: 'xhdpi'),
+     (Size: 144; Suffix: 'xxhdpi'));
+ private
+   IsLamwProject: boolean;
+   FManifest: TLamwAndroidManifestOptions;
+   FIconsPath: string; // ".../res/drawable-"
+   FChkBoxDrawData: array [TCheckBoxState] of record
+     Details, DetailsHot: TThemedElementDetails;
+     CSize: TSize;
+   end;
+   FBuildSystem: string;
+   FProjectPath: string;
+   FDefaultTheme: string;
+
+   FAllPermissionsState: TCheckBoxState;
+   FAllPermissionsHot: boolean;
+   function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
+   procedure ErrorMessage(const msg: string);
+   procedure FillPermissionGrid(Permissions: TStringList;
+     PermNames: TStringToStringTree);
+   procedure SetControlsEnabled(ts: TTabSheet; en: boolean);
+   procedure ShowLauncherIcon;
+ private
+   // gApp.Screen.Style := <orientation> statements
+   function GetCurrentAppScreenStyle: string;
+   function FindAppScreenStyleStatement(
+     out StartPos, ssConstStartPos, EndPos: integer): boolean;
+   function GetAppScreenStyleStatement(ssConstStartPos: integer;
+     out ssConstVal: string): boolean;
+   function SetAppScreenStyleStatement(const ssNewConstVal: string): boolean;
+   function RemoveAppScreenStyleStatement: boolean;
+   procedure TryUpdateStyleXML();
+ public
+   { public declarations }
+   constructor Create(AOwner: TComponent); override;
+   destructor Destroy; override;
+   class function SupportedOptionsClass: TAbstractIDEOptionsClass; override;
+   function GetTitle: string; override;
+   procedure Setup({%H-}ADialog: TAbstractOptionsEditorDialog); override;
+   procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
+   procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
+ end;
 
   { TMyCanvas }
 
