@@ -180,6 +180,7 @@ type
      procedure RemoveFromViewParent;  override;
 
      procedure GenEvent_OnClick(Obj: TObject);
+     procedure GenEvent_OnLOngClick(Obj: TObject);
      procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
      procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
 
@@ -211,6 +212,7 @@ type
      property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
 
      property OnClick : TOnNotify read FOnClick write FOnClick;
+     property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
      property OnFlingGesture: TOnFling read FOnFling write FOnFling;
      property OnPinchZoomGesture: TOnPinchZoom read FOnPinchGesture write FOnPinchGesture;
    end;
@@ -2714,6 +2716,13 @@ begin
   begin
     jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
     jTextView(Obj).GenEvent_OnLongClick(Obj);
+    Exit;
+  end;
+
+  if Obj is jPanel then
+  begin
+    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
+    jPanel(Obj).GenEvent_OnLongClick(Obj);
     Exit;
   end;
 
@@ -11117,6 +11126,11 @@ end;
 Procedure jPanel.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+procedure jPanel.GenEvent_OnLongClick(Obj: TObject);
+begin
+  if Assigned(FOnLongClick) then FOnLongClick(Obj);
 end;
 
 procedure jPanel.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
