@@ -144,7 +144,7 @@ public class jPanel extends RelativeLayout {
 		@Override
 		public boolean onSingleTapUp(MotionEvent e) {
 			//Log.i("Click", "------------");
-			controls.pOnClick(PasObj,Const.Click_Default);
+			controls.pOnClick(PasObj, Const.Click_Default);
 			return true;
 		}
 		
@@ -157,8 +157,8 @@ public class jPanel extends RelativeLayout {
 		
 		@Override
 		public void onLongPress(MotionEvent e) {
-			//Log.i("LongPress", "------------");
-			//TO DO
+			//Log.i("LongPress", "------------");			
+			controls.pOnLongClick(PasObj, Const.Click_Default);
 		}			
 
 		@Override
