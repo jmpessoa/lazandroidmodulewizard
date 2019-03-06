@@ -145,9 +145,21 @@ begin
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+var
+  manifestPermissions: TDynArrayOfString;
 begin
+
   jListView1.DispatchOnDrawItemBitmap(False);  //better performace!
   jListView1.DispatchOnDrawItemTextColor(False);  //better performace!
+
+  if(gApp.APILevel >= 23) and (IsRuntimePermissionNeed) then
+  begin
+
+    SetLength(manifestPermissions, 1);
+    manifestPermissions[0]:= 'android.permission.CONTACTS_READ';
+    Self.RequestRuntimePermission(manifestPermissions, $1234);
+    SetLength(manifestPermissions, 0);
+  end;
 end;
 
 end.

@@ -1545,6 +1545,10 @@ public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
 }
 
+public int getAPILevel() {
+  return android.os.Build.VERSION.SDK_INT;  
+}
+
 //by jmpessoa
 public  int  systemGetOrientation() {  
    return (this.activity.getResources().getConfiguration().orientation); 

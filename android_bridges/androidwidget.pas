@@ -806,6 +806,7 @@ type
 
     FMainActivity: string;
     FPackageName   : string;
+    FAPILevel      : Integer;
 
     FjClassName   : string;
     FForm        : jForm;       // Main/Initial Form
@@ -867,7 +868,7 @@ type
     property ClassName  : string read FjClassName write SetjClassName;
     property MainActivityName: string read GetMainActivityName;
     property PackageName  : string read GetPackageName;
-
+    property APILevel: Integer read FAPILevel;
   end;
 
  {jControl by jmpessoa}
@@ -1751,6 +1752,7 @@ Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 //-------------
 
   Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
+  function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
   Procedure jSystem_SetOrientation       (env:PJNIEnv;this:jobject; orientation : Integer);
   function jSystem_GetOrientation        (env:PJNIEnv;this:jobject): integer;
   Procedure jClassMethod(FuncName, FuncSig : PChar;
@@ -5941,6 +5943,8 @@ begin
   Jni.jRLayout  := layout;
   Jni.jIntent   := intent;
 
+  FAPILevel := jSystem_getAPILevel(env, this);
+
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);
 
@@ -7949,6 +7953,16 @@ begin
  env^.CallVoidMethodA(env,this,_jMethod,@_jParams);
 end;
 
+function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
+const
+  _cFuncName = 'getAPILevel';
+  _cFuncSig  = '()I';
+var
+  _jMethod : jMethodID = nil;
+begin
+  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+  Result        := env^.CallIntMethod(env,this,_jMethod);
+end;
 
 //by jmpessoa
 function jSystem_GetOrientation(env:PJNIEnv; this:jobject): integer;
