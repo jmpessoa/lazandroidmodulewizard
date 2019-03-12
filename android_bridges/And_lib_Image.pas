@@ -27,7 +27,7 @@ unit And_lib_Image;
   {$asmmode intel}
  {$endif}
  {$ifdef cpu64}
-  {$asmmode intel}
+ // {$asmmode intel}
  {$endif}
  {$ifdef fpc_little_endian}
   {$define little_endian}
@@ -1499,9 +1499,9 @@ asm
 end;
 {$elseif defined(CPU64)}
 asm
-  mov eax,i
-  mov cl,j
-  sar eax,cl
+ // mov eax,i
+ // mov cl,j
+ // sar eax,cl
 end;
 {$elseif defined(Android)}
 asm
