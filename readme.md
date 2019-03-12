@@ -43,7 +43,7 @@
 
 		-Stephano  - Many collaborations and suggestions!
 
-		-x2nie [Lazarus 1.3 patch to non LCL form designer!] 
+		-x2nie [Lazarus 1.3 patch for non LCL form designer!] 
 			http://github.com/x2nie/LiteZarus
 
 		-Fatih KILIÇ - How To Install!
@@ -95,6 +95,11 @@
 	*					
 	***************************************************************************************************
 
+Version 0.8 - rev 04 - 12 - March - 2019
+
+	NEW! Added "aarch64" support!!
+		ref. https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases
+	
 Version 0.8 - rev 03 - 26 - January- 2019
 
 	NEW "jXLSWriter" component
@@ -152,14 +157,12 @@ Version 0.8 - 31 - March- 2018
 	NEW! jDBListView component by Martin Lowry [Thanks!]
 	NEW! demo AppDBGridViewDemo1  by Martin Lowry [Thanks!]
 
-	REQUIREMENTS: 
+	REQUIREMENTS:  [EDITED!]
 
-		[LAMW 0.8] "AppCompat" [material] theme need:
+		[LAMW 0.8.4] "AppCompat" [material] theme need:
 		1. Java JDK 1.8
-		2. Gradle 4.1 + Internet Connection!
-		3. Android SDK "plataforms" 25 + "build-tools" 25.0.3 [or]
-		3. Android SDK "plataforms" 26 + "build-tools" 26.0.3 [or]
-		3. Android SDK "plataforms" 27 + "build-tools" 27.0.3
+		2. Gradle 4.4.1 + Internet Connection!
+		3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 [or]
 		4. Android SDK/Extra  "Support Repository"
 		5. Android SDK/Extra  "Support Library"
 		

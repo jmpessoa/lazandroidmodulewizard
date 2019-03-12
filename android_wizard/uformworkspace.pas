@@ -54,15 +54,14 @@ type
     procedure CheckBoxPIEClick(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
+    procedure EditPathToWorkspaceExit(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
 
     procedure ListBoxMinSDKChange(Sender: TObject);
     procedure ListBoxNdkPlatformChange(Sender: TObject);
     procedure ListBoxTargetAPIChange(Sender: TObject);
-
     procedure RGInstructionClick(Sender: TObject);
 
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
@@ -71,7 +70,6 @@ type
     procedure SpeedButtonSDKPlusClick(Sender: TObject);
     procedure SpeedButtonHintThemeClick(Sender: TObject);
     function IsLaz4Android(): boolean;
-
   private
     { private declarations }
     FFilename: string;
@@ -116,13 +114,14 @@ type
     FHasSdkToolsAnt: boolean;
     FIniFileSection: string;
     FIniFileName: string;
+    FInstructionSetIndex: integer;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
     function GetGradleVersion(out tagVersion: integer): string;
     function IsSdkToolsAntEnable: boolean;
     procedure WriteIniString(Key, Value: string);
-    function GetPathToSmartDesigner(): string;
+    function DoPathToSmartDesigner(): string;
     function DoNewPathToJavaTemplate(): string;
 
   public
@@ -143,13 +142,12 @@ type
     function GetBuildTool(sdkApi: integer): string;
 
     function GetMaxNdkPlatform(var index: integer): integer;
-    procedure SaveWorkSpaceSettings(const pFilename: string);
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
     property InstructionSet: string read FInstructionSet write FInstructionSet;
     property FPUSet: string  read FFPUSet write FFPUSet;
     property PathToJavaTemplates: string read FPathToJavaTemplates write FPathToJavaTemplates;
-    property PathToSmartDesigner: string  read GetPathToSmartDesigner write FPathToSmartDesigner;
+    property PathToSmartDesigner: string  read FPathToSmartDesigner write FPathToSmartDesigner;
     property AndroidProjectName: string read FAndroidProjectName write FAndroidProjectName;
 
     property PathToJavaJDK: string read FPathToJavaJDK write FPathToJavaJDK;
@@ -359,6 +357,9 @@ begin
     ShowMessage('Warning: for compatibility with old devices [4.x, 5.x]'+sLIneBreak+
                 'is strongly recommended NDK API < 23!');
 
+ if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 5) then
+    ShowMessage('Warning: ARMv8 [aarch64] nedd  NDK Api >= 21');
+
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIChange(Sender: TObject);
@@ -370,7 +371,54 @@ begin
     FTargetApi:= '26';
 
   if StrToInt(FTargetApi) < 26 then
-     ShowMessage('Warning: remember that the "google play" store now requires Target Api >= 26 !');
+     ShowMessage('Warning: remember that "google play" store NOW  requires Target Api >= 26 !');
+end;
+
+procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
+var
+  minNdkApi: integer;
+begin
+  Self.FInstructionSetIndex:= RGInstruction.ItemIndex;
+  FInstructionSet:= 'ARMV7A';
+  FFPUSet:= ''; //x86  or mipsel
+  case FInstructionSetIndex of
+   0:  begin
+        FFPUSet:= 'Soft';
+        FInstructionSet:='ARMV6';
+       end;
+   1:  begin
+         FFPUSet:= 'Soft';
+         FInstructionSet:='ARMV7A';
+       end;
+   2:  begin
+         FFPUSet:= 'VFPV3';
+         FInstructionSet:='ARMV7A';
+       end;
+   3:  FInstructionSet:='x86';
+   4:  FInstructionSet:='Mipsel';
+   5:  begin //need Api tarqet >= 21
+         FInstructionSet:='ARMV8';    //aarch64
+       end;
+  end;
+
+  if (FInstructionSetIndex = 2) and (IsLaz4Android) then
+  begin
+     ShowMessage('WARNING: "laz4Android 1.8.0" [out-of-box]'+ sLineBreak + 'don''t support "ARMV7a + VFPv3"' + sLineBreak +
+     sLineBreak +'Hint: Select "ARMv7a + Soft"');
+  end;
+
+  if (FInstructionSetIndex = 5) and (IsLaz4Android) then
+  begin
+    ShowMessage('WARNING: "laz4Android 1.8.0" [out-of-box]' + sLineBreak + 'don''t support "aarch64"' + sLineBreak +
+    sLineBreak +'Hint: Select "ARMv7a + Soft"');
+  end;
+
+  if FInstructionSetIndex = 5 then
+  begin
+     minNdkApi:=StrToInt(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]);
+     if minNdkApi < 21 then ShowMessage('Warning: "aarch64" need NDK Api >= 21 ...');
+  end;
+
 end;
 
 function TFormWorkspace.IsLaz4Android(): boolean;
@@ -389,32 +437,6 @@ begin
      Result:= True;
  end;
  {$endif}
-end;
-
-procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
-begin
-
-  if (RGInstruction.ItemIndex = 2) and (IsLaz4Android) then
-  begin
-     ShowMessage('WARNING: "laz4Android" [by default] don''t support "ARMv7a+VFPv3"');
-     //RGInstruction.ItemIndex:= 1;
-  end;
-
-  FInstructionSet:= 'x86';
-  FFPUSet:= ''; //x86  or mipsel
-
-  if RGInstruction.ItemIndex = 0  then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv6'; end;
-  if RGInstruction.ItemIndex = 1  then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv7a';end;
-  if RGInstruction.ItemIndex = 2  then begin FFPUSet:= 'VFPv3'; FInstructionSet:='ARMv7a';end;
-  if RGInstruction.ItemIndex = 3  then FInstructionSet:='x86';
-  if RGInstruction.ItemIndex = 4  then FInstructionSet:='Mipsel';
-
-  if FPrebuildOSYS = '' then
-  begin
-    if FPathToAndroidNDK <> '' then
-        FPrebuildOSYS:= GetPrebuiltDirectory();
-  end;
-
 end;
 
 function TFormWorkspace.GetNDKPlatformByApi(api: string): string;
@@ -447,110 +469,42 @@ end;
 
 function TFormWorkspace.GetPrebuiltDirectory: string;
 var
-   pathToNdkToolchains46,
-   pathToNdkToolchains49,
-   pathToNdkToolchains443: string;
+   pathToNdkToolchains49: string;  //   [ARM or x86]
 begin
     Result:= '';
-
-    if Pos('Mipsel', FInstructionSet) > 0 then
-    begin
-        {
-        pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                                      'x86-4.4.3'+DirectorySeparator+
-                                                      'prebuilt'+DirectorySeparator;
-
-        pathToNdkToolchains46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                                   'x86-4.6'+DirectorySeparator+
-                                                   'prebuilt'+DirectorySeparator;
-        }
-        pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                                     'mipsel-linux-android-4.9'+DirectorySeparator+
-                                                     'prebuilt'+DirectorySeparator;
-    end
-    else if Pos('x86', FInstructionSet) > 0 then
-    begin
-       pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                                     'x86-4.4.3'+DirectorySeparator+
-                                                     'prebuilt'+DirectorySeparator;
-
-       pathToNdkToolchains46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                                  'x86-4.6'+DirectorySeparator+
-                                                  'prebuilt'+DirectorySeparator;
-
-       pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                                    'x86-4.9'+DirectorySeparator+
-                                                    'prebuilt'+DirectorySeparator;
-    end
-    else  //ARM
-    begin
-     pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                                 'arm-linux-androideabi-4.4.3'+DirectorySeparator+
-                                                 'prebuilt'+DirectorySeparator;
-
-     pathToNdkToolchains46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                              'arm-linux-androideabi-4.6'+DirectorySeparator+
-                                              'prebuilt'+DirectorySeparator;
-
-     pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+    pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                 'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                 'prebuilt'+DirectorySeparator;
-    end;
-
-   {$ifdef windows}
-     if DirectoryExists(pathToNdkToolchains49+ 'windows') then
-     begin
-       Result:= 'windows';
-       Exit;
-     end;
-     if DirectoryExists(pathToNdkToolchains46+ 'windows') then
-     begin
-       Result:= 'windows';
-       Exit;
-     end;
-     if DirectoryExists(pathToNdkToolchains443+ 'windows') then
-     begin
-       Result:= 'windows';
-       Exit;
-     end;
-     if DirectoryExists(pathToNdkToolchains49 + 'windows-x86_64') then Result:= 'windows-x86_64';
+    {$ifdef windows}
+     Result:=  'windows';
+     if DirectoryExists(pathToNdkToolchains49+ 'windows-x86_64') then Result:= 'windows-x86_64';
    {$else}
      {$ifdef darwin}
+        Result:=  '';
         if DirectoryExists(pathToNdkToolchains49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
      {$else}
-       {$ifdef cpu64}
+       {$ifdef linux}
+         Result:=  'linux-x86_32';
          if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_64') then Result:= 'linux-x86_64';
-       {$else}
-         if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_32') then
-         begin
-            Result:= 'linux-x86_32';
-            Exit;
-         end;
-         if DirectoryExists(pathToNdkToolchains46+ 'linux-x86_32') then
-         begin
-           Result:= 'linux-x86_32';
-           Exit;
-         end;
-         if DirectoryExists(pathToNdkToolchains443+ 'linux-x86_32') then
-         begin
-           Result:= 'linux-x86_32';
-           Exit;
-         end;
        {$endif}
      {$endif}
    {$endif}
 
    if Result = '' then
    begin
+       {$ifdef WINDOWS}
+         Result:= 'windows-x86_64';
+       {$endif}
        {$ifdef LINUX}
            Result:= 'linux-x86_64';
        {$endif}
-       {$ifdef WINDOWS}
-           Result:= 'windows';
+       {$ifdef darwin}
+           Result:= 'darwin-x86_64';
        {$endif}
    end;
 
 end;
+
 
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
@@ -563,7 +517,6 @@ begin
   if ModalResult = mrCancel  then Exit;
 
   FMainActivity:= 'App'; //TODO: flexibility here...
-
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
@@ -578,7 +531,7 @@ begin
      if StrToInt(FMinApi) < 14 then FMinApi:= '14'
   end;
 
-  SaveWorkSpaceSettings(FFileName);
+  //SaveWorkSpaceSettings(FFileName);
 
   if apiTarg < 14 then
     FAndroidTheme:= 'Holo.Light'
@@ -602,7 +555,6 @@ begin
     Exit;
   end;
 
-  FPathToWorkspace:= Trim(EditPathToWorkspace.Text);
   FJavaClassName:= 'Controls'; //GUI  [try guess]
 
   if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then
@@ -737,18 +689,7 @@ begin
 
 end;
 
-procedure TFormWorkspace.FormCloseQuery(Sender: TObject; var CanClose: boolean);
-begin
-  CanClose := True;
-  if ModalResult = mrCancel then Exit;
-  if ListBoxTargetAPI.ItemIndex < 0 then
-  begin
-    MessageDlg('Target API is not selected!', mtError, [mbOk], 0);
-    CanClose := False;
-  end;
-end;
-
-function TFormWorkspace.GetPathToSmartDesigner(): string;
+function TFormWorkspace.DoPathToSmartDesigner(): string;
 var
   Pkg: TIDEPackage;
 begin
@@ -769,7 +710,7 @@ end;
 
 function TFormWorkspace.DoNewPathToJavaTemplate(): string;
 begin
-   FPathToJavaTemplates:= GetPathToSmartDesigner() + pathDelim +'java';
+   FPathToJavaTemplates:= DoPathToSmartDesigner() + pathDelim +'java';
    Result:=FPathToJavaTemplates;
     //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java
 end;
@@ -791,7 +732,6 @@ var
   flag: boolean;
   fileName: string;
 begin
-
   flag:= false;
   if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
   begin
@@ -802,25 +742,10 @@ begin
        CopyFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini',
                 IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
        //DeleteFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
-       FPathToJavaTemplates:= DoNewPathToJavaTemplate();
-       FPathToSmartDesigner:= GetPathToSmartDesigner();
+       Self.DoNewPathToJavaTemplate();
        flag:= True;
     end;
   end;
-
-  if flag then
-  begin
-    WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
-    WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
-  end;
-
-  //here ModuleType already is know!
-  fileName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
-  if not FileExists(fileName) then
-  begin
-    SaveSettings(fileName);  //force to create empty/initial files!
-  end;
-
 end;
 
 procedure TFormWorkspace.ListBoxMinSDKChange(Sender: TObject);
@@ -904,9 +829,8 @@ procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
 var
   indexNdk: integer;
   frm: TFormPathMissing;
-  //frmSys: TFormOSystem;
-  nativeMethodList, tempList,  fileList: TStringList;
-  i, j: integer;
+  nativeMethodList, tempList: TStringList;
+  i: integer;
   strIndexNdk: string;
 begin
   if FileExists(fileName) then
@@ -1002,10 +926,15 @@ begin
       FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
       if FPathToJavaTemplates = '' then
       begin
-        DoNewPathToJavaTemplate();
+        DoNewPathToJavaTemplate();   //0.8.3 new path!  ...\android_wizard\smartdesigner\java
       end;
 
-      fileList:= TStringList.Create;
+      FPathToSmartDesigner:= ReadString('NewProject','PathToSmartDesigner', '');
+      if FPathToSmartDesigner = '' then
+      begin
+        Self.DoPathToSmartDesigner();   //0.8.3 new path!  ...\android_wizard\smartdesigner
+      end;
+
       nativeMethodList:= TStringList.Create;
       tempList:= TStringList.Create;
 
@@ -1018,31 +947,17 @@ begin
               nativeMethodList.Add(Trim(tempList.Strings[i]));
         end;
 
-        fileList.Clear;
-        GetFiles(FPathToJavaTemplates+DirectorySeparator+'lamwdesigner'+DirectorySeparator, fileList);
-
-        tempList.Clear;
-        for i:= 0 to fileList.Count - 1 do
-        begin
-          tempList.LoadFromFile(fileList.Strings[i]);
-          for j:= 0 to tempList.Count-1 do
-          begin
-            if Pos(' native ', tempList.Strings[j]) > 0 then
-                nativeMethodList.Add(Trim(tempList.Strings[j]));
-          end;
-        end;
-
         tempList.Clear;
         for i:= 0 to nativeMethodList.Count-1 do
         begin
           tempList.Add(GetEventSignature(nativeMethodList.Strings[i]));
         end;
-        tempList.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'ControlsEvents.txt');
-        nativeMethodList.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'methods.native');
+        tempList.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'Controls.events');  //old "ControlsEvents.txt"
+        nativeMethodList.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'Controls.native');
       end;
+
       nativeMethodList.Free;
       tempList.Free;
-      fileList.Free;
 
       cbBuildSystem.Items.Clear;
       if FPathToAndroidSDK <> '' then
@@ -1101,6 +1016,7 @@ end;
 
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 begin
+
   EditPathToWorkspace.Left:= 8; // try fix hidpi bug
   ComboSelectProjectName.Left:= 8;  // try fix hidpi bug
 
@@ -1115,7 +1031,8 @@ begin
 
   if EditPathToWorkspace.Text <> '' then
      ComboSelectProjectName.SetFocus
-  else EditPathToWorkspace.SetFocus;
+  else
+    EditPathToWorkspace.SetFocus;
 
   if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
 
@@ -1130,6 +1047,10 @@ begin
      FHasSdkToolsAnt:= IsSdkToolsAntEnable();
 
   SpeedButtonSDKPlusClick(Self);
+
+  Self.RGInstruction.ItemIndex:= FInstructionSetIndex;
+
+
 end;
 
 procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
@@ -1142,7 +1063,7 @@ begin
     begin
       ShowMessage('Warning/Recomendation:'+
                sLineBreak+
-               sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
+               sLineBreak+'[LAMW 0.8.4] "AppCompat" [material] theme need:'+
                sLineBreak+' 1. Java JDK 1.8'+
                sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
                sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
@@ -1192,7 +1113,7 @@ begin
   begin
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then
-      MessageDlg('[LAMW 0.8] "AppCompat" [material] theme need JDK 1.8 + Gradle 4.4.1!', mtWarning, [mbOk], 0);
+      MessageDlg('[LAMW 0.8.4] "AppCompat" [material] theme need JDK 1.8 + Gradle 4.4.1!', mtWarning, [mbOk], 0);
   end;
 
 end;
@@ -1208,6 +1129,14 @@ begin
   end;
 end;
 
+procedure TFormWorkspace.EditPathToWorkspaceExit(Sender: TObject);
+begin
+  FPathToWorkspace:= EditPathToWorkspace.Text;
+  if EditPathToWorkspace.Text = '' then
+  begin
+     ShowMessage('Please,  enter path to [workspace] projects folder...');
+  end
+end;
 
 procedure TFormWorkspace.SpdBtnPathToWorkspaceClick(Sender: TObject);
 begin
@@ -1231,7 +1160,7 @@ procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.4] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
            sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
@@ -1290,7 +1219,7 @@ procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.4] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
            sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
@@ -1380,20 +1309,25 @@ end;
 
 procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by "AndroidWizard_inf.pas"
 var
-  indexInstructionSet: string;
+  auxInstSet: string;
   tagVersion: integer;
   ndkIndex: integer;
 begin
-   //before OnFormActive
+   //run before "OnFormActive"
 
   //verify if some was not load!
-  FFileName:= pFilename;
+  FFileName:= pFilename; //full filename
+
   Self.LoadPathsSettings(FFileName);
 
   with TIniFile.Create(pFilename) do
   try
+
+    DoNewPathToJavaTemplate();
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
-    FPackagePrefaceName:= ReadString('NewProject','AntPackageName', '');
+
+    FPackagePrefaceName:= ReadString('NewProject','PackagePrefaceName', '');
+    if FPackagePrefaceName = '' then FPackagePrefaceName:=  'org.lamw';
 
     FAntBuildMode:= 'debug';    //default...
     FTouchtestEnabled:= 'True'; //default
@@ -1401,9 +1335,12 @@ begin
     FMainActivity:= ReadString('NewProject','MainActivity', '');  //dummy
     if FMainActivity = '' then FMainActivity:= 'App';
 
-    indexInstructionSet:= ReadString('NewProject','InstructionSet', '');
+    auxInstSet:= ReadString('NewProject','InstructionSet', '');
 
-    if indexInstructionSet =  '' then  indexInstructionSet:= '0';
+    if auxInstSet = '' then auxInstSet:= '1';
+    if auxInstSet = '0' then auxInstSet:='1';
+
+    FInstructionSetIndex:= StrToInt(auxInstSet);
 
     ComboSelectProjectName.Items.Clear;
     FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
@@ -1426,16 +1363,14 @@ begin
     Free;
   end;
 
-  RGInstruction.ItemIndex:= StrToInt(indexInstructionSet);
-
   FInstructionSet:= 'x86'; //RGInstruction.Items[RGInstruction.ItemIndex];
   FFPUSet:= ''; //x86
-
-  if RGInstruction.ItemIndex = 0 then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv6'; end;
-  if RGInstruction.ItemIndex = 1 then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMv7a';end;
-  if RGInstruction.ItemIndex = 2 then begin FFPUSet:= 'VFPv3'; FInstructionSet:='ARMv7a';end;
-  if RGInstruction.ItemIndex = 3 then FInstructionSet:='x86';
-  if RGInstruction.ItemIndex = 4 then FInstructionSet:='Mipsel';
+  if FInstructionSetIndex = 0 then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMV6'; end;
+  if FInstructionSetIndex = 1 then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMV7A';end;
+  if FInstructionSetIndex = 2 then begin FFPUSet:= 'VFPV3'; FInstructionSet:='ARMV7A';end;
+  if FInstructionSetIndex = 3 then FInstructionSet:='x86';
+  if FInstructionSetIndex = 4 then FInstructionSet:='Mipsel';
+  if FInstructionSetIndex = 5 then begin FFPUSet:= ''; FInstructionSet:='ARMV8' end; //aarch64
 
   EditPathToWorkspace.Text := FPathToWorkspace;
   EditPackagePrefaceName.Text := FPackagePrefaceName;
@@ -1443,6 +1378,8 @@ begin
   FMaxSdkPlatform:= Self.GetMaxSdkPlatform();
   if FMaxSdkPlatform = 0 then    //  try fix "android-0"
       FMaxSdkPlatform:= FCandidateSdkPlatform;
+
+  ndkIndex:= 22;
 
   FMaxNdkPlatform:= Self.GetMaxNdkPlatform(ndkIndex);    //ndkIndex Max =  22 for old 4.x, 5.x devices compatibility!!!!
 
@@ -1458,36 +1395,55 @@ procedure TFormWorkspace.SaveSettings(const pFilename: string);  //called by ...
 begin
    with TInifile.Create(pFilename) do
    try
-      WriteString('NewProject', 'PathToWorkspace', FPathToWorkspace);
-      WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates);
-      WriteString('NewProject', 'PathToJavaJDK', FPathToJavaJDK);
-      WriteString('NewProject', 'PathToAndroidNDK', FPathToAndroidNDK);
-      WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
-      WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
-      WriteString('NewProject', 'PathToGradle', FPathToGradle);
-      //WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
+      if EditPathToWorkspace.Text <> '' then
+        WriteString('NewProject', 'PathToWorkspace', EditPathToWorkspace.Text)
+      else
+        ShowMessage('Warning: EditPathToWorkspace is Empty...');
+
+      if FInstructionSetIndex >= 0 then
+         WriteString('NewProject', 'InstructionSet', IntToStr(Self.FInstructionSetIndex));
+
+      if EditPackagePrefaceName.Text <> '' then
+         WriteString('NewProject', 'PackagePrefaceName', EditPackagePrefaceName.Text)
+      else
+        WriteString('NewProject', 'PackagePrefaceName', 'org.lamw');
+
+      if FPathToJavaTemplates <> '' then
+         WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates)
+      else
+        WriteString('NewProject', 'PathToJavaTemplates', Self.DoNewPathToJavaTemplate());
+
+      if FPathToSmartDesigner <> '' then
+        WriteString('NewProject', 'PathToSmartDesigner', FPathToSmartDesigner)
+      else
+        WriteString('NewProject', 'PathToSmartDesigner', Self.DoPathToSmartDesigner());
+
+      if FPathToJavaJDK <> '' then
+        WriteString('NewProject', 'PathToJavaJDK', FPathToJavaJDK);
+
+      if FPathToAndroidNDK <> '' then
+         WriteString('NewProject', 'PathToAndroidNDK', FPathToAndroidNDK);
+
+      if FPathToAndroidSDK <> '' then
+        WriteString('NewProject', 'PathToAndroidSDK', FPathToAndroidSDK);
+
+      if FPathToAntBin <> '' then
+        WriteString('NewProject', 'PathToAntBin', FPathToAntBin);
+
+      if FPathToGradle <> '' then
+        WriteString('NewProject', 'PathToGradle', FPathToGradle);
+
+      if Self.RGInstruction.ItemIndex >= 0 then
+         WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex))
+      else
+         WriteString('NewProject', 'InstructionSet', '1');
+
       if FPrebuildOSYS = '' then
       begin
          FPrebuildOSYS:= GetPrebuiltDirectory();
          WriteString('NewProject', 'PrebuildOSYS', FPrebuildOSYS);
       end;
-   finally
-      Free;
-   end;
-end;
 
-procedure TFormWorkspace.SaveWorkSpaceSettings(const pFilename: string);
-begin
-   with TInifile.Create(pFilename) do
-   try
-      WriteString('NewProject', 'MainActivity', FMainActivity); //dummy
-      WriteString('NewProject', 'PathToWorkspace', EditPathToWorkspace.Text);
-      WriteString('NewProject', 'FullProjectName', FAndroidProjectName);
-      WriteString('NewProject', 'InstructionSet', IntToStr(RGInstruction.ItemIndex));
-      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
-      WriteString('NewProject', 'AntPackageName', LowerCase(Trim(EditPackagePrefaceName.Text)));
-      WriteString('NewProject', 'AndroidPlatform', IntToStr(ListBoxNdkPlatform.ItemIndex));  //android-26
-      WriteString('NewProject', 'AntBuildMode', 'debug'); //default...
    finally
       Free;
    end;

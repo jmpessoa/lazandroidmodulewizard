@@ -4,14 +4,15 @@ object FrmCompCreate: TFrmCompCreate
   Top = 137
   Width = 724
   BorderStyle = bsToolWindow
-  Caption = 'Lamw: Lazarus Android Module Wizard: Create New jComponent'
+  Caption = '[LAMW]  Create New jComponent'
   ClientHeight = 468
   ClientWidth = 724
+  DesignTimePPI = 120
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.8.0.6'
   object Panel1: TPanel
     Left = 0
     Height = 50
@@ -23,14 +24,14 @@ object FrmCompCreate: TFrmCompCreate
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 23
-    Top = 445
+    Height = 29
+    Top = 439
     Width = 724
     Panels = <>
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 358
+    Height = 352
     Top = 50
     Width = 724
     ActivePage = TabSheet1
@@ -39,12 +40,12 @@ object FrmCompCreate: TFrmCompCreate
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
-      ClientHeight = 330
+      ClientHeight = 319
       ClientWidth = 716
       inline SynMemo1: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 330
+        Height = 319
         Hint = 'Right Click....'
         Top = 0
         Width = 716
@@ -57,7 +58,7 @@ object FrmCompCreate: TFrmCompCreate
         ParentFont = False
         PopupMenu = PopupMenu1
         TabOrder = 0
-        Gutter.Width = 57
+        Gutter.Width = 61
         Gutter.MouseActions = <>
         Highlighter = SynJavaSyn1
         Keystrokes = <        
@@ -501,7 +502,7 @@ object FrmCompCreate: TFrmCompCreate
             MouseActions = <>
           end
           object SynGutterLineNumber1: TSynGutterLineNumber
-            Width = 17
+            Width = 21
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
@@ -552,7 +553,7 @@ object FrmCompCreate: TFrmCompCreate
         ParentFont = False
         PopupMenu = PopupMenu2
         TabOrder = 0
-        Gutter.Width = 57
+        Gutter.Width = 61
         Gutter.MouseActions = <>
         Highlighter = SynPasSyn1
         Keystrokes = <        
@@ -993,7 +994,7 @@ object FrmCompCreate: TFrmCompCreate
             MouseActions = <>
           end
           object SynGutterLineNumber1: TSynGutterLineNumber
-            Width = 17
+            Width = 21
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
@@ -1122,7 +1123,7 @@ object FrmCompCreate: TFrmCompCreate
   object Panel2: TPanel
     Left = 0
     Height = 37
-    Top = 408
+    Top = 402
     Width = 724
     Align = alBottom
     BevelOuter = bvNone

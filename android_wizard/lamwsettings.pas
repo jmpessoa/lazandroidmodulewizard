@@ -13,7 +13,7 @@ type
 
   TLamwGlobalSettings = class
   public const
-    Version = '0.8.3';
+    Version = '0.8.4';
   private const
     IniFileName = 'LAMW.ini';
     IniFileSection = 'NewProject';
@@ -29,9 +29,9 @@ type
     FPathToGradle: string;
     FFPUSet: string;
     FInstructionSet: string;
-    //FDefaultBuildSystem: string;
     FGradleVersion: string;
     FPrebuildOSYS: string;
+    FNDK: string;
 
     //function GetDefaultBuildSystem: string;
     procedure ReloadIni;
@@ -183,9 +183,7 @@ end;
 
 function TLamwGlobalSettings.DoPathToSmartDesigner(): string;
 var
-  p: integer;
   Pkg: TIDEPackage;
-  path: string;
 begin
   Result:= '';
   if FPathToSmartDesigner = '' then
@@ -255,13 +253,6 @@ begin
   Result := FIniFile.ReadString(IniFileSection, Key, Def);
 end;
 
-{
-procedure TLamwGlobalSettings.SetDefaultBuildSystem(AValue: string);
-begin
-  WriteIniString('DefaultBuildSystem', AValue);
-end;
-}
-
 procedure TLamwGlobalSettings.SetGradleVersion(AValue: string);
 begin
   WriteIniString('GradleVersion', AValue);
@@ -309,6 +300,7 @@ end;
 
 function TLamwGlobalSettings.GetInstructionSet: string;
 begin
+  Self.ReloadPaths;
   FInstructionSet:= ReadIniString('InstructionSet');
   Result:= FInstructionSet;
 end;
@@ -340,6 +332,11 @@ begin
   inherited Destroy;
 end;
 
+{
+NDK=5
+PrebuildOSYS=
+
+}
 procedure TLamwGlobalSettings.ReloadPaths;
 begin
   ReloadIni;
@@ -350,6 +347,9 @@ begin
   FPathToAntBin        := ReadIniString('PathToAntBin');
   FPathToGradle        := ReadIniString('PathToGradle');
   FPathToSmartDesigner := ReadIniString('PathToSmartDesigner');
+  FNDK                 := ReadIniString('NDK');
+  FPrebuildOSYS        := ReadIniString('PrebuildOSYS');
+  FInstructionSet      := ReadIniString('InstructionSet');
 end;
 
 function TLamwGlobalSettings.GetNDK: string;

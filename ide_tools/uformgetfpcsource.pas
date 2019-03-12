@@ -97,7 +97,7 @@ begin
     Params.Add(fpcTrunkStorePath);       //https://github.com/graemeg/freepascal.git
 
     Tool.CmdLineParams := Params.DelimitedText;
-    Tool.Scanners.Add(SubToolDefault);
+    Tool.Scanners.Add(SubToolDefault);  // deprecated use "Parsers"
 
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot Run Extern [svn] Tool!');
@@ -125,8 +125,8 @@ procedure TFormGetFPCSource.SpeedButton6Click(Sender: TObject);
 var
   auxStr: string;
 begin
-  auxStr:='https://sliksvn.com/pub/Slik-Subversion-1.8.11-win32.msi';
-  //InputBox('Get svn client', 'You can get a command line svn client from here:', auxStr);
+  auxStr:='https://sliksvn.com/pub/Slik-Subversion-1.9.7-x64.msi' + sLineBreak +
+          'https://sliksvn.com/pub/Slik-Subversion-1.9.7-win32.msi';
   ShowMessage('Hint: a command line svn client is here:'+ sLineBreak + auxStr);
 end;
 

@@ -29,8 +29,8 @@ type
      FJavaClassName: string;
      FPathToClassName: string;
      FPathToJNIFolder: string;
-     FPathToNdkPlatforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
-     FPathToNdkToolchains: string;
+     //FPathToNdkPlatforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
+     //FPathToNdkToolchains: string;
      {C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3}
      FInstructionSet: string;    {ArmV6}
      FFPUSet: string;            {Soft}
@@ -238,6 +238,7 @@ begin
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'arm64-v8a');
       CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
       if FModuleType = 2 then //default
@@ -474,8 +475,8 @@ begin
       AndroidFileDescriptor.ModuleType:= 0;
 
       with TJavaParser.Create(FFullJavaSrcPath + DirectorySeparator+  'Controls.java') do
-      try         //produce helper file "ControlsEvents.txt"
-        FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'ControlsEvents.txt');
+      try         //produce helper file [old] "ControlsEvents.txt"
+        FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'Controls.events');
       finally
         Free;
       end;
@@ -487,6 +488,7 @@ begin
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
       CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'arm64-v8a');
       CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
 
       if  FModuleType < 2 then
@@ -679,6 +681,7 @@ function TAndroidProjectDescriptor.SettingsFilename: string;
 var
     flag: boolean;
 begin
+
     flag:= false;
     if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
     begin
@@ -700,7 +703,9 @@ begin
       WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
       WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
     end;
+
     Result := IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
+
 end;
 
 function TAndroidProjectDescriptor.GetPathToJNIFolder(fullPath: string): string;
@@ -1059,14 +1064,10 @@ begin
 
       FBuildSystem:= frm.BuildSystem;
       FAndroidTheme:= frm.AndroidTheme;
-
       FJavaClassName:= frm.JavaClassName;
-
       FSmallProjName:= frm.SmallProjName;
-
-      FInstructionSet:= frm.InstructionSet;{ ex. ArmV6}
+      FInstructionSet:= frm.InstructionSet;{ ex. ArmV6, ArmV7a, ArmV8}
       FFPUSet:= frm.FPUSet; {ex. Soft}
-
       FAndroidProjectName:= frm.AndroidProjectName;    //warning: full project name = path + name !
       FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
 
@@ -2076,7 +2077,7 @@ begin
                 strList.Add('             systemProp.https.proxyHost=10.0.16.1');
                 strList.Add('             systemProp.https.proxyPort=3128');
                 strList.Add(' ');
-                strList.Add('        Note 5. Java Jdk 1.8, Android SDK "platform" 25 [or up],  "build-tools" 25.0.3, Android SDK Extra "support library/repository" and "Gradle 4.1" are "must have" to support AppCompat material theme in LAMW 0.8.');
+                strList.Add('        Note 5. Java Jdk 1.8, Android SDK "platform" 26 [or up],  "build-tools" 26.0.2, Android SDK Extra "support library/repository" and "Gradle 4.4.1" are "must have" to support AppCompat material theme in LAMW 0.8.4');
                 strList.Add(' ');
                 strList.Add(' ');
                 strList.Add('***SETTING ENVIRONMENT VARIABLES...');
@@ -2386,6 +2387,7 @@ begin
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
         CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
+        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'arm64-v8a');
         CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
         CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
 
@@ -2522,34 +2524,36 @@ end;
 function TAndroidProjectDescriptor.InitProject(AProject: TLazProject): TModalResult;
 var
   MainFile: TLazProjectFile;
-  projName, projDir, auxStr: string;
+  projName, projDir, auxStr, auxInstr: string;
   sourceList: TStringList;
   auxList: TStringList;
 
   libraries_x86: string;
   libraries_arm: string;
   libraries_mips: string;
-
-  customOptions_x86: string;
-  customOptions_mips: string;
+  libraries_aarch64: string;
 
   customOptions_default: string;
-
+  customOptions_x86: string;
+  customOptions_mips: string;
   customOptions_armV6: string;
   customOptions_armV7a: string;
+  customOptions_armV8: string;
 
   PathToNdkPlatformsArm: string;
   PathToNdkPlatformsX86: string;
   PathToNdkPlatformsMips: string;
+  PathToNdkPlatformsAarch64: string;
 
   pathToNdkToolchainsX86: string;
   pathToNdkToolchainsArm: string;
   pathToNdkToolchainsMips: string;
+  pathToNdkToolchainsAarch64: string;
 
-   //by Stephano
   pathToNdkToolchainsBinX86: string;
   pathToNdkToolchainsBinArm: string;
   pathToNdkToolchainsBinMips: string;
+  pathToNdkToolchainsBinAarch64: string;
 
   osys: string;      {windows or linux-x86 or linux-x86_64}
   headerList: TStringList;
@@ -2575,6 +2579,7 @@ begin
     AProject.CustomData.Values['LAMW'] := 'GUI';
     AProject.CustomData.Values['Theme']:= FAndroidTheme;
     AProject.CustomData['StartModule'] := 'AndroidModule1';
+    //AProject.CustomData['TAG']:= '0';
   end
   else if  FModuleType = 1 then
     AProject.CustomData.Values['LAMW'] := 'NoGUI'
@@ -2795,6 +2800,10 @@ begin
                                                 FAndroidPlatform +DirectorySeparator+'arch-arm'+DirectorySeparator+
                                                 'usr'+DirectorySeparator+'lib';
 
+  PathToNdkPlatformsAarch64:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                                FAndroidPlatform +DirectorySeparator+'arch-arm64'+DirectorySeparator+
+                                                'usr'+DirectorySeparator+'lib';
+
   if FNDK = '7' then
       pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.4.3'+DirectorySeparator+
@@ -2810,25 +2819,51 @@ begin
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.6';
 
   if FNDK = '10e' then          //arm-linux-androideabi-4.9
+  begin
       pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.9';
+
+      pathToNdkToolchainsAarch64:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
+                                                 'aarch64-linux-android-4.9'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
+                                                 'aarch64-linux-android'+DirectorySeparator+'4.9';
+
+  end;
 
   if FNDK = '11c' then          //arm-linux-androideabi-4.9
+  begin
       pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.9';
 
+      pathToNdkToolchainsAarch64:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
+                                                 'aarch64-linux-android-4.9'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
+                                                 'aarch64-linux-android'+DirectorySeparator+'4.9';
+  end;
+
   if FNDK = '>11' then          //arm-linux-androideabi-4.9
+  begin
       pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'arm-linux-androideabi'+DirectorySeparator+'4.9.x';
+
+      pathToNdkToolchainsAarch64:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
+                                                 'aarch64-linux-android-4.9'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
+                                                 'aarch64-linux-android'+DirectorySeparator+'4.9.x';
+
+  end;
 
   if FNDK = '7' then
       pathToNdkToolchainsBinArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
@@ -2843,25 +2878,49 @@ begin
                                                  'bin';
 
   if FNDK = '10e' then
+  begin
       pathToNdkToolchainsBinArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
 
+      pathToNdkToolchainsBinAarch64:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
+                                                 'aarch64-linux-android-4.9'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'bin';
+  end;
+
   if FNDK = '11c' then
+  begin
       pathToNdkToolchainsBinArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
+
+      pathToNdkToolchainsBinAarch64:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
+                                                 'aarch64-linux-android-4.9'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'bin';
+  end;
 
 
   if FNDK = '>11' then
+  begin
       pathToNdkToolchainsBinArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                  'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                  'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
                                                  'bin';
 
+      pathToNdkToolchainsBinAarch64:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
+                                                 'aarch64-linux-android-4.9'+DirectorySeparator+
+                                                 'prebuilt'+DirectorySeparator+osys+DirectorySeparator+
+                                                 'bin';
+
+  end;
+
   libraries_arm:= PathToNdkPlatformsArm+';'+pathToNdkToolchainsArm;
+
+  libraries_aarch64:= PathToNdkPlatformsAarch64+';'+pathToNdkToolchainsAarch64;
 
   PathToNdkPlatformsX86:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
                                              FAndroidPlatform+DirectorySeparator+'arch-x86'+DirectorySeparator+
@@ -2889,6 +2948,7 @@ begin
                                                  'x86-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
                                                  'i686-android-linux'+DirectorySeparator+'4.9';
+
     pathToNdkToolchainsMips:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
                                                   'mipsel-linux-android-4.9'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                   osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+
@@ -2969,26 +3029,32 @@ begin
   libraries_x86:= PathToNdkPlatformsX86+';'+pathToNdkToolchainsX86;
   libraries_mips:= PathToNdkPlatformsMips+';'+pathToNdkToolchainsMips;
 
-  if Pos('Mipsel', FInstructionSet) > 0 then
+
+  //https://developer.android.com/ndk/guides/abis
+  auxStr:='armeabi'; //ARMv6
+  auxInstr:= LowerCase(FInstructionSet);
+  if auxInstr = 'armv7a' then auxStr:='armeabi-v7a';
+  if auxInstr = 'x86'    then auxStr:='x86';
+  if auxInstr = 'mipsel' then auxStr:='mips';
+  if auxInstr = 'armv8' then auxStr:='arm64-v8a';
+
+  AProject.LazCompilerOptions.TargetCPU:= 'arm';    {-P}
+  AProject.LazCompilerOptions.Libraries:= libraries_arm;  { -Fl}
+
+  if Pos('mips', auxStr) > 0 then
   begin
      AProject.LazCompilerOptions.TargetCPU:= 'mipsel';    {-P}
-     AProject.LazCompilerOptions.Libraries:= libraries_mips;
-     FPathToNdkPlatforms:= PathToNdkPlatformsMips;
-     FPathToNdkToolchains:= pathToNdkToolchainsMips;
+     AProject.LazCompilerOptions.Libraries:= libraries_mips;  { -Fl}
   end
-  else if Pos('x86', FInstructionSet) > 0 then
+  else if Pos('x86', auxStr) > 0 then
   begin
      AProject.LazCompilerOptions.TargetCPU:= 'i386';    {-P}
-     AProject.LazCompilerOptions.Libraries:= libraries_x86;
-     FPathToNdkPlatforms:= PathToNdkPlatformsX86;
-     FPathToNdkToolchains:= pathToNdkToolchainsX86;
+     AProject.LazCompilerOptions.Libraries:= libraries_x86;  { -Fl}
   end
-  else
+  else if Pos('arm64', auxStr) > 0 then
   begin
-     AProject.LazCompilerOptions.TargetCPU:= 'arm';    {-P}
-     AProject.LazCompilerOptions.Libraries:= libraries_arm;
-     FPathToNdkPlatforms:= PathToNdkPlatformsArm;
-     FPathToNdkToolchains:= pathToNdkToolchainsArm
+    AProject.LazCompilerOptions.TargetCPU:= 'aarch64';    {-P}
+    AProject.LazCompilerOptions.Libraries:= libraries_aarch64; { -Fl}
   end;
 
   {Parsing}
@@ -3003,15 +3069,15 @@ begin
   {Code Generation}
   AProject.LazCompilerOptions.TargetOS:= 'android'; {-T}
 
-  AProject.LazCompilerOptions.OptimizationLevel:= 3; //1;  //changed 21-december-2014
+  AProject.LazCompilerOptions.OptimizationLevel:= 3;
   AProject.LazCompilerOptions.Win32GraphicApp:= False;
 
   {Link}
   AProject.LazCompilerOptions.StripSymbols:= True; {-Xs}
   AProject.LazCompilerOptions.LinkSmart:= True {-XX};
   AProject.LazCompilerOptions.GenerateDebugInfo:= False;
-  AProject.LazCompilerOptions.SmallerCode:= True;    //added 21-december-2014
-  AProject.LazCompilerOptions.SmartLinkUnit:= True;  //added 21-december-2014
+  AProject.LazCompilerOptions.SmallerCode:= True;
+  AProject.LazCompilerOptions.SmartLinkUnit:= True;
 
   if FModuleType = 2 then
   begin
@@ -3022,63 +3088,39 @@ begin
     end;
   end;
 
-  {Verbose}
-      //.....................
-
-  auxStr:= 'armeabi';  //ARMv6
-  if FInstructionSet = 'ARMv7a' then auxStr:='armeabi-v7a';
-  if FInstructionSet = 'x86' then auxStr:='x86';
-  if FInstructionSet = 'Mipsel' then auxStr:='mips';
-
-  //if FInstructionSet <> 'x86' then
-  if Pos('ARM', FInstructionSet) > 0 then
+  customOptions_default:='-Xd'; //x86   aarch64   mips
+  if Pos('armeabi', auxStr) > 0 then
   begin
      customOptions_default:='-Xd'+' -Cf'+ FFPUSet;
      customOptions_default:= customOptions_default + ' -Cp'+ UpperCase(FInstructionSet);
-  end
-  else
-  begin
-     customOptions_default:='-Xd';
   end;
 
-  customOptions_armV6:= '-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV6';
-  customOptions_armV7a:='-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV7A';
-  customOptions_x86:=   '-Xd';
-  customOptions_mips:=  '-Xd';
+  customOptions_armV6 := '-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV6';
+  customOptions_armV7a:= '-Xd'+' -Cf'+ FFPUSet+ ' -CpARMV7A';
+  customOptions_x86   := '-Xd';
+  customOptions_mips  := '-Xd';
+  customOptions_armv8:=  '-Xd';
 
-  customOptions_armV6:=  customOptions_armV6  +' -XParm-linux-androideabi-';
+  customOptions_armV6 := customOptions_armV6  +' -XParm-linux-androideabi-';
   customOptions_armV7a:= customOptions_armV7a +' -XParm-linux-androideabi-';
-  customOptions_x86:=    customOptions_x86    +' -XPi686-linux-android-';   //fix by jmpessoa
-  customOptions_mips:=   customOptions_mips   +' -XPmipsel-linux-android-';
+  customOptions_x86   := customOptions_x86    +' -XPi686-linux-android-';
+  customOptions_mips  := customOptions_mips   +' -XPmipsel-linux-android-';
+  customOptions_armv8:= customOptions_armv8   +' -XPaarch64-linux-android-';
 
-  // Takeda Patch - "customOptions_default" now would really aware about compilation for x86 Target
-  //if FInstructionSet <> 'x86' then
-  if Pos('ARM', FInstructionSet) > 0 then
-  begin
-    customOptions_default:= customOptions_default+' -XParm-linux-androideabi-'+' -FD'+pathToNdkToolchainsBinArm;
-  end
-  else if Pos('x86', FInstructionSet) > 0 then
-  begin
-    customOptions_default:= customOptions_default+' -XPi686-linux-android-'+' -FD'+pathToNdkToolchainsBinX86;
-  end
-  else if Pos('Mipsel', FInstructionSet) > 0 then
+  if Pos('armeabi', auxStr) > 0 then
+    customOptions_default:= customOptions_default+' -XParm-linux-androideabi-'+' -FD'+pathToNdkToolchainsBinArm
+  else if Pos('arm64', auxStr) > 0 then
+      customOptions_default:= customOptions_default+' -XPaarch64-linux-android-'+' -FD'+pathToNdkToolchainsBinAarch64
+  else if Pos('x86', auxStr) > 0 then
+    customOptions_default:= customOptions_default+' -XPi686-linux-android-'+' -FD'+pathToNdkToolchainsBinX86
+  else if Pos('mips', auxStr) > 0 then
     customOptions_default:= customOptions_default+' -XPmipsel-linux-android-'+' -FD'+pathToNdkToolchainsBinMips;
 
-  customOptions_armV6:= customOptions_armV6+' -FD'+pathToNdkToolchainsBinArm;
-  customOptions_armV7a:= customOptions_armV7a+' -FD'+pathToNdkToolchainsBinArm;
-  customOptions_x86:= customOptions_x86+' -FD'+pathToNdkToolchainsBinX86;
-  customOptions_mips:= customOptions_mips+' -FD'+pathToNdkToolchainsBinMips;
-
-  (*FIXED !!!   lazarus  rev  >> 46598  !!!
-  {$IFDEF WINDOWS}
-     //to others :: just to [fix a bug]  lazarus  rev < 46598 .... //thanks to Stephano!
-     // ThierryDijoux - change auxStr by value of the correct folder
-     customOptions_default:= customOptions_default+' -o..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr       +DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-     customOptions_armV6:=   customOptions_armV6  +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'armeabi'    +DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-     customOptions_armV7a:=  customOptions_armV7a +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a'+DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-     customOptions_x86:=     customOptions_x86    +' -o..'+DirectorySeparator+'libs'+DirectorySeparator+'x86'        +DirectorySeparator+'lib'+LowerCase(FJavaClassName)+'.so';
-  {$ENDIF}
-  *)
+  customOptions_armV6 := customOptions_armV6 +' -FD' + pathToNdkToolchainsBinArm;
+  customOptions_armV7a:= customOptions_armV7a+' -FD' + pathToNdkToolchainsBinArm;
+  customOptions_armv8:= customOptions_armv8  +' -FD' + pathToNdkToolchainsBinAarch64;
+  customOptions_x86   := customOptions_x86   +' -FD' + pathToNdkToolchainsBinX86;
+  customOptions_mips  := customOptions_mips  +' -FD' + pathToNdkToolchainsBinMips;
 
   {Others}
   AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
@@ -3122,6 +3164,16 @@ begin
      auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt')
   else
      auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
+
+  auxList.Clear;
+  auxList.Add('<Libraries Value="'+libraries_aarch64+'"/>');
+  auxList.Add('<TargetCPU Value="aarch64"/>');
+  auxList.Add('<CustomOptions Value="'+customOptions_armv8+'"/>');
+  //auxList.Add('<TargetProcessor Value="ARMv8"/>');  //commented until lazarus fix bug for missing ARMv8  //again thanks to Stephano!
+  if FModuleType < 2 then
+     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt')
+  else
+     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt');
 
   auxList.Clear;
   auxList.Add('How To Get More Builds:');

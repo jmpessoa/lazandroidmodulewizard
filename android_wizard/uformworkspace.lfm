@@ -1,13 +1,13 @@
 object FormWorkspace: TFormWorkspace
-  Left = 231
-  Height = 641
-  Top = 111
-  Width = 440
+  Left = 487
+  Height = 716
+  Top = 101
+  Width = 487
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
-  Caption = 'LAMW 0.83:  New Project'
-  ClientHeight = 641
-  ClientWidth = 440
+  Caption = 'LAMW 0.8.4:  New Project'
+  ClientHeight = 716
+  ClientWidth = 487
   Color = clGradientInactiveCaption
   Constraints.MinHeight = 560
   Constraints.MinWidth = 400
@@ -151,15 +151,14 @@ object FormWorkspace: TFormWorkspace
   }
   OnActivate = FormActivate
   OnClose = FormClose
-  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '2.0.0.4'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
-    Top = 612
-    Width = 440
+    Top = 687
+    Width = 487
     Panels = <    
       item
         Text = '[Ndk]'
@@ -177,9 +176,9 @@ object FormWorkspace: TFormWorkspace
   end
   object PanelRadioGroup: TPanel
     Left = 8
-    Height = 240
+    Height = 289
     Top = 286
-    Width = 424
+    Width = 471
     Align = alClient
     BorderSpacing.Around = 8
     BevelOuter = bvNone
@@ -191,8 +190,8 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkVertical = crsHomogenousChildResize
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 4
-    ClientHeight = 240
-    ClientWidth = 424
+    ClientHeight = 289
+    ClientWidth = 471
     Color = clGradientInactiveCaption
     Constraints.MinHeight = 80
     ParentColor = False
@@ -201,9 +200,9 @@ object FormWorkspace: TFormWorkspace
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Side = asrBottom
       Left = 0
-      Height = 232
+      Height = 281
       Top = 4
-      Width = 223
+      Width = 247
       AutoFill = True
       Caption = 'Architecture/Instructions:'
       ChildSizing.LeftRightSpacing = 6
@@ -214,26 +213,26 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
-      ClientHeight = 207
-      ClientWidth = 219
+      ClientHeight = 256
+      ClientWidth = 243
       Color = clGradientInactiveCaption
-      ItemIndex = 0
       Items.Strings = (
-        'ARMv6            '
+        'ARMv6             '
         'ARMv7a+Soft'
-        'ARMv7a+VFPv3   (*) '
+        'ARMv7a+VFPv3  (*) '
         'x86'
         'Mipsel'
+        'Aarch64 (*)'
       )
       OnClick = RGInstructionClick
       ParentColor = False
       TabOrder = 0
     end
     object Image1: TImage
-      Left = 227
-      Height = 232
+      Left = 251
+      Height = 281
       Top = 4
-      Width = 197
+      Width = 220
       AutoSize = True
       Picture.Data = {
         1754506F727461626C654E6574776F726B47726170686963768B000089504E47
@@ -1359,21 +1358,21 @@ object FormWorkspace: TFormWorkspace
   end
   object PanelButtons: TPanel
     Left = 0
-    Height = 78
-    Top = 534
-    Width = 440
+    Height = 104
+    Top = 583
+    Width = 487
     Align = alBottom
     BevelOuter = bvNone
-    ClientHeight = 78
-    ClientWidth = 440
+    ClientHeight = 104
+    ClientWidth = 487
     Color = clGradientInactiveCaption
     Constraints.MinHeight = 50
     ParentColor = False
     TabOrder = 2
     object BitBtnOK: TBitBtn
-      Left = 350
-      Height = 26
-      Top = 35
+      Left = 397
+      Height = 28
+      Top = 63
       Width = 82
       Anchors = [akRight, akBottom]
       Caption = '&OK'
@@ -1383,9 +1382,9 @@ object FormWorkspace: TFormWorkspace
       TabOrder = 0
     end
     object BitBtnCancel: TBitBtn
-      Left = 350
-      Height = 26
-      Top = 6
+      Left = 397
+      Height = 28
+      Top = 32
       Width = 82
       Anchors = [akRight, akBottom]
       Caption = 'Cancel'
@@ -1412,7 +1411,7 @@ object FormWorkspace: TFormWorkspace
       Left = 4
       Height = 28
       Top = 30
-      Width = 309
+      Width = 356
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 4
       BorderSpacing.Top = 4
@@ -1432,7 +1431,7 @@ object FormWorkspace: TFormWorkspace
     end
     object SpeedButtonHintTheme: TSpeedButton
       AnchorSideTop.Control = ComboBoxTheme
-      Left = 317
+      Left = 364
       Height = 22
       Top = 30
       Width = 23
@@ -1476,11 +1475,11 @@ object FormWorkspace: TFormWorkspace
       OnClick = SpeedButtonHintThemeClick
     end
     object CheckBoxPIE: TCheckBox
-      Left = 119
+      Left = 76
       Height = 24
-      Top = 53
+      Top = 64
       Width = 194
-      Anchors = [akTop, akRight]
+      Anchors = [akRight, akBottom]
       Caption = 'Enable PIE [Target >= 21]'
       OnClick = CheckBoxPIEClick
       TabOrder = 3
@@ -1488,20 +1487,21 @@ object FormWorkspace: TFormWorkspace
     object CheckBoxLibrary: TCheckBox
       Left = 5
       Height = 24
-      Top = 52
+      Top = 64
       Width = 69
+      Anchors = [akLeft, akBottom]
       Caption = 'Library'
       OnClick = CheckBoxLibraryClick
       TabOrder = 4
       Visible = False
     end
     object Label1: TLabel
-      Left = 313
+      Left = 277
       Height = 20
-      Top = 59
-      Width = 104
-      Anchors = [akTop, akRight]
-      Caption = '(*)FpcUpDeluxe'
+      Top = 64
+      Width = 100
+      Anchors = [akRight, akBottom]
+      Caption = '(*)Fpcupdeluxe'
       ParentColor = False
     end
   end
@@ -1509,12 +1509,12 @@ object FormWorkspace: TFormWorkspace
     Left = 0
     Height = 125
     Top = 0
-    Width = 440
+    Width = 487
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 125
-    ClientWidth = 440
+    ClientWidth = 487
     Color = clGradientInactiveCaption
     ParentColor = False
     TabOrder = 3
@@ -1522,7 +1522,7 @@ object FormWorkspace: TFormWorkspace
       Left = 8
       Height = 20
       Top = 8
-      Width = 424
+      Width = 471
       Align = alTop
       BorderSpacing.Left = 8
       BorderSpacing.Top = 8
@@ -1537,10 +1537,11 @@ object FormWorkspace: TFormWorkspace
       Left = 8
       Height = 28
       Top = 32
-      Width = 393
+      Width = 440
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 8
       BorderSpacing.Top = 4
+      OnExit = EditPathToWorkspaceExit
       TabOrder = 0
     end
     object SpdBtnPathToWorkspace: TSpeedButton
@@ -1549,7 +1550,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
-      Left = 409
+      Left = 456
       Height = 22
       Hint = 'Select directory'
       Top = 35
@@ -1566,7 +1567,7 @@ object FormWorkspace: TFormWorkspace
       Left = 8
       Height = 28
       Top = 92
-      Width = 393
+      Width = 440
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 8
       BorderSpacing.Top = 4
@@ -1582,7 +1583,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
-      Left = 409
+      Left = 456
       Height = 22
       Top = 95
       Width = 23
@@ -1627,7 +1628,7 @@ object FormWorkspace: TFormWorkspace
       OnClick = SpdBtnRefreshProjectNameClick
     end
     object SpeedButton1: TSpeedButton
-      Left = 410
+      Left = 457
       Height = 22
       Top = 0
       Width = 23
@@ -1687,12 +1688,12 @@ object FormWorkspace: TFormWorkspace
     Left = 0
     Height = 65
     Top = 125
-    Width = 440
+    Width = 487
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 65
-    ClientWidth = 440
+    ClientWidth = 487
     Color = clGradientInactiveCaption
     ParentColor = False
     TabOrder = 4
@@ -1700,13 +1701,13 @@ object FormWorkspace: TFormWorkspace
       Left = 3
       Height = 65
       Top = 0
-      Width = 268
+      Width = 315
       Align = alClient
       BorderSpacing.Left = 3
       BorderSpacing.Right = 3
       Caption = 'Default Package Name:'
       ClientHeight = 40
-      ClientWidth = 264
+      ClientWidth = 311
       Color = clGradientInactiveCaption
       ParentColor = False
       TabOrder = 0
@@ -1716,7 +1717,7 @@ object FormWorkspace: TFormWorkspace
         Left = 6
         Height = 28
         Top = 4
-        Width = 260
+        Width = 307
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Left = 6
         BorderSpacing.Top = 4
@@ -1727,7 +1728,7 @@ object FormWorkspace: TFormWorkspace
       end
     end
     object GroupBox5: TGroupBox
-      Left = 274
+      Left = 321
       Height = 65
       Top = 0
       Width = 166
@@ -1759,7 +1760,7 @@ object FormWorkspace: TFormWorkspace
     Left = 8
     Height = 80
     Top = 198
-    Width = 424
+    Width = 471
     Align = alTop
     BorderSpacing.Around = 8
     BevelOuter = bvNone
@@ -1772,7 +1773,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
     ClientHeight = 80
-    ClientWidth = 424
+    ClientWidth = 471
     Color = clGradientInactiveCaption
     ParentColor = False
     TabOrder = 5
@@ -1780,16 +1781,16 @@ object FormWorkspace: TFormWorkspace
       Left = 0
       Height = 72
       Top = 4
-      Width = 132
-      Caption = 'Ndk:'
+      Width = 155
+      Caption = 'Ndk Api:'
       ClientHeight = 47
-      ClientWidth = 128
+      ClientWidth = 151
       TabOrder = 0
       object ListBoxNdkPlatform: TComboBox
         Left = 8
         Height = 28
         Top = 4
-        Width = 120
+        Width = 143
         Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 20
         OnChange = ListBoxNdkPlatformChange
@@ -1798,13 +1799,13 @@ object FormWorkspace: TFormWorkspace
       end
     end
     object GroupBox3: TGroupBox
-      Left = 136
+      Left = 159
       Height = 72
       Top = 4
-      Width = 154
+      Width = 155
       Caption = 'Min. Device Api:'
       ClientHeight = 47
-      ClientWidth = 150
+      ClientWidth = 151
       Color = clGradientInactiveCaption
       ParentColor = False
       TabOrder = 1
@@ -1812,7 +1813,7 @@ object FormWorkspace: TFormWorkspace
         Left = 7
         Height = 28
         Top = 4
-        Width = 131
+        Width = 132
         Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 20
         ItemIndex = 1
@@ -1835,19 +1836,19 @@ object FormWorkspace: TFormWorkspace
       end
     end
     object GroupBox4: TGroupBox
-      Left = 294
+      Left = 318
       Height = 72
       Top = 4
-      Width = 130
+      Width = 153
       Caption = 'Target Api:'
       ClientHeight = 47
-      ClientWidth = 126
+      ClientWidth = 149
       TabOrder = 2
       object ListBoxTargetAPI: TComboBox
         Left = 1
         Height = 28
         Top = 4
-        Width = 122
+        Width = 145
         Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 20
         OnChange = ListBoxTargetAPIChange

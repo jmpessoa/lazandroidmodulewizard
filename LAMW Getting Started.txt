@@ -6,8 +6,8 @@
 
 	"Getting Started" for Windows [by Jose Marques Pessoa]
 
-	Linux Install Tutorial:  LAMW folder  "...docs\linux" 
-
+	Linux Install Tutorial:  LAMW folder  "...docs\linux"
+                  
 
 	About MacOS: X11 [libGL.dylib] is no longer bundled with Mountain Lion (and later!)			
 			[This prevents/drop some LAMW features, 
@@ -40,7 +40,7 @@ I. Infrastructure
 	[Mac]		http://dl.google.com/android/android-sdk_r24.0.2-macosx.zip
 
 	Hint:	1)after unpacked/install, open a command line Terminal and go to folder "sdk/tools"
-		2)run the command  "android update sdk"   to open a GUI "SDK Manager"
+		2)run the command  ">android update sdk"   to open a GUI "SDK Manager"
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
 		5)check "Android SDK Build-Tools 25.0.3"	
@@ -60,15 +60,18 @@ I. Infrastructure
 	[Linux]		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 	[Mac]		https://dl.google.com/android/repository/sdk-tools-darwin-3859397.zip
 
-
 .Android NDK
 	https://developer.android.com/ndk/downloads/index.html
 
-.Laz4Android [Windows] [cross-arm-android compiler installed!] 
+.Lazarus
+	.Laz4Android [Windows] [cross-arm-android compiler installed!] 
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
 
-	:: OR Lazarus [canonical]
-		"Do It Yourself" a cross Android compile! [windows]: 			
+	.Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
+		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases		
+
+	.Lazarus [canonical]
+		"Do It Yourself" [windows]: 			
 			After install the LAMW go to:
 			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
 			2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
@@ -88,8 +91,7 @@ I. Infrastructure
 .Hint [Lazarus Docked Desktop. Nice!]
 	https://github.com/FlKo/LazarusDockedDesktops
 
-
-.[LAMW 0.8.3] "AppCompat" [material design] theme need:'+
+.[LAMW 0.8.4] "AppCompat" [material design] theme need:'+
 		1. Java JDK 1.8   
 		2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
 		3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 
@@ -100,7 +102,7 @@ I. Infrastructure
 
 II. LAMW:  Lazarus Android Module Wizard
 
-	.Install order.
+	.Packages Instalation order.
 
 		tfpandroidbridge_pack.lpk	[..../android_bridges]
 		lazandroidwizardpack.lpk	[..../android_wizard]
@@ -110,7 +112,7 @@ III. USING LAMW
 
 1. Configure Paths:
 
-	Lazarus IDE menu "Tools" ---> "[Lamw] Android Module Wizard" -->  "Path Settings ..."
+	Lazarus IDE menu "Tools" ---> "[LAMW] Android Module Wizard" -->  "Path Settings ..."
 
 		ref. https://od.lk/f/Ml8xNTU4Mjc1NDZf
 
@@ -124,7 +126,7 @@ III. USING LAMW
 	
 		ref. https://od.lk/f/Ml8xNTU4Mjc1NThf
 
-	2.2-From displayed dialog select "LAMW GUI Android Module" 	
+	2.2-From displayed dialog select "[LAMW] GUI Android Module" 	
 
 	2.3-Press OK Button.
 
@@ -142,7 +144,7 @@ III. USING LAMW
 
 		"New Project Name  [or Selec one]
 
-			example: LamwGUIProject1
+			example: AppLAMWProject1
 
 			[This is your Android App/Apk name]
 
@@ -152,16 +154,16 @@ III. USING LAMW
 
 	2.8-Select Architecture/Instruction: 
 
-		example: ARMv6
+		example: ARMv7a + Soft
 		
 		NOTE: 	Laz4Android support  "ARMv6" and "ARMv7a + Soft"
-			Fpcupdeluxe support  ARMv7a + VFPv3
+			Fpcupdeluxe support  "ARMv7a + VFPv3" and "Aarch64"
 		
         2.9.Select Android Theme
 
 		example: [DefaultDevice]
 
-			or "AppCompat" for material design theme
+			or "AppCompat" for material design theme 
 
 	2.9.Click "OK"
 

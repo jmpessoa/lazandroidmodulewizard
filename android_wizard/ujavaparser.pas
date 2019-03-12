@@ -522,7 +522,7 @@ end;
 constructor TJavaParser.Create(FileName: string);
 begin
   FMemStream := TMemoryStream.Create;
-  FMemStream.LoadFromFile(FileName);
+  FMemStream.LoadFromFile(FileName); //Controls.java
   FMemStream.Position := 0;
   Create(FMemStream);
 end;
@@ -560,7 +560,7 @@ var Bodies: TStringList;
 begin
   Bodies := TStringList.Create;
   try
-    Bodies.LoadFromFile(BodiesFilePath);
+    Bodies.LoadFromFile(BodiesFilePath); //"Controls.events"  old "ControlsEvents.txt
     Result := GetPascalJNIInterfaceCode(Bodies);
   finally
     Bodies.Free;

@@ -5,7 +5,7 @@ unit SmartDesigner;
 interface
 
 uses
-  Classes, SysUtils, ProjectIntf, Forms, AndroidWidget, process, math, SourceChanger;
+  Classes, SysUtils, Controls, ProjectIntf, Forms, AndroidWidget, process, math, SourceChanger, propedits;
 
 // tk min and max API versions for build.xml
 const
@@ -83,10 +83,18 @@ type
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
+
+    function AddClicked(ADesigner: TIDesigner;
+                 MouseDownComponent: TComponent; Button: TMouseButton;
+                 Shift: TShiftState; X, Y: Integer;
+                 var AComponentClass: TComponentClass;
+                 var NewParent: TComponent): boolean;
+
   public
     destructor Destroy; override;
     procedure Init;
     procedure Init4Project(AProject: TLazProject);
+    function IsLaz4Android(): boolean;
 
     // called from Designer
     procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
@@ -107,7 +115,7 @@ implementation
 
 uses
   {$ifdef unix}BaseUnix,{$endif}
-  Controls, Dialogs, {SrcEditorIntf,} LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
+  {Controls,} Dialogs, {SrcEditorIntf,} LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
   CodeCache, {SourceChanger,} LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
   LazFileUtils, LamwSettings, uJavaParser, strutils, PackageIntf;
 
@@ -185,10 +193,53 @@ end;
 
 { TLamwSmartDesigner }
 
+
+//http://wiki.freepascal.org/Extending_the_IDE#Event_handlers
+function TLamwSmartDesigner.AddClicked(ADesigner: TIDesigner;
+             MouseDownComponent: TComponent; Button: TMouseButton;
+             Shift: TShiftState; X, Y: Integer;
+             var AComponentClass: TComponentClass;
+             var NewParent: TComponent): boolean;
+begin
+  Result:= True;
+  if LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
+  begin
+    if LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Ant' then
+    begin
+      if AComponentClass.ClassNameIs('jsFloatingButton') or
+         AComponentClass.ClassNameIs('jsTextInput') or
+         AComponentClass.ClassNameIs('jsRecyclerView') or
+         AComponentClass.ClassNameIs('jsCardView') or
+         AComponentClass.ClassNameIs('jsViewPager') or
+         AComponentClass.ClassNameIs('jsDrawerLayout') or
+         AComponentClass.ClassNameIs('jsNavigationView') or
+         AComponentClass.ClassNameIs('jsAppBarLayout') or
+         AComponentClass.ClassNameIs('jsTabLayout') or
+         AComponentClass.ClassNameIs('jsToolBar') or
+         AComponentClass.ClassNameIs('jsCoordenatorLayout') or
+         AComponentClass.ClassNameIs('jsCollapsingToolbarLayout') or
+         AComponentClass.ClassNameIs('jsNestedScrollView') or
+         AComponentClass.ClassNameIs('jsBottomNavigationView') or
+         AComponentClass.ClassNameIs('jsAdMod') then
+      begin
+        ShowMessage('[Undone...]' +sLIneBreak+
+                     'Hint1: AppCompat components need Gradle build system...' +sLIneBreak+
+                     'Hint2: AppCompat theme is strongly recommended!'         +sLIneBreak+
+                     'Hint3: You can convert the project to AppCompat theme:'  +sLIneBreak+
+                     '       menu "Tools" --> "[LAMW]..." --> "Convert..."');
+        Result:= False;
+      end;
+    end;
+  end;
+end;
+
 function TLamwSmartDesigner.OnProjectOpened(Sender: TObject;
  AProject: TLazProject): TModalResult;
 begin
-  Init4Project(AProject);
+  if AProject.CustomData.Contains('LAMW') then
+  begin
+     Init4Project(AProject);
+  end;
   Result := mrOK;
 end;
 
@@ -296,6 +347,7 @@ begin
                    outBuildTool:= tempOutBuildTool;  //26.0.2
                 end;
               end;
+
          end;
        end;
     end;
@@ -325,20 +377,21 @@ begin
          if Pos('rc2', auxStr) = 0 then   //escape some alien...
          begin
            numberAsString:= Copy(auxStr, 1 , 2);  //19
-           builderNumber:=  StrToInt(numberAsString);
-
-           if savedBuilder < builderNumber then
+           if IsAllCharNumber(PChar(numberAsString))  then
            begin
-             savedBuilder:= builderNumber;
-             if builderNumber > platform then FCandidateSdkBuild:= auxStr;
+               builderNumber:=  StrToInt(numberAsString);
+               if savedBuilder < builderNumber then
+               begin
+                 savedBuilder:= builderNumber;
+                 if builderNumber > platform then FCandidateSdkBuild:= auxStr;
+               end;
+
+               if platform = builderNumber then
+               begin
+                 outBuildTool:= auxStr; //19.1.0
+                 Result:= True;
+               end;
            end;
-
-           if platform = builderNumber then
-           begin
-             outBuildTool:= auxStr; //19.1.0
-             Result:= True;
-           end
-
          end;
        end;
     end;
@@ -368,34 +421,40 @@ begin
   if (buildTool = '') then Exit;
 
   numberAsString:= StringReplace(buildTool,'.', '', [rfReplaceAll]); //26.0.2
-  maxBuilderNumber:= StrToInt(Trim(numberAsString));  //2602
+  numberAsString:= Trim(numberAsString);
 
-  if (maxBuilderNumber >= 2111) and (maxBuilderNumber < 2112) then
+  if IsAllCharNumber(PChar(numberAsString))  then
   begin
-    Result:= '2.0.0';
-  end
-  else if (maxBuilderNumber >= 2112) and (maxBuilderNumber < 2302) then
-  begin
-    Result:= '2.0.0';
-  end
-  else if (maxBuilderNumber >= 2302) and (maxBuilderNumber < 2500) then
-  begin
-      Result:= '2.2.0';
-  end
-  else if (maxBuilderNumber >= 2500) and (maxBuilderNumber < 2602) then   //<<---- good performance !!!
-  begin
-      Result:= '2.3.3';
-      //gradleVer:= '3.3';
-  end
-  else if (maxBuilderNumber >= 2602) and (maxBuilderNumber < 2700)  then
-  begin
-      Result:= '3.0.1';
-      //gradleVer:= '4.1';
-  end
-  else if maxBuilderNumber >= 2700  then
-  begin
-      Result:= '3.0.1';
-      //gradleVer:= '4.1';
+    maxBuilderNumber:= StrToInt(numberAsString);  //2602
+
+    if (maxBuilderNumber >= 2111) and (maxBuilderNumber < 2112) then
+    begin
+      Result:= '2.0.0';
+    end
+    else if (maxBuilderNumber >= 2112) and (maxBuilderNumber < 2302) then
+    begin
+      Result:= '2.0.0';
+    end
+    else if (maxBuilderNumber >= 2302) and (maxBuilderNumber < 2500) then
+    begin
+        Result:= '2.2.0';
+    end
+    else if (maxBuilderNumber >= 2500) and (maxBuilderNumber < 2602) then   //<<---- good performance !!!
+    begin
+        Result:= '2.3.3';
+        //gradleVer:= '3.3';
+    end
+    else if (maxBuilderNumber >= 2602) and (maxBuilderNumber < 2700)  then
+    begin
+        Result:= '3.0.1';
+        //gradleVer:= '4.1';
+    end
+    else if maxBuilderNumber >= 2700  then
+    begin
+        Result:= '3.0.1';
+        //gradleVer:= '4.1';
+    end;
+
   end;
 
 end;
@@ -410,6 +469,7 @@ var
 begin
 
   Result:= '';
+  tryGradleVer:= '';
 
  {200  < 220 ---  2.1
   220  < 233 ---  2.14.1
@@ -417,53 +477,68 @@ begin
   301  >     ---  4.1}
 
   numberAsString:= StringReplace(plugin,'.', '', [rfReplaceAll]); //3.0.1
-  pluginNumber:= StrToInt(numberAsString);  //301
-
-  if (pluginNumber >=  200) and (pluginNumber <  220) then
+  if IsAllCharNumber(PChar(numberAsString))  then
   begin
-     tryGradleVer:= '2.10';   //210  -> 2100
-  end;
+    pluginNumber:= StrToInt(numberAsString);  //301
 
-  if (pluginNumber >= 220) and (pluginNumber <  233) then
-  begin
-    tryGradleVer:= '2.14.1';  //        2141
-  end;
+    if (pluginNumber >=  200) and (pluginNumber <  220) then
+    begin
+       tryGradleVer:= '2.10';   //210  -> 2100
+    end;
 
-  if (pluginNumber >= 233) and (pluginNumber <  301) then
-  begin
-     tryGradleVer:= '4.1';
-  end;
+    if (pluginNumber >= 220) and (pluginNumber <  233) then
+    begin
+      tryGradleVer:= '2.14.1';  //        2141
+    end;
 
-  if pluginNumber >= 301 then
-  begin
-     tryGradleVer:= '4.1';
-  end;
+    if (pluginNumber >= 233) and (pluginNumber <  301) then
+    begin
+       tryGradleVer:= '4.1';
+    end;
 
-  numberAsString:= StringReplace(tryGradleVer,'.', '', [rfReplaceAll]); //4.1
-  len:= Length(numberAsString);
-  if len = 2 then numberAsString:= numberAsString + '00'; //4100
-  if len = 3 then numberAsString:= numberAsString + '0';
-  tryGradleNumber:= StrToInt(numberAsString);
+    if pluginNumber >= 301 then
+    begin
+       tryGradleVer:= '4.1';
+    end;
 
-  if gradleVers <> '' then
-  begin
-    numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]); //41
+    numberAsString:= StringReplace(tryGradleVer,'.', '', [rfReplaceAll]); //4.1
+
     len:= Length(numberAsString);
     if len = 2 then numberAsString:= numberAsString + '00'; //4100
     if len = 3 then numberAsString:= numberAsString + '0';
-    gradleNumber:= StrToInt(numberAsString);
-    if gradleNumber >= tryGradleNumber then
+
+    if IsAllCharNumber(PChar(numberAsString))  then
     begin
-      Result:= gradleVers;
-    end
-    else
-    begin
-       Result:= '4.1'; //tryGradleVer;
+
+      tryGradleNumber:= StrToInt(numberAsString);
+      if gradleVers <> '' then
+      begin
+        numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]); //41
+        len:= Length(numberAsString);
+        if len = 2 then numberAsString:= numberAsString + '00'; //4100
+        if len = 3 then numberAsString:= numberAsString + '0';
+
+        if IsAllCharNumber(PChar(numberAsString))  then
+        begin
+            gradleNumber:= StrToInt(numberAsString);
+            if gradleNumber >= tryGradleNumber then
+            begin
+              Result:= gradleVers;
+            end
+            else
+            begin
+               Result:= '4.1'; //tryGradleVer;
+            end;
+        end else Result:= '4.1'; //tryGradleVer;
+
+      end
+      else
+      begin
+        Result:= '4.1';
+      end;
+
     end;
-  end
-  else
-  begin
-    Result:= '4.1';
+
   end;
 
 end;
@@ -483,9 +558,6 @@ var
   linuxPathToGradle: string;
   linuxDirSeparator: string;
   buildToolApi: string;
-
-  gradleCompatibleStr: string;
-  gradleCompatibleNumber: integer;
   directive, compatVer, designVer, cardVer, recyclerVer, pathToSdk: string;
 begin
 
@@ -606,19 +678,30 @@ begin
 
        buildToolApi:= Copy(buildTool,1,2);   //26.0.2  --> 26
 
-       if StrToInt(buildToolApi) >= 25 then
-         pluginVersion:= GetPluginVersion(buildTool)
+       if IsAllCharNumber(PChar(buildToolApi))  then
+       begin
+         if StrToInt(buildToolApi) >= 25 then
+           pluginVersion:= GetPluginVersion(buildTool)
+         else
+           pluginVersion:= '2.3.3';
+       end
        else
-         pluginVersion:= '2.3.3';
+       begin
+         buildToolApi:= '26';
+         pluginVersion:= '3.0.0';
+       end;
 
        if pluginVersion <> '' then
        begin
          androidPluginStr:= StringReplace(pluginVersion,'.', '', [rfReplaceAll]);
-         androidPluginNumber:= StrToInt(Trim(androidPluginStr));  //ex. 3.0.0 --> 300
-         gradleCompatible:= TryGradleCompatibility(pluginVersion, FGradleVersion);
+         androidPluginStr:= Trim(androidPluginStr);
 
-         gradleCompatibleStr:= StringReplace(gradleCompatible,'.', '', [rfReplaceAll]);
-         gradleCompatibleNumber:= StrToInt(Trim(gradleCompatibleStr));
+         if IsAllCharNumber(PChar(androidPluginStr))  then
+            androidPluginNumber:= StrToInt(androidPluginStr)  //ex. 3.0.0 --> 300
+         else
+            androidPluginNumber:= 300;
+
+         gradleCompatible:= TryGradleCompatibility(pluginVersion, FGradleVersion);
 
          strList.Clear;
          strList.Add('buildscript {');
@@ -957,40 +1040,55 @@ begin
   end;
 end;
 
+function TLamwSmartDesigner.IsLaz4Android(): boolean;
+var
+  pathToConfig, pathToLaz: string;
+  p: integer;
+begin
+ Result:= False;
+ {$ifdef windows}
+ pathToConfig:= LazarusIDE.GetPrimaryConfigPath();
+ p:= Pos('config',pathToConfig);
+ if p > 0 then
+ begin
+   pathToLaz:= Copy(pathToConfig,1,p-1);
+   if FileExists(pathToLaz+'laz4android_readme.txt') then
+     Result:= True;
+ end;
+ {$endif}
+end;
+
 procedure TLamwSmartDesigner.Init4Project(AProject: TLazProject);
 var
-  auxList: TStringList;
-  projChipSet,  tempStr: string;
-  p,  maxSdkApi: integer;
+  tempStr: string;
+  p: integer;
   outMaxBuildTool: string;
   androidTheme: string;
   isProjectImported: boolean;
   sdkManifestTargetApi, buildTool: string;
   manifestTargetApi: integer;
   queryValue : String;
+  isBrandNew: boolean;
+  projectTarget, projectCustom, alertMsg: string;
 begin
-
-  if not AProject.CustomData.Contains('LAMW') then
+  if AProject.CustomData.Contains('LAMW') then
   begin
-    if not FileExists(AProject.ProjectInfoFile) then Exit;
-    auxList:= TStringList.Create;
-    try
-      auxList.LoadFromFile(AProject.ProjectInfoFile); //full path to 'controls.lpi';
-      if Pos('tfpandroidbridge_pack', auxList.Text) <= 0 then  Exit;
-      AProject.CustomData['LAMW']:= 'GUI';
-    finally
-      auxList.Free;
-    end;
-  end;
+    FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
+    FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
+    FPrebuildOSYS:= LamwGlobalSettings.PrebuildOSYS;
+    FPathToSmartDesigner:= LamwGlobalSettings.PathToSmartDesigner;
 
-  FProjFile := AProject.MainFile;
+    FProjFile := AProject.MainFile;
 
-  with AProject do
-  begin
-    if CustomData['LamwVersion'] <> LamwGlobalSettings.Version then
+    isBrandNew:= False;
+
+    if (AProject.CustomData['LamwVersion'] = '') and (AProject.CustomData['Theme'] <> '') then
+      isBrandNew:= True;
+
+    if AProject.CustomData['LamwVersion'] <> LamwGlobalSettings.Version then
     begin
-      Modified := True;
-      CustomData['LamwVersion'] := LamwGlobalSettings.Version;
+      AProject.Modified := True;
+      AProject.CustomData['LamwVersion'] := LamwGlobalSettings.Version;
       UpdateAllJControls(AProject);
     end;
 
@@ -1000,142 +1098,153 @@ begin
     tempStr:= Copy(FPathToAndroidProject, 1, Length(FPathToAndroidProject)-1);
     p:= LastDelimiter(PathDelim, tempStr) + 1;
     FSmallProjName:= Copy(tempStr,  p, Length(tempStr));
-
-    FPackageName := CustomData['Package'];
+    FPackageName := AProject.CustomData['Package'];
     if FPackageName = '' then
     begin
       FPackageName := GetPackageNameFromAndroidManifest(FPathToAndroidProject);
-      CustomData['Package'] := FPackageName;
+      AProject.CustomData['Package'] := FPackageName;
+    end;
+    FPathToJavaSource:= FPathToAndroidProject + 'src' + PathDelim + AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim));
+    androidTheme:= AProject.CustomData['Theme'];
+
+    if  (androidTheme = '') or (Pos('AppCompat', androidTheme) <= 0) then
+      LamwGlobalSettings.QueryPaths:= False;  //dont query Path to Gradle
+
+    FPathToGradle:= LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
+    LamwGlobalSettings.QueryPaths:= True; // reset to default...
+
+    if FPathToGradle <> '' then
+       FGradleVersion:= GetGradleVersion(FPathToGradle);
+
+    if not isBrandNew then
+    begin
+      isProjectImported:= IsDemoProject();   //demo or imported project,  etc...
+      if not DirectoryExists(FPathToAndroidProject + 'lamwdesigner') then //very very old project
+      begin
+         InitSmartDesignerHelpers;
+      end;
+    end
+    else isProjectImported:= False;
+
+    //try fix/repair project paths [demos, etc..] in "Run" --> "build"  time ...
+    if isProjectImported then
+    begin
+      TryChangeDemoProjecPaths();
+      TryChangeDemoProjecAntBuildScripts();
     end;
 
-    FPathToJavaSource:= FPathToAndroidProject + 'src' + PathDelim
-      + AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim));
-
-    androidTheme:= CustomData['Theme'];
-
-  end;
-
-   FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
-   FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
-   FPrebuildOSYS:= LamwGlobalSettings.PrebuildOSYS;
-   FPathToSmartDesigner:= LamwGlobalSettings.PathToSmartDesigner;
-
-   //LAMW 0.8
-  if  (androidTheme = '') or (Pos('AppCompat', androidTheme) <= 0) then
-    LamwGlobalSettings.QueryPaths:= False;  //dont query Path to Gradle
-
-  FPathToGradle:= LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
-  LamwGlobalSettings.QueryPaths:= True; // reset to default...
-
-  if FPathToGradle <> '' then
-     FGradleVersion:= GetGradleVersion(FPathToGradle);
-
-  isProjectImported:= IsDemoProject();   //demo or imported project,  etc...
-
-  if not DirectoryExists(FPathToAndroidProject + 'lamwdesigner') then
-  begin
-    if AProject.CustomData['LAMW'] = 'GUI' then InitSmartDesignerHelpers;
-  end;
-
-  // try fix/repair project paths [demos, etc..] in "Run" --> "build"  time ...
-  if isProjectImported then
-  begin
-    TryChangeDemoProjecPaths();
-    TryChangeDemoProjecAntBuildScripts();
-  end
-  else
-  begin  // add/update custom
-    LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
-    LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
-  end;
-
-  //Try configure chipset
-  FInstructionSet:= LamwGlobalSettings.InstructionSet;
-  if FInstructionSet = '0' then
-  begin
-    FInstructionSet:= 'ARMV6';
-    FFPUSet:= 'Soft';
-  end
-  else if FInstructionSet = '1' then
-  begin
-    FInstructionSet:= 'ARMV7A';
-    FFPUSet:= 'Soft';
-  end
-  else if FInstructionSet = '2' then
-  begin
-    FInstructionSet:= 'ARMV7A';
-    FFPUSet:= 'VFPV3';
-  end
-  else if FInstructionSet = '3' then
-  begin
-    FInstructionSet:= 'x86';
-    FFPUSet:= '';
-  end
-  else if FInstructionSet = '4' then
-  begin
-    FInstructionSet:= 'Mipsel';
-    FFPUSet:= '';
-  end;
-
-  if not IsChipSetDefault(projChipSet) then
-  begin
-    TryChangeChipSetConfigs(projChipSet);
-  end;
-
-  //LAMW 0.8
-  maxSdkApi:= GetMaxSdkPlatform(outMaxBuildTool);
-
-  if maxSdkApi =  0 then   // try fix "android-0"
-  begin
-     maxSdkApi:= FCandidateSdkPlatform;
-     outMaxBuildTool:= FCandidateSdkBuild;
-  end;
-
-  if AProject.CustomData['BuildSystem'] = '' then
-  begin
-    if IsSdkToolsAntEnable(FPathToAndroidSDK) then
-      AProject.CustomData['BuildSystem']:= 'Ant'
-    else
-      AProject.CustomData['BuildSystem']:= 'Gradle';
-  end
-  else
-  begin
     if AProject.CustomData['BuildSystem'] = 'Ant' then
-       if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
-           AProject.CustomData['BuildSystem']:= 'Gradle'
+    begin
+      if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
+         AProject.CustomData['BuildSystem']:= 'Gradle';
+    end;
+
+    if not isBrandNew then
+    begin
+      LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
+      LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
+
+      if AProject.CustomData['BuildSystem'] = '' then
+      begin
+        if IsSdkToolsAntEnable(FPathToAndroidSDK) then
+          AProject.CustomData['BuildSystem']:= 'Ant'
+        else
+          AProject.CustomData['BuildSystem']:= 'Gradle';
+      end
+      else
+      begin
+        if AProject.CustomData['BuildSystem'] = 'Ant' then
+           if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
+               AProject.CustomData['BuildSystem']:= 'Gradle'
+      end;
+
+      if AProject.CustomData['Theme'] = '' then
+         AProject.CustomData['Theme']:= 'DeviceDefault';
+
+      sdkManifestTargetApi:= GetTargetFromManifest();
+
+      if IsAllCharNumber(PChar(sdkManifestTargetApi))  then
+          manifestTargetApi:= StrToInt(sdkManifestTargetApi)
+      else manifestTargetApi:= 26;
+
+      buildTool:=  GetBuildTool(manifestTargetApi);
+      if manifestTargetApi < 26 then
+      begin
+         queryValue:= '26';
+         if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 26',
+                       '[Suggestion] Change Target API to 26'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
+         begin
+
+           if IsAllCharNumber(PChar(queryValue))  then
+              queryValue:= '26';
+
+           manifestTargetApi:= StrToInt(queryValue);
+
+           if manifestTargetApi < 26 then
+           begin
+              if not LamwGlobalSettings.KeepManifestTargetApi  then
+                 buildTool:= '26.0.2'
+              else
+                 buildTool:= GetBuildTool(manifestTargetApi);
+           end
+           else buildTool:= GetBuildTool(manifestTargetApi);
+         end;
+      end
+      else //target >= 26
+      begin
+        outMaxBuildTool:= FCandidateSdkBuild;
+        if not LamwGlobalSettings.KeepManifestTargetApi  then
+           buildTool:= outMaxBuildTool
+        else
+           buildTool:= GetBuildTool(manifestTargetApi);
+      end;
+      KeepBuildUpdated(manifestTargetApi, buildTool);
+
+      if Self.IsLaz4Android() then
+      begin
+         projectCustom:= UpperCase(AProject.LazCompilerOptions.CustomOptions);
+         projectTarget:= AProject.LazCompilerOptions.TargetCPU;  //aarch64 or arm or i386 or mipsel
+         //(-Fl) C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\;
+         //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\
+
+         //(-o)  ..\libs\armeabi-v7a\libcontrols
+
+         //-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi-
+         //-FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin
+         alertMsg:= '';
+         if Pos('aarch64', projectTarget) > 0  then
+            alertMsg:= 'WARNING: Target CPU "aarch64" not supported '+sLineBreak+
+                       '[out-of-box] by Laz4Android' +sLineBreak+ sLineBreak+
+                       'Hint1: Fora all: after "prebuild" change to your NDK installed system...'+sLineBreak+ sLineBreak+
+                       'Hint2: "Project" --> "Project Option" -->'+sLineBreak+
+                        '["Path"]'+sLineBreak+
+                        '-Fl' +sLineBreak+
+                        'change arch-arm64 [to] arch-arm'+sLineBreak+
+                        'change aarch64-linux-android [to] arm-linux-androideabi'+sLineBreak+ sLineBreak+
+                        '-o' +sLineBreak+
+                       'change arm64-v8a [to] armeabi-v7a'+sLineBreak+sLineBreak+
+                       '["Config and Target"]'+sLineBreak+
+                       'change Target CPU (-P) [to] arm'+sLineBreak+sLineBreak+
+                       '["Custom Options"]'+sLineBreak+
+                       'expand -Xd [to] -Xd -CfSoft -CpARMV7A'+sLineBreak+
+                       'change aarch64-linux-android [to] arm-linux-androideabi'+sLineBreak+
+                       sLineBreak+ '[Ctrl+c to Copy to Clipboard]';
+
+         if Pos('VFPV3', projectCustom) > 0  then
+            alertMsg:= 'WARNING: Custom Option "-CfVFPV3" not supported '+sLineBreak+
+                       '[out-of-box] by Laz4Android'+sLineBreak+ sLineBreak+
+                       'Hint: "Project" --> "Project Option" --> "Custom Options"'+sLineBreak+
+                       'change -CfVFPV3 to -CfSoft'+sLineBreak+
+                       sLineBreak+'[Ctrl+c to Copy to Clipboard]';
+
+         if alertMsg <> '' then
+            ShowMessage(alertMsg);
+
+      end;
+
+    end;
+
   end;
-
-  sdkManifestTargetApi:= GetTargetFromManifest();
-  manifestTargetApi:= StrToInt(sdkManifestTargetApi);
-  buildTool:=  GetBuildTool(manifestTargetApi);
-
-  if manifestTargetApi < 26 then
-  begin
-     queryValue:= '26';
-     if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 26',
-                   '[Suggestion] Change Target API to 26'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
-     begin
-       manifestTargetApi:= StrToInt(queryValue);
-       if manifestTargetApi < 26 then
-       begin
-          if not LamwGlobalSettings.KeepManifestTargetApi  then
-             buildTool:= '26.0.2'
-          else
-             buildTool:= GetBuildTool(manifestTargetApi);
-       end
-       else buildTool:= GetBuildTool(manifestTargetApi);
-     end;
-  end
-  else
-  begin
-     if not LamwGlobalSettings.KeepManifestTargetApi  then
-       buildTool:= outMaxBuildTool
-     else
-       buildTool:= GetBuildTool(manifestTargetApi);
-  end;
-
-  KeepBuildUpdated(manifestTargetApi, buildTool)
-
 end;
 
 function TLamwSmartDesigner.IsSdkToolsAntEnable(path: string): boolean;
@@ -1151,27 +1260,42 @@ procedure TLamwSmartDesigner.TryChangeChipSetConfigs(projectChipSet: string);
 var
   customResult: string;
   libTarget: string;
+  upFInstructionSet, upProjectChipSet: string;
 begin
 
   customResult:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
 
-  if Pos('ARMV6', FInstructionSet) > 0 then
+  upFInstructionSet:= Uppercase(FInstructionSet);
+  upProjectChipSet:= Uppercase(projectChipSet);
+
+  if Pos('ARMV6', upFInstructionSet) > 0 then
   begin
-    if Pos('ARMV7A',  projectChipSet) > 0 then //ARMV7A  ---> armv6
+    if Pos('ARMV7A',  upProjectChipSet) > 0 then //ARMV7A  ---> ARMV6
     begin
       customResult:= StringReplace(customResult, 'CpARMV7A' , 'CpARMV6', [rfReplaceAll,rfIgnoreCase]);
       customResult:= StringReplace(customResult, 'CfVFPV3', 'CfSoft', [rfReplaceAll,rfIgnoreCase]);
       LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
 
-      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
+      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;  //..\libs\arm64-v8a\libcontrols
       libTarget:= StringReplace(libTarget, 'armeabi-v7a', 'armeabi', [rfReplaceAll,rfIgnoreCase]);
       LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
     end;
+    //https://developer.android.com/ndk/guides/abis
+    if Pos('ARMV8',  upProjectChipSet) > 0 then //ARMV8  ---> ARMV6
+    begin
+      customResult:= StringReplace(customResult, '-Xd' , '-Xd -CfSoft -CpARMV6', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
+
+      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
+      libTarget:= StringReplace(libTarget, 'arm64-v8a', 'armeabi', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
+    end;
   end;
 
-  if Pos('ARMV7A', FInstructionSet) > 0 then
+  if Pos('ARMV7A', upFInstructionSet) > 0 then
   begin
-    if Pos('ARMV6',  projectChipSet ) > 0 then  //armv6  --> ARMV7A
+    if Pos('ARMV6',  upProjectChipSet ) > 0 then  //ARMV6  --> ARMV7A
     begin
       customResult:= StringReplace(customResult, 'CpARMV6' , 'CpARMV7A', [rfReplaceAll,rfIgnoreCase]);
       customResult:= StringReplace(customResult, 'CfSoft', 'Cf'+ FFPUSet, [rfReplaceAll,rfIgnoreCase]);
@@ -1181,30 +1305,73 @@ begin
       libTarget:= StringReplace(libTarget, 'armeabi', 'armeabi-v7a', [rfReplaceAll,rfIgnoreCase]);
       LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
     end;
+
+    if Pos('ARMV8',  upProjectChipSet ) > 0 then  //ARMV8  --> ARMV7A
+    begin
+      customResult:= StringReplace(customResult, '-Xd' , '-Xd -Cf'+ FFPUSet+ ' -CpARMV7A', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
+
+      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
+      libTarget:= StringReplace(libTarget, 'arm64-v8a', 'armeabi-v7a', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
+    end;
+
+  end;
+   //https://developer.android.com/ndk/guides/abis
+  if Pos('ARMV8', upFInstructionSet) > 0 then
+  begin
+    if Pos('ARMV6',  upProjectChipSet ) > 0 then  //ARMV6  --> ARMV8
+    begin
+      customResult:= StringReplace(customResult, 'CpARMV6' , '', [rfReplaceAll,rfIgnoreCase]);
+      customResult:= StringReplace(customResult, '-CfSoft', '', [rfReplaceAll,rfIgnoreCase]);   //CfVFPV4
+      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
+
+      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;   //..\libs\arm64-v8a\libcontrols
+      libTarget:= StringReplace(libTarget, 'armeabi', 'arm64-v8a', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'aarch64';
+    end;
+    if Pos('ARMV7A',  upProjectChipSet ) > 0 then  //ARMV7A --> ARMV8
+    begin
+      customResult:= StringReplace(customResult, 'CpARMV7A' , '', [rfReplaceAll,rfIgnoreCase]);
+      customResult:= StringReplace(customResult, '-CfVFPV3', '', [rfReplaceAll,rfIgnoreCase]);
+      //or
+      customResult:= StringReplace(customResult, '-CfSoft',  '', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
+      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;  //..\libs\arm64-v8a\libcontrols
+      libTarget:= StringReplace(libTarget, 'armeabi-v7a', 'arm64-v8a', [rfReplaceAll,rfIgnoreCase]);
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
+      LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'aarch64';
+    end;
   end;
 
 end;
 
 function TLamwSmartDesigner.IsChipSetDefault(var projectChipSet: string): boolean;
 var
-  projectTarger: string;
+  projectTarget: string;
 begin
 
-  projectTarger:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
+  projectTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;  //..\libs\armeabi-v7a\libcontrols
 
-  if Pos('armeabi-v7a', projectTarger) > 0 then
+  if Pos('arm64-v8a', projectTarget) > 0 then     //arm64-v8a
+  begin
+     projectChipSet:= 'ARMV8';
+  end
+  else if Pos('armeabi-v7a', projectTarget) > 0 then
   begin
      projectChipSet:= 'ARMV7A';
   end
-  else if  Pos('armeabi', projectTarger) > 0 then
+  else if Pos('armeabi', projectTarget) > 0 then
   begin
      projectChipSet:= 'ARMV6';
   end
-  else if  Pos('x86', projectTarger) > 0 then
+  else if Pos('x86', projectTarget) > 0 then
   begin
      projectChipSet:= 'x86';
   end
-  else if  Pos('mips', projectTarger) > 0 then
+  else if Pos('mips', projectTarget) > 0 then
   begin
      projectChipSet:= 'Mipsel';
   end;
@@ -1400,6 +1567,7 @@ begin
             begin
 
               if Pos('armeabi', chipArchitecture) > 0 then arch:= 'arch-arm'
+              else if Pos('arm64', chipArchitecture) > 0 then arch:= 'arch-arm64'
               else if Pos('x86', chipArchitecture) > 0 then arch:= 'arch-x86'
               else if Pos('mips', chipArchitecture) > 0 then arch:= 'arch-mips';
 
@@ -2156,10 +2324,11 @@ begin
   //LAMW 0.8
 
   chipArchitecture:= 'x86';
-  aux := LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
-  if Pos('-CpARMV6', aux) > 0 then chipArchitecture:= 'armeabi'
-  else if Pos('-CpARMV7A', aux) > 0 then chipArchitecture:= 'armeabi-v7a'
-  else if Pos('-XPmipsel', aux) > 0 then chipArchitecture:= 'mips';
+  aux := LowerCase(LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions);
+  if Pos('-cparmv6', aux) > 0 then chipArchitecture:= 'armeabi'
+  else if Pos('-cparmv7a', aux) > 0 then chipArchitecture:= 'armeabi-v7a'
+  else if Pos('-xpaarch64', aux) > 0 then chipArchitecture:= 'arm64-v8a'
+  else if Pos('-xpmipsel', aux) > 0 then chipArchitecture:= 'mips';
 
   AddSupportToFCLControls(chipArchitecture);
 
@@ -2286,7 +2455,13 @@ end;
 destructor TLamwSmartDesigner.Destroy;
 begin
   if LazarusIDE <> nil then
-    LazarusIDE.RemoveAllHandlersOfObject(Self);
+  begin
+    //LazarusIDE.RemoveAllHandlersOfObject(Self);
+    LazarusIDE.RemoveHandlerOnProjectOpened(@OnProjectOpened);
+    LazarusIDE.RemoveHandlerOnSavingAll(@OnProjectSavingAll);
+  end;
+  if  GlobalDesignHook <> nil then
+     GlobalDesignHook.RemoveHandlerAddClicked(@AddClicked);
   inherited Destroy;
 end;
 
@@ -2294,9 +2469,10 @@ procedure TLamwSmartDesigner.Init;
 begin
   LazarusIDE.AddHandlerOnProjectOpened(@OnProjectOpened);
   LazarusIDE.AddHandlerOnSavingAll(@OnProjectSavingAll);
+  GlobalDesignHook.AddHandlerAddClicked(@AddClicked);
 end;
 
-//F
+//F /libraries
 //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\;
 //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
 
@@ -2590,6 +2766,7 @@ begin
   CopyFile(lpiFileName, lpiFileName+'.bak2');
 
   FNDKIndex := LamwGlobalSettings.GetNDK;
+  if  FNDKIndex = '' then FNDKIndex:= '5';
 
   if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
   begin
@@ -2600,6 +2777,7 @@ begin
       strLibrary:= StringReplace(strTemp, pathToDemoNDKConverted,
                                          FPathToAndroidNDK,
                                          [rfReplaceAll,rfIgnoreCase]);
+
       //try
       strResult:= StringReplace(strLibrary, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 

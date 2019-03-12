@@ -8,7 +8,6 @@ uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
   StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf, PackageIntf {, process, math};
 
-
 type
 
   { TFormSettingsPaths }
@@ -19,26 +18,22 @@ type
     BitBtnCancel: TBitBtn;
     ComboBoxPrebuild: TComboBox;
     EditPathToGradle: TEdit;
-    EditPathToAndroidNDK: TEdit;
-    EditPathToJavaJDK: TEdit;
     EditPathToAndroidSDK: TEdit;
+    EditPathToJavaJDK: TEdit;
+    EditPathToAndroidNDK: TEdit;
     EditPathToAntBinary: TEdit;
-    GroupBoxPrebuild: TGroupBox;
+    GroupBox1: TGroupBox;
     Image1: TImage;
     LabelPathToGradle: TLabel;
-    LabelPathToAndroidNDK: TLabel;
-    LabelPathToJavaJDK: TLabel;
     LabelPathToAndroidSDK: TLabel;
+    LabelPathToJavaJDK: TLabel;
+    LabelPathToAndroidNDK: TLabel;
     LabelPathToAntBinary: TLabel;
     RGNDKVersion: TRadioGroup;
-    SelDirDlgPathToAndroidNDK: TSelectDirectoryDialog;
-    SelDirDlgPathToJavaJDK: TSelectDirectoryDialog;
-    SelDirDlgPathToAndroidSDK: TSelectDirectoryDialog;
-    SelDirDlgPathToAntBinary: TSelectDirectoryDialog;
-    SelDirDlgPathToGradle: TSelectDirectoryDialog;
-    SpBPathToAndroidNDK: TSpeedButton;
-    SpBPathToJavaJDK: TSpeedButton;
+    SelDirDlgPathTo: TSelectDirectoryDialog;
     SpBPathToAndroidSDK: TSpeedButton;
+    SpBPathToJavaJDK: TSpeedButton;
+    SpBPathToAndroidNDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
     SpBPathToGradle: TSpeedButton;
     SpeedButtonHelp: TSpeedButton;
@@ -47,12 +42,14 @@ type
     procedure BitBtnOKClick(Sender: TObject);
     procedure BitBtnCancelClick(Sender: TObject);
     procedure ComboBoxPrebuildChange(Sender: TObject);
+    procedure EditPathToAndroidNDKExit(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure SpBPathToAndroidNDKClick(Sender: TObject);
+    procedure LabelPathToAndroidSDKClick(Sender: TObject);
+    procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToGradleClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
-    procedure SpBPathToAndroidSDKClick(Sender: TObject);
+    procedure SpBPathToAndroidNDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
     procedure SpeedButtonHelpClick(Sender: TObject);
     procedure SpeedButtonInfoClick(Sender: TObject);
@@ -96,78 +93,36 @@ uses LamwSettings;
 
 function TFormSettingsPaths.GetPrebuiltDirectory: string;
 var
-   pathToNdkToolchains46,
-   pathToNdkToolchains49,
-   pathToNdkToolchains443: string;  //FInstructionSet   [ARM or x86]
+   pathToNdkToolchains49: string;  //FInstructionSet   [ARM or x86]
 begin
     Result:= '';
-
-    pathToNdkToolchains443:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                                 'arm-linux-androideabi-4.4.3'+DirectorySeparator+
-                                                 'prebuilt'+DirectorySeparator;
-
-    pathToNdkToolchains46:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
-                                              'arm-linux-androideabi-4.6'+DirectorySeparator+
-                                              'prebuilt'+DirectorySeparator;
+    if FPathToAndroidNDK = '' then Exit;
 
     pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                 'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                 'prebuilt'+DirectorySeparator;
-
-   {$ifdef windows}
+    {$ifdef windows}
      Result:=  'windows';
-     if DirectoryExists(pathToNdkToolchains49+ 'windows') then
-     begin
-       Result:= 'windows';
-       Exit;
-     end;
-     if DirectoryExists(pathToNdkToolchains46+ 'windows') then
-     begin
-       Result:= 'windows';
-       Exit;
-     end;
-     if DirectoryExists(pathToNdkToolchains443+ 'windows') then
-     begin
-       Result:= 'windows';
-       Exit;
-     end;
-     if DirectoryExists(pathToNdkToolchains49 + 'windows-x86_64') then Result:= 'windows-x86_64';
-
+     if DirectoryExists(pathToNdkToolchains49+ 'windows-x86_64') then Result:= 'windows-x86_64';
    {$else}
      {$ifdef darwin}
-        Result:=  'darwin-x86_64';
+        Result:=  '';
         if DirectoryExists(pathToNdkToolchains49+ 'darwin-x86_64') then Result:= 'darwin-x86_64';
      {$else}
-       Result:=  'linux-x86_64';
-       {$ifdef cpu64}
+       {$ifdef linux}
+         Result:=  'linux-x86_32';
          if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_64') then Result:= 'linux-x86_64';
-       {$else}
-         if DirectoryExists(pathToNdkToolchains49+ 'linux-x86_32') then
-         begin
-            Result:= 'linux-x86_32';
-            Exit;
-         end;
-         if DirectoryExists(pathToNdkToolchains46+ 'linux-x86_32') then
-         begin
-           Result:= 'linux-x86_32';
-           Exit;
-         end;
-         if DirectoryExists(pathToNdkToolchains443+ 'linux-x86_32') then
-         begin
-           Result:= 'linux-x86_32';
-           Exit;
-         end;
        {$endif}
      {$endif}
    {$endif}
 
    if Result = '' then
    begin
+       {$ifdef WINDOWS}
+         Result:= 'windows-x86_64';
+       {$endif}
        {$ifdef LINUX}
            Result:= 'linux-x86_64';
-       {$endif}
-       {$ifdef WINDOWS}
-           Result:= 'windows';
        {$endif}
        {$ifdef darwin}
            Result:= 'darwin-x86_64';
@@ -231,6 +186,11 @@ begin
   end;
 end;
 
+procedure TFormSettingsPaths.LabelPathToAndroidSDKClick(Sender: TObject);
+begin
+
+end;
+
 
 function TFormSettingsPaths.HasBuildTools(platform: integer): boolean;
 var
@@ -271,6 +231,7 @@ begin
   begin
     FIniFile.WriteString('NewProject', Key, Value);
     FIniFile.Free;
+    LamwGlobalSettings.ReloadPaths;
   end;
 end;
 
@@ -363,20 +324,19 @@ var
  pathToNdkToolchains49: string;
  saveContent: string;
 begin
-
   if EditPathToAndroidNDK.Text = '' then
   begin
     ShowMessage('Please, Enter "Path To Android NDK..."');
     Exit;
   end;
 
-  saveContent:= ComboBoxPrebuild.Text;
+  saveContent:= FPrebuildOSYS;
 
   pathToNdkToolchains49:= EditPathToAndroidNDK.Text+DirectorySeparator+'toolchains'+DirectorySeparator+
                                                 'arm-linux-androideabi-4.9'+DirectorySeparator+
                                                 'prebuilt'+DirectorySeparator;
 
-  if not DirectoryExists(pathToNdkToolchains49+ ComboBoxPrebuild.Text) then
+  if not DirectoryExists(pathToNdkToolchains49 + ComboBoxPrebuild.Text) then
   begin
      ShowMessage('Sorry... Path To Ndk Toolchains "'+ ComboBoxPrebuild.Text + '" Not Found!');
      ComboBoxPrebuild.Text:= saveContent;
@@ -384,6 +344,15 @@ begin
   else
      Self.FPrebuildOSYS:= ComboBoxPrebuild.Text;
 
+end;
+
+procedure TFormSettingsPaths.EditPathToAndroidNDKExit(Sender: TObject);
+begin
+  if EditPathToAndroidNDK.Text <> '' then
+  begin
+     FPathToAndroidNDK:= EditPathToAndroidNDK.Text;
+     ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();
+  end;
 end;
 
 procedure TFormSettingsPaths.BitBtnOKClick(Sender: TObject);
@@ -396,12 +365,12 @@ begin
    else ShowMessage('Please, Select [Radio] "NDK Version" number!!!');
 end;
 
-procedure TFormSettingsPaths.SpBPathToAndroidNDKClick(Sender: TObject);
+procedure TFormSettingsPaths.SpBPathToAndroidSDKClick(Sender: TObject);
 begin
-  if SelDirDlgPathToAndroidNDK.Execute then
+  if SelDirDlgPathTo.Execute then
   begin
-    EditPathToAndroidNDK.Text := SelDirDlgPathToAndroidNDK.FileName;
-    FPathToAndroidNDK:= SelDirDlgPathToAndroidNDK.FileName;
+    EditPathToAndroidSDK.Text := SelDirDlgPathTo.FileName;
+    FPathToAndroidSDK:= SelDirDlgPathTo.FileName;
   end;
 end;
 
@@ -444,34 +413,34 @@ end;
 
 procedure TFormSettingsPaths.SpBPathToGradleClick(Sender: TObject);
 begin
-  if SelDirDlgPathToGradle.Execute then
+  if SelDirDlgPathTo.Execute then
   begin
-    EditPathToGradle.Text:= SelDirDlgPathToGradle.FileName;
-    FPathToGradle:= SelDirDlgPathToGradle.FileName;
+    EditPathToGradle.Text:= SelDirDlgPathTo.FileName;
+    FPathToGradle:= SelDirDlgPathTo.FileName;
   end;
 end;
 
 procedure TFormSettingsPaths.SpBPathToJavaJDKClick(Sender: TObject);
 begin
 //  {$ifndef darwin}
-  if SelDirDlgPathToJavaJDK.Execute then
+  if SelDirDlgPathTo.Execute then
   begin
-    EditPathToJavaJDK.Text:= SelDirDlgPathToJavaJDK.FileName;
-    FPathToJavaJDK:= SelDirDlgPathToJavaJDK.FileName;
+    EditPathToJavaJDK.Text:= SelDirDlgPathTo.FileName;
+    FPathToJavaJDK:= SelDirDlgPathTo.FileName;
   end;
 //  {$endif}
 end;
 
-procedure TFormSettingsPaths.SpBPathToAndroidSDKClick(Sender: TObject);
+procedure TFormSettingsPaths.SpBPathToAndroidNDKClick(Sender: TObject);
 begin
-  if SelDirDlgPathToAndroidSDK.Execute then
+  if SelDirDlgPathTo.Execute then
   begin
-    EditPathToAndroidSDK.Text := SelDirDlgPathToAndroidSDK.FileName;
-    FPathToAndroidSDK:= SelDirDlgPathToAndroidSDK.FileName;
+    EditPathToAndroidNDK.Text := SelDirDlgPathTo.FileName;
+    FPathToAndroidNDK:= SelDirDlgPathTo.FileName;
 
     if FPrebuildOSYS = '' then
     begin
-      if FPathToAndroidSDK <> '' then
+      if FPathToAndroidNDK <> '' then
       begin
          FPrebuildOSYS:= Self.GetPrebuiltDirectory();   //try guess
          if FPrebuildOSYS <> '' then
@@ -483,10 +452,10 @@ end;
 
 procedure TFormSettingsPaths.SpBPathToAntBinaryClick(Sender: TObject);
 begin
-    if SelDirDlgPathToAntBinary.Execute then
+    if SelDirDlgPathTo.Execute then
   begin
-    EditPathToAntBinary.Text := SelDirDlgPathToAntBinary.FileName;
-    FPathToAntBin:= SelDirDlgPathToAntBinary.FileName;
+    EditPathToAntBinary.Text := SelDirDlgPathTo.FileName;
+    FPathToAntBin:= SelDirDlgPathTo.FileName;
   end;
 end;
 
@@ -494,7 +463,7 @@ procedure TFormSettingsPaths.SpeedButtonHelpClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.3] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.4] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]' +
            sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 [or up]'+
@@ -508,23 +477,32 @@ end;
 
 procedure TFormSettingsPaths.SpeedButtonInfoClick(Sender: TObject);
 begin
-  ShowMessage('All settings are stored in the file '+sLineBreak+'"LAMW.ini" [lazarus/config]');
+  ShowMessage('All settings are stored in the file '+sLineBreak+'"LAMW.ini" '+ sLineBreak +
+  'ex1. "laz4Android/config"' + sLineBreak +
+  'ex2. "C:\Users\...\AppData\Local\lazarus"');
 end;
 
 procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
    indexNdk: integer;
+   pathToNdkToolchains49: string;
 begin
 
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
     try
-      EditPathToAndroidNDK.Text := ReadString('NewProject','PathToAndroidNDK', '');
-      EditPathToJavaJDK.Text := ReadString('NewProject','PathToJavaJDK', '');
-      EditPathToAndroidSDK.Text := ReadString('NewProject','PathToAndroidSDK', '');
-      EditPathToAntBinary.Text := ReadString('NewProject','PathToAntBin', '');
-      EditpathToGradle.Text :=  ReadString('NewProject','PathToGradle', '');
+      FPathToAndroidNDK := ReadString('NewProject','PathToAndroidNDK', '');
+      FPathToJavaJDK := ReadString('NewProject','PathToJavaJDK', '');
+      FPathToAndroidSDK := ReadString('NewProject','PathToAndroidSDK', '');
+      FPathToAntBin := ReadString('NewProject','PathToAntBin', '');
+      FPathToGradle :=  ReadString('NewProject','PathToGradle', '');
+
+      EditPathToAndroidNDK.Text := FPathToAndroidNDK;
+      EditPathToJavaJDK.Text := FPathToJavaJDK;
+      EditPathToAndroidSDK.Text := FPathToAndroidSDK;
+      EditPathToAntBinary.Text := FPathToAntBin;
+      EditpathToGradle.Text := FPathToGradle;
 
       if ReadString('NewProject','NDK', '') <> '' then
         indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
@@ -532,12 +510,22 @@ begin
         indexNdk:= 3;  //ndk 10e
 
       RGNDKVersion.ItemIndex:= indexNdk;
-
       FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
-
       if FPrebuildOSYS <> '' then
       begin
-         ComboBoxPrebuild.Text:= FPrebuildOSYS
+        pathToNdkToolchains49:= EditPathToAndroidNDK.Text+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                      'arm-linux-androideabi-4.9'+DirectorySeparator+
+                                                      'prebuilt'+DirectorySeparator;
+        if DirectoryExists(pathToNdkToolchains49 + FPrebuildOSYS) then
+        begin
+            ComboBoxPrebuild.Text:= FPrebuildOSYS;
+        end
+        else
+        begin
+           FPrebuildOSYS:= Self.GetPrebuiltDirectory();
+           ComboBoxPrebuild.Text:= FPrebuildOSYS;
+           WriteIniString('PrebuildOSYS', FPrebuildOSYS);
+        end;
       end
       else
       begin
@@ -545,7 +533,10 @@ begin
           begin
              FPrebuildOSYS:= Self.GetPrebuiltDirectory();   //try guess
              if FPrebuildOSYS <> '' then
+             begin
                 ComboBoxPrebuild.Text:= FPrebuildOSYS;
+                WriteIniString('PrebuildOSYS', FPrebuildOSYS);
+             end;
           end;
       end;
     finally
@@ -556,6 +547,8 @@ begin
 end;
 
 procedure TFormSettingsPaths.SaveSettings(const fileName: string);
+var
+   pathToNdkToolchains49: string;
 begin
 
   with TInifile.Create(fileName) do
@@ -585,10 +578,22 @@ begin
     begin
       if FPathToAndroidSDK <> '' then
       begin
-         if ComboBoxPrebuild.Text =  '' then
-             ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();   //try guess
+         if ComboBoxPrebuild.Text = '' then
+           ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();   //try guess
       end;
+    end
+    else
+    begin
+
+      pathToNdkToolchains49:= FPathToAndroidNDK+DirectorySeparator+'toolchains'+DirectorySeparator+
+                                                'arm-linux-androideabi-4.9'+DirectorySeparator+
+                                                'prebuilt'+DirectorySeparator + ComboBoxPrebuild.Text;
+
+      if not DirectoryExists(pathToNdkToolchains49) then
+         ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();
+
     end;
+
     WriteString('NewProject', 'PrebuildOSYS', ComboBoxPrebuild.Text);
   finally
     Free;

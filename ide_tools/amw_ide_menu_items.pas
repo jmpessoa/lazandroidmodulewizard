@@ -130,8 +130,21 @@ end;
 
 procedure StartPathToBuildFPCCross(Sender: TObject);
 begin
+ {$IFDEF windows}
   FormBuildFPCCross:= TFormBuildFPCCross.Create(Application);
   FormBuildFPCCross.ShowModal;
+  {$Endif}
+
+  {$IFDEF linux}
+     ShowMessage('Warning: this option [should] not work for linux' +sLineBreak +
+     'you can get some help with LAMW documentation...')
+  {$Endif}
+
+  {$IFDEF darwin}
+     ShowMessage('Warning: this option [should] not work for MacOS' +sLineBreak +
+     'you can get some help with LAMW documentation...')
+  {$Endif}
+
 end;
 
 

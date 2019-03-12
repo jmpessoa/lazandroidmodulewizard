@@ -5,14 +5,12 @@ unit ApkBuild;
 interface
 
 uses
-  {$ifdef Windows}
+  {$if defined(Windows)}
     {$define Emulator}
     Windows,
-  {$else}
-    {$ifndef Darwin}
+  {$elseif not defined(Darwin)}
     {$define Emulator}
     XWindow,
-    {$endif}
   {$endif}
   Classes, SysUtils, ProjectIntf, Forms, LamwSettings, LCLVersion;
 
@@ -72,7 +70,9 @@ type
 
   TAntParser = class(TExtToolParser)
   public
-    procedure ReadLine(Line: string; OutputIndex: integer; var Handled: boolean); override;
+    procedure ReadLine(Line: string; OutputIndex: integer;
+      {$if lcl_fullversion >= 2010000}IsStdErr: boolean;{$endif}
+      var Handled: boolean); override;
     class function DefaultSubTool: string; override;
   end;
 
@@ -83,7 +83,9 @@ type
     FFailureGot: Boolean;
   public
     procedure InitReading; override;
-    procedure ReadLine(Line: string; OutputIndex: integer; var Handled: boolean); override;
+    procedure ReadLine(Line: string; OutputIndex: integer;
+      {$if lcl_fullversion >= 2010000}IsStdErr: boolean;{$endif}
+      var Handled: boolean); override;
     class function DefaultSubTool: string; override;
   end;
 
@@ -161,6 +163,7 @@ begin
 end;
 
 procedure TGradleParser.ReadLine(Line: string; OutputIndex: integer;
+  {$if lcl_fullversion>=2010000}IsStdErr: boolean;{$endif}
   var Handled: boolean);
 var
   msgLine: TMessageLine;
@@ -191,6 +194,7 @@ end;
 { TAntParser }
 
 procedure TAntParser.ReadLine(Line: string; OutputIndex: integer;
+  {$if lcl_fullversion>=2010000}IsStdErr: boolean;{$endif}
   var Handled: boolean);
 var
   msgLine: TMessageLine;
@@ -962,4 +966,5 @@ begin
 end;
 
 end.
+
 
