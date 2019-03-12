@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.View.MeasureSpec;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -60,6 +61,8 @@ public class jCommons {
 	private int algravity;
 	private int algravityAnchorId;
 	
+	private android.content.Context context;
+	
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
 		aOwnerView = _view;       // set owner
 		PasObj   = _pasobj; 	//Connect Pascal I/F						
@@ -67,6 +70,8 @@ public class jCommons {
 		lgravity = Gravity.NO_GRAVITY;
 		algravity = Gravity.NO_GRAVITY;
 		algravityAnchorId = -1;
+		
+		context = _context;
 		
 		if (aOwnerView != null) {
 			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
@@ -190,18 +195,34 @@ public class jCommons {
 	}
 		
 	public int getLParamHeight() {
-		int r = lparamH;		
+		int r = lparamH;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getHeight();
-		}		
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;				
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		    			
+			r = aOwnerView.getMeasuredHeight();
+		}
+		
 		return r;
 	}
 
 	public int getLParamWidth() {				
-		int r = lparamW;		
+		int r = lparamW;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getWidth();		
-		}				
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		   			
+			r = aOwnerView.getMeasuredWidth();		
+		}
+		
 		return r;		
 	}	
 	
