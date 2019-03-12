@@ -163,7 +163,8 @@ public class jCommons {
 	public int getLParamHeight() {
 		int r = lparamH;		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getHeight();
+			aOwnerView.measure(lparamW, lparamH);
+			r = aOwnerView.getMeasuredHeight();
 		}		
 		return r;
 	}
@@ -171,7 +172,8 @@ public class jCommons {
 	public int getLParamWidth() {				
 		int r = lparamW;		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getWidth();		
+			aOwnerView.measure(lparamW, lparamH);
+			r = aOwnerView.getMeasuredWidth();		
 		}				
 		return r;		
 	}	
