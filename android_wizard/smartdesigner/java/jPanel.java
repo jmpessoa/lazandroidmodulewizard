@@ -137,7 +137,7 @@ public class jPanel extends RelativeLayout {
 		@Override
 		public boolean onDown(MotionEvent event) {
 			//Log.i("Down", "------------");
-			//TO DO
+			controls.pOnDown(PasObj, Const.Click_Default);
 			return true;
 		}
 		
@@ -151,7 +151,7 @@ public class jPanel extends RelativeLayout {
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
 			//Log.i("DoubleTap", "------------");
-			//TO DO
+			controls.pOnDoubleClick(PasObj, Const.Click_Default);
 			return true;
 		}
 		
