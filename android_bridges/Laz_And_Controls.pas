@@ -155,6 +155,8 @@ type
 
  jPanel = class(jVisualControl)
    private
+     FOnDown: TOnNotify;
+     FOnDoubleClick: TOnNotify;
      FOnFling: TOnFling;
      FOnPinchGesture: TOnPinchZoom;
      FMinZoomFactor: single;
@@ -179,8 +181,10 @@ type
      procedure ClearLayout;
      procedure RemoveFromViewParent;  override;
 
+     procedure GenEvent_OnDown(Obj: TObject);
      procedure GenEvent_OnClick(Obj: TObject);
-     procedure GenEvent_OnLOngClick(Obj: TObject);
+     procedure GenEvent_OnLongClick(Obj: TObject);
+     procedure GenEvent_OnDoubleClick(Obj: TObject);
      procedure GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
      procedure GenEvent_OnPinchZoomGestureDetected(Obj: TObject; scaleFactor: single; state: integer);
 
@@ -211,8 +215,10 @@ type
      property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
      property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
 
+     property OnDown : TOnNotify read FOnDown write FOnDown;
      property OnClick : TOnNotify read FOnClick write FOnClick;
      property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
+     property OnDoubleClick : TOnNotify read FOnDoubleClick write FOnDoubleClick;
      property OnFlingGesture: TOnFling read FOnFling write FOnFling;
      property OnPinchZoomGesture: TOnPinchZoom read FOnPinchGesture write FOnPinchGesture;
    end;
@@ -1989,9 +1995,10 @@ type
   // Control Event
   Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject; Obj: TObject);
 
-
-  Procedure Java_Event_pOnClick                  (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
-  Procedure Java_Event_pOnLongClick              (env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  procedure Java_Event_pOnDown(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  procedure Java_Event_pOnDoubleClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  Procedure Java_Event_pOnClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  Procedure Java_Event_pOnLongClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
 
   //by jmpessoa
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);  overload;
@@ -2623,6 +2630,38 @@ begin
     jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnDraw(Obj);
   end;
+end;
+
+procedure Java_Event_pOnDown(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+begin
+
+  //----update global "gApp": to whom it may concern------
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jPanel then
+  begin
+    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
+    jPanel(Obj).GenEvent_OnDown(Obj);
+    exit;
+  end;
+
+end;
+
+procedure Java_Event_pOnDoubleClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+begin
+
+  //----update global "gApp": to whom it may concern------
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jPanel then
+  begin
+    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
+    jPanel(Obj).GenEvent_OnDoubleClick(Obj);
+    exit;
+  end;
+
 end;
 
 Procedure Java_Event_pOnClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
@@ -11123,6 +11162,11 @@ begin
 end;
 
 // Event : Java -> Pascal
+procedure jPanel.GenEvent_OnDown(Obj: TObject);
+begin
+  if Assigned(FOnDown) then FOnDown(Obj);
+end;
+
 Procedure jPanel.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
@@ -11131,6 +11175,11 @@ end;
 procedure jPanel.GenEvent_OnLongClick(Obj: TObject);
 begin
   if Assigned(FOnLongClick) then FOnLongClick(Obj);
+end;
+
+procedure jPanel.GenEvent_OnDoubleClick(Obj: TObject);
+begin
+  if Assigned(FOnDoubleClick) then FOnDoubleClick(Obj);
 end;
 
 procedure jPanel.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);
