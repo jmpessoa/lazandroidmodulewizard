@@ -287,7 +287,7 @@ var
   i, intAux: integer;
 begin
 
-  Result:= 0;
+  Result:= 21;
 
   lisDir:= TStringList.Create;
 
@@ -2778,11 +2778,15 @@ begin
                                          FPathToAndroidNDK,
                                          [rfReplaceAll,rfIgnoreCase]);
 
+
       //try
       strResult:= StringReplace(strLibrary, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
-      maxNdk:= Self.GetMaxNdkPlatform(); //21
-      strMaxNdk:= IntToStr(maxNdk);      //'21'
+      //C:\android\ndkr14b\platforms\android-22
+      maxNdk:= GetMaxNdkPlatform();
+      if maxNdk > 22 then maxNdk := 22;  //android 4.x and 5.x compatibulty....
+
+      strMaxNdk:= IntToStr(maxNdk);      //'22'
 
       strResult:= TryChangePrebuildOSY(strResult); //LAMW 0.8
 
@@ -2809,6 +2813,7 @@ begin
       strResult:= StringReplace(strCustom, pathToDemoNDKConverted,
                                          FPathToAndroidNDK,
                                          [rfReplaceAll,rfIgnoreCase]);
+
       //try
       strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
