@@ -1350,6 +1350,9 @@ begin
 
     auxInstSet:= ReadString('NewProject','InstructionSet', '');
 
+    if not IsAllCharNumber(PChar(auxInstSet)) then
+      auxInstSet:= '1';
+
     if auxInstSet = '' then auxInstSet:= '1';
     if auxInstSet = '0' then auxInstSet:='1';
 

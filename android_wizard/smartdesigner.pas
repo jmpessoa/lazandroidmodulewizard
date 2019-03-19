@@ -795,6 +795,7 @@ begin
          strList.Add('    defaultConfig {');
          strList.Add('            minSdkVersion 14');
 
+
          if targetApi <= StrToInt(buildToolApi) then
             strList.Add('            targetSdkVersion '+IntToStr(targetApi))
          else
@@ -1171,24 +1172,22 @@ begin
       if manifestTargetApi < 26 then
       begin
          queryValue:= '26';
+
          if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 26',
                        '[Suggestion] Change Target API to 26'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
          begin
-
-           if IsAllCharNumber(PChar(queryValue))  then
-              queryValue:= '26';
-
-           manifestTargetApi:= StrToInt(queryValue);
-
-           if manifestTargetApi < 26 then
+           manifestTargetApi:= 26;
+           buildTool:= GetBuildTool(26);
+           if queryValue <> '26' then
            begin
-              if not LamwGlobalSettings.KeepManifestTargetApi  then
-                 buildTool:= '26.0.2'
-              else
+              if IsAllCharNumber(PChar(queryValue)) then
+              begin
+                 manifestTargetApi:= StrToInt(queryValue);
                  buildTool:= GetBuildTool(manifestTargetApi);
-           end
-           else buildTool:= GetBuildTool(manifestTargetApi);
-         end;
+              end;
+           end;
+         end; //if input...
+
       end
       else //target >= 26
       begin
@@ -1198,6 +1197,7 @@ begin
         else
            buildTool:= GetBuildTool(manifestTargetApi);
       end;
+
       KeepBuildUpdated(manifestTargetApi, buildTool);
 
       if Self.IsLaz4Android() then
