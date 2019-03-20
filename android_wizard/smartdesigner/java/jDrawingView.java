@@ -71,13 +71,17 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     private SparseArray<PointF> mActivePointers;
 
     private int mBackgroundColor = Color.WHITE;
+    private boolean mBufferedDraw = false;
+    private int mWidth;
+    private int mHeight;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public jDrawingView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+    public jDrawingView(Controls _ctrls, long _Self, boolean _bufferedDraw) { //Add more others news "_xxx"p arams if needed!
         super(_ctrls.activity);
         context = _ctrls.activity;
         pascalObj = _Self;
         controls = _ctrls;
+        mBufferedDraw = _bufferedDraw;
 
         this.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
 
@@ -126,6 +130,9 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         mCanvas = null;
         gDetect = null;
         textPaint = null;
+        mBitmap = null;
+        textPaint = null;
+        mPath = null;
         setOnClickListener(null);
         scaleGestureDetector = null;
         LAMWCommon.free();
@@ -249,7 +256,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
                 break;
             }
 
-
             case MotionEvent.ACTION_MOVE: {
 
                 for (int size = event.getPointerCount(), i = 0; i < size; i++) {
@@ -359,8 +365,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
                 mActivePointers.remove(pointerId);
                 break;
             }
-
-
         }
 
         return true;
@@ -434,31 +438,41 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public Bitmap GetDrawingCache() {
-        //this.setDrawingCacheEnabled(true);
-        //Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
-        //this.setDrawingCacheEnabled(false);
-        return mBitmap;
+        if (mBufferedDraw) {
+            return mBitmap;
+        }
+        else {
+            this.setDrawingCacheEnabled(true);
+            Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+            this.setDrawingCacheEnabled(false);
+            return b;
+        }
     }
 
 
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
-        // Create bitmap, create canvas with bitmap, fill canvas with color.
-        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        mCanvas = new Canvas(mBitmap);
-        // Fill the Bitmap with the background color.
-        mCanvas.drawColor(mBackgroundColor);
+        mWidth = width;
+        mHeight = height;
+        if (mBufferedDraw) {
+            // Create bitmap, create canvas with bitmap, fill canvas with color.
+            mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            mCanvas = new Canvas(mBitmap);
+            // Fill the Bitmap with the background color.
+            mCanvas.drawColor(mBackgroundColor);
+        }
+        controls.pOnDrawingViewSizeChanged(pascalObj, width, height, oldWidth, oldHeight);
     }
 
     //
     @Override
     /*.*/ public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-     //   if (mBitmap != null)
+        //super.onDraw(canvas);
+        if (mBufferedDraw)
             canvas.drawBitmap(mBitmap, 0, 0, mPaint); //draw offscreen changes
-       // else
-         //   mCanvas = canvas;
+       else
+           mCanvas = canvas;
 
         controls.pOnDrawingViewDraw(pascalObj, Const.TouchUp, mActivePointers.size(),
                 mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
@@ -940,6 +954,19 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     public void Clear() {
         mCanvas.drawColor(mBackgroundColor);
+    }
+
+    public void SetBufferedDraw(boolean _value) {
+        mBufferedDraw = _value;
+        if (mBufferedDraw) {
+            // Create bitmap, create canvas with bitmap, fill canvas with color.
+            if (mBitmap == null) {
+                mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+                mCanvas = new Canvas(mBitmap);
+                // Fill the Bitmap with the background color.
+                mCanvas.drawColor(mBackgroundColor);
+            }
+        }
     }
 
 } //end class
