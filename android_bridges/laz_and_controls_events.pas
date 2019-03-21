@@ -64,12 +64,16 @@ uses
    Procedure Java_Event_pOnDatePicker(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
 
    Procedure Java_Event_pOnShellCommandExecuted(env: PJNIEnv; this: jobject; Obj: TObject; cmdResult: JString);
-   Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messagesReceived: JStringArray);
-   Procedure Java_Event_pOnTCPSocketClientBytesReceived(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayReceived: JByteArray);
-   Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 
-   Procedure Java_Event_pOnTCPSocketClientFileSendProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; count: integer; filesize: integer);
-   Procedure Java_Event_pOnTCPSocketClientFileSendFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
+   procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messageReceived: JString);
+   procedure Java_Event_pOnTCPSocketClientBytesReceived(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayReceived: JByteArray);
+   procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
+
+   procedure Java_Event_pOnTCPSocketClientFileSendProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; sendFileSize: integer; filesize: integer);
+   procedure Java_Event_pOnTCPSocketClientFileSendFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
+
+   procedure Java_Event_pOnTCPSocketClientFileGetProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; remainingFileSize: integer; filesize: integer);
+   procedure Java_Event_pOnTCPSocketClientFileGetFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
 
    Procedure Java_Event_pOnMediaPlayerVideoSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeight: integer);
    Procedure Java_Event_pOnMediaPlayerCompletion(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -925,35 +929,28 @@ begin
   end;
 end;
 
-Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messagesReceived: JStringArray);
+Procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messageReceived: JString);
 var
-   pasmessagesReceived: array of string;
-   i, messageSize: integer;
-   jStr: jObject;
+   pasMessageReceived: string;
    jBoo: jBoolean;
 begin
+
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
   if Obj is jTCPSocketClient then
   begin
     jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
-    if  messagesReceived <> nil then
+
+    pasMessageReceived := '';
+
+    if messageReceived <> nil then
     begin
-      messageSize:= env^.GetArrayLength(env, messagesReceived);
-      SetLength(pasmessagesReceived, messageSize);
-      for i:= 0 to messageSize - 1 do
-      begin
-        jStr:= env^.GetObjectArrayElement(env, messagesReceived, i);
-        case jStr = nil of
-          True : pasmessagesReceived[i]:= '';
-          False: begin
-                  jBoo:= JNI_False;
-                  pasmessagesReceived[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-                 end;
-        end;
-      end;
+      jBoo := JNI_False;
+      pasMessageReceived:= string( env^.GetStringUTFChars(Env,messageReceived,@jBoo) );
     end;
-    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientMessagesReceived(Obj, pasmessagesReceived);
+
+    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientMessagesReceived(Obj, pasMessageReceived);
   end;
 end;
 
@@ -993,7 +990,7 @@ begin
   end;
 end;
 
-Procedure Java_Event_pOnTCPSocketClientFileSendProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; count: integer; filesize: integer);
+Procedure Java_Event_pOnTCPSocketClientFileSendProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; sendFileSize: integer; filesize: integer);
 var
    pasfilename:  string;
    jBoo: jBoolean;
@@ -1009,7 +1006,7 @@ begin
       jBoo := JNI_False;
       pasfilename:= string( env^.GetStringUTFChars(Env,filename,@jBoo) );
     end;
-    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientFileSendProgress(Obj, pasfilename, count, filesize);
+    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientFileSendProgress(Obj, pasfilename, sendFileSize, filesize);
   end;
 end;
 
@@ -1033,6 +1030,45 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnTCPSocketClientFileGetProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; remainingFileSize: integer; filesize: integer);
+var
+   pasfilename:  string;
+   jBoo: jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTCPSocketClient then
+  begin
+    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
+    pasfilename := '';
+    if filename <> nil then
+    begin
+      jBoo := JNI_False;
+      pasfilename:= string( env^.GetStringUTFChars(Env,filename,@jBoo) );
+    end;
+    jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientFileGetProgress(Obj, pasfilename, remainingFileSize, filesize);
+  end;
+end;
+
+procedure Java_Event_pOnTCPSocketClientFileGetFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
+var
+   pasfilename:  string;
+   jBoo: jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jTCPSocketClient then
+  begin
+    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
+    pasfilename := '';
+    if filename <> nil then
+    begin
+      jBoo := JNI_False;
+      pasfilename:= string( env^.GetStringUTFChars(Env,filename,@jBoo) );
+    end;
+    jTCPSocketClient(Obj).GenEvent_pOnTCPSocketClientFileGetFinished(Obj, pasfilename, filesize);
+  end;
+end;
 
 Procedure Java_Event_pOnSurfaceViewCreated(env: PJNIEnv; this: jobject; Obj: TObject;
                                surfaceHolder: jObject);

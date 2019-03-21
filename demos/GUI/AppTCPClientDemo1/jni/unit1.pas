@@ -76,7 +76,10 @@ end;
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
    if  FConnected then
-     jTCPSocketClient1.CloseConnection('goodbye');
+   begin
+     jTCPSocketClient1.SendMessage('goodbye');
+     jTCPSocketClient1.CloseConnection();
+   end;
 end;
 
 procedure TAndroidModule1.jTCPSocketClient1Connected(Sender: TObject);
