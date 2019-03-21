@@ -13,6 +13,7 @@ type
    //CW - clockwise
 
    TPathDirection = (pdClockwise, pdCounterClockwise);
+   TOnDrawingViewSizeChanged = procedure(Sender: TObject; width: integer; height: integer; oldWidth: integer; oldHeight: integer) of object;
 
 {Draft Component code by "Lazarus Android Module Wizard" [5/20/2016 4:14:09]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -27,6 +28,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     FOnTouchDown : TOnTouchExtended;
     FOnTouchMove : TOnTouchExtended;
     FOnTouchUp   : TOnTouchExtended;
+    FOnSizeChanged: TOnDrawingViewSizeChanged;
 
     FPaintStrokeWidth: single;
     FPaintStyle: TPaintStyle;
@@ -45,6 +47,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     FMaxWorldY: single;
     FScaleX: single;
     FScaleY: single;
+    FBufferedDraw: boolean;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -57,7 +60,9 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure UpdateLayout; override;
 
    // procedure GenEvent_OnClick(Obj: TObject);
-    function jCreate(): jObject;
+    //function jCreate(): jObject;
+    function jCreate( _bufferedDraw: boolean): jObject;
+
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     procedure RemoveFromViewParent(); override;
@@ -134,19 +139,23 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
     procedure DrawOval(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
 
-    function GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer; overload;
-    function GetViewPortY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewPortHeight: integer): integer;  overload;
+    function GetViewportX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewportWidth: integer): integer; overload;
+    function GetViewportY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewportHeight: integer): integer;  overload;
 
-    procedure SetViewPortScaleXY(minX: single; maxX: single; minY: single; maxY: single);
-    function GetViewPortY(_worldY: single): integer; overload;
-    function GetViewPortX(_worldX: single): integer; overload;
+    procedure SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);
+    function GetViewportY(_worldY: single): integer; overload;
+    function GetViewportX(_worldX: single): integer; overload;
 
-    function GetWorldY(viewPortY:integer): single;
-    function GetWorldX(viewPortX:integer): single;
+    function GetWorldY(_viewportY:integer): single;
+    function GetWorldX(_viewportX:integer): single;
 
     procedure DrawBitmap(_bitmap: jObject; _x: single; _y: single; _angleDegree: single); overload;
     procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean); overload;
     procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
+    procedure Invalidate();
+    procedure Clear(_color: TARGBColorBridge); overload;
+    procedure Clear();  overload;
+    procedure SetBufferedDraw(_value: boolean);
 
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
@@ -154,6 +163,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     Procedure GenEvent_OnDrawingViewDraw(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 
+    Procedure GenEvent_OnDrawingViewSizeChanged(Obj: TObject; width: integer; height: integer; oldWidth: integer; oldHeight: integer);
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
 
@@ -169,10 +179,12 @@ jDrawingView = class(jVisualControl)    //jDrawingView
 
     property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
     property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
+    property BufferedDraw: boolean read FBufferedDraw write SetBufferedDraw;
     // Event - Click
     //property OnClick: TOnNotify read FOnClick write FOnClick;
     // Event - Drawing
     property OnDraw      : TOnTouchExtended read FOnDraw write FOnDraw;
+    property OnSizeChanged: TOnDrawingViewSizeChanged read FOnSizeChanged write FOnSizeChanged;
     // Event - Touch
     property OnTouchDown : TOnTouchExtended read FOnTouchDown write FOnTouchDown;
     property OnTouchMove : TOnTouchExtended read FOnTouchMove write FOnTouchMove;
@@ -180,7 +192,8 @@ jDrawingView = class(jVisualControl)    //jDrawingView
 
 end;
 
-function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+//function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean; this: jObject): jObject;
 procedure jDrawingView_jFree(env: PJNIEnv; _jdrawingview: JObject);
 procedure jDrawingView_SetViewParent(env: PJNIEnv; _jdrawingview: JObject; _viewgroup: jObject);
 procedure jDrawingView_RemoveFromViewParent(env: PJNIEnv; _jdrawingview: JObject);
@@ -252,6 +265,10 @@ procedure jDrawingView_DrawTextOnPath(env: PJNIEnv; _jdrawingview: JObject; _tex
 procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _x: single; _y: single; _angleDegree: single); overload;
 procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean); overload;
 procedure jDrawingView_DrawTextMultiLine(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single);
+procedure jDrawingView_Invalidate(env: PJNIEnv; _jdrawingview: JObject);
+procedure jDrawingView_Clear(env: PJNIEnv; _jdrawingview: JObject; _color: integer); overload;
+procedure jDrawingView_Clear(env: PJNIEnv; _jdrawingview: JObject); overload;
+procedure jDrawingView_SetBufferedDraw(env: PJNIEnv; _jdrawingview: JObject; _value: boolean);
 
 
 implementation
@@ -289,6 +306,7 @@ begin
 
   FPaintStrokeJoin:= sjDefault;
   FPaintStrokeCap:= scDefault;
+  FBufferedDraw:= False;
 
 end;
 
@@ -315,7 +333,8 @@ begin
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject:= jCreate(); //jSelf !
+   //FjObject:= jCreate(); //jSelf !
+   FjObject:= jCreate(FBufferedDraw); //jSelf !
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -423,10 +442,18 @@ begin
 end;
 *)
 
+{
 function jDrawingView.jCreate(): jObject;
 begin
    Result:= jDrawingView_jCreate(FjEnv, int64(Self), FjThis);
 end;
+}
+
+function jDrawingView.jCreate( _bufferedDraw: boolean): jObject;
+begin
+   Result:= jDrawingView_jCreate(FjEnv, int64(Self) ,_bufferedDraw, FjThis);
+end;
+
 
 procedure jDrawingView.jFree();
 begin
@@ -669,14 +696,20 @@ begin
                 end;
   end;
 end;
-// Event : Java Event -> Pascal
 
+// Event : Java Event -> Pascal
 procedure jDrawingView.GenEvent_OnDrawingViewDraw(Obj: TObject; Act,
   Cnt: integer; X, Y: array of Single; fligGesture: integer;
   pinchZoomGestureState: integer; zoomScaleFactor: single);
 begin
   if Assigned(FOnDraw) then
-      FOnDraw(Obj,Cnt,X,Y,TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
+      FOnDraw(Obj,Cnt,X,Y,TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor);
+end;
+
+Procedure jDrawingView.GenEvent_OnDrawingViewSizeChanged(Obj: TObject; width: integer; height: integer; oldWidth: integer; oldHeight: integer);
+begin
+    if Assigned(FOnSizeChanged) then
+        FOnSizeChanged(Obj, width, height, oldWidth, oldHeight);
 end;
 
 procedure jDrawingView.DrawLine(var _points: TDynArrayOfSingle);
@@ -685,7 +718,6 @@ begin
   if FInitialized then
      jDrawingView_DrawLine(FjEnv, FjObject, _points);
 end;
-
 
 procedure jDrawingView.DrawLine(_points: array of single);
 begin
@@ -982,7 +1014,36 @@ begin
      jDrawingView_DrawTextMultiLine(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
 end;
 
-procedure jDrawingView.SetViewPortScaleXY(minX: single; maxX: single; minY: single; maxY: single);
+procedure jDrawingView.Invalidate();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_Invalidate(FjEnv, FjObject);
+end;
+
+procedure jDrawingView.Clear(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_Clear(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+end;
+
+procedure jDrawingView.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_Clear(FjEnv, FjObject);
+end;
+
+procedure jDrawingView.SetBufferedDraw(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FBufferedDraw:= _value;
+  if FInitialized then
+     jDrawingView_SetBufferedDraw(FjEnv, FjObject, _value);
+end;
+
+procedure jDrawingView.SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);
 begin
     FMinWorldX:= minX;
     FMaxWorldX:= maxX;
@@ -995,59 +1056,60 @@ begin
     if (maxY-minY) <> 0 then FScaleY:= -(Self.Height-10)/(maxY-minY);
 end;
 
-function jDrawingView.GetViewPortX(_worldX: single): integer;
+function jDrawingView.GetViewportX(_worldX: single): integer;
 begin
   //in designing component state: result value here...
   Result:=round(FScaleX*(_worldX - FMinWorldX));
 end;
 
-function jDrawingView.GetViewPortY(_worldY: single): integer;
+function jDrawingView.GetViewportY(_worldY: single): integer;
 begin
   //in designing component state: result value here...
   Result:= 10+round(FScaleY*(_worldY - FMaxWorldY));
 end;
 
-function jDrawingView.GetWorldX(viewPortX:integer): single;
+function jDrawingView.GetWorldX(_viewportX:integer): single;
 begin
    if FScaleX <> 0 then
-     Result:=(viewPortX+FScaleX*FMinWorldX)/FScaleX
+     Result:=(_viewportX+FScaleX*FMinWorldX)/FScaleX
    else Result:= 0;
 end;
 
-function jDrawingView.GetWorldY(viewPortY:integer): single;
+function jDrawingView.GetWorldY(_viewportY:integer): single;
 begin
    if FScaleY <> 0 then
-     Result:=(viewPortY+FScaleY*FMaxWorldY)/FScaleY
+     Result:=(_viewportY+FScaleY*FMaxWorldY)/FScaleY
    else Result:= 0;
 end;
 
 
-function jDrawingView.GetViewPortX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewPortWidth: integer): integer;
+function jDrawingView.GetViewportX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewportWidth: integer): integer;
 var
   escX:real;
 begin
   //in designing component state: result value here...
   if FInitialized then
   begin
-     escX:=(_viewPortWidth/(_maxWorldX-_minWorldX));
+     escX:=(_viewportWidth/(_maxWorldX-_minWorldX));
      Result:=round(escX*(_worldX - _minWorldX));
   end;
 end;
 
-function jDrawingView.GetViewPortY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewPortHeight: integer): integer;
+function jDrawingView.GetViewportY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewportHeight: integer): integer;
 var
   escY:real;
 begin
   //in designing component state: result value here...
   if FInitialized then
   begin
-     escY:= -(_viewPortHeight-10)/(_maxWorldY-_minWorldY);
+     escY:= -(_viewportHeight-10)/(_maxWorldY-_minWorldY);
      Result:= 10+round(escY*(_worldY - _maxWorldY));
   end;
 end;
 
 {-------- jDrawingView_JNI_Bridge ----------}
 
+(*
 function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 var
   jParams: array[0..0] of jValue;
@@ -1060,6 +1122,22 @@ begin
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
+*)
+
+function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean; this: jObject): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jParams[1].z:= JBool(_bufferedDraw);
+  jCls:= Get_gjClass(env);
+  jMethod:= env^.GetMethodID(env, jCls, 'jDrawingView_jCreate', '(JZ)Ljava/lang/Object;');
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+end;
+
 
 (*
 //Please, you need insert:
@@ -2091,6 +2169,55 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'DrawTextMultiLine', '(Ljava/lang/String;FFFF)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_Invalidate(env: PJNIEnv; _jdrawingview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Invalidate', '()V');
+  env^.CallVoidMethod(env, _jdrawingview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_Clear(env: PJNIEnv; _jdrawingview: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '(I)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jDrawingView_Clear(env: PJNIEnv; _jdrawingview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _jdrawingview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_SetBufferedDraw(env: PJNIEnv; _jdrawingview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBufferedDraw', '(Z)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

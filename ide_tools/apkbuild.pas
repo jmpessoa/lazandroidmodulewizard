@@ -89,16 +89,49 @@ type
     class function DefaultSubTool: string; override;
   end;
 
+function IsAllCharNumber(pcString: PChar): Boolean;
+begin
+  Result := False;
+  while pcString^ <> #0 do // 0 indicates the end of a PChar string
+  begin
+    if not (pcString^ in ['0'..'9']) then Exit;
+    Inc(pcString);
+  end;
+  Result := True;
+end;
+
 function CollectDirs(const PathMask: string): TStringList;
 var
+  p: integer;
   dir: TSearchRec;
+  collectSdkPlatforms: boolean;
+  api: string;
 begin
+
+  collectSdkPlatforms:= False;
+  if Pos('platforms'+PathDelim+'android-',PathMask) > 0 then collectSdkPlatforms:= True;
+
   Result := TStringList.Create;
   if FindFirst(PathMask, faDirectory, dir) = 0 then
     repeat
       if dir.Name[1] <> '.' then
       begin
-        Result.Add(dir.Name);
+          if collectSdkPlatforms then
+          begin
+            p:= Pos('-', dir.Name);
+            if p > 0 then
+            begin
+              api:= Copy(dir.Name, p+1, MaxInt);
+              if IsAllCharNumber(PChar(api))  then
+              begin
+                 Result.Add(dir.Name);
+              end;
+            end;
+          end
+          else
+          begin
+            Result.Add(dir.Name);
+          end;
       end;
     until (FindNext(dir) <> 0);
   FindClose(dir);
@@ -141,17 +174,6 @@ begin
   finally
     f.Free;
   end;
-end;
-
-function IsAllCharNumber(pcString: PChar): Boolean;
-begin
-  Result := False;
-  while pcString^ <> #0 do // 0 indicates the end of a PChar string
-  begin
-    if not (pcString^ in ['0'..'9']) then Exit;
-    Inc(pcString);
-  end;
-  Result := True;
 end;
 
 { TGradleParser }
@@ -533,13 +555,14 @@ begin
               sl := CollectDirs(AppendPathDelim(FSdkPath) + 'platforms' + PathDelim + 'android-*');
               sl.Sorted := True;
 
+              (*
                 //try remove "android-P"
               if sl.Find('android-P', outIndex) then
                 sl.Delete(outIndex);
-
               //try remove "android-W"
               if sl.Find('android-4.4W.2', outIndex) then
                 sl.Delete(outIndex);
+              *)
 
               try
                 if sl.Count = 0 then Continue;

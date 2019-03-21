@@ -403,13 +403,13 @@ begin
 
   if (FInstructionSetIndex = 2) and (IsLaz4Android) then
   begin
-     ShowMessage('WARNING: "laz4Android 1.8.0" [out-of-box]'+ sLineBreak + 'don''t support "ARMV7a + VFPv3"' + sLineBreak +
+     ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0" [out-of-box]'+ sLineBreak + 'don''t support "ARMV7a + VFPv3"' + sLineBreak +
      sLineBreak +'Hint: Select "ARMv7a + Soft"');
   end;
 
   if (FInstructionSetIndex = 5) and (IsLaz4Android) then
   begin
-    ShowMessage('WARNING: "laz4Android 1.8.0" [out-of-box]' + sLineBreak + 'don''t support "aarch64"' + sLineBreak +
+    ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0" [out-of-box]' + sLineBreak + 'don''t support "aarch64"' + sLineBreak +
     sLineBreak +'Hint: Select "ARMv7a + Soft"');
   end;
 
@@ -544,6 +544,13 @@ begin
   if EditPathToWorkspace.Text = '' then
   begin
     ShowMessage('Error! Workspace Path was missing....[Cancel]');
+    ModalResult:= mrCancel;
+    Exit;
+  end;
+
+  if Pos(' ', EditPathToWorkspace.Text) > 0 then
+  begin
+    ShowMessage('Error! Path to Workspace contains space character....[Cancel]');
     ModalResult:= mrCancel;
     Exit;
   end;
@@ -1134,8 +1141,14 @@ begin
   FPathToWorkspace:= EditPathToWorkspace.Text;
   if EditPathToWorkspace.Text = '' then
   begin
-     ShowMessage('Please,  enter path to [workspace] projects folder...');
-  end
+     ShowMessage('Please,  enter path to projects [workspace] folder...');
+  end;
+
+  if Pos(' ', EditPathToWorkspace.Text) > 0 then
+  begin
+    ShowMessage('Warning: path to projects [workspace] contains space characters inside [not advised!]...');
+  end;
+
 end;
 
 procedure TFormWorkspace.SpdBtnPathToWorkspaceClick(Sender: TObject);
@@ -1336,6 +1349,9 @@ begin
     if FMainActivity = '' then FMainActivity:= 'App';
 
     auxInstSet:= ReadString('NewProject','InstructionSet', '');
+
+    if not IsAllCharNumber(PChar(auxInstSet)) then
+      auxInstSet:= '1';
 
     if auxInstSet = '' then auxInstSet:= '1';
     if auxInstSet = '0' then auxInstSet:='1';

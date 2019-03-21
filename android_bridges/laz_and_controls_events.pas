@@ -95,6 +95,9 @@ uses
    procedure Java_Event_pOnDrawingViewDraw(env: PJNIEnv; this: jobject; Obj: TObject; action, countPoints: integer;
                                       arrayX: jObject; arrayY: jObject; flingGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 
+   procedure Java_Event_pOnDrawingViewSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject;
+                                      width: integer; height: integer; oldWidth: integer; oldHeight: integer);
+
    Procedure Java_Event_pOnContactManagerContactsExecuted(env: PJNIEnv; this: jobject; Obj: TObject; count: integer);
 
    function Java_Event_pOnContactManagerContactsProgress(env: PJNIEnv; this: jobject; Obj: TObject; contactInfo: JString;
@@ -1238,6 +1241,19 @@ begin
       jDrawingView(Obj).GenEvent_OnDrawingViewDraw(Obj,action,countPoints,
                                                     arrayResultX,arrayResultY,
                                                     flingGesture,pinchZoomGestureState, zoomScaleFactor);
+  end;
+end;
+
+procedure Java_Event_pOnDrawingViewSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject;
+                                   width: integer; height: integer; oldWidth: integer; oldHeight: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jDrawingView then
+  begin
+      jForm(jDrawingView(Obj).Owner).UpdateJNI(gApp);
+      jDrawingView(Obj).GenEvent_OnDrawingViewSizeChanged(Obj,width, height, oldWidth, oldHeight);
   end;
 end;
 

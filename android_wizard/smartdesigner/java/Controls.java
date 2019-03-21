@@ -1,6 +1,6 @@
 package org.lamw.applamwproject3;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.3.1  - 01 February- 2019 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4  - 12 March - 2019 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard

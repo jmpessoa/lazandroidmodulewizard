@@ -149,6 +149,8 @@ type
                                      const ResourceName : string): string; override;
   end;
 
+   function IsAllCharNumber(pcString: PChar): Boolean;
+
 var
   AndroidProjectDescriptor: TAndroidProjectDescriptor;
   AndroidFileDescriptor: TAndroidFileDescPascalUnitWithResource;
@@ -803,33 +805,29 @@ begin
   Result:= False;
   savedBuilder:= 0;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
-
   FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
-
   if lisDir.Count > 0 then
   begin
     for i:= 0 to lisDir.Count-1 do
     begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
-       if  auxStr <> '' then
+       if auxStr <> '' then    //19.1.0
        begin
-         if  Pos('rc2', auxStr) = 0  then   //escape some alien...
-         begin
            numberAsString:= Copy(auxStr, 1 , 2);  //19
-           builderNumber:=  StrToInt(numberAsString);
-
-           if savedBuilder < builderNumber then
+           if IsAllCharNumber(PChar(numberAsString)) then
            begin
-             savedBuilder:= builderNumber;
-             if builderNumber > platform then FCandidateSdkBuild:= auxStr;
+             builderNumber:=  StrToInt(numberAsString);
+             if savedBuilder < builderNumber then
+             begin
+               savedBuilder:= builderNumber;
+               if builderNumber > platform then FCandidateSdkBuild:= auxStr;
+             end;
+             if  platform = builderNumber then
+             begin
+               outBuildTool:= auxStr; //25.0.3
+               Result:= True;
+             end;
            end;
-
-           if  platform = builderNumber then
-           begin
-             outBuildTool:= auxStr; //25.0.3
-             Result:= True;
-           end;
-         end;
        end;
     end;
   end;
@@ -3526,6 +3524,17 @@ begin
        theString:= '';
     end;
   end;
+end;
+
+function IsAllCharNumber(pcString: PChar): Boolean;
+begin
+  Result := False;
+  while pcString^ <> #0 do // 0 indicates the end of a PChar string
+  begin
+    if not (pcString^ in ['0'..'9']) then Exit;
+    Inc(pcString);
+  end;
+  Result := True;
 end;
 
 end.
