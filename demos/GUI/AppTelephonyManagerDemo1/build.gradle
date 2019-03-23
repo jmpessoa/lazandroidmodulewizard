@@ -13,10 +13,10 @@ android {
     lintOptions {
        abortOnError false
     }
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
             minSdkVersion 14
-            targetSdkVersion 23
+            targetSdkVersion 26
             versionCode 1
             versionName "1.0"
     }
@@ -37,6 +37,7 @@ android {
     }
 }
 dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
  
 task run(type: Exec, dependsOn: ':installDebug') {

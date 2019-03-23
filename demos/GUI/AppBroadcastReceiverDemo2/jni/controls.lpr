@@ -212,6 +212,15 @@ begin
 end;
 
 { Class:     org_lamw_appbroadcastreceiverdemo2_Controls
+  Method:    pOnDown
+  Signature: (JI)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
+  cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_appbroadcastreceiverdemo2_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
@@ -227,6 +236,15 @@ procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
   ); cdecl;
 begin
   Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_appbroadcastreceiverdemo2_Controls
+  Method:    pOnDoubleClick
+  Signature: (JI)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  value: JInt); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     org_lamw_appbroadcastreceiverdemo2_Controls
@@ -337,6 +355,16 @@ begin
 end;
 
 { Class:     org_lamw_appbroadcastreceiverdemo2_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     org_lamw_appbroadcastreceiverdemo2_Controls
   Method:    pOnBroadcastReceiver
   Signature: (JLandroid/content/Intent;)V }
 procedure pOnBroadcastReceiver(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -345,7 +373,7 @@ begin
   Java_Event_pOnBroadcastReceiver(PEnv, this, TObject(pasobj), intent);
 end;
 
-const NativeMethods: array[0..37] of JNINativeMethod = (
+const NativeMethods: array[0..40] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -416,12 +444,18 @@ const NativeMethods: array[0..37] of JNINativeMethod = (
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(JI)V';
+    fnPtr: @pOnDown; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
    (name: 'pOnLongClick';
     signature: '(JI)V';
     fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(JI)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -458,6 +492,9 @@ const NativeMethods: array[0..37] of JNINativeMethod = (
    (name: 'pOnLayouting';
     signature: '(JZ)V';
     fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
    (name: 'pOnBroadcastReceiver';
     signature: '(JLandroid/content/Intent;)V';
     fnPtr: @pOnBroadcastReceiver; )
@@ -564,9 +601,12 @@ exports
     +'pOnClickGeneric',
   pAppOnSpecialKeyDown name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_'
     +'pAppOnSpecialKeyDown',
+  pOnDown name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_pOnDown',
   pOnClick name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_pOnClick',
   pOnLongClick name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_'
     +'pOnLongClick',
+  pOnDoubleClick name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_'
+    +'pOnDoubleClick',
   pOnChange name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_pOnChange',
   pOnChanged name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_pOnChanged',
   pOnEnter name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_pOnEnter',
@@ -587,6 +627,8 @@ exports
     +'pOnAfterDispatchDraw',
   pOnLayouting name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_'
     +'pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_org_lamw_appbroadcastreceiverdemo2_'
+    +'Controls_pAppOnRequestPermissionResult',
   pOnBroadcastReceiver name 'Java_org_lamw_appbroadcastreceiverdemo2_Controls_'
     +'pOnBroadcastReceiver';
 

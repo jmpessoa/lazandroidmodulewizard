@@ -125,6 +125,7 @@ jIntentManager = class(jControl)
     procedure SetDataAndType(_uriData: jObject; _mimeType: string); overload;
     procedure SetDataAndType(_uriAsString: string; _mimeType: string); overload;
     function HasLaunchIntentForPackage(_packageName: string): boolean;
+    function GetExtraSMS(_intent: jObject; _addressBodyDelimiter: string): string;
 
 
  published
@@ -223,6 +224,7 @@ procedure jIntentManager_TryDownloadPackage(env: PJNIEnv; _jintentmanager: JObje
 procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriData: jObject; _mimeType: string); overload;
 procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriAsString: string; _mimeType: string); overload;
 function jIntentManager_HasLaunchIntentForPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string): boolean;
+function jIntentManager_GetExtraSMS(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _addressBodyDelimiter: string): string;
 
 
 implementation
@@ -862,6 +864,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_HasLaunchIntentForPackage(FjEnv, FjObject, _packageName);
+end;
+
+function jIntentManager.GetExtraSMS(_intent: jObject; _addressBodyDelimiter: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetExtraSMS(FjEnv, FjObject, _intent ,_addressBodyDelimiter);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2376,5 +2385,28 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jIntentManager_GetExtraSMS(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _addressBodyDelimiter: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intent;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_addressBodyDelimiter));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetExtraSMS', '(Landroid/content/Intent;Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

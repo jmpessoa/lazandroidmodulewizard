@@ -16,6 +16,8 @@ import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.telephony.SmsMessage;
+import android.util.Log;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 3:49:46]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -128,7 +130,7 @@ Sending Data: Extras vs. URI Parameters
              Returns the same Intent object, for chaining multiple calls into a single statement.
 	    */
    }
-   
+      
    public void StartActivityForResult(int _requestCode) {
 	   controls.activity.startActivityForResult(mIntent,_requestCode);
 	   // //startActivityForResult(photoPickerIntent, SELECT_PHOTO);
@@ -401,7 +403,7 @@ Sending Data: Extras vs. URI Parameters
 	    case 8: mIntent.setAction(Settings.ACTION_QUICK_LAUNCH_SETTINGS); break;
 	    case 9: mIntent.setAction(Settings.ACTION_DATE_SETTINGS); break;
 	    case 10: mIntent.setAction(Settings.ACTION_SETTINGS);   break;//system settings
-	    case 11: mIntent.setAction(Settings.ACTION_WIRELESS_SETTINGS); break;	    
+	    case 11: mIntent.setAction(Settings.ACTION_WIRELESS_SETTINGS); break;	//"android.settings.WIRELESS_SETTINGS"    
 	    case 12: mIntent.setAction(Settings.ACTION_DEVICE_INFO_SETTINGS); break;
 	    case 13: mIntent.setAction(android.content.Intent.ACTION_SEND); break;
 	    case 14: mIntent.setAction(android.content.Intent.ACTION_SEND_MULTIPLE); break;	    
@@ -542,8 +544,17 @@ Sending Data: Extras vs. URI Parameters
        else
           return false;
     }
-     
-   public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
+
+    public boolean IsCallable(String _action) {
+        Intent i = new Intent(_action);
+        List<ResolveInfo> list = controls.activity.getPackageManager().queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
+        if(list.size() > 0)
+            return true ;
+        else
+            return false;
+    }
+
+    public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
 	   return _intent.getAction().equals(_intentAction);
    }
    
@@ -652,5 +663,57 @@ Sending Data: Extras vs. URI Parameters
 	   controls.activity.startActivity(t);
    }
    
+   /** https://stackoverflow.com/questions/13719471/why-setdataandtype-for-an-android-intent-works-fine-when-setdata-and-settype
+    * Uri uri = Uri.parse("file:///sdcard/xxx/log.txt");
+      Intent viewTestLogFileIntent = new Intent(Intent.ACTION_EDIT);
+      viewTestLogFileIntent.setDataAndType(uri,"text/plain");
+    */
+   
+   public void SetDataAndType(Uri _uriData, String _mimeType) {	// thanks to @alexc   
+	   mIntent.setDataAndType(_uriData, _mimeType);
+   }
+   
+   public void SetDataAndType(String _uriAsString, String _mimeType) {	// thanks to @alexc   
+	   mIntent.setDataAndType(Uri.parse(_uriAsString), _mimeType);
+   }
+
+   /*
+ public void SetDataUriAsString(String _uriAsString) { //Uri.parse(fileUrl) - just Strings!
+	   
+	   mIntent.setData(Uri.parse(_uriAsString));  //just Strings!
+	   
+*/
+
+  public boolean HasLaunchIntentForPackage(String _packageName) {  //"com.dynamixsoftware.printershare"
+      mIntent = controls.activity.getPackageManager().getLaunchIntentForPackage(_packageName);
+      if ( mIntent == null )
+          return false;
+      else
+          return true;
+  }
+
+//https://www.javatips.net/api/android-examples-master/CallsAndSMS/app/src/main/java/nisrulz/github/sample/callsandsms/SMSReceiver.java#
+    public String GetExtraSMS(Intent _intent, String _addressBodyDelimiter)  {
+        //---get the SMS message passed in---
+        SmsMessage[] msgs = null;
+        String str = "";
+        if (_intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")) {
+            Bundle bundle = _intent.getExtras();
+            if (bundle != null)
+            {
+                //---retrieve the SMS message received---
+                Object[] pdus = (Object[]) bundle.get("pdus");
+                msgs = new SmsMessage[pdus.length];
+                for (int i=0; i<msgs.length; i++){
+                    msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+                    str += msgs[i].getOriginatingAddress();
+                    str += _addressBodyDelimiter;
+                    str += msgs[i].getMessageBody().toString();
+                    str += " ";
+                }
+            }
+        }
+        return str;
+    }
 }
 

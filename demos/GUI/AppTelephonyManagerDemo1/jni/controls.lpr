@@ -212,6 +212,15 @@ begin
 end;
 
 { Class:     org_lamw_apptelephonymanagerdemo1_Controls
+  Method:    pOnDown
+  Signature: (JI)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); 
+  cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_apptelephonymanagerdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); 
@@ -227,6 +236,15 @@ procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
   ); cdecl;
 begin
   Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_apptelephonymanagerdemo1_Controls
+  Method:    pOnDoubleClick
+  Signature: (JI)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+  value: JInt); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     org_lamw_apptelephonymanagerdemo1_Controls
@@ -347,6 +365,15 @@ begin
 end;
 
 { Class:     org_lamw_apptelephonymanagerdemo1_Controls
+  Method:    pOnBroadcastReceiver
+  Signature: (JLandroid/content/Intent;)V }
+procedure pOnBroadcastReceiver(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+  intent: JObject); cdecl;
+begin
+  Java_Event_pOnBroadcastReceiver(PEnv, this, TObject(pasobj), intent);
+end;
+
+{ Class:     org_lamw_apptelephonymanagerdemo1_Controls
   Method:    pOnTelephonyCallStateChanged
   Signature: (JILjava/lang/String;)V }
 procedure pOnTelephonyCallStateChanged(PEnv: PJNIEnv; this: JObject; 
@@ -356,7 +383,7 @@ begin
     phoneNumber);
 end;
 
-const NativeMethods: array[0..38] of JNINativeMethod = (
+const NativeMethods: array[0..41] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -427,12 +454,18 @@ const NativeMethods: array[0..38] of JNINativeMethod = (
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(JI)V';
+    fnPtr: @pOnDown; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
    (name: 'pOnLongClick';
     signature: '(JI)V';
     fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(JI)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -472,6 +505,9 @@ const NativeMethods: array[0..38] of JNINativeMethod = (
    (name: 'pAppOnRequestPermissionResult';
     signature: '(ILjava/lang/String;I)V';
     fnPtr: @pAppOnRequestPermissionResult; ),
+   (name: 'pOnBroadcastReceiver';
+    signature: '(JLandroid/content/Intent;)V';
+    fnPtr: @pOnBroadcastReceiver; ),
    (name: 'pOnTelephonyCallStateChanged';
     signature: '(JILjava/lang/String;)V';
     fnPtr: @pOnTelephonyCallStateChanged; )
@@ -578,9 +614,12 @@ exports
     +'pOnClickGeneric',
   pAppOnSpecialKeyDown name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_'
     +'pAppOnSpecialKeyDown',
+  pOnDown name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_pOnDown',
   pOnClick name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_pOnClick',
   pOnLongClick name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_'
     +'pOnLongClick',
+  pOnDoubleClick name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_'
+    +'pOnDoubleClick',
   pOnChange name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_pOnChange',
   pOnChanged name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_pOnEnter',
@@ -603,6 +642,8 @@ exports
     +'pOnLayouting',
   pAppOnRequestPermissionResult name 'Java_org_lamw_apptelephonymanagerdemo1_'
     +'Controls_pAppOnRequestPermissionResult',
+  pOnBroadcastReceiver name 'Java_org_lamw_apptelephonymanagerdemo1_Controls_'
+    +'pOnBroadcastReceiver',
   pOnTelephonyCallStateChanged name 'Java_org_lamw_apptelephonymanagerdemo1_'
     +'Controls_pOnTelephonyCallStateChanged';
 
