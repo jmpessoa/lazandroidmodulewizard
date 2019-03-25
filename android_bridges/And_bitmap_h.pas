@@ -11,9 +11,11 @@
 
 unit And_bitmap_h;
 
-   (*Modified by Stephano [14-04-2014]: "I saw Leledumbo's post and the readme file. The 2 solutions that I proposed are much cleaner and don't
-     require any extra steps from the user."
-    ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.105.html *)
+   (*
+     Modified by Stephano [14-04-2014]:
+     The 2 solutions that I proposed are much cleaner and don't require any extra steps from the user."
+     ref. http://forum.lazarus.freepascal.org/index.php/topic,21919.105.html
+   *)
 
 {$mode delphi}
 {$packrecords c}
@@ -22,9 +24,6 @@ interface
 
 uses
   ctypes, And_jni;
-
-{#include <stdint.h>
-#include <jni.h>}
 
 const
 

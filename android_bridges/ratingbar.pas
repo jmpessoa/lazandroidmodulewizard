@@ -5,7 +5,7 @@ unit ratingbar;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;
+  Classes, SysUtils, And_jni, AndroidWidget, systryparent;
 
 type
 
@@ -140,7 +140,6 @@ procedure jRatingBar.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
-  auxRating: single;
 begin
   if not FInitialized  then
   begin

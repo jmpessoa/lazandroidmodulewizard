@@ -9,18 +9,18 @@ uses
 
 type
 
-TIntentActionFiter = (afTimeTick,
-                   afTimeChanged,
-                   afTimeZoneChanged,
-                   afBootCompleted,
-                   afBatteryChanged,
-                   afPowerConnected,
-                   afPowerDisconnected,
-                   afShutDown,
-                   afSMSReceived,
+TIntentActionFiter = (afTimeTick,  //Intent.ACTION_TIME_TICK
+                   afTimeChanged,    //Intent.ACTION_TIME_CHANGED
+                   afTimeZoneChanged, //Intent.ACTION_TIMEZONE_CHANGED
+                   afBootCompleted,   //Intent.ACTION_BOOT_COMPLETED
+                   afBatteryChanged,   //Intent.ACTION_BATTERY_CHANGED
+                   afPowerConnected,    //Intent.ACTION_POWER_CONNECTED
+                   afPowerDisconnected,  //Intent.ACTION_POWER_DISCONNECTED
+                   afShutDown,           //Intent.ACTION_SHUTDOWN
+                   afSMSReceived,       //android.provider.Telephony.SMS_RECEIVED
                    afDownloadComplete,  //android.intent.action.DOWNLOAD_COMPLETE  or DownloadManager.ACTION_DOWNLOAD_COMPLETE
-                   afPhoneState,
-                   afNewOutgoingCall,      //android.intent.action.NEW_OUTGOING_CALL
+                   afPhoneState,        //android.intent.action.PHONE_STATE
+                   afNewOutgoingCall,   //android.intent.action.NEW_OUTGOING_CALL
                    afNone);
 
 
