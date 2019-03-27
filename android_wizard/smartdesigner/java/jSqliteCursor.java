@@ -112,7 +112,7 @@ public class jSqliteCursor {
     }
     
     public int GetValueAsInteger(int columnIndex) {
-    	int index = 0;
+    	int index = columnIndex;
     	
     	if (cursor != null){ 
     	    if	(columnIndex < 0) {index = 0;}
