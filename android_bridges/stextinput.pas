@@ -5,7 +5,7 @@ unit stextinput;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;
+  Classes, SysUtils, And_jni, AndroidWidget, systryparent;
 
 type
 

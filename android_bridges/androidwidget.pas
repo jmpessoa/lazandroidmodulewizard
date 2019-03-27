@@ -112,7 +112,6 @@ const
     $FF8A2BE2,$FF8B0000,$FF8B008B,$FF8B4513,$FF8FBC8F,
     $FF90EE90,$FF9370D8,$FF9400D3,$00000000,$00000000);
 
-  //by jmpessoa
   TProgressBarStyleArray: array[0..7] of DWord = ($01010077,
                                                   $01010078,
                                                   $01010287,
@@ -121,7 +120,6 @@ const
                                                   $01010079,
                                                   $0101020f,
                                                   $0101013c);
-  //by jmpessoa
   TInputTypeExArray: array[0..31] of DWord=($00000000,
                                             $00000001,
                                             $00001001,
@@ -154,14 +152,12 @@ const
                                             $00000004,
                                             $00000014,
                                             $00000024);
-  //by jmpessoa
   TScrollBarStyleArray: array[0..5] of DWord = ($00000000,
                                                 $01000000,
                                                 $02000000,
                                                 $03000000,
                                                 $00000001,
                                                 $00000002);
-  //by jmpessoa
   TPositionRelativeToAnchorIDArray: array[0..12] of DWord =($00000002,
                                                             $00000003,
                                                             $00000010,
@@ -175,7 +171,6 @@ const
                                                             $00000013,
                                                             $00000005,
                                                             $00000007);
-  //by jmpessoa
   TPositionRelativeToParentArray: array[0..8] of DWord = ($0000000c,
                                                           $0000000a,
                                                           $00000009,
@@ -410,8 +405,7 @@ type
       True:(RGB:TColorRGB);
   end;
 
-  //by jmpessoa
-  // ref. http://www.abpsoft.com/criacaoweb/tabcores.html
+  //ref. http://www.abpsoft.com/criacaoweb/tabcores.html
   TARGBColorBridge = (
   colbrBlack,colbrPaleGreen,colbrDarkOrchid,colbrYellowGreen,colbrSienna,
   colbrBrown,colbrDarkGray,colbrLightBlue,colbrHoneyDew,colbrPaleTurquoise,
@@ -444,7 +438,6 @@ type
   colbrLightGreen,colbrMediumPurple,colbrDarkViolet,colbrNone,
   colbrDefault, colbrCustom);  //default=transparent!
 
-  //by jmpessoa
   TProgressBarStyle = (cjProgressBarStyle,
                        cjProgressBarStyleHorizontal,
                        cjProgressBarStyleInverse,
@@ -517,7 +510,7 @@ type
                     itPassNumber,
                     itPassText,
                     itMultiLine);
-  //by jmpessoa
+
   TInputTypeEx  =(  itxText,
                     itxCapCharacters,
                     itxNumber,
@@ -527,7 +520,6 @@ type
                     itxTextPassword,
                     itxMultiLine);
 
-  //by jmpessoa
   //http://www.semurjengkol.com/android-relative-layout-example/#sthash.JdHGbyti.dpuf
   TPositionRelativeToAnchorID = ( raAbove,
                                   raBelow,
@@ -542,10 +534,9 @@ type
                                   raAlignEnd,
                                   raAlignLeft,
                                   raAlignRight);
-  //by jmpessoa
+
   TPositionRelativeToAnchorIDSet = set of TPositionRelativeToAnchorID;
 
-  //by jmpessoa
   //http://knowledge.lapasa.net/?p=334
   TPositionRelativeToParent = (rpBottom,
                                rpTop,
@@ -557,10 +548,8 @@ type
                                rpCenterInParent,
                                rpCenterVertical
                                {rpTrue});
-  //by jmpessoa
   TPositionRelativeToParentSet = set of TPositionRelativeToParent;
 
-  //by jmpessoa
   TLayoutParams = (lpMatchParent, lpWrapContent, lpHalfOfParent, lpOneQuarterOfParent, lpTwoThirdOfParent,
                    lpOneThirdOfParent, lpOneEighthOfParent,lpThreeEighthOfParent, lpFiveEighthOfParent,
                    lpSevenEighthOfParent, lpOneSixthOfParent, lpFiveSixthOfParent, lpOneFifthOfParent,
@@ -825,7 +814,7 @@ type
     Orientation   : TScreenStyle;   //orientation on app start....
 
     Locale        : TLocale;    //by thierrydijoux
-    ControlsVersionInfo: string; //by jmpessoa
+    ControlsVersionInfo: string; //
     TopIndex: integer;
 
     constructor Create(AOwner: TComponent); override;
@@ -1111,7 +1100,7 @@ end;
     function GetDoubleExtra(intentData: jObject; extraName: string; defaultValue: double): double;
 
     Procedure SetCloseCallBack(Func : TOnNotify; Sender : TObject);  overload;
-    Procedure SetCloseCallBack(Func : TOnCallBackData; Sender : TObject); overload; //by jmpessoa
+    Procedure SetCloseCallBack(Func : TOnCallBackData; Sender : TObject); overload;
 
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
@@ -1553,7 +1542,6 @@ end;
 
 //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
-
 function Get_jClassLocalRef(fullClassName: string): jClass;
 function Get_jObjectArrayElement(jobjectArray: jObject; index: integer): jObject;
 procedure Set_jObjectArrayElement(jobjectArray: jObject; index: integer; element: jObject);
@@ -1595,7 +1583,6 @@ function Call_jCallStaticBooleanMethodA(fullClassName: string;
 procedure Call_jCallStaticVoidMethod(fullClassName: string; funcName: string; funcSignature: string);
 procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; funcSignature: string; var jParams: array of jValue);
 
-
 //------------------------------------------------------------------------------
 // App - Main Activity
 //------------------------------------------------------------------------------
@@ -1610,7 +1597,6 @@ function jApp_GetFileList(env: PJNIEnv; this: JObject; Path: string): TDynArrayO
 
 Procedure jApp_Finish                  (env:PJNIEnv;this:jobject);
 
-//by jmpessoa
 Procedure jApp_Finish2                  (env:PJNIEnv;this:jobject);
 function  jApp_GetContext               (env:PJNIEnv;this:jobject): jObject;
 function  jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
@@ -1729,27 +1715,24 @@ Procedure View_Invalidate             (env:PJNIEnv;this:jobject; view : jObject)
 Procedure View_Invalidate             (env:PJNIEnv; view : jObject); overload;
 Procedure View_PostInvalidate(env:PJNIEnv; view : jObject);
 
-//------------
 function JBool( Bool : Boolean ) : byte;
 
-//----------
 // System Info
 Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject;context : jObject) : TWH;
 Function  jSysInfo_PathApp             (env:PJNIEnv;this:jobject;context : jObject; AppName : String) : String;
 Function  jSysInfo_PathDat             (env:PJNIEnv;this:jobject;context : jObject) : String;
 Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
+
 //by thierrydijoux
 Function jSysInfo_Language (env:PJNIEnv; this: jobject; localeType: TLocaleType): String;
-//by jmpessoa
+
 Function  jSysInfo_PathDataBase             (env:PJNIEnv;this:jobject;context : jObject) : String;
 // Device Info
-
 function jSysInfo_GetSystemVersion(env: PJNIEnv; _jform: JObject) : Integer;
 Function  jSysInfo_DevicePhoneNumber   (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 
-//-------------
 
   Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
   function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
@@ -2067,7 +2050,6 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   TouchUp(Sender,Mouches.Mouch);
  end;
 
-//by jmpessoa
 function Get_gjClass(env: PJNIEnv): jClass;
 begin
   if gjClass {global} = nil then
@@ -2425,10 +2407,8 @@ procedure jVisualControl.Init(refApp: jApp);
 begin
   inherited Init(refApp);
   FjPRLayout := jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
-  FjPRLayoutHome:= FjPRLayout;  //save origin
-
+  FjPRLayoutHome:= FjPRLayout;      //save origin
   FScreenStyle := jForm(Owner).ScreenStyle;
-
   (*
   if (PosRelativeToAnchor = []) and (PosRelativeToParent = []) then
   begin
@@ -2437,7 +2417,6 @@ begin
     //FMarginTop := FTop;
   end;
   *)
-
 end;
 
 procedure jVisualControl.Notification(AComponent: TComponent; Operation: TOperation);
@@ -5930,7 +5909,8 @@ var
   startOrient: integer;
 begin
   if FInitialized  then Exit;
-  // Setting Global Environment -----------------------------------------------
+
+  // Setting Global Environment
   FillChar(Forms,SizeOf(Forms),#0);
   Forms.Index:= -1; //initial dummy index ...
 
@@ -5947,7 +5927,6 @@ begin
 
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);
-
   startOrient:= jSystem_GetOrientation(env, this);
 
   if  startOrient = 1 then
@@ -5963,7 +5942,7 @@ begin
   Path.Ext      := jSysInfo_PathExt(env, this);
   Path.DCIM     := jSysInfo_PathDCIM(env, this);
 
-  Path.DataBase := jSysInfo_PathDataBase(env, this, activity);  //by jmpessoa
+  Path.DataBase := jSysInfo_PathDataBase(env, this, activity);
 
   if Pos('getLocale',Self.GetControlsVersionFeatures) > 0 then //"ver&rev=Feature;ver$rev=Feature2"
   begin
@@ -6166,7 +6145,6 @@ begin
   Result:= TProgressBarStyleArray[index];
 end;
 
-//by jmpessoa
 function GetScrollBarStyle(scrlBarStyle: TScrollBarStyle): integer;
 var
   index: integer;

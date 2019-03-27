@@ -1,8 +1,8 @@
 object AndroidModule1: TAndroidModule1
-  Left = 340
-  Top = 138
+  Left = 303
+  Top = 130
   Width = 320
-  Height = 428
+  Height = 533
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -13,6 +13,7 @@ object AndroidModule1: TAndroidModule1
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
+  OnClose = AndroidModule1Close
   OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
     Left = 38
@@ -40,14 +41,14 @@ object AndroidModule1: TAndroidModule1
     GravityInParent = lgNone
   end
   object jTextView2: jTextView
-    Left = 5
-    Top = 41
+    Left = 30
+    Top = 66
     Width = 203
     Height = 26
-    MarginLeft = 5
-    MarginTop = 5
-    MarginRight = 5
-    MarginBottom = 5
+    MarginLeft = 30
+    MarginTop = 30
+    MarginRight = 30
+    MarginBottom = 30
     Enabled = True
     Visible = True
     Anchor = jTextView1
@@ -67,7 +68,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jEditText1: jEditText
     Left = 5
-    Top = 239
+    Top = 331
     Width = 310
     Height = 39
     MarginLeft = 5
@@ -103,7 +104,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jButton1: jButton
     Left = 5
-    Top = 288
+    Top = 380
     Width = 310
     Height = 57
     MarginLeft = 5
@@ -128,7 +129,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jCheckBox1: jCheckBox
     Left = 5
-    Top = 77
+    Top = 127
     Width = 149
     Height = 32
     MarginLeft = 5
@@ -152,7 +153,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jCheckBox2: jCheckBox
     Left = 5
-    Top = 119
+    Top = 169
     Width = 217
     Height = 32
     MarginLeft = 5
@@ -176,7 +177,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jCheckBox3: jCheckBox
     Left = 5
-    Top = 161
+    Top = 211
     Width = 269
     Height = 32
     MarginLeft = 5
@@ -200,7 +201,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jTextView3: jTextView
     Left = 5
-    Top = 203
+    Top = 295
     Width = 154
     Height = 26
     MarginLeft = 5
@@ -209,7 +210,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Enabled = True
     Visible = True
-    Anchor = jCheckBox3
+    Anchor = jCheckBox4
     Id = 8
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
@@ -226,7 +227,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jButton2: jButton
     Left = 5
-    Top = 355
+    Top = 447
     Width = 310
     Height = 57
     MarginLeft = 5
@@ -249,9 +250,44 @@ object AndroidModule1: TAndroidModule1
     GravityInParent = lgNone
     OnClick = jButton2Click
   end
+  object jCheckBox4: jCheckBox
+    Left = 5
+    Top = 253
+    Width = 287
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jCheckBox3
+    Id = 10
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'PROCESS_OUTGOING_CALLS'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+  end
   object jTelephonyManager1: jTelephonyManager
     OnCallStateChanged = jTelephonyManager1CallStateChanged
     left = 144
     top = 264
+  end
+  object jBroadcastReceiver1: jBroadcastReceiver
+    IntentActionFilter = afNone
+    OnReceiver = jBroadcastReceiver1Receiver
+    left = 216
+    top = 40
+  end
+  object jIntentManager1: jIntentManager
+    IntentAction = iaNone
+    left = 256
+    top = 144
   end
 end

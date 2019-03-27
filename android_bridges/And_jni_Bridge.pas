@@ -1067,6 +1067,9 @@ function jHttpClient_GetConnectionTimeout(env: PJNIEnv; _jhttpclient: JObject): 
 procedure jHttpClient_UploadFile(env: PJNIEnv; _jhttpclient: JObject; _url: string; _fullFileName: string; _uploadFormName: string); overload;
 procedure jHttpClient_UploadFile(env: PJNIEnv; _jhttpclient: JObject; _url: string; _fullFileName: string);  overload;
 procedure jHttpClient_SetUploadFormName(env: PJNIEnv; _jhttpclient: JObject; _uploadFormName: string);
+procedure jHttpClient_SetUnvaluedNameData(env: PJNIEnv; _jhttpclient: JObject; _unvaluedName: string);
+procedure jHttpClient_SetEncodeValueData(env: PJNIEnv; _jhttpclient: JObject; _value: boolean);
+procedure jHttpClient_PostSOAPDataAsync(env: PJNIEnv; _jhttpclient: JObject; _SOAPData: string; _stringUrl: string);
 
 
 {ImageList}
@@ -11862,6 +11865,49 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetUploadFormName', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHttpClient_SetUnvaluedNameData(env: PJNIEnv; _jhttpclient: JObject; _unvaluedName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_unvaluedName));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetUnvaluedNameData', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHttpClient_SetEncodeValueData(env: PJNIEnv; _jhttpclient: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetEncodeValueData', '(Z)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHttpClient_PostSOAPDataAsync(env: PJNIEnv; _jhttpclient: JObject; _SOAPData: string; _stringUrl: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_SOAPData));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_stringUrl));
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'PostSOAPDataAsync', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

@@ -407,4 +407,13 @@ public class jButton extends Button {
    public void SetFrameGravity(int _value) {	   
       LAMWCommon.setLGravity(_value);
    }
+   
+   public void SetAllCaps(boolean allCaps)
+   {
+	   this.setAllCaps(allCaps);
+   }
+
+   public void SetFocus() {
+   	  this.requestFocus();
+   }
 }

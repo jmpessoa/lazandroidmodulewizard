@@ -5,7 +5,7 @@ unit srecyclerview;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;
+  Classes, SysUtils, And_jni, AndroidWidget, systryparent;
 
 Const
   ItemContentFormatArray: array  [0..4] of string = ('TEXT','IMAGE', 'CHECK', 'RATING', 'SWITCH');

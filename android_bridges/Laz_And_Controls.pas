@@ -138,9 +138,9 @@ unit Laz_And_Controls;
 interface
 
 uses
+  {And_lib_Unzip,}
   SysUtils, Classes,
-  And_jni, And_jni_Bridge,
-  And_lib_Unzip, And_bitmap_h,
+  And_bitmap_h, And_jni, And_jni_Bridge,
   AndroidWidget, systryparent;
 
 type
@@ -356,6 +356,9 @@ type
     procedure UploadFile(_url: string; _fullFileName: string; _uploadFormName: string); overload;
     procedure UploadFile(_url: string; _fullFileName: string);  overload;
     procedure SetUploadFormName(_uploadFormName: string);
+    procedure SetUnvaluedNameData(_unvaluedName: string);
+    procedure SetEncodeValueData(_value: boolean);
+    procedure PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -2070,11 +2073,9 @@ type
   Procedure Java_Event_pOnClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
   Procedure Java_Event_pOnLongClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
 
-  // Asset Function (P : Pascal Native)
+  //Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
-  Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
-
-  //procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
+  (**Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;**) //droped And_lib_Unzip.pas
 
   procedure DBListView_Log (msg: string);
 
@@ -2082,108 +2083,8 @@ implementation
 
 
 uses
+  {And_log_h,}  //for debug
   autocompletetextview, viewflipper, comboedittext, radiogroup;
-
-  {,And_log_h}  {for test}
-
-  (*
- procedure sysTryNewParent( var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp);
- begin
-
-  if FParent is jForm then Exit;  //default
-
-  if FParent is jPanel then
-  begin
-    if not jVisualControl(FParent).Initialized then jPanel(FParent).Init(refApp);
-    FjPRLayout:= jPanel(FParent).View;
-  end else
-  if FParent is jScrollView then
-  begin
-    if not jVisualControl(FParent).Initialized then jScrollView(FParent).Init(refApp);
-    FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
-  end else
-  if FParent is jHorizontalScrollView then
-  begin
-    if not jVisualControl(FParent).Initialized then jHorizontalScrollView(FParent).Init(refApp);
-    FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
-  end  else
-  if FParent is jCustomDialog then
-  begin
-    if not jVisualControl(FParent).Initialized then jCustomDialog(FParent).Init(refApp);
-    FjPRLayout:= jCustomDialog(FParent).View;
-  end else
-  if FParent is jViewFlipper then
-  begin
-    if not jVisualControl(FParent).Initialized then jViewFlipper(FParent).Init(refApp);
-    FjPRLayout:= jViewFlipper(FParent).View;
-  end else
-  if FParent is jToolbar then
-  begin
-    if not jVisualControl(FParent).Initialized then jToolbar(FParent).Init(refApp);
-    FjPRLayout:= jToolbar(FParent).View;
-  end  else
-  if FParent is jRadioGroup then
-  begin
-      if not jVisualControl(FParent).Initialized then jRadioGroup(FParent).Init(refApp);
-      FjPRLayout:= jRadioGroup(FParent).View;
-  end else
-  if FParent is jsToolbar then
-  begin
-    jsToolbar(FParent).Init(refApp);
-    FjPRLayout:= jsToolbar(FParent).View;
-  end  else
-  if FParent is jsCoordinatorLayout then
-  begin
-    if not jVisualControl(FParent).Initialized then jsCoordinatorLayout(FParent).Init(refApp);
-    FjPRLayout:= jsCoordinatorLayout(FParent).View;
-  end else
-  if FParent is jFrameLayout then
-  begin
-    if not jVisualControl(FParent).Initialized then jFrameLayout(FParent).Init(refApp);
-    FjPRLayout:= jFrameLayout(FParent).View;
-  end else
-  if FParent is jLinearLayout then
-  begin
-    if not jVisualControl(FParent).Initialized then jLinearLayout(FParent).Init(refApp);
-    FjPRLayout:= jLinearLayout(FParent).View;
-  end else
-  if FParent is jsDrawerLayout then
-  begin
-    if not jVisualControl(FParent).Initialized then jsDrawerLayout(FParent).Init(refApp);
-    FjPRLayout:= jsDrawerLayout(FParent).View;
-  end  else
-  if FParent is jsCardView then
-  begin
-      if not jVisualControl(FParent).Initialized then jsCardView(FParent).Init(refApp);
-      FjPRLayout:= jsCardView(FParent).View;
-  end else
-  if FParent is jsAppBarLayout then
-  begin
-      if not jVisualControl(FParent).Initialized then jsAppBarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsAppBarLayout(FParent).View;
-  end else
-  if FParent is jsTabLayout then
-  begin
-      if not jVisualControl(FParent).Initialized then jsTabLayout(FParent).Init(refApp);
-      FjPRLayout:= jsTabLayout(FParent).View;
-  end else
-  if FParent is jsCollapsingToolbarLayout then
-  begin
-      if not jVisualControl(FParent).Initialized then jsCollapsingToolbarLayout(FParent).Init(refApp);
-      FjPRLayout:= jsCollapsingToolbarLayout(FParent).View;
-  end else
-  if FParent is jsNestedScrollView then
-  begin
-      if not jVisualControl(FParent).Initialized then jsNestedScrollView(FParent).Init(refApp);
-      FjPRLayout:= jsNestedScrollView(FParent).View;
-  end else
-  if FParent is jsViewPager then
-  begin
-      if not jVisualControl(FParent).Initialized then jsViewPager(FParent).Init(refApp);
-      FjPRLayout:= jsViewPager(FParent).View;
-  end;
- end;
-*)
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -2203,6 +2104,7 @@ Function  Asset_SaveToFile(srcFile, outFile : String; SkipExists : Boolean = Fal
 // PkgName  '/data/app/com/kredix-1.apk'
 // srcFile  'assets/test.txt'
 // outFile  '/data/data/com/kredix/files/test.txt'
+(**      droped And_lib_Unzip.pas
 Function Asset_SaveToFileP(srcFile, outFile : string; SkipExists : Boolean = False) : Boolean;
  Var
   Stream : TMemoryStream;
@@ -2215,6 +2117,7 @@ Function Asset_SaveToFileP(srcFile, outFile : string; SkipExists : Boolean = Fal
   Stream.free;
   Result := FileExists(outFile);
  end;
+**)
 
 Function IntToWebViewStatus( EventType : Integer ) : TWebViewStatus;
  begin
@@ -4784,8 +4687,6 @@ begin
 end;
 
 procedure jButton.SetAllCaps(AValue: Boolean);
-var
-  _Text: String;
 begin
   FAllCaps := AValue;
   if(FInitialized) then
@@ -6897,6 +6798,27 @@ begin
   FUploadFormName:=_uploadFormName;
   if FInitialized then
      jHttpClient_SetUploadFormName(FjEnv, FjObject, _uploadFormName);
+end;
+
+procedure jHttpClient.SetUnvaluedNameData(_unvaluedName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_SetUnvaluedNameData(FjEnv, FjObject, _unvaluedName);
+end;
+
+procedure jHttpClient.SetEncodeValueData(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_SetEncodeValueData(FjEnv, FjObject, _value);
+end;
+
+procedure jHttpClient.PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_PostSOAPDataAsync(FjEnv, FjObject, _SOAPData ,_stringUrl);
 end;
 
 { jSMTPClient }

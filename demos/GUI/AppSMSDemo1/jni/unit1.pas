@@ -52,7 +52,7 @@ begin
 
    if IsRuntimePermissionGranted('android.permission.SEND_SMS')  then
    begin
-     if jSMS1.Send(jEditText1.Text, jEditText2.Text, 'com.example.appsmsdemo1.SMS_DELIVERED') = 1 then
+     if jSMS1.Send(jEditText1.Text, jEditText2.Text, 'com.example.appsmsdemo1.SMS_DELIVERED') >= 1 then  //warning: for message mult-parts return "parts_count" [thanks to CC!]
        ShowMessage('Message Sending .... OK!')
      else
        ShowMessage('Message Sending .... Fail!');
@@ -146,7 +146,7 @@ end;
 //DELIVERED status
 procedure TAndroidModule1.jBroadcastReceiver2Receiver(Sender: TObject; intent: jObject);
 begin
-   if jBroadcastReceiver2.GetResultCode() = RESULT_OK then   //ok
+   if (jBroadcastReceiver(Sender).GetResultCode() = RESULT_OK then   //ok
       ShowMessage('Ok. SMS delivered !!')
    else
       ShowMessage('Sorry... SMS Not delivered...')

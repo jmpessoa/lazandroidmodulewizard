@@ -8,7 +8,7 @@ unit gridview;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;
+  Classes, SysUtils, And_jni, AndroidWidget, systryparent;
 
 const
   DEFAULT_COLCOUNT=4;

@@ -31,6 +31,7 @@ public class jTelephonyManager /*extends ...*/ {
     boolean callFromApp=false; // To control the call has been made from the application
     boolean callFromOffHook=false; // To control the change to idle state is from the app call
     boolean isPhoneCalling=false;
+    boolean isListenerRemoved = false;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jTelephonyManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -42,6 +43,9 @@ public class jTelephonyManager /*extends ...*/ {
         //To be notified of changes of the phone state create an instance
         //of the TelephonyManager class and the StatePhoneReceiver class
         myPhoneStateListener = new StatePhoneReceiver();
+        mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+
     }
 
     public void jFree() {
@@ -59,67 +63,68 @@ public class jTelephonyManager /*extends ...*/ {
     This is to say that u do not have the option to know when the user picked the phone at other end.
      */
     // Monitor for changes to the state of the phone//
+    // This listener only works when the app is in foreground. To  Listen for call states when in background use BroadcastReceiver !!!]
     class StatePhoneReceiver extends PhoneStateListener {
 
     public StatePhoneReceiver() {
        //
     }
 
+    /*https://www.codeproject.com/Articles/548416/Detecting-Incoming-and-Outgoing-Phone-Calls-on-And     --service!!!
+      //Incoming call-  goes from IDLE to RINGING when it rings, to OFFHOOK when it's answered, to IDLE when its hung up
+     //Outgoing call-  goes from IDLE to OFFHOOK when it dials out, to IDLE when hung up
+     */
     @Override
     public void onCallStateChanged(int state, String incomingNumber) {
-
-        super.onCallStateChanged(state, incomingNumber);
-
         isPhoneCalling = false;
-
         switch (state) {
 
             case TelephonyManager.CALL_STATE_OFFHOOK: //Call is established  -The phone is off the hook
-            if (callFromApp) {
-                //Once you receive call, phone is busy
+            //if (callFromApp) {
+                //Once you receive call, phone is busy/active
                 //Log.i("PHONE RECEIVER", "Telephone is now busy");
-              callFromApp=false;
-              callFromOffHook=true;
-              isPhoneCalling = true;
+              //callFromApp=false;
+              //callFromOffHook=true;
               controls.pOnTelephonyCallStateChanged(pascalObj, 2, incomingNumber);
-            }break;
+              isPhoneCalling = true;   //<<-----
+            //}
+            break;
 
            case TelephonyManager.CALL_STATE_IDLE: //Call is finished
-             if (callFromOffHook) {
-                 callFromOffHook=false;
+             //if (callFromOffHook) {
+                 //callFromOffHook=false;
                  //Once the call ends, phone will become idle
                  //Log.i("PHONE RECEIVER", "Telephone is now idle");
-
                  if (isPhoneCalling) {
                     // Log.i(LOG_TAG, "restart app");
                      // restart app
-                     Intent i = controls.activity.getBaseContext().getPackageManager().getLaunchIntentForPackage(
-                             controls.activity.getBaseContext().getPackageName());
+                     Intent i = controls.activity.getBaseContext().getPackageManager().getLaunchIntentForPackage(controls.activity.getBaseContext().getPackageName());
                      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                      controls.activity.startActivity(i);
-                     isPhoneCalling = false;
                      controls.pOnTelephonyCallStateChanged(pascalObj, 0, incomingNumber);
+                     isPhoneCalling = false;
                  }
-             }break;
+             //}
+             break;
 
            case TelephonyManager.CALL_STATE_RINGING:  //Call is RINGING --(when incoming call coming)
-               if (callFromOffHook) {
+               // // phone ringing
+               //if (callFromOffHook) {
                    //read the incoming call number
                    //String phoneNumber = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
                    //Log.i("PHONE RECEIVER", "Telephone is now ringing " + phoneNumber);
                    controls.pOnTelephonyCallStateChanged(pascalObj, 1, incomingNumber);
-               }break;
+               //}
+               break;
         }
+        super.onCallStateChanged(state, incomingNumber);
     }
 
     }
 
     public void Call(String _phoneNumber) {
-
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
+        if(isListenerRemoved)
+           mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
 
         callFromApp=true;
 
@@ -139,6 +144,7 @@ public class jTelephonyManager /*extends ...*/ {
             audioManager.setMode(AudioManager.MODE_NORMAL); //Deactivate loudspeaker
             audioManager.setSpeakerphoneOn(false);
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE); // Remove listener
+            isListenerRemoved = true;
         }
         else {
             try {
@@ -153,16 +159,16 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetIMEI() {
         String sImei = "";
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
-            if (Build.VERSION.SDK_INT < 26) sImei = mTelephonyManager.getDeviceId();
+            /*
             //[ifdef_api26up]
-            if (Build.VERSION.SDK_INT >=  26) sImei =  mTelephonyManager.getImei();
-            //[endif_api26up]
-        } catch (SecurityException securityException) {
+            if (Build.VERSION.SDK_INT >=  26) {
+                sImei = mTelephonyManager.getImei();
+            }else //[endif_api26up]   */
+                sImei = mTelephonyManager.getDeviceId();
+        }   catch (SecurityException securityException) {
                 Log.d("jTelephonyMgr_IMEI", "Sorry... Not Permission granted!!");
         }
         return sImei;
@@ -170,10 +176,8 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetNetworkCountryIso() {
         String data = "";
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
             data = mTelephonyManager.getNetworkCountryIso();
         } catch (SecurityException securityException) {
@@ -184,10 +188,8 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetSimCountryIso() {
         String data = "";
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
             data = mTelephonyManager.getSimCountryIso();
         } catch (SecurityException securityException) {
@@ -198,10 +200,8 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetDeviceSoftwareVersion() {
         String data = "";
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
             data = mTelephonyManager.getDeviceSoftwareVersion();
         } catch (SecurityException securityException) {
@@ -212,10 +212,8 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetVoiceMailNumber() {
         String data = "";
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
             data = mTelephonyManager.getVoiceMailNumber();
         } catch (SecurityException securityException) {
@@ -227,10 +225,8 @@ public class jTelephonyManager /*extends ...*/ {
     public String GetPhoneType() {
         int phoneType = -1;
         String data = "";
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
             phoneType = mTelephonyManager.getPhoneType();
         } catch (SecurityException securityException) {
@@ -254,10 +250,8 @@ public class jTelephonyManager /*extends ...*/ {
 
     public boolean IsNetworkRoaming() {
         boolean isRoaming = false;
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
             isRoaming = mTelephonyManager.isNetworkRoaming();
         } catch (SecurityException securityException) {
@@ -266,13 +260,10 @@ public class jTelephonyManager /*extends ...*/ {
         return isRoaming;
     }
 
-
     public String GetLine1Number() {
         String data = "";
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
             data = mTelephonyManager.getLine1Number();
         } catch (SecurityException securityException) {
@@ -283,10 +274,8 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetNetworkOperatorName() {
         String data = "";
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         try {
             data = mTelephonyManager.getNetworkOperatorName();
         } catch (SecurityException securityException) {
@@ -296,11 +285,8 @@ public class jTelephonyManager /*extends ...*/ {
     }
 
     public boolean IsWifiEnabled() {
-
-        if (mTelephonyManager == null) {
-            mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
+        if(isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        }
         ConnectivityManager mgrConn = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         return (mgrConn.getActiveNetworkInfo() != null &&
                 mgrConn.getActiveNetworkInfo().getState() == NetworkInfo.State.CONNECTED) ||

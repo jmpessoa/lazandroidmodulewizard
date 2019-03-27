@@ -1,6 +1,6 @@
 package org.lamw.apptelephonymanagerdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.2.3  - 23 October  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4  - 12 March - 2019 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -70,6 +70,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.os.Build;
@@ -104,6 +105,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
@@ -668,20 +670,32 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
-	    
-	        Drawable res = null;	    
-		if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21		
+        Drawable res = null;
+
+        if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21
  			res = this.controls.activity.getResources().getDrawable(_resID);
  		}
- 	
-                //[ifdef_api21up]	 		
+
+ 		//[ifdef_api21up]
  		if(Build.VERSION.SDK_INT >= 21) {  			
  		   res = this.controls.activity.getResources().getDrawable(_resID, null);
- 		} 
-                //[endif_api21up]			
+ 		}//[endif_api21up]
 
  		return res;
 }
+
+	public void SetBackgroundImage(String _imageIdentifier) {
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
+		ImageView image = new ImageView(controls.activity);
+        LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        image.setLayoutParams(param);
+		image.setImageResource(android.R.color.transparent);
+		image.setImageDrawable(d);
+		//image.invalidate();
+		layout.addView(image);
+	}
+
 
 //by  thierrydijoux
 public String GetQuantityStringByName(String _resName, int _quantity) {
@@ -1386,6 +1400,21 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	public String getSystemVersionString(){
 		return android.os.Build.VERSION.RELEASE;
 	}
+
+	public ByteBuffer GetJByteBuffer(int _width, int _height) {
+		ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);
+		return graphicBuffer;
+	}
+
+        public ByteBuffer GetByteBufferFromImage(Bitmap _bitmap) {
+           if (_bitmap == null) return null;
+           int w =  _bitmap.getWidth();
+           int h =_bitmap.getHeight();
+           ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);
+           _bitmap.copyPixelsToBuffer(graphicBuffer);
+           graphicBuffer.rewind();  //reset position
+           return graphicBuffer;
+        }
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1421,8 +1450,10 @@ public native void pOnDraw(long pasobj);
 public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, float x2, float y2);
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
+public native void pOnDown(long pasobj, int value);
 public native void pOnClick(long pasobj, int value);
 public native void pOnLongClick(long pasobj, int value);
+public native void pOnDoubleClick(long pasobj, int value);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
@@ -1516,6 +1547,10 @@ public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
 }
 
+public int getAPILevel() {
+  return android.os.Build.VERSION.SDK_INT;  
+}
+
 //by jmpessoa
 public  int  systemGetOrientation() {  
    return (this.activity.getResources().getConfiguration().orientation); 
@@ -1532,6 +1567,27 @@ public  void classChkNull (Class<?> object) {
 
 public Context GetContext() {   
    return this.activity; 
+}
+
+//by TR3E Software
+public int getContextTop(){
+ ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
+ 
+ if( view != null)
+ 	return view.getTop();
+ else
+ 	return 0;
+	
+}
+
+//by  TR3E Software
+public int getStatusBarHeight() {
+	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+	
+	if ( resourceId > 0 )
+		return this.activity.getResources().getDimensionPixelSize(resourceId);
+	else
+		return 0;
 }
 
 //by  thierrydijoux
@@ -2098,6 +2154,11 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
 
+public java.lang.Object jBroadcastReceiver_jCreate(long _Self) {
+   return (java.lang.Object)(new jBroadcastReceiver(this,_Self));
+}   
+public native void pOnBroadcastReceiver(long pasobj, Intent intent);
+
 public  java.lang.Object jButton_Create(long pasobj ) {
   return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
@@ -2109,6 +2170,10 @@ public  java.lang.Object jCheckBox_Create(long pasobj ) {
 public java.lang.Object jEditText_Create(long pasobj ) {
   return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
 }
+
+public java.lang.Object jIntentManager_jCreate(long _Self) {
+   return (java.lang.Object)(new jIntentManager(this,_Self));
+}      
 
 public java.lang.Object jTelephonyManager_jCreate(long _Self) {
   return (java.lang.Object)(new jTelephonyManager(this,_Self));

@@ -58,8 +58,8 @@ jBluetooth = class(jControl)
     function GetReachablePairedDeviceByName(_deviceName: string): jObject;
     function GetReachablePairedDeviceByAddress(_deviceAddress: string): jObject;
 
-    function IsReachablePairedDevice(_macAddress: string): boolean;
-    function GetRemoteDevice(_macAddress: string): jObject;
+    function IsReachablePairedDevice(_deviceAddress: string): boolean;
+    function GetRemoteDevice(_deviceAddress: string): jObject;
 
     procedure UnpairDeviceByAddress(_deviceAddress: string);
     function GetFoundedDeviceByAddress(_deviceAddress: string): jObject;
@@ -233,18 +233,18 @@ begin
 end;
 
 
-function jBluetooth.IsReachablePairedDevice(_macAddress: string): boolean;
+function jBluetooth.IsReachablePairedDevice(_deviceAddress: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_IsReachablePairedDevice(FjEnv, FjObject, _macAddress);
+   Result:= jBluetooth_IsReachablePairedDevice(FjEnv, FjObject, _deviceAddress);
 end;
 
-function jBluetooth.GetRemoteDevice(_macAddress: string): jObject;
+function jBluetooth.GetRemoteDevice(_deviceAddress: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetRemoteDevice(FjEnv, FjObject, _macAddress);
+   Result:= jBluetooth_GetRemoteDevice(FjEnv, FjObject, _deviceAddress);
 end;
 
 procedure jBluetooth.GenEvent_OnBluetoothEnabled(Obj: TObject);

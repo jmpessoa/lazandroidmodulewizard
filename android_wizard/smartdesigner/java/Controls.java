@@ -1,6 +1,6 @@
-package org.lamw.applamwproject3;
+package org.lamw.appbroadcastreceiverdemo3;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.4  - 12 March - 2019 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.1  - 23 March - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1986,7 +1986,8 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
+
+	public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
 		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
@@ -2006,32 +2007,39 @@ public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 		return 0; //fail
 	}
 }
-
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {	
-	String SMS_DELIVERED = packageDeliveredAction;
-	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
-	SmsManager sms = SmsManager.getDefault();
-	try {
-		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-		if (multipartMessage) {
-			ArrayList<String> messages = sms.divideMessage(msg);    
-			ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
-			for (int i = 0; i < messages.size(); i++) {
-				deliveredPendingIntents.add(i, deliveredPendingIntent);
-			}			
-			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, deliveredPendingIntents);			  
-		} else {
-			List<String> messages = sms.divideMessage(msg);    
-			for (String message : messages) {
-				sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-			}			    
-		}	
-		//Log.i("Send_SMS",phoneNumber+": "+ msg);    
-		return 1; //ok	      
-	} catch (Exception e) {
-		return 0; //fail
+        //improved by CC
+        //http://forum.lazarus-ide.org/index.php/topic,44775.msg315109/topicseen.html
+	public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {
+		String SMS_DELIVERED = packageDeliveredAction;
+		PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+		SmsManager sms = SmsManager.getDefault();
+		int partsCount = 1;
+		try {
+			if (multipartMessage)
+			{
+				ArrayList<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+				for (int i = 0; i < messages.size(); i++)
+				{
+					deliveredPendingIntents.add(i, deliveredPendingIntent);
+				}
+				sms.sendMultipartTextMessage(phoneNumber, null, messages, deliveredPendingIntents, null  );
+			}
+			else
+			{
+				List<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				for (String message : messages)
+				{
+					sms.sendTextMessage(phoneNumber, null, message, deliveredPendingIntent, null );
+				}
+			}
+			return partsCount;
+		} catch (Exception e) {
+			return 0; //fail
+		}
 	}
-}
 
 public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
   //---get the SMS message passed in---	

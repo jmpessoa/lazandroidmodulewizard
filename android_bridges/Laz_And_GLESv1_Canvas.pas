@@ -62,9 +62,9 @@ unit Laz_And_GLESv1_Canvas; {start: 2013-10-26: the simonsayz's "And_GLESv1_Canv
 
 interface
 
-uses ctypes,SysUtils,Classes,Math,
+uses {ctypes,}SysUtils,Classes,Math,
      And_jni,And_jni_Bridge, Laz_And_Controls, AndroidWidget,
-     And_lib_Image, Laz_And_GLESv1_Canvas_h;
+     {And_lib_Image,} Laz_And_GLESv1_Canvas_h;
 
 // GL_OES_point_sprite
 const
@@ -105,7 +105,7 @@ Const
 Function  _glRGBA              ( R,G,B,A : Single  ) : TgfRGBA;
 Procedure _glLighting          ( Active : Boolean );
 Procedure _gluPerspective      ( fovy,aspect,zNear,zFar : Single);
-Function  _glTexture_Load_wPas (ImgName : String; Var Img : GLuint) : Boolean;
+(**Function  _glTexture_Load_wPas (ImgName : String; Var Img : GLuint) : Boolean;**) //droped And_lib_Image.pas
 
 //Function  _glTexture_Load_wJava(env:PJNIEnv; this:jobject; ImgName : String; Var Img : GLuint) : Boolean;
 function _glTexture_Load_wJava(env: PJNIEnv; _jcanvases2: JObject;_fullFilename: string; var Img : GLuint): boolean;
@@ -292,6 +292,7 @@ Procedure _glLighting( Active : Boolean );
  end;
   
 // jpg, png Only
+(***     droped  And_lib_Image.pas
 Function _glTexture_Load_wPas(ImgName : String; Var Img : GLuint) : Boolean;
  Var
   ImgDecoder : TImgDecoder;
@@ -337,6 +338,7 @@ Function _glTexture_Load_wPas(ImgName : String; Var Img : GLuint) : Boolean;
   ImgDecoder.Free;
   Result := True;
  end;
+***)
 
 function _glTexture_Load_wJava(env: PJNIEnv; _jcanvases2: JObject;_fullFilename: string; var Img : GLuint): boolean;
 var
@@ -1013,7 +1015,7 @@ begin
                 //Texture.Active :=        _glTexture_Load_wJava(gApp.Jni.jEnv, gApp.Jni.jThis, gApp.Path.Dat+'/'+filename, Texture.ID);
                   Texture.Active :=        _glTexture_Load_wJava(FjEnv, FjObject, gApp.Path.Dat+'/'+filename, Texture.ID);
              end;
-     tPascal : Texture.Active := _glTexture_Load_wPas(filename, Texture.ID);
+     (**tPascal : Texture.Active := _glTexture_Load_wPas(filename, Texture.ID);**) //And_lib_Image_droped
   end;
 end;
 
