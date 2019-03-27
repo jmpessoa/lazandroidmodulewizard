@@ -19,6 +19,7 @@ import android.graphics.BitmapFactory;
 /* 
  * LAMW -  LAZARUS ANDROID MODULE WIZARD
  * https://github.com/jmpessoa/lazandroidmodulewizard
+ * Review by TR3E 2019/03/27
  */
 public class jSqliteCursor {
 
@@ -56,12 +57,19 @@ public class jSqliteCursor {
     	if (cursor != null) cursor.moveToNext();
     }
     
+    public void MoveToPrev() {
+    	if (cursor != null) cursor.moveToPrevious();
+    }
+    
     public void MoveToLast() {
     	if (cursor != null) cursor.moveToLast();
     }
               
     public void MoveToPosition(int position) {
-    	if (cursor != null) cursor.moveToPosition(position);
+    	if (cursor == null) return;
+    	if ((position < 0) || (position >= cursor.getCount())) return;
+    		
+    	cursor.moveToPosition(position);
     }
   
     public int GetPosition() {
@@ -76,10 +84,20 @@ public class jSqliteCursor {
     	return cursor.getColumnIndex(colName);    	
     }
      
-    public String GetValueAsString(int columnIndex) {
+    public String GetValueAsString(int columnIndex) {    	
     	if (cursor == null) return "";
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return "";
+    	
+    	//Checking the position of the cursor avoid blocking errors
+    	int cursorPos = cursor.getPosition();
+    	
+    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
     	
     	return cursor.getString(columnIndex);    			
+    }
+    
+    public String GetValueAsString( String colName ){    	
+    	return GetValueAsString(GetColumnIndex(colName));    	
     }
 
     //Cursor.FIELD_TYPE_BLOB; //4
@@ -88,18 +106,31 @@ public class jSqliteCursor {
 	//Cursor.FIELD_TYPE_STRING//3
 	//Cursor.FIELD_TYPE_NULL //0
     public int GetColType(int columnIndex) {
-    	if (cursor == null) return Cursor.FIELD_TYPE_NULL; 
+    	if (cursor == null) return 0;
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return Cursor.FIELD_TYPE_NULL;
     		
     	return cursor.getType(columnIndex);    			
     }
     
     public byte[] GetValueAsBlod(int columnIndex) {
     	if (cursor == null) return null;
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return null;
+    	
+    	//Checking the position of the cursor avoid blocking errors
+    	int cursorPos = cursor.getPosition();
+    	
+    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
     	
     	return cursor.getBlob(columnIndex);    			
     }
     
-    public Bitmap GetValueAsBitmap(int columnIndex) {    	
+    public byte[] GetValueAsBlod( String colName ){    	    
+    	return GetValueAsBlod(GetColumnIndex(colName));    	
+    }
+    
+    public Bitmap GetValueAsBitmap(int columnIndex) {
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return null;
+    	
     	byte[] image = GetValueAsBlod(columnIndex);
     	
     	if( image == null ) return null;
@@ -107,40 +138,88 @@ public class jSqliteCursor {
     	return BitmapFactory.decodeByteArray(image, 0, image.length);    	
     }
     
+    public Bitmap GetValueAsBitmap( String colName ){    	    
+    	return GetValueAsBitmap(GetColumnIndex(colName));    	
+    }
+    
     public int GetValueAsInteger(int columnIndex) {
     	if (cursor == null) return -1;
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
     	
-    	int index = columnIndex;
-    	    	
-    	if	(columnIndex < 0) {index = 0;}
-    	if  (columnIndex >= cursor.getColumnCount() ) {index = cursor.getColumnCount()-1;}
+    	//Checking the position of the cursor avoid blocking errors
+    	int cursorPos = cursor.getPosition();
     	
-    	return cursor.getInt(index);
-    			
+    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
+    	
+    	return cursor.getInt(columnIndex);    	
+    }
+    
+    public int GetValueAsInteger( String colName ){    	    
+    	return GetValueAsInteger(GetColumnIndex(colName));    	
     }
     
     public short GetValueAsShort(int columnIndex) {
     	if (cursor == null) return -1;
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	
+    	//Checking the position of the cursor avoid blocking errors
+    	int cursorPos = cursor.getPosition();
+    	
+    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
     	
     	return cursor.getShort(columnIndex);    			
     }
+    
+    public short GetValueAsShort( String colName ){    	    
+    	return GetValueAsShort(GetColumnIndex(colName));    	
+    }
 
     public long GetValueAsLong(int columnIndex) {
-    	if (cursor == null) return -1; 
+    	if (cursor == null) return -1;
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	
+    	//Checking the position of the cursor avoid blocking errors
+    	int cursorPos = cursor.getPosition();
+    	
+    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
     		
     	return cursor.getLong(columnIndex);    			
+    }
+    
+    public long GetValueAsLong( String colName ){    	    
+    	return GetValueAsLong(GetColumnIndex(colName));    	
     }
 
     public float GetValueAsFloat(int columnIndex) {
     	if (cursor == null) return -1;
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	
+    	//Checking the position of the cursor avoid blocking errors
+    	int cursorPos = cursor.getPosition();
+    	
+    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
     	
     	return cursor.getFloat(columnIndex);    			
+    }
+    
+    public float GetValueAsFloat( String colName ){    	    
+    	return GetValueAsFloat(GetColumnIndex(colName));    	
     }
      
     public double GetValueAsDouble(int columnIndex) {
     	if (cursor == null) return -1;
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	
+    	//Checking the position of the cursor avoid blocking errors
+    	int cursorPos = cursor.getPosition();
+    	
+    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
     	
     	return cursor.getDouble(columnIndex);    			
+    }
+    
+    public double GetValueAsDouble( String colName ){    	    
+    	return GetValueAsDouble(GetColumnIndex(colName));    	
     }
        
     public int GetColumnCount() {
@@ -151,6 +230,7 @@ public class jSqliteCursor {
     
     public String GetColumName(int columnIndex) {
     	if (cursor == null) return "";
+    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return "";
     	
     	return cursor.getColumnName(columnIndex);    			
     }
@@ -161,19 +241,21 @@ public class jSqliteCursor {
 	//Cursor.FIELD_TYPE_STRING//3
 	//Cursor.FIELD_TYPE_NULL //0           
     public String GetValueAsString(int position, String columnName) {
-    	if (this.cursor == null) return "";
-    	
-    	String colValue = "";
-                	
-        if (position == -1) cursor.moveToLast();
-        else cursor.moveToPosition(position);
+    	if (this.cursor == null) return ""; 
+    	if ((position < 0) || (position >= cursor.getCount())) return "";
+    	                            
+        cursor.moveToPosition(position);
         	
-        int index = this.cursor.getColumnIndex(columnName);
+        int columnIndex = this.cursor.getColumnIndex(columnName);
+        
+        if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return "";
+        
+        String colValue = "";
             
-        switch (cursor.getType(index)) {                
-     	      case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(index));          break;
-     	      case Cursor.FIELD_TYPE_STRING : colValue = cursor.getString(index);                         break;
-     	      case Cursor.FIELD_TYPE_FLOAT  : colValue = String.format("%.3f", cursor.getFloat(index));   break;
+        switch (cursor.getType(columnIndex)) {                
+     	      case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(columnIndex));        break;
+     	      case Cursor.FIELD_TYPE_STRING : colValue = cursor.getString(columnIndex);                       break;
+     	      case Cursor.FIELD_TYPE_FLOAT  : colValue = String.format("%.3f", cursor.getFloat(columnIndex)); break;
      	      case Cursor.FIELD_TYPE_BLOB   : colValue = "BLOB";                                       break;
      	      case Cursor.FIELD_TYPE_NULL   : colValue = "NULL";                                       break;
      	      default:                        colValue = "UNKNOW";                              

@@ -677,6 +677,7 @@ type
    protected
      function GetCursor: jObject;
      function GetEOF: Boolean;
+     function GetBOF: Boolean;
    public
      constructor Create(AOwner: TComponent); override;
      destructor  Destroy; override;
@@ -684,6 +685,7 @@ type
 
      procedure MoveToFirst;
      procedure MoveToNext;
+     procedure MoveToPrev;
      procedure MoveToLast;
      procedure MoveToPosition(position: integer);
      function GetRowCount: integer;
@@ -692,12 +694,18 @@ type
      function GetColumnIndex(colName: string): integer;
      function GetColumName(columnIndex: integer): string;
      function GetColType(columnIndex: integer): TSqliteFieldType;
-     function GetValueAsString(columnIndex: integer): string;   overload;
+
      function GetValueAsString(position: integer; columnName: string): string; overload;
-     function GetValueAsBitmap(columnIndex: integer): jObject;
-     function GetValueAsInteger(columnIndex: integer): integer;
-     function GetValueAsDouble(columnIndex: integer): double;
-     function GetValueAsFloat(columnIndex: integer): real;
+     function GetValueAsString(columnIndex: integer): string;   overload;
+     function GetValueAsString(colName: string): string; overload;
+     function GetValueAsBitmap(columnIndex: integer): jObject; overload;
+     function GetValueAsBitmap(colName: string): jObject; overload;
+     function GetValueAsInteger(columnIndex: integer): integer; overload;
+     function GetValueAsInteger(colName: string): integer; overload;
+     function GetValueAsDouble(columnIndex: integer): double; overload;
+     function GetValueAsDouble(colName: string): double; overload;
+     function GetValueAsFloat(columnIndex: integer): real; overload;
+     function GetValueAsFloat(colName: string): real; overload;
 
      procedure SetCursor(Value: jObject);
      function GetPosition(): integer;   //position = -1 --> Last Row !
@@ -706,6 +714,7 @@ type
      procedure UnRegisterObserver(AObserver: jVisualControl);
      property Cursor: jObject read GetCursor;
      property EOF: boolean read GetEOF;
+     property BOF: boolean read GetBOF; 
 
    published
    end;
@@ -10361,7 +10370,14 @@ function jSqliteCursor.GetEOF: Boolean;
 begin
   Result := True;
   if (not FInitialized) or (FRowCount=POSITION_UNKNOWN) then Exit;
-  Result := FPosition = FRowCount;
+  Result := (FPosition = FRowCount);
+end;
+
+function jSqliteCursor.GetBOF: Boolean;
+begin
+  Result := True;
+  if (not FInitialized) or (FRowCount=POSITION_UNKNOWN) then Exit;
+  Result := (FPosition = -1);
 end;
 
 procedure jSqliteCursor.UnRegisterObserver(AObserver: jVisualControl);
@@ -10431,7 +10447,16 @@ procedure jSqliteCursor.MoveToNext;
 begin
   if not FInitialized  then Exit;
   jSqliteCursor_MoveToNext(FjEnv, FjObject );
-  Inc(FPosition);
+
+  if FPosition < FRowCount then Inc(FPosition);
+end;
+
+procedure jSqliteCursor.MoveToPrev;
+begin
+  if not FInitialized  then Exit;
+  jSqliteCursor_MoveToPrev(FjEnv, FjObject );
+
+  if FPosition > -1 then Inc(FPosition, -1);
 end;
 
 procedure jSqliteCursor.MoveToLast;
@@ -10499,10 +10524,22 @@ begin
    Result:= jSqliteCursor_GetValueAsString(FjEnv, FjObject , columnIndex);
 end;
 
+function jSqliteCursor.GetValueAsString(colName: string): string;
+begin
+ if not FInitialized  then Exit;
+   Result:= jSqliteCursor_GetValueAsString(FjEnv, FjObject , colName);
+end;
+
 function jSqliteCursor.GetValueAsBitmap(columnIndex: integer): jObject;
 begin
   if not FInitialized  then Exit;
     Result:= jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , columnIndex);
+end;
+
+function jSqliteCursor.GetValueAsBitmap(colName: string): jObject;
+begin
+  if not FInitialized  then Exit;
+    Result:= jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , colName);
 end;
 
 function jSqliteCursor.GetValueAsInteger(columnIndex: integer): integer;
@@ -10511,12 +10548,23 @@ begin
     Result:=  jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , columnIndex);
 end;
 
+function jSqliteCursor.GetValueAsInteger(colName: string): integer;
+begin
+  if not FInitialized  then Exit;
+    Result:=  jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , colName);
+end;
+
 function jSqliteCursor.GetValueAsDouble(columnIndex: integer): double;
 begin
   if not FInitialized  then Exit;
     Result:=  jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , columnIndex);
 end;
 
+function jSqliteCursor.GetValueAsDouble(colName: string): double;
+begin
+  if not FInitialized  then Exit;
+    Result:=  jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , colName);
+end;
 
 function jSqliteCursor.GetValueAsFloat(columnIndex: integer): real;
 begin
@@ -10524,7 +10572,12 @@ begin
     Result:=  jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , columnIndex);
 end;
 
-//position = -1 --->> Last Row !!!
+function jSqliteCursor.GetValueAsFloat(colName: string): real;
+begin
+  if not FInitialized  then Exit;
+    Result:=  jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , colName);
+end;
+
 function jSqliteCursor.GetValueAsString(position: integer; columnName: string): string;
 begin
   //in designing component state: result value here...
