@@ -43,16 +43,11 @@ public class jSqliteCursor {
     }
 	
 	public int GetRowCount() {
-		if (this.cursor != null) {
-    		return this.cursor.getCount();    		
-    	}
-    	else{
-    		return 0;
-    	}
+		if( this.cursor == null ) return 0;
+				
+    	return this.cursor.getCount();    		    	
     }
-    public void SetRowCount(int rows) {
-	//this.rows = rows;
-    }
+	
     public void MoveToFirst() {
     	if (cursor != null) cursor.moveToFirst();
     }
@@ -70,21 +65,21 @@ public class jSqliteCursor {
     }
   
     public int GetPosition() {
-    	int p = -1;    	
-    	if (cursor != null) { 
-    		 p = cursor.getPosition();
-    	}	     	
-    	return p;
+    	if (cursor == null) return -1;
+    		     	
+    	return cursor.getPosition();
     }
     
     public int GetColumnIndex(String colName) {
-    	if (cursor != null) return cursor.getColumnIndex(colName);
-    	else  return -1;
+    	if (cursor == null) return -1;
+    	
+    	return cursor.getColumnIndex(colName);    	
     }
      
     public String GetValueAsString(int columnIndex) {
-    	if (cursor != null) return cursor.getString(columnIndex);
-    	else return "";			
+    	if (cursor == null) return "";
+    	
+    	return cursor.getString(columnIndex);    			
     }
 
     //Cursor.FIELD_TYPE_BLOB; //4
@@ -93,63 +88,71 @@ public class jSqliteCursor {
 	//Cursor.FIELD_TYPE_STRING//3
 	//Cursor.FIELD_TYPE_NULL //0
     public int GetColType(int columnIndex) {
-    	if (cursor != null) return cursor.getType(columnIndex);
-    	else return Cursor.FIELD_TYPE_NULL ;			
+    	if (cursor == null) return Cursor.FIELD_TYPE_NULL; 
+    		
+    	return cursor.getType(columnIndex);    			
     }
     
     public byte[] GetValueAsBlod(int columnIndex) {
-    	if (cursor != null) return cursor.getBlob(columnIndex);
-    	else return null;			
+    	if (cursor == null) return null;
+    	
+    	return cursor.getBlob(columnIndex);    			
     }
     
-    public Bitmap GetValueAsBitmap(int columnIndex) {
-    	bufBmp = null;
+    public Bitmap GetValueAsBitmap(int columnIndex) {    	
     	byte[] image = GetValueAsBlod(columnIndex);
-    	if (image != null) {
-    	     this.bufBmp = BitmapFactory.decodeByteArray(image, 0, image.length);
-    	}     
-    	return bufBmp;
+    	
+    	if( image == null ) return null;
+    	
+    	return BitmapFactory.decodeByteArray(image, 0, image.length);    	
     }
     
     public int GetValueAsInteger(int columnIndex) {
-    	int index = columnIndex;
+    	if (cursor == null) return -1;
     	
-    	if (cursor != null){ 
-    	    if	(columnIndex < 0) {index = 0;}
-    	    if  (columnIndex >= cursor.getColumnCount() ) {index = cursor.getColumnCount()-1;} 
-    		return cursor.getInt(index);
-    	}	
-    	else return -1;			
+    	int index = columnIndex;
+    	    	
+    	if	(columnIndex < 0) {index = 0;}
+    	if  (columnIndex >= cursor.getColumnCount() ) {index = cursor.getColumnCount()-1;}
+    	
+    	return cursor.getInt(index);
+    			
     }
     
     public short GetValueAsShort(int columnIndex) {
-    	if (cursor != null) return cursor.getShort(columnIndex);
-    	else return -1;			
+    	if (cursor == null) return -1;
+    	
+    	return cursor.getShort(columnIndex);    			
     }
 
     public long GetValueAsLong(int columnIndex) {
-    	if (cursor != null) return cursor.getLong(columnIndex);
-    	else return -1;			
+    	if (cursor == null) return -1; 
+    		
+    	return cursor.getLong(columnIndex);    			
     }
 
     public float GetValueAsFloat(int columnIndex) {
-    	if (cursor != null) return cursor.getFloat(columnIndex);
-    	else return -1;			
+    	if (cursor == null) return -1;
+    	
+    	return cursor.getFloat(columnIndex);    			
     }
      
     public double GetValueAsDouble(int columnIndex) {
-    	if (cursor != null) return cursor.getDouble(columnIndex);
-    	else return -1;			
+    	if (cursor == null) return -1;
+    	
+    	return cursor.getDouble(columnIndex);    			
     }
        
     public int GetColumnCount() {
-    	if (cursor != null) {return cursor.getColumnCount();}
-    	else {return 0;}
+    	if (cursor == null) return 0;
+    	
+    	return cursor.getColumnCount();    	
     }
     
     public String GetColumName(int columnIndex) {
-    	if (cursor != null) return cursor.getColumnName(columnIndex);
-    	else return "";			
+    	if (cursor == null) return "";
+    	
+    	return cursor.getColumnName(columnIndex);    			
     }
          
     //Cursor.FIELD_TYPE_BLOB; //4
@@ -158,22 +161,24 @@ public class jSqliteCursor {
 	//Cursor.FIELD_TYPE_STRING//3
 	//Cursor.FIELD_TYPE_NULL //0           
     public String GetValueAsString(int position, String columnName) {
+    	if (this.cursor == null) return "";
+    	
     	String colValue = "";
-        if (this.cursor != null) {
+                	
+        if (position == -1) cursor.moveToLast();
+        else cursor.moveToPosition(position);
         	
-        	if (position == -1)  cursor.moveToLast();
-        	else cursor.moveToPosition(position);
-        	
-            int index = this.cursor.getColumnIndex(columnName);                      
-            switch (cursor.getType(index)) {                
-     	      case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(index));           break;
-     	      case Cursor.FIELD_TYPE_STRING : colValue =  cursor.getString(index);                         break;
-     	      case Cursor.FIELD_TYPE_FLOAT  : colValue =  String.format("%.3f", cursor.getFloat(index));   break;
+        int index = this.cursor.getColumnIndex(columnName);
+            
+        switch (cursor.getType(index)) {                
+     	      case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(cursor.getInt(index));          break;
+     	      case Cursor.FIELD_TYPE_STRING : colValue = cursor.getString(index);                         break;
+     	      case Cursor.FIELD_TYPE_FLOAT  : colValue = String.format("%.3f", cursor.getFloat(index));   break;
      	      case Cursor.FIELD_TYPE_BLOB   : colValue = "BLOB";                                       break;
      	      case Cursor.FIELD_TYPE_NULL   : colValue = "NULL";                                       break;
      	      default:                        colValue = "UNKNOW";                              
-    	   }                                                                       
-        }
+    	}                                                                       
+        
         return colValue;        
     }
     
