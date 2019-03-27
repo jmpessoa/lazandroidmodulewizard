@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -96,7 +97,7 @@ public class jHttpClient /*extends ...*/ {
     int serverResponseCode;
     String serverResponseMessage;
 
-    String unvaluedName = "SOAP-ENV:Envelope";
+    String unvaluedName = "SOAPBODY";
     boolean encodeValue = true;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
@@ -1341,6 +1342,22 @@ public class jHttpClient /*extends ...*/ {
 
     public void SetEncodeValueData(boolean _value) {
         encodeValue = _value;
+    }
+
+    public void PostSOAPDataAsync(String _SOAPData, String _stringUrl) {
+        // create instance of Random class
+        Random rand = new Random();
+        //Generate random integers in range 0 to 999
+        int rand_int1 = rand.nextInt(1000);
+        int len = _SOAPData.length();
+        String disregard =  "SOAPBODY"+len+""+rand_int1 ;      //disregard nameData 'SOAPBODY'
+        boolean saveEncodeState = encodeValue;
+        unvaluedName = disregard;
+        encodeValue =false;                               //not encode ValueData
+        AddValueForPost2(disregard,_SOAPData);
+        PostNameValueDataAsync(_stringUrl); //http://192.168.1.3/soap/IOSW
+        encodeValue = saveEncodeState;                 //not encode ValueData
+        unvaluedName = "SOAPBODY";
     }
 
 }

@@ -358,6 +358,7 @@ type
     procedure SetUploadFormName(_uploadFormName: string);
     procedure SetUnvaluedNameData(_unvaluedName: string);
     procedure SetEncodeValueData(_value: boolean);
+    procedure PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -6811,6 +6812,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jHttpClient_SetEncodeValueData(FjEnv, FjObject, _value);
+end;
+
+procedure jHttpClient.PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_PostSOAPDataAsync(FjEnv, FjObject, _SOAPData ,_stringUrl);
 end;
 
 { jSMTPClient }
