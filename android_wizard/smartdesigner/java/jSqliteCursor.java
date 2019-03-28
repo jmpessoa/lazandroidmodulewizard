@@ -19,24 +19,37 @@ import android.graphics.BitmapFactory;
 /* 
  * LAMW -  LAZARUS ANDROID MODULE WIZARD
  * https://github.com/jmpessoa/lazandroidmodulewizard
- * Review by TR3E 2019/03/27
+ * Review by TR3E 2019/03/28
  */
 public class jSqliteCursor {
 
-	private long       PasObj  = 0;      // Pascal Obj
-	private Controls   controls = null;   // Control Class for Event
+	private long       	PasObj  = 0;      // Pascal Obj
+	private Controls   	controls = null;   // Control Class for Event
+	private int 		cursorColumnCount = 0;
+	private int 		cursorRowCount = 0;
 	public Cursor cursor = null;	
-	public Bitmap bufBmp = null;
+	public Bitmap bufBmp = null;	
 	
 	//Constructor
 	public  jSqliteCursor(Controls ctrls, long pasobj ) {
 	   //Connect Pascal I/F
 	   PasObj   = pasobj;
 	   controls = ctrls;
+	   
+	   cursorColumnCount = 0;
+	   cursorRowCount = 0;
 	}
 	
 	public  void SetCursor(Cursor curs) {
 		this.cursor = curs;
+		
+		if( this.cursor != null ){
+			cursorColumnCount = cursor.getColumnCount();
+			cursorRowCount    = cursor.getCount();
+		}else{
+			cursorColumnCount = 0;
+			cursorRowCount = 0;	
+		}
 	}
 	
     public  Cursor GetCursor() {
@@ -44,9 +57,7 @@ public class jSqliteCursor {
     }
 	
 	public int GetRowCount() {
-		if( this.cursor == null ) return 0;
-				
-    	return this.cursor.getCount();    		    	
+		return cursorRowCount;    		    	
     }
 	
     public void MoveToFirst() {
@@ -66,8 +77,7 @@ public class jSqliteCursor {
     }
               
     public void MoveToPosition(int position) {
-    	if (cursor == null) return;
-    	if ((position < 0) || (position >= cursor.getCount())) return;
+    	if ((cursor == null) || (position < 0) || (position >= cursorRowCount)) return;
     		
     	cursor.moveToPosition(position);
     }
@@ -85,13 +95,12 @@ public class jSqliteCursor {
     }
      
     public String GetValueAsString(int columnIndex) {    	
-    	if (cursor == null) return "";
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return "";
+    	if ((cursor == null) || (columnIndex < 0) || (columnIndex >= cursorColumnCount)) return "";
     	
     	//Checking the position of the cursor avoid blocking errors
     	int cursorPos = cursor.getPosition();
     	
-    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
+    	if ((cursorPos < 0) || (cursorPos >= cursorRowCount)) return "";
     	
     	return cursor.getString(columnIndex);    			
     }
@@ -107,19 +116,18 @@ public class jSqliteCursor {
 	//Cursor.FIELD_TYPE_NULL //0
     public int GetColType(int columnIndex) {
     	if (cursor == null) return 0;
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return Cursor.FIELD_TYPE_NULL;
+    	if ((columnIndex < 0) || (columnIndex >= cursorColumnCount)) return Cursor.FIELD_TYPE_NULL;
     		
     	return cursor.getType(columnIndex);    			
     }
     
     public byte[] GetValueAsBlod(int columnIndex) {
-    	if (cursor == null) return null;
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return null;
+    	if ((cursor == null) || (columnIndex < 0) || (columnIndex >= cursorColumnCount)) return null;
     	
     	//Checking the position of the cursor avoid blocking errors
     	int cursorPos = cursor.getPosition();
     	
-    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
+    	if ((cursorPos < 0) || (cursorPos >= cursorRowCount)) return null;
     	
     	return cursor.getBlob(columnIndex);    			
     }
@@ -129,7 +137,7 @@ public class jSqliteCursor {
     }
     
     public Bitmap GetValueAsBitmap(int columnIndex) {
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return null;
+    	if ((columnIndex < 0) || (columnIndex >= cursorColumnCount)) return null;
     	
     	byte[] image = GetValueAsBlod(columnIndex);
     	
@@ -143,13 +151,12 @@ public class jSqliteCursor {
     }
     
     public int GetValueAsInteger(int columnIndex) {
-    	if (cursor == null) return -1;
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	if ((cursor == null) || (columnIndex < 0) || (columnIndex >= cursorColumnCount)) return -1;
     	
     	//Checking the position of the cursor avoid blocking errors
     	int cursorPos = cursor.getPosition();
     	
-    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
+    	if ((cursorPos < 0) || (cursorPos >= cursorRowCount)) return -1;
     	
     	return cursor.getInt(columnIndex);    	
     }
@@ -159,13 +166,12 @@ public class jSqliteCursor {
     }
     
     public short GetValueAsShort(int columnIndex) {
-    	if (cursor == null) return -1;
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	if ((cursor == null) || (columnIndex < 0) || (columnIndex >= cursorColumnCount)) return -1;
     	
     	//Checking the position of the cursor avoid blocking errors
     	int cursorPos = cursor.getPosition();
     	
-    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
+    	if ((cursorPos < 0) || (cursorPos >= cursorRowCount)) return -1;
     	
     	return cursor.getShort(columnIndex);    			
     }
@@ -175,13 +181,12 @@ public class jSqliteCursor {
     }
 
     public long GetValueAsLong(int columnIndex) {
-    	if (cursor == null) return -1;
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	if ((cursor == null) || (columnIndex < 0) || (columnIndex >= cursorColumnCount)) return -1;
     	
     	//Checking the position of the cursor avoid blocking errors
     	int cursorPos = cursor.getPosition();
     	
-    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
+    	if ((cursorPos < 0) || (cursorPos >= cursorRowCount)) return -1;
     		
     	return cursor.getLong(columnIndex);    			
     }
@@ -191,13 +196,12 @@ public class jSqliteCursor {
     }
 
     public float GetValueAsFloat(int columnIndex) {
-    	if (cursor == null) return -1;
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	if ((cursor == null) || (columnIndex < 0) || (columnIndex >= cursorColumnCount)) return -1;
     	
     	//Checking the position of the cursor avoid blocking errors
     	int cursorPos = cursor.getPosition();
     	
-    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
+    	if ((cursorPos < 0) || (cursorPos >= cursorRowCount)) return -1;
     	
     	return cursor.getFloat(columnIndex);    			
     }
@@ -207,13 +211,12 @@ public class jSqliteCursor {
     }
      
     public double GetValueAsDouble(int columnIndex) {
-    	if (cursor == null) return -1;
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return -1;
+    	if ((cursor == null) || (columnIndex < 0) || (columnIndex >= cursorColumnCount)) return -1;
     	
     	//Checking the position of the cursor avoid blocking errors
     	int cursorPos = cursor.getPosition();
     	
-    	if ((cursorPos < 0) || (cursorPos >= cursor.getCount())) cursor.moveToFirst();
+    	if ((cursorPos < 0) || (cursorPos >= cursorRowCount)) return -1;
     	
     	return cursor.getDouble(columnIndex);    			
     }
@@ -223,14 +226,11 @@ public class jSqliteCursor {
     }
        
     public int GetColumnCount() {
-    	if (cursor == null) return 0;
-    	
-    	return cursor.getColumnCount();    	
+    	return cursorColumnCount;    	
     }
     
     public String GetColumName(int columnIndex) {
-    	if (cursor == null) return "";
-    	if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return "";
+    	if ((cursor == null) || (columnIndex < 0) || (columnIndex >= cursorColumnCount)) return "";
     	
     	return cursor.getColumnName(columnIndex);    			
     }
@@ -241,14 +241,13 @@ public class jSqliteCursor {
 	//Cursor.FIELD_TYPE_STRING//3
 	//Cursor.FIELD_TYPE_NULL //0           
     public String GetValueAsString(int position, String columnName) {
-    	if (this.cursor == null) return ""; 
-    	if ((position < 0) || (position >= cursor.getCount())) return "";
+    	if ((this.cursor == null) || (position < 0) || (position >= cursorRowCount)) return "";
     	                            
         cursor.moveToPosition(position);
         	
         int columnIndex = this.cursor.getColumnIndex(columnName);
         
-        if ((columnIndex < 0) || (columnIndex >= cursor.getColumnCount())) return "";
+        if ((columnIndex < 0) || (columnIndex >= cursorColumnCount)) return "";
         
         String colValue = "";
             

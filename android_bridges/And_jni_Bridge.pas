@@ -953,8 +953,8 @@ function jSqliteCursor_GetPosition(env: PJNIEnv; SqliteCursor: JObject): integer
 Function  jSqliteDataAccess_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject;
                                         dataBaseName: string; colDelimiter: char; rowDelimiter: char): jObject;
 Procedure jSqliteDataAccess_Free(env:PJNIEnv; SqliteDataBase : jObject);
-function jSqliteDataAccess_CheckDataBaseExists(env:PJNIEnv;  SqliteDataBase: jObject; fullPathDB: string): boolean;
-Procedure jSqliteDataAccess_ExecSQL(env:PJNIEnv; SqliteDataBase: jObject; execQuery: string);
+function  jSqliteDataAccess_CheckDataBaseExists(env:PJNIEnv;  SqliteDataBase: jObject; fullPathDB: string): boolean;
+function  jSqliteDataAccess_ExecSQL(env:PJNIEnv; SqliteDataBase: jObject; execQuery: string) : boolean;
 Procedure jSqliteDataAccess_OpenOrCreate(env:PJNIEnv; SqliteDataBase: jObject; dataBaseName: string);
 Procedure jSqliteDataAccess_SetVersion(env:PJNIEnv; SqliteDataBase: jObject; version:integer ); // renabor
 function jSqliteDataAccess_GetVersion(env:PJNIEnv; SqliteDataBase: jObject):integer; // renabor
@@ -966,18 +966,18 @@ function jSqliteDataAccess_Select(env: PJNIEnv; _jsqlitedataaccess: JObject; sel
 function jSqliteDataAccess_Select(env: PJNIEnv; _jsqlitedataaccess: JObject; selectQuery: string; moveToLast: boolean): boolean; overload;
 function jSqliteDataAccess_GetCursor(env:PJNIEnv;  SqliteDataBase: jObject): jObject;
 procedure jSqliteDataAccess_SetSelectDelimiters(env:PJNIEnv; SqliteDataBase: jObject; coldelim: char; rowdelim: char);
-procedure jSqliteDataAccess_CreateTable(env:PJNIEnv; SqliteDataBase: jObject; createQuery: string);
-procedure jSqliteDataAccess_DropTable(env:PJNIEnv; SqliteDataBase: jObject; tableName: string);
-procedure jSqliteDataAccess_InsertIntoTable(env:PJNIEnv; SqliteDataBase: jObject; insertQuery: string);
-procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv; SqliteDataBase: jObject; deleteQuery: string);
-procedure jSqliteDataAccess_UpdateTable(env:PJNIEnv; SqliteDataBase: jObject; updateQuery: string);
-procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv; SqliteDataBase: jObject;
-                                        tableName: string; imageFieldName: string; keyFieldName: string; imageValue: jObject; keyValue: integer); overload;
+function  jSqliteDataAccess_CreateTable(env:PJNIEnv; SqliteDataBase: jObject; createQuery: string) : boolean;
+function  jSqliteDataAccess_DropTable(env:PJNIEnv; SqliteDataBase: jObject; tableName: string) : boolean;
+function  jSqliteDataAccess_InsertIntoTable(env:PJNIEnv; SqliteDataBase: jObject; insertQuery: string) : boolean;
+function  jSqliteDataAccess_DeleteFromTable(env:PJNIEnv; SqliteDataBase: jObject; deleteQuery: string) : boolean;
+function  jSqliteDataAccess_UpdateTable(env:PJNIEnv; SqliteDataBase: jObject; updateQuery: string) : boolean;
+function  jSqliteDataAccess_UpdateImage(env:PJNIEnv; SqliteDataBase: jObject;
+                                        tableName: string; imageFieldName: string; keyFieldName: string; imageValue: jObject; keyValue: integer) : boolean; overload;
 procedure jSqliteDataAccess_Close(env:PJNIEnv; SqliteDataBase: jObject);
 procedure jSqliteDataAccess_SetForeignKeyConstraintsEnabled(env: PJNIEnv; _jsqlitedataaccess: JObject; _value: boolean);
 procedure jSqliteDataAccess_SetDefaultLocale(env: PJNIEnv; _jsqlitedataaccess: JObject);
 procedure jSqliteDataAccess_DeleteDatabase(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
-procedure jSqliteDataAccess_UpdateImage(env: PJNIEnv; _jsqlitedataaccess: JObject; _tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer); overload;
+function  jSqliteDataAccess_UpdateImage(env: PJNIEnv; _jsqlitedataaccess: JObject; _tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean; overload;
 procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
 procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString);
 function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string): boolean;
@@ -10021,16 +10021,18 @@ begin
 end;
 
 //java: public void ExecSQL(String execQuery)
-Procedure jSqliteDataAccess_ExecSQL(env:PJNIEnv; SqliteDataBase : jObject; execQuery: string);
+function jSqliteDataAccess_ExecSQL(env:PJNIEnv; SqliteDataBase : jObject; execQuery: string) : boolean;
 var
+  jBoo: JBoolean;
   cls: jClass;
   method: jmethodID;
   _jParams : array[0..0] of jValue;
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(execQuery));
   cls := env^.GetObjectClass(env, SqliteDataBase);
-  method:= env^.GetMethodID(env, cls, 'ExecSQL', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  method:= env^.GetMethodID(env, cls, 'ExecSQL', '(Ljava/lang/String;)Z');
+  jBoo   := env^.CallBooleanMethodA(env, SqliteDataBase, method,@_jParams);
+  Result := boolean(jBoo);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -10101,30 +10103,34 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jSqliteDataAccess_CreateTable(env:PJNIEnv; SqliteDataBase: jObject; createQuery: string);
+function jSqliteDataAccess_CreateTable(env:PJNIEnv; SqliteDataBase: jObject; createQuery: string) : boolean;
 var
+  jBoo: JBoolean;
   cls: jClass;
   method: jmethodID;
   _jParams : array[0..0] of jValue;
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(createQuery));
   cls := env^.GetObjectClass(env, SqliteDataBase);
-  method:= env^.GetMethodID(env, cls, 'ExecSQL', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  method:= env^.GetMethodID(env, cls, 'ExecSQL', '(Ljava/lang/String;)Z');
+  jBoo   := env^.CallBooleanMethodA(env, SqliteDataBase, method,@_jParams);
+  Result := boolean(jBoo);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jSqliteDataAccess_DropTable(env:PJNIEnv;  SqliteDataBase: jObject; tableName: string);
+function jSqliteDataAccess_DropTable(env:PJNIEnv;  SqliteDataBase: jObject; tableName: string) : boolean;
 var
+  jBoo: JBoolean;
   cls: jClass;
   method: jmethodID;
   _jParams : array[0..0] of jValue;
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(tableName));
   cls := env^.GetObjectClass(env, SqliteDataBase);
-  method:= env^.GetMethodID(env, cls, 'ExecSQL', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  method:= env^.GetMethodID(env, cls, 'DropTable', '(Ljava/lang/String;)Z');
+  jBoo   := env^.CallBooleanMethodA(env, SqliteDataBase, method,@_jParams);
+  Result := boolean(jBoo);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -10258,27 +10264,30 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jSqliteDataAccess_InsertIntoTable(env:PJNIEnv; SqliteDataBase: jObject; insertQuery: string);
+function jSqliteDataAccess_InsertIntoTable(env:PJNIEnv; SqliteDataBase: jObject; insertQuery: string) : boolean;
 var
+  jBoo: JBoolean;
   cls: jClass;
   method: jmethodID;
   _jParams : array[0..0] of jValue;
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(insertQuery));
   cls := env^.GetObjectClass(env, SqliteDataBase);
-  method:= env^.GetMethodID(env, cls, 'InsertIntoTable', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  method := env^.GetMethodID(env, cls, 'InsertIntoTable', '(Ljava/lang/String;)Z');
+  jBoo   := env^.CallBooleanMethodA(env, SqliteDataBase, method,@_jParams);
+  Result := boolean(jBoo);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jSqliteDataAccess_UpdateImage(env:PJNIEnv; SqliteDataBase: jObject;
+function jSqliteDataAccess_UpdateImage(env:PJNIEnv; SqliteDataBase: jObject;
                                           tableName: string;
                                           imageFieldName: string;
                                           keyFieldName: string;
                                           imageValue: jObject;
-                                          keyValue: integer);
+                                          keyValue: integer) : boolean;
 var
+  jBoo: JBoolean;
   cls: jClass;
   method: jmethodID;
   _jParams : array[0..4] of jValue;
@@ -10290,8 +10299,9 @@ begin
   _jParams[4].i := keyValue;
   cls := env^.GetObjectClass(env, SqliteDataBase);
   method:= env^.GetMethodID(env, cls, 'UpdateImage',
-                                      '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)V');
-  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+                                      '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroid/graphics/Bitmap;I)Z');
+  jBoo   := env^.CallBooleanMethodA(env, SqliteDataBase, method,@_jParams);
+  Result := boolean(jBoo);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env,_jParams[2].l);
@@ -10299,30 +10309,34 @@ begin
 end;
 
 
-procedure jSqliteDataAccess_DeleteFromTable(env:PJNIEnv; SqliteDataBase: jObject; deleteQuery: string);
+function jSqliteDataAccess_DeleteFromTable(env:PJNIEnv; SqliteDataBase: jObject; deleteQuery: string) : boolean;
 var
+  jBoo: JBoolean;
   cls: jClass;
   method: jmethodID;
   _jParams : array[0..0] of jValue;
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(deleteQuery));
   cls := env^.GetObjectClass(env, SqliteDataBase);
-  method:= env^.GetMethodID(env, cls, 'DeleteFromTable', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  method:= env^.GetMethodID(env, cls, 'DeleteFromTable', '(Ljava/lang/String;)Z');
+  jBoo   := env^.CallBooleanMethodA(env, SqliteDataBase, method,@_jParams);
+  Result := boolean(jBoo);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jSqliteDataAccess_UpdateTable(env:PJNIEnv; SqliteDataBase: jObject; updateQuery: string);
+function jSqliteDataAccess_UpdateTable(env:PJNIEnv; SqliteDataBase: jObject; updateQuery: string) : boolean;
 var
+  jBoo: JBoolean;
   cls: jClass;
   method: jmethodID;
   _jParams : array[0..0] of jValue;
 begin
   _jParams[0].l := env^.NewStringUTF(env, pchar(updateQuery));
   cls := env^.GetObjectClass(env, SqliteDataBase);
-  method:= env^.GetMethodID(env, cls, 'UpdateTable', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, SqliteDataBase, method,@_jParams);
+  method:= env^.GetMethodID(env, cls, 'UpdateTable', '(Ljava/lang/String;)Z');
+  jBoo   := env^.CallBooleanMethodA(env, SqliteDataBase, method,@_jParams);
+  Result := boolean(jBoo);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -10379,8 +10393,9 @@ begin
 end;
 
 
-procedure jSqliteDataAccess_UpdateImage(env: PJNIEnv; _jsqlitedataaccess: JObject; _tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer);
+function jSqliteDataAccess_UpdateImage(env: PJNIEnv; _jsqlitedataaccess: JObject; _tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean;
 var
+  jBoo: JBoolean;
   jParams: array[0..4] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -10391,8 +10406,9 @@ begin
   jParams[3].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
   jParams[4].i:= _keyValue;
   jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
-  jMethod:= env^.GetMethodID(env, jCls, 'UpdateImage', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
-  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  jMethod:= env^.GetMethodID(env, jCls, 'UpdateImage', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Z');
+  jBoo   := env^.CallBooleanMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  Result := boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
@@ -10535,7 +10551,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
   jMethod:= env^.GetMethodID(env, jCls, 'SetDataBaseName', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
