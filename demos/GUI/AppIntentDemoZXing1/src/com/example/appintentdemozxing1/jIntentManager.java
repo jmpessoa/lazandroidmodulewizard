@@ -3,7 +3,6 @@ package com.example.appintentdemozxing1;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +16,8 @@ import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.telephony.SmsMessage;
+import android.util.Log;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 3:49:46]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -129,7 +130,7 @@ Sending Data: Extras vs. URI Parameters
              Returns the same Intent object, for chaining multiple calls into a single statement.
 	    */
    }
-   
+      
    public void StartActivityForResult(int _requestCode) {
 	   controls.activity.startActivityForResult(mIntent,_requestCode);
 	   // //startActivityForResult(photoPickerIntent, SELECT_PHOTO);
@@ -381,28 +382,39 @@ Sending Data: Extras vs. URI Parameters
       return "android.intent.action.DIAL";
    }	   
    
-   public String GetActionCallButtonAsString() {
-	  //String s =  Intent.ACTION_CALL_BUTTON; 
+   public String GetActionCallButtonAsString() { 
       return "android.intent.action.CALL_BUTTON";
    }	   
    
-      
+   public String GetActionMainAsString() {  
+	     return "android.intent.action.MAIN";
+   }
+   
    public void SetAction(int  _intentAction) {	 
 	  switch(_intentAction) { 
-	    case 0: mIntent.setAction("android.intent.action.VIEW"); //
-	    case 1: mIntent.setAction("android.intent.action.PICK"); //
-	    case 2: mIntent.setAction("android.intent.action.SENDTO"); //
-	    case 3: mIntent.setAction("android.intent.action.DIAL"); //
-	    case 4: mIntent.setAction("android.intent.action.CALL_BUTTON"); //
-	    case 5: mIntent.setAction( "android.intent.action.CALL");
-	    case 6: mIntent.setAction("android.media.action.IMAGE_CAPTURE"); //
-	    case 7: mIntent.setAction(Settings.ACTION_DATA_ROAMING_SETTINGS);
-	    case 8: mIntent.setAction(Settings.ACTION_QUICK_LAUNCH_SETTINGS);
-	    case 9: mIntent.setAction(Settings.ACTION_DATE_SETTINGS);
-	    case 10: mIntent.setAction(Settings.ACTION_SETTINGS);  //system settings
-	    case 11: mIntent.setAction(Settings.ACTION_WIRELESS_SETTINGS);	    
-	    case 12: mIntent.setAction(Settings.ACTION_DEVICE_INFO_SETTINGS);
-	    
+	    case 0: mIntent.setAction("android.intent.action.VIEW"); break;
+	    case 1: mIntent.setAction("android.intent.action.PICK"); break; 
+	    case 2: mIntent.setAction("android.intent.action.SENDTO"); break; 
+	    case 3: mIntent.setAction("android.intent.action.DIAL"); break; 
+	    case 4: mIntent.setAction("android.intent.action.CALL_BUTTON");  break;
+	    case 5: mIntent.setAction( "android.intent.action.CALL"); break;
+	    case 6: mIntent.setAction("android.media.action.IMAGE_CAPTURE"); break;
+	    case 7: mIntent.setAction(Settings.ACTION_DATA_ROAMING_SETTINGS); break;
+	    case 8: mIntent.setAction(Settings.ACTION_QUICK_LAUNCH_SETTINGS); break;
+	    case 9: mIntent.setAction(Settings.ACTION_DATE_SETTINGS); break;
+	    case 10: mIntent.setAction(Settings.ACTION_SETTINGS);   break;//system settings
+	    case 11: mIntent.setAction(Settings.ACTION_WIRELESS_SETTINGS); break;	//"android.settings.WIRELESS_SETTINGS"    
+	    case 12: mIntent.setAction(Settings.ACTION_DEVICE_INFO_SETTINGS); break;
+	    case 13: mIntent.setAction(android.content.Intent.ACTION_SEND); break;
+	    case 14: mIntent.setAction(android.content.Intent.ACTION_SEND_MULTIPLE); break;	    
+	    case 15: mIntent.setAction(android.content.Intent.ACTION_PICK_ACTIVITY); break;	
+	    case 16: mIntent.setAction(android.content.Intent.ACTION_EDIT); break;
+	    case 17: mIntent.setAction(android.content.Intent.ACTION_GET_CONTENT); break;
+	    case 18: mIntent.setAction(android.content.Intent.ACTION_TIME_TICK); break;
+	    case 19: mIntent.setAction(android.content.Intent.ACTION_VOICE_COMMAND); break;	    	    
+	    case 20: mIntent.setAction(android.content.Intent.ACTION_WEB_SEARCH); break; 	    
+	    case 21: mIntent.setAction("android.intent.action.Main");break;
+	    case 22: mIntent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
 	  }
 	  
    }
@@ -460,7 +472,6 @@ Sending Data: Extras vs. URI Parameters
     */
    
    public String GetActionCallAsString() {
-	   //String s = Intent.ACTION_CALL;
 	   return "android.intent.action.CALL";
    }
    
@@ -512,7 +523,19 @@ Sending Data: Extras vs. URI Parameters
    public String GetActionImageCaptureAsString() {
 	     return "android.media.action.IMAGE_CAPTURE";
    }
-      
+   
+   public String GetActionSMSReceivedAsString() {   //TODO: Pascal
+     return "android.provider.Telephony.SMS_RECEIVED";
+   }	   
+   
+   public String GetActionNewOutgoingCallAsString() {  //TODO Pascal
+       return "android.intent.action.NEW_OUTGOING_CALL";
+   }
+   
+   public String GetActionPhoneStateAsString() {  //TODO Pascal
+       return "android.intent.action.PHONE_STATE";
+   }
+   
    //http://www.coderanch.com/t/492490/Android/Mobile/Check-application-installed
    public boolean IsCallable(Intent _intent) {  
        List<ResolveInfo> list = controls.activity.getPackageManager().queryIntentActivities(_intent, PackageManager.MATCH_DEFAULT_ONLY);  
@@ -521,8 +544,17 @@ Sending Data: Extras vs. URI Parameters
        else
           return false;
     }
-     
-   public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
+
+    public boolean IsCallable(String _action) {
+        Intent i = new Intent(_action);
+        List<ResolveInfo> list = controls.activity.getPackageManager().queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
+        if(list.size() > 0)
+            return true ;
+        else
+            return false;
+    }
+
+    public boolean IsActionEqual(Intent _intent, String _intentAction) { //'android.provider.Telephony.SMS_RECEIVED'
 	   return _intent.getAction().equals(_intentAction);
    }
    
@@ -566,20 +598,20 @@ Sending Data: Extras vs. URI Parameters
    }
    
    //params: "packagename whos activity u want to  launch","jClassname"
-   public void SetComponent(String _packageName, String _className) {
-	   ComponentName cn = new ComponentName(_packageName, _packageName+"."+_className); //"full class name" ??? 
+   public void SetComponent(String _packageName, String _javaClassName) {
+	   ComponentName cn = new ComponentName(_packageName, _packageName+"."+_javaClassName); //"full class name" ??? 
 	   mIntent.setComponent(cn);
    }  
    
-   public void SetClassName(String _packageName, String _className) {
-		mIntent.setClassName(_packageName, _packageName+"."+_className);
+   public void SetClassName(String _packageName, String _javaClassName) {
+		mIntent.setClassName(_packageName, _packageName+"."+_javaClassName);
    }
    
-   public void SetClass(String _className) {	   
+   public void SetClass(String _fullJavaClassName) {	   
 	    Class cls = null;
 	    //String className = 'com.almondmendoza.library.openActivity';
 	    try {
-			cls = Class.forName(_className);
+			cls = Class.forName(_fullJavaClassName);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -588,9 +620,100 @@ Sending Data: Extras vs. URI Parameters
 		    mIntent.setClass(controls.activity, cls);
    }
    
+   public void SetClass(String _packageName, String _javaClassName) {	   
+	    Class<?> cls = null;
+	    //String className = 'com.almondmendoza.library.openActivity';
+	    try {
+			cls = Class.forName(_packageName+'.'+_javaClassName);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    if (cls != null)
+		    mIntent.setClass(controls.activity, cls);
+  }
+   
    public void StartService() { 
 	   controls.activity.startService(mIntent);
    }
+
+   public void PutExtraText(String _text) {	  
+	   mIntent.putExtra(android.content.Intent.EXTRA_TEXT, _text);
+   }
    
+   public void SetPackage(String _packageName) {
+	   mIntent.setPackage(_packageName);
+   }
+            
+   public boolean IsPackageInstalled(String _packageName) {
+	    PackageManager pm = controls.activity.getPackageManager();
+	    boolean installed = false;
+	    try {
+	        pm.getPackageInfo(_packageName, PackageManager.GET_ACTIVITIES);
+	        installed = true;
+	    } catch (PackageManager.NameNotFoundException e) {
+	        installed = false;
+	    }
+	    return installed;
+   }
+      
+   public void TryDownloadPackage(String _packageName) {
+	   Intent t = new Intent(Intent.ACTION_VIEW);
+	   t.setData(Uri.parse("market://search?q=pname:"+_packageName)); 
+	   controls.activity.startActivity(t);
+   }
+   
+   /** https://stackoverflow.com/questions/13719471/why-setdataandtype-for-an-android-intent-works-fine-when-setdata-and-settype
+    * Uri uri = Uri.parse("file:///sdcard/xxx/log.txt");
+      Intent viewTestLogFileIntent = new Intent(Intent.ACTION_EDIT);
+      viewTestLogFileIntent.setDataAndType(uri,"text/plain");
+    */
+   
+   public void SetDataAndType(Uri _uriData, String _mimeType) {	// thanks to @alexc   
+	   mIntent.setDataAndType(_uriData, _mimeType);
+   }
+   
+   public void SetDataAndType(String _uriAsString, String _mimeType) {	// thanks to @alexc   
+	   mIntent.setDataAndType(Uri.parse(_uriAsString), _mimeType);
+   }
+
+   /*
+ public void SetDataUriAsString(String _uriAsString) { //Uri.parse(fileUrl) - just Strings!
+	   
+	   mIntent.setData(Uri.parse(_uriAsString));  //just Strings!
+	   
+*/
+
+  public boolean HasLaunchIntentForPackage(String _packageName) {  //"com.dynamixsoftware.printershare"
+      mIntent = controls.activity.getPackageManager().getLaunchIntentForPackage(_packageName);
+      if ( mIntent == null )
+          return false;
+      else
+          return true;
+  }
+
+//https://www.javatips.net/api/android-examples-master/CallsAndSMS/app/src/main/java/nisrulz/github/sample/callsandsms/SMSReceiver.java#
+    public String GetExtraSMS(Intent _intent, String _addressBodyDelimiter)  {
+        //---get the SMS message passed in---
+        SmsMessage[] msgs = null;
+        String str = "";
+        if (_intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")) {
+            Bundle bundle = _intent.getExtras();
+            if (bundle != null)
+            {
+                //---retrieve the SMS message received---
+                Object[] pdus = (Object[]) bundle.get("pdus");
+                msgs = new SmsMessage[pdus.length];
+                for (int i=0; i<msgs.length; i++){
+                    msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+                    str += msgs[i].getOriginatingAddress();
+                    str += _addressBodyDelimiter;
+                    str += msgs[i].getMessageBody().toString();
+                    str += " ";
+                }
+            }
+        }
+        return str;
+    }
 }
 

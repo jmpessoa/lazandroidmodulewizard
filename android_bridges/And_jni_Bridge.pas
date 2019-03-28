@@ -9975,14 +9975,14 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jSqliteCursor_GetPosition(env: PJNIEnv; _jsqlitecursor: JObject): integer;
+function jSqliteCursor_GetPosition(env: PJNIEnv; SqliteCursor: JObject): integer;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jsqlitecursor);
+  jCls:= env^.GetObjectClass(env, SqliteCursor);
   jMethod:= env^.GetMethodID(env, jCls, 'GetPosition', '()I');
-  Result:= env^.CallIntMethod(env, _jsqlitecursor, jMethod);
+  Result:= env^.CallIntMethod(env, SqliteCursor, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
