@@ -672,8 +672,6 @@ type
    private
      FObservers: array of TAndroidWidget;
      FObserverCount: integer;
-     FRowCount: integer;
-     FPosition: integer;
    protected
      function GetCursor: jObject;
      function GetEOF: Boolean;
@@ -714,7 +712,7 @@ type
      procedure UnRegisterObserver(AObserver: jVisualControl);
      property Cursor: jObject read GetCursor;
      property EOF: boolean read GetEOF;
-     property BOF: boolean read GetBOF; 
+     property BOF: boolean read GetBOF;
 
    published
    end;
@@ -736,7 +734,7 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     procedure Init(refApp: jApp) override;
-    Procedure ExecSQL(execQuery: string);
+    function ExecSQL(execQuery: string) : boolean;
     function CheckDataBaseExists(dataBaseName: string): boolean;
     procedure OpenOrCreate(dataBaseName: string);
 
@@ -750,19 +748,19 @@ type
     function Select(selectQuery: string; moveToLast: boolean): boolean;   overload;
 
     procedure SetSelectDelimiters(coldelim: char; rowdelim: char);
-    procedure CreateTable(createQuery: string);
-    procedure DropTable(tableName: string);
-    procedure InsertIntoTable(insertQuery: string);
-    procedure DeleteFromTable(deleteQuery: string);
-    procedure UpdateTable(updateQuery: string);
-    procedure UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string; imageValue: jObject;keyValue: integer); overload;
+    function  CreateTable(createQuery: string) : boolean;
+    function  DropTable(tableName: string) : boolean;
+    function  InsertIntoTable(insertQuery: string) : boolean;
+    function  DeleteFromTable(deleteQuery: string) : boolean;
+    function  UpdateTable(updateQuery: string) : boolean;
+    function  UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string; imageValue: jObject;keyValue: integer) : boolean; overload;
+    function  UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean; overload;
     procedure Close;
     function  GetCursor: jObject; overload;
 
     procedure SetForeignKeyConstraintsEnabled(_value: boolean);
     procedure SetDefaultLocale();
     procedure DeleteDatabase(_dbName: string);
-    procedure UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer); overload;
     procedure InsertIntoTableBatch(var _insertQueries: TDynArrayOfString);
     procedure UpdateTableBatch(var _updateQueries: TDynArrayOfString);
     function CheckDataBaseExistsByName(_dbName: string): boolean;
@@ -786,9 +784,7 @@ type
     property TableName: TStrings read FTableName write FTableName;
     property ReturnHeaderOnSelect: boolean read FReturnHeaderOnSelect write SetReturnHeaderOnSelect;
   end;
-
-
-
+  
   TOnClickDBListItem = procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
 
   {Draft Component code by "Lazarus Android Module Wizard" [01/02/2018 11:13:51]}
@@ -10334,8 +10330,6 @@ begin
   //FjObject  := nil;
   SetLength(FObservers, MAXOBSERVERS);
   FObserverCount:=0;
-  FPosition:=POSITION_UNKNOWN;
-  FRowCount:=POSITION_UNKNOWN;
 end;
 
 destructor jSqliteCursor.Destroy;
@@ -10362,22 +10356,40 @@ end;
 
 function jSqliteCursor.GetCursor: jObject;
 begin
-  if not FInitialized  then Exit;
-  Result := jSqliteCursor_GetCursor(FjEnv, FjObject);
+  if FInitialized  then
+   result := jSqliteCursor_GetCursor(FjEnv, FjObject)
+  else
+   result := nil;
 end;
 
 function jSqliteCursor.GetEOF: Boolean;
+var
+  rowCount : integer;
 begin
   Result := True;
-  if (not FInitialized) or (FRowCount=POSITION_UNKNOWN) then Exit;
-  Result := (FPosition = FRowCount);
+
+  if (not FInitialized) then exit;
+
+  rowCount := jSqliteCursor_GetRowCount(FjEnv, FjObject );
+
+  if (rowCount=POSITION_UNKNOWN) or (rowCount =0) then Exit;
+
+  Result := (jSqliteCursor_GetPosition(FjEnv, FjObject) = rowCount);
 end;
 
 function jSqliteCursor.GetBOF: Boolean;
+var
+  rowCount : integer;
 begin
   Result := True;
-  if (not FInitialized) or (FRowCount=POSITION_UNKNOWN) then Exit;
-  Result := (FPosition = -1);
+
+  if (not FInitialized) then exit;
+
+  rowCount := jSqliteCursor_GetRowCount(FjEnv, FjObject );
+
+  if (rowCount=POSITION_UNKNOWN) or (rowCount =0) then Exit;
+
+  Result := (jSqliteCursor_GetPosition(FjEnv, FjObject) = -1);
 end;
 
 procedure jSqliteCursor.UnRegisterObserver(AObserver: jVisualControl);
@@ -10423,8 +10435,9 @@ var
   i: integer;
 begin
   if not FInitialized then Exit;
+
   jSqliteCursor_SetCursor(FjEnv, FjObject, Value);
-  FRowCount:=GetRowCount;
+
   if FObserverCount > 0 then
   begin
     for i := 0 to FObserverCount-1 do
@@ -10440,61 +10453,66 @@ procedure jSqliteCursor.MoveToFirst;
 begin
    if not FInitialized  then Exit;
    jSqliteCursor_MoveToFirst(FjEnv, FjObject );
-   FPosition:=0;
 end;
 
 procedure jSqliteCursor.MoveToNext;
 begin
   if not FInitialized  then Exit;
   jSqliteCursor_MoveToNext(FjEnv, FjObject );
-
-  if FPosition < FRowCount then Inc(FPosition);
 end;
 
 procedure jSqliteCursor.MoveToPrev;
 begin
   if not FInitialized  then Exit;
   jSqliteCursor_MoveToPrev(FjEnv, FjObject );
-
-  if FPosition > -1 then Inc(FPosition, -1);
 end;
 
 procedure jSqliteCursor.MoveToLast;
 begin
   if not FInitialized  then Exit;
   jSqliteCursor_MoveToLast(FjEnv, FjObject );
-  FPosition:=FRowCount-1;
 end;
 
 procedure jSqliteCursor.MoveToPosition(position: integer);
 begin
   if not FInitialized  then Exit;
   jSqliteCursor_MoveToPosition(FjEnv, FjObject , position);
-  FPosition:=position;
 end;
 
 function jSqliteCursor.GetRowCount: integer;
 begin
-   if not FInitialized  then Exit;
-   Result:= jSqliteCursor_GetRowCount(FjEnv, FjObject );
+
+   if FInitialized  then
+    result:= jSqliteCursor_GetRowCount(FjEnv, FjObject )
+   else
+    result := 0;
 end;
 
 function jSqliteCursor.GetColumnCount: integer;
 begin
-  if not FInitialized  then Exit;
-  Result:= jSqliteCursor_GetColumnCount(FjEnv, FjObject );
+
+  if FInitialized  then
+   Result := jSqliteCursor_GetColumnCount(FjEnv, FjObject )
+  else
+   result := 0;
 end;
 
 function jSqliteCursor.GetColumnIndex(colName: string): integer;
 begin
-   if not FInitialized  then Exit;
-   Result:= jSqliteCursor_GetColumnIndex(FjEnv, FjObject , colName);
+
+   if FInitialized  then
+    result:= jSqliteCursor_GetColumnIndex(FjEnv, FjObject , colName)
+   else
+    result := -1;
 end;
 
 function jSqliteCursor.GetColumName(columnIndex: integer): string;
 begin
-   if not FInitialized  then Exit;
-   Result:= jSqliteCursor_GetColumName(FjEnv, FjObject , columnIndex);
+
+   if FInitialized  then
+    result:= jSqliteCursor_GetColumName(FjEnv, FjObject , columnIndex)
+   else
+    result := '';
 end;
 {
 Cursor.FIELD_TYPE_NULL    //0
@@ -10507,8 +10525,12 @@ function jSqliteCursor.GetColType(columnIndex: integer): TSqliteFieldType;
 var
    colType: integer;
 begin
+   Result := ftNull;
+
    if not FInitialized  then Exit;
+
    colType:= jSqliteCursor_GetColType(FjEnv, FjObject , columnIndex);
+
    case colType of
      0: Result:= ftNull;
      1: Result:= ftInteger;
@@ -10520,76 +10542,110 @@ end;
 
 function jSqliteCursor.GetValueAsString(columnIndex: integer): string;
 begin
- if not FInitialized  then Exit;
-   Result:= jSqliteCursor_GetValueAsString(FjEnv, FjObject , columnIndex);
+
+ if FInitialized  then
+  result := jSqliteCursor_GetValueAsString(FjEnv, FjObject , columnIndex)
+ else
+  result := '';
 end;
 
 function jSqliteCursor.GetValueAsString(colName: string): string;
 begin
- if not FInitialized  then Exit;
-   Result:= jSqliteCursor_GetValueAsString(FjEnv, FjObject , colName);
+
+ if FInitialized  then
+  result := jSqliteCursor_GetValueAsString(FjEnv, FjObject , colName)
+ else
+  result := '';
 end;
 
 function jSqliteCursor.GetValueAsBitmap(columnIndex: integer): jObject;
 begin
-  if not FInitialized  then Exit;
-    Result:= jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , columnIndex);
+
+  if FInitialized  then
+   result:= jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , columnIndex)
+  else
+   result := nil;
 end;
 
 function jSqliteCursor.GetValueAsBitmap(colName: string): jObject;
 begin
-  if not FInitialized  then Exit;
-    Result:= jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , colName);
+
+  if FInitialized  then
+   result := jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , colName)
+  else
+   result := nil;
 end;
 
 function jSqliteCursor.GetValueAsInteger(columnIndex: integer): integer;
 begin
-  if not FInitialized  then Exit;
-    Result:=  jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , columnIndex);
+
+  if FInitialized  then
+   result := jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , columnIndex)
+  else
+   result := -1;
 end;
 
 function jSqliteCursor.GetValueAsInteger(colName: string): integer;
 begin
-  if not FInitialized  then Exit;
-    Result:=  jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , colName);
+
+  if FInitialized  then
+   result :=  jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , colName)
+  else
+   result := -1;
 end;
 
 function jSqliteCursor.GetValueAsDouble(columnIndex: integer): double;
 begin
-  if not FInitialized  then Exit;
-    Result:=  jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , columnIndex);
+
+  if FInitialized  then
+   result := jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , columnIndex)
+  else
+   result := -1;
 end;
 
 function jSqliteCursor.GetValueAsDouble(colName: string): double;
 begin
-  if not FInitialized  then Exit;
-    Result:=  jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , colName);
+
+  if FInitialized  then
+   Result :=  jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , colName)
+  else
+   result := -1;
 end;
 
 function jSqliteCursor.GetValueAsFloat(columnIndex: integer): real;
 begin
-  if not FInitialized  then Exit;
-    Result:=  jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , columnIndex);
+
+  if FInitialized  then
+   Result := jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , columnIndex)
+  else
+   result := -1;
 end;
 
 function jSqliteCursor.GetValueAsFloat(colName: string): real;
 begin
-  if not FInitialized  then Exit;
-    Result:=  jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , colName);
+
+  if FInitialized  then
+   result := jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , colName)
+  else
+   result := -1;
 end;
 
 function jSqliteCursor.GetValueAsString(position: integer; columnName: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSqliteCursor_GetValueAsString(FjEnv, FjObject, position ,columnName);
+   result := jSqliteCursor_GetValueAsString(FjEnv, FjObject, position ,columnName)
+  else
+   result := '';
 end;
 
 function jSqliteCursor.GetPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSqliteCursor_GetPosition(FjEnv, FjObject);
+   result := jSqliteCursor_GetPosition(FjEnv, FjObject)
+  else
+   result := -1;
 end;
 
 {jSqliteDataAccess}
@@ -10648,11 +10704,13 @@ begin
 
 end;
 
-Procedure jSqliteDataAccess.ExecSQL(execQuery: string);
+// Do not use 'SELECT' in this function
+function jSqliteDataAccess.ExecSQL(execQuery: string) : boolean;
 begin
-   if not FInitialized then Exit;
-   jSqliteDataAccess_ExecSQL(FjEnv, FjObject , execQuery);
-   if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
+   if FInitialized then
+    result := jSqliteDataAccess_ExecSQL(FjEnv, FjObject, execQuery)
+   else
+    result := false;
 end;
 
 //"data/data/com.data.pack/databases/" + myData.db;
@@ -10660,7 +10718,10 @@ function jSqliteDataAccess.CheckDataBaseExists(databaseName: string): boolean;
 var
   fullPathDB: string;
 begin                      {/data/data/com.example.program/databases}
+  Result := false;
+
   if not FInitialized then Exit;
+
   fullPathDB:=  GetFilePath(fpathDataBase) + '/' + databaseName;
   Result:= jSqliteDataAccess_CheckDataBaseExists(FjEnv, FjObject , fullPathDB);
 end;
@@ -10680,6 +10741,7 @@ end;
 
 function jSqliteDataAccess.GetVersion():integer; // renabor
 begin
+  Result := -1;
   if not FInitialized then Exit;
   Result:=jSqliteDataAccess_GetVersion(FjEnv, FjObject);
 end;
@@ -10687,8 +10749,9 @@ end;
 procedure jSqliteDataAccess.AddTable(tableName: string; createTableQuery: string);
 begin
   if not FInitialized then Exit;
-   jSqliteDataAccess_AddTableName(FjEnv, FjObject , tableName);
-   jSqliteDataAccess_AddCreateTableQuery(FjEnv, FjObject , createTableQuery);
+
+  jSqliteDataAccess_AddTableName(FjEnv, FjObject , tableName);
+  jSqliteDataAccess_AddCreateTableQuery(FjEnv, FjObject , createTableQuery);
 end;
 
 procedure jSqliteDataAccess.CreateAllTables;
@@ -10699,23 +10762,32 @@ end;
 
 function jSqliteDataAccess.Select(selectQuery: string): string;
 begin
+   Result := '';
+
    if not FInitialized then Exit;
-   Result:= jSqliteDataAccess_Select(FjEnv, FjObject, selectQuery);
-  //DBListView_Log('Query  ' + BoolToStr(result, 'SUCCESS', 'FAILURE'));
+
+   Result := jSqliteDataAccess_Select(FjEnv, FjObject, selectQuery);
+   //Restult: True or false must select the cursor to maintain consistency
    if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
 
 function jSqliteDataAccess.Select(selectQuery: string; moveToLast: boolean): boolean;
 begin
+  Result := false;
+
   if not FInitialized then Exit;
+
   Result:= jSqliteDataAccess_Select(FjEnv, FjObject, selectQuery ,moveToLast);
-  if Result then
-     if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
+
+  if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
 
 function jSqliteDataAccess.GetCursor: jObject;
 begin
+  Result := nil;
+
   if not FInitialized then Exit;
+
   Result:= jSqliteDataAccess_GetCursor(FjEnv, FjObject );
   //DBListView_Log('Internal cursor is ' + BoolToStr(result = nil, 'INVALID', 'VALID'));
 end;
@@ -10726,42 +10798,61 @@ begin
   jSqliteDataAccess_SetSelectDelimiters(FjEnv, FjObject , coldelim, rowdelim);
 end;
 
-procedure jSqliteDataAccess.CreateTable(createQuery: string);
+function jSqliteDataAccess.CreateTable(createQuery: string) : boolean;
 begin
+  Result := false;
+
   if not FInitialized then Exit;
-  jSqliteDataAccess_CreateTable(FjEnv, FjObject , createQuery);
+
+  Result := jSqliteDataAccess_CreateTable(FjEnv, FjObject , createQuery);
 end;
 
-procedure jSqliteDataAccess.DropTable(tableName: string);
+function jSqliteDataAccess.DropTable(tableName: string) : boolean;
 begin
+  Result := false;
+
   if not FInitialized then Exit;
-  jSqliteDataAccess_DropTable(FjEnv, FjObject , tableName);
+
+  Result := jSqliteDataAccess_DropTable(FjEnv, FjObject , tableName);
 end;
 
 //ex: "INSERT INTO TABLE1 (NAME, PLACE) VALUES('BRASILIA','CENTRO OESTE')"
-procedure jSqliteDataAccess.InsertIntoTable(insertQuery: string);
+function jSqliteDataAccess.InsertIntoTable(insertQuery: string) : boolean;
 begin
+  Result := false;
+
   if not FInitialized then Exit;
-  jSqliteDataAccess_InsertIntoTable(FjEnv, FjObject , insertQuery);
+
+  Result := jSqliteDataAccess_InsertIntoTable(FjEnv, FjObject , insertQuery);
 end;
 
 //ex: "DELETE FROM TABLE1  WHERE PLACE = 'BR'";
-procedure jSqliteDataAccess.DeleteFromTable(deleteQuery: string);
+function jSqliteDataAccess.DeleteFromTable(deleteQuery: string) : boolean;
 begin
+  Result := false;
+
   if not FInitialized then Exit;
-  jSqliteDataAccess_DeleteFromTable(FjEnv, FjObject , deleteQuery);
+
+  Result := jSqliteDataAccess_DeleteFromTable(FjEnv, FjObject , deleteQuery);
 end;
 
 //ex: "UPDATE TABLE1 SET NAME = 'MAX' WHERE PLACE = 'BR'"
-procedure jSqliteDataAccess.UpdateTable(updateQuery: string);
+function jSqliteDataAccess.UpdateTable(updateQuery: string) : boolean;
 begin
+  Result := false;
+
   if not FInitialized then Exit;
-  jSqliteDataAccess_UpdateTable(FjEnv, FjObject , updateQuery);
+
+  Result := jSqliteDataAccess_UpdateTable(FjEnv, FjObject , updateQuery);
 end;
 
-procedure jSqliteDataAccess.UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string;imageValue: jObject;keyValue: integer);
+function jSqliteDataAccess.UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string;imageValue: jObject;keyValue: integer) : boolean;
 begin
-  jSqliteDataAccess_UpdateImage(FjEnv, FjObject ,
+  Result := false;
+
+  if not FInitialized then Exit;
+
+  Result := jSqliteDataAccess_UpdateImage(FjEnv, FjObject ,
                                  tableName,imageFieldName,keyFieldName,imageValue,keyValue);
 end;
 
@@ -10820,11 +10911,14 @@ begin
      jSqliteDataAccess_DeleteDatabase(FjEnv, FjObject, _dbName);
 end;
 
-procedure jSqliteDataAccess.UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer);
+function jSqliteDataAccess.UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean;
 begin
+  Result := false;
+
   //in designing component state: set value here...
-  if FInitialized then
-     jSqliteDataAccess_UpdateImage(FjEnv, FjObject, _tabName ,_imageFieldName ,_keyFieldName ,_imageResIdentifier ,_keyValue);
+  if not FInitialized then exit;
+
+  Result := jSqliteDataAccess_UpdateImage(FjEnv, FjObject, _tabName ,_imageFieldName ,_keyFieldName ,_imageResIdentifier ,_keyValue);
 end;
 
 procedure jSqliteDataAccess.InsertIntoTableBatch(var _insertQueries: TDynArrayOfString);
@@ -10845,8 +10939,10 @@ function jSqliteDataAccess.CheckDataBaseExistsByName(_dbName: string): boolean;
 begin
   //in designing component state: result value here...
   Result:= False;
-  if FInitialized then
-   Result:= jSqliteDataAccess_CheckDataBaseExistsByName(FjEnv, FjObject, _dbName);
+
+  if not FInitialized then exit;
+
+  Result:= jSqliteDataAccess_CheckDataBaseExistsByName(FjEnv, FjObject, _dbName);
 end;
 
 procedure jSqliteDataAccess.UpdateImageBatch(var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
@@ -10866,10 +10962,12 @@ end;
 
 function jSqliteDataAccess.GetFullPathDataBaseName(): string;
 begin
-  if FInitialized then
-  begin
-     FFullPathDataBaseName:= GetFilePath(fpathDataBase) + '/' + FDataBaseName;
-  end;
+  Result := '';
+
+  if not FInitialized then exit;
+
+  FFullPathDataBaseName:= GetFilePath(fpathDataBase) + '/' + FDataBaseName;
+
   Result:= FFullPathDataBaseName;
 end;
 
