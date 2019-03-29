@@ -38,13 +38,14 @@ type
     FCandidateSdkBuild: string;
     FPathToGradle: string;
     FPathToSmartDesigner: string;
+    FChipArchitecture: string;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
     procedure AddSupportToFCLControls(chipArchitecture: string);
     function GetEventSignature(const nativeMethod: string): string;
     function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
-    function TryAddJControl(jclassname: string; out nativeAdded: boolean): boolean;
+    function TryAddJControl(ControlsJava: TStringList; jclassname: string; out nativeAdded: boolean): boolean;
     procedure UpdateProjectLpr(oldModuleName: string; newModuleName: string);
     procedure InitSmartDesignerHelpers;
     procedure UpdateStartModuleVarName;
@@ -1598,7 +1599,7 @@ begin
               p:= Pos(';', aux);
               if p > 0 then
               begin
-                 pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p));
+                 pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p-1));
                  //need by linker!
                  CopyFile(pathToFclBridges+'libso'+PathDelim+chipArchitecture+PathDelim+auxList.Strings[0],
                           pathToNdkApiPlatforms+auxList.Strings[0]);
@@ -1615,22 +1616,22 @@ begin
   fileList.Free;
 end;
 
-function TLamwSmartDesigner.TryAddJControl(jclassname: string;
+function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
   list, listRequirements, auxList, manifestList: TStringList;
-  p1, p2, i: integer;
+  p, p1, p2, i: integer;
   aux, tempStr: string;
   insertRef: string;
   c: char;
+  androidNdkApi, pathToNdkApiPlatforms,  arch: string;
 begin
    nativeAdded:= False;
    Result:= False;
 
    if FPackageName = '' then Exit;
 
-   if FileExists(FPathToJavaSource+jclassname+'.java') then
-     Exit; //do not duplicated!
+   if FileExists(FPathToJavaSource+jclassname+'.java') then Exit; //do not duplicated!
 
    list:= TStringList.Create;
    manifestList:= TStringList.Create;
@@ -1671,10 +1672,13 @@ begin
          list.Add(auxList.Strings[i]);
        end;
      end;
+
      aux:= list.Text;
-     list.LoadFromFile(FPathToJavaSource+'Controls.java');
-     list.Insert(list.Count-1, aux);
-     list.SaveToFile(FPathToJavaSource+'Controls.java');
+     //list.LoadFromFile(FPathToJavaSource+'Controls.java');
+     //list.Insert(list.Count-1, aux);
+     //list.SaveToFile(FPathToJavaSource+'Controls.java');
+     ControlsJava.Insert(ControlsJava.Count-1, aux);
+
    end;
 
    //try insert reference required by the jControl in AndroidManifest ..
@@ -1896,7 +1900,60 @@ begin
      end;
    end;
 
-   //-----
+   //xxxxxxxxxxxxxx
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.libso') then //jBarcodeScannerView.libso
+   begin
+     //libiconv.so
+     //libzbarjni.so
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libso');
+
+     for i:= 0 to  auxList.Count-1 do
+     begin
+        CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' + PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i],
+                FPathToAndroidProject+'libs'+PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i]);
+     end;
+
+     androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-21
+     if androidNdkApi <> '' then
+     begin
+
+       if Pos('armeabi', FChipArchitecture) > 0 then arch:= 'arch-arm'
+       else if Pos('arm64', FChipArchitecture) > 0 then arch:= 'arch-arm64'
+       else if Pos('x86', FChipArchitecture) > 0 then arch:= 'arch-x86'
+       else if Pos('mips', FChipArchitecture) > 0 then arch:= 'arch-mips';
+
+       //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
+       pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                               androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
+                                               'usr'+DirectorySeparator+'lib';
+
+
+       //need by linker!                       //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
+      for i:= 0 to  auxList.Count-1 do
+      begin
+         CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' + PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i],
+                  pathToNdkApiPlatforms+PathDelim+auxList.Strings[i]);
+      end;
+     end
+     else
+     begin
+       pathToNdkApiPlatforms:='';
+       aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+       p:= Pos(';', aux);
+       if p > 0 then
+       begin
+          pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p-1));
+          //need by linker!
+           for i:= 0 to  auxList.Count-1 do
+           begin
+              CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' + PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i],
+                       pathToNdkApiPlatforms+auxList.Strings[i]);
+           end;
+       end;
+     end;
+   end;
+
+   //xxxxxxxxxxxxxx
    //try fix "gradle.build"
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dependencies') then
    begin
@@ -2298,10 +2355,10 @@ end;
 
 function TLamwSmartDesigner.OnProjectSavingAll(Sender: TObject): TModalResult;
 var
-  auxList, controlsList, libList: TStringList;
+  ControlsJava, auxList, controlsList, libList: TStringList;
   i, j, p: Integer;
   nativeExists: Boolean;
-  aux, PathToJavaTemplates, chipArchitecture, LibPath: string;
+  aux, PathToJavaTemplates, LibPath: string;
   AndroidTheme: string;
   compoundList: TStringList;
   lprModuleName: string;
@@ -2309,8 +2366,6 @@ begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
   if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] <> 'GUI' then Exit;
-
-  auxList:= TStringList.Create;
 
   AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
 
@@ -2323,22 +2378,54 @@ begin
   if FStartModuleVarName = '' then UpdateStartModuleVarName;
   //LAMW 0.8
 
-  chipArchitecture:= 'x86';
+  FChipArchitecture:= 'x86';
   aux := LowerCase(LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions);
-  if Pos('-cparmv6', aux) > 0 then chipArchitecture:= 'armeabi'
-  else if Pos('-cparmv7a', aux) > 0 then chipArchitecture:= 'armeabi-v7a'
-  else if Pos('-xpaarch64', aux) > 0 then chipArchitecture:= 'arm64-v8a'
-  else if Pos('-xpmipsel', aux) > 0 then chipArchitecture:= 'mips';
+  if Pos('-cparmv6', aux) > 0 then FChipArchitecture:= 'armeabi'
+  else if Pos('-cparmv7a', aux) > 0 then FChipArchitecture:= 'armeabi-v7a'
+  else if Pos('-xpaarch64', aux) > 0 then FChipArchitecture:= 'arm64-v8a'
+  else if Pos('-xpmipsel', aux) > 0 then FChipArchitecture:= 'mips';
 
-  AddSupportToFCLControls(chipArchitecture);
+  AddSupportToFCLControls(FChipArchitecture);
 
   if LamwGlobalSettings.CanUpdateJavaTemplate then
   begin
     CleanupAllJControlsSource;
 
+    ControlsJava:= TStringList.Create;
+    auxList:= TStringList.Create;
+    controlsList := TStringList.Create;
+    controlsList.Sorted := True;
+    controlsList.Duplicates := dupIgnore;
+    compoundList:= TStringList.Create;
+
+    GetAllJControlsFromForms(controlsList);
+
+    for i:= 0 to controlsList.Count - 1 do       //Add component compound support
+    begin
+      if FileExists(PathToJavaTemplates+controlsList.Strings[i]+'.compound') then
+      begin
+        compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+controlsList.Strings[i]+'.compound');
+        for j:= 0 to compoundList.Count - 1 do
+        begin
+          if compoundList.Strings[j] <> '' then
+             controlsList.Add(compoundList.Strings[j]);
+        end;
+      end;
+    end;
+
+    //re-add all [updated] java code ...
+    ControlsJava.LoadFromFile(PathToJavaTemplates+'Controls.java');
+    ControlsJava.Strings[0]:= 'package '+FPackageName+';';
+
+    for j:= 0 to controlsList.Count - 1 do
+    begin
+      if FileExists(PathToJavaTemplates+controlsList.Strings[j]+'.java') then
+           TryAddJControl(ControlsJava, controlsList.Strings[j], nativeExists);
+    end;
+
     // tk Output some useful messages about libraries
-    LibPath := FPathToAndroidProject + 'libs'+DirectorySeparator+chipArchitecture;
-    IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Selected chip architecture: ' + chipArchitecture);
+    LibPath := FPathToAndroidProject + 'libs'+DirectorySeparator+FChipArchitecture;
+    IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Selected chip architecture: ' + FChipArchitecture);
     IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Taking libraries from folder: ' + LibPath);
     // end tk
 
@@ -2363,22 +2450,16 @@ begin
       libList.Add('try{System.loadLibrary("'+auxList.Strings[j]+'");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_lib'+auxList.Strings[j]+'", "exception", e);}');
     end;
 
-    auxList.Clear;
-    if FileExists(PathToJavaTemplates+'Controls.java') then
-    begin
-      auxList.LoadFromFile(PathToJavaTemplates+'Controls.java');
-      auxList.Strings[0]:= 'package '+FPackageName+';';
+    if libList.Count > 0 then
+       aux:=  StringReplace(ControlsJava.Text, '/*libsmartload*/' ,Trim(libList.Text), [rfReplaceAll,rfIgnoreCase])
+    else
+       aux:=  StringReplace(ControlsJava.Text, '/*libsmartload*/' ,
+               'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
+               [rfReplaceAll,rfIgnoreCase]);
 
-      if libList.Count > 0 then
-         aux:=  StringReplace(auxList.Text, '/*libsmartload*/' ,Trim(libList.Text), [rfReplaceAll,rfIgnoreCase])
-      else
-         aux:=  StringReplace(auxList.Text, '/*libsmartload*/' ,
-                 'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
-                 [rfReplaceAll,rfIgnoreCase]);
-
-      auxList.Text:= aux;
-      auxList.SaveToFile(FPathToJavaSource+'Controls.java');
-    end;
+    ControlsJava.Text:= aux;
+      //auxList.SaveToFile(FPathToJavaSource+'Controls.java');
+    ControlsJava.SaveToFile(FPathToJavaSource+'Controls.java');
 
     auxList.Clear;
     if Pos('AppCompat', AndroidTheme) > 0 then
@@ -2390,7 +2471,6 @@ begin
     begin
       if FileExists(PathToJavaTemplates + 'App.java') then
          auxList.LoadFromFile(PathToJavaTemplates + 'App.java');
-
     end;
     auxList.Strings[0]:= 'package '+FPackageName+';';
     auxList.SaveToFile(FPathToJavaSource+'App.java');
@@ -2408,7 +2488,12 @@ begin
     auxList.Strings[0]:= 'package '+FPackageName+';';
     auxList.SaveToFile(FPathToJavaSource+'jCommons.java');
 
+    compoundList.Free;
+    controlsList.Free;
     libList.Free;
+    auxList.Free;
+
+    ControlsJava.Free;
 
   end;  //CanUpdateJavaTemplate
 
@@ -2418,6 +2503,7 @@ begin
        FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'Controls.native');
   end;
 
+  (*
   controlsList := TStringList.Create;
   controlsList.Sorted := True;
   controlsList.Duplicates := dupIgnore;
@@ -2445,9 +2531,8 @@ begin
     if FileExists(PathToJavaTemplates+controlsList.Strings[j]+'.java') then
        TryAddJControl(controlsList.Strings[j], nativeExists);
   end;
-
   controlsList.Free;
-  auxList.Free;
+  *)
 
   UpdateProjectLpr(lprModuleName, FStartModuleVarName);
 end;
