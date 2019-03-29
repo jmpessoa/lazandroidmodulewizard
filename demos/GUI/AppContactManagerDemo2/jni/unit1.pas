@@ -22,6 +22,9 @@ type
     jTextView1: jTextView;
     procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure jButton1Click(Sender: TObject);
     procedure jContactManager1GetContactsFinished(Sender: TObject;
       count: integer);
@@ -49,6 +52,13 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+
+  if not IsRuntimePermissionGranted('android.permission.READ_CONTACTS') then
+  begin
+    ShowMessage('Sorry... "android.permission.READ_CONTACTS" DENIED');
+    Exit;
+  end;
+
   if not FInProgress then
   begin
      jButton1.Text:= 'Listing.. [wait]';
@@ -154,11 +164,28 @@ begin
 
   if(gApp.APILevel >= 23) and (IsRuntimePermissionNeed) then
   begin
-
     SetLength(manifestPermissions, 1);
     manifestPermissions[0]:= 'android.permission.CONTACTS_READ';
     Self.RequestRuntimePermission(manifestPermissions, $1234);
     SetLength(manifestPermissions, 0);
+  end;
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+  case requestCode of
+    $1234:begin
+           if grantResult = PERMISSION_GRANTED  then
+           begin
+              if manifestPermission = 'android.permission.READ_CONTACTS' then ShowMessage('"'+manifestPermission+'"  granted!');
+           end
+          else//PERMISSION_DENIED
+          begin
+              ShowMessage('Sorry... "['+manifestPermission+']" not granted... ' );
+          end;
+       end;
   end;
 end;
 

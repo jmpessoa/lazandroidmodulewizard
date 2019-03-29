@@ -1,6 +1,6 @@
 package com.example.appcontactmanagerdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.7 - 04 July - 2016 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.1  - 23 March - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -13,7 +13,7 @@ package com.example.appcontactmanagerdemo1;
 //                       simonsayz@naver.com
 //                       http://blog.naver.com/simonsayz
 //
-//          LoadMan    / Jang,Yang-Ho
+//         LoadMan    / Jang,Yang-Ho
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
 //
@@ -53,6 +53,8 @@ package com.example.appcontactmanagerdemo1;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -67,8 +69,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
@@ -81,22 +86,30 @@ import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.RemoteViews;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.io.*;
@@ -106,9 +119,24 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
+
 import java.util.List;
 import java.util.Locale;
 import java.lang.reflect.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.lang.Object;
+
+import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
+
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 
 //-------------------------------------------------------------------------
 //Constants
@@ -124,12 +152,12 @@ class Const {
 //Form
 //-------------------------------------------------------------------------
 class jForm {
-// Java-Pascal Interface
+//Java-Pascal Interface
 private long             PasObj   = 0;     // Pascal Obj
 private Controls        controls = null;   // Control Class for Event
 private RelativeLayout  layout   = null;
 private LayoutParams    layparam = null;
-private RelativeLayout  parent   = null;
+private RelativeLayout  parent   = null;   //activity appLayout
 private OnClickListener onClickListener;   // event
 private OnClickListener onViewClickListener;   // generic delegate event
 private OnItemClickListener onListItemClickListener; 
@@ -137,14 +165,19 @@ private Boolean         enabled  = true;   //
 private Intent intent;
 private int mCountTab = 0;
 
+private boolean mRemovedFromParent = false;
+
 // Constructor
 public  jForm(Controls ctrls, long pasobj) {
 PasObj   = pasobj;
 controls = ctrls;
+parent = controls.appLayout;
+
 layout   = new RelativeLayout(controls.activity);
 layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT);
 layout.setLayoutParams(layparam);
+
 // Init Event
 onClickListener = new OnClickListener() {
   public  void onClick(View view) {
@@ -183,9 +216,67 @@ public  RelativeLayout GetView() {
 	  return layout;
 }
 
+public  void SetEnabled ( boolean enabled ) {	
+	  for (int i = 0; i < layout.getChildCount(); i++) {
+	     View child = layout.getChildAt(i);
+	     child.setEnabled(enabled);
+	  }
+}
+ 
+public void SetLayoutVisibility(boolean _value) {
+	if (!_value) {
+	   layout.setVisibility(android.view.View.INVISIBLE);
+	} 
+	else {
+		layout.setVisibility(android.view.View.VISIBLE);
+	}	
+}
+
+public  void SetVisible ( boolean visible ) {	
+  if (visible) { 
+	  if (layout.getParent() == null) { 
+		   controls.appLayout.addView(layout);
+		   layout.setVisibility(android.view.View.VISIBLE);
+		   mRemovedFromParent = false;
+	  } 
+   }
+  else { 
+	  if (layout.getParent() != null) { 
+		 layout.setVisibility(android.view.View.INVISIBLE);
+		 controls.appLayout.removeView(layout);
+		 mRemovedFromParent = true;
+      }   
+   }
+}
+
+public void RemoveFromViewParent() {   //TODO Pascal
+	if (!mRemovedFromParent) {
+		if (layout != null)  {
+			layout.setVisibility(android.view.View.INVISIBLE);
+			if (parent != null) parent.removeView(layout);
+		}
+		mRemovedFromParent = true;
+	}
+}
+
+public void SetViewParent( android.view.ViewGroup _viewgroup) {
+	if ( (parent != null) && (layout != null) ) { parent.removeView(layout); }
+	parent = (RelativeLayout) _viewgroup;
+	if ( (parent != null) && (layout != null) ) {
+		parent.addView(layout, layparam);
+		layout.setVisibility(android.view.View.VISIBLE);
+	}
+	mRemovedFromParent = false;
+}
+
 public  void Show(int effect) {			
    controls.appLayout.addView(layout);
    parent = controls.appLayout;
+}
+
+
+public ViewGroup GetParent() {	
+  return controls.appLayout; //parent;
 }
 
 public  void Close(int effect ) {
@@ -197,63 +288,72 @@ public  void Close2() {
   controls.pOnClose(PasObj);
 }
 
-public boolean IsConnected(){ // by renabor
-   boolean r = false;	
+public boolean IsConnected(){ //by TR3E
+
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-   if (cm == null) return r;   
-   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-   if (activeNetwork == null) return r;   
-   return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+   if (cm != null) {
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+    if (activeNetwork != null)
+     return (activeNetwork.isAvailable() && activeNetwork.isConnected());
+   }
+
+   return false;
 }
 
-public boolean IsConnectedWifi(){ // by renabor
-   boolean r = false;
+public boolean IsConnectedWifi(){ // by TR3E
+
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-   if (cm == null) return r;   
-   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-   if (activeNetwork == null) return r;   
-   return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+
+   if (cm != null)
+   {
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+    if (activeNetwork != null)
+     return (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI);
+   }
+
+   return false;
 }
 
-public boolean IsConnectedTo(int _connectionType) {	   
-	   int r = -1;
-	   if (!IsConnected()) return false;	   
-	   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);	   
-	   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();	   
-	   if (activeNetwork != null) {   	   
-		  switch (activeNetwork.getType()){
-		  case ConnectivityManager.TYPE_MOBILE: r = 0; break;  //0
-		  case ConnectivityManager.TYPE_WIFI: r = 1; break;  //1
- 		  case ConnectivityManager.TYPE_BLUETOOTH: r = 2; break; //7
-		  case ConnectivityManager.TYPE_ETHERNET: r = 3; break; //9		  
-		  }	      
-	   }	   
-	   if (r == _connectionType)  
-		   return true;
-	   else 
-		  return false;
-	   
-}
-//
-public  void SetVisible ( boolean visible ) {	
-if (visible) { if (layout.getParent() == null)
-               { controls.appLayout.addView(layout); } }
-else         { if (layout.getParent() != null)
-               { controls.appLayout.removeView(layout); } };
-}
+public boolean IsConnectedTo(int _connectionType) { // by TR3E
 
-//
-public  void SetEnabled ( boolean enabled ) {	
-for (int i = 0; i < layout.getChildCount(); i++) {
-  View child = layout.getChildAt(i);
-  child.setEnabled(enabled);
-}
+           ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
+           if( cm != null )
+           {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            int result = -1;
+
+            if (activeNetwork != null)
+             if (activeNetwork.isAvailable() && activeNetwork.isConnected());
+             {
+                  switch (activeNetwork.getType()){
+                   case ConnectivityManager.TYPE_MOBILE:    result = 0; break; //0
+                   case ConnectivityManager.TYPE_WIFI:      result = 1; break; //1
+                   case ConnectivityManager.TYPE_BLUETOOTH: result = 2; break; //7
+                   case ConnectivityManager.TYPE_ETHERNET:  result = 3; break; //9
+                  }
+             }
+
+            return (result == _connectionType);
+           }
+
+           return false;
 }
 
 public void ShowMessage(String msg){
   Log.i("ShowMessage", msg);
   Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
+}
+
+public void ShowMessage(String _msg, int _gravity, int _timeLength) {
+	  Log.i("ShowMessage", _msg);
+	  Toast toast = Toast.makeText(controls.activity, _msg, _timeLength);
+	  toast.setGravity(Gravity.CENTER, 0, 0);
+	  toast.show();
 }
 
 public String GetDateTime() {
@@ -312,13 +412,17 @@ public int getSystemVersion()
 }
 
  public boolean SetWifiEnabled(boolean _status) {
-    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);             
-    return wifiManager.setWifiEnabled(_status);
+    //WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
+	 WifiManager wifiManager = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	 return wifiManager.setWifiEnabled(_status);
  }
 
  public boolean IsWifiEnabled() {
-    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
-    return  wifiManager.isWifiEnabled();	
+    //WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
+    WifiManager wifiManager = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	 return  wifiManager.isWifiEnabled();
  }
          
  public boolean IsMobileDataEnabled() {
@@ -435,7 +539,8 @@ public String LoadFromAssets(String _filename){
 			
 			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
 		      fos.write(buffer, 0, c);
-			}	     								
+			}	     		
+			
 			is.close();								
 			fos.close();
 			pathRes= PathDat +"/"+ _filename;
@@ -565,8 +670,32 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
-	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+        Drawable res = null;
+
+        if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21
+ 			res = this.controls.activity.getResources().getDrawable(_resID);
+ 		}
+
+ 		//[ifdef_api21up]
+ 		if(Build.VERSION.SDK_INT >= 21) {  			
+ 		   res = this.controls.activity.getResources().getDrawable(_resID, null);
+ 		}//[endif_api21up]
+
+ 		return res;
 }
+
+	public void SetBackgroundImage(String _imageIdentifier) {
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
+		ImageView image = new ImageView(controls.activity);
+        LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        image.setLayoutParams(param);
+		image.setImageResource(android.R.color.transparent);
+		image.setImageDrawable(d);
+		//image.invalidate();
+		layout.addView(image);
+	}
+
 
 //by  thierrydijoux
 public String GetQuantityStringByName(String _resName, int _quantity) {
@@ -582,8 +711,10 @@ public String GetStringResourceByName(String _resName) {
 	return value;
 }   
 
-public ActionBar GetActionBar() { 
-    return this.controls.activity.getActionBar();
+public ActionBar GetActionBar() {
+    if (! jCommons.IsAppCompatProject() ) {
+		return (controls.activity).getActionBar();
+	} else return null;
 }
 
 /*
@@ -593,80 +724,70 @@ public ActionBar GetActionBar() {
  */
 
 public void HideActionBar() {
- ActionBar actionBar = this.controls.activity.getActionBar(); 
- actionBar.hide();          
+	jCommons.ActionBarHide(controls);
 }
 
-public void ShowActionBar() {	         
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.show();
+public void ShowActionBar() {
+	jCommons.ActionBarShow(controls);
 }
 
 //Hide the title label
 public void ShowTitleActionBar(boolean _value) {
-	ActionBar actionBar = this.controls.activity.getActionBar();
-    actionBar.setDisplayShowTitleEnabled(_value);
+	jCommons.ActionBarShowTitle(controls, _value);
 }
 
 //Hide the logo = false
-public void ShowLogoActionBar(boolean _value) { 
-   ActionBar actionBar = this.controls.activity.getActionBar();	    
-   actionBar.setDisplayShowHomeEnabled(_value);
+public void ShowLogoActionBar(boolean _value) {
+	jCommons.ActionBarShowLogo(controls, _value);
 }
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetTitleActionBar(String _title) {
-	ActionBar actionBar = this.controls.activity.getActionBar();   	
-    actionBar.setTitle(_title);    
+	jCommons.SetActionBarTitle(controls, _title);
 }
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetSubTitleActionBar(String _subtitle) {
-   ActionBar actionBar = this.controls.activity.getActionBar();    
-   actionBar.setSubtitle(_subtitle);
-   //actionBar.setDisplayHomeAsUpEnabled(true);  
+   jCommons.SetActionBarSubTitle(controls, _subtitle);
 }
 
 //forward [<] activity! // If your minSdkVersion is 11 or higher!
 /*.*/public void SetDisplayHomeAsUpEnabledActionBar(boolean _value) {
-   ActionBar actionBar = this.controls.activity.getActionBar();    
-   actionBar.setDisplayHomeAsUpEnabled(_value);
+	jCommons.ActionBarDisplayHomeAsUpEnabled(controls, _value);
 }	
 
 public void SetIconActionBar(String _iconIdentifier) {
-	ActionBar actionBar = this.controls.activity.getActionBar();   	
-    actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+//[ifdef_api14up]
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
+	jCommons.ActionBarSetIcon(controls, d);
+//[endif_api14up]
 }
 
 public void SetTabNavigationModeActionBar(){
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	//API 11
-	actionBar.setSelectedNavigationItem(0);
+	jCommons.ActionBarSetTabNavigationMode(controls);
 }
 
 //This method remove all tabs from the action bar and deselect the current tab
 public void RemoveAllTabsActionBar() {
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.removeAllTabs();
-        this.controls.activity.invalidateOptionsMenu(); // by renabor
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
+	jCommons.ActionBarRemoveAllTabs(controls);
 }
 
 //Calculate ActionBar height
 //ref http://stackoverflow.com/questions/12301510/how-to-get-the-actionbar-height
 public int GetActionBarHeight() {
-int actionBarHeight = 0;
-TypedValue tv = new TypedValue();
-if (controls.activity.getActionBar().isShowing()) {  
-   if (controls.activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-      actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,controls.activity.getResources().getDisplayMetrics());
-   }
-}
-return actionBarHeight;
+  return jCommons.ActionGetBarBarHeight(controls);
 }
 
 public boolean ActionBarIsShowing() {
-  return controls.activity.getActionBar().isShowing();
+	return jCommons.ActionBarIsShowing(controls);
+}
+
+public boolean HasActionBar() {
+	return jCommons.HasActionBar(controls);
+}
+
+public boolean IsAppCompatProject () {
+	return jCommons.IsAppCompatProject();
 }
 
 public boolean IsPackageInstalled(String _packagename) {
@@ -688,7 +809,7 @@ public void ShowCustomMessage(View _layout,  int _gravity) {
 	if (par != null) {
 	    par.removeView(_layout);        	    
 	}    
-    _layout.setVisibility(0);
+    _layout.setVisibility(View.VISIBLE);
     toast.setView(_layout);
     toast.show();
 }
@@ -719,7 +840,7 @@ public void ShowCustomMessage(View _layout,  int _gravity,  int _lenghTimeSecond
 	if (par != null) {
 	    par.removeView(_layout);        	    
 	}    
-    _layout.setVisibility(0);
+    _layout.setVisibility(View.VISIBLE);//0
     toast.setView(_layout);    				
     //it will show the toast for 20 seconds: 
     //(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
@@ -758,10 +879,13 @@ public String GetScreenDensity() {
 
     int density = metrics.densityDpi;
         
+//[ifdef_api16up]
     if (density==DisplayMetrics.DENSITY_XXHIGH) {    	    	
         r= "XXHIGH:" + String.valueOf(density);
     }
-    else if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
+    else
+//[endif_api16up]
+    if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
         r= "XHIGH:" + String.valueOf(density);
     }
     else if (density==DisplayMetrics.DENSITY_HIGH) {    	    	
@@ -847,7 +971,7 @@ public String GetSubTitleActionBar() {
 }
 
 //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
-public void CopyFromAssetsToInternalAppStorage(String _filename){				    		   
+public String CopyFromAssetsToInternalAppStorage(String _filename) {				    		   
 		InputStream is = null;
 		FileOutputStream fos = null;			
 		String PathDat = controls.activity.getFilesDir().getAbsolutePath();			 			
@@ -869,8 +993,20 @@ public void CopyFromAssetsToInternalAppStorage(String _filename){
 		}catch (IOException e) {
 			// Log.i("ShareFromAssets","fail!!");
 		     e.printStackTrace();			     
-		}									
+		}
+		return PathDat+"/"+_filename;
 }	
+
+public String GetPathFromAssetsFile(String _assetsFileName) {  
+   return LoadFromAssets(_assetsFileName);
+}
+
+public Bitmap GetImageFromAssetsFile(String _assetsImageFileName) {
+	  String path =  LoadFromAssets(_assetsImageFileName);
+	  BitmapFactory.Options bo = new BitmapFactory.Options();
+	  bo.inScaled = false;
+	  return BitmapFactory.decodeFile(path, bo);
+}
 
 public void CopyFromInternalAppStorageToEnvironmentDir(String _filename, String _environmentDir) {	 
     String srcPath = controls.activity.getFilesDir().getAbsolutePath()+"/"+ _filename;       //Result : /data/data/com/MyApp/files	 
@@ -887,6 +1023,21 @@ public void CopyFromAssetsToEnvironmentDir(String _filename, String _environment
 public void ToggleSoftInput() {
 	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 	  imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+}
+
+public void HideSoftInput() {
+	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
+}
+
+public void HideSoftInput(View _view) {
+  InputMethodManager imm = (InputMethodManager)controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+  imm.hideSoftInputFromWindow(_view.getWindowToken(), 0);
+}
+
+public void ShowSoftInput() {
+	  InputMethodManager imm =(InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	  imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
 }
 
 //thanks to Mladen
@@ -934,8 +1085,337 @@ public String UriToString(Uri _uri) {
   return _uri.toString();
 }
 
+// ref. http://www.android-examples.com/get-display-ip-address-of-android-phone-device-programmatically/
+public int GetNetworkStatus() {
+  boolean WIFI = false;
+  boolean MOBILE = false;
+  int r = 0; //NOT_CONNECTED
+  ConnectivityManager CM = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+  NetworkInfo[] networkInfo = CM.getAllNetworkInfo();
+  for (NetworkInfo netInfo : networkInfo) {
+     if (netInfo.getTypeName().equalsIgnoreCase("WIFI"))
+     if (netInfo.isConnected()) WIFI = true;
+     if (netInfo.getTypeName().equalsIgnoreCase("MOBILE"))
+     if (netInfo.isConnected())
+     MOBILE = true;
+  }
+  
+  if(WIFI == true) {
+    r = 1; //WIFI_CONNECTED
+  }
+  
+  if(MOBILE == true) {
+	r = 2; //MOBILE_DATA_CONNECTED
+  }
+  
+  return  r;
+} 
+
+public String GetDeviceDataMobileIPAddress(){
+	String r = "";
+try {
+    for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); 
+      en.hasMoreElements();) {
+      NetworkInterface networkinterface = en.nextElement();
+      for (Enumeration<InetAddress> enumIpAddr = networkinterface.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+         InetAddress inetAddress = enumIpAddr.nextElement();
+         if (!inetAddress.isLoopbackAddress()) {        	                      
+           boolean isIPv4 = inetAddress.getHostAddress().indexOf(':') < 0;              
+           if (isIPv4)  return r = inetAddress.getHostAddress();     
+           if (!isIPv4) {
+                   int delim = inetAddress.getHostAddress().indexOf('%'); // drop ip6 zone suffix
+                   r = delim < 0 ? inetAddress.getHostAddress().toUpperCase() : inetAddress.getHostAddress().substring(0, delim).toUpperCase();
+           }                                
+         }
+      }
+    }
+}catch (Exception ex) {
+Log.e("Current IP", ex.toString());
 }
- 
+return r;
+}
+
+//ref. http://www.devlper.com/2010/07/getting-ip-address-of-the-device-in-android/
+public String GetDeviceWifiIPAddress() {
+    //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
+	WifiManager mWifi = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	//String ip = Formatter.formatIpAddress(
+    int  ipAddress = mWifi.getConnectionInfo().getIpAddress();
+    String sIP =String.format("%d.%d.%d.%d",
+    		(ipAddress & 0xff),
+    		(ipAddress >> 8 & 0xff),
+    		(ipAddress >> 16 & 0xff),
+    		(ipAddress >> 24 & 0xff));
+   return sIP;
+}
+
+  /** 
+  * Calculate the broadcast IP we need to send the packet along.
+  * ref. http://www.ece.ncsu.edu/wireless/MadeInWALAN/AndroidTutorial/ 
+  */
+  public String GetWifiBroadcastIPAddress() throws IOException {
+	String r = null;
+    //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
+	  WifiManager mWifi = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+	// DhcpInfo  is a simple object for retrieving the results of a DHCP request
+    DhcpInfo dhcp = mWifi.getDhcpInfo(); 
+    if (dhcp == null) {     
+      return null; 
+    }        
+    int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;     
+    byte[] quads = new byte[4];    
+    for (int k = 0; k < 4; k++) 
+      quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);      
+    // Returns the InetAddress corresponding to the array of bytes. 
+    // The high order byte is quads[0].
+    r = InetAddress.getByAddress(quads).getHostAddress();    
+    if  (r == null) r = "";    
+    return r;
+  }
+  
+  //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/    
+  public String LoadFromAssetsTextContent(String _filename) {
+	   String str;
+      // load text
+      try {
+   	   //Log.i("loadFromAssets", "name: "+_filename);
+          // get input stream for text
+          InputStream is = controls.activity.getAssets().open(_filename);
+          // check size
+          int size = is.available();
+          // create buffer for IO
+          byte[] buffer = new byte[size];
+          // get data to buffer
+          is.read(buffer);
+          // close stream
+          is.close();
+          // set result to TextView
+          str = new String(buffer);
+          //Log.i("loadFromAssets", ":: "+ str);
+          return str.toString();
+      }
+      catch (IOException ex) {
+   	   //Log.i("loadFromAssets", "error!");
+          return "";
+      }       
+  }
+  
+  
+//Fatih: Path = '' = Asset Root Folder 
+//Path Example: gunlukler/2015/02/28/001
+  
+public String[] GetAssetContentList(String _path) throws IOException { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	Resources r = this.controls.activity.getResources();  
+	AssetManager am = r.getAssets(); 
+	String fileList[] = am.list(_path); 
+	if (fileList != null) 
+	{    
+		for (int i = 0; i < fileList.length; i++) 
+		{ 
+			Folders.add(fileList[i]); 
+		} 
+	} 
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+} 
+
+//Fatih: gets system storage driver list
+public String[] GetDriverList() { 
+	ArrayList<String> Drivers = new ArrayList<String>(); 
+
+	String sDriver;
+	sDriver = System.getenv("EXTERNAL_STORAGE");
+	if(sDriver != null)
+	{
+		File fDriver = new File(sDriver);
+
+		if (fDriver.exists() && fDriver.canWrite()) {
+			Drivers.add(fDriver.getAbsolutePath());
+		}
+	}
+
+	sDriver = System.getenv("SECONDARY_STORAGE");
+	if(sDriver != null)
+	{
+		File fDriver = new File(sDriver);
+
+		if (fDriver.exists() && fDriver.canWrite()) {
+			Drivers.add(fDriver.getAbsolutePath());
+		}
+	}
+	
+	String sDrivers[] = Drivers.toArray(new String[Drivers.size()]);    	   
+	return sDrivers; 
+} 
+
+//Fatih: get folders list 
+//Path Example: /storage/emulated/legacy/ 
+public String[] GetFolderList(String _envPath) { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	File f = new File(_envPath);
+	File[] files = f.listFiles();
+	for (File fFile : files) {
+	    if (fFile.isDirectory()) {
+			Folders.add(fFile.getName());
+	    }
+	}	
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+} 
+
+//Fatih: get files list 
+//Path Example: /storage/emulated/legacy/ 
+public String[] GetFileList(String _envPath) { 
+	ArrayList<String> Folders = new ArrayList<String>(); 
+
+	File f = new File(_envPath);
+	File[] files = f.listFiles();
+	for (File fFile : files) {
+	    if (fFile.isFile()) {
+			Folders.add(fFile.getName());
+	    }
+	}	
+	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
+	return sFolders; 
+}  
+
+public boolean FileExists(String _fullFileName) {	
+	return new File(_fullFileName).isFile();	
+}
+
+public boolean DirectoryExists(String _fullDirectoryName) {
+	return new File(_fullDirectoryName).isDirectory();
+}
+
+
+//http://blog.scriptico.com/category/dev/java/android/
+public void Minimize() {
+  Intent main = new Intent(Intent.ACTION_MAIN);
+  main.addCategory(Intent.CATEGORY_HOME);
+  main.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  controls.activity.startActivity(main);
+}
+
+public void Restart(int _delay) {
+  PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0, 
+		                                           new Intent( controls.activity.getIntent() ), 
+		                                           controls.activity.getIntent().getFlags());  
+  AlarmManager manager = (AlarmManager) controls.activity.getSystemService(Context.ALARM_SERVICE);  
+  manager.set(AlarmManager.RTC, System.currentTimeMillis() + _delay, intent);
+  System.exit(2);
+}
+
+public String UriEncode(String _message) {
+	return Uri.encode(_message);
+}
+
+//http://www.viralandroid.com/2015/12/how-to-use-font-awesome-icon-in-android-application.html
+//http://fontawesome.io/cheatsheet/	
+public String ParseHtmlFontAwesome(String _htmlString) {
+	   String iconHeart = _htmlString; //"&#xf004;";
+	   String valHexStr = iconHeart.replace("&#x", "").replace(";", "");
+	   long valLong = Long.parseLong(valHexStr,16);
+	   //button.setText(getString((char)valLong+"");
+	   return (char)valLong+"" ;
+}
+
+//https://developer.android.com/reference/android/provider/Settings.System
+
+	public int GetSettingsSystemInt(String _strKey) {
+		try {
+			return android.provider.Settings.System.getInt(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return -1;
+		}
+	}
+
+	//https://developer.android.com/reference/android/provider/Settings.System
+	public String GetSettingsSystemString(String _strKey) {
+	  String r = android.provider.Settings.System.getString(controls.activity.getContentResolver(), _strKey);
+  	  if (r == null) r = "";
+  	  return r;
+	}
+
+	public float GetSettingsSystemFloat(String _strKey) {
+		try {
+			return android.provider.Settings.System.getFloat(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return  -1;
+		}
+	}
+
+	public long GetSettingsSystemLong(String _strKey) {
+		try {
+			return android.provider.Settings.System.getLong(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return  -1;
+		}
+	}
+
+	public boolean PutSettingsSystemInt (String _strKey, int _value) {
+			return android.provider.Settings.System.putInt(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemLong (String _strKey, long _value) {
+			return android.provider.Settings.System.putLong(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemFloat(String _strKey, float _value) {
+			return android.provider.Settings.System.putFloat(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemString(String _strKey, String _strValue) {
+		return android.provider.Settings.System.putString(controls.activity.getContentResolver(), _strKey, _strValue);
+	}
+
+	public boolean IsRuntimePermissionNeed() {
+		return Build.VERSION.SDK_INT >= 23;  //Build.VERSION_CODES.M
+	}
+
+	public boolean IsRuntimePermissionGranted(String _androidPermission) {  //"android.permission.CAMERA"
+		return jCommons.IsRuntimePermissionGranted(controls, _androidPermission);
+	}
+
+	public void RequestRuntimePermission(String _androidPermission, int _requestCode) {  //"android.permission.CAMERA"
+		jCommons.RequestRuntimePermission(controls, _androidPermission, _requestCode);
+	}
+
+	public void RequestRuntimePermission(String[] _androidPermissions, int _requestCode) {  //"android.permission.CAMERA"
+		jCommons.RequestRuntimePermission(controls, _androidPermissions, _requestCode);
+	}
+
+	//by TR3E
+	public int getScreenWidth( ){
+		return this.controls.activity.getResources().getDisplayMetrics().widthPixels;
+	}
+	//by TR3E
+	public int getScreenHeight( ){
+		return this.controls.activity.getResources().getDisplayMetrics().heightPixels;
+	}
+	//by TR3E
+	public String getSystemVersionString(){
+		return android.os.Build.VERSION.RELEASE;
+	}
+
+	public ByteBuffer GetJByteBuffer(int _width, int _height) {
+		ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);
+		return graphicBuffer;
+	}
+
+        public ByteBuffer GetByteBufferFromImage(Bitmap _bitmap) {
+           if (_bitmap == null) return null;
+           int w =  _bitmap.getWidth();
+           int h =_bitmap.getHeight();
+           ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);
+           _bitmap.copyPixelsToBuffer(graphicBuffer);
+           graphicBuffer.rewind();  //reset position
+           return graphicBuffer;
+        }
+}
 //**class entrypoint**//please, do not remove/change this line!
 
 //Main Java/Pascal Interface Class
@@ -947,9 +1427,9 @@ public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscap
 public int systemVersion;
 
 //Jave -> Pascal Function ( Pascal Side = Event )
-public native void pAppOnCreate(Context context, RelativeLayout layout);
+public native void pAppOnCreate(Context context, RelativeLayout layout, Intent intent);
 public native int  pAppOnScreenStyle();
-public native void pAppOnNewIntent();
+public native void pAppOnNewIntent(Intent intent);
 public native void pAppOnDestroy();
 public native void pAppOnPause();
 public native void pAppOnRestart();
@@ -966,11 +1446,14 @@ public native boolean pAppOnPrepareOptionsMenu(Menu menu, int menuSize);
 public native boolean pAppOnPrepareOptionsMenuItem(Menu menu, MenuItem menuItem, int itemIndex);
 public native void pAppOnCreateContextMenu(ContextMenu menu);
 public native void pAppOnClickContextMenuItem(MenuItem menuItem, int itemID, String itemCaption, boolean checked);
-public native void pOnDraw(long pasobj, Canvas canvas);
+public native void pOnDraw(long pasobj);
 public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, float x2, float y2);
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
+public native void pOnDown(long pasobj, int value);
 public native void pOnClick(long pasobj, int value);
+public native void pOnLongClick(long pasobj, int value);
+public native void pOnDoubleClick(long pasobj, int value);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
@@ -979,42 +1462,36 @@ public native void pAppOnViewClick(View view, int id);
 public native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
 public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state);
- 
-//Load Pascal Library
+public native void pOnLostFocus(long pasobj, String text);
+public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
+public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
+public native void pOnLayouting(long pasobj, boolean changed);
+public native void pAppOnRequestPermissionResult(int requestCode, String permission, int grantResult);
+// -------------------------------------------------------------------------------------------
+//Load Pascal Library - Please, do not edit the static content commented in the template file
+// -------------------------------------------------------------------------------------------
 static {
-	/*
-    try {
-    	System.loadLibrary("freetype"); // need by TFPNoGUIGraphicsBridge [ref. www.github.com/jmpessoa/tfpnoguigraphicsbridge]
-    } catch (UnsatisfiedLinkError e) {
-         Log.e("JNI_Load_LibFreetype", "exception", e);
-    }
-    */	
-    try {
-    	System.loadLibrary("controls");
-    } catch (UnsatisfiedLinkError e) {
-         Log.e("JNI_Load_LibControls", "exception", e);
-    }  
+try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
 }
-
 // -------------------------------------------------------------------------
 //  Activity Event
 // -------------------------------------------------------------------------
-public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }     
-//
-public  void jAppOnCreate(Context context,RelativeLayout layout )
-                                          { pAppOnCreate(context,layout);  }
+public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   } 
 
-public  void jAppOnNewIntent()            { pAppOnNewIntent();             }     
+public  void jAppOnCreate(Context context,RelativeLayout layout, Intent intent) //android.os.Bundle;
+                                          { pAppOnCreate(context,layout,intent); }
+
+public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent); }     
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
 public  void jAppOnRestart()              { pAppOnRestart();               }    
 public  void jAppOnResume()               { pAppOnResume();                }    
-public  void jAppOnStart()                { pAppOnStart();                 }     //change by jmpessoa : old OnActive
+public  void jAppOnStart()                { pAppOnStart();                 }    
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
 public  int  jAppOnRotate(int rotate)     {  return(pAppOnRotate(rotate)); }
 
-//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position      //tips by jmpessoa
+//rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position 
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
 
 public  void jAppOnActivityResult(int requestCode, int resultCode, Intent data) 
@@ -1036,9 +1513,13 @@ public boolean jAppOnPrepareOptionsItem(Menu m, MenuItem item, int index) {
 public  void jAppOnCreateContextMenu(ContextMenu m) {pAppOnCreateContextMenu(m);}
 public  void jAppOnClickContextMenuItem(MenuItem item,int itemID, String itemCaption, boolean checked) {pAppOnClickContextMenuItem(item,itemID,itemCaption,checked);}
 public void jAppOnViewClick(View view, int id){ pAppOnViewClick(view,id);}
-public void jAppOnListItemClick(AdapterView adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
+public void jAppOnListItemClick(AdapterView<?> adapter, View view, int position, int id){ pAppOnListItemClick(adapter, view,position,id);}
 //public  void jAppOnHomePressed()          { pAppOnHomePressed();           }
 public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {return pAppOnSpecialKeyDown(keyChar, keyCode, keyCodeString);};
+
+public  void jAppOnRequestPermissionResult(int requestCode, String permission, int grantResult) {
+	pAppOnRequestPermissionResult(requestCode, permission ,grantResult);
+}
 
 //// -------------------------------------------------------------------------
 //  System, Class
@@ -1047,8 +1528,27 @@ public  void systemGC() {
    System.gc();
 }
 
+
+public void ShowAlert(String _title, String _message, String _btnText) {
+	
+	AlertDialog dialog = null;
+	AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
+	builder.setMessage       (_message)
+	       .setCancelable    (false)	       
+	       .setNeutralButton(_btnText, null);
+	       	      
+	dialog = builder.create();
+	dialog.setTitle(_title);
+	dialog.show();
+}
+
+
 public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
+}
+
+public int getAPILevel() {
+  return android.os.Build.VERSION.SDK_INT;  
 }
 
 //by jmpessoa
@@ -1056,16 +1556,38 @@ public  int  systemGetOrientation() {
    return (this.activity.getResources().getConfiguration().orientation); 
 }
 
-public  void classSetNull (Class object) {
+public  void classSetNull (Class<?> object) {
    object = null;
 }
-public  void classChkNull (Class object) {
+
+public  void classChkNull (Class<?> object) {
    if (object == null) { Log.i("JAVA","checkNull-Null"); };
    if (object != null) { Log.i("JAVA","checkNull-Not Null"); };
 }
 
 public Context GetContext() {   
    return this.activity; 
+}
+
+//by TR3E Software
+public int getContextTop(){
+ ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
+ 
+ if( view != null)
+ 	return view.getTop();
+ else
+ 	return 0;
+	
+}
+
+//by  TR3E Software
+public int getStatusBarHeight() {
+	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+	
+	if ( resourceId > 0 )
+		return this.activity.getResources().getDimensionPixelSize(resourceId);
+	else
+		return 0;
 }
 
 //by  thierrydijoux
@@ -1348,15 +1870,32 @@ public String getLocale(int localeType) {
 // -------------------------------------------------------------------------
 // Result: Phone Number - LORDMAN
 public  String getDevPhoneNumber() {
+	String f = "";
+
   TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-  return ( telephony.getLine1Number() );
+  if (telephony!=null) {
+	  try {
+		  f = telephony.getLine1Number();
+	  } catch (SecurityException ex) {
+		  Log.e("getDevPhoneNumber", ex.getMessage());
+	  }
+  }
+  return f;
 }
 
 // Result: Device ID - LORDMAN
 // Remarks : Nexus7 (no moblie device) -> Crash : fixed code - Simon
 public  String getDevDeviceID() {
+	String f = "";
   TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-  return ( telephony.getDeviceId()    );
+	if (telephony!=null) {
+		try {
+			f = telephony.getDeviceId();
+		} catch (SecurityException ex) {
+			Log.e("getDevDeviceID", ex.getMessage());
+		}
+	}
+  return f;
 }
 // -------------------------------------------------------------------------
 //  Bitmap
@@ -1447,38 +1986,60 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg) {
+
+	public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);	      
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, null);
-	      }	      
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      return 1; //ok	      
-	  }catch (Exception e) {
-		  //Log.i("Send_SMS Fail",e.toString());
-	      return 0; //fail
-	  }
-}
-
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction) {	
-	String SMS_DELIVERED = packageDeliveredAction;
-	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
-	SmsManager sms = SmsManager.getDefault();
-	try {
-	      //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-	      //Log.i("Send_SMS",phoneNumber+": "+ msg);
-	      List<String> messages = sms.divideMessage(msg);    
-	      for (String message : messages) {
-	          sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-	      }	      
-	      return 1; //ok	      
-	}catch (Exception e) {
-	      return 0; //fail
+		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
+		if (multipartMessage) {
+			ArrayList<String> messages = sms.divideMessage(msg);    
+			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, null);			  
+		} else {
+			List<String> messages = sms.divideMessage(msg);    
+			for (String message : messages) {
+				sms.sendTextMessage(phoneNumber, null, message, null, null);
+			}			    
+		}
+		//Log.i("Send_SMS",phoneNumber+": "+ msg);
+		return 1; //ok	      
+	} catch (Exception e) {
+		//Log.i("Send_SMS Fail",e.toString());
+		return 0; //fail
 	}
 }
+        //improved by CC
+        //http://forum.lazarus-ide.org/index.php/topic,44775.msg315109/topicseen.html
+	public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {
+		String SMS_DELIVERED = packageDeliveredAction;
+		PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+		SmsManager sms = SmsManager.getDefault();
+		int partsCount = 1;
+		try {
+			if (multipartMessage)
+			{
+				ArrayList<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+				for (int i = 0; i < messages.size(); i++)
+				{
+					deliveredPendingIntents.add(i, deliveredPendingIntent);
+				}
+				sms.sendMultipartTextMessage(phoneNumber, null, messages, deliveredPendingIntents, null  );
+			}
+			else
+			{
+				List<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				for (String message : messages)
+				{
+					sms.sendTextMessage(phoneNumber, null, message, deliveredPendingIntent, null );
+				}
+			}
+			return partsCount;
+		} catch (Exception e) {
+			return 0; //fail
+		}
+	}
 
 public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
   //---get the SMS message passed in---	
@@ -1578,8 +2139,7 @@ public  int[] getBmpArray(String file) {
    * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
-   */
-  //by jmpessoa  
+   */ 
 public String jCamera_takePhoto(String path, String filename) {
  	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
@@ -1602,20 +2162,16 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
 
-public  java.lang.Object jTextView_Create(long pasobj) {
-  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
+public  java.lang.Object jAsyncTask_Create(long pasobj ) {
+   return (java.lang.Object)( new jAsyncTask(this,pasobj));
 }
+public native boolean pOnAsyncEventDoInBackground(long pasobj, int progress);
+public native int pOnAsyncEventProgressUpdate(long pasobj, int progress);
+public native int pOnAsyncEventPreExecute(long pasobj);
+public native void pOnAsyncEventPostExecute(long pasobj, int progress);
 
 public  java.lang.Object jButton_Create(long pasobj ) {
   return (java.lang.Object)( new jButton(this.activity,this,pasobj));
-}
-
-public  java.lang.Object jImageView_Create(long pasobj ) {
-  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
-}
-
-public java.lang.Object jEditText_Create(long pasobj ) {
-  return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
 }
 
 public java.lang.Object jContactManager_jCreate(long _Self) {
@@ -1624,16 +2180,20 @@ public java.lang.Object jContactManager_jCreate(long _Self) {
 public native void pOnContactManagerContactsExecuted(long pasobj,  int count);
 public native boolean pOnContactManagerContactsProgress(long pasobj, String contactInfo, String contactShortInfo, String contactPhotoUriAsString, Bitmap contactPhoto, int progress);
 
+public java.lang.Object jEditText_Create(long pasobj ) {
+  return (java.lang.Object)( new jEditText(this.activity,this,pasobj));
+}
+
+public  java.lang.Object jImageView_Create(long pasobj ) {
+  return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
+}
+
 public java.lang.Object jIntentManager_jCreate(long _Self) {
    return (java.lang.Object)(new jIntentManager(this,_Self));
 }      
 
-public  java.lang.Object jAsyncTask_Create(long pasobj ) {
-   return (java.lang.Object)( new jAsyncTask(this,pasobj));
+public  java.lang.Object jTextView_Create(long pasobj) {
+  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
 }
-public native boolean pOnAsyncEventDoInBackground(long pasobj, int progress);
-public native int pOnAsyncEventProgressUpdate(long pasobj, int progress);
-public native int pOnAsyncEventPreExecute(long pasobj);
-public native void pOnAsyncEventPostExecute(long pasobj, int progress);
 
 }

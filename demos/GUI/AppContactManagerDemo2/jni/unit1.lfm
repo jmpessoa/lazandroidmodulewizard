@@ -7,45 +7,52 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = AndroidModule1Create
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 70
+    Left = 43
     Top = 5
-    Width = 179
-    Height = 20
+    Width = 234
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
+    Id = 5289785
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App Contact Manager Demo 2'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
-    Id = 5289785
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 2
-    Top = 34
+    Top = 40
     Width = 316
-    Height = 40
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jTextView1
+    Id = 4661961
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -54,16 +61,23 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
-    Id = 4661961
   end
   object jListView1: jListView
-    Left = 3
-    Top = 120
-    Width = 312
+    Left = 0
+    Top = 144
+    Width = 320
     Height = 96
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
     Visible = True
     Anchor = jProgressBar1
+    Id = 4274354
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -78,20 +92,25 @@ object AndroidModule1: TAndroidModule1
     TextSizeDecorated = sdNone
     TextAlign = alLeft
     HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
     OnClickItem = jListView1ClickItem
-    Id = 4274354
   end
   object jProgressBar1: jProgressBar
     Left = 10
-    Top = 88
+    Top = 111
     Width = 300
     Height = 23
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = False
     Visible = True
     Anchor = jButton1
+    Id = 1258859
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -100,7 +119,7 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     Progress = 0
     Max = 100
-    Id = 1258859
+    GravityInParent = lgNone
   end
   object jContactManager1: jContactManager
     OnGetContactsFinished = jContactManager1GetContactsFinished

@@ -139,7 +139,22 @@ public class jImageFileManager /*extends ...*/ {
      Bitmap bitmap = BitmapFactory.decodeStream(istr);
      return bitmap;
  }
+ 
+	public Bitmap LoadFromRawFolder(String pictureName)
+	{
+		Bitmap bitmap = null;
 
+		int rID = controls.activity.getResources().getIdentifier(pictureName, "raw", controls.activity.getPackageName());
+		{
+			if(rID != 0) 
+			{
+				InputStream is = controls.activity.getResources().openRawResource(rID);
+				if (is != null) { bitmap = BitmapFactory.decodeStream(is); }
+			}
+		}
+		return bitmap;
+	}
+ 
  private int GetDrawableResourceId(String _resName) {
  	  try {
  	     Class<?> res = R.drawable.class;

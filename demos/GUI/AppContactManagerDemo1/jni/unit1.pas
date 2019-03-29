@@ -41,6 +41,9 @@ type
     procedure AndroidModule1ActivityResult(Sender: TObject;
       requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure jAsyncTask1DoInBackground(Sender: TObject; progress: integer; out
       keepInBackground: boolean);
     procedure jAsyncTask1PostExecute(Sender: TObject; progress: integer);
@@ -97,6 +100,12 @@ end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
+  if not IsRuntimePermissionGranted('android.permission.WRITE_CONTACTS') then
+  begin
+    ShowMessage('Sorry... "android.permission.WRITE_CONTACTS" DENIED');
+    Exit;
+  end;
+
   if not jAsyncTask1.Running then
      jAsyncTask1.Execute()
    else
@@ -128,6 +137,33 @@ end;
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
   jEditText1.SetFocus;
+
+  if IsRuntimePermissionNeed() then   // that is, if target API >= 23
+  begin
+    ShowMessage('Requesting Runtime Permission....');
+    Self.RequestRuntimePermission(['android.permission.READ_CONTACTS',
+                                   'android.permission.WRITE_CONTACTS'], 1004);   //handled by OnRequestPermissionResult
+  end
+
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+     case requestCode of
+    1004:begin
+           if grantResult = PERMISSION_GRANTED  then
+           begin
+              if manifestPermission = 'android.permission.READ_CONTACTS' then ShowMessage('"'+manifestPermission+'"  granted!');
+              if manifestPermission = 'android.permission.WRITE_CONTACTS' then ShowMessage('"'+manifestPermission+'"  granted!')
+           end
+          else//PERMISSION_DENIED
+          begin
+              ShowMessage('Sorry... "['+manifestPermission+']" not granted... ' );
+          end;
+       end;
+  end;
 end;
 
 end.

@@ -1,6 +1,6 @@
 package com.example.appcontactmanagerdemo2;
 
-//Lamw: Lazarus Android Module Wizard - Version 0.7 - 04 July - 2016
+//Lamw: Lazarus Android Module Wizard - version 0.8.4 - 12 March - 2019
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -21,9 +21,6 @@ package com.example.appcontactmanagerdemo2;
 
 
 import java.lang.Override;
-
-
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -42,7 +39,7 @@ import android.util.Log;
 
 public class App extends Activity {
     
-	private Controls       controls;
+    private Controls       controls;
 	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,12 +69,29 @@ public class App extends Activity {
                
       // Event : Java -> Pascal
       //Log.i("jApp","02.Controls.jAppOnCreate");
-      controls.jAppOnCreate(this, controls.appLayout);
+      //Bundle extras = getIntent().getExtras();      
       
+      controls.jAppOnCreate(this, controls.appLayout, getIntent());
+      
+      //Log.i("jApp","03.Controls.jAppOnCreate");
     }
-       
+
+   //[ifdef_api23up]
+    @Override
+    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+        if ( (permissions.length > 0) && (grantResults.length > 0) ) {
+            for (int i = 0; i < permissions.length; i++) {
+                controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[i], grantResults[i]);
+            }
+        }
+    } //[endif_api23up]
+
     @Override    
-    protected void onNewIntent(Intent intent) {super.onNewIntent(intent); controls.jAppOnNewIntent();}
+    protected void onNewIntent(Intent intent) {
+    	super.onNewIntent(intent);
+    	//Bundle extras = intent.getExtras();    	
+    	//if (extras != null) Log.i("onNewIntent",  extras.getString("data"));    	
+    	controls.jAppOnNewIntent(intent);}
     
     @Override
     protected void onDestroy() { super.onDestroy(); controls.jAppOnDestroy();}
@@ -238,6 +252,17 @@ public boolean onOptionsItemSelected(MenuItem item) {
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
             break;
             
+        case KeyEvent.KEYCODE_DEL:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;
+            
+        case KeyEvent.KEYCODE_NUM:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;            
+            
+        case KeyEvent.KEYCODE_NUM_LOCK:
+            controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+            break;            
         //default:  controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));         	
       }      
       return super.onKeyDown(keyCode, event);      
