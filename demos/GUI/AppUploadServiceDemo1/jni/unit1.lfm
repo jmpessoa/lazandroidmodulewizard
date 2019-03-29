@@ -1,0 +1,106 @@
+object AndroidModule1: TAndroidModule1
+  Left = 321
+  Top = 161
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
+  object jTextView1: jTextView
+    Left = 55
+    Top = 5
+    Width = 209
+    Height = 26
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Upload Service Demo1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jButton1: jButton
+    Left = 53
+    Top = 83
+    Width = 213
+    Height = 57
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jCheckBox1
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Upload File'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton1Click
+  end
+  object jCheckBox1: jCheckBox
+    Left = 5
+    Top = 41
+    Width = 72
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView1
+    Id = 3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'WiFi'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+  end
+  object jBroadcastReceiver1: jBroadcastReceiver
+    IntentActionFilter = afNone
+    OnReceiver = jBroadcastReceiver1Receiver
+    left = 192
+    top = 212
+  end
+  object jIntentManager1: jIntentManager
+    IntentAction = iaNone
+    left = 56
+    top = 176
+  end
+  object jUploadService1: jUploadService
+    left = 59
+    top = 286
+  end
+end
