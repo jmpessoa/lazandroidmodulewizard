@@ -1810,6 +1810,27 @@ begin
        end;
      end;
    end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.activity') then  //jModalDialog
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.activity');
+     if auxList.Text <> '' then
+     begin
+       tempStr:= Trim(auxList.Text);
+       insertRef:= '</activity>'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
+       listRequirements.Add(tempStr);  //Add service
+       if Pos(tempStr , aux) <= 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
+         manifestList.Text:= aux;
+         manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+       end;
+     end;
+   end;
+
    //-----
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.provider') then
    begin
@@ -1899,8 +1920,6 @@ begin
             FPathToAndroidProject+'libs'+DirectorySeparator+auxList.Strings[i]);
      end;
    end;
-
-   //xxxxxxxxxxxxxx
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.libso') then //jBarcodeScannerView.libso
    begin
      //libiconv.so
@@ -1952,8 +1971,6 @@ begin
        end;
      end;
    end;
-
-   //xxxxxxxxxxxxxx
    //try fix "gradle.build"
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dependencies') then
    begin
