@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  uploadservice,
   xlswriter,
   telephonymanager,
   smsmanager,
@@ -80,6 +81,7 @@ begin
   {$I jmediarecorder_icon.lrs}
   {$I jdownloadmanager_icon.lrs}
   {$I jdownloadservice_icon.lrs}
+  {$I juploadservice_icon.lrs}
   {$I jcamera_icon.lrs}
   {$I jtelephonymanager_icon.lrs}
   {$I jsmsmanager_icon.lrs}
@@ -137,6 +139,7 @@ begin
       jMediaPlayer,
       jDownloadManager,
       jDownloadService,
+      jUploadService,
       jAlarmManager,
       jTelephonyManager,
       jSMSManager,

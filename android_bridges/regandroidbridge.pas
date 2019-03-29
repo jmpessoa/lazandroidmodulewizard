@@ -41,7 +41,8 @@ uses
   framelayout,
   captionpanel,
   customcamera,
-  searchview;
+  searchview,
+  zbarcodescannerview;
 
 Procedure Register;
   
@@ -99,6 +100,7 @@ begin
   {$I jlinearlayout_icon.lrs}
   {$I jframelayout_icon.lrs}
   {$I jcaptionpanel_icon.lrs}
+  {$I jzbarcodescannerview_icon.lrs}
 
   RegisterComponents('Android Bridges',
     [
@@ -149,7 +151,8 @@ begin
       jExpandableListView,
       jLinearLayout,
       jFrameLayout,
-      jCaptionPanel
+      jCaptionPanel,
+      jZBarcodeScannerView
     ]
   );
   RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);

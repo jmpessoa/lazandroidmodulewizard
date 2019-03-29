@@ -184,6 +184,9 @@ uses
                                                        itemIndex: integer; widgetClass: integer;
                                                         widgetCaption: JString; status: integer);
 
+   Procedure Java_Event_pOnZBarcodeScannerViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                       codedata: JString; codetype: integer);
+
 
 implementation
 
@@ -196,7 +199,7 @@ uses
    autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
-   customcamera, calendarview, searchview, telephonymanager, sadmob;
+   customcamera, calendarview, searchview, telephonymanager, sadmob, zbarcodescannerview;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1570,6 +1573,13 @@ begin
     Exit;
   end;
 
+  if Obj is jZBarcodeScannerView then
+  begin
+    jForm(jZBarcodeScannerView(Obj).Owner).UpdateJNI(gApp);
+    jZBarcodeScannerView(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+
 end;
 
 procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);
@@ -2055,7 +2065,6 @@ begin
   if Obj is jsRecyclerView then
   begin
     jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
-
     paswidgetCaption := '';
     if widgetCaption <> nil then
     begin
@@ -2063,6 +2072,28 @@ begin
       paswidgetCaption:= string( env^.GetStringUTFChars(env,widgetCaption,@_jBoolean) );
     end;
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetClick(Obj,itemIndex, TItemContentFormat(widgetClass),paswidgetCaption, TItemWidgetStatus(status));
+  end;
+end;
+
+Procedure Java_Event_pOnZBarcodeScannerViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                    codedata: JString; codetype: integer);
+
+var
+  _jBoolean: JBoolean;
+  pascodedata: string;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jZBarcodeScannerView then
+  begin
+    jForm(jZBarcodeScannerView(Obj).Owner).UpdateJNI(gApp);
+    pascodedata := '';
+    if codedata <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pascodedata:= string( env^.GetStringUTFChars(env,codedata,@_jBoolean) );
+    end;
+    jZBarcodeScannerView(Obj).GenEvent_OnZBarcodeScannerViewResult(Obj,pascodedata, codetype);
   end;
 end;
 

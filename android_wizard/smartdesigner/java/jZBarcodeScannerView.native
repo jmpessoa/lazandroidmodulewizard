@@ -1,0 +1,1 @@
+public native void pOnZBarcodeScannerViewResult(long pasobj, String codedata, int codetype);

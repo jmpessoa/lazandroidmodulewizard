@@ -1,0 +1,3 @@
+public java.lang.Object jZBarcodeScannerView_jCreate(long _Self) {
+  return (java.lang.Object)(new jZBarcodeScannerView(this,_Self));
+}
