@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  oraclejdbcconnection,
   uploadservice,
   xlswriter,
   telephonymanager,
@@ -107,6 +108,7 @@ begin
   {$I jbluetoothserversocket_icon.lrs}
   {$I jsqlitedataaccess_icon.lrs}
   {$I jsqlitecursor_icon.lrs}
+  {$I joraclejdbcconnection_icon.lrs}
   {$I jshellcommand_icon.lrs}
   {$I jdumpjavamethods_icon.lrs}
   {$I jmyhello_icon.lrs}
@@ -160,6 +162,7 @@ begin
       jBluetoothServerSocket,
       jSqliteDataAccess,
       jSqliteCursor,
+      jOracleJDBCConnection,
       jShellCommand,
       jDumpJavaMethods,
       jMyHello
