@@ -24,6 +24,10 @@ type
       jTextView1: jTextView;
       jTextView2: jTextView;
 
+      procedure AndroidModule1JNIPrompt(Sender: TObject);
+      procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+        requestCode: integer; manifestPermission: string;
+        grantResult: TManifestPermissionResult);
       procedure jBluetoothServerSocket1Connected(Sender: TObject;
         deviceName: string; deviceAddress: string; out keepConnected: boolean);
       procedure jBluetoothServerSocket1IncomingData(Sender: TObject;
@@ -55,7 +59,19 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-   //ShowMessage('Click Listen....');
+  if not IsRuntimePermissionGranted('android.permission.ACCESS_COARSE_LOCATION') then
+  begin
+    ShowMessage('Sorry... "android.permission.ACCESS_COARSE_LOCATION');
+    Exit;
+  end;
+
+  if not IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION') then
+  begin
+    ShowMessage('Sorry... "android.permission.ACCESS_FINE_LOCATION');
+    Exit;
+  end;
+
+  //ShowMessage('Click Listen....');
    jBluetoothServerSocket1.Listen();
    jButton1.Text:= 'Listing...';
 end;
@@ -77,6 +93,35 @@ procedure TAndroidModule1.jBluetoothServerSocket1Connected(Sender: TObject;
 begin
     ShowMessage('Connected to: ['+deviceName+'] ['+deviceAddress+']');
     //if any "unwelcome"  then  keepConnected:= False
+end;
+
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+  if IsRuntimePermissionNeed() then   // that is, if target API >= 23
+  begin
+    ShowMessage('Requesting Runtime Permission....');
+    Self.RequestRuntimePermission(['android.permission.ACCESS_COARSE_LOCATION',
+                                   'android.permission.ACCESS_FINE_LOCATION'], 2015);   //handled by OnRequestPermissionResult
+  end;
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+   case requestCode of
+    2015:begin
+           if grantResult = PERMISSION_GRANTED  then
+           begin
+              if manifestPermission = 'android.permission.ACCESS_COARSE_LOCATION' then ShowMessage('"'+manifestPermission+'"  granted!');
+              if manifestPermission = 'android.permission.ACCESS_FINE_LOCATION' then ShowMessage('"'+manifestPermission+'"  granted!')
+           end
+          else//PERMISSION_DENIED
+          begin
+              ShowMessage('Sorry... "['+manifestPermission+']" not granted... ' );
+          end;
+       end;
+  end;
 end;
 
 procedure TAndroidModule1.jBluetoothServerSocket1IncomingData(Sender: TObject;

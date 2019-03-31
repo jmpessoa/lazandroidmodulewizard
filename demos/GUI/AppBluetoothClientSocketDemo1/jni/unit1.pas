@@ -7,8 +7,7 @@ interface
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls,
-  Laz_And_Controls_Events, bluetooth, bluetoothclientsocket, AndroidWidget,
-  imagefilemanager;
+  Laz_And_Controls_Events, bluetooth, bluetoothclientsocket, AndroidWidget;
   
 type
 
@@ -28,6 +27,10 @@ type
       jTextView1: jTextView;
       jTextView2: jTextView;
 
+      procedure AndroidModule1JNIPrompt(Sender: TObject);
+      procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+        requestCode: integer; manifestPermission: string;
+        grantResult: TManifestPermissionResult);
       procedure jBluetooth1DeviceFound(Sender: TObject; deviceName: string; deviceAddress: string);
       procedure jBluetooth1Disabled(Sender: TObject);
       procedure jBluetooth1DiscoveryFinished(Sender: TObject; countFoundedDevices: integer; countPairedDevices: integer);
@@ -48,8 +51,7 @@ type
 
       procedure jListView1ClickItem(Sender: TObject; itemIndex: integer; itemCaption: string);
       procedure jListView1DrawItemTextColor(Sender: TObject;
-        itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge
-        );
+        itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge);
 
     private
       {private declarations}
@@ -126,6 +128,19 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+
+  if not IsRuntimePermissionGranted('android.permission.ACCESS_COARSE_LOCATION') then
+  begin
+    ShowMessage('Sorry... "android.permission.ACCESS_COARSE_LOCATION');
+    Exit;
+  end;
+
+  if not IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION') then
+  begin
+    ShowMessage('Sorry... "android.permission.ACCESS_FINE_LOCATION');
+    Exit;
+  end;
+
   jBluetooth1.Enabled();
 end;
 
@@ -134,6 +149,36 @@ procedure TAndroidModule1.jBluetooth1DeviceFound(Sender: TObject;
 begin
   //ShowMessage('deviceName: ' +deviceName +' : deviceAddress: '+deviceAddress);
   //jListView1.Add(deviceName + '|' + deviceAddress);
+end;
+
+////https://developer.android.com/guide/topics/security/permissions#normal-dangerous
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+     if IsRuntimePermissionNeed() then   // that is, if target API >= 23
+  begin
+    ShowMessage('Requesting Runtime Permission....');
+    Self.RequestRuntimePermission(['android.permission.ACCESS_COARSE_LOCATION',
+                                   'android.permission.ACCESS_FINE_LOCATION'], 1010);   //handled by OnRequestPermissionResult
+  end
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+       case requestCode of
+    1010:begin
+           if grantResult = PERMISSION_GRANTED  then
+           begin
+              if manifestPermission = 'android.permission.ACCESS_COARSE_LOCATION' then ShowMessage('"'+manifestPermission+'"  granted!');
+              if manifestPermission = 'android.permission.ACCESS_FINE_LOCATION' then ShowMessage('"'+manifestPermission+'"  granted!')
+           end
+          else//PERMISSION_DENIED
+          begin
+              ShowMessage('Sorry... "['+manifestPermission+']" not granted... ' );
+          end;
+       end;
+  end;
 end;
 
 procedure TAndroidModule1.jBluetooth1Disabled(Sender: TObject);
@@ -165,6 +210,19 @@ end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
+
+     if not IsRuntimePermissionGranted('android.permission.ACCESS_COARSE_LOCATION') then
+     begin
+       ShowMessage('Sorry... "android.permission.ACCESS_COARSE_LOCATION');
+       Exit;
+     end;
+
+     if not IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION') then
+     begin
+       ShowMessage('Sorry... "android.permission.ACCESS_FINE_LOCATION');
+       Exit;
+     end;
+
    jListView1.Clear;
    jBluetooth1.Discovery(); //handled by: OnDiscoveryStarted, OnDeviceFound and OnDiscoveryFinished
    jDialogProgress1.Show();
@@ -172,6 +230,19 @@ end;
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
+     if not IsRuntimePermissionGranted('android.permission.ACCESS_COARSE_LOCATION') then
+     begin
+       ShowMessage('Sorry... "android.permission.ACCESS_COARSE_LOCATION');
+       Exit;
+     end;
+
+     if not IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION') then
+     begin
+       ShowMessage('Sorry... "android.permission.ACCESS_FINE_LOCATION');
+       Exit;
+     end;
+
+
   ShowMessage('Listing Only Paired Devices....');
   jListView1.Clear;
   ShowPairedDevices();
@@ -185,12 +256,10 @@ end;
 //http://kpbird.blogspot.com.br/2011/04/android-send-image-via-bluetooth.html
 procedure TAndroidModule1.jButton5Click(Sender: TObject);
 begin
-
   if jBluetoothClientSocket1.IsConnected() then
      jBluetoothClientSocket1.WriteMessage('Hi, Good Job!')  //NO header!
   else
      ShowMessage('Not Connected yet...');
-
 end;
 
 procedure TAndroidModule1.jButton6Click(Sender: TObject);

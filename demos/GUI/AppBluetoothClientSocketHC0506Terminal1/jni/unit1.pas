@@ -43,6 +43,9 @@ type
     procedure AndroidModule1CloseQuery(Sender: TObject; var CanClose: boolean);
     procedure AndroidModule1CreateOptionMenu(Sender: TObject; jObjMenu: jObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure jBluetooth1DeviceFound(Sender: TObject; deviceName: string;
       deviceAddress: string);
     procedure jBluetooth1Disabled(Sender: TObject);
@@ -170,6 +173,20 @@ end;
 
 procedure TAndroidModule1.Discovery_BT;
 begin
+
+  if not IsRuntimePermissionGranted('android.permission.ACCESS_COARSE_LOCATION') then
+  begin
+    ShowMessage('Sorry... "android.permission.ACCESS_COARSE_LOCATION');
+    Exit;
+  end;
+
+  if not IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION') then
+  begin
+    ShowMessage('Sorry... "android.permission.ACCESS_FINE_LOCATION');
+    Exit;
+  end;
+
+
   if (jBluetooth1.IsEnable()) then
   begin
     //Discovery BT devices
@@ -193,24 +210,24 @@ end;
 procedure TAndroidModule1.Hide_BT_panel;
 begin
   jPanel_BT_connect.Visible := False;
-  jPanel_BT_connect.ClearLayout();
+  jPanel_BT_connect.ResetAllRules;
   jPanel_BT_connect.UpdateLayout();
   jTextView_Send.Anchor := nil;
   jTextView_Send.PosRelativeToParent := [rpTop, rpLeft];
   jTextView_Send.PosRelativeToAnchor := [];
-  jTextView_Send.ClearLayout();
+  jTextView_Send.ResetAllRules();
   jTextView_Send.UpdateLayout;
 end;
 
 procedure TAndroidModule1.Show_BT_panel;
 begin
   jPanel_BT_connect.Visible := True;
-  jPanel_BT_connect.ClearLayout;
+  jPanel_BT_connect.ResetAllRules;
   jPanel_BT_connect.UpdateLayout();
   jTextView_Send.Anchor := jPanel_BT_connect;
   jTextView_Send.PosRelativeToParent := [rpLeft];
   jTextView_Send.PosRelativeToAnchor := [raAlignBottom];
-  jTextView_Send.ClearLayout();
+  jTextView_Send.ResetAllRules();
   jTextView_Send.UpdateLayout;
 end;
 
@@ -221,10 +238,19 @@ begin
   //jListView_BT_connect.Add(deviceName + '|' + deviceAddress);
 end;
 
+//https://developer.android.com/guide/topics/security/permissions#normal-dangerous
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 var
   BT_device: string;
 begin
+
+  if IsRuntimePermissionNeed() then   // that is, if target API >= 23
+  begin
+    ShowMessage('Requesting Runtime Permission....');
+    Self.RequestRuntimePermission(['android.permission.ACCESS_COARSE_LOCATION',
+                                   'android.permission.ACCESS_FINE_LOCATION'], 1110);   //handled by OnRequestPermissionResult
+  end;
+
   Self.SetScreenOrientationStyle(ssPortrait); //Portrait orientation only
   toast_bt_rx_en := True; //Toast Bt RX enable by default
   if (not jBluetooth1.IsEnable()) then
@@ -238,6 +264,25 @@ begin
   begin
     //Here when BT already enabled on startup app
     Discovery_BT;
+  end;
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+    case requestCode of
+    1110:begin
+           if grantResult = PERMISSION_GRANTED  then
+           begin
+              if manifestPermission = 'android.permission.ACCESS_COARSE_LOCATION' then ShowMessage('"'+manifestPermission+'"  granted!');
+              if manifestPermission = 'android.permission.ACCESS_FINE_LOCATION' then ShowMessage('"'+manifestPermission+'"  granted!')
+           end
+          else//PERMISSION_DENIED
+          begin
+              ShowMessage('Sorry... "['+manifestPermission+']" not granted... ' );
+          end;
+       end;
   end;
 end;
 

@@ -26,6 +26,10 @@ type
     jImageList1: jImageList;
     jListView1: jListView;
     jTextView1: jTextView;
+    procedure AndroidModule1JNIPrompt(Sender: TObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure jBluetooth1DeviceBondStateChanged(Sender: TObject;
       state: integer; deviceName: string; deviceAddress: string);
     procedure jBluetooth1DeviceFound(Sender: TObject; deviceName: string;
@@ -109,6 +113,18 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+  if not IsRuntimePermissionGranted('android.permission.ACCESS_COARSE_LOCATION') then
+  begin
+    ShowMessage('Sorry... "android.permission.ACCESS_COARSE_LOCATION');
+    Exit;
+  end;
+
+  if not IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION') then
+  begin
+    ShowMessage('Sorry... "android.permission.ACCESS_FINE_LOCATION');
+    Exit;
+  end;
+
   jBluetooth1.Enabled();
 end;
 
@@ -140,6 +156,35 @@ begin
   end;
 end;
 
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+    if IsRuntimePermissionNeed() then   // that is, if target API >= 23
+  begin
+    ShowMessage('Requesting Runtime Permission....');
+    Self.RequestRuntimePermission(['android.permission.ACCESS_COARSE_LOCATION',
+                                   'android.permission.ACCESS_FINE_LOCATION'], 1210);   //handled by OnRequestPermissionResult
+  end;
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+   case requestCode of
+    1210:begin
+           if grantResult = PERMISSION_GRANTED  then
+           begin
+              if manifestPermission = 'android.permission.ACCESS_COARSE_LOCATION' then ShowMessage('"'+manifestPermission+'"  granted!');
+              if manifestPermission = 'android.permission.ACCESS_FINE_LOCATION' then ShowMessage('"'+manifestPermission+'"  granted!')
+           end
+          else//PERMISSION_DENIED
+          begin
+              ShowMessage('Sorry... "['+manifestPermission+']" not granted... ' );
+          end;
+       end;
+  end;
+end;
+
 {
 Note: to transfer via Bluetooth , you need to do some common user's tasks:
       activate bluetooth, detect [visibles] neighbors devices and pair neighbors devices....
@@ -147,6 +192,19 @@ Note: to transfer via Bluetooth , you need to do some common user's tasks:
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
+    if not IsRuntimePermissionGranted('android.permission.ACCESS_COARSE_LOCATION') then
+    begin
+      ShowMessage('Sorry... "android.permission.ACCESS_COARSE_LOCATION');
+      Exit;
+    end;
+
+    if not IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION') then
+    begin
+      ShowMessage('Sorry... "android.permission.ACCESS_FINE_LOCATION');
+      Exit;
+    end;
+
+
    jListView1.Clear;
    jBluetooth1.Discovery(); //handled by: OnDiscoveryStarted, OnDeviceFound and OnDiscoveryFinished
    jDialogProgress1.Show();
@@ -154,6 +212,19 @@ end;
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
+
+    if not IsRuntimePermissionGranted('android.permission.ACCESS_COARSE_LOCATION') then
+    begin
+      ShowMessage('Sorry... "android.permission.ACCESS_COARSE_LOCATION');
+      Exit;
+    end;
+
+    if not IsRuntimePermissionGranted('android.permission.ACCESS_FINE_LOCATION') then
+    begin
+      ShowMessage('Sorry... "android.permission.ACCESS_FINE_LOCATION');
+      Exit;
+    end;
+
   ShowMessage('Listing Only Paired Devices....');
   jListView1.Clear;
   ShowPairedDevices();
