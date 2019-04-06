@@ -165,7 +165,7 @@ public class jImageBtn extends View {
 				invalidate();
 				break;
 			}
-			case MotionEvent.ACTION_MOVE: { break; }
+			case MotionEvent.ACTION_MOVE: // { break; } Fixed the bug: The button stays down after clicking and moving
 			case MotionEvent.ACTION_UP  : {  btnState = 0;
 				invalidate();
 				controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
