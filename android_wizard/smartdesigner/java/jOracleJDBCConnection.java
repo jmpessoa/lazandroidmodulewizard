@@ -75,6 +75,7 @@ public class jOracleJDBCConnection /*extends ...*/ {
 
     public static Connection createConnection(String driver, String url, String username, String password) throws ClassNotFoundException, SQLException {
         Class.forName(driver);
+        Locale.setDefault(Locale.ENGLISH); 
         return DriverManager.getConnection(url, username, password);
     }
 
