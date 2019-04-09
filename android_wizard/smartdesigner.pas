@@ -565,9 +565,34 @@ begin
   strList:= TStringList.Create;
   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'colors.xml') then
   begin
-     strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'colors.xml');
      if not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml') then
-     strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
+     begin
+       strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'colors.xml');
+       strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
+     end;
+  end;
+
+
+  AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
+
+  if not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml') then
+  begin
+    if (AndroidTheme = '') or (Pos('AppCompat', AndroidTheme) <= 0) then
+    begin
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'styles.xml') then
+      begin
+         strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'styles.xml');
+         strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
+      end;
+    end;
+    if Pos('AppCompat', AndroidTheme) > 0 then
+    begin
+       if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+AndroidTheme+'.xml') then
+       begin
+          CopyFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+AndroidTheme+'.xml',
+                     FPathToAndroidProject+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
+       end;
+    end;
   end;
 
   sdkManifestTarqet:= GetTargetFromManifest();
@@ -670,7 +695,6 @@ begin
   strList.SaveToFile(FPathToAndroidProject+'local.properties');
 
   //gradle.build
-  AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
 
   if targetApi >= 21 then
   begin
