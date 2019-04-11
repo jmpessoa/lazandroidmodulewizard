@@ -7,6 +7,7 @@ object AndroidModule1: TAndroidModule1
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrBlack
@@ -17,12 +18,14 @@ object AndroidModule1: TAndroidModule1
     Left = 0
     Top = 0
     Width = 300
-    Height = 151
+    Height = 165
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
+    Enabled = True
     Visible = True
+    Id = 5157644
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop]
     LayoutParamWidth = lpMatchParent
@@ -30,67 +33,70 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrNavajoWhite
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 5157644
     object jTextView1: jTextView
-      Left = 76
+      Left = 54
       Top = 5
-      Width = 147
-      Height = 20
+      Width = 191
+      Height = 26
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
+      Id = 3926083
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
       LayoutParamHeight = lpWrapContent
       Text = 'GUI form designer Demo'
       Alignment = taLeft
-      Enabled = True
       BackgroundColor = colbrDefault
       FontColor = colbrRed
       FontSize = 0
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
-      Id = 3926083
+      GravityInParent = lgNone
     end
     object jTextView2: jTextView
       Left = 5
-      Top = 35
-      Width = 285
-      Height = 20
+      Top = 41
+      Width = 290
+      Height = 26
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
       Visible = True
       Anchor = jTextView1
+      Id = 2599751
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpLeft]
       LayoutParamWidth = lpMatchParent
       LayoutParamHeight = lpWrapContent
       Text = 'Item Name:'
       Alignment = taLeft
-      Enabled = True
       BackgroundColor = colbrDefault
       FontColor = colbrLime
       FontSize = 0
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
-      Id = 2599751
+      GravityInParent = lgNone
     end
     object jPanel3: jPanel
-      Left = 7
-      Top = 64
-      Width = 285
+      Left = 4
+      Top = 76
+      Width = 292
       Height = 58
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
+      Enabled = True
       Visible = True
       Anchor = jTextView2
+      Id = 8563928
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpMatchParent
@@ -98,17 +104,18 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrOrange
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
-      Id = 8563928
       object jEditText1: jEditText
-        Left = 7
+        Left = 4
         Top = 9
-        Width = 270
+        Width = 284
         Height = 39
         MarginLeft = 4
         MarginTop = 10
         MarginRight = 4
         MarginBottom = 10
+        Enabled = True
         Visible = True
+        Id = 9498139
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
@@ -128,19 +135,23 @@ object AndroidModule1: TAndroidModule1
         WrappingLine = False
         Editable = True
         FontSizeUnit = unitDefault
-        Id = 9498139
+        CloseSoftInputOnEnter = True
+        CapSentence = False
+        GravityInParent = lgNone
       end
     end
     object jPanel4: jPanel
       Left = 4
-      Top = 100
-      Width = 136
-      Height = 47
+      Top = 97
+      Width = 150
+      Height = 64
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
+      Enabled = True
       Visible = True
+      Id = 0
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpBottom, rpLeft]
       LayoutParamWidth = lpHalfOfParent
@@ -148,17 +159,18 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrGainsboro
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
-      Id = 0
       object jButton1: jButton
-        Left = 3
+        Left = 2
         Top = 3
-        Width = 129
-        Height = 40
+        Width = 146
+        Height = 57
         MarginLeft = 2
         MarginTop = 4
         MarginRight = 2
         MarginBottom = 4
+        Enabled = True
         Visible = True
+        Id = 0
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
@@ -168,20 +180,22 @@ object AndroidModule1: TAndroidModule1
         FontColor = colbrDefault
         FontSize = 0
         FontSizeUnit = unitDefault
+        GravityInParent = lgNone
         OnClick = jButton1Click
-        Id = 0
       end
     end
     object jPanel5: jPanel
-      Left = 160
-      Top = 100
-      Width = 136
-      Height = 47
+      Left = 146
+      Top = 97
+      Width = 150
+      Height = 64
       MarginLeft = 4
       MarginTop = 4
       MarginRight = 4
       MarginBottom = 4
+      Enabled = True
       Visible = True
+      Id = 8563929
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpBottom, rpRight]
       LayoutParamWidth = lpHalfOfParent
@@ -189,17 +203,18 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrGainsboro
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
-      Id = 0
       object jButton2: jButton
-        Left = 3
+        Left = 2
         Top = 3
-        Width = 129
-        Height = 40
+        Width = 146
+        Height = 57
         MarginLeft = 2
         MarginTop = 4
         MarginRight = 2
         MarginBottom = 4
+        Enabled = True
         Visible = True
+        Id = 0
         PosRelativeToAnchor = []
         PosRelativeToParent = [rpCenterInParent]
         LayoutParamWidth = lpMatchParent
@@ -209,22 +224,24 @@ object AndroidModule1: TAndroidModule1
         FontColor = colbrDefault
         FontSize = 0
         FontSizeUnit = unitDefault
+        GravityInParent = lgNone
         OnClick = jButton2Click
-        Id = 0
       end
     end
   end
   object jPanel2: jPanel
     Left = 4
-    Top = 155
-    Width = 288
-    Height = 206
+    Top = 169
+    Width = 292
+    Height = 220
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 1
+    Enabled = True
     Visible = True
     Anchor = jPanel1
+    Id = 945929
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -232,14 +249,19 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrLightCyan
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 945929
     object jListView1: jListView
       Tag = 1
-      Left = 6
-      Top = 3
-      Width = 276
+      Left = 0
+      Top = 0
+      Width = 292
       Height = 130
+      MarginLeft = 0
+      MarginTop = 0
+      MarginRight = 0
+      MarginBottom = 0
+      Enabled = True
       Visible = True
+      Id = 3721116
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpCenterHorizontal]
       LayoutParamWidth = lpMatchParent
@@ -255,20 +277,24 @@ object AndroidModule1: TAndroidModule1
       TextAlign = alLeft
       HighLightSelectedItemColor = colbrRed
       FontSizeUnit = unitDefault
-      Id = 3721116
+      ItemPaddingTop = 40
+      ItemPaddingBottom = 40
+      WidgetTextColor = colbrDefault
     end
   end
   object jButton3: jButton
-    Left = 82
-    Top = 366
-    Width = 136
-    Height = 40
+    Left = 75
+    Top = 394
+    Width = 150
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
     Visible = True
     Anchor = jPanel2
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpHalfOfParent
@@ -278,7 +304,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrRed
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton3Click
-    Id = 0
   end
 end
