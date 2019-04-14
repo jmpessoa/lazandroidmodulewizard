@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  slantern,
   sadmob,
   sdrawerlayout,
   snavigationview,
@@ -34,6 +35,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jslantern_icon.lrs}
   {$I jsadmob_icon.lrs}
   {$I jsdrawerlayout_icon.lrs}
   {$I jsnavigationview_icon.lrs}
@@ -49,8 +51,9 @@ begin
   {$I jsfloatingbutton_icon.lrs}
   {$I jsbottomnavigationview_icon.lrs}
   {$I jstextinput_icon.lrs}
-  RegisterComponents('Android Bridges Support',
+  RegisterComponents('Android Bridges AppCompat',
     [
+      jsLantern,
       jsAdMob,
       jsDrawerLayout,
       jsNavigationView,

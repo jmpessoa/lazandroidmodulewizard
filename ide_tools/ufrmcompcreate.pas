@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas,
   Forms, Controls, Graphics, Dialogs, ExtCtrls, ComCtrls, Menus, Clipbrd,
   StdCtrls, Buttons, SynEditTypes, Process, uregistercompform, inifiles,
-  PackageIntf, LazIDEIntf;
+  PackageIntf, LazIDEIntf, uformimportjarstuff, uFormComplements;
 
 type
 
@@ -16,6 +16,7 @@ type
 
   TFrmCompCreate = class(TForm)
     BitBtn1: TBitBtn;
+    BitBtnJAR: TBitBtn;
     Memo1: TMemo;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
@@ -29,6 +30,7 @@ type
     MenuItem7: TMenuItem;
     MenuItem8: TMenuItem;
     MenuItem9: TMenuItem;
+    OpenDialog1: TOpenDialog;
     PageControl1: TPageControl;
     Panel1: TPanel;
     Panel2: TPanel;
@@ -42,6 +44,7 @@ type
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
+    procedure BitBtnJARClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -66,9 +69,14 @@ type
     FJNIDecoratedMethodName: string;
     FPathToJavaClass: string;
 
-    FPathToJavaTemplates: string;
+    FPathToJavaTemplates: string;  //C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner\java
     FPathToLAMW: string;
     FFirstFocus: boolean;
+
+    FPathToJARFile: string;
+    FJARFilename:  string;
+    FListJarClass: TStringList;
+    FPathToJavaJDK: string;        //PathToJavaJDK=C:\Program Files\Java\jdk1.8.0_151
 
     procedure DoJavaParse;
     procedure InsertJControlCodeTemplate(txt: string);
@@ -85,6 +93,11 @@ type
     function GetArrayTypeByFuncResultHack(funcResult: string): string;
     procedure TryInsertJavaCreate(txt: string);
     procedure LoadSettings(const fileName: string);
+    procedure AddComplements(javaclassName: string);
+    function GetJavaClassName(selList: TStringList): string;
+    function GetCleanPermData(aux: string): string;
+    function GetCleanDepData(aux: string): string;
+
   public
     { public declarations }
   end;
@@ -95,6 +108,8 @@ type
   function TrimChar(query: string; delimiter: char): string;
   function ReplaceChar(query: string; oldchar, newchar: char):string;
   function LastPos(delimiter: string; str: string): integer;
+  function RunCmdProcess(const cmd: string): integer;
+
 
 var
   FrmCompCreate: TFrmCompCreate;
@@ -280,6 +295,10 @@ begin
      Result := 'int64';
      if Pos('[', jType) > 0 then Result := 'TDynArrayOfInt64';
   end;
+
+  if Result = 'jObject' then
+      if Pos('[', jType) > 0 then Result := 'TDynArrayOfJObject';
+
 end;
 
 
@@ -400,6 +419,8 @@ begin
    begin
      newJavaClassName:= 'MyControl';
      strList:= TStringList.Create;
+     strList.Add(' ');
+     strList.Add('import android.content.Context;');
      strList.Add(' ');
      strList.Add('/*Draft java code by "Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']*/');
      strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
@@ -959,15 +980,12 @@ end;
 
 procedure TFrmCompCreate.PopupMenu1Close(Sender: TObject);
 var
-  selList: TStringList;
-  clsLine, clsName: string;
-  index, i: integer;
-  foundClass: boolean;
+  clsName: string;
   strCaption: string;
   responseStr : string;
   auxList: TStringList;
   auxStr: string;
-  indexFound: integer;
+  indexFound, i: integer;
 begin
   strCaption:= (Sender as TMenuItem).Caption;
   if Pos('Search ', strCaption) > 0 then
@@ -979,6 +997,7 @@ begin
 
   if Pos('Insert ', strCaption) > 0 then
   begin
+    //FModeImport:= miDraft;
     InsertJControlCodeTemplate(strCaption);
     Exit;
   end;
@@ -1015,23 +1034,166 @@ begin
           end;
         end;
     end;
-    auxList.Free;
 
+    auxList.Clear;
     SplitStr(strCaption, ' ');
-
     FProjectModel:= strCaption;   //ex. Write  "[Draft] Pascal jVisualControl Interface"
-
-    selList:= TStringList.Create;
-
     if  SynMemo1.SelText <> '' then
-        selList.Text:= SynMemo1.SelText; //java class code...
+        auxList.Text:= SynMemo1.SelText; //java class code...
 
-    if selList.Text = '' then selList.Text:= SynMemo1.Text; //java class code...
+    if auxList.Text = '' then auxList.Text:= SynMemo1.Text; //java class code...
+    if auxList.Text = '' then Exit;
 
+    clsName:= GetJavaClassName(auxList);
+
+    if clsName <> '' then
+    begin
+      FJavaClassName:= clsName;
+
+      FHackListJNIHeader.Clear;
+      FHackListPascalClass.Clear;
+      FHackListPascalClassImpl.Clear;
+
+      DoJavaParse;    //process...
+
+      FHackListPascalClassImpl.Add(' ');
+      FHackListPascalClassImpl.Add('{-------- '+FJavaClassName +'_JNI_Bridge ----------}');
+      FHackListPascalClassImpl.Add(' ');
+
+      SynMemo2.Lines.Clear;
+      SynMemo2.Lines.Text:= GetHackListPascalClassInterf + FHackListPascalClassImpl.Text + FPascalJNIInterfaceCode;
+
+      SynMemo2.Lines.Add('end.');
+
+      PageControl1.ActivePage:= TabSheet2;
+      SynMemo2.SelectAll;
+      SynMemo2.CopyToClipboard;
+      SynMemo2.ClearSelection;
+      SynMemo2.PasteFromClipboard;
+      //ShowMessage('New '+clsName+' DRAFT Component Code was Copied To Clipboard!');
+      AddComplements(FJavaClassName); // "FJavaClassName.libjar"   "FJavaClassName.libso" ,  etc...
+    end;
+    auxList.Free;
+  end;
+end;
+
+{
+permission   <uses-permission android:name="android.permission.INTERNET"/>
+libjar exp4j-0.4.8.jar
+libso  libiconv.so
+anim in_from_left.xml
+compound jPanel jTextView
+dependencies  implementation 'com.android.support:design:25.3.1'     //"implementation" -> androidPluginNumber >= 300
+}
+
+
+//implementation 'com.android.support:design:25.3.1'
+function TFrmCompCreate.GetCleanDepData(aux: string): string;
+var
+  p: integer;
+  temp, temp2: string;
+begin
+  temp:= aux;
+  p:= Pos(' ', aux);
+  if p > 0 then
+    temp:= Trim(Copy(aux, p+1, MaxInt));
+
+  temp2:= StringReplace(temp, '"', '', [rfReplaceAll]);      // "com.android.support:design:25.3.1"
+  Result:= StringReplace(temp2, '''', '', [rfReplaceAll]);   // 'com.android.support:design:25.3.1'
+end;
+
+//permission   <uses-permission android:name="android.permission.INTERNET"/>
+function TFrmCompCreate.GetCleanPermData(aux: string): string;
+var
+  p: integer;
+  temp: string;
+begin
+  temp:= aux;
+  p:= Pos('=', aux);
+  if p > 0 then
+    temp:= Trim(Copy(aux, p+1, MaxInt));
+
+  Result:= StringReplace(temp, '"', '', [rfReplaceAll]);
+
+  p:= Pos('>', Result);
+  if p > 0 then
+  begin
+    temp:= Result;     // 12345/>
+    Result:=  Copy(temp, 1, p-2)
+  end;
+
+end;
+
+procedure TFrmCompCreate.AddComplements(javaclassName: string);
+var
+  frm: TFormAddComplements;
+  i, count: integer;
+  ext, filename,  aux, data: string;
+  list: TStringList;
+begin
+  frm:= TFormAddComplements.Create(nil);
+  if frm.ShowModal = mrOK then
+  begin  //FPathToJavaTemplates: "C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner\java"
+     count:= frm.ListBoxPath.Count;
+     list:= TStringList.Create;
+
+     for i:= 0 to count-1 do
+     begin
+        ext:= ExtractFileExt(frm.ListBoxPath.Items.Strings[i]);
+        filename:= ExtractFileName(frm.ListBoxPath.Items.Strings[i]);
+        case ext of
+          '.so': begin
+                    if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.libso') then
+                        list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.libso');
+                    list.Add(filename);
+                    list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.libso');
+                 end;
+          '.jar': begin
+                    if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.libjar') then
+                        list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.libjar');
+                    list.Add(filename);
+                    list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.libjar');
+                  end;
+        end;
+     end;
+
+     count:= frm.ListBoxGradleDep.Count;
+     for i:= 0 to count-1 do
+     begin
+        aux:= frm.ListBoxGradleDep.Items.Strings[i];
+        list.Clear;
+        if Pos('.permission.', aux) <= 0 then //com.android.support:design:25.3.1
+        begin //dependencies
+          data:= GetCleanDepData(Trim(aux));
+          if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies') then
+            list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
+          list.Add('implementation '''+data+'''');
+          list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
+        end;
+
+        if Pos('.permission.', aux) > 0 then
+        begin //permissions  //<uses-permission android:name="android.permission.INTERNET"/>
+          data:= GetCleanPermData(Trim(aux));
+           if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.permission') then
+               list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.permission');
+           list.Add('<uses-permission android:name="'+data+'"/>');
+           list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.permission');
+        end;
+
+     end;
+     list.Free;
+  end;
+  frm.Free;
+end;
+
+function TFrmCompCreate.GetJavaClassName(selList: TStringList): string;
+var
+  clsLine: string;
+  foundClass: boolean;
+  i, index: integer;
+begin
     if selList.Text = '' then Exit;
-
     foundClass:= False;
-
     i:= 0;
     while (not foundClass) and (i < selList.Count) do
     begin
@@ -1039,55 +1201,21 @@ begin
        if Pos('class ', clsLine) > 0 then foundClass:= True;
        Inc(i);
     end;
-
-    selList.Free;
-
     if foundClass then
     begin
       clsLine:= Trim(clsLine); //cleanup...
-
-      if Pos('public', clsLine) > 0 then   //public class jMyComponent
+      if Pos('public ', clsLine) > 0 then   //public class jMyComponent
       begin
          SplitStr(clsLine, ' ');  //remove "public" word...
          clsLine:= Trim(clsLine); //cleanup...
       end;
       SplitStr(clsLine, ' ');  //remove "class" word...
       clsLine:= Trim(clsLine); //cleanup...
-
       if Pos(' ', clsLine) > 0  then index:= Pos(' ', clsLine)
       else if Pos('{', clsLine) > 0 then index:= Pos('{', clsLine)
       else if Pos(#10, clsLine) > 0 then index:= Pos(#10, clsLine);
-
-      clsName:= Trim(Copy(clsLine,1,index-1));  //get class name
-
-      if clsName <> '' then
-      begin
-        FJavaClassName:= clsName;
-
-        FHackListJNIHeader.Clear;
-        FHackListPascalClass.Clear;
-        FHackListPascalClassImpl.Clear;
-
-        DoJavaParse;    //process...
-
-        FHackListPascalClassImpl.Add(' ');
-        FHackListPascalClassImpl.Add('{-------- '+FJavaClassName +'_JNI_Bridge ----------}');
-        FHackListPascalClassImpl.Add(' ');
-
-        SynMemo2.Lines.Clear;
-        SynMemo2.Lines.Text:= GetHackListPascalClassInterf + FHackListPascalClassImpl.Text + FPascalJNIInterfaceCode;
-
-        SynMemo2.Lines.Add('end.');
-
-        PageControl1.ActivePage:= TabSheet2;
-        SynMemo2.SelectAll;
-        SynMemo2.CopyToClipboard;
-        SynMemo2.ClearSelection;
-        SynMemo2.PasteFromClipboard;
-        ShowMessage('New '+clsName+' DRAFT Component Code was Copied To Clipboard!');
-      end;
-    end;
-  end;
+      Result:= Trim(Copy(clsLine,1,index-1));  //get class name
+   end;
 end;
 
 procedure TFrmCompCreate.PopupMenu2Close(Sender: TObject);
@@ -1179,20 +1307,33 @@ begin
            SynMemo2.CopyToClipboard;
            SynMemo2.ClearSelection;
            SynMemo2.PasteFromClipboard;
-           SynMemo2.Lines.SaveToFile(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
 
-           ShowMessage('Saved to: '+ FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+           if not FileExists(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas') then
+              SynMemo2.Lines.SaveToFile(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas')
+           else
+           begin
+              case QuestionDlg ('FileExists!','Overwrite the ".pas" File?',mtWarning,[mrYes,'Yes', mrNo, 'No'], '') of
+                  mrYes: SynMemo2.Lines.SaveToFile(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+              end;
+           end;
+           //ShowMessage('Saved to: '+ FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+           if not FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java') then
+              SynMemo1.Lines.SaveToFile(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java')
+           else
+           begin
+             case QuestionDlg ('FileExists!','Overwrite the ".java" File?',mtWarning,[mrYes,'Yes', mrNo, 'No'],'') of
+                 mrYes: SynMemo1.Lines.SaveToFile(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java');
+             end;
+           end;
 
            if FileExists(FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs') then
            begin
               CopyFile(FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs',
                        FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs');
            end;
-
+           //AddComplements(FJavaClassName);
          end; //finally
-
-
-      end     //if iconPath
+      end;     //if iconPath
     end;      //showModal
     frm.Free;
   end;
@@ -1213,6 +1354,7 @@ end;
 
 procedure TFrmCompCreate.FormActivate(Sender: TObject);
 begin
+    FListJarClass:= TStringList.Create;
     if FFirstFocus then
     begin
       SynMemo1.SetFocus;
@@ -1222,13 +1364,494 @@ begin
     end;
 end;
 
+//public Eq2GSolver(float, float, float);
+function GetSupperParam(signature: string; var listParam: TstringList): integer;
+var
+  p1, p2, i: integer;
+  temp: string;
+begin
+  Result:= 0;
+  p1:= Pos('(',signature);
+  p2:= Pos(')',signature);
+
+  if (p2-p1) < 3 then Exit;
+
+  listParam.Clear;
+  listParam.Delimiter:=',';
+  listParam.StrictDelimiter:=True;
+  temp:= Copy(signature, p1+1, p2-p1-1); //float, float, float
+  listParam.DelimitedText:=StringReplace(temp, ' ', '', [rfIgnoreCase, rfReplaceAll]);
+
+  for i:= 0 to  listParam.Count-1 do
+  begin
+    listParam.Strings[i]:= listParam.Strings[i] + ' _arg'+ IntToStr(i);
+  end;
+
+  Result:= listParam.Count;
+end;
+
+function GetMethodSignature(signature: string; out newsignature: string): integer;
+var
+  p1, p2, i: integer;
+  temp: string;
+  listParam: TStringList;
+  header: string;
+begin
+  Result:= 0;
+  p1:= Pos('(',signature);
+  p2:= Pos(')',signature);
+
+  if (p2-p1) < 3 then
+  begin
+    newsignature:= signature;
+    Exit;
+  end;
+
+  header:= Copy(signature, 1, p1);
+
+  listParam:= TStringList.Create;
+  listParam.Delimiter:=',';
+  listParam.StrictDelimiter:=True;
+  temp:= Copy(signature, p1+1, p2-p1-1); //float, float, float
+  listParam.DelimitedText:=StringReplace(temp, ' ', '', [rfIgnoreCase, rfReplaceAll]);
+
+  //public Eq2GSolver(float, float, float);
+  for i:= 0 to  listParam.Count-1 do
+  begin
+    listParam.Strings[i]:= listParam.Strings[i] + ' _arg'+ IntToStr(i);
+  end;
+
+  newsignature:= header + listParam.DelimitedText + ')';
+
+  Result:= listParam.Count;
+  listParam.Free;
+
+end;
+
+function GetPosSpace(header: string): integer;
+var
+  i, len: integer;
+begin
+  len:= Length(header);
+  i:= len;
+  while header[i] <> ' ' do
+  begin
+     Dec(i);
+  end;
+  Result:= i;
+end;
+
+function UppercaseChar(s: String; p: integer): String;
+var
+  header, tail, ch: String;
+begin
+  header := Copy(s, 1, p-1);
+  ch:= Copy(s, p,1);
+  tail := Copy(s, p+1, MaxInt);
+  Result := header + Uppercase(ch) + tail;
+end;
+
+function GetMethodSignatureEx(signature: string; out newsignature: string; out methname: string; outListParams: TStrings): integer;
+var
+  p1, p2, i, ps: integer;
+  temp: string;
+  listParam: TStringList;
+  header: string;
+  outParams: TStringList;
+begin
+  Result:= 0;
+  p1:= Pos('(',signature);
+  p2:= Pos(')',signature);
+
+  header:= Copy(signature, 1, p1); //public void Foo(
+
+  ps:= GetPosSpace(header);
+  methname:= Copy(header, ps+1, p1-(ps+1));
+
+  if (p2-p1) < 3 then
+  begin
+    temp:= UppercaseChar(signature, ps+1);
+    newsignature:= StringReplace(temp, '...', '[]', [rfIgnoreCase, rfReplaceAll]);
+    Exit;
+  end;
+
+  listParam:= TStringList.Create;
+  listParam.Delimiter:=',';
+  listParam.StrictDelimiter:=True;
+  temp:= Copy(signature, p1+1, p2-p1-1); //float, float, float   //java.util.Map<java.lang.String, java.lang.Double>
+
+  listParam.DelimitedText:=StringReplace(temp, ' ', '', [rfIgnoreCase, rfReplaceAll]);
+
+  outParams:= TStringList.Create;
+  outParams.Delimiter:=',';
+  outParams.StrictDelimiter:= True;
+
+  //public net.objecthunter.exp4j.Expression setVariables(java.util.Map<java.lang.String, java.lang.Double>)
+  //public Eq2GSolver(float, float, float);
+  for i:= 0 to  listParam.Count-1 do
+  begin
+    if (Pos('<',listParam.Strings[i]) <= 0) then
+    begin
+       listParam.Strings[i]:= listParam.Strings[i] + ' _arg'+ IntToStr(i);
+       outParams.Add(' _arg'+ IntToStr(i));
+    end
+    else
+    begin
+       if listParam.Count = 1 then //java.util.Map<java.lang.String, java.lang.Double>  or   java.util.Set<java.lang.String>
+       begin
+         listParam.Strings[i]:= listParam.Strings[i] + ' _arg'+ IntToStr(i);
+         outParams.Add(' _arg'+ IntToStr(i));
+       end
+       else
+       begin   //  public SetVariables(java.util.Map<java.lang.String _arg0,java.lang.Double> _arg1) {
+         if Pos('>', listParam.Strings[i]) >  0 then //java.util.Set<java.lang.String>, java.util.Set<java.lang.Integer>
+         begin
+             listParam.Strings[i]:= listParam.Strings[i] + ' _arg'+ IntToStr(i);
+             outParams.Add(' _arg'+ IntToStr(i));
+         end;
+       end;
+    end;
+  end;
+  temp:= UppercaseChar(header + listParam.DelimitedText + ')', ps+1);
+  newsignature:= StringReplace(temp, '...', '[]', [rfIgnoreCase, rfReplaceAll]);
+  outListParams.Text:= outParams.Text;
+  Result:= outParams.Count;
+
+  listParam.Free;
+
+end;
+
+function RunCmdProcess(const cmd: string): integer;
+begin
+  with TProcess.Create(nil) do  //UTF8
+  try
+    Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    Executable := cmd;
+    ShowWindow := swoHIDE;
+    Execute;
+    Result := ExitCode;
+  finally
+    Free;
+  end;
+end;
+
+//FPathToJavaTemplates: string;
+//C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner\java
+procedure TFrmCompCreate.BitBtnJARClick(Sender: TObject);
+var
+    strList: TstringList;
+    pathLibjar, importPack, javaClass, constructorSignature: string;
+    success: boolean;
+    p, i: integer;
+    methodSignatureList, outParams: TStringList;
+    listSupperParam: TStringList;
+    countSupperParam: integer;
+    supperParamEx, supperParam, methodSignature,  ext, methnam: string;
+    codeDesign, codeFrom: integer;
+    this: string;
+begin
+  if OpenDialog1.Execute then
+  begin
+    FPathToJARFile:= OpenDialog1.FileName;
+    FJARFilename:= ExtractFileName(FPathToJARFile);
+    FListJarClass.Clear;
+    FListJarClass.Add(FJARFilename);
+    pathLibjar:= FPathToJavaTemplates+PathDelim+'libjar';
+    CopyFile(FPathToJARFile,pathLibjar+PathDelim+FJARFilename);
+
+    methodSignatureList:= TStringList.Create;
+    strList:= TstringList.Create;
+    listSupperParam:= TStringList.Create;
+    outParams:= TStringList.Create;
+    outParams.Delimiter:=',';
+    outParams.StrictDelimiter:= True;
+
+    ext:= '.bat';
+    {$IFDEF UNIX}
+    ext:='.sh';
+    {$Endif}
+
+    strList.Add('@echo off');
+    strList.Add('CD '+pathLibjar);
+    strList.Add('SET JAVA_TEMP="'+FPathToJavaJDK+PathDelim+'bin"');
+    strList.Add('SET PATH=%PATH%;%JAVA_TEMP%');
+    strList.Add('SET ESCAPE=".class"');
+    strList.Add('jar -tf '+FJARFilename+' | findstr %ESCAPE% > jar-tf_' + ChangeFileExt(FJARFilename,'.txt'));
+    strList.SaveToFile(pathLibjar+PathDelim+ 'jar-tf_' + ChangeFileExt(FJARFilename,ext));
+
+    RunCmdProcess(pathLibjar+PathDelim+'jar-tf_' + ChangeFileExt(FJARFilename,ext));
+
+    strList.Clear;
+    strList.LoadFromFile(pathLibjar+PathDelim+'jar-tf_' + ChangeFileExt(FJARFilename,'.txt'));
+
+    FormImportJAR:= TFormImportJAR.Create(Self);
+    FormImportJAR.Caption:= 'Form Import Java class';
+    FormImportJAR.LabelSelect.Caption:= 'Select a class:';
+    FormImportJAR.SpeedButtonShowMethods.Visible:= False;
+    FormImportJAR.TaskMode:= 0;
+    FormImportJAR.MethodSignatureList.Text:= strList.Text;
+    FormImportJAR.ShowModal;
+    success:= False;
+    if FormImportJAR.ModalResult = mrOk then
+    begin
+       importPack:= FormImportJAR.ListBox1.GetSelectedText; //org.lamw.simplemath.Eq2GSolver
+       p:= LastDelimiter('.', importPack);
+       javaClass:= Copy(importPack, p+1, MaxInt);    //Eq2GSolver
+       strList.Clear;
+       strList.Add('@echo off');
+       strList.Add('CD '+pathLibjar);
+       strList.Add('SET JAVA_TEMP="'+FPathToJavaJDK+PathDelim+'bin"');
+       strList.Add('SET PATH=%PATH%;%JAVA_TEMP%');
+       strList.Add('javap -classpath '+FJARFilename+' '+importPack + ' > javap_'+ChangeFileExt(FJARFilename,'')+'_'+javaClass+'.txt');  //+ ' > javap2.txt'
+       strList.SaveToFile(pathLibjar+PathDelim+ 'javap_'+ChangeFileExt(FJARFilename,'')+'_'+javaClass+ext);
+       success:= True;
+    end;
+
+    if success then
+    begin
+
+      RunCmdProcess(pathLibjar+PathDelim+ 'javap_'+ChangeFileExt(FJARFilename,'')+'_'+javaClass+ext);
+      if FormImportJAR <> nil then FormImportJAR.Free;
+      FormImportJAR:= TFormImportJAR.Create(Self);
+
+      FormImportJAR.SpeedButtonShowMethods.Visible:= True;
+      FormImportJAR.Caption:= 'Form Import '+ javaClass;
+      FormImportJAR.LabelSelect.Caption:= 'Select a constructor:';
+      FormImportJAR.ConstructorSignature:= 'public ' + importPack + '(';
+      FormImportJAR.TaskMode:= 1;
+      strList.LoadFromFile(pathLibjar+PathDelim+'javap_'+ChangeFileExt(FJARFilename,'')+'_'+javaClass+'.txt');
+      FormImportJAR.MethodSignatureList.Text:= strList.Text;
+      FormImportJAR.ShowModal;
+      if FormImportJAR.ModalResult = mrOk then
+      begin
+         constructorSignature:= FormImportJAR.ListBox1.GetSelectedText;
+         countSupperParam:= GetSupperParam(constructorSignature, listSupperParam);
+         methodSignatureList.Text:= FormImportJAR.FListMethods.Text;  //only methods...
+         codeDesign:= FormImportJAR.RadioGroupDesign.ItemIndex;
+         codeFrom:= FormImportJAR.RadioGroupFrom.ItemIndex;
+      end
+      else success:= False;
+    end;
+
+    if codeDesign = 1 then this:= 'this'
+    else this:= 'm'+javaClass;
+
+    if success then
+    begin
+      strList.Clear;
+      strList.Add(' ');
+      strList.Add('/*'+FJARFilename+'*/');
+      strList.Add('import '+ importPack+';');
+      strList.Add('import android.content.Context;');
+
+      if codeFrom = 1then //VisualControl
+      begin
+        strList.Add('import android.view.View;');
+        strList.Add('import android.view.ViewGroup;');
+      end;
+
+      strList.Add(' ');
+      strList.Add('/*Draft java code by "Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']*/');
+      strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
+      strList.Add('/*jControl LAMW template*/');
+      strList.Add(' ');
+
+      if  codeDesign =  1 then
+        strList.Add('public class j'+javaClass+' extends '+javaClass+' {')
+      else
+        strList.Add('public class j'+javaClass+' {');
+
+      strList.Add('  ');
+      strList.Add('    private long pasobj = 0;        //Pascal Object');
+      strList.Add('    private Controls controls  = null; //Java/Pascal [events] Interface ...');
+      strList.Add('    private Context  context   = null;');
+      if codeFrom = 1then //VisualControl
+      begin
+        strList.Add('    private jCommons LAMWCommon;');
+        strList.Add(' ');
+        strList.Add('    private OnClickListener onClickListener;   // click event');
+        strList.Add('    private Boolean enabled  = true;           // click-touch enabled!');
+      end;
+      strList.Add('  ');
+      if codeDesign = 0 then
+         strList.Add('    private '+importPack+' m'+javaClass+';');
+      strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
+      strList.Add('  ');
+      supperParamEx:= listSupperParam.DelimitedText;
+
+      if countSupperParam > 0 then
+           strList.Add('    public j'+javaClass+'(Controls _ctrls, long _Self,'+supperParamEx+') {')
+      else
+           strList.Add('    public j'+javaClass+'(Controls _ctrls, long _Self) {');
+
+      if countSupperParam > 0 then
+      begin
+        supperParam:= '_arq0';
+        for i:= 1 to countSupperParam-1 do
+        begin
+          supperParam:= supperParam + ',' + '_arg'+ IntToStr(i);
+        end;
+      end
+      else supperParam:= '';
+
+      if codeFrom = 0 then
+      begin
+        if codeDesign = 1 then
+          strList.Add('       super('+supperParam+');')
+        else
+          strList.Add('       m'+javaClass+' = new '+importPack+'('+supperParam+');');
+      end
+      else
+      begin
+         strList.Add('       super(_ctrls.activity);');
+         strList.Add('       LAMWCommon = new jCommons(this,_ctrls.activity,pasobj);');
+      end;
+      strList.Add('       context   = _ctrls.activity;');
+      strList.Add('       pasobj = _Self;');
+      strList.Add('       controls  = _ctrls;');
+      if codeFrom = 1 then
+      begin
+        strList.Add('       onClickListener = new OnClickListener(){');
+        strList.Add('       /*.*/public void onClick(View view){     // *.* is a mask to future parse...;');
+        strList.Add('               if (enabled) {');
+        strList.Add('                  controls.pOnClickGeneric(pasobj, Const.Click_Default); //JNI event onClick!');
+        strList.Add('               }');
+        strList.Add('            };');
+        strList.Add('       };');
+        strList.Add('       setOnClickListener(onClickListener);');
+      end;
+      strList.Add('    }');
+      strList.Add('  ');
+      strList.Add('    public void jFree() {');
+      strList.Add('      //free local objects...');
+      if codeFrom = 1 then
+      begin
+        strList.Add('    setOnClickListener(null);');
+        strList.Add('	 LAMWCommon.free();');
+      end;
+      strList.Add('      m'+javaClass+' = null;');
+      strList.Add('    }');
+      strList.Add('  ');
+
+      if codeFrom = 1 then
+      begin
+         strList.Add('    public void SetViewParent(ViewGroup _viewgroup) {');
+         strList.Add('	    LAMWCommon.setParent(_viewgroup);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public ViewGroup GetParent() {');
+         strList.Add('      return LAMWCommon.getParent();');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void RemoveFromViewParent() {');
+         strList.Add('      LAMWCommon.removeFromViewParent();');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public View GetView() {');
+         strList.Add('       return this;');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void SetLParamWidth(int _w) {');
+         strList.Add('       LAMWCommon.setLParamWidth(_w);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void SetLParamHeight(int _h) {');
+         strList.Add('       LAMWCommon.setLParamHeight(_h);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public int GetLParamWidth() {');
+         strList.Add('       return LAMWCommon.getLParamWidth();');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public int GetLParamHeight() {');
+         strList.Add('	     return  LAMWCommon.getLParamHeight();');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void SetLGravity(int _g) {');
+         strList.Add('       LAMWCommon.setLGravity(_g);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void SetLWeight(float _w) {');
+         strList.Add('       LAMWCommon.setLWeight(_w);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {');
+         strList.Add('       LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void AddLParamsAnchorRule(int _rule) {');
+         strList.Add('	     LAMWCommon.addLParamsAnchorRule(_rule);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void AddLParamsParentRule(int _rule) {');
+         strList.Add('	     LAMWCommon.addLParamsParentRule(_rule);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void SetLayoutAll(int _idAnchor) {');
+         strList.Add('       LAMWCommon.setLayoutAll(_idAnchor);');
+         strList.Add('    }');
+         strList.Add(' ');
+         strList.Add('    public void ClearLayoutAll() {');
+         strList.Add('	     LAMWCommon.clearLayoutAll();');
+         strList.Add('    }');
+      end;
+      strList.Add(' ');
+      strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
+      strList.Add('  //write others [public] methods code here......');
+      if codeFrom = 1 then
+      begin
+        strList.Add('    public void SetId(int _id) { //wrapper method pattern ...');
+        strList.Add('       this.setId(_id);');
+        strList.Add('    }');
+      end;
+      strList.Add(' ');
+
+      //add test here:
+      //methodSignatureList.Add('public void foo1(java.lang.String, java.util.Set<java.lang.String>, java.util.Set<java.lang.Integer>)');
+
+      for i:= 0 to methodSignatureList.Count - 1 do
+      begin
+          countSupperParam:= GetMethodSignatureEx(Trim(methodSignatureList.Strings[i]), methodSignature, methnam, outParams);
+          strList.Add('   '+methodSignature+' {');
+
+          if countSupperParam > 0 then
+             supperParam:= outParams.DelimitedText//supperParam + ',' + '_arg'+ IntToStr(k);
+          else supperParam:= '';
+
+          if Pos(' void ', methodSignature) > 0 then
+            strList.Add('      '+this+'.'+methnam+'('+supperParam+');')
+          else
+            strList.Add('      return '+this+'.'+methnam+'('+supperParam+');');
+
+          strList.Add('   }');
+          strList.Add(' ');
+
+      end;
+      strList.Add('}');
+      //strList.SaveToFile(FPathToJavaTemplates+PathDelim+'j'+javaClass+'.java'); //TODO
+
+      SynMemo1.Clear;
+      SynMemo1.Lines.Text:= strList.Text;
+
+    end else SynMemo1.Clear;
+
+    outParams.Free;
+    listSupperParam.Free;
+    strList.Free;
+    methodSignatureList.Free;
+  end;
+
+
+end;
+
 procedure TFrmCompCreate.FormDestroy(Sender: TObject);
 begin
-    FHackListJNIHeader.Free;
-    FHackListPascalClass.Free;
-    FHackListPascalClassImpl.Free;
-    Memo2List.Free;
-    FImportsList.Free;
+   FListJarClass.Free; //jEq2GSolver.libjar
+   FHackListJNIHeader.Free;
+   FHackListPascalClass.Free;
+   FHackListPascalClassImpl.Free;
+   Memo2List.Free;
+   FImportsList.Free;
 end;
 
 function TFrmCompCreate.GetJSignature(params, res: string): string;
@@ -1857,7 +2480,8 @@ begin
   begin
     with TIniFile.Create(fileName) do
     try
-      FPathToJavaTemplates := ReadString('NewProject','PathToJavaTemplates', '');
+      FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
+      FPathToJavaJDK:=  ReadString('NewProject','PathToJavaJDK', '');
     finally
       Free;
     end;

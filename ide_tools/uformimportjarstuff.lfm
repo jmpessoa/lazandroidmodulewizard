@@ -1,0 +1,173 @@
+object FormImportJAR: TFormImportJAR
+  Left = 701
+  Height = 508
+  Top = 315
+  Width = 690
+  BorderStyle = bsToolWindow
+  Caption = 'Form Import Java class'
+  ClientHeight = 508
+  ClientWidth = 690
+  DesignTimePPI = 120
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '2.0.0.4'
+  object ListBox1: TListBox
+    AnchorSideTop.Control = Panel1
+    AnchorSideBottom.Control = BitBtn1
+    Left = 6
+    Height = 429
+    Top = 0
+    Width = 678
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ItemHeight = 0
+    OnClick = ListBox1Click
+    TabOrder = 0
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 29
+    Top = 479
+    Width = 690
+    Panels = <>
+  end
+  object BitBtn1: TBitBtn
+    Left = 586
+    Height = 40
+    Top = 429
+    Width = 94
+    Anchors = [akRight, akBottom]
+    Default = True
+    DefaultCaption = True
+    GlyphShowMode = gsmAlways
+    Kind = bkOK
+    ModalResult = 1
+    TabOrder = 2
+  end
+  object BitBtn2: TBitBtn
+    AnchorSideRight.Control = BitBtn1
+    Left = 492
+    Height = 40
+    Top = 429
+    Width = 94
+    Anchors = [akRight, akBottom]
+    Cancel = True
+    DefaultCaption = True
+    GlyphShowMode = gsmAlways
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 3
+  end
+  object Panel1: TPanel
+    Left = 0
+    Height = 63
+    Top = 0
+    Width = 690
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 63
+    ClientWidth = 690
+    TabOrder = 4
+    object LabelSelect: TLabel
+      Left = 8
+      Height = 20
+      Top = 37
+      Width = 122
+      Caption = 'Select a Java class:'
+      ParentColor = False
+    end
+    object SpeedButtonShowMethods: TSpeedButton
+      Left = 661
+      Height = 28
+      Top = 8
+      Width = 29
+      Anchors = [akTop, akRight]
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        200000000000000400006400000064000000000000000000000000000000C37C
+        0064925500FF925400FF925500FF925500FF925500FF925500FF925500FF9255
+        00FF925500FF925500FFC37C0064000000000000000000000000C37C00649457
+        00FFE9C689FFF4DBAFFFF4DBAFFFF4DBAFFFF4DBAFFFF4DBAFFFF4DBAFFFF4DB
+        AFFFF4DBAFFFE9C689FF945600FFC37C00640000000000000000975900FFEDD4
+        A8FFFAEDD7FFFAEDD7FFFAEDD7FFF9EDD7FFFAEDD7FFFAEDD7FFF9EDD7FFF9ED
+        D7FFF9EDD7FF975900FFE9C689FF975800FF00000000000000009A5B00FFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFF9A5B00FFF4DBAFFF9A5B00FF00000000000000009D5E00FF9E5E
+        00FF9E5E00FF9E5E00FF9E5F00FF9E5F00FF9E5E00FF9E5E00FF9E5E00FF9D5E
+        00FF9E5E00FFEAC88CFFF5DEB4FF9E5F00FF0000000000000000000000000000
+        0000A26200FFF6E0BBFFF6E0BCFFF5E1BCFFF6E0BBFFF6E0BBFFF5E0BBFFF6E1
+        BBFFF6E1BBFFF6E1BBFFF6E0BBFFA26100FF0000000000000000000000000000
+        0000A66400FFF6E5C4FFF7E4C3FFF7E4C4FFF7E4C4FFF7E4C4FFF7E4C4FFF7E4
+        C3FFF7E4C4FFF6E5C4FFF7E5C3FFA66400FF0000000000000000000000000000
+        0000AB6800FFF8E9CDFFF8E8CDFFF8E9CDFFF8E8CDFFF8E9CDFFF9E9CDFFF8E9
+        CDFFF8E9CDFFF8E9CDFFF9E8CDFFAB6900FF0000000000000000000000000000
+        0000AF6C00FFFAEDD7FFF9EDD7FFFAEDD7FFF9EDD7FFF9EDD7FFF9EDD7FFFAED
+        D7FFFAEDD7FFFAEDD7FFFAEDD7FFAE6B00FF0000000000000000000000000000
+        0000B36F00FFFAF1E1FFFBF1E1FFFBF1E1FFFBF1E1FFFBF2E1FFFBF1E1FFFBF1
+        E1FFFBF1E1FFFBF2E1FFFBF2E1FFB36F00FF0000000000000000000000000000
+        0000B77200FFFCF6EAFFFDF5EAFFFDF6EBFFFCF5EBFFFCF5EAFFFCF6EBFFFCF6
+        EBFFFCF5EBFFFCF5EBFFFCF6EBFFB77300FF0000000000000000000000000000
+        0000BB7600FFFDFAF3FFFEF9F3FFFEFAF3FFFEFAF3FFFEFAF2FFFEFAF3FFFDFA
+        F3FFFEF9F3FFFEFAF3FFFDFAF3FFBB7600FF0000000000000000000000000000
+        0000BF7800FFFFFCFAFFFEFDFAFFFEFCFAFFFEFDFAFFFFFCFAFFFEFDF9FFFFFC
+        FAFFFEFDF9FFFEFDFAFFFEFDFAFFBE7800FFBE7800FFBE7800FF000000000000
+        0000C17A00FFF2E2C7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2E2C7FFC17A00FF000000000000
+        0000C37C0064C37C00FFF2E2C7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFF2E2C7FFC37C00FFC37C0064000000000000
+        000000000000C37C0064C37C00FFC37C00FFC37C00FFC37C00FFC37C00FFC37C
+        00FFC37C00FFC37C00FFC37C00FFC37C00FFC37C006400000000
+      }
+      OnClick = SpeedButtonShowMethodsClick
+    end
+    object RadioGroupDesign: TRadioGroup
+      Left = 400
+      Height = 50
+      Top = 4
+      Width = 253
+      AutoFill = True
+      Caption = 'Code Design'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 25
+      ClientWidth = 249
+      Columns = 2
+      ItemIndex = 0
+      Items.Strings = (
+        'Composition'
+        'Inheritance'
+      )
+      TabOrder = 0
+    end
+    object RadioGroupFrom: TRadioGroup
+      Left = 155
+      Height = 50
+      Top = 4
+      Width = 231
+      AutoFill = True
+      Caption = 'Inherit from'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 25
+      ClientWidth = 227
+      Columns = 2
+      ItemIndex = 0
+      Items.Strings = (
+        'jControl'
+        'jVisualControl'
+      )
+      OnClick = RadioGroupFromClick
+      TabOrder = 1
+    end
+  end
+end

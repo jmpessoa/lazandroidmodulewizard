@@ -547,8 +547,8 @@ end;
 //https://community.oracle.com/blogs/schaefa/2005/01/20/how-do-conditional-compilation-java
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
-  strList: TStringList;
-  i: integer;
+  strList, listRequirements, requiredList: TStringList;
+  i, p, k: integer;
   strTargetApi, tempStr, sdkManifestTarqet: string;
   AndroidTheme: string;
   androidPluginStr: string;
@@ -563,6 +563,10 @@ var
 begin
 
   strList:= TStringList.Create;
+  listRequirements:= TStringList.Create;
+  listRequirements.Sorted:= True;
+  listRequirements.Duplicates:= dupIgnore;
+
   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'colors.xml') then
   begin
      if not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml') then
@@ -571,7 +575,6 @@ begin
        strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
      end;
   end;
-
 
   AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
 
@@ -742,6 +745,17 @@ begin
          strList.Add('        classpath ''com.android.tools.build:gradle:'+ pluginVersion+'''');
          strList.Add('    }');
          strList.Add('}');
+
+         strList.Add('allprojects {');
+         strList.Add('    repositories {');
+         if androidPluginNumber >= 300 then
+            strList.Add('    google()')
+         else
+            strList.Add('    //google()');
+         strList.Add('       jcenter()');
+         strList.Add('    }');
+         strList.Add('}');
+
          strList.Add('apply plugin: ''com.android.application''');
          strList.Add('android {');
          strList.Add('    lintOptions {');
@@ -862,10 +876,26 @@ begin
             strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');
             strList.Add('    '+directive+' ''com.android.support:cardview-v7:'+cardVer+'''');
             strList.Add('    '+directive+' ''com.android.support:recyclerview-v7:'+recyclerVer+'''');
-            strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
+            //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
 
-            {
-            Extras
+            requiredList:= TStringList.Create;
+            requiredList:= FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.required', False);
+            for i:= 0 to requiredList.Count-1 do
+            begin
+                listRequirements.LoadFromFile(requiredList.Strings[i]);
+                for k:= 0 to listRequirements.Count-1 do
+                begin                           //implementation 'com.github.nisrulz:lantern:2.0.0'
+                   p:= Pos('implementation ', listRequirements.Strings[k]);
+                   if p > 0 then
+                   begin
+                     p:= Pos(' ', listRequirements.Strings[k]);
+                     tempStr:= Copy(listRequirements.Strings[k], p, MaxInt);
+                     strList.Add('    '+directive+tempStr);
+                   end;
+                end;
+            end;
+            requiredList.Free;
+           {Extras
             Android Support Repository
             Android Support Library
             C:\adt32\sdk\extras\android\m2repository\com\android\support\appcompat-v7
@@ -1503,7 +1533,7 @@ var
   fileName: string;
 begin
   ForceDirectory(FPathToJavaSource+'bak');
-  contentList := FindAllFiles(FPathToJavaSource, '*.java', False);
+  contentList:= FindAllFiles(FPathToJavaSource, '*.java', False);
   for i:= 0 to contentList.Count-1 do
   begin         //do backup
     CopyFile(contentList.Strings[i],
@@ -1643,9 +1673,9 @@ end;
 function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
-  list, listRequirements, auxList, manifestList: TStringList;
+  list, listRequirements, auxList, manifestList, gradleList, defaultDependencies: TStringList;
   p, p1, p2, i: integer;
-  aux, tempStr: string;
+  aux, tempStr, auxStr: string;
   insertRef: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
@@ -1995,18 +2025,32 @@ begin
        end;
      end;
    end;
-   //try fix "gradle.build"
+
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dependencies') then
    begin
       auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dependencies');
       if auxList.Text <> '' then
       begin
-        manifestList.LoadFromFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
+        gradleList:=TStringList.Create;
+        gradleList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+        aux:= gradleList.Text;
+        insertRef:= 'fileTree(include: [''*.jar''], dir: ''libs'')';
         for i:= 0 to auxList.Count-1 do
         begin
-           manifestList.Text:= StringReplace(manifestList.Text, '//'+auxList.Strings[i], auxList.Strings[i], [rfReplaceAll,rfIgnoreCase]);
+           auxStr:=auxList.Strings[i];
+           listRequirements.Add(auxStr); // implementation 'com.android.support:design:25.3.1'
+           SplitStr(auxStr, ' ');
+           p:= LastDelimiter(':',auxStr);
+           tempStr:= Copy(auxStr, 2, p - 2);
+           if Pos(tempStr, aux) <= 0 then
+           begin
+             p1:= Pos(insertRef, aux);
+             Insert(sLineBreak + '    '+auxList.Strings[i] , aux, p1+Length(insertRef) );
+           end;
         end;
-        manifestList.SaveToFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
+        gradleList.Text:= aux;
+        gradleList.SaveToFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
+        gradleList.Free;
       end;
    end;
    //-----

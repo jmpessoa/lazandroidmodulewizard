@@ -1,0 +1,148 @@
+object FormAddComplements: TFormAddComplements
+  Left = 740
+  Height = 532
+  Top = 345
+  Width = 569
+  Caption = 'LAMW jComponent Create'
+  ClientHeight = 532
+  ClientWidth = 569
+  DesignTimePPI = 120
+  LCLVersion = '2.0.0.4'
+  object Panel1: TPanel
+    Left = 0
+    Height = 63
+    Top = 0
+    Width = 569
+    Align = alTop
+    BevelOuter = bvNone
+    Caption = 'Component Complements [Optional]'
+    TabOrder = 0
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 29
+    Top = 503
+    Width = 569
+    Panels = <>
+  end
+  object Label1: TLabel
+    Left = 16
+    Height = 20
+    Top = 72
+    Width = 156
+    Caption = 'Libraries:  ".so", ".jar",  ...'
+    ParentColor = False
+  end
+  object EditPath: TEdit
+    Left = 16
+    Height = 28
+    Top = 96
+    Width = 499
+    TabOrder = 2
+  end
+  object SpeedButtonOpen: TSpeedButton
+    Left = 520
+    Height = 28
+    Top = 96
+    Width = 29
+    Caption = '...'
+    OnClick = SpeedButtonOpenClick
+  end
+  object ListBoxPath: TListBox
+    Left = 16
+    Height = 104
+    Top = 136
+    Width = 499
+    ItemHeight = 0
+    TabOrder = 3
+  end
+  object BitBtn1: TBitBtn
+    Left = 320
+    Height = 38
+    Top = 456
+    Width = 94
+    Cancel = True
+    DefaultCaption = True
+    GlyphShowMode = gsmAlways
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 4
+  end
+  object BitBtn2: TBitBtn
+    Left = 421
+    Height = 38
+    Top = 456
+    Width = 94
+    Default = True
+    DefaultCaption = True
+    GlyphShowMode = gsmAlways
+    Kind = bkOK
+    ModalResult = 1
+    TabOrder = 5
+  end
+  object SpeedButtonAddPath: TSpeedButton
+    Left = 520
+    Height = 28
+    Top = 136
+    Width = 29
+    Caption = '+'
+    OnClick = SpeedButtonAddPathClick
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 20
+    Top = 264
+    Width = 430
+    Caption = 'Gradle Dependencies: [ ex.:    com.android.support:design:25.3.1 ]'
+    ParentColor = False
+  end
+  object ListBoxGradleDep: TListBox
+    Left = 16
+    Height = 100
+    Top = 352
+    Width = 499
+    ItemHeight = 0
+    TabOrder = 6
+  end
+  object EditGradleDep: TEdit
+    Left = 16
+    Height = 28
+    Top = 312
+    Width = 499
+    TabOrder = 7
+  end
+  object SpeedButtonAddGradleDep: TSpeedButton
+    Left = 520
+    Height = 28
+    Top = 352
+    Width = 29
+    Caption = '+'
+    OnClick = SpeedButtonAddGradleDepClick
+  end
+  object SpeedButton3: TSpeedButton
+    Left = 520
+    Height = 28
+    Top = 168
+    Width = 29
+    Caption = ' - '
+  end
+  object SpeedButton4: TSpeedButton
+    Left = 520
+    Height = 28
+    Top = 384
+    Width = 29
+    Caption = ' - '
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 20
+    Top = 284
+    Width = 494
+    Caption = 'Manifest Permission: [ex.:  android.permission.READ_EXTERNAL_STORAGE ]'
+    ParentColor = False
+  end
+  object OpenDialog1: TOpenDialog
+    left = 416
+    top = 8
+  end
+end

@@ -516,7 +516,6 @@ var
   i: Integer;
   str, sval, temp: string;
   sl: TStringList;
-  outIndex: integer;
 begin
   Result := mrOk;
   // build.xml
@@ -554,15 +553,6 @@ begin
 
               sl := CollectDirs(AppendPathDelim(FSdkPath) + 'platforms' + PathDelim + 'android-*');
               sl.Sorted := True;
-
-              (*
-                //try remove "android-P"
-              if sl.Find('android-P', outIndex) then
-                sl.Delete(outIndex);
-              //try remove "android-W"
-              if sl.Find('android-4.4W.2', outIndex) then
-                sl.Delete(outIndex);
-              *)
 
               try
                 if sl.Count = 0 then Continue;
