@@ -749,9 +749,9 @@ begin
          strList.Add('allprojects {');
          strList.Add('    repositories {');
          if androidPluginNumber >= 300 then
-            strList.Add('    google()')
+         strList.Add('       google()')
          else
-            strList.Add('    //google()');
+         strList.Add('     //google()');
          strList.Add('       jcenter()');
          strList.Add('    }');
          strList.Add('}');

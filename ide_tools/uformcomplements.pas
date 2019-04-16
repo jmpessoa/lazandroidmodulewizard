@@ -30,6 +30,7 @@ type
     SpeedButton4: TSpeedButton;
     SpeedButtonOpen: TSpeedButton;
     StatusBar1: TStatusBar;
+    procedure ListBoxPathClick(Sender: TObject);
     procedure SpeedButtonAddPathClick(Sender: TObject);
     procedure SpeedButtonAddGradleDepClick(Sender: TObject);
     procedure SpeedButtonOpenClick(Sender: TObject);
@@ -61,6 +62,11 @@ begin
     ListBoxPath.Items.Add(Self.EditPath.Text);
     EditPath.Text:= '';
   end;
+end;
+
+procedure TFormAddComplements.ListBoxPathClick(Sender: TObject);
+begin
+
 end;
 
 procedure TFormAddComplements.SpeedButtonAddGradleDepClick(Sender: TObject);

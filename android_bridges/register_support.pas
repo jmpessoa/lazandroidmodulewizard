@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  sscreenshot,
   slantern,
   sadmob,
   sdrawerlayout,
@@ -35,6 +36,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jsscreenshot_icon.lrs}
   {$I jslantern_icon.lrs}
   {$I jsadmob_icon.lrs}
   {$I jsdrawerlayout_icon.lrs}
@@ -53,6 +55,7 @@ begin
   {$I jstextinput_icon.lrs}
   RegisterComponents('Android Bridges AppCompat',
     [
+      jsScreenShot,
       jsLantern,
       jsAdMob,
       jsDrawerLayout,

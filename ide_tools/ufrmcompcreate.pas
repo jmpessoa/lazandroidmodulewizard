@@ -1147,12 +1147,14 @@ begin
                         list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.libso');
                     list.Add(filename);
                     list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.libso');
+                    CopyFile(frm.ListBoxPath.Items.Strings[i], FPathToJavaTemplates + PathDelim + 'libso' + PathDelim + filename);
                  end;
           '.jar': begin
                     if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.libjar') then
                         list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.libjar');
                     list.Add(filename);
                     list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.libjar');
+                    CopyFile(frm.ListBoxPath.Items.Strings[i], FPathToJavaTemplates + PathDelim + 'libjar' + PathDelim + filename);
                   end;
         end;
      end;

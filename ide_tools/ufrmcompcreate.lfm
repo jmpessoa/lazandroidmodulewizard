@@ -1,7 +1,7 @@
 object FrmCompCreate: TFrmCompCreate
-  Left = 483
+  Left = 354
   Height = 647
-  Top = 187
+  Top = 169
   Width = 1019
   Caption = '[LAMW]  Create New jComponent'
   ClientHeight = 647
@@ -178,9 +178,9 @@ object FrmCompCreate: TFrmCompCreate
     Height = 531
     Top = 50
     Width = 1019
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Align = alClient
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
@@ -1207,11 +1207,11 @@ object FrmCompCreate: TFrmCompCreate
           ''
           '   2.1. Insert a new [wrapper] java class  jControl/jVisualControl from template; '
           ''
-          '        hint1. Alternatively, you can paste you java code from clipboard!'
+          '        hint1. Alternatively, you can paste you java code [template compatible] from clipboard!'
           ''
           '        hint2. Alternatively, you can import a "JAR" file and selec a class [at the moment, only for no visual  control]!'
           ''
-          '        hint2: You can also use the demo AppTryCode3 to produce a complete [wrapper] java class !'
+          '        hint3: You can also use the demo AppTryCode3 to produce a complete [wrapper]  java class !'
           ''
           '        warning/important: All "imports" from "Controls.java" template  and new "imports" from you java class code'
           '                   will  be researched to try write the correct JNI methods signatures.....'
@@ -1224,7 +1224,7 @@ object FrmCompCreate: TFrmCompCreate
           '        hint1: Only public methods will be translated to pascal [bridge ] code.'
           '        hint2:  use the  mask  /*.*/   to make a public method invisible for the parse [ex.  /*.*/public myfunctio() {....} ]  '
           ''
-          '   2.3. [Tab java] Select all  the new java class code and right click it.'
+          '   2.3. Select all  the new java class code and right click it [java tab] .'
           '      '
           '       hint1:  if have only one java class code you do not need select it! just right click it!'
           '       hint2. save your java class source code in LAMW folder "......\android_wizard\smartdesigner\java" :'
@@ -1232,7 +1232,7 @@ object FrmCompCreate: TFrmCompCreate
           '        warning:  the  LAMW java to pascal convert dont support complex/generic types like  "java.util.Map<,>" ,  "java.util.Set<>" etc..'
           '       So, we need re-write  the method signature [by hand] for primitives data/array type....'
           ''
-          '      But simple java object param/return  is ok! '
+          '      But simple java Object param [or return]  is ok! '
           '     '
           '      public void SetImage(Bitmap _image) {     //<<----  OK! '
           '             this.setImage(_image);'
@@ -1247,7 +1247,7 @@ object FrmCompCreate: TFrmCompCreate
           '      '
           '   2.4. Popup Menu: Select "Write [Draft] Pascal jControl/jVisualControl Interface".'
           ' '
-          '   2.5. Right click Pascal tab [popup] and select "Register Component...";'
+          '   2.5. Right click Pascal Tab  and select "Register Component..." from  Popup Menu;'
           ''
           '          warning: Mac users: please, you must copy the console app "lazres" [lazarus/tools] to the folder '
           '          ".../LazAndroidWizard/ide_tools"; '
@@ -1257,7 +1257,7 @@ object FrmCompCreate: TFrmCompCreate
           '   2.7.  [Dialog]:  open a "register_*.pas" file (ex. "register_extra.pas"); **'
           ''
           '      hint: you can select "register_template.pas" to write a custom register file, '
-          '              but, then,  you must insert it to  "tfpandroidbridge_pack.lpk".'
+          '              but, then,  you must insert it into  "tfpandroidbridge_pack.lpk".'
           ''
           '   2.8. Ok. You got you DRAFT pascal component JNI stuff! Please, look in the folder   "..../LazAndroidWizard/android_bridges" '
           '         directory:'
@@ -1265,7 +1265,7 @@ object FrmCompCreate: TFrmCompCreate
           '        :: *.pas           <--- open and fix/complete the pascal code with your others events/properties/methods/variables/overload! '
           ''
           '        :: *_icon.lrs    <--- new icon resource'
-          '        :: register_extras.pas   <--- updated!  by default, the new component was included there!'
+          '        :: register_extras.pas   <--- updated!  by default, the new component will be include there!'
           ''
           '   2.9. [Lazarus IDE Menu]: Package -> Open Package File (*.lpk) --> "tfpandroidbridge_pack.pas" in folder  '
           '         "....../LazAndroidWizard/android_bridges".'

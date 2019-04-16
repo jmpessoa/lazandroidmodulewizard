@@ -1392,6 +1392,7 @@ type
     function GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
     procedure LoadFromURL(_url: string);
     procedure SaveToFile(_filename: string);
+    function GetView(): jObject; override;
 
     property Count: integer read GetCount;
   published
@@ -1421,6 +1422,7 @@ type
     FOnLongClickItem:  TOnClickCaptionItem;
     FOnDrawItemTextColor: TOnDrawItemTextColor;
     FOnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor;
+    FOnDrawItemWidgetText: TOnDrawItemWidgetText;
     FOnDrawItemBitmap: TOnDrawItemBitmap;
     FOnWidgeItemLostFocus: TOnWidgeItemLostFocus;
     FOnScrollStateChanged: TOnScrollStateChanged;
@@ -1467,6 +1469,7 @@ type
 
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+    procedure GenEvent_OnDrawItemWidgetText(Obj: TObject; index: integer; caption: string;  out newtext: string);
 
     procedure GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
     procedure GenEvent_OnDrawItemWidgetBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
@@ -1539,6 +1542,8 @@ type
     procedure SetItemPaddingBottom(_itemPaddingBottom: integer);
     procedure SetWidgetTextColor(_textcolor: TARGBColorBridge);
     procedure SetDispatchOnDrawItemWidgetTextColor(_value: boolean);
+    procedure SetDispatchOnDrawItemWidgetText(_value: boolean);
+    procedure SetWidgetInputTypeIsCurrency(_value: boolean);
     procedure SetWidgetFontFromAssets(_customFontName: string);
     procedure DispatchOnDrawWidgetItemWidgetTextColor(_value: boolean);
     procedure DispatchOnDrawItemWidgetImage(_value: boolean);
@@ -1595,6 +1600,7 @@ type
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
     property OnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor read FOnDrawItemWidgetTextColor write FOnDrawItemWidgetTextColor;
+    property OnDrawItemWidgetText: TOnDrawItemWidgetText read FOnDrawItemWidgetText write FOnDrawItemWidgetText;
     property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
     property OnDrawItemWidgetBitmap: TOnDrawItemWidgetBitmap read FOnDrawItemWidgetBitmap write FOnDrawItemWidgetBitmap;
 
@@ -2016,6 +2022,7 @@ type
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+  function Java_Event_pOnListViewDrawItemWidgetText(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JString;
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
   procedure Java_Event_pOnWidgeItemLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; index: integer;  caption: JString);
   procedure Java_Event_pOnListViewScrollStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: JBoolean);
@@ -2866,6 +2873,29 @@ begin
     jListVIew(Obj).GenEvent_OnDrawItemWidgetTextColor(Obj, index, pasCaption, outColor);
   end;
   Result:= JInt(outColor);
+end;
+
+function Java_Event_pOnListViewDrawItemWidgetText(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JString;
+var
+  pasCaption: string;
+  _jBoolean: JBoolean;
+  outText: string;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outText:= '';
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnDrawItemWidgetText(Obj, index, pasCaption, outText);
+  end;
+  Result:= Get_jString(outText);
 end;
 
 
@@ -5776,6 +5806,12 @@ begin
      jImageView_setParent(FjEnv, FjObject, FjPRLayout);
 end;
 
+function jImageView.GetView(): jObject;
+begin
+ if FInitialized then
+   Result:= jImageView_GetView(FjEnv, FjObject);
+end;
+
 Procedure jImageView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
@@ -7627,6 +7663,15 @@ begin
 
 end;
 
+procedure jListView.GenEvent_OnDrawItemWidgetText(Obj: TObject; index: integer; caption: string;  out newtext: string);
+var
+  outText: string;
+begin
+  outText:= '';
+  if Assigned(FOnDrawItemWidgetText) then FOnDrawItemWidgetText(Obj,index,caption, outText);
+  newtext:= outText;
+end;
+
 procedure jListView.GenEvent_OnDrawItemBitmap(Obj: TObject; index: integer; caption: string;  out bitmap: JObject);
 begin
   bitmap:=  nil;
@@ -7851,6 +7896,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_SetDispatchOnDrawItemWidgetTextColor(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.SetDispatchOnDrawItemWidgetText(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetDispatchOnDrawItemWidgetText(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.SetWidgetInputTypeIsCurrency(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetWidgetInputTypeIsCurrency(FjEnv, FjObject, _value);
 end;
 
 procedure jListView.SetWidgetFontFromAssets(_customFontName: string);

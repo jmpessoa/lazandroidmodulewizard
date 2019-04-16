@@ -1,7 +1,7 @@
 object FormImportJAR: TFormImportJAR
-  Left = 701
+  Left = 314
   Height = 508
-  Top = 315
+  Top = 170
   Width = 690
   BorderStyle = bsToolWindow
   Caption = 'Form Import Java class'

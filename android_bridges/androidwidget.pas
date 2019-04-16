@@ -321,7 +321,6 @@ type
 
 
  TDynArrayOfSmallint = array of smallint;
-
  TDynArrayOfInteger = array of integer;
 
  TDynArrayOfLongint = array of longint;
@@ -333,9 +332,12 @@ type
  TDynArrayOfJChar = array of JChar;
  TDynArrayOfJBoolean = array of JBoolean;
  TDynArrayOfJByte = array of JByte;
+ TDynArrayOfJObject = array of JObject;
+
 
  TArrayOfByte = array of JByte;
  TArrayOfJByte = array of JByte;
+
 
  TScanByte = Array[0..0] of JByte;
  PScanByte = ^TScanByte;
@@ -698,6 +700,7 @@ type
 
   TOnDrawItemTextColor = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge) of Object;
   TOnDrawItemWidgetTextColor = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out textColor: TARGBColorBridge) of Object;
+  TOnDrawItemWidgetText = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out newWidgetText: string) of Object;
 
   TOnDrawItemBitmap  = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out bimap: JObject) of Object;
   TOnDrawItemWidgetBitmap  = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out bimap: JObject) of Object;
