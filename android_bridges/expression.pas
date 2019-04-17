@@ -5,7 +5,7 @@ unit expression;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget;
+  Classes, SysUtils, And_jni, AndroidWidget;
 
 type
 

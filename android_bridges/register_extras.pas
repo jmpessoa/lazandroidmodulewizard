@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  mikrotikrouteros,
   expression,
   oraclejdbcconnection,
   uploadservice,
@@ -62,6 +63,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jmikrotikrouteros_icon.lrs}
   {$I jexpression_icon.lrs}
   {$I jxlswriter_icon.lrs}
   {$I jmodaldialog_icon.lrs}
@@ -117,6 +119,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jMikrotikRouterOS,
       jExpression,
       jXLSWriter,
       jModalDialog,

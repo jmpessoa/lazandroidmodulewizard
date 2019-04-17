@@ -426,7 +426,7 @@ begin
      strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
      strList.Add('/*jControl LAMW template*/');
      strList.Add(' ');
-     strList.Add('class j'+newJavaClassName+' /*extends ...*/ {');
+     strList.Add('public class j'+newJavaClassName+' /*extends ...*/ {');
      strList.Add('  ');
      strList.Add('    private long pascalObj = 0;        //Pascal Object');
      strList.Add('    private Controls controls  = null; //Java/Pascal [events] Interface ...');
