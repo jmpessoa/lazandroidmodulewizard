@@ -22,6 +22,8 @@ type
     MenuItem10: TMenuItem;
     MenuItem11: TMenuItem;
     MenuItem12: TMenuItem;
+    MenuItem13: TMenuItem;
+    MenuItem14: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
@@ -48,7 +50,6 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-
     procedure PopupMenu1Close(Sender: TObject);
     procedure PopupMenu2Close(Sender: TObject);
   private
@@ -78,9 +79,9 @@ type
     FListJarClass: TStringList;
     FPathToJavaJDK: string;        //PathToJavaJDK=C:\Program Files\Java\jdk1.8.0_151
 
-    procedure DoJavaParse;
+    procedure DoJavaParse(produceAll: boolean);
     procedure InsertJControlCodeTemplate(txt: string);
-    function GetHackListPascalClassInterf: string;
+    function GetHackListPascalClassInterf(produceAll: boolean): string;
     function GetJSignature(params, res: string): string;
     function GetPascalCodeHack(funcName, funcParam, funcResult, jniSignature: string): string;
     function GetParamSignature(param: string): string;
@@ -95,7 +96,6 @@ type
     procedure LoadSettings(const fileName: string);
     procedure AddComplements(javaclassName: string);
     function GetJavaClassName(selList: TStringList): string;
-    function GetCleanPermData(aux: string): string;
     function GetCleanDepData(aux: string): string;
 
   public
@@ -109,7 +109,6 @@ type
   function ReplaceChar(query: string; oldchar, newchar: char):string;
   function LastPos(delimiter: string; str: string): integer;
   function RunCmdProcess(const cmd: string): integer;
-
 
 var
   FrmCompCreate: TFrmCompCreate;
@@ -635,12 +634,13 @@ begin
    end;
 end;
 
-function TFrmCompCreate.GetHackListPascalClassInterf: string;
+function TFrmCompCreate.GetHackListPascalClassInterf(produceAll: boolean): string;
 var
   listPascal, listProperties: TStringList;
   i: integer;
 begin
   listPascal:= TStringList.Create;
+
   listPascal.Add('unit '+Copy(LowerCase(FJavaClassName), 2, Length(FJavaClassName))+';');
   listPascal.Add(' ');
   listPascal.Add('{$mode delphi}');
@@ -648,17 +648,24 @@ begin
   listPascal.Add('interface');
   listPascal.Add(' ');
   listPascal.Add('uses');
-
-  if Pos('jVisualControl', FProjectModel) > 0  then
-    listPascal.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, systryparent;')
+  if produceAll then
+  begin
+    if Pos('jVisualControl', FProjectModel) > 0  then
+      listPascal.Add('  Classes, SysUtils, And_jni, {And_jni_Bridge,} AndroidWidget, systryparent;')
+    else
+      listPascal.Add('  Classes, SysUtils, And_jni, {And_jni_Bridge,} AndroidWidget;');
+  end
   else
-    listPascal.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget;');
+     listPascal.Add('  Classes, SysUtils, And_jni, AndroidWidget;');
 
   listPascal.Add(' ');
   listPascal.Add('type');
   listPascal.Add(' ');
-  listPascal.Add('{Draft Component code by "LAMW: Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']}');
-  listPascal.Add('{https://github.com/jmpessoa/lazandroidmodulewizard} ');
+  if produceAll then
+  begin
+    listPascal.Add('{Draft Component code by "LAMW: Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']}');
+    listPascal.Add('{https://github.com/jmpessoa/lazandroidmodulewizard} ');
+  end;
   listPascal.Add(' ');
   if Pos('jVisualControl', FProjectModel) > 0  then
   begin
@@ -668,90 +675,109 @@ begin
   end
   else
   begin
-    listPascal.Add('{jControl template}');
-    listPascal.Add(' ');
-    listPascal.Add(FJavaClassName+' = class(jControl)');
-  end;
-
-  listPascal.Add(' private');
-
-  listProperties:= TStringList.Create;
-
-  if Pos('_', FHackCreateProperties) > 0 then
-     listPascal.Add('   '+StringReplace(FHackCreateProperties,'_','F',[rfReplaceAll])+';') //** Add F
-  else
-  begin
-    listProperties.StrictDelimiter:= True;
-    listProperties.Delimiter:= ';';
-    listProperties.DelimitedText:= FHackCreateProperties;
-    for i:= 0 to listProperties.Count-1 do
+    if produceAll then
     begin
-      listPascal.Add('   '+'FP'+Trim(listProperties.Strings[i]) + ';'); //** Add F
+      listPascal.Add('{jControl template}');
+      listPascal.Add(' ');
+      listPascal.Add(FJavaClassName+' = class(jControl)');
+    end
+    else
+    begin
+      listPascal.Add('{warning: draft "'+FJavaClassName+'" complement....}');
+      listPascal.Add('{         copy/add to "'+Copy(LowerCase(FJavaClassName), 2, Length(FJavaClassName))+'.pas" file}');
+      listPascal.Add(' ');
+      listPascal.Add(FJavaClassName+' = class');
+      listPascal.Add(' public');
     end;
   end;
 
-  if Pos('jVisualControl', FProjectModel) > 0  then
+  if produceAll then
   begin
-   listPascal.Add('    procedure SetVisible(Value: Boolean);');
-   listPascal.Add('    procedure SetColor(Value: TARGBColorBridge); //background');
-  end;
+    listPascal.Add(' private');
 
-  listPascal.Add(' ');
-  //listPascal.Add(' protected');
-  //if Pos('jVisualControl', FProjectModel) > 0  then
-  //   listPascal.Add('    procedure SetParentComponent(Value: TComponent); override;');
-  //listPascal.Add(' ');
-  listPascal.Add(' public');
-  listPascal.Add('    constructor Create(AOwner: TComponent); override;');
-  listPascal.Add('    destructor  Destroy; override;');
-  listPascal.Add('    procedure Init(refApp: jApp); override;');
+    listProperties:= TStringList.Create;
 
-  if Pos('jVisualControl', FProjectModel) > 0  then
-  begin
-    listPascal.Add('    procedure Refresh;');
-    listPascal.Add('    procedure UpdateLayout; override;');
-    listPascal.Add('    procedure ClearLayout;');
-    listPascal.Add('    ');
-    listPascal.Add('    procedure GenEvent_OnClick(Obj: TObject);');
+    if Pos('_', FHackCreateProperties) > 0 then
+       listPascal.Add('   '+StringReplace(FHackCreateProperties,'_','F',[rfReplaceAll])+';') //** Add F
+    else
+    begin
+      listProperties.StrictDelimiter:= True;
+      listProperties.Delimiter:= ';';
+      listProperties.DelimitedText:= FHackCreateProperties;
+      for i:= 0 to listProperties.Count-1 do
+      begin
+        listPascal.Add('   '+'FP'+Trim(listProperties.Strings[i]) + ';'); //** Add F
+      end;
+    end;
+
+    if Pos('jVisualControl', FProjectModel) > 0  then
+    begin
+     listPascal.Add('    procedure SetVisible(Value: Boolean);');
+     listPascal.Add('    procedure SetColor(Value: TARGBColorBridge); //background');
+    end;
+
+    listPascal.Add(' ');
+    //listPascal.Add(' protected');
+    //if Pos('jVisualControl', FProjectModel) > 0  then
+    //   listPascal.Add('    procedure SetParentComponent(Value: TComponent); override;');
+    //listPascal.Add(' ');
+    listPascal.Add(' public');
+    listPascal.Add('    constructor Create(AOwner: TComponent); override;');
+    listPascal.Add('    destructor  Destroy; override;');
+    listPascal.Add('    procedure Init(refApp: jApp); override;');
+
+    if Pos('jVisualControl', FProjectModel) > 0  then
+    begin
+      listPascal.Add('    procedure Refresh;');
+      listPascal.Add('    procedure UpdateLayout; override;');
+      listPascal.Add('    procedure ClearLayout;');
+      listPascal.Add('    ');
+      listPascal.Add('    procedure GenEvent_OnClick(Obj: TObject);');
+    end;
   end;
 
   listPascal.Add(FHackListPascalClass.Text);
 
-  listPascal.Add(' published');
-
-  (* TODO:
-  if Pos('_', FHackCreateProperties) > 0 then
+  if produceAll then
   begin
-    listProperties.StrictDelimiter:= True;
-    listProperties.Delimiter:= ';';
-    listProperties.DelimitedText:= StringReplace(FHackCreateProperties,'_', '',[rfReplaceAll]);
-    for i:= 0 to listProperties.Count-1 do
-    begin                              //UpperCaseFirst
-      listPascal.Add('    property ' + UpperCaseFirst(Trim(listProperties.Strings[i])) +
-                          ' read F'   + Trim(listProperties.Strings[i])+
-                          ' write F'  + Trim(listProperties.Strings[i])+';'); //** Add F
+    listPascal.Add(' published');
+
+    (* TODO:
+    if Pos('_', FHackCreateProperties) > 0 then
+    begin
+      listProperties.StrictDelimiter:= True;
+      listProperties.Delimiter:= ';';
+      listProperties.DelimitedText:= StringReplace(FHackCreateProperties,'_', '',[rfReplaceAll]);
+      for i:= 0 to listProperties.Count-1 do
+      begin                              //UpperCaseFirst
+        listPascal.Add('    property ' + UpperCaseFirst(Trim(listProperties.Strings[i])) +
+                            ' read F'   + Trim(listProperties.Strings[i])+
+                            ' write F'  + Trim(listProperties.Strings[i])+';'); //** Add F
+      end;
+    end
+    else
+    begin
+      for i:= 0 to listProperties.Count-1 do
+      begin                              //UpperCaseFirst
+        listPascal.Add('    property P' + Trim(listProperties.Strings[i]) +
+                            ' read FP'   + Trim(listProperties.Strings[i])+
+                            ' write FP'  + Trim(listProperties.Strings[i])+';'); //** Add F
+      end;
     end;
-  end
-  else
-  begin
-    for i:= 0 to listProperties.Count-1 do
-    begin                              //UpperCaseFirst
-      listPascal.Add('    property P' + Trim(listProperties.Strings[i]) +
-                          ' read FP'   + Trim(listProperties.Strings[i])+
-                          ' write FP'  + Trim(listProperties.Strings[i])+';'); //** Add F
+    *)
+
+    listProperties.Free;
+
+    if Pos('jVisualControl', FProjectModel) > 0  then
+    begin
+      listPascal.Add('    property BackgroundColor: TARGBColorBridge read FColor write SetColor;');
+      listPascal.Add('    property OnClick: TOnNotify read FOnClick write FOnClick;');
     end;
-  end;
-  *)
 
-  listProperties.Free;
+    listPascal.Add(' ');
 
-  if Pos('jVisualControl', FProjectModel) > 0  then
-  begin
-    listPascal.Add('    property BackgroundColor: TARGBColorBridge read FColor write SetColor;');
-    listPascal.Add('    property OnClick: TOnNotify read FOnClick write FOnClick;');
   end;
 
-  listPascal.Add(' ');
   listPascal.Add('end;');
   listPascal.Add(' ');
   listPascal.Add(FHackListJNIHeader.Text);
@@ -761,218 +787,221 @@ begin
   listPascal.Add('  ');
   listPascal.Add('{---------  '+  FJavaClassName +'  --------------}');
   listPascal.Add(' ');
-  listPascal.Add('constructor '+FJavaClassName+'.Create(AOwner: TComponent);');
-  listPascal.Add('begin');
-  listPascal.Add('  inherited Create(AOwner);');
 
-  if Pos('jVisualControl', FProjectModel) > 0  then
+  if produceAll then
   begin
-    listPascal.Add('  FMarginLeft   := 10;');
-    listPascal.Add('  FMarginTop    := 10;');
-    listPascal.Add('  FMarginBottom := 10;');
-    listPascal.Add('  FMarginRight  := 10;');
-    listPascal.Add('  FHeight       := 96; //??');
-    listPascal.Add('  FWidth        := 96; //??');
-    listPascal.Add('  FLParamWidth  := lpMatchParent;  //lpWrapContent');
-    listPascal.Add('  FLParamHeight := lpWrapContent; //lpMatchParent');
-    listPascal.Add('  FAcceptChildrenAtDesignTime:= False;');
-  end;
-  listPascal.Add('//your code here....');
-  listPascal.Add('end;');
-  listPascal.Add(' ');
-
-  {if Pos('jVisualControl', FProjectModel) > 0  then
-  begin
-    listPascal.Add('procedure '+FJavaClassName+'.SetParentComponent(Value: TComponent);');
+    listPascal.Add('constructor '+FJavaClassName+'.Create(AOwner: TComponent);');
     listPascal.Add('begin');
-    listPascal.Add('  inherited SetParentComponent(Value);');
-    listPascal.Add('  Self.Height:= 96; //??');
-    listPascal.Add('  Self.Width:= 96; //??');
-    listPascal.Add('  if Value <> nil then');
-    listPascal.Add('  begin');
-    listPascal.Add('      Parent:= TAndroidWidget(Value);');
-    listPascal.Add('      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13; //??');
-    listPascal.Add('  end;');
+    listPascal.Add('  inherited Create(AOwner);');
+
+    if Pos('jVisualControl', FProjectModel) > 0  then
+    begin
+      listPascal.Add('  FMarginLeft   := 10;');
+      listPascal.Add('  FMarginTop    := 10;');
+      listPascal.Add('  FMarginBottom := 10;');
+      listPascal.Add('  FMarginRight  := 10;');
+      listPascal.Add('  FHeight       := 96; //??');
+      listPascal.Add('  FWidth        := 96; //??');
+      listPascal.Add('  FLParamWidth  := lpMatchParent;  //lpWrapContent');
+      listPascal.Add('  FLParamHeight := lpWrapContent; //lpMatchParent');
+      listPascal.Add('  FAcceptChildrenAtDesignTime:= False;');
+    end;
+    listPascal.Add('//your code here....');
     listPascal.Add('end;');
     listPascal.Add(' ');
-  end;}
 
-  listPascal.Add('destructor '+FJavaClassName+'.Destroy;');
-  listPascal.Add('begin');
-  listPascal.Add('  if not (csDesigning in ComponentState) then');
-  listPascal.Add('  begin');
-  listPascal.Add('     if FjObject <> nil then');
-  listPascal.Add('     begin');
-  listPascal.Add('       jFree();');
-  listPascal.Add('       FjObject:= nil;');
-  listPascal.Add('     end;');
-  listPascal.Add('  end;');
-  listPascal.Add('  //you others free code here...''');
-  listPascal.Add('  inherited Destroy;');
-  listPascal.Add('end;');
-  listPascal.Add(' ');
-
-  listPascal.Add('procedure '+FJavaClassName+'.Init(refApp: jApp);');
-  if Pos('jVisualControl', FProjectModel) > 0  then
-  begin
-   listPascal.Add('var');
-   listPascal.Add('  rToP: TPositionRelativeToParent;');
-   listPascal.Add('  rToA: TPositionRelativeToAnchorID;');
-  end;
-
-  listPascal.Add('begin');
-  listPascal.Add('   ');
-
-  if Pos('jVisualControl', FProjectModel) > 0  then
-  begin
-   listPascal.Add(' if not FInitialized then');
-   listPascal.Add(' begin');
-  end else
-   listPascal.Add('  if FInitialized  then Exit;');
-
-  listPascal.Add('  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!');
-  listPascal.Add('  //your code here: set/initialize create params....');
-
-  listProperties:= TStringList.Create;
-
-  if Pos('_', FHackCreateParam) > 0 then
-  begin
-    listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !');   //** add F
-
-    if Pos('jControl', FProjectModel) > 0  then
-       listPascal.Add('  FInitialized:= True;');
-
-  end
-  else
-  begin
-    listProperties.StrictDelimiter:= True;
-    listProperties.Delimiter:= ',';
-    listProperties.DelimitedText:= FHackCreateParam;
-    for i:= 0 to listProperties.Count-1 do
+    {if Pos('jVisualControl', FProjectModel) > 0  then
     begin
-      listProperties.Strings[i]:= 'FP'+Trim(listProperties.Strings[i]); //ReplaceCharFirst(Trim(listProperties.Strings[i]),'F')+';'; //** Add F
+      listPascal.Add('procedure '+FJavaClassName+'.SetParentComponent(Value: TComponent);');
+      listPascal.Add('begin');
+      listPascal.Add('  inherited SetParentComponent(Value);');
+      listPascal.Add('  Self.Height:= 96; //??');
+      listPascal.Add('  Self.Width:= 96; //??');
+      listPascal.Add('  if Value <> nil then');
+      listPascal.Add('  begin');
+      listPascal.Add('      Parent:= TAndroidWidget(Value);');
+      listPascal.Add('      Self.Width:= Trunc(TAndroidWidget(Parent).Width) - 13; //??');
+      listPascal.Add('  end;');
+      listPascal.Add('end;');
+      listPascal.Add(' ');
+    end;}
+
+    listPascal.Add('destructor '+FJavaClassName+'.Destroy;');
+    listPascal.Add('begin');
+    listPascal.Add('  if not (csDesigning in ComponentState) then');
+    listPascal.Add('  begin');
+    listPascal.Add('     if FjObject <> nil then');
+    listPascal.Add('     begin');
+    listPascal.Add('       jFree();');
+    listPascal.Add('       FjObject:= nil;');
+    listPascal.Add('     end;');
+    listPascal.Add('  end;');
+    listPascal.Add('  //you others free code here...''');
+    listPascal.Add('  inherited Destroy;');
+    listPascal.Add('end;');
+    listPascal.Add(' ');
+
+    listPascal.Add('procedure '+FJavaClassName+'.Init(refApp: jApp);');
+    if Pos('jVisualControl', FProjectModel) > 0  then
+    begin
+     listPascal.Add('var');
+     listPascal.Add('  rToP: TPositionRelativeToParent;');
+     listPascal.Add('  rToA: TPositionRelativeToAnchorID;');
     end;
-    listPascal.Add('  FjObject:= jCreate('+listProperties.DelimitedText+'); //jSelf !');   //** add F
 
-    if Pos('jControl', FProjectModel) > 0  then
-       listPascal.Add('  FInitialized:= True;');
+    listPascal.Add('begin');
+    listPascal.Add('   ');
 
+    if Pos('jVisualControl', FProjectModel) > 0  then
+    begin
+     listPascal.Add(' if not FInitialized then');
+     listPascal.Add(' begin');
+    end else
+     listPascal.Add('  if FInitialized  then Exit;');
+
+    listPascal.Add('  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!');
+    listPascal.Add('  //your code here: set/initialize create params....');
+
+    listProperties:= TStringList.Create;
+
+    if Pos('_', FHackCreateParam) > 0 then
+    begin
+      listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !');   //** add F
+
+      if Pos('jControl', FProjectModel) > 0  then
+         listPascal.Add('  FInitialized:= True;');
+
+    end
+    else
+    begin
+      listProperties.StrictDelimiter:= True;
+      listProperties.Delimiter:= ',';
+      listProperties.DelimitedText:= FHackCreateParam;
+      for i:= 0 to listProperties.Count-1 do
+      begin
+        listProperties.Strings[i]:= 'FP'+Trim(listProperties.Strings[i]); //ReplaceCharFirst(Trim(listProperties.Strings[i]),'F')+';'; //** Add F
+      end;
+      listPascal.Add('  FjObject:= jCreate('+listProperties.DelimitedText+'); //jSelf !');   //** add F
+
+      if Pos('jControl', FProjectModel) > 0  then
+         listPascal.Add('  FInitialized:= True;');
+
+    end;
+
+    listProperties.Free;
+
+    if Pos('jVisualControl', FProjectModel) > 0  then
+    begin
+     listPascal.Add('  if FParent <> nil then');
+     listPascal.Add('   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);');
+     listPascal.Add(' ');
+     listPascal.Add('  FjPRLayoutHome:= FjPRLayout;');
+     listPascal.Add(' ');
+     listPascal.Add('  '+FJavaClassName+'_SetViewParent(FjEnv, FjObject, FjPRLayout);');
+     listPascal.Add('  '+FJavaClassName+'_SetId(FjEnv, FjObject, Self.Id);');
+     listPascal.Add(' end;');
+     listPascal.Add(' ');
+     listPascal.Add('  '+FJavaClassName+'_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,');
+     listPascal.Add('                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,');
+     listPascal.Add('                        sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),');
+     listPascal.Add('                        sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));');
+
+     listPascal.Add('  ');
+
+     listPascal.Add('  for rToA := raAbove to raAlignRight do');
+     listPascal.Add('  begin');
+     listPascal.Add('    if rToA in FPositionRelativeToAnchor then');
+     listPascal.Add('    begin');
+     listPascal.Add('      '+FJavaClassName+'_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));');
+     listPascal.Add('    end;');
+     listPascal.Add('  end;');
+     listPascal.Add('  for rToP := rpBottom to rpCenterVertical do');
+     listPascal.Add('  begin');
+     listPascal.Add('    if rToP in FPositionRelativeToParent then');
+     listPascal.Add('    begin');
+     listPascal.Add('      '+FJavaClassName+'_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));');
+     listPascal.Add('    end;');
+     listPascal.Add('  end;');
+     listPascal.Add('  ');
+     listPascal.Add('  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id');
+     listPascal.Add('  else Self.AnchorId:= -1; //dummy');
+     listPascal.Add('  ');
+     listPascal.Add('  '+FJavaClassName+'_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);');
+     listPascal.Add('  ');
+     listPascal.Add(' if not FInitialized then');
+     listPascal.Add(' begin');
+     listPascal.Add('  FInitialized := true;');
+     listPascal.Add('  ');
+     listPascal.Add('  if  FColor <> colbrDefault then');
+     listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));');
+     listPascal.Add('  ');
+     listPascal.Add('  View_SetVisible(FjEnv, FjObject, FVisible);');
+     listPascal.Add(' end;');
+    end;
+    listPascal.Add('end;');
+    listPascal.Add('  ');
+    if Pos('jVisualControl', FProjectModel) > 0  then
+    begin
+     listPascal.Add('procedure '+FJavaClassName+'.SetColor(Value: TARGBColorBridge);');
+     listPascal.Add('begin');
+     listPascal.Add('  FColor:= Value;');
+     listPascal.Add('  if (FInitialized = True) and (FColor <> colbrDefault)  then');
+     listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));');
+     listPascal.Add('end;');
+
+     listPascal.Add('procedure '+FJavaClassName+'.SetVisible(Value : Boolean);');
+     listPascal.Add('begin');
+     listPascal.Add('  FVisible:= Value;');
+     listPascal.Add('  if FInitialized then');
+     listPascal.Add('    View_SetVisible(FjEnv, FjObject, FVisible);');
+     listPascal.Add('end;');
+     listPascal.Add('   ');
+     listPascal.Add('procedure '+FJavaClassName+'.UpdateLayout;');
+     listPascal.Add('begin');
+     listPascal.Add('   ');
+     listPascal.Add('  if not FInitialized then exit;');
+     listPascal.Add('   ');
+     listPascal.Add('  ClearLayout();');
+     listPascal.Add('   ');
+     listPascal.Add('  inherited UpdateLayout;');
+     listPascal.Add('   ');
+     listPascal.Add('  init(gApp);');
+     listPascal.Add('   ');
+     listPascal.Add('end;');
+     listPascal.Add('   ');
+     listPascal.Add('procedure '+FJavaClassName+'.Refresh;');
+     listPascal.Add('begin');
+     listPascal.Add('  if FInitialized then');
+     listPascal.Add('    View_Invalidate(FjEnv, FjObject);');
+     listPascal.Add('end;');
+     listPascal.Add('   ');
+     listPascal.Add('procedure '+FJavaClassName+'.ClearLayout;');
+     listPascal.Add('var');
+     listPascal.Add('   rToP: TPositionRelativeToParent;');
+     listPascal.Add('   rToA: TPositionRelativeToAnchorID;');
+     listPascal.Add('begin');
+     listPascal.Add('   ');
+     listPascal.Add('   if not FInitialized then Exit;');
+     listPascal.Add('   ');
+     listPascal.Add('  '+FJavaClassName+'_ClearLayoutAll(FjEnv, FjObject );');
+     listPascal.Add('   ');
+     listPascal.Add('   for rToP := rpBottom to rpCenterVertical do');
+     listPascal.Add('      if rToP in FPositionRelativeToParent then');
+     listPascal.Add('        '+FJavaClassName+'_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));');
+     listPascal.Add('   ');
+     listPascal.Add('   for rToA := raAbove to raAlignRight do');
+     listPascal.Add('     if rToA in FPositionRelativeToAnchor then');
+     listPascal.Add('       '+FJavaClassName+'_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));');
+     listPascal.Add('   ');
+     listPascal.Add('end;');
+     listPascal.Add(' ');
+     listPascal.Add('//Event : Java -> Pascal');
+     listPascal.Add('procedure '+FJavaClassName+'.GenEvent_OnClick(Obj: TObject);');
+     listPascal.Add('begin');
+     listPascal.Add('  if Assigned(FOnClick) then FOnClick(Obj);');
+     listPascal.Add('end;');
+    end;
   end;
-
-  listProperties.Free;
-
-  if Pos('jVisualControl', FProjectModel) > 0  then
-  begin
-   listPascal.Add('  if FParent <> nil then');
-   listPascal.Add('   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);');
-   listPascal.Add(' ');
-   listPascal.Add('  FjPRLayoutHome:= FjPRLayout;');
-   listPascal.Add(' ');
-   listPascal.Add('  '+FJavaClassName+'_SetViewParent(FjEnv, FjObject, FjPRLayout);');
-   listPascal.Add('  '+FJavaClassName+'_SetId(FjEnv, FjObject, Self.Id);');
-   listPascal.Add(' end;');
-   listPascal.Add(' ');
-   listPascal.Add('  '+FJavaClassName+'_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,');
-   listPascal.Add('                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,');
-   listPascal.Add('                        sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),');
-   listPascal.Add('                        sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));');
-
-   listPascal.Add('  ');
-
-   listPascal.Add('  for rToA := raAbove to raAlignRight do');
-   listPascal.Add('  begin');
-   listPascal.Add('    if rToA in FPositionRelativeToAnchor then');
-   listPascal.Add('    begin');
-   listPascal.Add('      '+FJavaClassName+'_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));');
-   listPascal.Add('    end;');
-   listPascal.Add('  end;');
-   listPascal.Add('  for rToP := rpBottom to rpCenterVertical do');
-   listPascal.Add('  begin');
-   listPascal.Add('    if rToP in FPositionRelativeToParent then');
-   listPascal.Add('    begin');
-   listPascal.Add('      '+FJavaClassName+'_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));');
-   listPascal.Add('    end;');
-   listPascal.Add('  end;');
-   listPascal.Add('  ');
-   listPascal.Add('  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id');
-   listPascal.Add('  else Self.AnchorId:= -1; //dummy');
-   listPascal.Add('  ');
-   listPascal.Add('  '+FJavaClassName+'_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);');
-   listPascal.Add('  ');
-   listPascal.Add(' if not FInitialized then');
-   listPascal.Add(' begin');
-   listPascal.Add('  FInitialized := true;');
-   listPascal.Add('  ');
-   listPascal.Add('  if  FColor <> colbrDefault then');
-   listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));');
-   listPascal.Add('  ');
-   listPascal.Add('  View_SetVisible(FjEnv, FjObject, FVisible);');
-   listPascal.Add(' end;');
-  end;
-  listPascal.Add('end;');
-  listPascal.Add('  ');
-  if Pos('jVisualControl', FProjectModel) > 0  then
-  begin
-   listPascal.Add('procedure '+FJavaClassName+'.SetColor(Value: TARGBColorBridge);');
-   listPascal.Add('begin');
-   listPascal.Add('  FColor:= Value;');
-   listPascal.Add('  if (FInitialized = True) and (FColor <> colbrDefault)  then');
-   listPascal.Add('    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));');
-   listPascal.Add('end;');
-
-   listPascal.Add('procedure '+FJavaClassName+'.SetVisible(Value : Boolean);');
-   listPascal.Add('begin');
-   listPascal.Add('  FVisible:= Value;');
-   listPascal.Add('  if FInitialized then');
-   listPascal.Add('    View_SetVisible(FjEnv, FjObject, FVisible);');
-   listPascal.Add('end;');
-   listPascal.Add('   ');
-   listPascal.Add('procedure '+FJavaClassName+'.UpdateLayout;');
-   listPascal.Add('begin');
-   listPascal.Add('   ');
-   listPascal.Add('  if not FInitialized then exit;');
-   listPascal.Add('   ');
-   listPascal.Add('  ClearLayout();');
-   listPascal.Add('   ');
-   listPascal.Add('  inherited UpdateLayout;');
-   listPascal.Add('   ');
-   listPascal.Add('  init(gApp);');
-   listPascal.Add('   ');
-   listPascal.Add('end;');
-   listPascal.Add('   ');
-   listPascal.Add('procedure '+FJavaClassName+'.Refresh;');
-   listPascal.Add('begin');
-   listPascal.Add('  if FInitialized then');
-   listPascal.Add('    View_Invalidate(FjEnv, FjObject);');
-   listPascal.Add('end;');
-   listPascal.Add('   ');
-   listPascal.Add('procedure '+FJavaClassName+'.ClearLayout;');
-   listPascal.Add('var');
-   listPascal.Add('   rToP: TPositionRelativeToParent;');
-   listPascal.Add('   rToA: TPositionRelativeToAnchorID;');
-   listPascal.Add('begin');
-   listPascal.Add('   ');
-   listPascal.Add('   if not FInitialized then Exit;');
-   listPascal.Add('   ');
-   listPascal.Add('  '+FJavaClassName+'_ClearLayoutAll(FjEnv, FjObject );');
-   listPascal.Add('   ');
-   listPascal.Add('   for rToP := rpBottom to rpCenterVertical do');
-   listPascal.Add('      if rToP in FPositionRelativeToParent then');
-   listPascal.Add('        '+FJavaClassName+'_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));');
-   listPascal.Add('   ');
-   listPascal.Add('   for rToA := raAbove to raAlignRight do');
-   listPascal.Add('     if rToA in FPositionRelativeToAnchor then');
-   listPascal.Add('       '+FJavaClassName+'_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));');
-   listPascal.Add('   ');
-   listPascal.Add('end;');
-   listPascal.Add(' ');
-   listPascal.Add('//Event : Java -> Pascal');
-   listPascal.Add('procedure '+FJavaClassName+'.GenEvent_OnClick(Obj: TObject);');
-   listPascal.Add('begin');
-   listPascal.Add('  if Assigned(FOnClick) then FOnClick(Obj);');
-   listPascal.Add('end;');
-  end;
-
   Result:= listPascal.Text;
 
   listPascal.Free;
@@ -986,6 +1015,7 @@ var
   auxList: TStringList;
   auxStr: string;
   indexFound, i: integer;
+  produceAll: boolean;
 begin
   strCaption:= (Sender as TMenuItem).Caption;
   if Pos('Search ', strCaption) > 0 then
@@ -1004,6 +1034,10 @@ begin
 
   if strCaption <> 'Cancel' then
   begin
+
+    produceAll:= True;
+    if Pos('complementary', strCaption) > 0  then produceAll:= False;
+
     for i:= 0 to SynMemo1.Lines.Count-1 do  //import local....
     begin
          auxStr:= SynMemo1.Lines.Strings[i];
@@ -1054,14 +1088,14 @@ begin
       FHackListPascalClass.Clear;
       FHackListPascalClassImpl.Clear;
 
-      DoJavaParse;    //process...
+      DoJavaParse(produceAll);    //process...   FPascalJNIInterfaceCode
 
       FHackListPascalClassImpl.Add(' ');
       FHackListPascalClassImpl.Add('{-------- '+FJavaClassName +'_JNI_Bridge ----------}');
       FHackListPascalClassImpl.Add(' ');
 
       SynMemo2.Lines.Clear;
-      SynMemo2.Lines.Text:= GetHackListPascalClassInterf + FHackListPascalClassImpl.Text + FPascalJNIInterfaceCode;
+      SynMemo2.Lines.Text:= GetHackListPascalClassInterf(produceAll) + FHackListPascalClassImpl.Text + FPascalJNIInterfaceCode;
 
       SynMemo2.Lines.Add('end.');
 
@@ -1070,8 +1104,10 @@ begin
       SynMemo2.CopyToClipboard;
       SynMemo2.ClearSelection;
       SynMemo2.PasteFromClipboard;
-      //ShowMessage('New '+clsName+' DRAFT Component Code was Copied To Clipboard!');
-      AddComplements(FJavaClassName); // "FJavaClassName.libjar"   "FJavaClassName.libso" ,  etc...
+
+      if produceAll then   //here?
+        AddComplements(FJavaClassName); // "FJavaClassName.libjar"   "FJavaClassName.libso" ,  etc...
+
     end;
     auxList.Free;
   end;
@@ -1100,28 +1136,6 @@ begin
 
   temp2:= StringReplace(temp, '"', '', [rfReplaceAll]);      // "com.android.support:design:25.3.1"
   Result:= StringReplace(temp2, '''', '', [rfReplaceAll]);   // 'com.android.support:design:25.3.1'
-end;
-
-//permission   <uses-permission android:name="android.permission.INTERNET"/>
-function TFrmCompCreate.GetCleanPermData(aux: string): string;
-var
-  p: integer;
-  temp: string;
-begin
-  temp:= aux;
-  p:= Pos('=', aux);
-  if p > 0 then
-    temp:= Trim(Copy(aux, p+1, MaxInt));
-
-  Result:= StringReplace(temp, '"', '', [rfReplaceAll]);
-
-  p:= Pos('>', Result);
-  if p > 0 then
-  begin
-    temp:= Result;     // 12345/>
-    Result:=  Copy(temp, 1, p-2)
-  end;
-
 end;
 
 procedure TFrmCompCreate.AddComplements(javaclassName: string);
@@ -1159,30 +1173,31 @@ begin
         end;
      end;
 
-     count:= frm.ListBoxGradleDep.Count;
+     count:= frm.ListBoxGradleDep.Count; //dependencies
      for i:= 0 to count-1 do
      begin
         aux:= frm.ListBoxGradleDep.Items.Strings[i];
         list.Clear;
-        if Pos('.permission.', aux) <= 0 then //com.android.support:design:25.3.1
-        begin //dependencies
-          data:= GetCleanDepData(Trim(aux));
-          if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies') then
+        data:= GetCleanDepData(Trim(aux));
+        if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies') then
             list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
-          list.Add('implementation '''+data+'''');
-          list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
-        end;
-
-        if Pos('.permission.', aux) > 0 then
-        begin //permissions  //<uses-permission android:name="android.permission.INTERNET"/>
-          data:= GetCleanPermData(Trim(aux));
-           if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.permission') then
-               list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.permission');
-           list.Add('<uses-permission android:name="'+data+'"/>');
-           list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.permission');
-        end;
-
+        list.Add('implementation '''+data+'''');
+        list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
      end;
+
+     count:= frm.ListBoxPermission.Count; //<uses-permission android:name="android.permission.INTERNET"/>
+     for i:= 0 to count-1 do
+     begin
+        data:= frm.ListBoxPermission.Items.Strings[i];
+        list.Clear;
+
+        if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.permission') then
+            list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.permission');
+
+        list.Add('<uses-permission android:name="'+data+'"/>');
+        list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.permission');
+     end;
+
      list.Free;
   end;
   frm.Free;
@@ -1333,7 +1348,6 @@ begin
               CopyFile(FPathToLAMW+DirectorySeparator+'ide_tools'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs',
                        FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+LowerCase(FJavaClassName)+'_icon.lrs');
            end;
-           //AddComplements(FJavaClassName);
          end; //finally
       end;     //if iconPath
     end;      //showModal
@@ -1925,7 +1939,6 @@ begin
 
           paramType:= '';
           paramName:= GetParamNameHack(funcParam, {var}paramType);
-
           paramCount:= 1;
 
           if Pos('[', paramJava) = 0 then
@@ -2141,8 +2154,9 @@ begin
         paramName:= 'env^.NewStringUTF(env, PChar('+paramName+'))';
         listDeleteLocalRef.Add('  env^.DeleteLocalRef(env,jParams[0].l);')
      end
-     else if Pos('Z', paramType) > 0 then paramName:= 'JBool('+paramName+')'
-     else if Pos('C', paramType) > 0 then paramName:= 'JChar('+paramName+')';
+     else if paramType = 'Z' then paramName:= 'JBool('+paramName+')'
+     else if paramType = 'C' then paramName:= 'JChar('+paramName+')';   //Canvas
+
      strList.Add('  jParams[0].'+GetJParamHack(paramType)+':= '+paramName +';');
   end
   else
@@ -2177,8 +2191,8 @@ begin
           paramName:='env^.NewStringUTF(env, PChar('+paramName+'))';
           listDeleteLocalRef.Add('  env^.DeleteLocalRef(env,jParams['+IntToStr(i-ix)+'].l);')
        end
-       else if Pos('Z', paramType) > 0 then paramName:= 'JBool('+paramName+')'
-       else if Pos('C', paramType) > 0 then paramName:= 'JChar('+paramName+')';
+       else if paramType = 'Z' then paramName:= 'JBool('+paramName+')'
+       else if paramType = 'C' then paramName:= 'JChar('+paramName+')';
 
        strList.Add('  jParams['+IntToStr(i-ix)+'].'+GetJParamHack(paramType)+':= '+paramName +';');
     end;
@@ -2353,14 +2367,13 @@ begin
   strList.Free;
 end;
 
-procedure TFrmCompCreate.DoJavaParse;
+procedure TFrmCompCreate.DoJavaParse(produceAll: boolean);
 var
   pNative, pPublic, pComment1, pComment2, pSemicolon: integer;
   s1, s2: string;
   i, p1, p2: integer;
   strList, Memo3List, Memo4List, Memo5List, Memo6List: TStringList;
-  auxStr, auxName, auxParam, strPascalCode, auxPathJNI,
-  methSignature: string;
+  auxStr, auxName, auxParam, strPascalCode, auxPathJNI, methSignature, auxSignature: string;
   strOnLoadList: TStringList;
   clipList: TStringList;
 begin
@@ -2435,11 +2448,18 @@ begin
       auxPathJNI:= FJNIDecoratedMethodName;
       SplitStr(auxPathJNI,'_');
 
-      methSignature:= GetJSignature(Trim(auxParam), Trim(strList.Strings[strList.Count-2]));
+      auxSignature:= Trim(strList.Strings[strList.Count-2]);
+      methSignature:= GetJSignature(Trim(auxParam), auxSignature);
 
-      strPascalCode:= GetPascalCodeHack(Trim(strList.Strings[strList.Count-1]) {funct},
-                        Trim(auxParam),Trim(strList.Strings[strList.Count-2]){result}, methSignature);
+      if produceAll then
+         strPascalCode:= GetPascalCodeHack(Trim(strList.Strings[strList.Count-1]) {funct},
+                                           Trim(auxParam),
+                                           auxSignature{result}, methSignature)
 
+      else if auxSignature <> 'public' then
+             strPascalCode:= GetPascalCodeHack(Trim(strList.Strings[strList.Count-1]) {funct},
+                                               Trim(auxParam),
+                                               auxSignature{result}, methSignature);
       Memo5List.Add(strPascalCode);
       Memo6List.Add('  '+Trim(strList.Strings[strList.Count-1])+' name '''+
                        FJNIDecoratedMethodName+'_'+Trim(strList.Strings[strList.Count-1])+''',');

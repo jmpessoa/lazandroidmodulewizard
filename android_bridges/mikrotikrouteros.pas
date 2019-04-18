@@ -28,10 +28,13 @@ jMikrotikRouterOS = class(jControl)
 
     procedure SetUsername(_Username: string);
     procedure SetPassword(_password: string);
-    procedure Connect(_host: string);
-    procedure Disconnect();
-    procedure Execute(_cmd: string);
+    function Connect(_host: string): boolean; overload;
+    function Connect(_host: string; _port: integer; _timeout: integer): boolean; overload;
+    function IsConnected(): boolean;
+    function Execute(_cmd: string): boolean;
     function ExecuteForResult(_cmd: string): TDynArrayOfString;
+
+    procedure Disconnect();
 
     property Username: string read FUsername write SetUsername;
     property Password: string read FPassword write SetPassword;
@@ -44,11 +47,12 @@ function jMikrotikRouterOS_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jO
 procedure jMikrotikRouterOS_jFree(env: PJNIEnv; _jmikrotikrouteros: JObject);
 procedure jMikrotikRouterOS_SetUsername(env: PJNIEnv; _jmikrotikrouteros: JObject; _Username: string);
 procedure jMikrotikRouterOS_SetPassword(env: PJNIEnv; _jmikrotikrouteros: JObject; _password: string);
-procedure jMikrotikRouterOS_Connect(env: PJNIEnv; _jmikrotikrouteros: JObject; _host: string);
+ function jMikrotikRouterOS_Connect(env: PJNIEnv; _jmikrotikrouteros: JObject; _host: string): boolean; overload;
+function jMikrotikRouterOS_Execute(env: PJNIEnv; _jmikrotikrouteros: JObject; _cmd: string): boolean;
 procedure jMikrotikRouterOS_Disconnect(env: PJNIEnv; _jmikrotikrouteros: JObject);
-procedure jMikrotikRouterOS_Execute(env: PJNIEnv; _jmikrotikrouteros: JObject; _cmd: string);
 function jMikrotikRouterOS_ExecuteForResult(env: PJNIEnv; _jmikrotikrouteros: JObject; _cmd: string): TDynArrayOfString;
-
+function jMikrotikRouterOS_IsConnected(env: PJNIEnv; _jmikrotikrouteros: JObject): boolean;
+function jMikrotikRouterOS_Connect(env: PJNIEnv; _jmikrotikrouteros: JObject; _host: string; _port: integer; _timeout: integer): boolean; overload;
 
 
 implementation
@@ -114,11 +118,18 @@ begin
      jMikrotikRouterOS_SetPassword(FjEnv, FjObject, _password);
 end;
 
-procedure jMikrotikRouterOS.Connect(_host: string);
+function jMikrotikRouterOS.Connect(_host: string): boolean;
 begin
-  //in designing component state: set value here...
+  //in designing component state: result value here...
   if FInitialized then
-     jMikrotikRouterOS_Connect(FjEnv, FjObject, _host);
+   Result:= jMikrotikRouterOS_Connect(FjEnv, FjObject, _host);
+end;
+
+function jMikrotikRouterOS.Execute(_cmd: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jMikrotikRouterOS_Execute(FjEnv, FjObject, _cmd);
 end;
 
 procedure jMikrotikRouterOS.Disconnect();
@@ -128,18 +139,25 @@ begin
      jMikrotikRouterOS_Disconnect(FjEnv, FjObject);
 end;
 
-procedure jMikrotikRouterOS.Execute(_cmd: string);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jMikrotikRouterOS_Execute(FjEnv, FjObject, _cmd);
-end;
-
 function jMikrotikRouterOS.ExecuteForResult(_cmd: string): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jMikrotikRouterOS_ExecuteForResult(FjEnv, FjObject, _cmd);
+end;
+
+function jMikrotikRouterOS.IsConnected(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jMikrotikRouterOS_IsConnected(FjEnv, FjObject);
+end;
+
+function jMikrotikRouterOS.Connect(_host: string; _port: integer; _timeout: integer): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jMikrotikRouterOS_Connect(FjEnv, FjObject, _host ,_port ,_timeout);
 end;
 
 {-------- jMikrotikRouterOS_JNI_Bridge ----------}
@@ -179,10 +197,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jmikrotikrouteros);
   jMethod:= env^.GetMethodID(env, jCls, 'SetUsername', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmikrotikrouteros, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jMikrotikRouterOS_SetPassword(env: PJNIEnv; _jmikrotikrouteros: JObject; _password: string);
 var
@@ -198,21 +215,37 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
-procedure jMikrotikRouterOS_Connect(env: PJNIEnv; _jmikrotikrouteros: JObject; _host: string);
+function jMikrotikRouterOS_Connect(env: PJNIEnv; _jmikrotikrouteros: JObject; _host: string): boolean;
 var
+  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_host));
   jCls:= env^.GetObjectClass(env, _jmikrotikrouteros);
-  jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jmikrotikrouteros, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jmikrotikrouteros, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jMikrotikRouterOS_Execute(env: PJNIEnv; _jmikrotikrouteros: JObject; _cmd: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_cmd));
+  jCls:= env^.GetObjectClass(env, _jmikrotikrouteros);
+  jMethod:= env^.GetMethodID(env, jCls, 'Execute', '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jmikrotikrouteros, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 procedure jMikrotikRouterOS_Disconnect(env: PJNIEnv; _jmikrotikrouteros: JObject);
 var
@@ -222,20 +255,6 @@ begin
   jCls:= env^.GetObjectClass(env, _jmikrotikrouteros);
   jMethod:= env^.GetMethodID(env, jCls, 'Disconnect', '()V');
   env^.CallVoidMethod(env, _jmikrotikrouteros, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMikrotikRouterOS_Execute(env: PJNIEnv; _jmikrotikrouteros: JObject; _cmd: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_cmd));
-  jCls:= env^.GetObjectClass(env, _jmikrotikrouteros);
-  jMethod:= env^.GetMethodID(env, jCls, 'Execute', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jmikrotikrouteros, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -270,6 +289,38 @@ begin
       end;
     end;
   end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jMikrotikRouterOS_IsConnected(env: PJNIEnv; _jmikrotikrouteros: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jmikrotikrouteros);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsConnected', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jmikrotikrouteros, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jMikrotikRouterOS_Connect(env: PJNIEnv; _jmikrotikrouteros: JObject; _host: string; _port: integer; _timeout: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_host));
+  jParams[1].i:= _port;
+  jParams[2].i:= _timeout;
+  jCls:= env^.GetObjectClass(env, _jmikrotikrouteros);
+  jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Ljava/lang/String;II)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jmikrotikrouteros, jMethod, @jParams);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;

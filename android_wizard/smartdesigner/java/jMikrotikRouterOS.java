@@ -14,7 +14,6 @@ import me.legrange.mikrotik.MikrotikApiException;
 /*jControl LAMW template*/
 
 //ref https://github.com/GideonLeGrange/mikrotik-java
-
 public class jMikrotikRouterOS /*extends ...*/ {
   
     private long pascalObj = 0;        //Pascal Object
@@ -24,6 +23,9 @@ public class jMikrotikRouterOS /*extends ...*/ {
     private String HOST = "192.168.1.1";
     private String USERNAME = "admin";
     private String PASSWORD = "";
+    private int DEFAULT_PORT = ApiConnection.DEFAULT_PORT;  //8728
+
+    private int CONNECTION_TIMEOUT = ApiConnection.DEFAULT_CONNECTION_TIMEOUT;  //60000
 
     protected ApiConnection con;
 
@@ -38,6 +40,11 @@ public class jMikrotikRouterOS /*extends ...*/ {
   
     public void jFree() {
       //free local objects...
+        try {
+            Disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
   
   //write others [public] methods code here......
@@ -51,38 +58,59 @@ public class jMikrotikRouterOS /*extends ...*/ {
         PASSWORD = _password;
     }
 
-    public void Connect(String _host) throws Exception {
+    public boolean Connect(String _host) throws Exception {
+        boolean r = false;
         HOST = _host;
-        con = ApiConnection.connect(SocketFactory.getDefault(), HOST, ApiConnection.DEFAULT_PORT, 2000);
+        con = ApiConnection.connect(SocketFactory.getDefault(), HOST, DEFAULT_PORT, CONNECTION_TIMEOUT);
         con.login(USERNAME, PASSWORD);
+        r = true;
+        return r;
+    }
+
+    public boolean IsConnected() {
+        return con.isConnected();
+    }
+
+    public boolean Connect(String _host, int _port, int _timeout) throws Exception {
+        boolean r = false;
+        HOST = _host;
+        con = ApiConnection.connect(SocketFactory.getDefault(), _host, _port, _timeout);
+        con.login(USERNAME, PASSWORD);
+        r = true;
+        return r;
     }
 
     public void Disconnect() throws Exception {
-        con.close();
+        if (con != null)  con.close();
     }
 
-    public void Execute(String _cmd) throws MikrotikApiException {
-        con.execute(_cmd); //"/system/reboot"
+    public boolean Execute(String _cmd) throws MikrotikApiException {
+        boolean r = false;
+        if (con != null) {
+            con.execute(_cmd); //"/system/reboot"
+            r = true;
+        }
+        return r;
     }
 
     public String[] ExecuteForResult(String _cmd) throws MikrotikApiException {
         ArrayList<String> list = new ArrayList<String>();
-        List<Map<String, String>> results =  con.execute(_cmd); //"/interface/print"
-        for (Map<String, String> result : results) {
-            //Getting the Set of entries
-            Set<Map.Entry<String, String>> entrySet = result.entrySet();
-            //Creating an ArrayList Of Entry objects
-            ArrayList<Map.Entry<String, String>> listOfEntry = new ArrayList<Map.Entry<String,String>>(entrySet);
-            for (Map.Entry<String, String> entry : listOfEntry) {
-                //System.out.println(entry.getKey()+" : "+entry.getValue());
-                list.add(entry.getKey()+":"+entry.getValue());
+        list.add("0:0");
+        if (con != null) {
+            List<Map<String, String>> results = con.execute(_cmd); //"/interface/print"
+            for (Map<String, String> result : results) {
+                //Getting the Set of entries
+                Set<Map.Entry<String, String>> entrySet = result.entrySet();
+                //Creating an ArrayList Of Entry objects
+                ArrayList<Map.Entry<String, String>> listOfEntry = new ArrayList<Map.Entry<String, String>>(entrySet);
+                list.clear();
+                for (Map.Entry<String, String> entry : listOfEntry) {
+                    //System.out.println(entry.getKey()+" : "+entry.getValue());
+                    list.add(entry.getKey() + ":" + entry.getValue());
+                }
             }
         }
-        if (list.size() > 0)
-           return (String[])list.toArray();
-        else {
-            list.add("0:0");
-            return (String[])list.toArray();
-        }
+        return (String[])list.toArray();
     }
+
 }

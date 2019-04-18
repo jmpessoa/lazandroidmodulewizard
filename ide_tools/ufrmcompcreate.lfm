@@ -1,7 +1,7 @@
 object FrmCompCreate: TFrmCompCreate
-  Left = 354
+  Left = 471
   Height = 647
-  Top = 169
+  Top = 70
   Width = 1019
   Caption = '[LAMW]  Create New jComponent'
   ClientHeight = 647
@@ -178,9 +178,9 @@ object FrmCompCreate: TFrmCompCreate
     Height = 531
     Top = 50
     Width = 1019
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Align = alClient
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
@@ -1315,12 +1315,12 @@ object FrmCompCreate: TFrmCompCreate
     Enabled = False
     CommentAttri.Foreground = clOlive
     KeyAttri.Foreground = clGreen
-    left = 40
-    top = 144
+    left = 152
+    top = 160
   end
   object SynPasSyn1: TSynPasSyn
     Enabled = False
-    CommentAttri.Foreground = clTeal
+    CommentAttri.Foreground = clBlue
     KeyAttri.Foreground = clNavy
     CompilerMode = pcmDelphi
     NestedComments = False
@@ -1331,22 +1331,29 @@ object FrmCompCreate: TFrmCompCreate
     left = 368
     top = 216
     object MenuItem1: TMenuItem
-      Caption = 'Insert Java jControl Template'
+      Caption = 'Insert Java jControl template'
       OnClick = PopupMenu1Close
     end
     object MenuItem5: TMenuItem
-      Caption = 'Insert Java jVisualControl Template'
+      Caption = 'Insert Java jVisualControl template'
       OnClick = PopupMenu1Close
     end
     object MenuItem6: TMenuItem
       Caption = '-'
     end
     object MenuItem7: TMenuItem
-      Caption = 'Write [Draft] Pascal jControl  Interface'
+      Caption = 'Write [draft] Pascal jControl  Interface'
       OnClick = PopupMenu1Close
     end
     object MenuItem8: TMenuItem
-      Caption = 'Write  [Draft] Pascal jVisualControl Interface'
+      Caption = 'Write  [draft] Pascal jVisualControl Interface'
+      OnClick = PopupMenu1Close
+    end
+    object MenuItem14: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem13: TMenuItem
+      Caption = 'Write [draft] complementary Pascal Interface'
       OnClick = PopupMenu1Close
     end
     object MenuItem9: TMenuItem

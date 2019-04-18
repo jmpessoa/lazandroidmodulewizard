@@ -15,22 +15,26 @@ type
   TFormAddComplements = class(TForm)
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    ComboBoxPermission: TComboBox;
     EditGradleDep: TEdit;
     EditPath: TEdit;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    ListBoxPermission: TListBox;
     ListBoxGradleDep: TListBox;
     ListBoxPath: TListBox;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
+    SpeedButtonPermission: TSpeedButton;
+    SpeedButton2: TSpeedButton;
     SpeedButtonAddPath: TSpeedButton;
     SpeedButtonAddGradleDep: TSpeedButton;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
     SpeedButtonOpen: TSpeedButton;
     StatusBar1: TStatusBar;
-    procedure ListBoxPathClick(Sender: TObject);
+    procedure SpeedButtonPermissionClick(Sender: TObject);
     procedure SpeedButtonAddPathClick(Sender: TObject);
     procedure SpeedButtonAddGradleDepClick(Sender: TObject);
     procedure SpeedButtonOpenClick(Sender: TObject);
@@ -64,9 +68,13 @@ begin
   end;
 end;
 
-procedure TFormAddComplements.ListBoxPathClick(Sender: TObject);
+procedure TFormAddComplements.SpeedButtonPermissionClick(Sender: TObject);
 begin
-
+  if ComboBoxPermission.Text <> '' then
+  begin
+    ListBoxPermission.Items.Add(ComboBoxPermission.Text);
+    ComboBoxPermission.Text:= '';
+  end;
 end;
 
 procedure TFormAddComplements.SpeedButtonAddGradleDepClick(Sender: TObject);
