@@ -1,4 +1,4 @@
-package com.example.apploadimagevideosoundfrominternet;
+package org.lamw.appcompatscreenshottdemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -728,6 +728,11 @@ public class jImageView extends ImageView {
 			Log.e("SaveToFile", "Exception: " + e.toString());
 		}
 	}
+
+	public View GetView() {
+		return this;
+	}
+
 
 }
 

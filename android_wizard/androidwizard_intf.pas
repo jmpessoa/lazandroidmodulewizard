@@ -980,7 +980,7 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
 
 var
   frm: TFormWorkspace;
-  strList: TStringList;
+  strList, defaultDependencies: TStringList;
   i, intTargetApi, intMinApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
@@ -1872,6 +1872,17 @@ begin
                 strList.Add('        classpath ''com.android.tools.build:gradle:'+pluginVersion+'''');
                 strList.Add('    }');
                 strList.Add('}');
+
+                strList.Add('allprojects {');
+                strList.Add('    repositories {');
+                if androidPluginNumber >= 300 then
+                strList.Add('       google()')
+                else
+                strList.Add('     //google()');
+                strList.Add('       jcenter()');
+                strList.Add('    }');
+                strList.Add('}');
+
                 strList.Add('apply plugin: ''com.android.application''');
                 strList.Add('android {');
                 strList.Add('    lintOptions {');
@@ -1998,15 +2009,11 @@ begin
 
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin
-
-
-                    //compile fileTree(include: ['*.jar'], dir: 'libs')
-
-                    strList.Add('    '+directive+' ''com.android.support:appcompat-v7:'+compatVer+'''');
-                    strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');
-                    strList.Add('    '+directive+' ''com.android.support:cardview-v7:'+cardVer+'''');
-                    strList.Add('    '+directive+' ''com.android.support:recyclerview-v7:'+recyclerVer+'''');
-                    strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
+                   strList.Add('    '+directive+' ''com.android.support:appcompat-v7:'+compatVer+'''');
+                   strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');
+                   strList.Add('    '+directive+' ''com.android.support:cardview-v7:'+cardVer+'''');
+                   strList.Add('    '+directive+' ''com.android.support:recyclerview-v7:'+recyclerVer+'''');
+                   //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
                    {from:
                    C:\android\sdk\extras\android\m2repository\com\android\support\appcompat-v7
                    C:\android\sdk\extras\android\m2repository\com\android\support\design
@@ -2015,6 +2022,7 @@ begin
                    C:\android\sdk\extras\google\m2repository\com\google\android\gms\play-services-ads   //11.0.4
                    }
                 end;
+
                 strList.Add('}');
                 strList.Add(' ');
                 strList.Add('task run(type: Exec, dependsOn: '':installDebug'') {');

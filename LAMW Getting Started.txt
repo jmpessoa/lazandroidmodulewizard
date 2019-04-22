@@ -35,17 +35,16 @@ I. Infrastructure
 	Warning:  Java JDK > 8 don't support [anymore] "ant" build system!
 
 .Android SDK [old] ---  "ant" and "gradle" build supported...    [recommended!!!]
-	[Windows]	http://dl.google.com/android/installer_r24.0.2-windows.exe
-	[Linux]		http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz
-	[Mac]		http://dl.google.com/android/android-sdk_r24.0.2-macosx.zip
+
+	[Windows]	https://dl.google.com/android/repository/tools_r25.2.5-windows.zip
+	[Linux]		https://dl.google.com/android/repository/tools_r25.2.5-linux.zip
+	[Mac]		https://dl.google.com/android/repository/tools_r25.2.5-macosx.zip
 
 	Hint:	1)after unpacked/install, open a command line Terminal and go to folder "sdk/tools"
 		2)run the command  ">android update sdk"   to open a GUI "SDK Manager"
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
-		5)check "Android SDK Build-Tools 25.0.3"	
 		6)check "Android SDK Build-Tools 26.0.2"  	
-		7)go to "Android 7.1.1 (API 25)" and check only "SDK Platform"
 		8)go to "Android 8.0.0 (API 26)" and check only "SDK Platform"
 		9)go to "Extras" and check: 
 				"Android Support Repository"				
@@ -66,6 +65,7 @@ I. Infrastructure
 .Lazarus
 	.Laz4Android [Windows] [cross-arm-android compiler installed!] 
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
+			Hint: Install here: "C:\Laz4Android2.0.0"   [not "Program Files"  !!!]
 
 	.Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
 		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases		

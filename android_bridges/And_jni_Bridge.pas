@@ -464,6 +464,7 @@ procedure jImageView_SetRoundedShape(env: PJNIEnv; _jimageview: JObject; _value:
 procedure jImageView_SetImageFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _jbyteBuffer: jObject; _width: integer; _height: integer);
 procedure jImageView_LoadFromURL(env: PJNIEnv; _jimageview: JObject; _url: string);
 procedure jImageView_SaveToFile(env: PJNIEnv; _jimageview: JObject; _filename: string);
+function jImageView_GetView(env: PJNIEnv; _jimageview: JObject): jObject;
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -554,6 +555,8 @@ procedure jListView_SetItemPaddingTop(env: PJNIEnv; _jlistview: JObject; _ItemPa
 procedure jListView_SetItemPaddingBottom(env: PJNIEnv; _jlistview: JObject; _itemPaddingBottom: integer);
 procedure jListView_SetWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _textcolor: integer);
 procedure jListView_SetDispatchOnDrawItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+procedure jListView_SetDispatchOnDrawItemWidgetText(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+procedure jListView_SetWidgetInputTypeIsCurrency(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_SetWidgetFontFromAssets(env: PJNIEnv; _jlistview: JObject; _customFontName: string);
 procedure jListView_DispatchOnDrawWidgetItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_DispatchOnDrawItemWidgetImage(env: PJNIEnv; _jlistview: JObject; _value: boolean);
@@ -4868,6 +4871,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jImageView_GetView(env: PJNIEnv; _jimageview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
+  Result:= env^.CallObjectMethod(env, _jimageview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // ListView
@@ -5869,6 +5883,32 @@ begin
   jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetDispatchOnDrawItemWidgetTextColor', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetDispatchOnDrawItemWidgetText(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDispatchOnDrawItemWidgetText', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetWidgetInputTypeIsCurrency(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetWidgetInputTypeIsCurrency', '(Z)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  expression,
   oraclejdbcconnection,
   uploadservice,
   xlswriter,
@@ -61,6 +62,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jexpression_icon.lrs}
   {$I jxlswriter_icon.lrs}
   {$I jmodaldialog_icon.lrs}
   {$I jincomingcallwidgetprovider_icon.lrs}
@@ -115,6 +117,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jExpression,
       jXLSWriter,
       jModalDialog,
       jIncomingCallWidgetProvider,

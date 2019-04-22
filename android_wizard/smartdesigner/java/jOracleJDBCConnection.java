@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Locale;
 
 //import static oracle.net.aso.C12.e;
 
@@ -51,6 +52,7 @@ public class jOracleJDBCConnection /*extends ...*/ {
 
     //java.sql.Connection
     private Connection connection = null;
+    private static Locale locale = Locale.ENGLISH;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jOracleJDBCConnection(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -75,6 +77,7 @@ public class jOracleJDBCConnection /*extends ...*/ {
 
     public static Connection createConnection(String driver, String url, String username, String password) throws ClassNotFoundException, SQLException {
         Class.forName(driver);
+        Locale.setDefault(locale);
         return DriverManager.getConnection(url, username, password);
     }
 

@@ -1,0 +1,3 @@
+public java.lang.Object jsLantern_jCreate(long _Self) {
+  return (java.lang.Object)(new jsLantern(this,_Self));
+}

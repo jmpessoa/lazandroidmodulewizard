@@ -1,0 +1,232 @@
+object FormAddComplements: TFormAddComplements
+  Left = 620
+  Height = 608
+  Top = 180
+  Width = 513
+  Caption = 'LAMW jComponent Create'
+  ClientHeight = 608
+  ClientWidth = 513
+  DesignTimePPI = 120
+  LCLVersion = '2.0.0.4'
+  object Panel1: TPanel
+    Left = 0
+    Height = 63
+    Top = 0
+    Width = 513
+    Align = alTop
+    BevelOuter = bvNone
+    Caption = 'Component Complements'
+    TabOrder = 0
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 29
+    Top = 579
+    Width = 513
+    Panels = <>
+  end
+  object Label1: TLabel
+    Left = 16
+    Height = 20
+    Top = 72
+    Width = 156
+    Caption = 'Libraries:  ".so", ".jar",  ...'
+    ParentColor = False
+  end
+  object EditPath: TEdit
+    AnchorSideRight.Control = SpeedButtonOpen
+    Left = 16
+    Height = 28
+    Top = 96
+    Width = 457
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 2
+  end
+  object SpeedButtonOpen: TSpeedButton
+    Left = 473
+    Height = 28
+    Top = 96
+    Width = 29
+    Anchors = [akTop, akRight]
+    Caption = '...'
+    OnClick = SpeedButtonOpenClick
+  end
+  object ListBoxPath: TListBox
+    AnchorSideRight.Control = SpeedButtonAddPath
+    Left = 16
+    Height = 60
+    Top = 136
+    Width = 456
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 0
+    TabOrder = 3
+  end
+  object BitBtn1: TBitBtn
+    AnchorSideRight.Control = BitBtn2
+    Left = 272
+    Height = 38
+    Top = 534
+    Width = 94
+    Anchors = [akRight, akBottom]
+    Cancel = True
+    DefaultCaption = True
+    GlyphShowMode = gsmAlways
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 4
+  end
+  object BitBtn2: TBitBtn
+    Left = 366
+    Height = 38
+    Top = 534
+    Width = 94
+    Anchors = [akRight, akBottom]
+    Default = True
+    DefaultCaption = True
+    GlyphShowMode = gsmAlways
+    Kind = bkOK
+    ModalResult = 1
+    TabOrder = 5
+  end
+  object SpeedButtonAddPath: TSpeedButton
+    Left = 472
+    Height = 28
+    Top = 136
+    Width = 29
+    Anchors = [akTop, akRight]
+    Caption = '+'
+    OnClick = SpeedButtonAddPathClick
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 20
+    Top = 208
+    Width = 430
+    Caption = 'Gradle Dependencies: [ ex.:    com.android.support:design:25.3.1 ]'
+    ParentColor = False
+  end
+  object ListBoxGradleDep: TListBox
+    AnchorSideRight.Control = SpeedButtonAddGradleDep
+    Left = 16
+    Height = 72
+    Top = 272
+    Width = 456
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 0
+    TabOrder = 6
+  end
+  object EditGradleDep: TEdit
+    Left = 16
+    Height = 28
+    Top = 232
+    Width = 456
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 7
+  end
+  object SpeedButtonAddGradleDep: TSpeedButton
+    Left = 472
+    Height = 28
+    Top = 272
+    Width = 29
+    Anchors = [akTop, akRight]
+    Caption = '+'
+    OnClick = SpeedButtonAddGradleDepClick
+  end
+  object SpeedButton3: TSpeedButton
+    Left = 472
+    Height = 28
+    Top = 168
+    Width = 29
+    Anchors = [akTop, akRight]
+    Caption = ' - '
+  end
+  object SpeedButton4: TSpeedButton
+    Left = 472
+    Height = 28
+    Top = 304
+    Width = 29
+    Anchors = [akTop, akRight]
+    Caption = ' - '
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 20
+    Top = 360
+    Width = 134
+    Caption = 'Manifest Permission:'
+    ParentColor = False
+  end
+  object ComboBoxPermission: TComboBox
+    Left = 16
+    Height = 28
+    Top = 384
+    Width = 456
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 20
+    Items.Strings = (
+      'android.permission.ACCESS_BLUETOOTH_SHARE'
+      'android.permission.ACCESS_COARSE_LOCATION'
+      'android.permission.ACCESS_FINE_LOCATION'
+      'android.permission.ACCESS_NETWORK_STATE'
+      'android.permission.ACCESS_WIFI_STATE'
+      'android.permission.BLUETOOTH'
+      'android.permission.BLUETOOTH_ADMIN'
+      'android.permission.CALL_PHONE'
+      'android.permission.CAMERA'
+      'android.permission.CHANGE_NETWORK_STATE'
+      'android.permission.CHANGE_WIFI_STATE'
+      'android.permission.INTERNET'
+      'android.permission.MODIFY_AUDIO_SETTINGS'
+      'android.permission.NFC'
+      'android.permission.PROCESS_OUTGOING_CALLS'
+      'android.permission.READ_CONTACTS'
+      'android.permission.READ_EXTERNAL_STORAGE'
+      'android.permission.READ_OWNER_DATA'
+      'android.permission.READ_PHONE_STATE'
+      'android.permission.READ_PHONE_STATE'
+      'android.permission.READ_SMS'
+      'android.permission.RECEIVE_SMS'
+      'android.permission.RESTART_PACKAGES'
+      'android.permission.SEND_SMS'
+      'android.permission.VIBRATE'
+      'android.permission.WAKE_LOCK'
+      'android.permission.WRITE_CONTACTS'
+      'android.permission.WRITE_EXTERNAL_STORAGE'
+      'android.permission.WRITE_OWNER_DATA'
+    )
+    Style = csDropDownList
+    TabOrder = 8
+  end
+  object ListBoxPermission: TListBox
+    AnchorSideRight.Control = SpeedButtonPermission
+    AnchorSideBottom.Control = BitBtn2
+    Left = 16
+    Height = 116
+    Top = 418
+    Width = 456
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ItemHeight = 0
+    TabOrder = 9
+  end
+  object SpeedButtonPermission: TSpeedButton
+    Left = 472
+    Height = 28
+    Top = 418
+    Width = 29
+    Anchors = [akTop, akRight]
+    Caption = '+'
+    OnClick = SpeedButtonPermissionClick
+  end
+  object SpeedButton2: TSpeedButton
+    Left = 472
+    Height = 28
+    Top = 456
+    Width = 29
+    Anchors = [akTop, akRight]
+    Caption = ' - '
+  end
+  object OpenDialog1: TOpenDialog
+    left = 456
+    top = 8
+  end
+end

@@ -1,54 +1,198 @@
 object FrmCompCreate: TFrmCompCreate
-  Left = 396
-  Height = 468
-  Top = 137
-  Width = 724
-  BorderStyle = bsToolWindow
+  Left = 471
+  Height = 647
+  Top = 70
+  Width = 1019
   Caption = '[LAMW]  Create New jComponent'
-  ClientHeight = 468
-  ClientWidth = 724
+  ClientHeight = 647
+  ClientWidth = 1019
   DesignTimePPI = 120
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '2.0.0.4'
   object Panel1: TPanel
     Left = 0
     Height = 50
     Top = 0
-    Width = 724
+    Width = 1019
     Align = alTop
     BevelOuter = bvNone
+    ClientHeight = 50
+    ClientWidth = 1019
     TabOrder = 0
+    object BitBtnJAR: TBitBtn
+      Left = 921
+      Height = 38
+      Top = 0
+      Width = 94
+      Anchors = [akTop, akRight]
+      Caption = 'Explore'
+      Glyph.Data = {
+        36100000424D3610000000000000360000002800000020000000200000000100
+        2000000000000010000064000000640000000000000000000000FFFFFF00FFFF
+        FF00000000050000001000000016000000160000001600000016000000160000
+        0016000000160000001600000016000000160000001600000016000000160000
+        0016000000160000001600000016000000160000001600000016000000160000
+        001600000016000000100000000500000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000100000003100000042000000430000004300000043000000430000
+        0043000000430000004300000043000000430000004300000043000000430000
+        0043000000430000004300000043000000430000004300000043000000430000
+        004300000042000000310000001000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000160062E1F30062E4FF0061E3FF0060E3FF0060E3FF0060E3FF005F
+        E3FF005FE3FF005FE3FF005FE3FF0060E3FF0060E3FF005FE3FF005EE3FF005E
+        E3FF005EE3FF005FE3FF005FE3FF005FE3FF0060E3FF0060E3FF0060E3FF0061
+        E3FF0062E4FF0062E1F30000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000160062E4FF42A6FFFF3FA2FFFF3EA2FFFF3AA0FFFF339DFFFF309B
+        FFFF329CFFFF339DFFFF75BDFFFF349DFFFF389FFFFF349DFFFF73BDFFFF40A3
+        FFFF74BDFFFF359EFFFF359EFFFF76BEFFFF389FFFFF3DA2FFFF3EA2FFFF3FA2
+        FFFF42A6FFFF0062E4FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000160061E3FF3FA3FFFF369AFEFF3499FDFF2D95FDFFFFFFFFFFFFFF
+        FFFFC6E3FEFF1C8DFDFFFFFFFFFF3B9CFDFF1C8CFDFF4CA4FDFFFFFFFFFF2993
+        FDFFFFFFFFFF208EFDFF42A0FDFFFFFFFFFF2993FDFF3398FDFF3599FDFF369A
+        FEFF3FA3FFFF0061E3FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000160060E3FF3FA3FFFF2D91FAFF2C91FAFF298FFAFF1F8AFAFF3395
+        FBFFFFFFFFFF0C80F9FFBADBFDFFFFFFFFFFFFFFFFFFFFFFFFFFBBDCFDFF0C80
+        F9FFFFFFFFFF097EF9FF88C0FCFFD3E9FDFF1F8AFAFF2B90FAFF2D91FAFF2D91
+        FAFF3FA3FFFF0060E3FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000160061E3FF40A4FFFF2589F7FF268AF7FF2589F7FF2087F7FF0F7E
+        F6FFFFFFFFFF4E9FF9FF5FA9F9FFEAF4FFFF0071F5FFEAF4FFFF63ABF9FF087A
+        F6FFFFFFFFFFD9ECFDFFFFFFFFFF61AAF9FF1882F7FF2489F7FF268AF7FF2589
+        F7FF40A4FFFF0061E3FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000160061E4FF40A4FFFF1D82F3FF1F84F4FF1F84F4FF1B82F4FF0A79
+        F3FFFFFFFFFF4A9BF7FF0174F2FFFFFFFFFF3C95F6FFFFFFFFFF0676F3FF0676
+        F3FFFFFFFFFF006FF2FF4599F5FFFFFFFFFF0F7BF3FF1C82F4FF1F84F4FF1D82
+        F3FF40A4FFFF0061E4FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000160061E4FF41A5FFFF167BF0FF187DF1FF187DF1FF147BF1FF0372
+        F0FFFFFFFFFF4999F3FF0070EFFFB6D6FAFFE9F3FFFFB7D7FAFF0572F0FF0170
+        EFFFFFFFFFFF0068EFFF0673F0FFFFFFFFFF0773F0FF157BF1FF187DF1FF167B
+        F0FF41A5FFFF0061E4FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000160061E4FF41A5FFFF0D73EDFF0F75EEFF1076EEFF0E74EEFF006D
+        EDFFFFFFFFFF4A97F2FF006DEDFF5AA1F3FFFFFFFFFF5BA1F3FF046FEDFF006C
+        EDFFFFFFFFFFE0EFFDFFFFFFFFFF95C2F7FF046FEDFF0E74EEFF0F75EEFF0D73
+        EDFF41A5FFFF0061E4FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016005EE5FF3CA3FFFF0068EAFF016BEBFF026CECFF016BECFF0068
+        EBFF0065EBFF0067EBFF0068EBFF0066EBFF0063EBFF0066EBFF0069EBFF0068
+        EBFF0063EBFF0062EAFF0062EBFF0065EBFF006AEBFF016BECFF016BEBFF0068
+        EAFF3CA3FFFF005EE5FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00000000161F71D9FF53A3EFFF1D6FD6FF1F70D7FF2071D7FF1F70D7FF1F70
+        D7FF1E70D7FF2071D7FF2172D7FF2172D7FF2071D7FF2172D7FF2272D7FF2172
+        D7FF2071D7FF1E70D7FF1E70D7FF1E70D7FF1F70D7FF2071D7FF1F70D7FF1D6F
+        D6FF53A3EFFF1F71D9FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016C0B7ADFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFC0B7ADFF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B2B1AFFFFFFFFFFFFFFEFCFFFEFDFCFFFFFEFCFFFFFFFCFFFFFF
+        FDFFEDF4FBFF5E9EEEFF237AE9FF237AE9FF4C93EDFF237AE9FF257BE9FF3A8A
+        ECFF3987EAFF4992ECFFAACBF5FFFFFFFCFFFFFEFCFFFEFDFCFFFEFDFCFFFFFE
+        FCFFFFFFFFFFB2B1AFFF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016AFAFAFFFFFFFFFFFFAFAF8FFF9F9F8FFFBFAF8FFFFFFF9FF004D
+        E3FF207AE8FF77ACEFFF8FBAF0FFCFE0F6FFCEE0F6FFD0E1F6FF92BBF0FF79AD
+        EFFF4C93ECFF5E9DEDFF5396ECFFFFFFF9FFFBFAF8FFF9F9F8FFF9F9F8FFFAFA
+        F8FFFFFFFFFFAFAFAFFF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016AFAFAFFFFFFFFFFFF6F6F6FFF6F6F6FFF7F7F6FFFEFBF7FFCDDE
+        F3FF6BA5EDFFD8E4F4FF8CB7EFFF277CE8FF287DE8FF287DE8FF4F94EBFFAECB
+        F1FFFFFFF8FFE0E9F5FFC6DAF3FFFCF9F6FFF7F6F6FFF6F6F6FFF6F6F6FFF6F6
+        F6FFFFFFFFFFAFAFAFFF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFF4F4F3FFF4F4F3FFF4F4F3FFF6F6F3FFFCF9
+        F3FFFFFCF4FFFFFFF4FF4B92EAFFCFDEF1FFCEDDF1FFCFDEF2FF8BB6EDFFFCF8
+        F3FFFFFEF4FFFFFCF4FFFDFAF3FFF7F6F3FFF4F4F3FFF4F4F3FFF4F4F3FFF4F4
+        F3FFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFF2F1F1FFF2F1F1FFF2F1F1FFF2F1F1FFF5F3
+        F1FFFEF7F1FFA7C6EEFF0065E6FF287EE8FF277DE8FF0065E5FF0065E7FF438C
+        E9FF8DB7EDFF4E93EAFFF0F1F0FFF9F5F1FFF3F1F1FFF2F1F1FFF2F1F1FFF2F1
+        F1FFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFEEEFEDFFEFEFEEFFEFEFEEFFF0EFEEFFF4F2
+        EEFFEEEEEEFF99BEEBFF76A8EAFFC4D6EDFFC3D6EDFFC6D7EDFFD8E1EEFFFFFF
+        EFFFFFFBEFFFCDDBECFF005BE5FFFDF7EEFFF1F0EEFFEFEFEEFFEFEFEEFFEEEF
+        EDFFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFECECEBFFEDEDECFFEDEDECFFEEEEECFFF5F2
+        ECFF3A87E7FF0049E5FF82B0E9FFB9CFEAFFBCD1EAFF488EE8FF5D9BE8FF5294
+        E7FFB0CAEAFFF3F0EBFF005CE6FFFCF5ECFFF0EFECFFEDEDECFFEDEDECFFECEC
+        EBFFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFEAE9E8FFEBEAE9FFEBEAE9FFECEAE9FFF0EC
+        E9FFF9F2E9FFD7DFE9FFB1CAE8FFF1EDE9FF6BA2E8FFB0CAE8FF2379E7FFFFF8
+        E9FFE6E8E9FF5C9AE7FFADC7E8FFF3EFE9FFEDEBE9FFEBEAE9FFEBEAE9FFEAE9
+        E8FFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFE7E7E4FFE8E8E6FFE8E8E6FFE8E8E6FFE9E9
+        E6FFEBEAE6FFF0EDE6FFF9F2E6FF67A0E6FF82AFE6FF659EE6FF0058E6FFFBF3
+        E6FFEFECE6FFEFECE6FFEEECE6FFEAEAE6FFE8E8E6FFE8E8E6FFE8E8E6FFE7E7
+        E4FFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFE4E3E2FFE6E5E4FFE6E5E4FFE6E5E4FFE6E5
+        E4FFE7E5E4FFEBE8E4FFD3DAE4FF0061E6FFFFFDE4FF0051E6FF82AEE5FFF5ED
+        E4FFE9E7E4FFE7E5E4FFE7E5E4FFE6E5E4FFE6E5E4FFE6E4E4FFE5E4E3FFE4E3
+        E2FFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFE1E1DFFFE3E3E1FFE3E3E1FFE3E3E1FFE3E3
+        E1FFE3E3E1FFE8E6E1FFBFCEE2FF004EE7FFEBE7E1FF005EE7FFA7C2E3FFF3EC
+        E1FFE6E5E1FFE3E3E0FFE1E2DFFFE1E1DFFFE1E1DFFFE1E1DFFFE1E1DEFFE0E0
+        DDFFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFDFDEDDFFE1E0DFFFE1E0DFFFE1E0DFFFE1E0
+        DFFFE1E0DFFFE4E2DFFFF0E8DFFF418AE4FF1471E6FF78A8E2FF0E6EE6FFBECE
+        E0FFE9E5DFFFE2E0DDFFEDEDECFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFB0B0B0FF0000001600000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFDDDCD9FFDFDEDBFFDFDEDCFFDFDEDCFFDFDE
+        DCFFDFDEDCFFE0DEDCFFE5E1DCFFF1E8DBFF679EE1FF005CE7FFBBCBDEFF5F99
+        E2FF8BB0DFFFE1DED9FFFFFFFFFFCDCDCDFFA9A9A9FFAAAAAAFFA9A9A9FFA7A7
+        A7FFFFFFFFFFB1B1B1FF0000001000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFD9D8D7FFDBDAD9FFDCDBDAFFDCDBDAFFDCDB
+        DAFFDCDBDAFFDCDBDAFFDDDBDAFFE1DEDAFFECE4DAFF89AFDEFF086BE6FFF2E6
+        D9FFE4DFD9FFDBD9D7FFFFFFFFFFA9A9AAFFFFFFFFFFF9F9F8FFF0EFEFFFFFFF
+        FFFFEAEAEAFFB1B1B1EA0000000500000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFD7D6D4FFD9D8D6FFDAD9D7FFDAD9D7FFDAD9
+        D7FFDAD9D7FFDAD9D7FFDAD9D7FFDBD9D7FFE0DCD7FFEBE2D6FF3A84E2FFB3C5
+        DAFFDFDBD6FFD8D6D4FFFFFFFFFFAAAAAAFFF9F9F7FFEDECECFFFFFFFFFFE8E8
+        E8FFAFAFAFE5000000050000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000016B0B0B0FFFFFFFFFFD5D4D1FFD6D5D3FFD7D6D4FFD7D6D4FFD7D6
+        D4FFD7D6D4FFD7D6D4FFD7D6D4FFD8D6D4FFD9D7D4FFE0DBD4FF5491DEFFBEC8
+        D6FFDAD7D3FFD5D4D1FFFFFFFFFFA9A9A9FFF0EFEFFFFFFFFFFFE7E7E7FFAEAE
+        AEE600000005000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000015B0B0B0FFFFFFFFFFCFCECCFFD1D0CDFFD2D0CEFFD2D0CEFFD2D0
+        CEFFD2D0CEFFD2D0CEFFD2D0CEFFD2D0CEFFD2D1CEFFD5D2CEFFC6CACFFFD6D3
+        CEFFD2D1CDFFCFCECCFFFFFFFFFFA7A7A7FFFFFFFFFFE8E8E8FFAAAAAAC00000
+        000400000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF000000000DB2B2B2FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE9E9E9FFAAAAAAAE000000030000
+        000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF0000000004B1B1B1B4B2B2B2FFB0B0B0FFB0B0B0FFB0B0B0FFB0B0B0FFB0B0
+        B0FFB0B0B0FFB0B0B0FFB0B0B0FFB0B0B0FFB0B0B0FFB0B0B0FFB0B0B0FFB0B0
+        B0FFB0B0B0FFB0B0B0FFB0B0B0FFB1B1B1FFAFAFAFB000000004000000000000
+        000000000000000000000000000000000000FFFFFF00FFFFFF00
+      }
+      GlyphShowMode = gsmAlways
+      OnClick = BitBtnJARClick
+      TabOrder = 0
+    end
   end
   object StatusBar1: TStatusBar
     Left = 0
     Height = 29
-    Top = 439
-    Width = 724
+    Top = 618
+    Width = 1019
     Panels = <>
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 352
+    Height = 531
     Top = 50
-    Width = 724
+    Width = 1019
     ActivePage = TabSheet1
     Align = alClient
     TabIndex = 0
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
-      ClientHeight = 319
-      ClientWidth = 716
+      ClientHeight = 498
+      ClientWidth = 1011
       inline SynMemo1: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 319
+        Height = 498
         Hint = 'Right Click....'
         Top = 0
-        Width = 716
+        Width = 1011
         Align = alClient
         Font.Height = -13
         Font.Name = 'Courier New'
@@ -58,7 +202,7 @@ object FrmCompCreate: TFrmCompCreate
         ParentFont = False
         PopupMenu = PopupMenu1
         TabOrder = 0
-        Gutter.Width = 61
+        Gutter.Width = 68
         Gutter.MouseActions = <>
         Highlighter = SynJavaSyn1
         Keystrokes = <        
@@ -498,11 +642,11 @@ object FrmCompCreate: TFrmCompCreate
         SelectedColor.StrikeOutPriority = 50
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
-            Width = 24
+            Width = 30
             MouseActions = <>
           end
           object SynGutterLineNumber1: TSynGutterLineNumber
-            Width = 21
+            Width = 17
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
@@ -512,18 +656,19 @@ object FrmCompCreate: TFrmCompCreate
             LeadingZeros = False
           end
           object SynGutterChanges1: TSynGutterChanges
-            Width = 4
+            Width = 5
             MouseActions = <>
             ModifiedColor = 59900
             SavedColor = clGreen
           end
           object SynGutterSeparator1: TSynGutterSeparator
-            Width = 2
+            Width = 3
             MouseActions = <>
             MarkupInfo.Background = clWhite
             MarkupInfo.Foreground = clGray
           end
           object SynGutterCodeFolding1: TSynGutterCodeFolding
+            Width = 13
             MouseActions = <>
             MarkupInfo.Background = clNone
             MarkupInfo.Foreground = clGray
@@ -535,15 +680,15 @@ object FrmCompCreate: TFrmCompCreate
     end
     object TabSheet2: TTabSheet
       Caption = 'Pascal'
-      ClientHeight = 330
-      ClientWidth = 716
+      ClientHeight = 498
+      ClientWidth = 1011
       inline SynMemo2: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 330
+        Height = 498
         Hint = 'Right Click....'
         Top = 0
-        Width = 716
+        Width = 1011
         Align = alClient
         Font.Height = -13
         Font.Name = 'Courier New'
@@ -553,7 +698,7 @@ object FrmCompCreate: TFrmCompCreate
         ParentFont = False
         PopupMenu = PopupMenu2
         TabOrder = 0
-        Gutter.Width = 61
+        Gutter.Width = 68
         Gutter.MouseActions = <>
         Highlighter = SynPasSyn1
         Keystrokes = <        
@@ -990,11 +1135,11 @@ object FrmCompCreate: TFrmCompCreate
         SelectedColor.StrikeOutPriority = 50
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
-            Width = 24
+            Width = 30
             MouseActions = <>
           end
           object SynGutterLineNumber1: TSynGutterLineNumber
-            Width = 21
+            Width = 17
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
@@ -1004,18 +1149,19 @@ object FrmCompCreate: TFrmCompCreate
             LeadingZeros = False
           end
           object SynGutterChanges1: TSynGutterChanges
-            Width = 4
+            Width = 5
             MouseActions = <>
             ModifiedColor = 59900
             SavedColor = clGreen
           end
           object SynGutterSeparator1: TSynGutterSeparator
-            Width = 2
+            Width = 3
             MouseActions = <>
             MarkupInfo.Background = clWhite
             MarkupInfo.Foreground = clGray
           end
           object SynGutterCodeFolding1: TSynGutterCodeFolding
+            Width = 13
             MouseActions = <>
             MarkupInfo.Background = clNone
             MarkupInfo.Foreground = clGray
@@ -1027,13 +1173,13 @@ object FrmCompCreate: TFrmCompCreate
     end
     object TabSheet3: TTabSheet
       Caption = 'Help'
-      ClientHeight = 330
-      ClientWidth = 716
+      ClientHeight = 498
+      ClientWidth = 1011
       object Memo1: TMemo
         Left = 0
-        Height = 330
+        Height = 498
         Top = 0
-        Width = 716
+        Width = 1011
         Align = alClient
         Lines.Strings = (
           '"Lazarus Android Module Wizard"'
@@ -1043,7 +1189,7 @@ object FrmCompCreate: TFrmCompCreate
           #9#9'https://github.com/jmpessoa/lazandroidmodulewizard'
           #9#9'http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html'
           ''
-          ':: How To Create JNI Bridge Component ::'
+          ':: How to Create JNI Bridge Component ::'
           '  '
           '1. Component Model:  '
           ''
@@ -1061,47 +1207,68 @@ object FrmCompCreate: TFrmCompCreate
           ''
           '   2.1. Insert a new [wrapper] java class  jControl/jVisualControl from template; '
           ''
-          '        hint1. Alternatively, you can paste you java code from clipboard!'
-          '        hint2: You can also use the demo AppTryCode3 to produce a complete [wrapper] java class !'
-          '        hint3: All "imports" from "Controls.java" template  and new "imports" from you java class code'
+          '        hint1. Alternatively, you can paste you java code [template compatible] from clipboard!'
+          ''
+          '        hint2. Alternatively, you can import a "JAR" file and selec a class [at the moment, only for no visual  control]!'
+          ''
+          '        hint3: You can also use the demo AppTryCode3 to produce a complete [wrapper]  java class !'
+          ''
+          '        warning/important: All "imports" from "Controls.java" template  and new "imports" from you java class code'
           '                   will  be researched to try write the correct JNI methods signatures.....'
-          '                   '
-          ''
+          '                      '
           '   2.2. Rename [and extends] the new class [and constructor], write some custom field, methods, etc... '
-          ''
+          '        [for "JAR" imported class this task is automated! ]'
+          '        '
           '        guideline: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...'
           '         '
           '        hint1: Only public methods will be translated to pascal [bridge ] code.'
           '        hint2:  use the  mask  /*.*/   to make a public method invisible for the parse [ex.  /*.*/public myfunctio() {....} ]  '
           ''
-          '   2.3. [Tab java] Select all  the new java class code and right click it.'
+          '   2.3. Select all  the new java class code and right click it [java tab] .'
           '      '
-          '       hint:  if have only one java class code you do not need select it! just right click it!'
+          '       hint1:  if have only one java class code you do not need select it! just right click it!'
+          '       hint2. save your java class source code in LAMW folder "......\android_wizard\smartdesigner\java" :'
           ''
+          '        warning:  the  LAMW java to pascal convert dont support complex/generic types like  "java.util.Map<,>" ,  "java.util.Set<>" etc..'
+          '       So, we need re-write  the method signature [by hand] for primitives data/array type....'
+          ''
+          '      But simple java Object param [or return]  is ok! '
+          '     '
+          '      public void SetImage(Bitmap _image) {     //<<----  OK! '
+          '             this.setImage(_image);'
+          '      }'
+          ' '
+          '     public Bitmap GetImage(Bitmap _image) {     //<<---- OK!'
+          '             return this.getImage();'
+          '      }'
+          ''
+          '       warning/important: All "imports" from "Controls.java" template  and new "imports" from you java class code'
+          '                   will  be researched to try write the correct JNI methods signatures.....'
+          '      '
           '   2.4. Popup Menu: Select "Write [Draft] Pascal jControl/jVisualControl Interface".'
           ' '
-          '   2.5. Right click Pascal tab [popup] and select "Register Component...";'
+          '   2.5. Right click Pascal Tab  and select "Register Component..." from  Popup Menu;'
           ''
           '          warning: Mac users: please, you must copy the console app "lazres" [lazarus/tools] to the folder '
-          '".../LazAndroidWizard/ide_tools"; '
+          '          ".../LazAndroidWizard/ide_tools"; '
           ''
           '   2.6. [Dialog]:  select a 16x16 PNG icon file;'
           ''
           '   2.7.  [Dialog]:  open a "register_*.pas" file (ex. "register_extra.pas"); **'
           ''
           '      hint: you can select "register_template.pas" to write a custom register file, '
-          '               but, then,  you must insert it to  "tfpandroidbridge_pack.lpk".'
+          '              but, then,  you must insert it into  "tfpandroidbridge_pack.lpk".'
           ''
-          '   2.8. Ok. You got you DRAFT pascal component jni stuff! Please, look in the folder   "..../LazAndroidWizard/android_bridges" '
-          'directory:'
+          '   2.8. Ok. You got you DRAFT pascal component JNI stuff! Please, look in the folder   "..../LazAndroidWizard/android_bridges" '
+          '         directory:'
           '         '
           '        :: *.pas           <--- open and fix/complete the pascal code with your others events/properties/methods/variables/overload! '
           ''
           '        :: *_icon.lrs    <--- new icon resource'
-          '        :: register_extras.pas   <--- updated!  The new component was included there!'
+          '        :: register_extras.pas   <--- updated!  by default, the new component will be include there!'
           ''
           '   2.9. [Lazarus IDE Menu]: Package -> Open Package File (*.lpk) --> "tfpandroidbridge_pack.pas" in folder  '
-          '"....../LazAndroidWizard/android_bridges".'
+          '         "....../LazAndroidWizard/android_bridges".'
           ''
           '   2.10. [Package Wizard]: Compile --->> Use ---> Install.'
           ''
@@ -1123,20 +1290,21 @@ object FrmCompCreate: TFrmCompCreate
   object Panel2: TPanel
     Left = 0
     Height = 37
-    Top = 402
-    Width = 724
+    Top = 581
+    Width = 1019
     Align = alBottom
     BevelOuter = bvNone
     ClientHeight = 37
-    ClientWidth = 724
+    ClientWidth = 1019
     TabOrder = 3
     object BitBtn1: TBitBtn
-      Left = 649
+      Left = 925
       Height = 37
       Top = 0
-      Width = 75
+      Width = 94
       Align = alRight
       DefaultCaption = True
+      GlyphShowMode = gsmAlways
       Kind = bkClose
       ModalResult = 11
       TabOrder = 0
@@ -1147,38 +1315,45 @@ object FrmCompCreate: TFrmCompCreate
     Enabled = False
     CommentAttri.Foreground = clOlive
     KeyAttri.Foreground = clGreen
-    left = 62
-    top = 136
+    left = 152
+    top = 160
   end
   object SynPasSyn1: TSynPasSyn
     Enabled = False
-    CommentAttri.Foreground = clTeal
+    CommentAttri.Foreground = clBlue
     KeyAttri.Foreground = clNavy
     CompilerMode = pcmDelphi
     NestedComments = False
-    left = 253
-    top = 139
+    left = 496
+    top = 296
   end
   object PopupMenu1: TPopupMenu
-    left = 114
-    top = 237
+    left = 368
+    top = 216
     object MenuItem1: TMenuItem
-      Caption = 'Insert Java jControl Template'
+      Caption = 'Insert Java jControl template'
       OnClick = PopupMenu1Close
     end
     object MenuItem5: TMenuItem
-      Caption = 'Insert Java jVisualControl Template'
+      Caption = 'Insert Java jVisualControl template'
       OnClick = PopupMenu1Close
     end
     object MenuItem6: TMenuItem
       Caption = '-'
     end
     object MenuItem7: TMenuItem
-      Caption = 'Write [Draft] Pascal jControl  Interface'
+      Caption = 'Write [draft] Pascal jControl  Interface'
       OnClick = PopupMenu1Close
     end
     object MenuItem8: TMenuItem
-      Caption = 'Write  [Draft] Pascal jVisualControl Interface'
+      Caption = 'Write  [draft] Pascal jVisualControl Interface'
+      OnClick = PopupMenu1Close
+    end
+    object MenuItem14: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem13: TMenuItem
+      Caption = 'Write [draft] complementary Pascal Interface'
       OnClick = PopupMenu1Close
     end
     object MenuItem9: TMenuItem
@@ -1197,8 +1372,8 @@ object FrmCompCreate: TFrmCompCreate
     end
   end
   object PopupMenu2: TPopupMenu
-    left = 236
-    top = 252
+    left = 544
+    top = 120
     object MenuItem2: TMenuItem
       Caption = 'Register Component...'
       OnClick = PopupMenu2Close
@@ -1210,5 +1385,11 @@ object FrmCompCreate: TFrmCompCreate
       Caption = 'Cancel'
       OnClick = PopupMenu2Close
     end
+  end
+  object OpenDialog1: TOpenDialog
+    DefaultExt = '.jar'
+    Filter = 'JAR|*.jar'
+    left = 400
+    top = 8
   end
 end

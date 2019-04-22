@@ -11,8 +11,8 @@ uses
   uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff, unitformimportpicture;
 
 procedure StartPathTool(Sender: TObject);
-procedure StartLateTool(Sender: TObject);   //By Thierrydijoux!
-procedure StartResEditor(Sender: TObject);   //By Thierrydijoux!
+procedure StartLateTool(Sender: TObject);     //By Thierrydijoux!
+procedure StartResEditor(Sender: TObject);    //By Thierrydijoux!
 procedure StartComponentCreate(Sender: TObject);
 procedure StartPathToBuildFPCCross(Sender: TObject);
 procedure StartFPCTrunkSource(Sender: TObject);
@@ -36,7 +36,7 @@ begin
   FormGetFPCSource.ShowModal;
 end;
 
-procedure StartPathTool(Sender: TObject);  //by jmpessoa
+procedure StartPathTool(Sender: TObject);
 begin
   // Call path tool Code
   FormSettingsPaths:=  TFormSettingsPaths.Create(Application);
@@ -56,7 +56,7 @@ begin
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '' ) then
   begin
      linkLibrariesPath:='';                       //C:\adt32\ndk10e\platforms\android-15\arch-x86\usr\lib\
-     aux:= Project.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+     aux:= Project.LazCompilerOptions.Libraries;  //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
      p:= Pos(';', aux);
      if p > 0 then
      begin
@@ -408,13 +408,11 @@ var
    pathToADB: string;
    strExt: string;
    pathToSdk: string;
-   packageName: string;
 begin
   Project:= LazarusIDE.ActiveProject;
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '' ) then
   begin
     pathToSdk:= Project.CustomData.Values['SdkPath'];
-    packageName:= Project.CustomData.Values['Package'];
     pathToADB:= pathToSdk+'platform-tools';
 
     strExt:= '';
@@ -490,7 +488,7 @@ begin
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] = 'GUI' ) then
   begin
 
-    if  Project.CustomData.Values['Theme'] =  paramTheme then
+    if Project.CustomData.Values['Theme'] =  paramTheme then
     begin
        ShowMessage('Warning: this theme ['+paramTheme+'] is already being used...');
        Exit;
@@ -501,10 +499,13 @@ begin
       isOldTheme:= False;
 
     Project.CustomData.Values['Theme']:= paramTheme;
+
     Project.CustomData.Values['BuildSystem']:= 'Gradle';
     //Project.CustomData.Values['LamwVersion']:= '0.8';
 
     packageName:= Project.CustomData.Values['Package'];
+
+    Project.Modified:= True;   // <-- need here!!
 
     p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
     pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
@@ -517,13 +518,13 @@ begin
       begin
         pathToJavaSrc:= pathToProject+'src'+DirectorySeparator+StringReplace(packageName,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
 
-        list:= TStringList.Create;
-        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'App.java');
+        list:= TStringList.Create; //C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner\java\support
+        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator+'support'+DirectorySeparator+'App.java');
         list.Strings[0]:= 'package '+packageName+';';
         list.SaveToFile(pathToJavaSrc+DirectorySeparator+'App.java');
 
         list.Clear;
-        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java');
+        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator+'support'+DirectorySeparator+'jCommons.java');
         list.Strings[0]:= 'package '+packageName+';';
         list.SaveToFile(pathToJavaSrc+DirectorySeparator+'jCommons.java');
 
@@ -542,7 +543,8 @@ begin
         begin
           if FileExists(pathToProject+'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml') then
           begin
-             DeleteFile(pathToProject+'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml')
+             DeleteFile(pathToProject+'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
+             DeleteDirectory(pathToProject+'res'+DirectorySeparator+'values-v21', False);
           end;
 
           targetApi:= Trim(GetTargetFromManifest(pathToProject));
@@ -554,10 +556,9 @@ begin
           end;
 
           list.Clear;
-          list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'lamwdesigner'+DirectorySeparator+'support'+DirectorySeparator+'buildgradle.txt');
+          list.LoadFromFile(pathToJavaTemplates+DirectorySeparator+'support'+DirectorySeparator+'buildgradle.txt');
 
-          if StrToInt(targetApi) < 25 then targetApi:= '25';
-          //if StrToInt(targetApi) > 25 then targetApi:= '25';
+          if StrToInt(targetApi) < 26 then targetApi:= '26';
 
           tmpStr:= StringReplace(list.Text,'#sdkapi', targetApi, [rfReplaceAll]);
           list.Text:= tmpStr;
@@ -567,7 +568,9 @@ begin
           list.Text:= tmpStr;
           list.SaveToFile(pathToProject+'build.gradle');
 
-          ShowMessage('Welcome to Material Design!!' +sLineBreak + 'Welcome to "Android Bridges Support" components!!!');
+          ShowMessage('Welcome to Material Design!!' +sLineBreak +
+                      'Welcome to "Android Bridges AppCompat" components!!!'+sLineBreak+
+                      'Please, "Save All" Now!!' +sLineBreak+ 'And "Re-Open" the Project!');
         end;
         list.Free;
 
@@ -1515,6 +1518,7 @@ begin
   //CmdMyTool := RegisterIDECommand(Cat,'Export To Android Studio', 'Export .so to Android Studio', Key, nil, @StartExportLibToPath);
   //RegisterIDEMenuCommand(ideSubMnuAMW, 'ExportToAndroidStudio', 'Export .so to AndroidStudio', nil, nil, CmdMyTool);
 
+
   // Adding 9a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToCanUpdateJavaTemplates', '[Configure] CanUpdateJavaTemplates ...', nil, @StartCanUpdateJavaTemplates);
 
@@ -1529,6 +1533,8 @@ begin
 
   //Adding 13a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportPictureForm', 'Use/Import Image/Picture...', nil, @StartImportPictureStuff);
+
+  //StartImportJARStuff
 
   // And so on...
 
