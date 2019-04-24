@@ -8,9 +8,6 @@ interface
 
 uses
   Classes,
-  mikrotikrouteros,
-  sscreenshot,
-  slantern,
   sadmob,
   sdrawerlayout,
   snavigationview,
@@ -37,9 +34,6 @@ implementation
   
 Procedure Register;
 begin
-  {$I jmikrotikrouteros_icon.lrs}
-  {$I jsscreenshot_icon.lrs}
-  {$I jslantern_icon.lrs}
   {$I jsadmob_icon.lrs}
   {$I jsdrawerlayout_icon.lrs}
   {$I jsnavigationview_icon.lrs}
@@ -57,9 +51,6 @@ begin
   {$I jstextinput_icon.lrs}
   RegisterComponents('Android Bridges AppCompat',
     [
-      jMikrotikRouterOS,
-      jsScreenShot,
-      jsLantern,
       jsAdMob,
       jsDrawerLayout,
       jsNavigationView,

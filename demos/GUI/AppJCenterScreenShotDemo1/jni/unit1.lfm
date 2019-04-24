@@ -1,0 +1,146 @@
+object AndroidModule1: TAndroidModule1
+  Left = 341
+  Top = 183
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
+  object jTextView1: jTextView
+    Left = 69
+    Top = 5
+    Width = 182
+    Height = 26
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App ScreenShot Demo1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jEditText1: jEditText
+    Left = 53
+    Top = 41
+    Width = 213
+    Height = 39
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView1
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Alignment = taLeft
+    InputTypeEx = itxText
+    MaxTextLength = -1
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    HintTextColor = colbrDefault
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = True
+    VerScrollBar = True
+    WrappingLine = False
+    Editable = True
+    FontSizeUnit = unitDefault
+    CloseSoftInputOnEnter = True
+    CapSentence = False
+    GravityInParent = lgNone
+  end
+  object jButton1: jButton
+    Left = 53
+    Top = 90
+    Width = 213
+    Height = 57
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jEditText1
+    Id = 3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Take ScreenShot'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton1Click
+  end
+  object jListView1: jListView
+    Left = 53
+    Top = 152
+    Width = 213
+    Height = 184
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Anchor = jButton1
+    Id = 4
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Items.Strings = (
+      'Item 0'
+      'Item 1'
+      'Item 2'
+      'Item 3'
+      'Item 4'
+    )
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ImageItemIdentifier = 'ic_launcher'
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
+  end
+  object jcScreenShot1: jcScreenShot
+    left = 224
+    top = 296
+  end
+end

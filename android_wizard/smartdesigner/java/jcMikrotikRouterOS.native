@@ -1,0 +1,1 @@
+public native void pOnMikrotikAsyncReceive(long pasobj, String delimitedContent, String delimiter);

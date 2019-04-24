@@ -1080,6 +1080,7 @@ end;
     PromptOnBackKey: boolean;
     TryBacktrackOnClose: boolean;
     DoJNIPromptOnShow: boolean;
+    Standby: boolean;
 
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
@@ -2877,10 +2878,9 @@ begin
     begin
        gApp.TopIndex:= FormIndex;
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
+       if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
+       if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
     end;
-
-    if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
-    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 
   end
   else    //actEasel ...

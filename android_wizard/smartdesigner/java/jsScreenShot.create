@@ -1,3 +1,0 @@
-public java.lang.Object jsScreenShot_jCreate(long _Self) {
-  return (java.lang.Object)(new jsScreenShot(this,_Self));
-}

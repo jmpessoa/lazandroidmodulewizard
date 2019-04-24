@@ -166,6 +166,7 @@ object FormSettingsPaths: TFormSettingsPaths
     BorderSpacing.Around = 8
     Caption = '&OK'
     Default = True
+    GlyphShowMode = gsmAlways
     Kind = bkOK
     ModalResult = 1
     OnClick = BitBtnOKClick
@@ -183,6 +184,7 @@ object FormSettingsPaths: TFormSettingsPaths
     BorderSpacing.Around = 8
     Cancel = True
     Caption = 'Cancel'
+    GlyphShowMode = gsmAlways
     Kind = bkCancel
     ModalResult = 2
     OnClick = BitBtnCancelClick

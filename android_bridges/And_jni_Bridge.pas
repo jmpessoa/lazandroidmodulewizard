@@ -915,6 +915,7 @@ procedure jImageBtn_ClearLayoutAll(env: PJNIEnv; _imagebtn: JObject);
 Procedure jImageBtn_setLayoutAll(env:PJNIEnv; ImageBtn : jObject;  idAnchor: DWord);
 procedure jImageBtn_SetFrameGravity(env: PJNIEnv; ImageBtn: JObject; _value: integer);
 procedure jImageBtn_RemoveFromViewParent(env: PJNIEnv; ImageBtn: JObject);
+procedure jImageBtn_SetSleepDown(env: PJNIEnv; _jimagebtn: JObject; _sleepMiliSeconds: integer);
 
  { AsyncTask }
 function jAsyncTask_Create             (env: PJNIEnv;    this:jobject; SelfObj: TObject): jObject;
@@ -9583,6 +9584,19 @@ begin
 _jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
  env^.CallVoidMethod(env,ImageBtn,_jMethod);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jImageBtn_SetSleepDown(env: PJNIEnv; _jimagebtn: JObject; _sleepMiliSeconds: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _sleepMiliSeconds;
+  jCls:= env^.GetObjectClass(env, _jimagebtn);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSleepDown', '(I)V');
+  env^.CallVoidMethodA(env, _jimagebtn, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

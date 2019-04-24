@@ -1878,6 +1878,7 @@ type
 
     FImageList : jImageList;
     FFilePath: TFilePath;
+    FSleepDown: integer;
 
     procedure SetImages(Value: jImageList);
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -1904,6 +1905,7 @@ type
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject); override;
     procedure RemoveFromViewParent;  override;
+    procedure SetSleepDown(_sleepMiliSeconds: integer);
 
   published
 
@@ -1915,6 +1917,7 @@ type
 
     property ImageUpIdentifier: string read FImageUpName write SetImageUpByRes;
     property ImageDownIdentifier: string read FImageDownName write SetImageDownByRes;
+    property SleepDown: integer read FSleepDown write SetSleepDown;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
 
     // Event
@@ -4017,7 +4020,7 @@ begin
 
    jEditText_setSingleLine(FjEnv, FjObject , True);
 
-   if  FText <> '' then
+   if FText <> '' then
     jEditText_setText(FjEnv, FjObject , FText);
 
    if FEditable = False then
@@ -9991,6 +9994,7 @@ begin
   FMarginRight  := 5;
   FWidth        := 72;
   FHeight       := 72;
+  FSleepDown:= 0;
 end;
 
 Destructor jImageBtn.Destroy;
@@ -10071,6 +10075,9 @@ begin
   end;
 
   jImageBtn_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+
+  if FSleepDown > 0 then
+     jImageBtn_SetSleepDown(FjEnv, FjObject, FSleepDown);
 
   if not FInitialized then
   begin
@@ -10218,6 +10225,7 @@ begin
   end;
 end;
 
+
 // Event : Java -> Pascal
 procedure jImageBtn.GenEvent_OnClick(Obj: TObject);
 begin
@@ -10231,6 +10239,15 @@ begin
   if FInitialized then
      jImageBtn_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 end;
+
+procedure jImageBtn.SetSleepDown(_sleepMiliSeconds: integer);
+begin
+  //in designing component state: set value here...
+  FSleepDown:= _sleepMiliSeconds;
+  if FInitialized then
+     jImageBtn_SetSleepDown(FjEnv, FjObject, _sleepMiliSeconds);
+end;
+
 
 //------------------------------------------------------------------------------
 // jAsyncTask

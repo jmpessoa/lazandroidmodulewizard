@@ -1,3 +1,0 @@
-public java.lang.Object jMikrotikRouterOS_jCreate(long _Self) {
-  return (java.lang.Object)(new jMikrotikRouterOS(this,_Self));
-}

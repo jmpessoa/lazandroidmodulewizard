@@ -14,7 +14,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="14">
+    <Files Count="15">
       <Item1>
         <Filename Value="regandroidbridge.pas"/>
         <HasRegisterProc Value="True"/>
@@ -74,6 +74,11 @@
         <Filename Value="systryparent.pas"/>
         <UnitName Value="systryparent"/>
       </Item14>
+      <Item15>
+        <Filename Value="register_jcenter.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="register_jcenter"/>
+      </Item15>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
