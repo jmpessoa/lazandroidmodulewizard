@@ -1421,6 +1421,7 @@ type
     FOnClickWidgetItem: TOnClickWidgetItem;
     FOnLongClickItem:  TOnClickCaptionItem;
     FOnDrawItemTextColor: TOnDrawItemTextColor;
+    FOnDrawItemBackColor: TOnDrawItemBackColor; // by tr3e
     FOnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor;
     FOnDrawItemWidgetText: TOnDrawItemWidgetText;
     FOnDrawItemBitmap: TOnDrawItemBitmap;
@@ -1468,6 +1469,8 @@ type
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
 
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+    procedure GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword); // by tr3e
+
     procedure GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemWidgetText(Obj: TObject; index: integer; caption: string;  out newtext: string);
 
@@ -1600,6 +1603,7 @@ type
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
+    property OnDrawItemBackColor: TOnDrawItemBackColor read FOnDrawItemBackColor write FOnDrawItemBackColor; // by tr3e
     property OnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor read FOnDrawItemWidgetTextColor write FOnDrawItemWidgetTextColor;
     property OnDrawItemWidgetText: TOnDrawItemWidgetText read FOnDrawItemWidgetText write FOnDrawItemWidgetText;
     property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
@@ -2025,6 +2029,7 @@ type
   Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+  function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt; // by tr3e
   function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function Java_Event_pOnListViewDrawItemWidgetText(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JString;
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
@@ -2902,6 +2907,23 @@ begin
   Result:= Get_jString(outText);
 end;
 
+//by tr3e
+function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt;
+var
+  _jBoolean: JBoolean;
+  outColor: dword;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outColor:= 0;
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+
+    jListVIew(Obj).GenEvent_OnDrawItemBackgroundColor(Obj, index, outColor);
+  end;
+  Result:= outColor;
+end;
 
 function Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
 var
@@ -7652,6 +7674,18 @@ begin
 
   if Assigned(FOnDrawItemTextColor) then FOnDrawItemTextColor(Obj,index,caption, outColor);
 
+  if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
+      color:= GetARGB(FCustomColor, outColor);
+end;
+
+// by tr3e
+procedure jListView.GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword);
+var
+  outColor: TARGBColorBridge;
+begin
+  outColor:= colbrDefault;
+  color:= 0; //default;
+  if Assigned(FOnDrawItemBackColor) then FOnDrawItemBackColor(Obj,index, outColor);
   if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
       color:= GetARGB(FCustomColor, outColor);
 end;

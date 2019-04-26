@@ -1110,8 +1110,14 @@ class jArrayAdapter extends ArrayAdapter {
 			    }
 				
 			   itemLayout.addView(txtLayout, txtParam);								
-			} 
-
+			}
+			
+			// tr3e add background color to cells
+			int drawItemBackColor = controls.pOnListViewDrawItemBackgroundColor(PasObj, (int)position);
+						
+			if (drawItemBackColor != Color.TRANSPARENT)
+				itemLayout.setBackgroundColor(drawItemBackColor);
+			// tr3e            
             			
 			if (items.get(position).highLightColor != Color.TRANSPARENT)
 				itemLayout.setBackgroundColor(items.get(position).highLightColor); 
