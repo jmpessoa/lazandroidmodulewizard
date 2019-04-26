@@ -1,11 +1,9 @@
-unit register_Template;
+unit register_template;
   
 {$mode objfpc}{$H+}
   
 interface
   
-//please, do not change this code format/layout!
-
 uses
   Classes,
   SysUtils,
@@ -14,12 +12,10 @@ uses
 Procedure Register;
   
 implementation
-
-//please, do not change this code format/layout!
   
 Procedure Register;
-begin                 
-  RegisterComponents('template',
+begin
+  RegisterComponents('#TAB',
     [
     ]
   );

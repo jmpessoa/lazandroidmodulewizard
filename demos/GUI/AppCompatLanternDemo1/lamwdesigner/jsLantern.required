@@ -1,4 +1,0 @@
-<uses-permission android:name="android.permission.CAMERA"/>
-<uses-permission android:name="android.permission.FLASHLIGHT"/>
-<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
-implementation 'com.github.nisrulz:lantern:2.0.0'

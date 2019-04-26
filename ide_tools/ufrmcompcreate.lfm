@@ -1,7 +1,7 @@
 object FrmCompCreate: TFrmCompCreate
-  Left = 471
+  Left = 373
   Height = 647
-  Top = 70
+  Top = 126
   Width = 1019
   Caption = '[LAMW]  Create New jComponent'
   ClientHeight = 647

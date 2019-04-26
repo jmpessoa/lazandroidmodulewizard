@@ -1,17 +1,17 @@
 object FormImportLAMWStuff: TFormImportLAMWStuff
   Left = 446
-  Height = 325
+  Height = 329
   Top = 216
   Width = 432
   Caption = 'Import LAMW Stuff'
-  ClientHeight = 325
+  ClientHeight = 329
   ClientWidth = 432
   DesignTimePPI = 120
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '2.0.0.4'
   object ListBoxTarget: TListBox
-    Left = 16
+    Left = 17
     Height = 136
-    Top = 32
+    Top = 48
     Width = 398
     Anchors = [akTop, akLeft, akRight]
     ItemHeight = 0
@@ -27,9 +27,9 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     TabOrder = 1
   end
   object Label1: TLabel
-    Left = 16
+    Left = 17
     Height = 20
-    Top = 8
+    Top = 24
     Width = 355
     Caption = 'Target [select an unit/form to be modified/replaced!]:'
     ParentColor = False
@@ -52,32 +52,42 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     OnClick = SpeedButton1Click
   end
   object BitBtn1: TBitBtn
-    Left = 210
+    Left = 216
     Height = 38
     Top = 272
     Width = 93
     Anchors = [akTop, akRight]
     Default = True
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkOK
     ModalResult = 1
     TabOrder = 2
   end
   object BitBtn2: TBitBtn
-    Left = 320
+    Left = 321
     Height = 38
     Top = 272
     Width = 94
     Anchors = [akTop, akRight]
     Cancel = True
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkCancel
     ModalResult = 2
     TabOrder = 3
   end
+  object SpeedButton2: TSpeedButton
+    Left = 384
+    Height = 28
+    Top = 16
+    Width = 29
+    Caption = '?'
+    OnClick = SpeedButton2Click
+  end
   object OpenDialog1: TOpenDialog
     Filter = 'LFM|*.lfm'
-    left = 40
-    top = 256
+    left = 80
+    top = 264
   end
 end

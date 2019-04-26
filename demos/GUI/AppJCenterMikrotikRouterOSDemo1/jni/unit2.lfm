@@ -1,0 +1,251 @@
+object AndroidModule2: TAndroidModule2
+  Left = 610
+  Top = 182
+  Width = 355
+  Height = 566
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule2'
+  ActivityMode = actRecyclable
+  BackgroundColor = colbrWhiteSmoke
+  ActionBarTitle = abtDefault
+  object jListView1: jListView
+    Left = 15
+    Top = 224
+    Width = 325
+    Height = 96
+    MarginLeft = 15
+    MarginTop = 0
+    MarginRight = 15
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Anchor = jTextView3
+    Id = 15
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Items.Strings = (
+      '????'
+    )
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextDecorated = txtNormal
+    ItemLayout = layImageTextWidget
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ImageItemIdentifier = 'info_16'
+    ItemPaddingTop = 40
+    ItemPaddingBottom = 40
+    WidgetTextColor = colbrDefault
+    OnLongClickItem = jListView1LongClickItem
+  end
+  object jTextView1: jTextView
+    Left = 62
+    Top = 5
+    Width = 230
+    Height = 26
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 22
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App MikrotikRouterOS Demo1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrMediumBlue
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jTextView2: jTextView
+    Left = 15
+    Top = 41
+    Width = 170
+    Height = 26
+    MarginLeft = 15
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView1
+    Id = 23
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Select/Edit Command:'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jsFloatingButton1: jsFloatingButton
+    Left = 259
+    Top = 470
+    Width = 56
+    Height = 56
+    MarginLeft = 40
+    MarginTop = 40
+    MarginRight = 40
+    MarginBottom = 40
+    Enabled = True
+    Visible = True
+    Id = 24
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpBottom, rpRight]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrLimeGreen
+    ImageIdentifier = 'check256_white'
+    GravityInParent = lgNone
+    OnClick = jsFloatingButton1Click
+  end
+  object jComboEditText1: jComboEditText
+    Left = 15
+    Top = 77
+    Width = 319
+    Height = 39
+    MarginLeft = 15
+    MarginTop = 5
+    MarginRight = 15
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView2
+    Id = 26
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpNineTenthsOfParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    Alignment = taLeft
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    Items.Strings = (
+      '/interface/print'
+      '/ip/dns/print'
+      '/ip/arp/print'
+      '/ip/dhcp-client/print'
+      '/ip/firewall/filter/print'
+      '/system/reboot'
+      ''
+    )
+    ItemPaddingTop = 25
+    ItemPaddingBottom = 25
+    CloseSoftInputOnEnter = True
+    DropListTextColor = colbrDefault
+    DropListBackgroundColor = colbrDefault
+    GravityInParent = lgNone
+  end
+  object jTextView3: jTextView
+    Left = 15
+    Top = 193
+    Width = 57
+    Height = 26
+    MarginLeft = 15
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jButton1
+    Id = 27
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Results:'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jButton1: jButton
+    Left = 15
+    Top = 126
+    Width = 325
+    Height = 57
+    MarginLeft = 15
+    MarginTop = 5
+    MarginRight = 15
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jComboEditText1
+    Id = 28
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Execute'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton1Click
+  end
+  object jImageBtn1: jImageBtn
+    Left = 268
+    Top = 82
+    Width = 72
+    Height = 72
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 15
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jComboEditText1
+    Id = 29
+    PosRelativeToAnchor = [raAlignTop]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    ImageUpIdentifier = 'drop_down_32_gray'
+    ImageDownIdentifier = 'drop_down_32_yellow_all'
+    SleepDown = 2000
+    GravityInParent = lgNone
+    OnClick = jImageBtn1Click
+  end
+  object jcMikrotikRouterOS1: jcMikrotikRouterOS
+    left = 72
+    top = 440
+  end
+  object jDialogYN1: jDialogYN
+    Title = 'jDialogYesNo'
+    Msg = 'Accept ?'
+    Yes = 'Yes'
+    No = 'No'
+    OnClickYN = jDialogYN1ClickYN
+    left = 216
+    top = 352
+  end
+end

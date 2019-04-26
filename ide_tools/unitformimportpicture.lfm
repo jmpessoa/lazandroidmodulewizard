@@ -8,7 +8,7 @@ object FormImportPicture: TFormImportPicture
   ClientWidth = 430
   DesignTimePPI = 120
   OnActivate = FormActivate
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '2.0.0.4'
   object Label1: TLabel
     Left = 18
     Height = 20
@@ -82,6 +82,7 @@ object FormImportPicture: TFormImportPicture
     Anchors = [akRight, akBottom]
     Default = True
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkOK
     ModalResult = 1
     TabOrder = 3
@@ -94,6 +95,7 @@ object FormImportPicture: TFormImportPicture
     Anchors = [akRight, akBottom]
     Cancel = True
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkCancel
     ModalResult = 2
     TabOrder = 4

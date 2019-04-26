@@ -133,6 +133,8 @@ uses
 
    procedure Java_Event_pOnFileSelected(env: PJNIEnv; this: jobject; Obj: TObject; path: JString; fileName: JString);
 
+   procedure Java_Event_pOnMikrotikAsyncReceive(env: PJNIEnv; this: jobject; Obj: TObject; delimitedContent: JString; delimiter: JString );
+
    Procedure Java_Event_pOnClickComboDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;
                                                   index: integer; caption: JString);
 
@@ -199,7 +201,7 @@ uses
    autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
-   customcamera, calendarview, searchview, telephonymanager, sadmob, zbarcodescannerview;
+   customcamera, calendarview, searchview, telephonymanager, sadmob, zbarcodescannerview, cmikrotikrouteros;
 
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
@@ -1662,6 +1664,36 @@ begin
     jOpenDialog(Obj).GenEvent_OnFileSelected(Obj, pasPath, pasFileName);
   end;
 end;
+
+procedure Java_Event_pOnMikrotikAsyncReceive(env: PJNIEnv; this: jobject; Obj: TObject; delimitedContent: JString; delimiter: JString );
+var
+   pasdelimitedContent: string;
+   pasdelimiter: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jcMikrotikRouterOS then
+  begin
+    jForm(jOpenDialog(Obj).Owner).UpdateJNI(gApp);
+    pasdelimitedContent:= '';
+    if delimitedContent <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasdelimitedContent:= string( env^.GetStringUTFChars(env,delimitedContent,@_jBoolean) );
+    end;
+
+    pasdelimiter := '';
+    if delimiter <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasdelimiter:= string( env^.GetStringUTFChars(env,delimiter,@_jBoolean) );
+    end;
+
+    jcMikrotikRouterOS(Obj).GenEvent_OnMikrotikAsyncReceive(Obj, pasdelimitedContent, pasdelimiter);
+  end;
+end;
+
 
 Procedure Java_Event_pOnExpandableListViewGroupExpand(env: PJNIEnv; this: jobject; Obj: TObject;
                                                            groupPosition: integer; groupHeader: JString);

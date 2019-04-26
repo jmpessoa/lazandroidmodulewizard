@@ -1239,9 +1239,9 @@ procedure TFrmCompCreate.PopupMenu2Close(Sender: TObject);
 var
  AProcess: TProcess;
  iconPath, regFile, userTab: string;
- //auxStr, bufStr: string;
+ auxStr, lastStr: string;
  strList: TStringList;
- i: integer;
+ i, p: integer;
  frm: TFormRegisterComp;
 begin
   if (Sender as TMenuItem).Caption <> 'Cancel' then
@@ -1283,11 +1283,12 @@ begin
              strList.LoadFromFile(regFile);
              if Pos('_template', regFile) > 0 then
              begin
-               userTab:= InputBox('Register [Tab] Component', 'Tab Name', 'myTab');
-               regFile:= StringReplace(regFile,'_template', '_'+ReplaceChar(userTab,' ','_'),[]);
-
-               strList.Strings[0]:= 'unit register_'+ReplaceChar(userTab,' ','_')+';';
-               strList.Text:= StringReplace(strList.Text,'template', userTab,[]);
+               userTab:= InputBox('Register [Tab] Component', 'Tab Name', 'Android Bridges ???');
+               auxStr:= Lowercase(ReplaceChar(userTab,' ','_'));
+               regFile:= StringReplace(regFile,'template', auxStr,[]); //new file name
+               strList.Strings[0]:= 'unit register_'+auxStr+';';
+               lastStr:= StringReplace(strList.Text,'#TAB',userTab,[]); //
+               strList.Text:= lastStr;
              end;
              i:= 0;
              while i < strList.Count-1 do

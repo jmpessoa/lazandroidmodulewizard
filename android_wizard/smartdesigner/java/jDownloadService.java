@@ -77,44 +77,47 @@ public class jDownloadService extends IntentService {
 
 	    InputStream stream = null;
 	    FileOutputStream fos = null;
-	    
 	    long startTime = System.currentTimeMillis();
-	    
-	    try {
 
+	   // successfully finished
+	   result = -1; //Activity.RESULT_OK;
+
+	   try {
 	      URL url = new URL(urlPath);
 	      startTime = System.currentTimeMillis();
 	      URLConnection con = url.openConnection();
-	      stream = con.getInputStream();
 
-			//https://stackoverflow.com/questions/32138739/bytearraybuffer-missing-in-sdk23
-			BufferedInputStream bis = new BufferedInputStream(stream);
-			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			//We create an array of bytes
-			byte[] data = new byte[50];
-			int current = 0;
+	      if (con != null) {
+			  stream = con.getInputStream();
+			  //https://stackoverflow.com/questions/32138739/bytearraybuffer-missing-in-sdk23
+			  BufferedInputStream bis = new BufferedInputStream(stream);
+			  ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			  //We create an array of bytes
+			  byte[] data = new byte[50];
+			  int current = 0;
 
-			while((current = bis.read(data,0,data.length)) != -1){
-				buffer.write(data,0,current);
-			}
-			fos = new FileOutputStream(output.getPath());
-			fos.write(buffer.toByteArray());
-			fos.flush();
-			//fos.close();
+			  while ((current = bis.read(data, 0, data.length)) != -1) {
+				  buffer.write(data, 0, current);
+			  }
+			  fos = new FileOutputStream(output.getPath());
 
-	      // successfully finished
-	      result = -1; //Activity.RESULT_OK;
+			  if (fos != null) {
+				  fos.write(buffer.toByteArray());
+				  fos.flush();
+			  } else result = 0; //0 = fail
+		  } else result = 0; //0 = fail
+
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	    } finally {
 	    	try {
-				fos.close();
+				if (fos != null) fos.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	    	try {
-				stream.close();
+				if (stream != null)  stream.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
