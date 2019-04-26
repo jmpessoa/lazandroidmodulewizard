@@ -1527,6 +1527,7 @@ type
     function GetWidgetText(_index: integer): string;
 
     procedure SetWidgetCheck(_value: boolean; _index: integer);
+    function  GetWidgetCheck(_index: integer) : boolean; //by tr3e
     procedure SetItemTagString(_tagString: string; _index: integer);
     function GetItemTagString(_index: integer): string;
     procedure SetImageByResIdentifier(_imageResIdentifier: string);
@@ -7398,7 +7399,10 @@ end;
 Procedure jListView.Refresh;
 begin
   if FInitialized then
-     View_Invalidate(FjEnv, FjObject );
+  begin
+     jListView_Refresh(FjEnv, FjObject ); // by tr3e
+     //View_Invalidate(FjEnv, FjObject );
+  end;
 end;
 
 Procedure jListView.SetFontColor(Value: TARGBColorBridge);
@@ -7755,6 +7759,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_setWidgetCheck(FjEnv, FjObject, _value ,_index);
+end;
+
+function jListView.GetWidgetCheck(_index: integer) : boolean;
+begin
+  result := false;
+
+  //in designing component state: set value here...
+  if FInitialized then
+   result := jListView_getWidgetCheck(FjEnv, FjObject, _index);
 end;
 
 procedure jListView.SetItemTagString(_tagString: string; _index: integer);

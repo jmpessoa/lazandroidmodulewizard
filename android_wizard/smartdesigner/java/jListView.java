@@ -391,6 +391,10 @@ class jArrayAdapter extends ArrayAdapter {
 					 itemTextLeft.setTextColor(items.get(position).textColor);
 				   }				 
 				   itemTextLeft.setTypeface(items.get(position).typeFace, faceTitle);
+				   // tr3e fix change font size
+				   if (items.get(position).textSize != 0) {
+					   itemTextLeft.setTextSize(items.get(position).textSize);
+				   }
 			     }
 			   }			 
 			   else {
@@ -417,6 +421,10 @@ class jArrayAdapter extends ArrayAdapter {
 					   itemTextRight.setTextColor(items.get(position).textColor);				
 				     }
 				     itemTextRight.setTypeface(items.get(position).typeFace, faceTitle);
+				     // tr3e fix change font size
+					 if (items.get(position).textSize != 0) {
+						 itemTextRight.setTextSize(items.get(position).textSize);
+					 }
 				   }
 				}
 			}
@@ -1678,6 +1686,11 @@ public class jListView extends ListView {
 		alist.get(_index).checked = _value;
 		aadapter.notifyDataSetChanged();
 	}
+	
+	// tr3e add getChecker for widget
+	public boolean getWidgetCheck( int _index ){
+		return alist.get(_index).checked;
+	}
 
 	public void setItemTagString(String _tagString, int _index){
 		alist.get(_index).tagString = _tagString;
@@ -1692,6 +1705,11 @@ public class jListView extends ListView {
 
 	private void DoHighlight(int position, int _color) {	
 		alist.get(position).highLightColor = _color;
+		aadapter.notifyDataSetChanged();
+	}
+	
+	// tr3e add refresh
+	public void Refresh() {			
 		aadapter.notifyDataSetChanged();
 	}
 	
