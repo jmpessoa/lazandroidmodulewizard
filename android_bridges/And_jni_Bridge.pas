@@ -511,6 +511,7 @@ Procedure jListView_setWidgetItem2(env:PJNIEnv; ListView : jObject; value: integ
 Procedure jListView_setWidgetItem3(env:PJNIEnv; ListView : jObject; value: integer; txt: string; index: integer);
 
 Procedure jListView_setWidgetText(env:PJNIEnv; ListView : jObject; txt: string; index: integer);
+function  jListView_getWidgetCheck(env: PJNIEnv; _jlistview: JObject; _index: integer) : boolean; // by tr3e
 Procedure jListView_setTextDecorated(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
 Procedure jListView_setTextSizeDecorated(env:PJNIEnv; ListView : jObject; value: integer; index:integer);
 Procedure jListView_setItemLayout(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
@@ -572,6 +573,7 @@ procedure jListView_SetVisibilityGone(env: PJNIEnv; _jlistview: JObject);
 procedure jListView_SaveToFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
 //procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
 function jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
+procedure jListView_Refresh(env:PJNIEnv;  ListView : jObject); // by tr3e
 
 procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string); overload;
 procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string; _filterMode: integer);  overload;
@@ -5612,6 +5614,33 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+// by tr3e
+function jListView_getWidgetCheck(env: PJNIEnv; _jlistview: JObject; _index: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'getWidgetCheck', '(I)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jlistview, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// by tr3e
+procedure jListView_Refresh(env:PJNIEnv;  ListView : jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+  cls:= env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'Refresh', '()V');
+ env^.CallVoidMethod(env,ListView,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
 
 procedure jListView_setItemTagString(env: PJNIEnv; _jlistview: JObject; _tagString: string; _index: integer);
 var
