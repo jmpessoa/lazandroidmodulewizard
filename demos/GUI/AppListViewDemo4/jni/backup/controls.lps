@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="5">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="741"/>
+        <CursorPos Y="758"/>
+        <UsageCount Value="30"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jForm;jListView"/>
+        </CustomData>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="33"/>
+        <CursorPos X="38" Y="47"/>
+        <UsageCount Value="30"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1950"/>
+        <CursorPos X="66" Y="2975"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="693"/>
+        <CursorPos X="22" Y="700"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\And_jni_Bridge.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="555"/>
+        <CursorPos X="28" Y="565"/>
+        <UsageCount Value="10"/>
+      </Unit4>
+    </Units>
+    <JumpHistory Count="25" HistoryIndex="24">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="300" Column="3" TopLine="16"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <Caret Line="1582" Column="24" TopLine="1576"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <Caret Line="1453" Column="15" TopLine="1444"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <Caret Line="7654" Column="46" TopLine="7649"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <Caret Line="1453" Column="15" TopLine="1445"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <Caret Line="7654" Column="41" TopLine="7639"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="300" Column="26" TopLine="296"/>
+      </Position7>
+      <Position8>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="271" Column="3" TopLine="268"/>
+      </Position8>
+      <Position9>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="306" Column="3" TopLine="303"/>
+      </Position9>
+      <Position10>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="312" Column="3" TopLine="303"/>
+      </Position10>
+      <Position11>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="318" Column="3" TopLine="303"/>
+      </Position11>
+      <Position12>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="324" Column="3" TopLine="321"/>
+      </Position12>
+      <Position13>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="293" Column="22" TopLine="277"/>
+      </Position13>
+      <Position14>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="7" Column="42"/>
+      </Position14>
+      <Position15>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="292" Column="36" TopLine="280"/>
+      </Position15>
+      <Position16>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="291" Column="36" TopLine="279"/>
+      </Position16>
+      <Position17>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="290" Column="36" TopLine="278"/>
+      </Position17>
+      <Position18>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="289" Column="36" TopLine="277"/>
+      </Position18>
+      <Position19>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="288" Column="36" TopLine="276"/>
+      </Position19>
+      <Position20>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="287" Column="36" TopLine="275"/>
+      </Position20>
+      <Position21>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="286" Column="36" TopLine="274"/>
+      </Position21>
+      <Position22>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="285" Column="36" TopLine="273"/>
+      </Position22>
+      <Position23>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="284" Column="36" TopLine="272"/>
+      </Position23>
+      <Position24>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="90" Column="3" TopLine="82"/>
+      </Position24>
+      <Position25>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="86" Column="20" TopLine="75"/>
+      </Position25>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode="default"/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
