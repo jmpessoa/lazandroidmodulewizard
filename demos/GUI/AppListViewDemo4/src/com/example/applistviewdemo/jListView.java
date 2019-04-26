@@ -1,4 +1,4 @@
-package org.lamw.appexpressiondemo1;
+package com.example.applistviewdemo;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,9 +19,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Environment;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -55,7 +52,6 @@ class jListItemRow {
 	View jWidget;     //fixed RadioButton Group default behavior: thanks to Leledumbo.
 	String widgetText;
 	int widgetTextColor;
-	//int widgetInputType = -1;  //
 	
 	int savePosition = -1;
 	
@@ -101,8 +97,6 @@ class jArrayAdapter extends ArrayAdapter {
 	private boolean mDrawAllItemPartsTextColor;
 	private boolean mDispatchOnDrawItemBitmap;
 	private boolean mDispatchOnDrawItemWidgetTextColor;
-	private boolean mDispatchOnDrawItemWidgetText;
-	private boolean mWidgetInputTypeIsCurrency;
 	private boolean mDispatchOnDrawItemWidgetImage;
 
 	boolean mChangeFontSizeByComplexUnitPixel;
@@ -177,8 +171,6 @@ class jArrayAdapter extends ArrayAdapter {
 		mDispatchOnDrawItemTextColor = true;
 		mDrawAllItemPartsTextColor = true;
 		mDispatchOnDrawItemWidgetTextColor = true;
-		mDispatchOnDrawItemWidgetText = true;
-		mWidgetInputTypeIsCurrency = false;
 		mDispatchOnDrawItemWidgetImage = true;
 				
 		mDrawAllItemPartsTextColor = true;
@@ -209,15 +201,7 @@ class jArrayAdapter extends ArrayAdapter {
 	public void SetDispatchOnDrawItemWidgetTextColor(boolean _value) { //+++
 		mDispatchOnDrawItemWidgetTextColor = _value;
 	}
-
-	public void SetDispatchOnDrawItemWidgetText(boolean _value) { //+++
-		mDispatchOnDrawItemWidgetText = _value;
-	}
-
-	public void SetWidgetInputTypeIsCurrency(boolean _value) { //+++
-		mWidgetInputTypeIsCurrency = _value;
-	}
-
+	
 	public void SetDispatchOnDrawItemWidgetImage(boolean _value) { //+++
 	   mDispatchOnDrawItemWidgetImage = _value;
 	}
@@ -314,69 +298,70 @@ class jArrayAdapter extends ArrayAdapter {
 	}
 
 	@Override
-	public  View getView(final int position, View v, ViewGroup parent) {
+	public  View getView(int position, View v, ViewGroup parent) {
 
-		if ( (position >= 0)   && ( position < items.size() ) ) {
-            //&& ( !items.get(position).label.equals("") )
+		if ( (position < 0) || ( position >= items.size() ) ) 
+	     return v;
+		
+        //&& ( !items.get(position).label.equals("") )
+		LinearLayout listLayout = new LinearLayout(ctx);
 
-			final int curPosition = position;
-
-			LinearLayout listLayout = new LinearLayout(ctx);
-
-			listLayout.setOrientation(LinearLayout.HORIZONTAL);
-			AbsListView.LayoutParams lparam =new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-					                                                      AbsListView.LayoutParams.WRAP_CONTENT); //w, h
-			listLayout.setLayoutParams(lparam);
+		listLayout.setOrientation(LinearLayout.HORIZONTAL);
+		AbsListView.LayoutParams lparam =new AbsListView.LayoutParams( AbsListView.LayoutParams.MATCH_PARENT,
+					                                                   AbsListView.LayoutParams.WRAP_CONTENT); //w, h
+		listLayout.setLayoutParams(lparam);
 			
-			RelativeLayout.LayoutParams imgParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
-			imgParam.rightMargin = 10;
-			imgParam.leftMargin = 10;
+		RelativeLayout.LayoutParams imgParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+		imgParam.rightMargin = 10;
+		imgParam.leftMargin = 10;
 			
-			RelativeLayout.LayoutParams widgetParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
-			widgetParam.rightMargin = 10;
-			widgetParam.leftMargin = 10;					
+		RelativeLayout.LayoutParams widgetParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+		widgetParam.rightMargin = 10;
+		widgetParam.leftMargin = 10;					
 
-			ImageView itemImage = null;
+		ImageView itemImage = null;
 			
-			TextView itemTextLeft = null; 
-			TextView itemTextRight = null; 
+		TextView itemTextLeft = null; 
+		TextView itemTextRight = null; 
 					
-			RelativeLayout.LayoutParams leftParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
-			RelativeLayout.LayoutParams rightParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+		RelativeLayout.LayoutParams leftParam  = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
+		RelativeLayout.LayoutParams rightParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
 			
-			leftParam.rightMargin = 10;
-			leftParam.leftMargin = 10;			
-			rightParam.rightMargin = 10;
-			rightParam.leftMargin = 10;											
+		leftParam.rightMargin = 10;
+		leftParam.leftMargin = 10;			
+		rightParam.rightMargin = 10;
+		rightParam.leftMargin = 10;											
 			
-			String txt1 = "";
-			String txt2 = "";
-			String line1 = "";
-			String line2 = "";
+		String txt1 = "";
+		String txt2 = "";
+		String line1 = "";
+		String line2 = "";
 			
-			String line = items.get(position).label;
+		String line = items.get(position).label;
 			
-			int faceTitle;
-			int faceBody;
-			switch (items.get(position).textDecorated) {
+		int faceTitle;
+		int faceBody;
+		
+		switch (items.get(position).textDecorated) {
 				case 0:  faceTitle = Typeface.NORMAL; faceBody = Typeface.NORMAL; break;
 				case 1:  faceTitle = Typeface.NORMAL; faceBody = Typeface.ITALIC; break;
 				case 2:  faceTitle = Typeface.NORMAL; faceBody = Typeface.BOLD; break;
 
-				case 3:  faceTitle = Typeface.BOLD; faceBody = Typeface.BOLD; break;
+				case 3:  faceTitle = Typeface.BOLD;   faceBody = Typeface.BOLD; break;
 				case 4:  faceTitle = Typeface.BOLD;   faceBody = Typeface.NORMAL; break;
 				case 5:  faceTitle = Typeface.BOLD;   faceBody = Typeface.ITALIC; break;
 
 				case 6:  faceTitle = Typeface.ITALIC; faceBody = Typeface.ITALIC; break;
-				case 7:  faceTitle = Typeface.ITALIC;   faceBody = Typeface.NORMAL; break;
-				case 8:  faceTitle = Typeface.ITALIC;   faceBody = Typeface.ITALIC; break;
+				case 7:  faceTitle = Typeface.ITALIC; faceBody = Typeface.NORMAL; break;
+				case 8:  faceTitle = Typeface.ITALIC; faceBody = Typeface.ITALIC; break;
 
 				default: faceTitle = Typeface.NORMAL; faceBody = Typeface.NORMAL; break;
-			}
+		}
 			
-			int pos1 = -1;
-			pos1 = line.indexOf(items.get(position).leftDelimiter);  //")"			
-			if (pos1 >= 0) {							   											    
+		int pos1 = -1;
+		pos1 = line.indexOf(items.get(position).leftDelimiter);  //")"			
+		
+		if (pos1 >= 0) {							   											    
 			   if ( pos1  !=  0) { 
 			     txt1 = line.substring(0, pos1);	
 			     line1 =  line.substring(pos1+1, line.length());
@@ -400,7 +385,7 @@ class jArrayAdapter extends ArrayAdapter {
 			   else {
 				 line =  line.substring(1, line.length());	
 			   }
-			}
+		}
 			                                   
 			int pos2 = -1;
 			
@@ -569,12 +554,8 @@ class jArrayAdapter extends ArrayAdapter {
 						   itemText[i].setTextSize(mTextSizeTypedValue, auxf + 3*i);  // sdInCecreasing
 				}			
 				
-				itemText[i].setText(lines[i]);
-
-				if (items.get(position).textColor != 0) {
-					itemText[i].setTextColor(items.get(position).textColor);
-				}
-
+				itemText[i].setText(lines[i]);				
+								
 				if (mDispatchOnDrawItemTextColor)  {
 					int drawItemTxtColor = controls.pOnListViewDrawItemCaptionColor(PasObj, (int)position, lines[i]);
 					if (drawItemTxtColor != 0) {
@@ -588,8 +569,18 @@ class jArrayAdapter extends ArrayAdapter {
 							}
 						}
 					}
+					else {
+						if (items.get(position).textColor != 0) {
+							itemText[i].setTextColor(items.get(position).textColor);
+						}
+					}
 				}
-
+				else {
+					if (items.get(position).textColor != 0) {
+						itemText[i].setTextColor(items.get(position).textColor);
+					}
+				}
+				
 				if (items.get(position).textAlign == 2) {  //center  ***
 				   itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);
 				}
@@ -602,19 +593,15 @@ class jArrayAdapter extends ArrayAdapter {
 			switch(items.get(position).widget) {   //0 == there is not a widget!
 				case 1:  itemWidget = new CheckBox(ctx);
 					((CheckBox)itemWidget).setId(position+6666); //dummy
-
-					((CheckBox)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
-
-					if (items.get(position).widgetTextColor != 0) {
-						((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
-
+															
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
-						if (drawWidgetTxtColor != 0)
-						  ((CheckBox)itemWidget).setTextColor(drawWidgetTxtColor); //drawWidgetTxtColor
+						 ((CheckBox)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);
 					}
-
+					
 					if (mDispatchOnDrawItemWidgetImage)  {  // +++
 						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
 						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
@@ -636,37 +623,24 @@ class jArrayAdapter extends ArrayAdapter {
 					if (items.get(position).textSize != 0) {
 					   ((CheckBox)itemWidget).setTextSize(items.get(position).textSize);
 					}
-
+					
 					((CheckBox)itemWidget).setText(items.get(position).widgetText);
-
-					if (mDispatchOnDrawItemWidgetText)  {  // +++
-						String drawWidgetTxt = controls.pOnListViewDrawItemWidgetText(PasObj, (int)position, items.get(position).widgetText);
-						if (!drawWidgetTxt.equals("")) {
-							((CheckBox) itemWidget).setText(drawWidgetTxt); //drawWidgetTxt
-							items.get(position).widgetText = drawWidgetTxt;
-						}
-					}
-
+					
+					items.get(position).jWidget = itemWidget; //
 					((CheckBox)itemWidget).setChecked(items.get(position).checked);
-
-					items.get(position).jWidget = (CheckBox)itemWidget;
-
 					break;
 					
 				case 2:  itemWidget = new RadioButton(ctx);
 					((RadioButton)itemWidget).setId(position+6666);
-					((RadioButton)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
-
-					if (items.get(position).widgetTextColor != 0) {
-						((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
-
+					
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
-						if (drawWidgetTxtColor != 0)
-						  ((RadioButton)itemWidget).setTextColor(drawWidgetTxtColor);
+						 ((RadioButton)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);
 					}
-
+					
 					if (mDispatchOnDrawItemWidgetImage)  {  // +++
 						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
 						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
@@ -690,35 +664,22 @@ class jArrayAdapter extends ArrayAdapter {
 					  	   ((RadioButton)itemWidget).setTypeface(mWidgetCustomFont);
 					
 					((RadioButton)itemWidget).setText(items.get(position).widgetText);
-
-					if (mDispatchOnDrawItemWidgetText)  {  // +++
-						String drawWidgetTxt = controls.pOnListViewDrawItemWidgetText(PasObj, (int)position, items.get(position).widgetText);
-						if (!drawWidgetTxt.equals("")) {
-							((RadioButton) itemWidget).setText(drawWidgetTxt); //drawWidgetTxtColor
-							items.get(position).widgetText = drawWidgetTxt;
-						}
-					}
-
+										
+					items.get(position).jWidget = itemWidget; 
 					((RadioButton)itemWidget).setChecked(items.get(position).checked);
-
-					items.get(position).jWidget = (RadioButton)itemWidget;
-
 					break;
 					
 				case 3:  itemWidget = new Button(ctx);
 					((Button)itemWidget).setId(position+6666);
-					((Button)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
-
-					if (items.get(position).widgetTextColor != 0) {
-						((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
-
+					
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
-						if (drawWidgetTxtColor != 0)
-						    ((Button)itemWidget).setTextColor(drawWidgetTxtColor);
+						 ((Button)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);
 					}
-
+					
 					if (mDispatchOnDrawItemWidgetImage)  {  // +++
 						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
 						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
@@ -742,32 +703,21 @@ class jArrayAdapter extends ArrayAdapter {
 					  	   ((Button)itemWidget).setTypeface(mWidgetCustomFont);
 					
 					((Button)itemWidget).setText(items.get(position).widgetText);
-
-					if (mDispatchOnDrawItemWidgetText)  {  // +++
-						String drawWidgetTxt = controls.pOnListViewDrawItemWidgetText(PasObj, (int)position, items.get(position).widgetText);
-						if (!drawWidgetTxt.equals("")) {
-							((Button) itemWidget).setText(drawWidgetTxt); //drawWidgetTxtColor
-							items.get(position).widgetText = drawWidgetTxt;
-						}
-					}
-
-					items.get(position).jWidget = (Button)itemWidget;
+					
+					items.get(position).jWidget = itemWidget;
 					break;
 					
 				case 4:  itemWidget = new TextView(ctx);
 					((TextView)itemWidget).setId(position+6666);
-					((TextView)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
-
-					if (items.get(position).widgetTextColor != 0) {
-						((TextView)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
-
+														
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
-						if (drawWidgetTxtColor != 0)
-						  ((TextView)itemWidget).setTextColor(drawWidgetTxtColor);
+						 ((TextView)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((TextView)itemWidget).setTextColor(items.get(position).widgetTextColor);
 					}
-
+										
 					if (mDispatchOnDrawItemWidgetImage)  {  // +++
 						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
 						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
@@ -790,16 +740,8 @@ class jArrayAdapter extends ArrayAdapter {
 					if (mWidgetCustomFont != null)  
 					  	   ((TextView)itemWidget).setTypeface(mWidgetCustomFont);
 					
-					((TextView)itemWidget).setText(items.get(position).widgetText);
-
-					if (mDispatchOnDrawItemWidgetText)  {  // +++
-						String drawWidgetTxt = controls.pOnListViewDrawItemWidgetText(PasObj, (int)position, items.get(position).widgetText);
-						if (!drawWidgetTxt.equals("")) {
-							((TextView) itemWidget).setText(drawWidgetTxt); //drawWidgetTxtColor
-							items.get(position).widgetText = drawWidgetTxt;
-						}
-					}
-
+					((TextView)itemWidget).setText(items.get(position).widgetText);					
+                      
 					/*
 					int id = GetDrawableResourceId("ic_launcher");
 					Drawable d = GetDrawableResourceById(id);  		
@@ -816,32 +758,23 @@ class jArrayAdapter extends ArrayAdapter {
 					}					
 					*/
 					
-					items.get(position).jWidget = (TextView)itemWidget;
+					items.get(position).jWidget = itemWidget;
 					break;
 
 				case 5:  itemWidget = new EditText(ctx);
 					((EditText)itemWidget).setId(position+6666);
-					((EditText)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
-
-					if (items.get(position).widgetTextColor != 0) {
-						((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
-
 					((EditText)itemWidget).setLines(1);
 					((EditText)itemWidget).setMaxLines(1);
 					((EditText)itemWidget).setMinLines(1);
-					((EditText)itemWidget).setPadding(15,4,15,4);
-
-					if (mWidgetInputTypeIsCurrency) {
-						((EditText) itemWidget).setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
-					}
-
+										
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
-						if (drawWidgetTxtColor != 0)
 						   ((EditText)itemWidget).setTextColor(drawWidgetTxtColor);
+					}											
+					else if (items.get(position).widgetTextColor != 0) {  
+					  ((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
 					}
-
+					
 					if (mDispatchOnDrawItemWidgetImage)  {  // +++
 						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
 						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
@@ -864,22 +797,12 @@ class jArrayAdapter extends ArrayAdapter {
 					if (mWidgetCustomFont != null)  
 					  	   ((EditText)itemWidget).setTypeface(mWidgetCustomFont);
 					
-					((EditText)itemWidget).setText(items.get(position).widgetText);
-
-					if (mDispatchOnDrawItemWidgetText)  {  // +++
-						String drawWidgetTxt = controls.pOnListViewDrawItemWidgetText(PasObj, (int)position, items.get(position).widgetText);
-						if (!drawWidgetTxt.equals("")) {
-							((EditText) itemWidget).setText(drawWidgetTxt); //drawWidgetTxtColor
-							items.get(position).widgetText = drawWidgetTxt;
-						}
-					}
-
-					items.get(position).jWidget = (EditText)itemWidget;
-
+					((EditText)itemWidget).setText(items.get(position).widgetText);					
+					
+					items.get(position).jWidget = itemWidget;					
 					((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {
 						public void onFocusChange(View v, boolean hasFocus) {
-							int temp = v.getId();
-							final int index = temp - 6666; //dummy
+							final int index = v.getId() - 6666; //dummy
 							final EditText caption = (EditText)v;
 							if (!hasFocus){
 								if (index >= 0) {
@@ -891,20 +814,7 @@ class jArrayAdapter extends ArrayAdapter {
 							}
 						}
 					});
-
-					((EditText)itemWidget).addTextChangedListener(new TextWatcher() {
-						@Override
-						public  void beforeTextChanged(CharSequence s, int start, int count, int after) {
-						}
-						@Override
-						public  void onTextChanged(CharSequence s, int start, int before, int count) {
-						}
-						@Override
-						public  void afterTextChanged(Editable s) {
-							items.get(curPosition).widgetText = s.toString();
-						}
-					});
-
+										
 					break;
 															
 			}
@@ -1110,14 +1020,13 @@ class jArrayAdapter extends ArrayAdapter {
 			    }
 				
 			   itemLayout.addView(txtLayout, txtParam);								
-			}
-			
+			} 
+
 			// tr3e add background color to cells
 			int drawItemBackColor = controls.pOnListViewDrawItemBackgroundColor(PasObj, (int)position);
-						
+			
 			if (drawItemBackColor != Color.TRANSPARENT)
 				itemLayout.setBackgroundColor(drawItemBackColor);
-			// tr3e            
             			
 			if (items.get(position).highLightColor != Color.TRANSPARENT)
 				itemLayout.setBackgroundColor(items.get(position).highLightColor); 
@@ -1126,7 +1035,7 @@ class jArrayAdapter extends ArrayAdapter {
 			
 			return listLayout;
 			
-		} else return v;
+	
 
 	}
 
@@ -1692,7 +1601,6 @@ public class jListView extends ListView {
 		alist.get(_index).checked = _value;
 		aadapter.notifyDataSetChanged();
 	}
-	
 	// tr3e add getChecker for widget
 	public boolean getWidgetCheck( int _index ){
 		return alist.get(_index).checked;
@@ -1713,7 +1621,6 @@ public class jListView extends ListView {
 		alist.get(position).highLightColor = _color;
 		aadapter.notifyDataSetChanged();
 	}
-	
 	// tr3e add refresh
 	public void Refresh() {			
 		aadapter.notifyDataSetChanged();
@@ -1925,14 +1832,7 @@ public class jListView extends ListView {
 	public void DispatchOnDrawWidgetItemWidgetTextColor(boolean _value) {
 	   aadapter.SetDispatchOnDrawItemWidgetTextColor(_value);
 	}
-
-	public void DispatchOnDrawWidgetItemWidgetText(boolean _value) {
-		aadapter.SetDispatchOnDrawItemWidgetText(_value);
-	}
-
-	public void SetWidgetInputTypeIsCurrency(boolean _value) {
-		aadapter.SetWidgetInputTypeIsCurrency(_value);
-	}
+	
 	public void DispatchOnDrawItemWidgetImage(boolean _value) {
 		aadapter.SetDispatchOnDrawItemWidgetImage(_value);
 	}

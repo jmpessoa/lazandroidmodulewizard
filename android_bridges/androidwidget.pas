@@ -699,6 +699,7 @@ type
   TOnEditLostFocus = Procedure(Sender: TObject; textContent: string) of object;
 
   TOnDrawItemTextColor = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge) of Object;
+  TOnDrawItemBackColor = Procedure(Sender: TObject; itemIndex: integer; out backColor: TARGBColorBridge) of Object; //by tr3e
   TOnDrawItemWidgetTextColor = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out textColor: TARGBColorBridge) of Object;
   TOnDrawItemWidgetText = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out newWidgetText: string) of Object;
 
