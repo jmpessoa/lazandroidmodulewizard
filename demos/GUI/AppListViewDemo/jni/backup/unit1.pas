@@ -33,7 +33,6 @@ type
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jEditText1LostFocus(Sender: TObject; text: string);
-      procedure jListView1ClickImageItem(Sender: TObject; itemIndex: integer);
       procedure jListView1ClickItem(Sender: TObject; itemIndex: integer;
         itemCaption: string);
       procedure jListView1ClickWidgetItem(Sender: TObject; Item: integer;
@@ -160,12 +159,6 @@ begin
   ShowMessage(text);
 end;
 
-procedure TAndroidModule1.jListView1ClickImageItem(Sender: TObject;
-  itemIndex: integer);
-begin
-  showmessage('Image Click!');
-end;
-
 procedure TAndroidModule1.jListView1ClickItem(Sender: TObject;
   itemIndex: integer; itemCaption: string);
 begin
@@ -182,7 +175,6 @@ procedure TAndroidModule1.jListView1ClickWidgetItem(Sender: TObject;
 var
   i: integer;
 begin
-  showmessage('Widget Click!');
   //ShowMessage();
   for i:=0 to jListView1.Count-1 do
   begin

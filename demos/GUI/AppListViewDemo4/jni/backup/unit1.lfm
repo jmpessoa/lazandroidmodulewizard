@@ -32,7 +32,7 @@ object AndroidModule1: TAndroidModule1
     Items.Strings = (
       ''
     )
-    BackgroundColor = colbrAquamarine
+    BackgroundColor = colbrWhite
     FontColor = colbrDefault
     FontSize = 16
     WidgetItem = wgCheckBox

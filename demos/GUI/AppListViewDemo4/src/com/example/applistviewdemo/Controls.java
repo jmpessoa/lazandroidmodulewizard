@@ -1,6 +1,6 @@
 package com.example.applistviewdemo;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.2.4  - 04 December  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.1  - 23 March - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1400,6 +1400,21 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	public String getSystemVersionString(){
 		return android.os.Build.VERSION.RELEASE;
 	}
+
+	public ByteBuffer GetJByteBuffer(int _width, int _height) {
+		ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);
+		return graphicBuffer;
+	}
+
+        public ByteBuffer GetByteBufferFromImage(Bitmap _bitmap) {
+           if (_bitmap == null) return null;
+           int w =  _bitmap.getWidth();
+           int h =_bitmap.getHeight();
+           ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);
+           _bitmap.copyPixelsToBuffer(graphicBuffer);
+           graphicBuffer.rewind();  //reset position
+           return graphicBuffer;
+        }
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1530,6 +1545,10 @@ public void ShowAlert(String _title, String _message, String _btnText) {
 
 public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
+}
+
+public int getAPILevel() {
+  return android.os.Build.VERSION.SDK_INT;  
 }
 
 //by jmpessoa
@@ -1967,7 +1986,8 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
+
+	public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
 		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
@@ -1987,32 +2007,39 @@ public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 		return 0; //fail
 	}
 }
-
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {	
-	String SMS_DELIVERED = packageDeliveredAction;
-	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
-	SmsManager sms = SmsManager.getDefault();
-	try {
-		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-		if (multipartMessage) {
-			ArrayList<String> messages = sms.divideMessage(msg);    
-			ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
-			for (int i = 0; i < messages.size(); i++) {
-				deliveredPendingIntents.add(i, deliveredPendingIntent);
-			}			
-			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, deliveredPendingIntents);			  
-		} else {
-			List<String> messages = sms.divideMessage(msg);    
-			for (String message : messages) {
-				sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-			}			    
-		}	
-		//Log.i("Send_SMS",phoneNumber+": "+ msg);    
-		return 1; //ok	      
-	} catch (Exception e) {
-		return 0; //fail
+        //improved by CC
+        //http://forum.lazarus-ide.org/index.php/topic,44775.msg315109/topicseen.html
+	public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {
+		String SMS_DELIVERED = packageDeliveredAction;
+		PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+		SmsManager sms = SmsManager.getDefault();
+		int partsCount = 1;
+		try {
+			if (multipartMessage)
+			{
+				ArrayList<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+				for (int i = 0; i < messages.size(); i++)
+				{
+					deliveredPendingIntents.add(i, deliveredPendingIntent);
+				}
+				sms.sendMultipartTextMessage(phoneNumber, null, messages, deliveredPendingIntents, null  );
+			}
+			else
+			{
+				List<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				for (String message : messages)
+				{
+					sms.sendTextMessage(phoneNumber, null, message, deliveredPendingIntent, null );
+				}
+			}
+			return partsCount;
+		} catch (Exception e) {
+			return 0; //fail
+		}
 	}
-}
 
 public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
   //---get the SMS message passed in---	
@@ -2142,6 +2169,7 @@ public  java.lang.Object jListView_Create3(long pasobj,  int widget, String widg
   return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt, null,txtDecorated,itemLay,textSizeDecorated, textAlign));
 }
 public native void pOnClickWidgetItem(long pasobj, int position, boolean checked);
+public native void pOnClickImageItem(long pasobj, int position);
 public native void pOnClickCaptionItem(long pasobj, int position, String caption);
 public native void pOnListViewLongClickCaptionItem(long pasobj, int position, String caption);
 public native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
@@ -2150,6 +2178,7 @@ public native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String
 public native void pOnWidgeItemLostFocus(long pasobj, int position, String widgetText);
 public native void pOnListViewScrollStateChanged(long pasobj, int firstVisibleItem, int visibleItemCount, int totalItemCount, boolean lastItemReached);
 public native int pOnListViewDrawItemWidgetTextColor(long pasobj, int position, String widgetText);
+public native String pOnListViewDrawItemWidgetText(long pasobj, int position, String widgetText);
 public native Bitmap pOnListViewDrawItemWidgetImage(long pasobj, int position, String widgetText);
 
 }

@@ -373,6 +373,15 @@ begin
 end;
 
 { Class:     com_example_applistviewdemo_Controls
+  Method:    pOnClickImageItem
+  Signature: (JI)V }
+procedure pOnClickImageItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+  position: JInt); cdecl;
+begin
+  Java_Event_pOnClickImageItem(PEnv, this, TObject(pasobj), position);
+end;
+
+{ Class:     com_example_applistviewdemo_Controls
   Method:    pOnClickCaptionItem
   Signature: (JILjava/lang/String;)V }
 procedure pOnClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
@@ -454,6 +463,16 @@ begin
 end;
 
 { Class:     com_example_applistviewdemo_Controls
+  Method:    pOnListViewDrawItemWidgetText
+  Signature: (JILjava/lang/String;)Ljava/lang/String; }
+function pOnListViewDrawItemWidgetText(PEnv: PJNIEnv; this: JObject; 
+  pasobj: JLong; position: JInt; widgetText: JString): JString; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetText(PEnv, this, TObject(pasobj), 
+    position, widgetText);
+end;
+
+{ Class:     com_example_applistviewdemo_Controls
   Method:    pOnListViewDrawItemWidgetImage
   Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
 function pOnListViewDrawItemWidgetImage(PEnv: PJNIEnv; this: JObject; 
@@ -463,7 +482,7 @@ begin
     ), position, widgetText);
 end;
 
-const NativeMethods: array[0..49] of JNINativeMethod = (
+const NativeMethods: array[0..51] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -588,6 +607,9 @@ const NativeMethods: array[0..49] of JNINativeMethod = (
    (name: 'pOnClickWidgetItem';
     signature: '(JIZ)V';
     fnPtr: @pOnClickWidgetItem; ),
+   (name: 'pOnClickImageItem';
+    signature: '(JI)V';
+    fnPtr: @pOnClickImageItem; ),
    (name: 'pOnClickCaptionItem';
     signature: '(JILjava/lang/String;)V';
     fnPtr: @pOnClickCaptionItem; ),
@@ -612,6 +634,9 @@ const NativeMethods: array[0..49] of JNINativeMethod = (
    (name: 'pOnListViewDrawItemWidgetTextColor';
     signature: '(JILjava/lang/String;)I';
     fnPtr: @pOnListViewDrawItemWidgetTextColor; ),
+   (name: 'pOnListViewDrawItemWidgetText';
+    signature: '(JILjava/lang/String;)Ljava/lang/String;';
+    fnPtr: @pOnListViewDrawItemWidgetText; ),
    (name: 'pOnListViewDrawItemWidgetImage';
     signature: '(JILjava/lang/String;)Landroid/graphics/Bitmap;';
     fnPtr: @pOnListViewDrawItemWidgetImage; )
@@ -737,6 +762,8 @@ exports
     +'Controls_pAppOnRequestPermissionResult',
   pOnClickWidgetItem name 'Java_com_example_applistviewdemo_Controls_'
     +'pOnClickWidgetItem',
+  pOnClickImageItem name 'Java_com_example_applistviewdemo_Controls_'
+    +'pOnClickImageItem',
   pOnClickCaptionItem name 'Java_com_example_applistviewdemo_Controls_'
     +'pOnClickCaptionItem',
   pOnListViewLongClickCaptionItem name 'Java_com_example_applistviewdemo_'
@@ -753,6 +780,8 @@ exports
     +'Controls_pOnListViewScrollStateChanged',
   pOnListViewDrawItemWidgetTextColor name 'Java_com_example_applistviewdemo_'
     +'Controls_pOnListViewDrawItemWidgetTextColor',
+  pOnListViewDrawItemWidgetText name 'Java_com_example_applistviewdemo_'
+    +'Controls_pOnListViewDrawItemWidgetText',
   pOnListViewDrawItemWidgetImage name 'Java_com_example_applistviewdemo_'
     +'Controls_pOnListViewDrawItemWidgetImage';
 

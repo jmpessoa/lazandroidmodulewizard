@@ -55,8 +55,8 @@ public class jCommons {
 		lgravity = Gravity.NO_GRAVITY;
 		algravity = Gravity.NO_GRAVITY;
         algravityAnchorId = -1;
-        
-        context = _context;        
+                
+        context = _context;
 
 		if (aOwnerView != null) {
 			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
@@ -151,8 +151,8 @@ public class jCommons {
 		marginTop = _top;
 		marginRight = _right;
 		marginBottom = _bottom;
-        lparamH = _h;
-		lparamW = _w;
+		lparamH = _h;
+		lparamW = _w;		
 	}
 	
 	public void setLParamWidth(int _w) {
@@ -169,14 +169,13 @@ public class jCommons {
 		int r = lparamH;
 		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			
 			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;				
 			
-			int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
 		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
 		    			
-			r = aOwnerView.getMeasuredHeight();			
+			r = aOwnerView.getMeasuredHeight();
 		}
 		
 		return r;
@@ -186,14 +185,13 @@ public class jCommons {
 		int r = lparamW;
 		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-					
 			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
 			
-			int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
 		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
 		   			
-			r = aOwnerView.getMeasuredWidth();		   
+			r = aOwnerView.getMeasuredWidth();		
 		}
 		
 		return r;		

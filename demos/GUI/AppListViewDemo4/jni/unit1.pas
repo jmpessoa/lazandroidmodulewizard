@@ -52,7 +52,7 @@ end;
 procedure TAndroidModule1.jListView3ClickWidgetItem(Sender: TObject;
   itemIndex: integer; checked: boolean);
 begin
-  if jListView3.GetWidgetCheck(itemIndex) then
+  if jListView3.IsItemChecked(itemIndex) then
   begin
    jListView3.SetFontSizeByIndex(18, itemIndex);
    showmessage('Is Check!')
@@ -69,7 +69,7 @@ end;
 procedure TAndroidModule1.jListView3DrawItemBackColor(Sender: TObject;
   itemIndex: integer; out backColor: TARGBColorBridge);
 begin
-  if jListView3.GetWidgetCheck(itemIndex) then
+  if jListView3.IsItemChecked(itemIndex) then
    backColor := colbrRed;
 end;
 

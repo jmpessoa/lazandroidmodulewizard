@@ -15,10 +15,10 @@ object AndroidModule1: TAndroidModule1
   ActionBarTitle = abtDefault
   OnJNIPrompt = DataModuleJNIPrompt
   object jTextView1: jTextView
-    Left = 64
+    Left = 62
     Top = 10
-    Width = 172
-    Height = 19
+    Width = 175
+    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -37,14 +37,13 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
-    GravityInParent = lgNone
     OnAfterDispatchDraw = jTextView1AfterDispatchDraw
   end
   object jButton1: jButton
     Left = 2
-    Top = 102
-    Width = 150
-    Height = 48
+    Top = 103
+    Width = 136
+    Height = 40
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
@@ -62,16 +61,15 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
-    GravityInParent = lgNone
     OnClick = jButton1Click
     OnBeforeDispatchDraw = jButton1BeforeDispatchDraw
     OnAfterDispatchDraw = jButton1AfterDispatchDraw
   end
   object jButton2: jButton
-    Left = 156
-    Top = 102
-    Width = 150
-    Height = 48
+    Left = 142
+    Top = 103
+    Width = 136
+    Height = 40
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
@@ -89,13 +87,12 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
-    GravityInParent = lgNone
     OnClick = jButton2Click
   end
   object jEditText1: jEditText
     Tag = 1
     Left = 10
-    Top = 49
+    Top = 50
     Width = 280
     Height = 39
     MarginLeft = 10
@@ -126,17 +123,14 @@ object AndroidModule1: TAndroidModule1
     WrappingLine = False
     Editable = True
     FontSizeUnit = unitDefault
-    CloseSoftInputOnEnter = True
-    CapSentence = False
-    GravityInParent = lgNone
     OnLostFocus = jEditText1LostFocus
   end
   object jListView1: jListView
     Tag = 1
     Left = 5
-    Top = 159
+    Top = 152
     Width = 290
-    Height = 150
+    Height = 136
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -164,21 +158,17 @@ object AndroidModule1: TAndroidModule1
     TextAlign = alCenter
     HighLightSelectedItemColor = colbrDefault
     FontSizeUnit = unitDefault
-    ItemPaddingTop = 40
-    ItemPaddingBottom = 40
-    WidgetTextColor = colbrDefault
     OnClickItem = jListView1ClickItem
     OnClickWidgetItem = jListView1ClickWidgetItem
-    OnClickImageItem = jListView1ClickImageItem
     OnLongClickItem = jListView1LongClickItem
     OnDrawItemTextColor = jListView1DrawItemTextColor
     OnDrawItemBitmap = jListView1DrawItemBitmap
   end
   object jListView2: jListView
     Left = 5
-    Top = 319
+    Top = 298
     Width = 290
-    Height = 120
+    Height = 106
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -212,18 +202,15 @@ object AndroidModule1: TAndroidModule1
     TextAlign = alLeft
     HighLightSelectedItemColor = colbrDefault
     FontSizeUnit = unitDefault
-    ItemPaddingTop = 40
-    ItemPaddingBottom = 40
-    WidgetTextColor = colbrDefault
     OnClickItem = jListView2ClickItem
     OnClickWidgetItem = jListView2ClickWidgetItem
     OnScrollStateChanged = jListView2ScrollStateChanged
   end
   object jListView3: jListView
     Left = 5
-    Top = 449
+    Top = 414
     Width = 290
-    Height = 120
+    Height = 106
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -250,9 +237,6 @@ object AndroidModule1: TAndroidModule1
     TextAlign = alCenter
     HighLightSelectedItemColor = colbrDefault
     FontSizeUnit = unitDefault
-    ItemPaddingTop = 40
-    ItemPaddingBottom = 40
-    WidgetTextColor = colbrDefault
     OnClickItem = jListView3ClickItem
   end
   object jImageFileManager1: jImageFileManager
