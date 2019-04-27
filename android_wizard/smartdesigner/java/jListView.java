@@ -114,6 +114,13 @@ class jArrayAdapter extends ArrayAdapter {
 
 	public ValueFilter customFilter = null;
 	public int mFilterMode = 0;
+	
+	// tr3e Code optimization
+	View itemWidget        = null;
+	TextView textViewnew   = null;
+	TextView itemTextLeft  = null; 
+	TextView itemTextRight = null;
+	// tr3e Code optimization
 
 	private class ValueFilter extends Filter{
 
@@ -312,12 +319,207 @@ class jArrayAdapter extends ArrayAdapter {
 		}
 		return (ValueFilter)customFilter;
 	}
+	
+	// tr3e Code optimization
+		private int getFaceTitle( int textDecorated ){
+			switch ( textDecorated) {
+			 case 0:  return Typeface.NORMAL;
+			 case 1:  return Typeface.NORMAL;
+			 case 2:  return Typeface.NORMAL;
+
+			 case 3:  return Typeface.BOLD;
+			 case 4:  return Typeface.BOLD;
+			 case 5:  return Typeface.BOLD;
+
+			 case 6:  return Typeface.ITALIC;
+			 case 7:  return Typeface.ITALIC;
+			 case 8:  return Typeface.ITALIC;
+
+			 default: return Typeface.NORMAL;	
+			}
+		}
+		
+		private int getFaceBody( int textDecorated ){
+			switch (textDecorated) {
+			case 0:  return Typeface.NORMAL; 
+			case 1:  return Typeface.ITALIC; 
+			case 2:  return Typeface.BOLD; 
+
+			case 3:  return Typeface.BOLD; 
+			case 4:  return Typeface.NORMAL; 
+			case 5:  return Typeface.ITALIC; 
+
+			case 6:  return Typeface.ITALIC; 
+			case 7:  return Typeface.NORMAL; 
+			case 8:  return Typeface.ITALIC; 
+
+			default: return Typeface.NORMAL; 
+	       }
+		}
+		
+		private void itemDrawImage( int position ){
+			
+			if( itemWidget == null ) return;
+			
+			if (mDispatchOnDrawItemWidgetImage)  {  // +++
+				  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, position, items.get(position).widgetText);						 																
+				  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
+				  int h = d.getIntrinsicHeight(); 
+				  int w = d.getIntrinsicWidth();   
+				  d.setBounds( 0, 0, w, h );
+				  int _side = 0;
+				  switch(_side) {
+				    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
+				    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null); break;  //right
+				    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null); break; //above
+				    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
+				  }					
+			}
+		}
+		
+		private float setTextSizeAndGetAuxf( int position ){
+			
+			float auxCustomPixel;
+			
+			float defaultInPixel = textViewnew.getTextSize();  //default in pixel!!!				
+			float result =  pixelsToSP(defaultInPixel);  //just initialize ... pixel to TypedValue.COMPLEX_UNIT_SP
+			
+			if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_SP) {
+			   result =  pixelsToSP(defaultInPixel);   //default in TypedValue.COMPLEX_UNIT_SP!
+			   
+			   if (items.get(position).textSize != 0) {
+				  textViewnew.setTextSize(items.get(position).textSize);					
+				  auxCustomPixel = textViewnew.getTextSize();
+				  result =  pixelsToSP(auxCustomPixel);  //custom in default in TypedValue.COMPLEX_UNIT_SP!
+			   }
+			}
+							
+			if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_PX) {  //in pixel
+				   if (items.get(position).textSize != 0) {
+					  textViewnew.setTextSize(items.get(position).textSize);					
+					  auxCustomPixel = textViewnew.getTextSize();
+					  result = auxCustomPixel;  //already in pixel										
+				   }
+			}
+							
+			if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_DIP) {
+				   result =  pixelsToDIP(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
+				   if (items.get(position).textSize != 0) {
+					  textViewnew.setTextSize(items.get(position).textSize);					
+					  auxCustomPixel = textViewnew.getTextSize();
+					  result =  pixelsToDIP(auxCustomPixel);  //custom in TypedValue.COMPLEX_UNIT_DIP
+				   }
+			}
+											
+			if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_MM) {
+				   result =  pixelsToMM(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
+				   if (items.get(position).textSize != 0) {
+					  textViewnew.setTextSize(items.get(position).textSize);					
+					  auxCustomPixel = textViewnew.getTextSize();
+					  result =  pixelsToMM(auxCustomPixel);   //custom in TypedValue.COMPLEX_UNIT_DIP
+				   }					  					   
+			}
+			
+			if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_PT) {
+				   result =  pixelsToPT(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
+				   if (items.get(position).textSize != 0) {
+					  textViewnew.setTextSize(items.get(position).textSize);					
+					  auxCustomPixel = textViewnew.getTextSize();
+					  result =  pixelsToPT(auxCustomPixel);   //custom in TypedValue.COMPLEX_UNIT_DIP
+				   }
+			}
+			
+			return result;
+		}
+		
+		private String getItemTextLeft( String line, int position, int faceTitle ){
+			
+			String result = line;
+			String txt1   = "";
+			String line1  = "";
+			
+			itemTextLeft  = null;
+			
+			int pos1 = -1;
+			pos1     = line.indexOf(items.get(position).leftDelimiter);  //")"			
+			
+			if (pos1 >= 0) {							   											    
+				   if ( pos1  !=  0) { 
+				     txt1   = line.substring(0, pos1);	
+				     line1  = line.substring(pos1+1, line.length());
+				     result = line1;
+				     
+				     if ( txt1.length() > 0) {
+				       itemTextLeft = new TextView(ctx);  
+				       itemTextLeft.setId(position + 1111);
+				       //itemTextLeft.setPadding(20, 40, 20, 40);
+				       itemTextLeft.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
+				       
+				       itemTextLeft.setText(txt1);
+				       
+					   if (items.get(position).textColor != 0) 
+						 itemTextLeft.setTextColor(items.get(position).textColor);
+					   				 
+					   itemTextLeft.setTypeface(items.get(position).typeFace, faceTitle);
+					   // tr3e fix change font size
+					   if (items.get(position).textSize != 0) 
+						   itemTextLeft.setTextSize(items.get(position).textSize);
+					   
+				     }
+				   }			 
+				   else {
+					 result =  line.substring(1, line.length());	
+				   }
+			}
+			
+			return result;
+		}
+		
+		private String getItemTextRight( String line, int position, int faceTitle ){
+			
+			String result = line;
+			String txt2   = "";
+			String line2  = "";
+			
+			itemTextRight = null;
+			
+			int pos2 = -1;
+			
+			pos2 = line.lastIndexOf(items.get(position).rightDelimiter);  //searches right-to-left instead  //rightDelimiter ")"
+			
+			if (pos2 > 0 ) {				
+				if ( pos2 < line.length() ) { 
+			   	   txt2   = line.substring(pos2+1, line.length());
+				   line2  = line.substring(0, pos2);				
+				   result = line2;
+				   
+				   if (txt2.length() > 0) { 
+				     itemTextRight = new TextView(ctx);
+				     itemTextRight.setId(position + 2222);
+				     //itemTextRight.setPadding(20, 40, 20, 40);
+				     itemTextRight.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
+				     itemTextRight.setText(txt2);
+				     if (items.get(position).textColor != 0) {
+					   itemTextRight.setTextColor(items.get(position).textColor);				
+				     }
+				     itemTextRight.setTypeface(items.get(position).typeFace, faceTitle);
+				     // tr3e fix change font size
+					 if (items.get(position).textSize != 0) {
+						 itemTextRight.setTextSize(items.get(position).textSize);
+					 }
+				   }
+				}
+			}
+			
+			return result;
+		}
+		// tr3e Code optimization
 
 	@Override
 	public  View getView(final int position, View v, ViewGroup parent) {
 
-		if ( (position >= 0)   && ( position < items.size() ) ) {
-            //&& ( !items.get(position).label.equals("") )
+		if ( (position < 0) || ( position >= items.size() ) ) return v;
+            //|| ( items.get(position).label.equals("") )
 
 			final int curPosition = position;
 
@@ -337,9 +539,6 @@ class jArrayAdapter extends ArrayAdapter {
 			widgetParam.leftMargin = 10;					
 
 			ImageView itemImage = null;
-			
-			TextView itemTextLeft = null; 
-			TextView itemTextRight = null; 
 					
 			RelativeLayout.LayoutParams leftParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
 			RelativeLayout.LayoutParams rightParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
@@ -349,85 +548,15 @@ class jArrayAdapter extends ArrayAdapter {
 			rightParam.rightMargin = 10;
 			rightParam.leftMargin = 10;											
 			
-			String txt1 = "";
-			String txt2 = "";
-			String line1 = "";
-			String line2 = "";
-			
 			String line = items.get(position).label;
 			
-			int faceTitle;
-			int faceBody;
-			switch (items.get(position).textDecorated) {
-				case 0:  faceTitle = Typeface.NORMAL; faceBody = Typeface.NORMAL; break;
-				case 1:  faceTitle = Typeface.NORMAL; faceBody = Typeface.ITALIC; break;
-				case 2:  faceTitle = Typeface.NORMAL; faceBody = Typeface.BOLD; break;
-
-				case 3:  faceTitle = Typeface.BOLD; faceBody = Typeface.BOLD; break;
-				case 4:  faceTitle = Typeface.BOLD;   faceBody = Typeface.NORMAL; break;
-				case 5:  faceTitle = Typeface.BOLD;   faceBody = Typeface.ITALIC; break;
-
-				case 6:  faceTitle = Typeface.ITALIC; faceBody = Typeface.ITALIC; break;
-				case 7:  faceTitle = Typeface.ITALIC;   faceBody = Typeface.NORMAL; break;
-				case 8:  faceTitle = Typeface.ITALIC;   faceBody = Typeface.ITALIC; break;
-
-				default: faceTitle = Typeface.NORMAL; faceBody = Typeface.NORMAL; break;
-			}
-			
-			int pos1 = -1;
-			pos1 = line.indexOf(items.get(position).leftDelimiter);  //")"			
-			if (pos1 >= 0) {							   											    
-			   if ( pos1  !=  0) { 
-			     txt1 = line.substring(0, pos1);	
-			     line1 =  line.substring(pos1+1, line.length());
-			     line = line1;
-			     if ( txt1.length() > 0) {
-			       itemTextLeft = new TextView(ctx);  
-			       itemTextLeft.setId(position + 1111);
-			       //itemTextLeft.setPadding(20, 40, 20, 40);
-			       itemTextLeft.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
-			       itemTextLeft.setText(txt1);
-				   if (items.get(position).textColor != 0) {
-					 itemTextLeft.setTextColor(items.get(position).textColor);
-				   }				 
-				   itemTextLeft.setTypeface(items.get(position).typeFace, faceTitle);
-				   // tr3e fix change font size
-				   if (items.get(position).textSize != 0) {
-					   itemTextLeft.setTextSize(items.get(position).textSize);
-				   }
-			     }
-			   }			 
-			   else {
-				 line =  line.substring(1, line.length());	
-			   }
-			}
-			                                   
-			int pos2 = -1;
-			
-			pos2 = line.lastIndexOf(items.get(position).rightDelimiter);  //searches right-to-left instead  //rightDelimiter ")"
-			
-			if (pos2 > 0 ) {				
-				if ( pos2 < line.length() ) { 
-			   	   txt2 = line.substring(pos2+1, line.length());
-				   line2 = line.substring(0, pos2);				
-				   line = line2;			
-				   if (txt2.length() > 0) { 
-				     itemTextRight = new TextView(ctx);
-				     itemTextRight.setId(position + 2222);
-				     //itemTextRight.setPadding(20, 40, 20, 40);
-				     itemTextRight.setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
-				     itemTextRight.setText(txt2);
-				     if (items.get(position).textColor != 0) {
-					   itemTextRight.setTextColor(items.get(position).textColor);				
-				     }
-				     itemTextRight.setTypeface(items.get(position).typeFace, faceTitle);
-				     // tr3e fix change font size
-					 if (items.get(position).textSize != 0) {
-						 itemTextRight.setTextSize(items.get(position).textSize);
-					 }
-				   }
-				}
-			}
+			// tr3e Code optimization
+			int faceTitle = getFaceTitle( items.get(position).textDecorated );
+			int faceBody  = getFaceBody( items.get(position).textDecorated );
+					
+			line = getItemTextLeft( line, position, faceTitle );
+			line = getItemTextRight( line, position, faceTitle );
+			// tr3e Code optimization
 									
 			String[] lines = line.split(Pattern.quote(items.get(position).delimiter));								
 			
@@ -485,56 +614,11 @@ class jArrayAdapter extends ArrayAdapter {
     		    		    		
 			for (int i=0; i < lines.length; i++) {
 
-				TextView textViewnew = new TextView(ctx);
+				// tr3e Code optimization
+				textViewnew = new TextView(ctx);
 				
-				float auxCustomPixel;
-				
-				float defaultInPixel = textViewnew.getTextSize();  //default in pixel!!!				
-				float auxf =  pixelsToSP(defaultInPixel);  //just initialize ... pixel to TypedValue.COMPLEX_UNIT_SP
-				
-				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_SP) {
-				   auxf =  pixelsToSP(defaultInPixel);   //default in TypedValue.COMPLEX_UNIT_SP!									
-				   if (items.get(position).textSize != 0) {
-					  textViewnew.setTextSize(items.get(position).textSize);					
-					  auxCustomPixel = textViewnew.getTextSize();
-					  auxf =  pixelsToSP(auxCustomPixel);  //custom in default in TypedValue.COMPLEX_UNIT_SP!
-				   }
-				}
-								
-				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_PX) {  //in pixel
-					   if (items.get(position).textSize != 0) {
-						  textViewnew.setTextSize(items.get(position).textSize);					
-						  auxCustomPixel = textViewnew.getTextSize();
-						  auxf = auxCustomPixel;  //already in pixel										
-					   }
-				}
-								
-				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_DIP) {
-					   auxf =  pixelsToDIP(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
-					   if (items.get(position).textSize != 0) {
-						  textViewnew.setTextSize(items.get(position).textSize);					
-						  auxCustomPixel = textViewnew.getTextSize();
-						  auxf =  pixelsToDIP(auxCustomPixel);  //custom in TypedValue.COMPLEX_UNIT_DIP
-					   }
-				}
-												
-				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_MM) {
-					   auxf =  pixelsToMM(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
-					   if (items.get(position).textSize != 0) {
-						  textViewnew.setTextSize(items.get(position).textSize);					
-						  auxCustomPixel = textViewnew.getTextSize();
-						  auxf =  pixelsToMM(auxCustomPixel);   //custom in TypedValue.COMPLEX_UNIT_DIP
-					   }					  					   
-				}
-				
-				if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_PT) {
-					   auxf =  pixelsToPT(defaultInPixel);   //convert pixel to TypedValue.COMPLEX_UNIT_DIP								
-					   if (items.get(position).textSize != 0) {
-						  textViewnew.setTextSize(items.get(position).textSize);					
-						  auxCustomPixel = textViewnew.getTextSize();
-						  auxf =  pixelsToPT(auxCustomPixel);   //custom in TypedValue.COMPLEX_UNIT_DIP
-					   }
-				}
+				float auxf = setTextSizeAndGetAuxf( position );
+				// tr3e Code optimization
 				
 				itemText[i] = textViewnew;
 				//itemText[i].setPadding(20, 40, 20, 40);  
@@ -554,20 +638,16 @@ class jArrayAdapter extends ArrayAdapter {
 					}
 				}   
 				   				
-				if (i == 0) {										
-					itemText[i].setTypeface(items.get(position).typeFace, faceTitle); 
-				}  				
-				else{
-					itemText[i].setTypeface(items.get(position).typeFace, faceBody); 
-				}	
+				if (i == 0)										
+					itemText[i].setTypeface(items.get(position).typeFace, faceTitle); 				  			
+				else
+					itemText[i].setTypeface(items.get(position).typeFace, faceBody); 					
 				
-				if (items.get(position).textSizeDecorated == 1) {
-							itemText[i].setTextSize(mTextSizeTypedValue, auxf - 3*i);  // sdDeCecreasing
-				}
+				if (items.get(position).textSizeDecorated == 1)
+							itemText[i].setTextSize(mTextSizeTypedValue, auxf - 3*i);  // sdDeCecreasing				
 
-				if (items.get(position).textSizeDecorated == 2) {
-						   itemText[i].setTextSize(mTextSizeTypedValue, auxf + 3*i);  // sdInCecreasing
-				}			
+				if (items.get(position).textSizeDecorated == 2)
+						   itemText[i].setTextSize(mTextSizeTypedValue, auxf + 3*i);  // sdInCecreasing						
 				
 				itemText[i].setText(lines[i]);
 
@@ -590,14 +670,13 @@ class jArrayAdapter extends ArrayAdapter {
 					}
 				}
 
-				if (items.get(position).textAlign == 2) {  //center  ***
-				   itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);
-				}
+				if (items.get(position).textAlign == 2)   //center  ***
+				   itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);				
 															
 				txtLayout.addView(itemText[i]);				
 			}
 			
-			View itemWidget = null;
+			itemWidget = null;
 
 			switch(items.get(position).widget) {   //0 == there is not a widget!
 				case 1:  itemWidget = new CheckBox(ctx);
@@ -605,9 +684,8 @@ class jArrayAdapter extends ArrayAdapter {
 
 					((CheckBox)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 
-					if (items.get(position).widgetTextColor != 0) {
-						((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
+					if (items.get(position).widgetTextColor != 0)
+						((CheckBox)itemWidget).setTextColor(items.get(position).widgetTextColor);					
 
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
@@ -615,27 +693,13 @@ class jArrayAdapter extends ArrayAdapter {
 						  ((CheckBox)itemWidget).setTextColor(drawWidgetTxtColor); //drawWidgetTxtColor
 					}
 
-					if (mDispatchOnDrawItemWidgetImage)  {  // +++
-						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
-						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
-						  int h = d.getIntrinsicHeight(); 
-						  int w = d.getIntrinsicWidth();   
-						  d.setBounds( 0, 0, w, h );
-						  int _side = 0;
-						  switch(_side) {
-						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
-						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
-						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
-						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
-						  }					
-					}					
+					itemDrawImage( position );					
 					
 					if (mWidgetCustomFont != null)  
 					  	   ((CheckBox)itemWidget).setTypeface(mWidgetCustomFont);
 					
-					if (items.get(position).textSize != 0) {
-					   ((CheckBox)itemWidget).setTextSize(items.get(position).textSize);
-					}
+					if (items.get(position).textSize != 0)
+					   ((CheckBox)itemWidget).setTextSize(items.get(position).textSize);					
 
 					((CheckBox)itemWidget).setText(items.get(position).widgetText);
 
@@ -657,9 +721,8 @@ class jArrayAdapter extends ArrayAdapter {
 					((RadioButton)itemWidget).setId(position+6666);
 					((RadioButton)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 
-					if (items.get(position).widgetTextColor != 0) {
-						((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
+					if (items.get(position).widgetTextColor != 0)
+						((RadioButton)itemWidget).setTextColor(items.get(position).widgetTextColor);					
 
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
@@ -667,27 +730,13 @@ class jArrayAdapter extends ArrayAdapter {
 						  ((RadioButton)itemWidget).setTextColor(drawWidgetTxtColor);
 					}
 
-					if (mDispatchOnDrawItemWidgetImage)  {  // +++
-						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
-						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
-						  int h = d.getIntrinsicHeight(); 
-						  int w = d.getIntrinsicWidth();   
-						  d.setBounds( 0, 0, w, h );
-						  int _side = 0;
-						  switch(_side) {
-						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
-						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
-						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
-						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
-						  }					
-					}
+					itemDrawImage( position );
 					
-					if (items.get(position).textSize != 0) {
-					   ((RadioButton)itemWidget).setTextSize(items.get(position).textSize);
-					}
+					if (items.get(position).textSize != 0)
+					   ((RadioButton)itemWidget).setTextSize(items.get(position).textSize);					
 					
 					if (mWidgetCustomFont != null)  
-					  	   ((RadioButton)itemWidget).setTypeface(mWidgetCustomFont);
+					   ((RadioButton)itemWidget).setTypeface(mWidgetCustomFont);
 					
 					((RadioButton)itemWidget).setText(items.get(position).widgetText);
 
@@ -709,9 +758,8 @@ class jArrayAdapter extends ArrayAdapter {
 					((Button)itemWidget).setId(position+6666);
 					((Button)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 
-					if (items.get(position).widgetTextColor != 0) {
-						((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);
-					}
+					if (items.get(position).widgetTextColor != 0)
+						((Button)itemWidget).setTextColor(items.get(position).widgetTextColor);					
 
 					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
 						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
@@ -719,20 +767,7 @@ class jArrayAdapter extends ArrayAdapter {
 						    ((Button)itemWidget).setTextColor(drawWidgetTxtColor);
 					}
 
-					if (mDispatchOnDrawItemWidgetImage)  {  // +++
-						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
-						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
-						  int h = d.getIntrinsicHeight(); 
-						  int w = d.getIntrinsicWidth();   
-						  d.setBounds( 0, 0, w, h );
-						  int _side = 0;
-						  switch(_side) {
-						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
-						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
-						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
-						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
-						  }					
-					}
+					itemDrawImage( position );
 					
 					if (items.get(position).textSize != 0) {
 					   ((Button)itemWidget).setTextSize(items.get(position).textSize);
@@ -768,27 +803,13 @@ class jArrayAdapter extends ArrayAdapter {
 						  ((TextView)itemWidget).setTextColor(drawWidgetTxtColor);
 					}
 
-					if (mDispatchOnDrawItemWidgetImage)  {  // +++
-						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
-						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
-						  int h = d.getIntrinsicHeight(); 
-						  int w = d.getIntrinsicWidth();   
-						  d.setBounds( 0, 0, w, h );
-						  int _side = 0;
-						  switch(_side) {
-						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
-						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
-						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
-						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
-						  }					
-					}					
+					itemDrawImage( position );					
 					
-					if (items.get(position).textSize != 0) {
-					   ((TextView)itemWidget).setTextSize(items.get(position).textSize);
-					}
+					if (items.get(position).textSize != 0)
+					   ((TextView)itemWidget).setTextSize(items.get(position).textSize);					
 					
 					if (mWidgetCustomFont != null)  
-					  	   ((TextView)itemWidget).setTypeface(mWidgetCustomFont);
+					   ((TextView)itemWidget).setTypeface(mWidgetCustomFont);
 					
 					((TextView)itemWidget).setText(items.get(position).widgetText);
 
@@ -798,23 +819,7 @@ class jArrayAdapter extends ArrayAdapter {
 							((TextView) itemWidget).setText(drawWidgetTxt); //drawWidgetTxtColor
 							items.get(position).widgetText = drawWidgetTxt;
 						}
-					}
-
-					/*
-					int id = GetDrawableResourceId("ic_launcher");
-					Drawable d = GetDrawableResourceById(id);  		
-					int h = d.getIntrinsicHeight(); 
-					int w = d.getIntrinsicWidth();   
-					d.setBounds( 0, 0, w, h );	
-					int _side = 0;
-					
-					switch(_side) {
-					  case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
-					  case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
-					  case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
-					  case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
 					}					
-					*/
 					
 					items.get(position).jWidget = (TextView)itemWidget;
 					break;
@@ -842,24 +847,10 @@ class jArrayAdapter extends ArrayAdapter {
 						   ((EditText)itemWidget).setTextColor(drawWidgetTxtColor);
 					}
 
-					if (mDispatchOnDrawItemWidgetImage)  {  // +++
-						  Bitmap image = controls.pOnListViewDrawItemWidgetImage(PasObj, (int)position, items.get(position).widgetText);						 																
-						  Drawable d = new BitmapDrawable(controls.activity.getResources(), image);
-						  int h = d.getIntrinsicHeight(); 
-						  int w = d.getIntrinsicWidth();   
-						  d.setBounds( 0, 0, w, h );
-						  int _side = 0;
-						  switch(_side) {
-						    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
-						    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null);   break;  //right
-						    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null);  break; //above
-						    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
-						  }					
-					}
+					itemDrawImage( position );
 					
-					if (items.get(position).textSize != 0) {
-					   ((EditText)itemWidget).setTextSize(items.get(position).textSize);
-					}
+					if (items.get(position).textSize != 0)
+					   ((EditText)itemWidget).setTextSize(items.get(position).textSize);					
 					
 					if (mWidgetCustomFont != null)  
 					  	   ((EditText)itemWidget).setTypeface(mWidgetCustomFont);
@@ -1125,8 +1116,6 @@ class jArrayAdapter extends ArrayAdapter {
 			listLayout.addView(itemLayout);
 			
 			return listLayout;
-			
-		} else return v;
 
 	}
 
