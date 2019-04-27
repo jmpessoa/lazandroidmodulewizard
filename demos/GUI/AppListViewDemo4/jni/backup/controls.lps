@@ -2,9 +2,9 @@
 <CONFIG>
   <ProjectSession>
     <PathDelim Value="\"/>
-    <Version Value="11"/>
+    <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="5">
+    <Units Count="7">
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -20,11 +20,10 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jForm;jListView"/>
+          <Item0 Name="jControls" Value="jListView"/>
         </CustomData>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="33"/>
-        <CursorPos X="38" Y="47"/>
+        <TopLine Value="8"/>
+        <CursorPos Y="15"/>
         <UsageCount Value="30"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -32,20 +31,20 @@
       </Unit1>
       <Unit2>
         <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="1950"/>
-        <CursorPos X="66" Y="2975"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1406"/>
+        <CursorPos X="3" Y="1409"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit2>
       <Unit3>
         <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\androidwidget.pas"/>
         <UnitName Value="AndroidWidget"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="693"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="705"/>
         <CursorPos X="22" Y="700"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\And_jni_Bridge.pas"/>
@@ -54,112 +53,118 @@
         <CursorPos X="28" Y="565"/>
         <UsageCount Value="10"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android1.8\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1415"/>
+        <CursorPos X="3" Y="1418"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android1.8\config\onlinepackagemanager\packages\LAMW\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="691"/>
+        <CursorPos X="3" Y="703"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit6>
     </Units>
-    <JumpHistory Count="25" HistoryIndex="24">
+    <JumpHistory Count="23" HistoryIndex="22">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="300" Column="3" TopLine="16"/>
       </Position1>
       <Position2>
-        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
-        <Caret Line="1582" Column="24" TopLine="1576"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="300" Column="26" TopLine="296"/>
       </Position2>
       <Position3>
-        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
-        <Caret Line="1453" Column="15" TopLine="1444"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="271" Column="3" TopLine="268"/>
       </Position3>
       <Position4>
-        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
-        <Caret Line="7654" Column="46" TopLine="7649"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="306" Column="3" TopLine="303"/>
       </Position4>
       <Position5>
-        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
-        <Caret Line="1453" Column="15" TopLine="1445"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="312" Column="3" TopLine="303"/>
       </Position5>
       <Position6>
-        <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
-        <Caret Line="7654" Column="41" TopLine="7639"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="318" Column="3" TopLine="303"/>
       </Position6>
       <Position7>
         <Filename Value="unit1.pas"/>
-        <Caret Line="300" Column="26" TopLine="296"/>
+        <Caret Line="324" Column="3" TopLine="321"/>
       </Position7>
       <Position8>
         <Filename Value="unit1.pas"/>
-        <Caret Line="271" Column="3" TopLine="268"/>
+        <Caret Line="293" Column="22" TopLine="277"/>
       </Position8>
       <Position9>
         <Filename Value="unit1.pas"/>
-        <Caret Line="306" Column="3" TopLine="303"/>
+        <Caret Line="7" Column="42"/>
       </Position9>
       <Position10>
         <Filename Value="unit1.pas"/>
-        <Caret Line="312" Column="3" TopLine="303"/>
+        <Caret Line="292" Column="36" TopLine="280"/>
       </Position10>
       <Position11>
         <Filename Value="unit1.pas"/>
-        <Caret Line="318" Column="3" TopLine="303"/>
+        <Caret Line="291" Column="36" TopLine="279"/>
       </Position11>
       <Position12>
         <Filename Value="unit1.pas"/>
-        <Caret Line="324" Column="3" TopLine="321"/>
+        <Caret Line="290" Column="36" TopLine="278"/>
       </Position12>
       <Position13>
         <Filename Value="unit1.pas"/>
-        <Caret Line="293" Column="22" TopLine="277"/>
+        <Caret Line="289" Column="36" TopLine="277"/>
       </Position13>
       <Position14>
         <Filename Value="unit1.pas"/>
-        <Caret Line="7" Column="42"/>
+        <Caret Line="288" Column="36" TopLine="276"/>
       </Position14>
       <Position15>
         <Filename Value="unit1.pas"/>
-        <Caret Line="292" Column="36" TopLine="280"/>
+        <Caret Line="287" Column="36" TopLine="275"/>
       </Position15>
       <Position16>
         <Filename Value="unit1.pas"/>
-        <Caret Line="291" Column="36" TopLine="279"/>
+        <Caret Line="286" Column="36" TopLine="274"/>
       </Position16>
       <Position17>
         <Filename Value="unit1.pas"/>
-        <Caret Line="290" Column="36" TopLine="278"/>
+        <Caret Line="285" Column="36" TopLine="273"/>
       </Position17>
       <Position18>
         <Filename Value="unit1.pas"/>
-        <Caret Line="289" Column="36" TopLine="277"/>
+        <Caret Line="284" Column="36" TopLine="272"/>
       </Position18>
       <Position19>
         <Filename Value="unit1.pas"/>
-        <Caret Line="288" Column="36" TopLine="276"/>
+        <Caret Line="90" Column="3" TopLine="82"/>
       </Position19>
       <Position20>
         <Filename Value="unit1.pas"/>
-        <Caret Line="287" Column="36" TopLine="275"/>
+        <Caret Line="86" Column="20" TopLine="75"/>
       </Position20>
       <Position21>
         <Filename Value="unit1.pas"/>
-        <Caret Line="286" Column="36" TopLine="274"/>
+        <Caret Line="47" Column="38" TopLine="33"/>
       </Position21>
       <Position22>
         <Filename Value="unit1.pas"/>
-        <Caret Line="285" Column="36" TopLine="273"/>
+        <Caret Line="15" TopLine="8"/>
       </Position22>
       <Position23>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="284" Column="36" TopLine="272"/>
+        <Filename Value="..\..\..\..\..\..\downloads\laz4android1.8\config\onlinepackagemanager\packages\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <Caret Line="1418" Column="3" TopLine="1415"/>
       </Position23>
-      <Position24>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="90" Column="3" TopLine="82"/>
-      </Position24>
-      <Position25>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="86" Column="20" TopLine="75"/>
-      </Position25>
     </JumpHistory>
-    <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
-    </RunParams>
   </ProjectSession>
 </CONFIG>

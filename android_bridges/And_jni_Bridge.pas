@@ -511,7 +511,6 @@ Procedure jListView_setWidgetItem2(env:PJNIEnv; ListView : jObject; value: integ
 Procedure jListView_setWidgetItem3(env:PJNIEnv; ListView : jObject; value: integer; txt: string; index: integer);
 
 Procedure jListView_setWidgetText(env:PJNIEnv; ListView : jObject; txt: string; index: integer);
-function  jListView_getWidgetCheck(env: PJNIEnv; _jlistview: JObject; _index: integer) : boolean; // by tr3e
 Procedure jListView_setTextDecorated(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
 Procedure jListView_setTextSizeDecorated(env:PJNIEnv; ListView : jObject; value: integer; index:integer);
 Procedure jListView_setItemLayout(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
@@ -5611,22 +5610,6 @@ begin
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'setWidgetCheck', '(ZI)V');
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-// by tr3e
-function jListView_getWidgetCheck(env: PJNIEnv; _jlistview: JObject; _index: integer): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _index;
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'getWidgetCheck', '(I)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jlistview, jMethod, @jParams);
-  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
 

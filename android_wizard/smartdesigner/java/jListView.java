@@ -567,7 +567,7 @@ class jArrayAdapter extends ArrayAdapter {
 				itemImage.setImageBitmap(items.get(position).bmp);
 				itemImage.setFocusable(false);
 				itemImage.setFocusableInTouchMode(false);				
-				itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
+				itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
 			}
 			
 			if (mDispatchOnDrawItemBitmap)  {
@@ -579,7 +579,7 @@ class jArrayAdapter extends ArrayAdapter {
 					itemImage.setImageBitmap(imageBmp);
 					itemImage.setFocusable(false);
 					itemImage.setFocusableInTouchMode(false);					
-					itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
+					itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
 				}
 				else {
 					if (items.get(position).bmp !=  null) {
@@ -589,7 +589,7 @@ class jArrayAdapter extends ArrayAdapter {
 						itemImage.setImageBitmap(items.get(position).bmp);
 						itemImage.setFocusable(false);
 						itemImage.setFocusableInTouchMode(false);						
-						itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
+						itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
 					}
 				}
 			}
@@ -601,7 +601,7 @@ class jArrayAdapter extends ArrayAdapter {
 					itemImage.setImageBitmap(items.get(position).bmp);
 					itemImage.setFocusable(false);
 					itemImage.setFocusableInTouchMode(false);
-					itemImage.setOnClickListener(getOnCheckItem(itemImage, position));
+					itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
 				}
 			}
 
@@ -1117,6 +1117,18 @@ class jArrayAdapter extends ArrayAdapter {
 			
 			return listLayout;
 
+	}
+	
+	
+	// by tr3e
+	View.OnClickListener getOnImageClick(final View cb, final int position) {
+		return new View.OnClickListener() {
+			public void onClick(View v) {
+				if (cb.getClass().getName().equals("android.widget.ImageView")) {
+					controls.pOnClickImageItem(PasObj, position);
+				}				
+			}
+		};
 	}
 
 	View.OnClickListener getOnCheckItem(final View cb, final int position) {
@@ -1680,11 +1692,6 @@ public class jListView extends ListView {
 	public void setWidgetCheck(boolean _value, int _index){
 		alist.get(_index).checked = _value;
 		aadapter.notifyDataSetChanged();
-	}
-	
-	// tr3e add getChecker for widget
-	public boolean getWidgetCheck( int _index ){
-		return alist.get(_index).checked;
 	}
 
 	public void setItemTagString(String _tagString, int _index){

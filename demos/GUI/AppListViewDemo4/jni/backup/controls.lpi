@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="11"/>
+    <Version Value="10"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -18,14 +18,15 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <CustomData Count="7">
+    <CustomData Count="8">
       <Item0 Name="BuildSystem" Value="Ant"/>
       <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8"/>
+      <Item2 Name="LamwVersion" Value="0.8.4"/>
       <Item3 Name="NdkApi" Value="android-24"/>
       <Item4 Name="NdkPath" Value="c:\laztoapk\downloads\android-ndk-r17c\"/>
       <Item5 Name="Package" Value="com.example.applistviewdemo"/>
       <Item6 Name="SdkPath" Value="c:\laztoapk\downloads\android-sdk-windows\"/>
+      <Item7 Name="Theme" Value="DeviceDefault"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -34,10 +35,9 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="1">
-        <Mode0 Name="default"/>
-      </Modes>
+      <local>
+        <FormatVersion Value="1"/>
+      </local>
     </RunParams>
     <RequiredPackages Count="1">
       <Item1>
@@ -55,7 +55,7 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jForm;jListView"/>
+          <Item0 Name="jControls" Value="jListView"/>
         </CustomData>
       </Unit1>
     </Units>
