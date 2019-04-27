@@ -1144,14 +1144,21 @@ class jArrayAdapter extends ArrayAdapter {
 				else if (cb.getClass().getName().equals("android.widget.RadioButton")) {
 					//new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
 					boolean doCheck = ((RadioButton)cb).isChecked(); //new code
+					
 					for (int i=0; i < items.size(); i++) {
-						((RadioButton)items.get(i).jWidget).setChecked(false);
-						items.get(i).checked = false;
-						thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015
+						RadioButton rb = (RadioButton)items.get(i).jWidget;
+						// by tr3e fix bug
+						if( rb != null ){
+						 rb.setChecked(false);
+						 items.get(i).checked = false;
+						}						
 					}
 
 					items.get(position).checked = doCheck;
 					((RadioButton)items.get(position).jWidget).setChecked(doCheck);
+					// by tr3e, only one call is necessary
+					thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015
+					
 					controls.pOnClickWidgetItem(PasObj, position, doCheck);
 
 				}
