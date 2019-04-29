@@ -178,9 +178,9 @@ object FrmCompCreate: TFrmCompCreate
     Height = 531
     Top = 50
     Width = 1019
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Align = alClient
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
@@ -1182,16 +1182,16 @@ object FrmCompCreate: TFrmCompCreate
         Width = 1011
         Align = alClient
         Lines.Strings = (
-          '"Lazarus Android Module Wizard"'
+          '"LAMW: Lazarus Android Module Wizard"'
           ''
           #9'Author: Jose Marques Pessoa : jmpessoa__hotmail_com'
           ''
           #9#9'https://github.com/jmpessoa/lazandroidmodulewizard'
           #9#9'http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html'
           ''
-          ':: How to Create JNI Bridge Component ::'
+          ':: How to Create JNI Bridge Component code::'
           '  '
-          '1. Component Model:  '
+          '1. LAMW Component Model:  '
           ''
           '   ::  jControl: No GUI Control      '
           ''
@@ -1213,15 +1213,18 @@ object FrmCompCreate: TFrmCompCreate
           ''
           '        hint3: You can also use the demo AppTryCode3 to produce a complete [wrapper]  java class !'
           ''
+          '       hint4. you do not need to build the "perfect" component now .... later you can add more methods, events and properties! [sections 3 e 4 bellow]'
+          ''
           '        warning/important: All "imports" from "Controls.java" template  and new "imports" from you java class code'
           '                   will  be researched to try write the correct JNI methods signatures.....'
+          ''
           '                      '
           '   2.2. Rename [and extends] the new class [and constructor], write some custom field, methods, etc... '
           '        [for "JAR" imported class this task is automated! ]'
           '        '
           '        guideline: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...'
           '         '
-          '        hint1: Only public methods will be translated to pascal [bridge ] code.'
+          '        hint1: Only public methods will be translated to pascal [bridge] code.'
           '        hint2:  use the  mask  /*.*/   to make a public method invisible for the parse [ex.  /*.*/public myfunctio() {....} ]  '
           ''
           '   2.3. Select all  the new java class code and right click it [java tab] .'
@@ -1232,7 +1235,7 @@ object FrmCompCreate: TFrmCompCreate
           '        warning:  the  LAMW java to pascal convert dont support complex/generic types like  "java.util.Map<,>" ,  "java.util.Set<>" etc..'
           '       So, we need re-write  the method signature [by hand] for primitives data/array type....'
           ''
-          '      But simple java Object param [or return]  is ok! '
+          '      But simple java Object param [or return]  is ok   [including array!!!]! '
           '     '
           '      public void SetImage(Bitmap _image) {     //<<----  OK! '
           '             this.setImage(_image);'
@@ -1277,8 +1280,60 @@ object FrmCompCreate: TFrmCompCreate
           '   '
           '   2.11. Wait .... Lazarus re-building ...'
           ''
-          '   2.12. The new component  is there: "Android Bridges Extra" palette!.'
+          '   2.12. The new component  is on "Android Bridges Extra" [or other...] palette!.'
+          '   '
+          '   3. Added more methods to your component   '
           ''
+          '   3.1.  write new method to  your ".java" code'
+          '           ex.'
+          '                 public void SetFoo(int _foo) {'
+          '                       mFoo = _foo;'
+          '                 }'
+          '                  public int GetFoo() {'
+          '                        return mFoo;'
+          '                  } '
+          ''
+          '   3.1.  In java tab write a draft java class code to wrapper the [new] methods;'
+          ''
+          '           class jMyComponent {'
+          ''
+          '                 public void SetFoo(int _foo) {'
+          '                       mFoo = _foo;'
+          '                 }'
+          '                  public int GetFoo() {'
+          '                        return mFoo;'
+          '                  } '
+          '          }                 '
+          '           '
+          '    3.2   Right click the Java tab and select "Write [draft] complementary Pascal Interface"'
+          ''
+          '    3.4   Copy the the pascal interface code to your component unit!!!'
+          '        '
+          '    4. Added "native" methods to your component '
+          ''
+          '    4.1.  write the native method "call" to to  your ".java" code    [study some LAMW code as example!]'
+          ''
+          '    4.2.  write the native method signature to to  your ".native" file    [study some LAMW code as example!]'
+          '           ex.          '
+          '              public native void pOnSpinnerItemSeleceted(long pasobj, int position, String caption);'
+          ''
+          '    4.3.  In java tab write a draft java class code to wrapper the the native [one line!] method;'
+          '         '
+          '           class jMyComponent {'
+          ''
+          '                public native void pOnMyComponentItemSeleceted(long pasobj, int position, String caption); //MyComponent'
+          ''
+          '          }                 '
+          ''
+          '         NOTE: the  "//MyComponent" signs the part of the method name that will be overshadowed in the nomination of the property.'
+          '                            ex.  FOnItemSeleceted   [ not FOnMyComponentItemSeleceted  ]   '
+          ''
+          '    4.4   Right click the Java tab and select "Write [draft] complementary Native Method Pascal Interface" '
+          ''
+          '    4.5   Copy the the pascal interface code [generated] to your component unit [mycomponent.pas] and to "Laz_And_Controls_Events.pas"!!!'
+          ''
+          '    Congratulations!!!      '
+          '      '
           'Thank you!'
         )
         ReadOnly = True
@@ -1354,6 +1409,13 @@ object FrmCompCreate: TFrmCompCreate
     end
     object MenuItem13: TMenuItem
       Caption = 'Write [draft] complementary Pascal Interface'
+      OnClick = PopupMenu1Close
+    end
+    object MenuItem16: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem15: TMenuItem
+      Caption = 'Write [draft] complementary Native Method Pascal Interface'
       OnClick = PopupMenu1Close
     end
     object MenuItem9: TMenuItem

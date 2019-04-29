@@ -331,7 +331,11 @@ type
 
  TDynArrayOfJChar = array of JChar;
  TDynArrayOfJBoolean = array of JBoolean;
- TDynArrayOfJByte = array of JByte;
+
+ //jbyte <->  shortint
+ TDynArrayOfJByte = array of JByte;  //array of shortint
+ TDynArrayOfShortint = array of shortint;  //array of jbyte
+
  TDynArrayOfJObject = array of JObject;
 
 
@@ -689,7 +693,6 @@ type
   TOnClickItem       = Procedure(Sender: TObject; itemIndex: Integer) of object;
 
   TOnClickWidgetItem = Procedure(Sender: TObject; itemIndex: integer; checked: boolean) of object;
-  TOnClickImageItem = Procedure(Sender: TObject; itemIndex: integer) of object; // by tr3e
 
   TOnClickCaptionItem = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
 
@@ -1553,7 +1556,7 @@ function Get_jObjectArrayElement(jobjectArray: jObject; index: integer): jObject
 procedure Set_jObjectArrayElement(jobjectArray: jObject; index: integer; element: jObject);
 function Create_jObjectArray(Len: integer; cls: jClass; initialElement: jObject): jObject;
 function Get_jArrayLength(jobjectArray: jObject): integer;
-function  Is_jInstanceOf(jObj:JObject; cls:JClass): boolean;
+function Is_jInstanceOf(jObj:JObject; cls:JClass): boolean;
 function Get_jObjectClass(jObj: jObject): jClass;
 
 function Get_jObjGlobalRef(jObj: jObject): jObject;
