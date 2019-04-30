@@ -1,0 +1,4 @@
+cd c:\laztoapk\downloads\android-sdk-windows\tools
+android create avd -n avd_default -t 1 -c 32M
+cd C:\laztoapk\projects\project1\AppListViewDemo2
+pause
