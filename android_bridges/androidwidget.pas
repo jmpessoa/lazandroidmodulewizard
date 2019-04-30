@@ -693,6 +693,7 @@ type
   TOnClickItem       = Procedure(Sender: TObject; itemIndex: Integer) of object;
 
   TOnClickWidgetItem = Procedure(Sender: TObject; itemIndex: integer; checked: boolean) of object;
+  TOnClickImageItem = Procedure(Sender: TObject; itemIndex: integer) of object; // by tr3e
 
   TOnClickCaptionItem = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
 

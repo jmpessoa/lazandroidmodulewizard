@@ -370,7 +370,7 @@ class jArrayAdapter extends ArrayAdapter {
 				  int _side = 0;
 				  switch(_side) {
 				    case 0: ((TextView)itemWidget).setCompoundDrawables(d, null, null, null); break; //left
-				    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null); break;  //right
+				    case 1: ((TextView)itemWidget).setCompoundDrawables(null, null, d, null); break; //right
 				    case 2: ((TextView)itemWidget).setCompoundDrawables(null, d, null, null); break; //above
 				    case 3: ((TextView)itemWidget).setCompoundDrawables(null, null, null, d); 		
 				  }					
@@ -792,6 +792,7 @@ class jArrayAdapter extends ArrayAdapter {
 				case 4:  itemWidget = new TextView(ctx);
 					((TextView)itemWidget).setId(position+6666);
 					((TextView)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					//((TextView)itemWidget).setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom); // by tr3e
 
 					if (items.get(position).widgetTextColor != 0) {
 						((TextView)itemWidget).setTextColor(items.get(position).widgetTextColor);
@@ -803,8 +804,8 @@ class jArrayAdapter extends ArrayAdapter {
 						  ((TextView)itemWidget).setTextColor(drawWidgetTxtColor);
 					}
 
-					itemDrawImage( position );					
-					
+					itemDrawImage( position );
+										
 					if (items.get(position).textSize != 0)
 					   ((TextView)itemWidget).setTextSize(items.get(position).textSize);					
 					
@@ -1694,6 +1695,11 @@ public class jListView extends ListView {
 	public void setWidgetText(String value, int index){
 		alist.get(index).widgetText = value;
 		aadapter.notifyDataSetChanged();
+	}
+	
+	// tr3e add getChecker for widget
+	public boolean getWidgetCheck( int _index ){
+		return alist.get(_index).checked;
 	}
 
 	public void setWidgetCheck(boolean _value, int _index){

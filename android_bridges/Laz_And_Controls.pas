@@ -1419,6 +1419,7 @@ type
   private
     FOnClickItem  : TOnClickCaptionItem;
     FOnClickWidgetItem: TOnClickWidgetItem;
+    FOnClickImageItem: TOnClickImageItem; // by tr3e
     FOnLongClickItem:  TOnClickCaptionItem;
     FOnDrawItemTextColor: TOnDrawItemTextColor;
     FOnDrawItemBackColor: TOnDrawItemBackColor; // by tr3e
@@ -1465,6 +1466,7 @@ type
 
   protected
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
+    procedure GenEvent_OnClickImageItem(Obj: TObject; index: integer ); // by tr3e
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
 
@@ -1601,6 +1603,7 @@ type
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
+    property OnClickImageItem: TOnClickImageItem read FOnClickImageItem write FOnClickImageItem;
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
     property OnDrawItemBackColor: TOnDrawItemBackColor read FOnDrawItemBackColor write FOnDrawItemBackColor; // by tr3e
@@ -2025,6 +2028,8 @@ type
   //by jmpessoa
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);  overload;
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);  overload; //deprecated
+  //by tr3e
+  procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer);
 
   Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
@@ -2704,6 +2709,18 @@ begin
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     jListVIew(Obj).GenEvent_OnClickWidgetItem(Obj, index, Boolean(checked)); Exit;
+  end;
+end;
+
+// by tr3e
+procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jListView then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    jListVIew(Obj).GenEvent_OnClickImageItem(Obj, index); Exit;
   end;
 end;
 
@@ -7658,6 +7675,12 @@ end;
 procedure jListView.GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
 begin
   if Assigned(FOnClickWidgetItem) then FOnClickWidgetItem(Obj,index,checked);
+end;
+
+//by tr3e
+procedure jListView.GenEvent_OnClickImageItem(Obj: TObject; index: integer);
+begin
+  if Assigned(FOnClickImageItem) then FOnClickImageItem(Obj,index);
 end;
 
 procedure jListView.GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
