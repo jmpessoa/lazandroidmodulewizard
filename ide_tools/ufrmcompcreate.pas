@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, SynMemo, SynHighlighterJava, SynHighlighterPas,
   Forms, Controls, Graphics, Dialogs, ExtCtrls, ComCtrls, Menus, Clipbrd,
-  StdCtrls, Buttons, SynEditTypes, Process, uregistercompform, inifiles,
+  StdCtrls, Buttons, SynEditTypes, Process, uregistercompform, inifiles,strutils,
   PackageIntf, LazIDEIntf, uformimportjarstuff, uFormComplements;
 
 type
@@ -24,6 +24,8 @@ type
     MenuItem12: TMenuItem;
     MenuItem13: TMenuItem;
     MenuItem14: TMenuItem;
+    MenuItem15: TMenuItem;
+    MenuItem16: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
@@ -78,6 +80,7 @@ type
     FJARFilename:  string;
     FListJarClass: TStringList;
     FPathToJavaJDK: string;        //PathToJavaJDK=C:\Program Files\Java\jdk1.8.0_151
+    //FNativeEventNamingBypass: string;
 
     procedure DoJavaParse(produceAll: boolean);
     procedure InsertJControlCodeTemplate(txt: string);
@@ -97,6 +100,21 @@ type
     procedure AddComplements(javaclassName: string);
     function GetJavaClassName(selList: TStringList): string;
     function GetCleanDepData(aux: string): string;
+
+    //native event interface...
+
+    function GetNativePascalTypeSignature(jSignature: string): string;
+    function TryNativeReConvertOutSignature(ptype: string): string;
+    function GetNativeParamName(param: string): string;
+    function TryNativeConvertParam(param: string): string;
+    function TryNativeConvertSignature(param: string): string;
+    function GetNativePascalFuncResultHack(jType: string): string;
+    function GetNativePascalSignature(const methodNative: string; out eventname: string; out outType: string): string;
+    function GetNativeOutPascalReturnInit(ptype: string): string;
+
+    procedure GetNativeMethodInterface(jclassname: string; nativeMethod: string; namingBypass: string; MemoLines: TStrings);
+
+    function GetNativeMethod(selList: TStringList; out namingBypass: string): string;
 
   public
     { public declarations }
@@ -287,7 +305,7 @@ begin
   else if Pos('byte', jType) > 0 then
   begin
      Result := 'byte';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfJByte';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfJByte'; //array of shortint!  -128 + 127
   end
   else if Pos('long', jType) > 0 then
   begin
@@ -1007,9 +1025,33 @@ begin
   listPascal.Free;
 end;
 
+//public native void pOnSpinnerItemSeleceted(long pasobj, int position, String caption); //Spinner
+function TFrmCompCreate.GetNativeMethod(selList: TStringList; out namingBypass: string): string;
+var
+  found: boolean;
+  i: integer;
+  aux: string;
+begin
+    Result:= '';
+    if selList.Text = '' then Exit;
+    found:= False;
+    i:= 0;
+    while (not found) and (i < selList.Count) do
+    begin
+       if Pos(' native ', selList.Strings[i]) > 0 then
+       begin
+          aux:= selList.Strings[i];
+          Result:= SplitStr(aux, '//');
+          namingBypass:= Trim(aux);
+          found:= True;
+       end;
+       Inc(i);
+    end
+end;
+
 procedure TFrmCompCreate.PopupMenu1Close(Sender: TObject);
 var
-  clsName: string;
+  clsName, nativeEventMethod, namingBypass: string;
   strCaption: string;
   responseStr : string;
   auxList: TStringList;
@@ -1023,6 +1065,26 @@ begin
      responseStr := InputBox('Java Source:', 'Search: [MatchCase+WholeWord]', '');
      if responseStr <> '' then
         SynMemo1.SearchReplace(responseStr, responseStr,[ssoMatchCase,ssoWholeWord]);
+  end;
+
+  if Pos('Native Method', strCaption) > 0 then
+  begin
+     auxList:= TStringList.Create;
+     if  SynMemo1.SelText <> '' then
+         auxList.Text:= SynMemo1.SelText; //java class code...
+
+     if auxList.Text = '' then auxList.Text:= SynMemo1.Text; //java class code...
+     if auxList.Text = '' then Exit;
+
+     clsName:= Trim(GetJavaClassName(auxList));
+     nativeEventMethod:= GetNativeMethod(auxList, namingBypass);
+
+     PageControl1.ActivePage:= TabSheet2;
+     SynMemo2.Lines.Clear;
+     GetNativeMethodInterface(clsName,nativeEventMethod,namingBypass, SynMemo2.Lines);
+
+     auxList.Free;
+     Exit;
   end;
 
   if Pos('Insert ', strCaption) > 0 then
@@ -1241,7 +1303,7 @@ var
  iconPath, regFile, userTab: string;
  auxStr, lastStr: string;
  strList: TStringList;
- i, p: integer;
+ i: integer;
  frm: TFormRegisterComp;
 begin
   if (Sender as TMenuItem).Caption <> 'Cancel' then
@@ -2512,6 +2574,406 @@ begin
   pathToWizard:= GetPathToWizard(); //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard
   k:= LastPos(DirectorySeparator, pathToWizard);
   FPathToLAMW:= Copy(pathToWizard, 1, k-1); //C:\laz4android18FPC304\components\androidmodulewizard
+end;
+
+//----------------------------Native Envent Pascal Interface------------------
+function TFrmCompCreate.GetNativePascalTypeSignature(jSignature: string): string;
+var
+  jType, pType: string;
+  jName: string;
+begin
+    pType:= 'JObject';
+
+    jName:= Trim(jSignature);
+    jType:= SplitStr(jName, ' ');
+
+    if Pos('String', jType) > 0 then
+    begin
+      pType:= 'jString';
+      if Pos('String[', jType) > 0 then pType:= 'jstringArray';
+    end
+    else if Pos('int', jType) > 0  then  //The search is case-sensitive!
+    begin
+       pType := 'integer';
+       if Pos('[', jType) > 0 then pType := 'jintArray';
+    end
+    else if Pos('double',jType) > 0 then
+    begin
+       pType := 'double';
+       if Pos('[', jType) > 0 then pType := 'jdoubleArray';
+    end
+    else if Pos('float', jType) > 0 then
+    begin
+       pType := 'single';
+       if Pos('[', jType) > 0 then pType := 'jfloatArray';
+    end
+    else if Pos('char', jType) > 0 then
+    begin
+       pType := 'jchar';
+       if Pos('[', jType) > 0 then pType := 'jcharArray';
+    end
+    else if Pos('short', jType) > 0 then
+    begin
+       pType := 'smallint';
+       if Pos('[', jType) > 0 then pType := 'jshortArray';
+    end
+    else if Pos('boolean', jType) > 0 then
+    begin
+       pType := 'jBoolean';
+       if Pos('[', jType) > 0 then pType := 'jbooleanArray';
+    end
+    else if Pos('byte', jType) > 0 then
+    begin
+       pType := 'jbyte';
+       if Pos('[', jType) > 0 then pType := 'jbyteArray';
+    end
+    else if Pos('long', jType) > 0 then
+    begin
+       pType := 'int64';
+       if Pos('[', jType) > 0 then pType := 'jlongArray';
+    end;
+
+    if  jName <> '' then
+      Result:= jName + ':' + pType
+    else
+      Result:= pType;
+
+end;
+
+function TFrmCompCreate.GetNativePascalFuncResultHack(jType: string): string;
+begin
+  Result:= 'jObject';
+  if Pos('String', jType) > 0 then
+  begin
+     Result:= 'string';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfString';
+  end else if Pos('int', jType) > 0  then
+  begin
+     Result := 'integer';  //longint
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfInteger';
+  end
+  else if Pos('double',jType) > 0 then
+  begin
+     Result := 'double';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfDouble';
+  end
+  else if Pos('float', jType) > 0 then
+  begin
+     Result := 'single';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfSingle';
+  end
+  else if Pos('char', jType) > 0 then
+  begin
+     Result := 'char';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfJChar';
+  end
+  else if Pos('short', jType) > 0 then
+  begin
+     Result := 'smallint';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfSmallint';  //smallint
+  end
+  else if Pos('boolean', jType) > 0 then
+  begin
+     Result := 'boolean';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfJBoolean';
+  end
+  else if Pos('byte', jType) > 0 then
+  begin
+     Result := 'byte';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfJByte';  //array of shortint
+  end
+  else if Pos('long', jType) > 0 then
+  begin
+     Result := 'int64';
+     if Pos('[', jType) > 0 then Result := 'TDynArrayOfInt64';
+  end;
+
+  if Result = 'jObject' then
+      if Pos('[', jType) > 0 then Result := 'TDynArrayOfJObject';
+
+end;
+
+//public native void pOnTelephonyCallStateChanged(long pasobj, int state, String phoneNumber);
+function TFrmCompCreate.GetNativePascalSignature(const methodNative: string; out eventname: string; out outType: string): string;
+var
+  method: string;
+  signature: string;
+  params: string;
+  i, d, p, p1, p2: integer;
+  listParam: TStringList;
+  fTypereturn: string;
+begin
+  listParam:= TStringList.Create;
+
+  fTypereturn:= '';
+  method:= methodNative;
+
+  p:= Pos('native', method);
+  method:= Copy(method, p+Length('native'), MaxInt);
+  p1:= Pos('(', method);
+  p2:= PosEx(')', method, p1 + 1);
+  d:=(p2-p1);
+
+  params:= Copy(method, p1+1, d-1); //long pasobj, long elapsedTimeMillis
+                                    //long pasobj, int state, String phoneNumber
+  method:= Copy(method, 1, p1-1);
+  method:= Trim(method);            //void pOnChronometerTick
+
+  fTypereturn:= Trim(SplitStr(method, ' '));
+
+  method:= Trim(method);            //pOnChronometerTick
+
+  signature:= '(env:PJNIEnv;this:JObject';
+  if Length(params) > 3 then
+  begin
+    listParam.Delimiter:= ',';
+    listParam.StrictDelimiter:= True;
+    listParam.DelimitedText:= params;
+    for i:= 0 to listParam.Count-1 do
+    begin
+      if Pos('pasobj', listParam.Strings[i]) > 0 then
+        signature:= signature + ';'+ 'Sender:TObject'
+      else
+        signature:= signature + ';' + GetNativePascalTypeSignature(Trim(listParam.Strings[i]));
+    end;
+  end;
+
+
+  if fTypereturn = 'void' then
+    Result:= 'procedure Java_Event_'+method+signature+');'
+  else
+  begin
+    outType:= GetNativePascalFuncResultHack(fTypereturn) ;
+    Result:= 'function Java_Event_'+method+signature+'):'+GetNativePascalTypeSignature(fTypereturn)+';';
+  end;
+
+  eventname:= Copy(method, 2, MaxInt);
+
+  listParam.Free;
+end;
+
+function TFrmCompCreate.TryNativeConvertSignature(param: string): string;
+var
+  pname, ptype: string;
+begin
+  Result:= param;
+  ptype:= param;
+  pname:= SplitStr(ptype, ':');
+  if Pos('jfloatArray', ptype) > 0 then Result:= pname + ':' + 'array of single'
+  else if Pos('jdoubleArray', ptype) > 0 then Result:= pname + ':' + 'array of double'
+  else if Pos('jintArray', ptype) > 0 then Result:= pname + ':' + 'array of integer'
+  else if Pos('jbyteArray', ptype) > 0 then Result:= pname + ':' + 'array of shortint'
+  else if Pos('jString', ptype) > 0 then Result:= pname + ':' + 'string'
+  else if Pos('jstringArray', ptype) > 0 then Result:= pname + ':' + 'array of string'
+  else if Pos('jBoolean', ptype) > 0 then Result:= pname + ':' + 'boolean';
+end;
+
+function TFrmCompCreate.TryNativeConvertParam(param: string): string;
+var
+  pname, ptype: string;
+begin
+  ptype:= param;
+  pname:= SplitStr(ptype, ':');
+  Result:= pname;
+  if Pos('jString', ptype) > 0 then Result:= 'GetString(env,'+pname+')'
+  else if Pos('jBoolean', ptype) > 0 then Result:= 'boolean('+pname+')'
+  else if Pos('jbyteArray', ptype) > 0 then Result:= 'GetDynArrayOfJByte(env,'+pname+')'  //array of shortint
+  else if Pos('jintArray', ptype) > 0 then Result:= 'GetDynArrayOfInteger(env,'+pname+')'
+  else if Pos('jfloatArray', ptype) > 0 then Result:= 'GetDynArrayOfSingle(env,'+pname+')'
+  else if Pos('jdoubleArray', ptype) > 0 then Result:= 'GetDynArrayOfDouble(env,'+pname+')'
+  else if Pos('jstringArray', ptype) > 0 then Result:= 'GetDynArrayOfString(env,'+pname+')';
+end;
+
+function TFrmCompCreate.GetNativeParamName(param: string): string;
+var
+  pname, ptype: string;
+begin
+  ptype:= param;
+  pname:= SplitStr(ptype, ':');
+  Result:= pname;
+end;
+
+function TFrmCompCreate.TryNativeReConvertOutSignature(ptype: string): string;
+begin
+  Result:= ptype;
+  if ptype = 'TDynArrayOfInteger' then Result:= 'array of integer'
+  else if ptype = 'TDynArrayOfString'  then Result:= 'array of string'
+  else if ptype = 'TDynArrayOfSingle'  then Result:= 'array of single'
+  else if ptype = 'TDynArrayOfDouble'  then Result:= 'array of double'
+  else if ptype = 'TDynArrayOfJByte'   then Result:= 'array of shortint'
+  else if ptype = 'jBoolean' then Result:= 'boolean'
+  else if ptype = 'jString'  then Result:= 'string';
+end;
+
+function TFrmCompCreate.GetNativeOutPascalReturnInit(ptype: string): string;
+begin
+  Result:= '0';
+  if ptype = 'TDynArrayOfInteger' then Result:= 'nil'
+  else if ptype = 'TDynArrayOfString'  then Result:= 'nil'
+  else if ptype = 'TDynArrayOfSingle'  then Result:= 'nil'
+  else if ptype = 'TDynArrayOfDouble'  then Result:= 'nil'
+  else if ptype = 'TDynArrayOfJByte'   then Result:= 'nil'
+  else if ptype = 'boolean' then Result:= 'False'
+  else if ptype = 'string'  then Result:= '';
+end;
+
+
+procedure TFrmCompCreate.GetNativeMethodInterface(jclassname: string; nativeMethod: string; namingBypass: string; MemoLines: TStrings);
+var
+  signature, eventname, params, pasSignature, pasParams: string;
+  listBody, listParam: TStringList;
+  p1, p2, i, count: integer;
+  aux, outPascalReturnType, smallEventName: string;
+begin
+  listParam:= TStringList.Create;
+  listParam.Delimiter:= ';';
+  listParam.StrictDelimiter:= True;
+  listBody:= TStringList.Create;
+  outPascalReturnType:= ''; //jString, jBoolean, integer, single
+  signature:= GetNativePascalSignature(nativeMethod, eventname, outPascalReturnType);
+  p1:= Pos('(', signature);
+  p2:= Pos(')', signature);
+  listParam.DelimitedText:= Copy(signature, p1+1,p2-(p1+1)); // env:PJNIEnv;this:JObject;Obj:TObject;state:integer;phoneNumber:jString
+
+  count:= listParam.Count;
+
+  smallEventName:= StringReplace(eventname,namingBypass,'',[rfIgnoreCase, rfReplaceAll]);
+
+  pasSignature:='Sender:TObject';
+  params:= 'Sender';
+  pasParams:= 'Sender';
+
+  MemoLines.Clear;
+  MemoLines.Add('//----------------------------------------------- Laz_And_Controls_Events.pas ----------------------------------');
+  MemoLines.Add(' ');
+  MemoLines.Add('interface');
+  MemoLines.Add(' ');
+  MemoLines.Add(signature);
+  MemoLines.Add(' ');
+  MemoLines.Add(' ');
+  MemoLines.Add('implementation');
+  MemoLines.Add(' ');
+  MemoLines.Add('uses');
+  MemoLines.Add('  '+Lowercase(Copy(jclassname,2,MaxInt))+';');
+  MemoLines.Add(' ');
+  MemoLines.Add(signature);
+
+  if count > 3 then
+  begin
+    for i:= 3 to count-1 do
+    begin
+       //Sender:TObject;state:integer;phoneNumber:string
+       aux:= listParam.Strings[i];
+       pasSignature:= pasSignature + ';'+ TryNativeConvertSignature(aux);
+       pasParams:=pasParams + ',' +GetNativeParamName(aux);
+       params:= params + ','+ TryNativeConvertParam(aux);
+    end;
+  end;
+
+  if outPascalReturnType <> '' then
+  begin
+    MemoLines.Add('var');
+    MemoLines.Add('  outReturn: '+outPascalReturnType+';');
+  end;
+
+  MemoLines.Add('begin');
+  MemoLines.Add('  gApp.Jni.jEnv:= env;');
+  MemoLines.Add('  gApp.Jni.jThis:= this;');
+
+  if outPascalReturnType <> '' then
+  begin
+    MemoLines.Add('  outReturn:='+GetNativeOutPascalReturnInit(outPascalReturnType)+';');
+  end;
+
+  MemoLines.Add('  if Sender is '+jclassname+' then');
+  MemoLines.Add('  begin');
+  MemoLines.Add('    jForm('+jclassname+'(Sender).Owner).UpdateJNI(gApp);');
+  if outPascalReturnType = '' then
+    MemoLines.Add('    '+jclassname+'(Sender).GenEvent_'+eventname+'('+params+');')
+  else
+    MemoLines.Add('    '+jclassname+'(Sender).GenEvent_'+eventname+'('+params+',outReturn);');
+
+  MemoLines.Add('  end;');
+  if outPascalReturnType <> '' then
+  begin
+
+    if outPascalReturnType = 'string' then
+      MemoLines.Add('  Result:=GetJString(env,outReturn);')
+    else if outPascalReturnType = 'boolean' then
+       MemoLines.Add('  Result:=JBool(outReturn);')
+
+    else if outPascalReturnType = 'TDynArrayOfJByte' then
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfJByte(env,outReturn);')
+
+    else if outPascalReturnType = 'TDynArrayOfInteger' then
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfInteger(env,outReturn);')
+
+    else if outPascalReturnType = 'TDynArrayOfSingle' then
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfSingle(env,outReturn);')
+
+    else if outPascalReturnType = 'TDynArrayOfDouble' then
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfDouble(env,outReturn);')
+
+    else if outPascalReturnType = 'TDynArrayOfString' then
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfString(env,outReturn);')
+
+    else
+      MemoLines.Add('  Result:=outReturn;');
+  end;
+  MemoLines.Add('end;');
+
+  MemoLines.Add(' ');
+  MemoLines.Add(' ');
+  MemoLines.Add(' ');
+  MemoLines.Add('//----------------------------------------------- '+Lowercase(Copy(jclassname,2,MaxInt))+'.pas ----------------------------------');
+  MemoLines.Add(' ');
+  MemoLines.Add('type');
+  MemoLines.Add(' ');
+
+  if outPascalReturnType = '' then
+     MemoLines.Add('T'+eventname+'=procedure('+pasSignature+') of object;')
+  else                                                                        //TryNativeReConvertOutSignature
+     MemoLines.Add('T'+eventname+'=procedure('+pasSignature+';var outReturn:'+outPascalReturnType+') of object;');
+
+  MemoLines.Add(' ');
+  MemoLines.Add(jclassname+' = class');
+  MemoLines.Add('private');
+  MemoLines.Add('  F'+smallEventName+': T'+eventname+';');
+  MemoLines.Add('public');
+
+  if outPascalReturnType = '' then
+    MemoLines.Add('  procedure GenEvent_'+eventname+'('+pasSignature+');')
+  else                                                                                 //TryNativeReConvertOutSignature(
+    MemoLines.Add('  procedure GenEvent_'+eventname+'('+pasSignature+';var outReturn:'+outPascalReturnType+');');
+
+  MemoLines.Add('published');
+  MemoLines.Add('  property '+smallEventName+': T'+eventname+' read F'+smallEventName+' write F'+smallEventName+';');
+  MemoLines.Add('end;');
+
+  MemoLines.Add(' ');
+  MemoLines.Add(' ');
+  MemoLines.Add('implementation');
+  MemoLines.Add(' ');
+  MemoLines.Add(' ');
+
+  if outPascalReturnType = '' then
+    MemoLines.Add('procedure '+jclassname+'.GenEvent_'+eventname+'('+pasSignature+');')
+  else                                                                                              //TryNativeReConvertOutSignature(
+    MemoLines.Add('procedure '+jclassname+'.GenEvent_'+eventname+'('+pasSignature+';var outReturn:'+outPascalReturnType+');');
+
+  MemoLines.Add('begin');
+
+  if outPascalReturnType = '' then
+    MemoLines.Add('  if Assigned(F'+smallEventName+') then F'+smallEventName+'('+pasParams+');')
+  else
+    MemoLines.Add('  if Assigned(F'+smallEventName+') then F'+smallEventName+'('+pasParams+',outReturn);');
+
+  MemoLines.Add('end;');
+
+
+  listParam.Free;
+  listBody.Free;
+
 end;
 
 //generics...

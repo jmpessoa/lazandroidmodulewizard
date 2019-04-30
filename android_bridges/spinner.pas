@@ -93,7 +93,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetSelectedPaddingBottom(_paddingBottom: integer);
     procedure SetLGravity(_value: TLayoutGravity);
 
-    procedure GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
+    procedure GenEvent_OnSpinnerItemSelected(Obj: TObject; caption: string; position: integer);
 
     property ViewParent: jObject  read  FjPRLayout write SetViewParent; // Java : Parent Relative Layout
     property Count: integer read GetSize;
@@ -118,7 +118,6 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
 
     property SelectedPaddingTop: integer read FSelectedPaddingTop write SetSelectedPaddingTop;
     property SelectedPaddingBottom: integer read FSelectedPaddingBottom write SetSelectedPaddingBottom;
-
 
     property OnItemSelected: TOnItemSelected  read FOnItemSelected write FOnItemSelected;
   end;
@@ -551,9 +550,9 @@ begin
   FItems.Delimiter:= saveDelimiter;
 end;
 
-procedure jSpinner.GenEvent_OnSpinnerItemSeleceted(Obj: TObject; caption: string; position: integer);
+procedure jSpinner.GenEvent_OnSpinnerItemSelected(Obj: TObject; caption: string; position: integer);
 begin
-   if Assigned(FOnItemSelected) then FOnItemSelected(Obj, caption, position);
+  if Assigned(FOnItemSelected) then FOnItemSelected(Obj, caption, position);
 end;
 
 Procedure jSpinner.SetSelectedFontColor(Value: TARGBColorBridge);

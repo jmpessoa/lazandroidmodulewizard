@@ -1419,7 +1419,6 @@ type
   private
     FOnClickItem  : TOnClickCaptionItem;
     FOnClickWidgetItem: TOnClickWidgetItem;
-    FOnClickImageItem: TOnClickImageItem; // by tr3e
     FOnLongClickItem:  TOnClickCaptionItem;
     FOnDrawItemTextColor: TOnDrawItemTextColor;
     FOnDrawItemBackColor: TOnDrawItemBackColor; // by tr3e
@@ -1466,7 +1465,6 @@ type
 
   protected
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
-    procedure GenEvent_OnClickImageItem(Obj: TObject; index: integer ); // by tr3e
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
 
@@ -1532,6 +1530,7 @@ type
     function GetWidgetText(_index: integer): string;
 
     procedure SetWidgetCheck(_value: boolean; _index: integer);
+    function  GetWidgetCheck(_index: integer) : boolean; //by tr3e
     procedure SetItemTagString(_tagString: string; _index: integer);
     function GetItemTagString(_index: integer): string;
     procedure SetImageByResIdentifier(_imageResIdentifier: string);
@@ -1602,10 +1601,9 @@ type
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
-    property OnClickImageItem: TOnClickImageItem read FOnClickImageItem write FOnClickImageItem;
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
-    property OnDrawItemBackColor: TOnDrawItemBackColor read FOnDrawItemBackColor write FOnDrawItemBackColor; // tr3e
+    property OnDrawItemBackColor: TOnDrawItemBackColor read FOnDrawItemBackColor write FOnDrawItemBackColor; // by tr3e
     property OnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor read FOnDrawItemWidgetTextColor write FOnDrawItemWidgetTextColor;
     property OnDrawItemWidgetText: TOnDrawItemWidgetText read FOnDrawItemWidgetText write FOnDrawItemWidgetText;
     property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
@@ -2027,13 +2025,11 @@ type
   //by jmpessoa
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);  overload;
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);  overload; //deprecated
-  //by tr3e
-  procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer);
 
   Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
-  function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt; // by tr3e
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+  function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt; // by tr3e
   function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function Java_Event_pOnListViewDrawItemWidgetText(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JString;
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
@@ -2711,18 +2707,6 @@ begin
   end;
 end;
 
-// by tr3e
-procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Obj is jListView then
-  begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
-    jListVIew(Obj).GenEvent_OnClickImageItem(Obj, index); Exit;
-  end;
-end;
-
 procedure Java_Event_pOnBeforeDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
 begin
   gApp.Jni.jEnv:= env;
@@ -2940,7 +2924,6 @@ begin
   end;
   Result:= outColor;
 end;
-
 
 function Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
 var
@@ -7672,12 +7655,6 @@ begin
   if Assigned(FOnAfterDispatchDraw) then FOnAfterDispatchDraw(Obj, canvas, tag);
 end;
 
-//by tr3e
-procedure jListView.GenEvent_OnClickImageItem(Obj: TObject; index: integer);
-begin
-  if Assigned(FOnClickImageItem) then FOnClickImageItem(Obj,index);
-end;
-
 procedure jListView.GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
 begin
   if Assigned(FOnClickWidgetItem) then FOnClickWidgetItem(Obj,index,checked);
@@ -7686,18 +7663,6 @@ end;
 procedure jListView.GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
 begin
   if Assigned(FOnLongClickItem) then FOnLongClickItem(Obj,index,caption);
-end;
-
-//by tr3e
-procedure jListView.GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword);
-var
-  outColor: TARGBColorBridge;
-begin
-  outColor:= colbrDefault;
-  color:= 0; //default;
-  if Assigned(FOnDrawItemBackColor) then FOnDrawItemBackColor(Obj,index, outColor);
-  if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
-      color:= GetARGB(FCustomColor, outColor);
 end;
 
 procedure jListView.GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
@@ -7709,6 +7674,18 @@ begin
 
   if Assigned(FOnDrawItemTextColor) then FOnDrawItemTextColor(Obj,index,caption, outColor);
 
+  if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
+      color:= GetARGB(FCustomColor, outColor);
+end;
+
+// by tr3e
+procedure jListView.GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword);
+var
+  outColor: TARGBColorBridge;
+begin
+  outColor:= colbrDefault;
+  color:= 0; //default;
+  if Assigned(FOnDrawItemBackColor) then FOnDrawItemBackColor(Obj,index, outColor);
   if (outColor <> colbrNone) and  (outColor <> colbrDefault) then
       color:= GetARGB(FCustomColor, outColor);
 end;
@@ -7816,6 +7793,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_setWidgetCheck(FjEnv, FjObject, _value ,_index);
+end;
+
+function jListView.GetWidgetCheck(_index: integer) : boolean;
+begin
+  result := false;
+
+  //in designing component state: set value here...
+  if FInitialized then
+   result := jListView_getWidgetCheck(FjEnv, FjObject, _index);
 end;
 
 procedure jListView.SetItemTagString(_tagString: string; _index: integer);
