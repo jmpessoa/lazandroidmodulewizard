@@ -31,7 +31,7 @@ uses
    procedure Java_Event_pOnBluetoothServerSocketListen(env: PJNIEnv; this: jobject; Obj: TObject; serverName: JString; strUUID: JString);
    procedure Java_Event_pOnBluetoothServerSocketAcceptTimeout(env: PJNIEnv; this: jobject; Obj: TObject);
 
-   procedure Java_Event_pOnSpinnerItemSeleceted(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+   procedure Java_Event_pOnSpinnerItemSelected(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
 
    procedure Java_Event_pOnLocationChanged(env: PJNIEnv; this: jobject; Obj: TObject; latitude: JDouble; longitude: JDouble; altitude: JDouble; address: JString);
    procedure Java_Event_pOnLocationStatusChanged(env: PJNIEnv; this: jobject; Obj: TObject; status: integer; provider: JString; msgStatus: JString);
@@ -215,6 +215,11 @@ begin
     end;
 end;
 
+function GetJString(env: PJNIEnv; str: string): JString;
+begin
+  Result:= env^.NewStringUTF(env, PChar(str));
+end;
+
 function GetDynArrayOfString(env: PJNIEnv; stringArrayData: jstringArray): TDynArrayOfString;
 var
   jstr: JString;
@@ -252,7 +257,7 @@ var
 begin
   sizeArray:=  env^.GetArrayLength(env, doubleArrayData);
   SetLength(Result, sizeArray);
-  env^.GetFloatArrayRegion(env, doubleArrayData, 0, sizeArray, @Result[0] {target});
+  env^.GetDoubleArrayRegion(env, doubleArrayData, 0, sizeArray, @Result[0] {target});
 end;
 
 function GetDynArrayOfInteger(env: PJNIEnv; intArrayData: jintArray): TDynArrayOfInteger;
@@ -290,7 +295,7 @@ begin
   Result:= nil;
   newSize0:= Length(dataContent);
   Result:= env^.NewFloatArray(env, newSize0);  // allocate
-  env^.SetByteArrayRegion(env, Result, 0 , newSize0, @dataContent[0] {source});
+  env^.SetFloatArrayRegion(env, Result, 0 , newSize0, @dataContent[0] {source});
 end;
 
 function GetJObjectOfDynArrayOfDouble(env: PJNIEnv; var dataContent: TDynArrayOfDouble):jdoubleArray; // jObject;
@@ -300,7 +305,7 @@ begin
   Result:= nil;
   newSize0:= Length(dataContent);
   Result:= env^.NewDoubleArray(env, newSize0);  // allocate
-  env^.SetByteArrayRegion(env, Result, 0 , newSize0, @dataContent[0] {source});
+  env^.SetDoubleArrayRegion(env, Result, 0 , newSize0, @dataContent[0] {source});
 end;
 
 function GetJObjectOfDynArrayOfInteger(env: PJNIEnv; var dataContent: TDynArrayOfInteger):jintArray; // jObject;
@@ -310,7 +315,7 @@ begin
   Result:= nil;
   newSize0:= Length(dataContent);
   Result:= env^.NewIntArray(env, newSize0);  // allocate
-  env^.SetByteArrayRegion(env, Result, 0 , newSize0, @dataContent[0] {source});
+    env^.SetIntArrayRegion(env, Result, 0 , newSize0, @dataContent[0] {source});
 end;
 
 function GetJObjectOfDynArrayOfString(env: PJNIEnv; var dataContent: TDynArrayOfString): jstringArray;  // jObject;
@@ -661,7 +666,7 @@ begin
   end;
 end;
 
-procedure Java_Event_pOnSpinnerItemSeleceted(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+procedure Java_Event_pOnSpinnerItemSelected(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
 var
  pasCaption: string;
  _jBoolean: JBoolean;
@@ -678,7 +683,7 @@ begin
       _jBoolean:= JNI_False;
       pasCaption:= string( env^.GetStringUTFChars(Env,caption,@_jBoolean) );
     end;
-    jSpinner(Obj).GenEvent_OnSpinnerItemSeleceted(Obj, pasCaption, position);
+    jSpinner(Obj).GenEvent_OnSpinnerItemSelected(Obj, pasCaption, position);
   end;
 end;
 

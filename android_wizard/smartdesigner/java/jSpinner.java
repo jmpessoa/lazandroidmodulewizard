@@ -222,7 +222,7 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
             setSelection(position);
             mSelectedIndex = position;
             mSelectedText = caption;
-            controls.pOnSpinnerItemSeleceted(pascalObj,position,caption);
+            controls.pOnSpinnerItemSelected(pascalObj,position,caption);
         }
 
         @Override

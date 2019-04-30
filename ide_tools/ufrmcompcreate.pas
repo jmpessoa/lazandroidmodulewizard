@@ -103,13 +103,14 @@ type
 
     //native event interface...
 
-    function GetNativePascalTypeSignature(jSignature: string): string; //int index;
+    function GetNativePascalTypeSignature(jSignature: string): string;
     function TryNativeReConvertOutSignature(ptype: string): string;
     function GetNativeParamName(param: string): string;
     function TryNativeConvertParam(param: string): string;
     function TryNativeConvertSignature(param: string): string;
     function GetNativePascalFuncResultHack(jType: string): string;
     function GetNativePascalSignature(const methodNative: string; out eventname: string; out outType: string): string;
+    function GetNativeOutPascalReturnInit(ptype: string): string;
 
     procedure GetNativeMethodInterface(jclassname: string; nativeMethod: string; namingBypass: string; MemoLines: TStrings);
 
@@ -2804,6 +2805,19 @@ begin
   else if ptype = 'jString'  then Result:= 'string';
 end;
 
+function TFrmCompCreate.GetNativeOutPascalReturnInit(ptype: string): string;
+begin
+  Result:= '0';
+  if ptype = 'TDynArrayOfInteger' then Result:= 'nil'
+  else if ptype = 'TDynArrayOfString'  then Result:= 'nil'
+  else if ptype = 'TDynArrayOfSingle'  then Result:= 'nil'
+  else if ptype = 'TDynArrayOfDouble'  then Result:= 'nil'
+  else if ptype = 'TDynArrayOfJByte'   then Result:= 'nil'
+  else if ptype = 'boolean' then Result:= 'False'
+  else if ptype = 'string'  then Result:= '';
+end;
+
+
 procedure TFrmCompCreate.GetNativeMethodInterface(jclassname: string; nativeMethod: string; namingBypass: string; MemoLines: TStrings);
 var
   signature, eventname, params, pasSignature, pasParams: string;
@@ -2858,12 +2872,19 @@ begin
 
   if outPascalReturnType <> '' then
   begin
-     MemoLines.Add('var');
-     MemoLines.Add('  outReturn: '+outPascalReturnType+';');
+    MemoLines.Add('var');
+    MemoLines.Add('  outReturn: '+outPascalReturnType+';');
   end;
+
   MemoLines.Add('begin');
   MemoLines.Add('  gApp.Jni.jEnv:= env;');
   MemoLines.Add('  gApp.Jni.jThis:= this;');
+
+  if outPascalReturnType <> '' then
+  begin
+    MemoLines.Add('  outReturn:='+GetNativeOutPascalReturnInit(outPascalReturnType)+';');
+  end;
+
   MemoLines.Add('  if Sender is '+jclassname+' then');
   MemoLines.Add('  begin');
   MemoLines.Add('    jForm('+jclassname+'(Sender).Owner).UpdateJNI(gApp);');
@@ -2877,24 +2898,24 @@ begin
   begin
 
     if outPascalReturnType = 'string' then
-      MemoLines.Add('  Result:=Get_jString(outReturn);')
+      MemoLines.Add('  Result:=GetJString(env,outReturn);')
     else if outPascalReturnType = 'boolean' then
        MemoLines.Add('  Result:=JBool(outReturn);')
 
     else if outPascalReturnType = 'TDynArrayOfJByte' then
-      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfJByte(outReturn);')
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfJByte(env,outReturn);')
 
     else if outPascalReturnType = 'TDynArrayOfInteger' then
-      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfInteger(outReturn);')
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfInteger(env,outReturn);')
 
     else if outPascalReturnType = 'TDynArrayOfSingle' then
-      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfSingle(outReturn);')
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfSingle(env,outReturn);')
 
     else if outPascalReturnType = 'TDynArrayOfDouble' then
-      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfDouble(outReturn);')
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfDouble(env,outReturn);')
 
     else if outPascalReturnType = 'TDynArrayOfString' then
-      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfString(outReturn);')
+      MemoLines.Add('  Result:=GetJObjectOfDynArrayOfString(env,outReturn);')
 
     else
       MemoLines.Add('  Result:=outReturn;');
@@ -2911,8 +2932,8 @@ begin
 
   if outPascalReturnType = '' then
      MemoLines.Add('T'+eventname+'=procedure('+pasSignature+') of object;')
-  else
-     MemoLines.Add('T'+eventname+'=procedure('+pasSignature+';var outReturn:'+TryNativeReConvertOutSignature(outPascalReturnType)+') of object;');
+  else                                                                        //TryNativeReConvertOutSignature
+     MemoLines.Add('T'+eventname+'=procedure('+pasSignature+';var outReturn:'+outPascalReturnType+') of object;');
 
   MemoLines.Add(' ');
   MemoLines.Add(jclassname+' = class');
@@ -2922,8 +2943,8 @@ begin
 
   if outPascalReturnType = '' then
     MemoLines.Add('  procedure GenEvent_'+eventname+'('+pasSignature+');')
-  else
-    MemoLines.Add('  procedure GenEvent_'+eventname+'('+pasSignature+';var outReturn:'+TryNativeReConvertOutSignature(outPascalReturnType)+');');
+  else                                                                                 //TryNativeReConvertOutSignature(
+    MemoLines.Add('  procedure GenEvent_'+eventname+'('+pasSignature+';var outReturn:'+outPascalReturnType+');');
 
   MemoLines.Add('published');
   MemoLines.Add('  property '+smallEventName+': T'+eventname+' read F'+smallEventName+' write F'+smallEventName+';');
@@ -2937,8 +2958,8 @@ begin
 
   if outPascalReturnType = '' then
     MemoLines.Add('procedure '+jclassname+'.GenEvent_'+eventname+'('+pasSignature+');')
-  else
-    MemoLines.Add('procedure '+jclassname+'.GenEvent_'+eventname+'('+pasSignature+';var outReturn:'+TryNativeReConvertOutSignature(outPascalReturnType)+');');
+  else                                                                                              //TryNativeReConvertOutSignature(
+    MemoLines.Add('procedure '+jclassname+'.GenEvent_'+eventname+'('+pasSignature+';var outReturn:'+outPascalReturnType+');');
 
   MemoLines.Add('begin');
 
