@@ -1439,12 +1439,21 @@ type
     FTextSizeDecorated: TTextSizeDecorated;
     FItemLayout   : TItemLayout;
     FTextAlign     : TTextAlign;
+    FTextPosition  : TTextPosition;
 
     FHighLightSelectedItemColor: TARGBColorBridge;
     FImageItemIdentifier: string;
 
-    FItemPaddingTop: integer;
-    FItemPaddingBottom: integer;
+    FItemPaddingTop : integer;
+    FItemPaddingBottom : integer;
+    FItemPaddingLeft: integer;  // by tr3e
+    FItemPaddingRight: integer; // by tr3e
+
+    FTextMarginLeft  : integer; // by tr3e
+    FTextMarginRight : integer; // by tr3e
+    FTextMarginInner : integer; // by tr3e
+
+    FTextWordWrap : boolean; // by tr3e
 
     FWidgetTextColor: TARGBColorBridge;
 
@@ -1519,6 +1528,8 @@ type
     procedure SetTextDecoratedByIndex(Value: TTextDecorated; index: integer);
     procedure SetTextSizeDecoratedByIndex(value: TTextSizeDecorated; index: integer);
     procedure SetTextAlignByIndex(Value: TTextAlign; index: integer);
+    procedure SetTextPositionByIndex(Value: TTextPosition; index: integer); // by tr3e
+    procedure SetTextWordWrap(_value: boolean); // by tr3e
 
     procedure SetLayoutByIndex(Value: TItemLayout; index: integer);
 
@@ -1546,6 +1557,12 @@ type
     procedure SetAllPartsOnDrawItemTextColor(_value: boolean);
     procedure SetItemPaddingTop(_ItemPaddingTop: integer);
     procedure SetItemPaddingBottom(_itemPaddingBottom: integer);
+    procedure SetItemPaddingLeft(_itemPaddingLeft: integer); // by tr3e
+    procedure SetItemPaddingRight(_itemPaddingRight: integer); // by tr3e
+    procedure SetTextMarginLeft(_left: integer); // by tr3e
+    procedure SetTextMarginRight(_right: integer); // by tr3e
+    procedure SetTextMarginInner(_inner: integer); // by tr3e
+    procedure SetWidgetImageSide(_side: integer); // by tr3e
     procedure SetWidgetTextColor(_textcolor: TARGBColorBridge);
     procedure SetDispatchOnDrawItemWidgetTextColor(_value: boolean);
     procedure SetDispatchOnDrawItemWidgetText(_value: boolean);
@@ -1591,6 +1608,8 @@ type
     property ItemLayout: TItemLayout read FItemLayout write FItemLayout;
     property TextSizeDecorated: TTextSizeDecorated read FTextSizeDecorated write FTextSizeDecorated;
     property TextAlign: TTextAlign read FTextAlign write FTextAlign;
+    property TextPosition: TTextPosition read FTextPosition write FTextPosition; // by tr3e
+    property TextWordWrap: boolean read FTextWordWrap write SetTextWordWrap; // by tr3e
     property HighLightSelectedItemColor: TARGBColorBridge read FHighLightSelectedItemColor write SetHighLightSelectedItemColor;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
@@ -1598,6 +1617,13 @@ type
     property ImageItemIdentifier: string read FImageItemIdentifier write SetImageByResIdentifier;
     property ItemPaddingTop: integer read FItemPaddingTop write SetItemPaddingTop;
     property ItemPaddingBottom: integer read FItemPaddingBottom write SetItemPaddingBottom;
+    property ItemPaddingLeft: integer read FItemPaddingLeft write SetItemPaddingLeft; // by tr3e
+    property ItemPaddingRight: integer read FItemPaddingRight write SetItemPaddingRight;
+
+    property TextMarginLeft: integer read FTextMarginLeft write SetTextMarginLeft; // by tr3e
+    property TextMarginRight: integer read FTextMarginRight write SetTextMarginRight; // by tr3e
+    property TextMarginInner: integer read FTextMarginInner write SetTextMarginInner; // by tr3e
+    
     property WidgetTextColor: TARGBColorBridge read FWidgetTextColor write SetWidgetTextColor;
 
     // Event
@@ -7170,6 +7196,7 @@ begin
   FItemLayout:= layText;
   FTextSizeDecorated:= sdNone;
   FTextAlign:= alLeft;
+  FTextPosition:= posCenter;
   FItems:= TStringList.Create;
   TStringList(FItems).OnChange:= ListViewChange;  //event handle
 
@@ -7181,8 +7208,16 @@ begin
   FHighLightSelectedItemColor:= colbrDefault;
   FImageItemIdentifier:= '';
 
-  FItemPaddingTop:= 40;
-  FItemPaddingBottom:= 40;
+  FItemPaddingTop    := 10;
+  FItemPaddingBottom := 10;
+  FItemPaddingLeft   := 10;
+  FItemPaddingRight  := 10;
+
+  FTextMarginLeft    := 10;
+  FTextMarginRight   := 10;
+  FTextMarginInner   := 2;
+
+  FTextWordWrap := false;
 
   FWidgetTextColor:= colbrDefault;
 
@@ -7217,7 +7252,8 @@ begin
 
     FjObject := jListView_Create2(FjEnv, FjThis, Self,
                                Ord(FWidgetItem), FWidgetText, FImageItem.GetImage,
-                               Ord(FTextDecorated), Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
+                               Ord(FTextDecorated), Ord(FItemLayout), Ord(FTextSizeDecorated),
+                               Ord(FTextAlign), Ord(FTextPosition));
 
     if FWidgetTextColor <> colbrDefault then
         jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
@@ -7237,11 +7273,26 @@ begin
     if FColor <> colbrDefault then
        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-    if FItemPaddingTop <> 40 then
+    if FItemPaddingTop <> 10 then
       jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
 
-    if FItemPaddingBottom <> 40 then
+    if FItemPaddingBottom <> 10 then
       jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+
+    if FItemPaddingLeft <> 10 then // by tr3e
+      jListView_SetItemPaddingLeft(FjEnv, FjObject, FItemPaddingLeft);
+
+    if FItemPaddingRight <> 10 then
+      jListView_SetItemPaddingRight(FjEnv, FjObject, FItemPaddingRight);
+
+    if FTextMarginLeft <> 10 then // by tr3e
+      jListView_SetTextMarginLeft(FjEnv, FjObject, FTextMarginLeft);
+
+    if FTextMarginRight <> 10 then // by tr3e
+      jListView_SetTextMarginRight(FjEnv, FjObject, FTextMarginRight);
+
+    if FTextMarginInner <> 10 then // by tr3e
+      jListView_SetTextMarginInner(FjEnv, FjObject, FTextMarginInner);
 
     for i:= 0 to FItems.Count-1 do
     begin
@@ -7254,7 +7305,8 @@ begin
    begin
     FjObject := jListView_Create3(FjEnv, FjThis, Self,
                                Ord(FWidgetItem), FWidgetText,
-                               Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated), Ord(FTextAlign));
+                               Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated),
+                               Ord(FTextAlign), Ord(FTextPosition));
 
     if FWidgetTextColor <> colbrDefault then
       jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
@@ -7277,11 +7329,26 @@ begin
     if FImageItemIdentifier <> '' then    //ic_launcher
         jListView_SetImageByResIdentifier(FjEnv, FjObject, FImageItemIdentifier);
 
-    if FItemPaddingTop <> 40 then
-       jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
+    if FItemPaddingTop <> 10 then
+      jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
 
-    if FItemPaddingBottom <> 40 then
-       jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+    if FItemPaddingBottom <> 10 then
+      jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+
+    if FItemPaddingLeft <> 10 then // by tr3e
+      jListView_SetItemPaddingLeft(FjEnv, FjObject, FItemPaddingLeft);
+
+    if FItemPaddingRight <> 10 then
+      jListView_SetItemPaddingRight(FjEnv, FjObject, FItemPaddingRight);
+
+    if FTextMarginLeft <> 10 then // by tr3e
+      jListView_SetTextMarginLeft(FjEnv, FjObject, FTextMarginLeft);
+
+    if FTextMarginRight <> 10 then // by tr3e
+      jListView_SetTextMarginRight(FjEnv, FjObject, FTextMarginRight);
+
+    if FTextMarginInner <> 10 then // by tr3e
+      jListView_SetTextMarginInner(FjEnv, FjObject, FTextMarginInner);
 
     for i:= 0 to FItems.Count-1 do
     begin
@@ -7290,6 +7357,8 @@ begin
     end;
 
    end;
+
+   jListView_SetWordWrap(FjEnv, FjObject, FTextWordWrap);
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -7401,6 +7470,12 @@ begin
     jListView_setTextAlign(FjEnv, FjObject , ord(Value), index);
 end;
 
+// by tr3e
+procedure jListView.SetTextPositionByIndex(Value: TTextPosition; index: integer);
+begin
+  if FInitialized then
+    jListView_setTextPosition(FjEnv, FjObject , ord(Value), index);
+end;
 
 function jListView.IsItemChecked(index: integer): boolean;
 begin
@@ -7954,6 +8029,62 @@ begin
   FItemPaddingBottom:= _itemPaddingBottom;
   if FInitialized then
      jListView_SetItemPaddingBottom(FjEnv, FjObject, _itemPaddingBottom);
+end;
+
+// by tr3e
+procedure jListView.SetItemPaddingLeft(_itemPaddingLeft: integer);
+begin
+  //in designing component state: set value here...
+  FItemPaddingLeft := _itemPaddingLeft;
+  if FInitialized then
+     jListView_SetItemPaddingLeft(FjEnv, FjObject, _itemPaddingLeft);
+end;
+
+procedure jListView.SetItemPaddingRight(_itemPaddingRight: integer);
+begin
+  //in designing component state: set value here...
+  FItemPaddingRight := _itemPaddingRight;
+  if FInitialized then
+     jListView_SetItemPaddingRight(FjEnv, FjObject, _itemPaddingRight);
+end;
+
+procedure jListView.SetTextMarginLeft(_left: integer);
+begin
+  //in designing component state: set value here...
+  FTextMarginLeft := _left;
+  if FInitialized then
+     jListView_SetTextMarginLeft(FjEnv, FjObject, _left);
+end;
+
+procedure jListView.SetTextMarginRight(_right: integer);
+begin
+  //in designing component state: set value here...
+  FTextMarginRight := _right;
+  if FInitialized then
+     jListView_SetTextMarginRight(FjEnv, FjObject, _right);
+end;
+
+procedure jListView.SetTextMarginInner(_inner: integer);
+begin
+  //in designing component state: set value here...
+  FTextMarginInner := _inner;
+  if FInitialized then
+     jListView_SetTextMarginInner(FjEnv, FjObject, _inner);
+end;
+
+procedure jListView.SetWidgetImageSide(_side: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetWidgetImageSide(FjEnv, FjObject, _side);
+end;
+
+procedure jListView.SetTextWordWrap(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FTextWordWrap := _value;
+  if FInitialized then
+     jListView_SetWordWrap(FjEnv, FjObject, _value);
 end;
 
 procedure jListView.SetWidgetTextColor(_textcolor: TARGBColorBridge);
