@@ -470,12 +470,14 @@ function jImageView_GetView(env: PJNIEnv; _jimageview: JObject): jObject;
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
                                          widgetText: string; image: jObject;
-                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
+                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer;
+                                         txtAlign: integer; txtPosition : integer): jObject;
 
 Function  jListView_Create3             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
                                          widgetText: string;
-                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
+                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer;
+                                         txtAlign: integer; txtPosition : integer): jObject;
 Procedure jListView_Free               (env:PJNIEnv; ListView : jObject);
 Procedure jListView_setParent          (env:PJNIEnv;
                                         ListView : jObject;ViewGroup : jObject);
@@ -518,6 +520,7 @@ Procedure jListView_setItemLayout(env:PJNIEnv; ListView : jObject; value: intege
 Procedure jListView_setImageItem(env:PJNIEnv; ListView : jObject; bitmap: jObject; index: integer); overload;
 Procedure jListView_setImageItem(env:PJNIEnv; ListView : jObject; imgResIdentifier: string; index: integer); overload;
 Procedure jListView_setTextAlign(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
+Procedure jListView_setTextPosition(env:PJNIEnv; ListView : jObject; value: integer; index: integer); //by tr3e
 function jListView_IsItemChecked(env:PJNIEnv; ListView : jObject; index: integer): boolean;
 function jListView_GetItemText(env:PJNIEnv; ListView : jObject; index: integer): string;
 function jListView_GetCount(env:PJNIEnv; ListView : jObject): integer;
@@ -554,6 +557,13 @@ function jListView_GetLongPressSelectedItem(env: PJNIEnv; _jlistview: JObject): 
 procedure jListView_SetAllPartsOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_SetItemPaddingTop(env: PJNIEnv; _jlistview: JObject; _ItemPaddingTop: integer);
 procedure jListView_SetItemPaddingBottom(env: PJNIEnv; _jlistview: JObject; _itemPaddingBottom: integer);
+procedure jListView_SetItemPaddingLeft(env: PJNIEnv; _jlistview: JObject; _itemPaddingLeft: integer); // by tr3e
+procedure jListView_SetItemPaddingRight(env: PJNIEnv; _jlistview: JObject; _itemPaddingRight: integer); // by tr3e
+procedure jListView_SetTextMarginLeft(env: PJNIEnv; _jlistview: JObject; _value: integer); // by tr3e
+procedure jListView_SetTextMarginRight(env: PJNIEnv; _jlistview: JObject; _value: integer); // by tr3e
+procedure jListView_SetTextMarginInner(env: PJNIEnv; _jlistview: JObject; _value: integer); // by tr3e
+procedure jListView_SetWidgetImageSide(env: PJNIEnv; _jlistview: JObject; _value: integer); // by tr3e
+procedure jListView_SetWordWrap(env: PJNIEnv; _jlistview: JObject; _value: boolean); // by tr3e
 procedure jListView_SetWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _textcolor: integer);
 procedure jListView_SetDispatchOnDrawItemWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_SetDispatchOnDrawItemWidgetText(env: PJNIEnv; _jlistview: JObject; _value: boolean);
@@ -4893,10 +4903,11 @@ end;
 function jListView_Create2(env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
                                          widgetText: string; image: jObject;
-                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
+                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer;
+                                         txtAlign: integer; txtPosition : integer): jObject;
 var
  _jMethod: jMethodID = nil;
- _jParams: array[0..7] of jValue;
+ _jParams: array[0..8] of jValue;
  cls: jClass;
 begin
  _jParams[0].j := Int64(SelfObj);
@@ -4907,10 +4918,11 @@ begin
  _jParams[5].i := itemLay;
  _jParams[6].i := txtSizeDec;
  _jParams[7].i := txtAlign;
+ _jParams[7].i := txtPosition;
   cls:= Get_gjClass(env); {global}
   {jmpessoa/warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
  _jMethod:= env^.GetMethodID(env, cls, 'jListView_Create2',
-                                       '(JILjava/lang/String;Landroid/graphics/Bitmap;IIII)Ljava/lang/Object;');
+                                       '(JILjava/lang/String;Landroid/graphics/Bitmap;IIIII)Ljava/lang/Object;');
   Result := env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result := env^.NewGlobalRef(env,Result);
   env^.DeleteLocalRef(env,_jParams[2].l);
@@ -4920,10 +4932,11 @@ end;
 function jListView_Create3(env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
                                          widgetText: string;
-                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer; txtAlign: integer): jObject;
+                                         txtDecorated: integer; itemLay: integer; txtSizeDec: integer;
+                                         txtAlign: integer; txtPosition : integer): jObject;
 var
  _jMethod: jMethodID = nil;
- _jParams: array[0..6] of jValue;
+ _jParams: array[0..7] of jValue;
  cls: jClass;
 begin
  _jParams[0].j := Int64(SelfObj);
@@ -4933,11 +4946,12 @@ begin
  _jParams[4].i := itemLay;
  _jParams[5].i := txtSizeDec;
  _jParams[6].i := txtAlign;
+ _jParams[7].i := txtPosition;
   cls:= Get_gjClass(env); {global}
 
   {jmpessoa/warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
  _jMethod:= env^.GetMethodID(env, cls, 'jListView_Create3',
-                                       '(JILjava/lang/String;IIII)Ljava/lang/Object;');
+                                       '(JILjava/lang/String;IIIII)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, _jMethod,@_jParams);
   Result:= env^.NewGlobalRef(env,Result);
   env^.DeleteLocalRef(env,_jParams[2].l);
@@ -5276,6 +5290,21 @@ begin
  _jParams[1].i := index;
  cls := env^.GetObjectClass(env, ListView);
  _jMethod:= env^.GetMethodID(env, cls, 'setTextAlign', '(II)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+// by tr3e
+Procedure jListView_setTextPosition(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := value;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextPosition', '(II)V');
  env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -5889,6 +5918,98 @@ begin
   env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+// by tr3e
+procedure jListView_SetItemPaddingLeft(env: PJNIEnv; _jlistview: JObject; _itemPaddingLeft: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _itemPaddingLeft;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemPaddingLeft', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetItemPaddingRight(env: PJNIEnv; _jlistview: JObject; _itemPaddingRight: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _itemPaddingRight;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemPaddingRight', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetTextMarginLeft(env: PJNIEnv; _jlistview: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextMarginLeft', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetTextMarginRight(env: PJNIEnv; _jlistview: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextMarginRight', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetTextMarginInner(env: PJNIEnv; _jlistview: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextMarginInner', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetWidgetImageSide(env: PJNIEnv; _jlistview: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetWidgetImageSide', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+Procedure jListView_SetWordWrap(env:PJNIEnv; _jlistview : jObject; _value : Boolean);
+var
+  jMethod : jMethodID = nil;
+  jParams : Array[0..0] of jValue;
+  cls: jClass;
+ begin
+  jParams[0].z := JBool(_value);
+  cls := env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, cls, 'SetItemCenterWordWrap', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod,@jParams);
+  env^.DeleteLocalRef(env, cls);
+ end;
 
 procedure jListView_SetWidgetTextColor(env: PJNIEnv; _jlistview: JObject; _textcolor: integer);
 var

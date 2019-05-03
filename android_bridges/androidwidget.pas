@@ -473,12 +473,13 @@ type
 
   TTextSizeDecorated = (sdNone, sdDecreasing, sdIncreasing);
 
-  TTextAlign = (alLeft, alRight, alCenter);      //jListView
+  TTextAlign = (alLeft, alRight, alCenter);       //jListView
+  TTextPosition = (posTop, posCenter, posBottom); //jListView by tr3e
 
   TTextAlignment = (taLeft, taRight, taCenter);  //others...
 
- TTextAlignHorizontal = (thLeft, thRight, thCenter);  //jCanvas
- TTextAlignVertical = (tvTop, tvBottom, tvCenter);
+  TTextAlignHorizontal = (thLeft, thRight, thCenter);  //jCanvas
+  TTextAlignVertical = (tvTop, tvBottom, tvCenter);
 
   TGravity = (gvBottom, gvCenter, gvCenterHorizontal, gvCenterVertical, gvLeft, gvNoGravity,
               gvRight, gvStart, gvTop, gvEnd, gvFillHorizontal, gvFillVertical);
