@@ -59,6 +59,7 @@ type
     procedure TryChangeChipSetConfigs(projectChipSet: string);
 
     function GetTargetFromManifest(): string;
+    function GetMinSDKFromManifest(): string;
     function GetMaxNdkPlatform(): integer;
 
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
@@ -272,6 +273,27 @@ begin
       n := ManifestXML.DocumentElement.FindNode('uses-sdk');
       if not (n is TDOMElement) then Exit;
       Result := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
+    finally
+      ManifestXML.Free
+    end;
+  except
+    Exit;
+  end;
+end;
+
+function TLamwSmartDesigner.GetMinSDKFromManifest(): string;
+var
+  ManifestXML: TXMLDocument;
+  n: TDOMNode;
+begin
+  Result := '';
+  if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
+  try
+    ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
+    try
+      n := ManifestXML.DocumentElement.FindNode('uses-sdk');
+      if not (n is TDOMElement) then Exit;
+      Result := TDOMElement(n).AttribStrings['android:minSdkVersion'];
     finally
       ManifestXML.Free
     end;
@@ -548,8 +570,8 @@ end;
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
   strList, listRequirements, requiredList: TStringList;
-  i, p, k: integer;
-  strTargetApi, tempStr, sdkManifestTarqet: string;
+  i, p, k, minsdkApi: integer;
+  strTargetApi, tempStr, sdkManifestTarqet, sdkManifestMinApi: string;
   AndroidTheme: string;
   androidPluginStr: string;
   androidPluginNumber: integer;
@@ -753,6 +775,7 @@ begin
          else
          strList.Add('     //google()');
          strList.Add('       jcenter()');
+         strList.Add('       maven { url ''https://jitpack.io'' }');
          strList.Add('    }');
          strList.Add('}');
 
@@ -832,8 +855,17 @@ begin
          end;
 
          strList.Add('    defaultConfig {');
-         strList.Add('            minSdkVersion 14');
 
+         sdkManifestMinApi:= GetMinSDKFromManifest();
+
+         if  sdkManifestMinApi <> '' then
+            minsdkApi:= StrToInt(sdkManifestMinApi)
+         else
+            minsdkApi:= 14;
+
+         if minsdkApi < 14 then minsdkApi:= 14;
+
+         strList.Add('            minSdkVersion '+sdkManifestMinApi);
 
          if targetApi <= StrToInt(buildToolApi) then
             strList.Add('            targetSdkVersion '+IntToStr(targetApi))

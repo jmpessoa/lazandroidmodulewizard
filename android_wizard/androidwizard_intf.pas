@@ -1880,6 +1880,7 @@ begin
                 else
                 strList.Add('     //google()');
                 strList.Add('       jcenter()');
+                strList.Add('       maven { url ''https://jitpack.io'' }');
                 strList.Add('    }');
                 strList.Add('}');
 

@@ -602,6 +602,19 @@ type
      procedure Draw; override;
   end;
 
+  { TDraftSContinuousScrollableImageView }
+
+  TDraftSContinuousScrollableImageView = class(TDraftWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
+  end;
+
+
   { TARGBColorBridgePropertyEditor }
 
   TARGBColorBridgePropertyEditor = class(TEnumPropertyEditor)
@@ -717,7 +730,7 @@ uses
   snavigationview, scardview, srecyclerview, stextinput,
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
   sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView},
-  customcamera, sadmob, calendarview, searchview, zbarcodescannerview;
+  customcamera, sadmob, calendarview, searchview, zbarcodescannerview, scontinuousscrollableimageview;
 
 const
   DrawableSearchPaths: array [0..4] of string = (
@@ -3128,8 +3141,8 @@ begin
 end;
 
 procedure TDraftSearchView.UpdateLayout;
-var
-  fs: Integer;
+//var
+  //fs: Integer;
 begin
   with jSearchView(FAndroidWidget) do
     if LayoutParamHeight = lpWrapContent then
@@ -3413,16 +3426,17 @@ end;
 function TDraftListView.GetImage: TPortableNetworkGraphic;
 begin
   if FImage <> nil then
+  begin
     Result := FImage
+  end
   else
     with jListView(FAndroidWidget) do
     begin
       if ImageItemIdentifier <> '' then
       begin
-        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageItemIdentifier));
-        Result := FImage;
-      end else
-      Result := nil;
+        FImage:= Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageItemIdentifier));
+        Result:= FImage;
+      end else Result := nil;
     end;
 end;
 
@@ -3660,7 +3674,6 @@ end;
 procedure TDraftImageView.Draw;
 var
   r: TRect;
-  w, h: integer;
 begin
 
   if Color <> colbrDefault then
@@ -3673,30 +3686,10 @@ begin
 
   if GetImage <> nil then
   begin
-    (*
-    w:= Trunc(FImage.Width/3);
-    h:= Trunc(FImage.Height/3);
-    w:= Max(w,h);
-    h:= w;
-    if w < {64} Self.Width then
-    begin
-      w:= Self.Width; //64;
-      //h:= 64;
-    end;
-    if h < {64} Self.Height then
-    begin
-     // w:= 64;
-      h:= Self.Height; //64;
-    end;
-    *)
-  //  Fcanvas.Brush.Color:= clNone;
-   // Fcanvas.Brush.Style:= bsClear;
-
     Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
     Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
-
-    //Fcanvas.Rectangle(0, 0, w+8, h+8);    // outer frame
-    r:= Rect(6, 6, Self.Width-6,Self.Height-6);
+    //r:= Rect(6, 6, Self.Width-6,Self.Height-6);
+    r:= Rect(6, 6, FMinWidth-6, FMinHeight-6);
     Fcanvas.StretchDraw(r, GetImage);
   end
   else
@@ -3704,34 +3697,41 @@ begin
     Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
     Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
   end;
+
 end;
 
 procedure TDraftImageView.UpdateLayout;
 var
   im: TPortableNetworkGraphic;
+  aspectratio: single;
+  adjustedheight: integer;
 begin
   im := GetImage;
   if im <> nil then
   begin
-    with jImageView(FAndroidWidget) do
+    with jsContinuousScrollableImageView(FAndroidWidget) do
     begin
-        (*
-        if LayoutParamHeight = lpWrapContent then
-          FMinHeight := im.Height;
-        if LayoutParamWidth = lpWrapContent then
-          FMinWidth := im.Width;
-        *)
-        FMinWidth:= Trunc(FImage.Width/3);
-        FMinHeight:= Trunc(FImage.Height/3);
 
-        FMinWidth:= Max(FMinWidth,FMinHeight) + 8;
-        FMinHeight:= FMinWidth;
+        if FImage.Width > Self.Width then
+          FMinWidth:= Self.Width
+        else
+          FMinWidth:= FImage.Width;
 
-        if FMinWidth < 72 then
-        begin
-          FMinWidth:= 72;
-          FMinHeight:= FMinWidth;
-        end;
+        aspectratio:= FImage.Width/FImage.Height;
+        adjustedheight:= Trunc(FMinWidth/aspectratio);
+
+        if adjustedheight < 200 then
+           FMinHeight:= adjustedheight
+        else
+           FMinHeight:= 200;
+
+        //FMinWidth:= Min(FMinWidth,FImage.Width) + 8;
+        //FMinHeight:= Min(FMinHeight,FImage.Height) + 8;
+
+        if FMinWidth < 72 then FMinWidth:= 72;
+        if FMinHeight < 72 then FMinHeight:= 72;
+
+
     end;
   end;
   inherited UpdateLayout;
@@ -3798,6 +3798,103 @@ begin
   inherited UpdateLayout;
 end;
 
+{ TDraftSContinuousScrollableImageView }
+
+function TDraftSContinuousScrollableImageView.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+  begin
+    Result := FImage
+  end
+  else
+  begin
+    with jsContinuousScrollableImageView(FAndroidWidget) do
+    begin
+      if ImageIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageIdentifier));
+        Result := FImage;
+      end
+      else Result := nil;
+    end;
+  end;
+end;
+
+constructor TDraftSContinuousScrollableImageView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+  Color := jsContinuousScrollableImageView(AWidget).BackgroundColor;
+  FontColor:= colbrGray;
+  BackGroundColor:= clActiveCaption; //clMenuHighlight;
+  if jsContinuousScrollableImageView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
+procedure TDraftSContinuousScrollableImageView.Draw;
+var
+  r: TRect;
+begin
+
+  if Color <> colbrDefault then
+     Fcanvas.Brush.Color := ToTColor(Color)
+  else
+  begin
+     Fcanvas.Brush.Color:= clNone;
+     Fcanvas.Brush.Style:= bsClear;
+  end;
+
+  if GetImage <> nil then
+  begin
+    Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
+    Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
+    //r:= Rect(6, 6, Self.Width-6,Self.Height-6);
+    r:= Rect(6, 6, FMinWidth-6, FMinHeight-6);
+    Fcanvas.StretchDraw(r, GetImage);
+  end
+  else
+  begin
+    Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
+    Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
+  end;
+
+end;
+
+procedure TDraftSContinuousScrollableImageView.UpdateLayout;
+var
+  im: TPortableNetworkGraphic;
+  aspectratio: single;
+  adjustedheight: integer;
+begin
+  im := GetImage;
+  if im <> nil then
+  begin
+    with jsContinuousScrollableImageView(FAndroidWidget) do
+    begin
+
+        if FImage.Width > Self.Width then
+          FMinWidth:= Self.Width
+        else
+          FMinWidth:= FImage.Width;
+
+        aspectratio:= FImage.Width/FImage.Height;
+        adjustedheight:= Trunc(FMinWidth/aspectratio);
+
+        if adjustedheight < 200 then
+           FMinHeight:= adjustedheight
+        else
+           FMinHeight:= 200;
+
+        //FMinWidth:= Min(FMinWidth,FImage.Width) + 8;
+        //FMinHeight:= Min(FMinHeight,FImage.Height) + 8;
+
+        if FMinWidth < 72 then FMinWidth:= 72;
+        if FMinHeight < 72 then FMinHeight:= 72;
+
+
+    end;
+  end;
+  inherited UpdateLayout;
+end;
 
 { TDrafDrawingView }
 
@@ -4499,6 +4596,7 @@ initialization
   RegisterPropertyEditor(TypeInfo(string), jForm, 'BackgroundImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jBitmap, 'ImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jsFloatingButton, 'ImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jsContinuousScrollableImageView, 'ImageIdentifier', TImageIdentifierPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
@@ -4574,6 +4672,9 @@ initialization
   RegisterAndroidWidgetDraftClass(jsCollapsingToolbarLayout, TDraftSCollapsingToolbarLayout);
   RegisterAndroidWidgetDraftClass(jsNestedScrollView, TDraftSNestedScrollView);
   RegisterAndroidWidgetDraftClass(jsAdMob, TDraftSAdMob);
+
+  RegisterAndroidWidgetDraftClass(jsContinuousScrollableImageView, TDraftSContinuousScrollableImageView);
+
 
 finalization
   DraftClassesMap.Free;

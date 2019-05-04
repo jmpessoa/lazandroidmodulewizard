@@ -70,7 +70,7 @@ begin
      begin
         if Self.IsWifiEnabled() then
         begin
-          ShowMessage('Wait... try downloading ZXing App fro Google Play Store ...');
+          ShowMessage('Wait... try downloading ZXing App from Google Play Store ...');
           jIntentManager1.SetAction(jIntentManager1.GetActionViewAsString());
           //or jIntentManager1.SetAction('android.intent.action.VIEW');
 
