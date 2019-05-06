@@ -1,6 +1,7 @@
-package org.lamw.apptextfilemanagerdemo1;
+package com.example.appfileproviderdemo1;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -13,6 +14,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Environment;
 
 /*Draft java code by "Lazarus Android Module Wizard"*/
@@ -227,6 +229,28 @@ public class jTextFileManager /*extends ...*/ {
    
    public String LoadFromByteArray(byte[] _byteArray) {  //TODO Pascal
 	   return (new String(_byteArray));   
-   }      
+   }
+
+    //by LMB
+    public byte[] LoadFromAssetsAsJByteArray(String _filePath) {
+        try {
+            AssetManager assets = controls.activity.getAssets();
+            InputStream in = assets.open(_filePath);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int n = in.read(buffer);
+            while (n >= 0) {
+                out.write(buffer, 0, n);
+                n = in.read(buffer);
+            }
+            in.close();
+            return out.toByteArray();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
 

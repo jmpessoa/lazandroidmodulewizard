@@ -38,6 +38,11 @@ jTextFileManager = class(jControl)
     function PasteFromClipboard(): string;
     procedure CopyContentToClipboard(_filename: string);
     procedure PasteContentFromClipboard(_filename: string);
+    //by LMB
+    function LoadFromAssetsAsJByteArray(_filePath: string): TDynArrayOfJByte;
+    function LoadFromAssetsAsStream(_path: string): TMemoryStream;
+    function LoadFromAssetsAsText(_path: string; IsUTF8: boolean): string;
+
 
  published
 
@@ -57,6 +62,7 @@ function jTextFileManager_PasteFromClipboard(env: PJNIEnv; _jtextfilemanager: JO
 
 procedure jTextFileManager_CopyContentToClipboard(env: PJNIEnv; _jtextfilemanager: JObject; _filename: string);
 procedure jTextFileManager_PasteContentFromClipboard(env: PJNIEnv; _jtextfilemanager: JObject; _filename: string);
+function jTextFileManager_LoadFromAssetsAsJByteArray(env: PJNIEnv; _jtextfilemanager: JObject; _filePath: string): TDynArrayOfJByte;
 
 
 
@@ -192,6 +198,43 @@ begin
      jTextFileManager_PasteContentFromClipboard(FjEnv, FjObject, _filename);
 end;
 
+//LMB
+function jTextFileManager.LoadFromAssetsAsJByteArray(_filePath: string): TDynArrayOfJByte;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTextFileManager_LoadFromAssetsAsJByteArray(FjEnv, FjObject, _filePath);
+end;
+
+//LMB
+function jTextFileManager.LoadFromAssetsAsStream(_path: string): TMemoryStream;
+var
+  buf: TDynArrayOfJByte;
+begin
+  buf := LoadFromAssetsAsJByteArray(_path);
+  result := TMemoryStream.Create;
+  if length(buf) > 0 then begin
+    result.Write(buf[0], length(buf));
+    result.Seek(0,0);  // position stream for reading
+  end;
+end;
+
+//LMB
+function jTextFileManager.LoadFromAssetsAsText(_path: string; IsUTF8: boolean): string;
+var
+  s: AnsiString; L: integer; buf: TDynArrayOfJByte;
+begin
+  result:= '';
+  buf:= LoadFromAssetsAsJByteArray(_path);
+  L:= length(buf);
+  if L = 0 then exit; // file not found or empty
+  SetLength(s, L); // copy buffer to string
+  move(buf[0], s[1], length(buf));
+  if IsUTF8 then //
+    result := Utf8Decode(s)  //Warning: Implicit string type conversion with potential data loss from "UnicodeString" to "AnsiString"
+  else
+    result := s;
+end;
 
 {-------- jTextFileManager_JNI_Bridge ----------}
 
@@ -431,6 +474,28 @@ begin
   jCls:= env^.GetObjectClass(env, _jtextfilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PasteContentFromClipboard', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextfilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jTextFileManager_LoadFromAssetsAsJByteArray(env: PJNIEnv; _jtextfilemanager: JObject; _filePath: string): TDynArrayOfJByte;
+var
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filePath));
+  jCls:= env^.GetObjectClass(env, _jtextfilemanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssetsAsJByteArray', '(Ljava/lang/String;)[B');
+  jResultArray:= env^.CallObjectMethodA(env, _jtextfilemanager, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
