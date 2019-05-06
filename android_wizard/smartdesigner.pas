@@ -206,8 +206,9 @@ begin
   Result:= True;
   if LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
   begin
-    if LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Ant' then
-    begin
+
+      if Pos('AppCompat.',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then Exit;
+
       if AComponentClass.ClassNameIs('jsFloatingButton') or
          AComponentClass.ClassNameIs('jsTextInput') or
          AComponentClass.ClassNameIs('jsRecyclerView') or
@@ -222,16 +223,15 @@ begin
          AComponentClass.ClassNameIs('jsCollapsingToolbarLayout') or
          AComponentClass.ClassNameIs('jsNestedScrollView') or
          AComponentClass.ClassNameIs('jsBottomNavigationView') or
-         AComponentClass.ClassNameIs('jsAdMod') then
+         AComponentClass.ClassNameIs('jsAdMod') or
+         AComponentClass.ClassNameIs('jsContinuousScrollableImageView') then
       begin
-        ShowMessage('[Undone...]' +sLIneBreak+
-                     'Hint1: AppCompat components need Gradle build system...' +sLIneBreak+
-                     'Hint2: AppCompat theme is strongly recommended!'         +sLIneBreak+
-                     'Hint3: You can convert the project to AppCompat theme:'  +sLIneBreak+
+        ShowMessage('[Undoing..] "'+AComponentClass.ClassName+'" need AppCompat theme...' +sLIneBreak+
+                     'Hint:  You can convert the project to AppCompat theme:'  +sLIneBreak+
                      '       menu "Tools" --> "[LAMW]..." --> "Convert..."');
         Result:= False;
       end;
-    end;
+
   end;
 end;
 
@@ -1705,8 +1705,8 @@ end;
 function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
-  list, listRequirements, auxList, manifestList, gradleList, defaultDependencies: TStringList;
-  p, p1, p2, i: integer;
+  list, listRequirements, auxList, manifestList, gradleList: TStringList;
+  p, p1, p2, i, minSdkManifest, minSdkControl: integer;
   aux, tempStr, auxStr: string;
   insertRef: string;
   c: char;
@@ -1765,6 +1765,42 @@ begin
      //list.SaveToFile(FPathToJavaSource+'Controls.java');
      ControlsJava.Insert(ControlsJava.Count-1, aux);
 
+   end;
+
+   //updated manifest minAdkApi
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk') then
+   begin
+     minSdkManifest:= StrToInt(GetMinSDKFromManifest());
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk');
+     minSdkControl:= StrToInt(auxList.Strings[0]);
+     if minSdkControl > minSdkManifest then
+     begin
+        auxList.Clear;
+        auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+        tempStr:= auxList.Text;
+        tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+IntTostr(minSdkManifest)+'"' , 'android:minSdkVersion="'+IntToStr(minSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
+        auxList.Text:= tempStr;
+        auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+
+        if FileExists(FPathToAndroidProject+'build.gradle') then
+        begin
+          auxList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+          tempStr:= auxList.Text;
+          tempStr:= StringReplace(tempStr, 'minSdkVersion '+IntTostr(minSdkManifest), 'minSdkVersion '+IntToStr(minSdkControl), [rfReplaceAll,rfIgnoreCase]);
+          auxList.Text:= tempStr;
+          auxList.SaveToFile(FPathToAndroidProject+'build.gradle');
+        end;
+     end;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then
+   begin
+      if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
+      begin
+         ShowMessage(jclassname+'.java require Gradle'+sLineBreak+'Build system Changed to Gradle...');
+         LazarusIDE.ActiveProject.Modified:= True;
+         LazarusIDE.ActiveProject.CustomData['BuildSystem']:= 'Gradle';
+      end;
    end;
 
    //try insert reference required by the jControl in AndroidManifest ..

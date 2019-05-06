@@ -1,27 +1,57 @@
 object FormAddComplements: TFormAddComplements
   Left = 620
-  Height = 608
+  Height = 602
   Top = 180
   Width = 513
-  Caption = 'LAMW jComponent Create'
-  ClientHeight = 608
+  Caption = 'LAMW jComponent Create -  Complements'
+  ClientHeight = 602
   ClientWidth = 513
   DesignTimePPI = 120
   LCLVersion = '2.0.0.4'
   object Panel1: TPanel
     Left = 0
-    Height = 63
+    Height = 60
     Top = 0
     Width = 513
     Align = alTop
     BevelOuter = bvNone
-    Caption = 'Component Complements'
+    ClientHeight = 60
+    ClientWidth = 513
     TabOrder = 0
+    object Label4: TLabel
+      Left = 18
+      Height = 20
+      Top = 9
+      Width = 75
+      Caption = 'MinSdkApi:'
+      ParentColor = False
+    end
+    object ComboBoxMinSdkApi: TComboBox
+      Left = 21
+      Height = 28
+      Top = 29
+      Width = 125
+      ItemHeight = 20
+      ItemIndex = 0
+      Items.Strings = (
+        '14'
+        '15'
+        '16'
+        '17'
+        '18'
+        '19'
+        '20'
+        '21'
+      )
+      Style = csDropDownList
+      TabOrder = 0
+      Text = '14'
+    end
   end
   object StatusBar1: TStatusBar
     Left = 0
     Height = 29
-    Top = 579
+    Top = 573
     Width = 513
     Panels = <>
   end
@@ -65,7 +95,7 @@ object FormAddComplements: TFormAddComplements
     AnchorSideRight.Control = BitBtn2
     Left = 272
     Height = 38
-    Top = 534
+    Top = 528
     Width = 94
     Anchors = [akRight, akBottom]
     Cancel = True
@@ -78,7 +108,7 @@ object FormAddComplements: TFormAddComplements
   object BitBtn2: TBitBtn
     Left = 366
     Height = 38
-    Top = 534
+    Top = 528
     Width = 94
     Anchors = [akRight, akBottom]
     Default = True
@@ -183,10 +213,8 @@ object FormAddComplements: TFormAddComplements
       'android.permission.READ_EXTERNAL_STORAGE'
       'android.permission.READ_OWNER_DATA'
       'android.permission.READ_PHONE_STATE'
-      'android.permission.READ_PHONE_STATE'
       'android.permission.READ_SMS'
       'android.permission.RECEIVE_SMS'
-      'android.permission.RESTART_PACKAGES'
       'android.permission.SEND_SMS'
       'android.permission.VIBRATE'
       'android.permission.WAKE_LOCK'
@@ -201,7 +229,7 @@ object FormAddComplements: TFormAddComplements
     AnchorSideRight.Control = SpeedButtonPermission
     AnchorSideBottom.Control = BitBtn2
     Left = 16
-    Height = 116
+    Height = 110
     Top = 418
     Width = 456
     Anchors = [akTop, akLeft, akRight, akBottom]

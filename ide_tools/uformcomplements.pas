@@ -15,12 +15,14 @@ type
   TFormAddComplements = class(TForm)
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    ComboBoxMinSdkApi: TComboBox;
     ComboBoxPermission: TComboBox;
     EditGradleDep: TEdit;
     EditPath: TEdit;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Label4: TLabel;
     ListBoxPermission: TListBox;
     ListBoxGradleDep: TListBox;
     ListBoxPath: TListBox;
