@@ -34,6 +34,8 @@ public class jFileProvider extends ContentProvider {
    private Context  context   = null;
    private String mAuthorities = "com.example.appfileproviderdemo1";
    String mFileSource = "raw";
+   String mPath = "";
+
       
    public jFileProvider() { 
 	  //
@@ -65,32 +67,52 @@ public class jFileProvider extends ContentProvider {
 	   
        Context context1=getContext();
        int resID = 0;    		   
-       String auxname = uri.getLastPathSegment();  // hello.txt_raw or hello.txt_internla or hello.txt_assets        
-       mFileSource= auxname.split(":")[1];  //raw              
-       String identifier = auxname.split("\\:")[0];  //hello.txt       
+       String auxname = uri.getLastPathSegment();          // note1.txt:assets
+       String identifier = auxname.split("\\:")[0];  // note1.txt
+       String dataSource= auxname.split(":")[1];     // assets
        String path = context1.getFilesDir()+"/"+ identifier;
-       
        try {
-    	                         
-           if (mFileSource.equals("raw")) {
+           if (dataSource.equals("raw")) {
         	   identifier = identifier.split("\\.")[0];  //hello
                resID=context1.getResources().getIdentifier(identifier,"raw",context1.getPackageName());
-               in2file(context1.getResources().openRawResource(resID),path);               
-           }else if (mFileSource.equals("drawable")) { 
+               in2file(context1.getResources().openRawResource(resID),path);
+           }else if (dataSource.equals("drawable")) {
         	   identifier = identifier.split("\\.")[0];  //hello
                resID=context1.getResources().getIdentifier(identifier,"drawable",context1.getPackageName());
                in2file(context1.getResources().openRawResource(resID),path);
-           }else if (mFileSource.equals("assets")) {
+           }else if (dataSource.equals("assets")) {
         	   in2file(context1.getAssets().open(identifier),path);
            }
-                               
            return ParcelFileDescriptor.open(new File(path), ParcelFileDescriptor.MODE_READ_ONLY);
            
        } catch (Exception e) {
        }
        return null;
-   }    
-   
+   }
+
+   /*
+   openAssetFile is implemented by providers that need to be able to return sub-sections of files,
+   often assets inside of their .apk.
+    */
+   /*
+    @Override
+    public AssetFileDescriptor openAssetFile(Uri uri, String mode) throws FileNotFoundException {
+        if (mFileSource.equals("assets")) {
+            //in2file(context1.getAssets().open(identifier), path);
+            AssetManager am = getContext().getAssets();
+            String fileName = uri.getLastPathSegment();
+            if (fileName == null)
+                throw new FileNotFoundException();
+            AssetFileDescriptor fileDescriptor = null;
+            try {
+                fileDescriptor = am.openFd(fileName);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return fileDescriptor;
+        }else return null;
+    }
+*/
    @Override
    public Cursor query(Uri uri,String[] projection,String selection, String[] selectionArgs,String sortOrder) {
        return null;
@@ -117,8 +139,7 @@ public class jFileProvider extends ContentProvider {
    }
    
    //Input stream --> file
-   private static void in2file(InputStream in,String path) 
-       throws Exception { 
+   private static void in2file(InputStream in,String path) throws Exception {
        byte[] w=new byte[1024]; 
        FileOutputStream out=null;
        try {
@@ -142,8 +163,7 @@ public class jFileProvider extends ContentProvider {
    
 //-------------------------------------------------
    //Input stream --> data
-   public static byte[] in2data(InputStream in) 
-	        throws Exception { 
+   public static byte[] in2data(InputStream in) throws Exception {
 	        byte[] w=new byte[1024]; 
 	        ByteArrayOutputStream out=new ByteArrayOutputStream();
 	        try {
@@ -181,11 +201,11 @@ public class jFileProvider extends ContentProvider {
 	   }
 	   
    }
-        
-   public String GetTextContent(String _textfilename) {	   
-	 try {
-	    ContentResolver r = controls.activity.getContentResolver();  
-	    InputStream in = r.openInputStream(Uri.parse("content://"+mAuthorities+"/"+ _textfilename+":"+mFileSource));
+
+    public String GetTextContent(String _textfilename) {
+       try {
+	    ContentResolver r = controls.activity.getContentResolver();
+	    InputStream in = r.openInputStream(Uri.parse("content://"+mAuthorities+"/"+_textfilename+":"+mFileSource));
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    byte[] buffer = new byte[4096];
 	    int n = in.read(buffer);
@@ -218,7 +238,6 @@ public class jFileProvider extends ContentProvider {
 			e.printStackTrace();
 		}
 		return null;
-	 
    }
       
    public byte[] GetContent(String _filename) {	   
