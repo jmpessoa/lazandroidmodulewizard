@@ -1572,10 +1572,8 @@ public class jListView extends ListView {
 	
 	// by tr3e
 	public void ClearChecked(){
-		for( int i = 0; i < alist.size(); i++ ){
-			alist.get(i).checked = false;
-			this.setItemChecked(i, false);
-		}
+		for( int i = 0; i < alist.size(); i++ )			
+			this.setItemChecked(i, false);		
 		
 		aadapter.notifyDataSetChanged();
 	}
