@@ -201,7 +201,8 @@ uses
    autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
-   customcamera, calendarview, searchview, telephonymanager, sadmob, zbarcodescannerview, cmikrotikrouteros;
+   customcamera, calendarview, searchview, telephonymanager,
+   sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -1709,6 +1710,13 @@ begin
   begin
     jForm(jZBarcodeScannerView(Obj).Owner).UpdateJNI(gApp);
     jZBarcodeScannerView(Obj).GenEvent_OnClick(Obj);
+    Exit;
+  end;
+
+  if Obj is jsContinuousScrollableImageView then
+  begin
+    jForm(jsContinuousScrollableImageView(Obj).Owner).UpdateJNI(gApp);
+    jsContinuousScrollableImageView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 

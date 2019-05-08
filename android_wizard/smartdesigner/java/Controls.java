@@ -1,6 +1,6 @@
-package org.lamw.appbroadcastreceiverdemo3;
+package org.lamw.appjcenterscrollingimageviewdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.4.1  - 23 March - 2019
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.2  - 01 May - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -83,6 +83,7 @@ import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.net.ConnectivityManager;

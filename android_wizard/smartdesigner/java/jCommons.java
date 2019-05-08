@@ -42,7 +42,7 @@ public class jCommons {
  /* //[endif_api14up]
  private int lgravity = Gravity.TOP | Gravity.LEFT;
  //[ifdef_api14up] */
-	private float lweight = 0;
+	private float lweight = 1.0f;
 	private boolean mRemovedFromParent = false;
 	private int algravity;
 	private int algravityAnchorId;
@@ -299,11 +299,12 @@ public class jCommons {
 			}			
 		}        
  		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
+          		((FrameLayout.LayoutParams)lparams).gravity = lgravity;
 		}
  		
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
+		if (lparams instanceof LinearLayout.LayoutParams) { //.weight
+                        ((LinearLayout.LayoutParams)lparams).weight = lweight; //lweight = 1 <-- the trick!!
+			((LinearLayout.LayoutParams)lparams).gravity = lgravity; //lweight;
 		}
 		
 		if (aOwnerView != null) { aOwnerView.setLayoutParams(lparams); }

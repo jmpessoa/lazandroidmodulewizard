@@ -1213,6 +1213,9 @@ begin
      count:= frm.ListBoxPath.Count;
      list:= TStringList.Create;
 
+     list.Add(Trim(frm.ComboBoxMinSdkApi.Text));
+     list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.minsdk');
+     list.Clear;
      for i:= 0 to count-1 do
      begin
         ext:= ExtractFileExt(frm.ListBoxPath.Items.Strings[i]);

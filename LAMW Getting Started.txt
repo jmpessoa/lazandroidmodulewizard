@@ -230,9 +230,10 @@ III. USING LAMW
 
 	[Congratulations!!!]
 
-10. NOTE: All LAMW projects [and demos] are Eclipse compatible!
+10. NOTE1: All LAMW projects [and demos] are AndroidStudio/Eclipse compatible!
+	Please,  read the "How_to_open_LAMW_project_with_AndroidStudio.txt"
 
-		Thank you!
+    NOTE2: Components from  Palettes "Android Bridges AppCompat"  and "Android Bridges JCenter" need build system "Gradle" [and Internet connection]
 
 11. About "untitled" demos:
 
@@ -241,6 +242,7 @@ AppTest2: jni coding: the hard way
 AppTryCode1: jHello component demo [array, strings,  etc...]
 AppTryCode2: jMediaPlayer1 and  jSurfaceView1 components demo 
 AppTryCode2: jDumpJavaMethods component demo [about java to pascal converter...]
+
 
 
 Thanks to All!
