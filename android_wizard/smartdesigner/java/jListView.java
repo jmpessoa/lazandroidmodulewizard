@@ -1498,8 +1498,7 @@ public class jListView extends ListView {
 			return false;
 		}
 		});
-
-		
+				
 		this.setOnScrollListener(new AbsListView.OnScrollListener() {
 		    @Override
 		    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount){
@@ -1569,6 +1568,25 @@ public class jListView extends ListView {
 		lastSelectedItem = -1;
 		alist.clear();
 		aadapter.notifyDataSetChanged();
+	}
+	
+	// by tr3e
+	public void ClearChecked(){
+		for( int i = 0; i < alist.size(); i++ )			
+			this.setItemChecked(i, false);		
+		
+		aadapter.notifyDataSetChanged();
+	}
+	
+	// by tr3e
+	public int GetItemsChecked(){
+		int count = 0;
+		
+		for( int i = 0; i < alist.size(); i++ )
+		 if( alist.get(i).checked )
+			 count++;
+		
+		return count;			
 	}
 
 	//
@@ -2182,7 +2200,9 @@ public class jListView extends ListView {
 	}
 
 	public void SetItemChecked(int _index, boolean _value) {
-	    this.setItemChecked(_index, _value);		  
+	    this.setItemChecked(_index, _value);
+		alist.get(_index).checked = _value;
+		
 		if (highLightSelectedItem) {	
 			 if (lastSelectedItem != -1) {
 			    DoHighlight(lastSelectedItem, Color.TRANSPARENT); //textcolor
