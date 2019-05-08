@@ -1573,6 +1573,8 @@ type
     function SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
     procedure SetSelection(_index: integer);
     procedure SmoothScrollToPosition(_index: integer);
+    procedure ClearChecked(); // by tr3e
+    function  GetItemsChecked(): integer; // by tr3e
     procedure SetItemChecked(_index: integer; _value: boolean);
     function GetCheckedItemPosition(): integer;
     procedure SetViewParent(Value: jObject);  override;
@@ -7475,6 +7477,22 @@ procedure jListView.SetTextPositionByIndex(Value: TTextPosition; index: integer)
 begin
   if FInitialized then
     jListView_setTextPosition(FjEnv, FjObject , ord(Value), index);
+end;
+
+// by tr3e
+procedure jListView.ClearChecked;
+begin
+  if FInitialized then
+    jListView_ClearChecked(FjEnv, FjObject );
+end;
+
+// by tr3e
+function jListView.GetItemsChecked(): integer;
+begin
+  Result:= 0;
+
+  if FInitialized then
+    result := jListView_GetItemsChecked(FjEnv, FjObject);
 end;
 
 function jListView.IsItemChecked(index: integer): boolean;

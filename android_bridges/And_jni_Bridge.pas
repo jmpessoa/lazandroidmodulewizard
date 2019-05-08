@@ -574,6 +574,8 @@ procedure jListView_DispatchOnDrawItemWidgetImage(env: PJNIEnv; _jlistview: JObj
 function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 procedure jListView_SetSelection(env: PJNIEnv; _jlistview: JObject; _index: integer);
 procedure jListView_SmoothScrollToPosition(env: PJNIEnv; _jlistview: JObject; _index: integer);
+procedure jListView_ClearChecked(env: PJNIEnv; _jlistview: JObject ); // by tr3e
+function  jListView_GetItemsChecked(env: PJNIEnv; _jlistview: JObject): integer; // by tr3e
 procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
 function jListView_GetCheckedItemPosition(env: PJNIEnv; _jlistview: JObject): integer;
 Procedure jListView_RemoveFromViewParent(env:PJNIEnv; _jlistview: jObject);
@@ -5192,6 +5194,30 @@ begin
   _jMethod:= env^.GetMethodID(env, cls, 'clear', '()V');
   env^.CallVoidMethod(env,ListView,_jMethod);
   env^.DeleteLocalRef(env, cls);
+end;
+
+//by tr3e
+Procedure jListView_ClearChecked(env:PJNIEnv; _jlistview: jObject);
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, _jlistview);
+  _jMethod:= env^.GetMethodID(env, cls, 'ClearChecked', '()V');
+  env^.CallVoidMethod(env,_jlistview,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+// by tr3e
+function jListView_GetItemsChecked(env: PJNIEnv; _jlistview: JObject): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+ cls := env^.GetObjectClass(env, _jlistview);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetItemsChecked', '()I');
+ Result:= env^.CallIntMethod(env,_jlistview,_jMethod);
+ env^.DeleteLocalRef(env, cls);
 end;
 
 //by jmpessoa
