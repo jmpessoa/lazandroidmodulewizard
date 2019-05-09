@@ -40,8 +40,8 @@ jTextFileManager = class(jControl)
     procedure PasteContentFromClipboard(_filename: string);
     //by LMB
     function LoadFromAssetsAsJByteArray(_filePath: string): TDynArrayOfJByte;
-    function LoadFromAssetsAsStream(_path: string): TMemoryStream;
-    function LoadFromAssetsAsText(_path: string; IsUTF8: boolean): string;
+    function LoadFromAssetsAsStream(_filePath: string): TMemoryStream;
+    function LoadFromAssetsAsText(_filePath: string; IsUTF8: boolean): string;
 
 
  published
@@ -207,11 +207,11 @@ begin
 end;
 
 //LMB
-function jTextFileManager.LoadFromAssetsAsStream(_path: string): TMemoryStream;
+function jTextFileManager.LoadFromAssetsAsStream(_filePath: string): TMemoryStream;
 var
   buf: TDynArrayOfJByte;
 begin
-  buf := LoadFromAssetsAsJByteArray(_path);
+  buf := LoadFromAssetsAsJByteArray(_filePath);
   result := TMemoryStream.Create;
   if length(buf) > 0 then begin
     result.Write(buf[0], length(buf));
@@ -220,12 +220,12 @@ begin
 end;
 
 //LMB
-function jTextFileManager.LoadFromAssetsAsText(_path: string; IsUTF8: boolean): string;
+function jTextFileManager.LoadFromAssetsAsText(_filePath: string; IsUTF8: boolean): string;
 var
   s: AnsiString; L: integer; buf: TDynArrayOfJByte;
 begin
   result:= '';
-  buf:= LoadFromAssetsAsJByteArray(_path);
+  buf:= LoadFromAssetsAsJByteArray(_filePath);
   L:= length(buf);
   if L = 0 then exit; // file not found or empty
   SetLength(s, L); // copy buffer to string
