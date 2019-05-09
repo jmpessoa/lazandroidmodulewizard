@@ -574,6 +574,8 @@ procedure jListView_DispatchOnDrawItemWidgetImage(env: PJNIEnv; _jlistview: JObj
 function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 procedure jListView_SetSelection(env: PJNIEnv; _jlistview: JObject; _index: integer);
 procedure jListView_SmoothScrollToPosition(env: PJNIEnv; _jlistview: JObject; _index: integer);
+function  jListView_GetFontSizeByIndex(env:PJNIEnv; ListView : jObject; index: integer) : integer; // by tr3e
+procedure jListView_SetDrawAlphaBackground(env:PJNIEnv; _listview : jObject; _alpha: integer); // by tr3e
 procedure jListView_ClearChecked(env: PJNIEnv; _jlistview: JObject ); // by tr3e
 function  jListView_GetItemsChecked(env: PJNIEnv; _jlistview: JObject): integer; // by tr3e
 procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
@@ -5262,6 +5264,35 @@ begin
    env^.DeleteLocalRef(env,_jParams[0].l);
    env^.DeleteLocalRef(env, cls);
 end;
+
+// by tr3e
+procedure jListView_SetDrawAlphaBackground(env:PJNIEnv; _listview : jObject; _alpha: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].i := _alpha;
+ cls := env^.GetObjectClass(env, _listview);
+ _jMethod:= env^.GetMethodID(env, cls, 'SetDrawAlphaBackground', '(I)V');
+ env^.CallVoidMethodA(env, _listview,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+// by tr3e
+function jListView_GetFontSizeByIndex(env:PJNIEnv; ListView : jObject; index: integer): integer;
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+ _jBool: jBoolean;
+begin
+ _jParams[0].i:= index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetFontSizeByIndex', '(I)I');
+ Result:= env^.CallIntMethodA(env, ListView,_jMethod, @_jParams);
+ env^.DeleteLocalRef(env, cls);
+end; 
 
 //by jmpessoa
 Procedure jListView_setId(env:PJNIEnv; ListView : jObject; id: DWord);
