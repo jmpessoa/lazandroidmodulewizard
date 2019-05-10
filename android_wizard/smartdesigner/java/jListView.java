@@ -338,7 +338,10 @@ class jArrayAdapter extends ArrayAdapter {
 
 	
 	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( ctx.getResources().getDrawable(_resID));
+		if( _resID == 0 )
+			  return null;
+		else
+		 	  return ctx.getResources().getDrawable(_resID);
 	}
 	
 	private int GetDrawableResourceId(String _resName) {
@@ -587,17 +590,7 @@ class jArrayAdapter extends ArrayAdapter {
 		else if (items.get(position).itemLayout == 1) // Pascal WidgetTextlayImage
 		    paddingLeft  = 0;
 		else return; // layText
-		
-		if (items.get(position).bmp !=  null) {
-			itemImage = new ImageView(ctx);
-			itemImage.setId(position+3333);
-			itemImage.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-			itemImage.setImageBitmap(items.get(position).bmp);
-			itemImage.setFocusable(false);
-			itemImage.setFocusableInTouchMode(false);				
-			itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
-		}
-		
+				
 		if (mDispatchOnDrawItemBitmap)  {
 			Bitmap  imageBmp = (Bitmap)controls.pOnListViewDrawItemBitmap(PasObj, (int)position , items.get(position).label);
 			if (imageBmp != null) {
@@ -1844,18 +1837,25 @@ public class jListView extends ListView {
 	}
 	
 	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+		if( _resID == 0 ) return null;
+		
+		return this.controls.activity.getResources().getDrawable(_resID);
 	}
 
 	public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable		
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));
-		alist.get(index).bmp = ((BitmapDrawable)d).getBitmap();		
-		aadapter.notifyDataSetChanged();		
+		
+		if( d != null ){
+		 alist.get(index).bmp = ((BitmapDrawable)d).getBitmap();		
+		 aadapter.notifyDataSetChanged();
+		}
 	}
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
-		genericBmp = ((BitmapDrawable)d).getBitmap();	
+		
+		if( d != null )
+		 genericBmp = ((BitmapDrawable)d).getBitmap();	
 	}
 		
 	public void setTextDecorated(int value, int index){

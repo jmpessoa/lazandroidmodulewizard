@@ -337,7 +337,9 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	}
     */
       
-   private Bitmap GetBitmapFromById(int _resID) {		
+   private Bitmap GetBitmapFromById(int _resID) {
+	    if( _resID == 0 ) return null; // by tr3e
+	   
  		Drawable res = null;		
  		
  		if (Build.VERSION.SDK_INT < 21 ) {

@@ -671,6 +671,8 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
+	    if( _resID == 0 ) return null; // by tr3e
+	    		
         Drawable res = null;
 
         if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21
@@ -687,7 +689,10 @@ public Drawable GetDrawableResourceById(int _resID) {
 
 	public void SetBackgroundImage(String _imageIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
-		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
+		
+		if( d == null ) return; // by tr3e
+		
+		//Bitmap bmp = ((BitmapDrawable)d).getBitmap();
 		ImageView image = new ImageView(controls.activity);
         LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         image.setLayoutParams(param);
@@ -760,7 +765,9 @@ public void SetSubTitleActionBar(String _subtitle) {
 public void SetIconActionBar(String _iconIdentifier) {
 //[ifdef_api14up]
 	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
-	jCommons.ActionBarSetIcon(controls, d);
+	
+	if( d != null ) // by tr3e
+	 jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
 }
 

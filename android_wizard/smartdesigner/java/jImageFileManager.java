@@ -51,7 +51,8 @@ public class jImageFileManager /*extends ...*/ {
     //free local objects...        	
   }
 
- public void SaveToSdCard(Bitmap _image, String _filename) {	
+ public boolean SaveToSdCard(Bitmap _image, String _filename) {
+	    if( _image == null ) return false;
 	   	  	   
 	    File file;
 	    String root = Environment.getExternalStorageDirectory().toString();
@@ -69,8 +70,10 @@ public class jImageFileManager /*extends ...*/ {
 	       out.close();
 	    } catch (Exception e) {
          e.printStackTrace();
+         return false;
 	    }
 	    
+	    return true;
  }
  
  // By using this line you can able to see saved images in the gallery view.
@@ -104,6 +107,7 @@ public class jImageFileManager /*extends ...*/ {
 	   }
 	   catch (Exception ex)
 	   {
+		   return null; // Fix by tr3e
 	   }
 	   
 	   return inputStream;
@@ -111,19 +115,22 @@ public class jImageFileManager /*extends ...*/ {
  
  public Bitmap LoadFromURL(String _imageURL) {
 	   
-  BitmapFactory.Options bmOptions;
-	bmOptions = new BitmapFactory.Options();
-	bmOptions.inSampleSize = 1;
+  BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+  
+  bmOptions.inSampleSize = 1;
 	   
   Bitmap bitmap = null;
-  InputStream in = null;      
-     try {
-         in = OpenHttpConnection(_imageURL);
-         bitmap = BitmapFactory.decodeStream(in, null, bmOptions);
-         in.close();
-     } catch (IOException e1) {
-     }
-     return bitmap;              
+  InputStream in = null;
+  
+  try {
+      in = OpenHttpConnection(_imageURL);
+      bitmap = BitmapFactory.decodeStream(in, null, bmOptions);
+      in.close();
+  } catch (IOException e1) {
+	  return null;
+  }
+  
+  return bitmap;              
      
  }
                  
@@ -131,13 +138,15 @@ public class jImageFileManager /*extends ...*/ {
  {
      AssetManager assetManager = controls.activity.getAssets();
      InputStream istr = null;
+     
      try {
          istr = assetManager.open(strName);
      } catch (IOException e) {
          e.printStackTrace();
+         return null; // Fix by tr3e
      }
-     Bitmap bitmap = BitmapFactory.decodeStream(istr);
-     return bitmap;
+     
+     return BitmapFactory.decodeStream(istr);
  }
  
 	public Bitmap LoadFromRawFolder(String pictureName)
@@ -145,13 +154,13 @@ public class jImageFileManager /*extends ...*/ {
 		Bitmap bitmap = null;
 
 		int rID = controls.activity.getResources().getIdentifier(pictureName, "raw", controls.activity.getPackageName());
+		
+		if(rID != 0) 
 		{
-			if(rID != 0) 
-			{
-				InputStream is = controls.activity.getResources().openRawResource(rID);
-				if (is != null) { bitmap = BitmapFactory.decodeStream(is); }
-			}
+		 InputStream is = controls.activity.getResources().openRawResource(rID);
+		 if (is != null) bitmap = BitmapFactory.decodeStream(is);
 		}
+		
 		return bitmap;
 	}
  
@@ -169,21 +178,28 @@ public class jImageFileManager /*extends ...*/ {
  }
 
  private Drawable GetDrawableResourceById(int _resID) {
- 	  return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	 if( _resID == 0 ) return null; // Fix by tr3e
+	 
+ 	 return this.controls.activity.getResources().getDrawable(_resID);	
  }
            
  public Bitmap LoadFromResources(String _imageResIdentifier)
  {
-	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));	
-	Bitmap bmap = ((BitmapDrawable)d).getBitmap();
-    return bmap;
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+	
+	if( d == null ) return null; // fix by tr3e
+	
+    return ((BitmapDrawable)d).getBitmap();
  }
  
  public Bitmap LoadFromFile(String _filename) {  //InternalAppStorage  !!!	   
-	   Bitmap bmap=null;	  
+	   Bitmap bmap=null;
+	   
 	   File fDir = this.controls.activity.getFilesDir();  //Result : /data/data/com/MyApp/files
-	   File file = new File(fDir, _filename);	   
-	   InputStream fileInputStream = null;	   
+	   File file = new File(fDir, _filename);
+	   
+	   InputStream fileInputStream = null;
+	   
 	   try {
 		 fileInputStream = new FileInputStream(file);
 		 BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
@@ -193,20 +209,24 @@ public class jImageFileManager /*extends ...*/ {
 	   } catch (FileNotFoundException e) {
 		// TODO Auto-generated catch block
 		 e.printStackTrace();
-	   }  	   
+		 return null;
+	   }
+	   
 	   return bmap;  	   
  }
  
- public Bitmap LoadFromFile(String _path, String _filename) { //EnvironmentDirectoryPath  !!	   
-	   String imageIn = _path+"/"+_filename;	      
-	   Bitmap bitmap = BitmapFactory.decodeFile(imageIn);	      
-	   return bitmap; 
+ public Bitmap LoadFromFile(String _path, String _filename) { //EnvironmentDirectoryPath  !!	   	   	      	   	     
+	   return BitmapFactory.decodeFile(_path + "/" + _filename); 
  }
  
- public void SaveToFile(Bitmap _image, String _filename) {	   	    
+ public boolean SaveToFile(Bitmap _image, String _filename) {
+	    if( _image == null ) return false;
+	    
 	    String root = this.controls.activity.getFilesDir().getAbsolutePath();	      	    	    
-	    File file = new File (root +"/"+ _filename);	    
-	    if (file.exists ()) file.delete (); 
+	    File file = new File (root +"/"+ _filename);
+	    
+	    if (file.exists ()) file.delete ();
+	    
 	    try {
 	        FileOutputStream out = new FileOutputStream(file);	  
 	        
@@ -217,13 +237,19 @@ public class jImageFileManager /*extends ...*/ {
 	         out.close();
 	    } catch (Exception e) {
 	         e.printStackTrace();
-	    }  	     	   
+	         return false;
+	    }
+	    
+	    return true;
  }
     
- public void SaveToFile(Bitmap _image,String _path, String _filename) {	   	    
-	       	    	    
-	    File file = new File (_path +"/"+ _filename);	    
-	    if (file.exists ()) file.delete (); 
+ public boolean SaveToFile(Bitmap _image,String _path, String _filename) {	   	    
+	    if( _image == null ) return false;
+	 
+	    File file = new File (_path +"/"+ _filename);
+	    
+	    if (file.exists ()) file.delete ();
+	    
 	    try {
 	        FileOutputStream out = new FileOutputStream(file);	  
 	        
@@ -234,24 +260,33 @@ public class jImageFileManager /*extends ...*/ {
 	         out.close();
 	    } catch (Exception e) {
 	         e.printStackTrace();
-	    }  	     	   
+	         return false;
+	    }
+	    
+	    return true;
 }
 
  public Bitmap LoadFromUri(Uri _imageUri) {
       InputStream imageStream;
       Bitmap selectedImage= null;
-		try {
+      
+	  try {
 			imageStream = controls.activity.getContentResolver().openInputStream(_imageUri);
 			selectedImage = BitmapFactory.decodeStream(imageStream);
-		} catch (FileNotFoundException e) {
+	  } catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}        
+			return null;
+	  }
+	  
       return selectedImage;
  }
        
  public  Bitmap LoadFromFile(String _filename, int _scale) {
 	   BitmapFactory.Options options = new BitmapFactory.Options();
+	   
+	   if( options == null ) return null;
+	   
 	   options.inSampleSize = _scale; // --> 1/4
 	   return BitmapFactory.decodeFile(_filename, options);
  }
@@ -263,16 +298,19 @@ public class jImageFileManager /*extends ...*/ {
  public int GetBitmapWidth(Bitmap _bitmap) {	 	 
 	 	if ( _bitmap != null ) {
 	 	   return _bitmap.getWidth();	 	  
-	 	} else return 0;	 	 
+	 	} else 
+	 	   return 0;	 	 
   }
 
   public  int GetBitmapHeight(Bitmap _bitmap) {	 
 	 	if ( _bitmap != null ) {
 	 	   return _bitmap.getHeight();	  
-	 	} else return 0;	 
+	 	} else 
+	 	   return 0;	 
   }
 	 
 	public byte[] GetByteArrayFromBitmap(Bitmap _bitmap, String _compressFormat) {
+		if( _bitmap == null ) return null; // by tr3e
 	     
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		String strUpper = _compressFormat.toUpperCase();		
@@ -288,11 +326,15 @@ public class jImageFileManager /*extends ...*/ {
 	 }
 
 	public Bitmap SetByteArrayToBitmap(byte[] _imageArray) {
+		if( _imageArray == null ) return null; // by tr3e
+		
 	    return BitmapFactory.decodeByteArray(_imageArray, 0, _imageArray.length);
 	}
 
 	 //http://androidtrainningcenter.blogspot.com.br/2012/05/bitmap-operations-like-re-sizing.html
 	public Bitmap ClockWise(Bitmap _bitmap, ImageView _imageView){
+		 if( (_bitmap == null) || (_imageView == null) ) return null; // by tr3e
+		 
 	     Matrix mMatrix = new Matrix();
 	     Matrix mat= _imageView.getImageMatrix();    
 	     mMatrix.set(mat);
@@ -301,6 +343,8 @@ public class jImageFileManager /*extends ...*/ {
 	} 
 
 	public Bitmap AntiClockWise(Bitmap _bitmap, ImageView _imageView){
+		if( (_bitmap == null) || (_imageView == null) ) return null; // by tr3e
+		
 	     Matrix mMatrix = new Matrix();
 	     Matrix mat= _imageView.getImageMatrix();    
 	     mMatrix.set(mat);
@@ -308,7 +352,9 @@ public class jImageFileManager /*extends ...*/ {
 	     return Bitmap.createBitmap(_bitmap, 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), mMatrix, false);    
 	}
 	
-	public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {  
+	public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {
+		if( (_bmp == null) || (_imageView == null) ) return null; // by tr3e
+		
 	    Matrix mMatrix = new Matrix();
 	    Matrix mat= _imageView.getImageMatrix();    
 	    mMatrix.set(mat);        
@@ -323,33 +369,48 @@ public class jImageFileManager /*extends ...*/ {
 	
 	public Bitmap GetBitmapFromIntentResult(Intent _intentData) {						
 		Uri selectedImage = _intentData.getData();
+		
+		if( selectedImage == null ) return null; // Fix by tr3e
+		
 		String[] filePathColumn = { MediaStore.Images.Media.DATA };	 
 	    Cursor cursor = controls.activity.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+	    
+	    if( cursor == null ) return null; // Fix by tr3e
+	    
 	    cursor.moveToFirst();
 	    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 	    String picturePath = cursor.getString(columnIndex);
 	    cursor.close();
+	    
 	    return BitmapFactory.decodeFile(picturePath);    
 	}
 	
 	
 	public Bitmap GetBitmapThumbnailFromCamera(Intent _intentData) {
 		Bundle extras = _intentData.getExtras();
+		
+		if( extras == null ) return null; // Fix by tr3e
+		
 	    return (Bitmap) extras.get("data");    
 	}
 	
 	//TODO Pascal
-	public String GetImageFilePath(Intent _intentData) {
-		   //Uri selectedImage = data.getData();
-	  Uri selectedImage = _intentData.getData();	
-	  String[] filePathColumn = { MediaStore.Images.Media.DATA };	   
-	  Cursor cursor = controls.activity.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-	  cursor.moveToFirst();
-	  int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-	  String path = cursor.getString(columnIndex);
-	  cursor.close();               
-	  return path;
-	  // String path contains the path of selected Image  
+	public String GetImageFilePath(Intent _intentData) {		   
+		Uri selectedImage = _intentData.getData();
+		  
+		if( selectedImage == null ) return ""; // Fix by tr3e
+		  
+		String[] filePathColumn = { MediaStore.Images.Media.DATA };	   
+		Cursor cursor = controls.activity.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+		  
+		if( cursor == null ) return ""; // Fix by tr3e
+		  
+		cursor.moveToFirst();
+		int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+		String path = cursor.getString(columnIndex);
+		cursor.close();               
+		return path;
+	    // String path contains the path of selected Image  
 	}
 
 	public Bitmap LoadFromUri(String _uriAsString) {
@@ -362,6 +423,7 @@ public class jImageFileManager /*extends ...*/ {
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return null;
 			}        
 	       return selectedImage;
 	}

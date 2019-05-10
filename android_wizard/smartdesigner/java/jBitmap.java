@@ -62,12 +62,19 @@ private int GetDrawableResourceId(String _resName) {
 
 //by jmpessoa
 private Drawable GetDrawableResourceById(int _resID) {
+	if( _resID == 0 ) return null; // by tr3e
+	
 	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
 }
 
 //by jmpessoa
-public  void loadRes(String imgResIdentifier) { 
-	   int id =	GetDrawableResourceId(imgResIdentifier);	
+public  void loadRes(String imgResIdentifier) {
+	    bmp = null;
+	    
+	    int id =	GetDrawableResourceId(imgResIdentifier);
+	    
+	    if( id == 0 ) return; // by tr3e
+	    
 	    BitmapFactory.Options bo = new BitmapFactory.Options();
 	    bo.inScaled = false; 
 	    bmp =  BitmapFactory.decodeResource(this.controls.activity.getResources(), id, bo);	

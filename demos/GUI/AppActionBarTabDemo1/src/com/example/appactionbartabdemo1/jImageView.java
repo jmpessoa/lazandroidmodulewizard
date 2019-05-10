@@ -164,6 +164,8 @@ public class jImageView extends ImageView {
 
 	public Drawable GetDrawableResourceById(int _resID) {
 		
+		if( _resID == 0 ) return null; // by tr3e
+		
 		Drawable res = null;
 		
 		if (Build.VERSION.SDK_INT < 21 ) {
@@ -180,6 +182,9 @@ public class jImageView extends ImageView {
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+		
+		if( d == null ) return; // by tr3e
+		
 		bmp = ((BitmapDrawable)d).getBitmap();
 		this.setImageResource(android.R.color.transparent);
 		this.setImageDrawable(d);

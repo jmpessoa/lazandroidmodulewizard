@@ -137,8 +137,9 @@ public class jContextMenu /*extends ...*/ {
     public void SetHeader(ContextMenu _menu, String _title, String _iconIdentifier){
     	mHeaderTitle = _title;
     	mHeaderIconIdentifier = _iconIdentifier;
-  	   _menu.setHeaderTitle((CharSequence)_title);
+  	   _menu.setHeaderTitle((CharSequence)_title);  	   
   	   _menu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));
+  	   
   	   if (mMenu == null) mMenu = _menu;
     }
     
@@ -151,9 +152,9 @@ public class jContextMenu /*extends ...*/ {
     
     public void SetHeaderIconByIdentifier(String _iconIdentifier){    	     	  
    	   mHeaderIconIdentifier = _iconIdentifier;
-   	   if (mMenu != null) {
-   		  mMenu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));
-   	   }
+   	   
+   	   if (mMenu != null)
+   		   mMenu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));   	   
      }    
     
     public boolean IsItemChecked(int _itemID) {

@@ -201,8 +201,10 @@ public class jMenu /*extends ...*/ {
     	  }
     }
     
-    private Drawable GetDrawableResourceById(int _resID) {   	    	 
-    	 return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
+    private Drawable GetDrawableResourceById(int _resID) {
+    	if( _resID == 0 ) return null; // by tr3e
+    	
+    	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
     }
     
     //_itemType --> 0:Default, 1:Checkable

@@ -275,6 +275,8 @@ public class jTextView extends TextView {
 	}
 	
 	private Drawable GetDrawableResourceById(int _resID) {
+		if( _resID == 0 ) return null; // by tr3e
+		
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
 	}
 	
@@ -306,7 +308,13 @@ public class jTextView extends TextView {
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
 		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		if( id == 0 ) return; // by tr3e
+		
+		Drawable d = GetDrawableResourceById(id);
+		
+		if( d == null ) return;
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		

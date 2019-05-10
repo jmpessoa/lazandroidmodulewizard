@@ -27,7 +27,7 @@ jImageFileManager = class(jControl)
     procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
-    procedure SaveToSdCard(_image: jObject; _filename: string);
+    function  SaveToSdCard(_image: jObject; _filename: string) : boolean;
     procedure ShowImagesFromGallery();
     function LoadFromSdCard(_filename: string): jObject;
     function LoadFromURL(_imageURL: string): jObject;
@@ -36,8 +36,8 @@ jImageFileManager = class(jControl)
     function LoadFromResources(_imageResIdentifier: string): jObject;
     function LoadFromFile(_filenameInternalAppStorage: string): jObject; overload;
     function LoadFromFile(_pathEnvironment: string; _filename: string): jObject; overload;
-    procedure SaveToFile(_image: jObject; _filename: string); overload;
-    procedure SaveToFile(_image: jObject;_path: string; _filename: string); overload;
+    function SaveToFile(_image: jObject; _filename: string) : boolean; overload;
+    function SaveToFile(_image: jObject;_path: string; _filename: string) : boolean; overload;
     function LoadFromUri(_imageUri: jObject): jObject;   overload;
 
     function LoadFromFile(_filename: string; _scale: integer): jObject; overload;
@@ -63,7 +63,7 @@ end;
 
 function jImageFileManager_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
 procedure jImageFileManager_jFree(env: PJNIEnv; _jimagefilemanager: JObject);
-procedure jImageFileManager_SaveToSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string);
+function jImageFileManager_SaveToSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string) : boolean;
 procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; _jimagefilemanager: JObject);
 function jImageFileManager_LoadFromSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject;
 function jImageFileManager_LoadFromURL(env: PJNIEnv; _jimagefilemanager: JObject; _imageURL: string): jObject;
@@ -73,8 +73,8 @@ function jImageFileManager_LoadFromRawFolder(env: PJNIEnv; _jimagefilemanager: J
 function jImageFileManager_LoadFromResources(env: PJNIEnv; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
 function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject; overload;
 function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _path: string; _filename: string): jObject; overload;
-procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string); overload;
-procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject;_path:string; _filename: string); overload;
+function jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string) : boolean; overload;
+function jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject;_path:string; _filename: string) : boolean; overload;
 function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _imageUri: jObject): jObject;  overload;
 
 function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string; _scale: integer): jObject;  overload;
@@ -139,11 +139,13 @@ begin
      jImageFileManager_jFree(FjEnv, FjObject);
 end;
 
-procedure jImageFileManager.SaveToSdCard(_image: jObject; _filename: string);
+function jImageFileManager.SaveToSdCard(_image: jObject; _filename: string) : boolean;
 begin
+  result := false;
+
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_SaveToSdCard(FjEnv, FjObject, _image ,_filename);
+   result := jImageFileManager_SaveToSdCard(FjEnv, FjObject, _image ,_filename);
 end;
 
 procedure jImageFileManager.ShowImagesFromGallery();
@@ -203,18 +205,22 @@ begin
     Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject,_pathEnvironment, _filename);
 end;
 
-procedure jImageFileManager.SaveToFile(_image: jObject; _filename: string);
+function jImageFileManager.SaveToFile(_image: jObject; _filename: string) : boolean;
 begin
+  result := false;
+
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_SaveToFile(FjEnv, FjObject, _image ,_filename);
+   result := jImageFileManager_SaveToFile(FjEnv, FjObject, _image ,_filename);
 end;
 
-procedure jImageFileManager.SaveToFile(_image: jObject; _path:string;  _filename: string);
+function jImageFileManager.SaveToFile(_image: jObject; _path:string;  _filename: string) : boolean;
 begin
+  result := false;
+
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_SaveToFile(FjEnv, FjObject, _image ,_path, _filename);
+   result := jImageFileManager_SaveToFile(FjEnv, FjObject, _image ,_path, _filename);
 end;
 
 function jImageFileManager.LoadFromUri(_imageUri: jObject): jObject;
@@ -354,22 +360,24 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
-procedure jImageFileManager_SaveToSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string);
+function jImageFileManager_SaveToSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string) : boolean;
 var
+  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].l:= _image;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SaveToSdCard', '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jimagefilemanager, jMethod, @jParams);
+
+  jCls    := env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod := env^.GetMethodID(env, jCls, 'SaveToSdCard', '(Landroid/graphics/Bitmap;Ljava/lang/String;)Z');
+  jBoo    := env^.CallBooleanMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  Result  := boolean(jBoo);
+
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; _jimagefilemanager: JObject);
 var
@@ -486,24 +494,29 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string);
+function jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string) : boolean;
 var
+  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].l:= _image;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jimagefilemanager, jMethod, @jParams);
+
+  jCls    := env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod := env^.GetMethodID(env, jCls, 'SaveToFile', '(Landroid/graphics/Bitmap;Ljava/lang/String;)Z');
+  jBoo    := env^.CallBooleanMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  Result  := boolean(jBoo);
+
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
-procedure jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _path: string; _filename: string);
+function jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _path: string; _filename: string) : boolean;
 var
+  jBoo: JBoolean;
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -511,9 +524,12 @@ begin
   jParams[0].l:= _image;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_path));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Landroid/graphics/Bitmap;Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jimagefilemanager, jMethod, @jParams);
+
+  jCls    := env^.GetObjectClass(env, _jimagefilemanager);
+  jMethod := env^.GetMethodID(env, jCls, 'SaveToFile', '(Landroid/graphics/Bitmap;Ljava/lang/String;Ljava/lang/String;)Z');
+  jBoo    := env^.CallBooleanMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  Result  := boolean(jBoo);
+
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);

@@ -773,6 +773,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
  //by jmpessoa
  private Drawable GetDrawableResourceById(int _resID) {
+  if( _resID == 0 ) return null; // by tr3e
+  
   return this.controls.activity.getResources().getDrawable(_resID);
  }
 
@@ -1079,6 +1081,9 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 	  
   ByteArrayOutputStream stream = new ByteArrayOutputStream();
   Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+  
+  if( d == null ) return;
+  
   bufBmp = ((BitmapDrawable)d).getBitmap();
   bufBmp.compress(CompressFormat.PNG, 0, stream);        	
   byte[] image_byte = stream.toByteArray();

@@ -284,6 +284,7 @@ public class jImageView extends ImageView {
 	}
 
 	public Drawable GetDrawableResourceById(int _resID) {
+		if( _resID == 0 ) return null; // by tr3e
 		
 		Drawable res = null;
 		
@@ -301,7 +302,13 @@ public class jImageView extends ImageView {
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+		
+		if( d == null ) return;
+		
 		Bitmap b = ((BitmapDrawable)d).getBitmap();
+		
+		if( b == null ) return;
+		
 		bmp = GetResizedBitmap(b, b.getWidth(), b.getHeight());
 		this.setImageResource(android.R.color.transparent);
 		if (!mRounded)

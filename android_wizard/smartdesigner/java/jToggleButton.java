@@ -145,6 +145,8 @@ public class jToggleButton extends ToggleButton /*dummy*/ { //please, fix what G
    }
 
    private Drawable GetDrawableResourceById(int _resID) {
+	  if( _resID == 0 ) return null; // by tr3e
+	   
       return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
    }
 
