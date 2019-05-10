@@ -230,8 +230,13 @@ public class jButton extends Button {
 		this.setBackgroundResource( GetDrawableResourceId(_imgResIdentifier) );			
 	}	
 	
-	public  void SetBackgroundByImage(Bitmap _image) {	
+	public  void SetBackgroundByImage(Bitmap _image) {
+	  if(_image == null) return;
+	  
 	  Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+	  
+	  if( d == null ) return;
+	  
       //[ifdef_api16up]
 	  if(Build.VERSION.SDK_INT >= 16) 
           this.setBackground(d);
