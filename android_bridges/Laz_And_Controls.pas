@@ -1516,6 +1516,7 @@ type
     Procedure Clear;
     Procedure SetFontColorByIndex(Value : TARGBColorBridge; index: integer);
     Procedure SetFontSizeByIndex(Value : DWord; index: integer  );
+    function  GetFontSizeByIndex(index: integer  ) : integer; // by tr3e
 
     procedure SetWidgetByIndex(Value: TWidgetItem; index: integer); overload;
     procedure SetWidgetByIndex(Value: TWidgetItem; txt: string; index: integer); overload;
@@ -1573,6 +1574,7 @@ type
     function SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
     procedure SetSelection(_index: integer);
     procedure SmoothScrollToPosition(_index: integer);
+    procedure SetDrawAlphaBackground(_alpha: integer); // by tr3e
     procedure ClearChecked(); // by tr3e
     function  GetItemsChecked(): integer; // by tr3e
     procedure SetItemChecked(_index: integer; _value: boolean);
@@ -7564,6 +7566,21 @@ begin
   //FFontSize:= Value;
   if FInitialized and (Value > 0) then
      jListView_setTextSize2(FjEnv, FjObject , Value, index);
+end;
+
+// by tr3e
+function jListView.GetFontSizeByIndex(index: Integer): integer;
+begin
+  if FInitialized then
+    Result:= jListView_GetFontSizeByIndex(FjEnv, FjObject, index);
+end;
+
+// by tr3e
+procedure jListView.SetDrawAlphaBackground(_alpha: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetDrawAlphaBackground(FjEnv, FjObject, _alpha);
 end;
 
 // LORDMAN 2013-08-07

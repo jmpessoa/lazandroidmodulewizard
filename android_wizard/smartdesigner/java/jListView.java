@@ -122,6 +122,8 @@ class jArrayAdapter extends ArrayAdapter {
     boolean mWordWrap;
     
     int mItemImageWidgetSide = 0; // left, right, top, bottom
+    
+    int mDrawAplhaBackground = 0x88000000; // Alphablending for background default 53%
     // by tr3e
     
     Typeface mWidgetCustomFont = null;
@@ -1272,8 +1274,9 @@ class jArrayAdapter extends ArrayAdapter {
 			// tr3e add background color to cells
 			int drawItemBackColor = controls.pOnListViewDrawItemBackgroundColor(PasObj, (int)position);
 						
-			if (drawItemBackColor != Color.TRANSPARENT)
-				itemLayout.setBackgroundColor(drawItemBackColor);
+			if (drawItemBackColor != Color.TRANSPARENT){
+				itemLayout.setBackgroundColor(drawItemBackColor-mDrawAplhaBackground);				
+			}
 			// tr3e            
             			
 			if (items.get(position).highLightColor != Color.TRANSPARENT)
@@ -1434,7 +1437,7 @@ public class jListView extends ListView {
 		typeFace = Typeface.DEFAULT;
 		
 		setBackgroundColor(0x00000000);
-		setCacheColorHint(0);
+		setCacheColorHint(0);		
 
 		alist = new ArrayList<jListItemRow>();
 		orig_alist = new ArrayList<jListItemRow>();
@@ -1597,6 +1600,11 @@ public class jListView extends ListView {
 
 	public  String  getItemText(int index) {
 		return alist.get(index).label;        
+	}
+	
+	// by tr3e
+	public  int GetFontSizeByIndex(int index) {
+		return alist.get(index).textSize;		
 	}
 
 	public int GetSize() {
@@ -1839,10 +1847,10 @@ public class jListView extends ListView {
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
 	}
 
-	public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable
+	public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable		
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));
-		alist.get(index).bmp = ((BitmapDrawable)d).getBitmap();
-		aadapter.notifyDataSetChanged();
+		alist.get(index).bmp = ((BitmapDrawable)d).getBitmap();		
+		aadapter.notifyDataSetChanged();		
 	}
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
@@ -2118,6 +2126,7 @@ public class jListView extends ListView {
 		aadapter.SetItemPaddingBottom(_itemPaddingBottom);
 		aadapter.notifyDataSetChanged();
 	}
+	
 	// by tr3e	
 	public void SetItemPaddingLeft(int _left) { 
 		aadapter.SetItemPaddingLeft( _left);
@@ -2148,6 +2157,19 @@ public class jListView extends ListView {
 		aadapter.SetWidgetImageSide(_side);
 		aadapter.notifyDataSetChanged();
 	}
+	
+	public void SetDrawAlphaBackground( int _alpha ){
+	 int tmpAlpha = _alpha;
+	 
+	 if( _alpha < 0 )
+		 tmpAlpha = 0;
+	 else if ( _alpha > 255 )
+		 tmpAlpha = 255;
+		 	 
+	 aadapter.mDrawAplhaBackground = 16777216*tmpAlpha;
+	 aadapter.notifyDataSetChanged();
+	}
+	// by tr3e end
 
 	public void SetWidgetTextColor(int _textcolor) {
 		this.widgetTextColor = _textcolor; 
