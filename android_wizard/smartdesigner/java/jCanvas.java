@@ -97,17 +97,24 @@ public class jCanvas {
 	}
 
 	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+		if( _bmp == null ) return null;
+		
 		float factorH = _newHeight / (float)_bmp.getHeight();
 		float factorW = _newWidth / (float)_bmp.getWidth();
 		float factorToUse = (factorH > factorW) ? factorW : factorH;
+		
 		Bitmap bm = Bitmap.createScaledBitmap(_bmp,
 				(int) (_bmp.getWidth() * factorToUse),
 				(int) (_bmp.getHeight() * factorToUse),false);
+		
 		return bm;
 	}
 
 	public void drawBitmap(Bitmap _bitmap, int _width, int _height) {
+		if( (_bitmap == null) || (_width <= 0) || (_height <= 0) ) return; // Fix by tr3e
+		
 		Bitmap bmp = GetResizedBitmap(_bitmap, _width, _height);
+		
 		Rect rect = new Rect(0, 0, _width, _height);
 		canvas.drawBitmap(bmp,null,rect,paint);
 	}
@@ -121,6 +128,8 @@ public class jCanvas {
     		scaleFactor = Math.min(bitmap.getWidth()/(right-left), bitmap.getHeight()/(bottom-top));
 }	
 		*/
+		if( bitmap == null ) return;
+		
 		Rect rect = new Rect(left,top, right, bottom);
 		if ( (bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {
 			int nh = (int) ( bitmap.getHeight() * (512.0 / bitmap.getWidth()) );

@@ -950,7 +950,10 @@ private long pascalObj = 0;        // Pascal Object
      }
     
     public Bitmap GetBitmapResource(String _resourceDrawableIdentifier, boolean _inScaled) {
-       int id =	GetDrawableResourceId(_resourceDrawableIdentifier);	
+       int id =	GetDrawableResourceId(_resourceDrawableIdentifier);
+       
+       if( id == 0 ) return null; // by tr3e
+       
        BitmapFactory.Options bo = new BitmapFactory.Options();
        bo.inScaled = _inScaled; //false; 
        return  BitmapFactory.decodeResource(context.getResources(), id, bo);

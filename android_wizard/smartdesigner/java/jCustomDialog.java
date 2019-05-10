@@ -253,6 +253,7 @@ public class jCustomDialog extends RelativeLayout {
 			mDialog.setContentView(this);			
 			
 			mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+			
 			mDialog.setTitle(mTitle);			
 			//mDialog.setCanceledOnTouchOutside(mCanceledOnTouchOutside);
 			mDialog.setCancelable(FCancelable);
@@ -306,7 +307,7 @@ public class jCustomDialog extends RelativeLayout {
 		if (mDialog == null) return;
 		
 		mIconIdentifier = _iconIdentifier;
-		mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+		mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);		
 		mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
 	}
 

@@ -130,7 +130,7 @@ class jGridViewCustomAdapter extends ArrayAdapter {
                 itemLayout.addView(imageViewItem, imgParam);
             }
             else {
-                if (! items.get(position).drawableIdentifier.equals("")) {
+                if (! items.get(position).drawableIdentifier.equals("")) {                	
                     imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));
                     itemLayout.addView(imageViewItem, imgParam);
                 }

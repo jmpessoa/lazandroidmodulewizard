@@ -99,7 +99,7 @@ public class jActionBarTab {
 	public void Add(String _title, View _panel, String _iconIdentifier){
 		  ActionBar.Tab tab = CreateTab(_title, _panel);  
 		  if (!_iconIdentifier.equals("")) {
-		      tab.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier))); //_iconIdentifier
+			  tab.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier))); //_iconIdentifier
 		  }
 		  ActionBar actionBar = this.controls.activity.getActionBar();
 		  actionBar.addTab(tab, false);		  
@@ -154,6 +154,8 @@ public class jActionBarTab {
 	
 	//by jmpessoa
 	private Drawable GetDrawableResourceById(int _resID) {
+		if( _resID == 0 ) return null; // by tr3e
+		
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
 	}
 	

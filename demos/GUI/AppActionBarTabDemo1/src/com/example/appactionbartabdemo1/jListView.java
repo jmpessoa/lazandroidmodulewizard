@@ -265,6 +265,8 @@ class jArrayAdapter extends ArrayAdapter {
 
 	
 	private Drawable GetDrawableResourceById(int _resID) {
+		if( _resID == 0 ) return null; // by tr3e
+		
 		return (Drawable)( ctx.getResources().getDrawable(_resID));
 	}
 	
@@ -1530,6 +1532,8 @@ public class jListView extends ListView {
 	}
 	
 	private Drawable GetDrawableResourceById(int _resID) {
+		if( _resID == 0 ) return null; // by tr3e
+		
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
 	}
 

@@ -736,11 +736,20 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     private Drawable GetDrawableResourceById(int _resID) {
+    	if( _resID == 0 ) return null; // by tr3e
+    	
         return (Drawable) (this.controls.activity.getResources().getDrawable(_resID));
     }
 
     public void SetImageByResourceIdentifier(String _imageResIdentifier) {
-        Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+    	int id = GetDrawableResourceId(_imageResIdentifier); 
+    			
+    	if( id == 0 ) return; // by tr3e
+    	
+        Drawable d = GetDrawableResourceById(id);
+        
+        if( d == null ) return; 
+        
         Bitmap bmp = ((BitmapDrawable) d).getBitmap();
         this.DrawBitmap(bmp);
         this.invalidate();

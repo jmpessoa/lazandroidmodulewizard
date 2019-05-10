@@ -668,8 +668,10 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
+	    if( _resID == 0 ) return null; // by tr3e
 	    
-	        Drawable res = null;	    
+	    Drawable res = null;
+	    
 		if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21		
  			res = this.controls.activity.getResources().getDrawable(_resID);
  		}
@@ -745,7 +747,9 @@ public void SetSubTitleActionBar(String _subtitle) {
 public void SetIconActionBar(String _iconIdentifier) {
 //[ifdef_api14up]
 	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
-	jCommons.ActionBarSetIcon(controls, d);
+	
+	if( d != null )
+	 jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
 }
 
