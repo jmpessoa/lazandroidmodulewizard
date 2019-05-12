@@ -717,6 +717,9 @@ type
    published
    end;
 
+  TBatchAsyncTaskType = (attUnknown, attUpdate, attInsert);
+  TOnSqliteDataAccessAsyncPostExecute=procedure(Sender:TObject;count:integer;msgResult:string) of object;
+
   jSqliteDataAccess = class(jControl)
   private
     FjSqliteCursor    : jSqliteCursor;
@@ -727,6 +730,10 @@ type
     FCreateTableQuery: TStrings;
     FTableName: TStrings;
     FReturnHeaderOnSelect: boolean;
+
+    FBatchAsyncTaskType: TBatchAsyncTaskType;
+    FOnAsyncPostExecute: TOnSqliteDataAccessAsyncPostExecute;
+
     procedure SetjSqliteCursor(Value: jSqliteCursor);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -761,8 +768,12 @@ type
     procedure SetForeignKeyConstraintsEnabled(_value: boolean);
     procedure SetDefaultLocale();
     procedure DeleteDatabase(_dbName: string);
-    procedure InsertIntoTableBatch(var _insertQueries: TDynArrayOfString);
-    procedure UpdateTableBatch(var _updateQueries: TDynArrayOfString);
+    //procedure InsertIntoTableBatch(var _insertQueries: TDynArrayOfString);
+    //procedure UpdateTableBatch(var _updateQueries: TDynArrayOfString);
+    function InsertIntoTableBatch(var _insertQueries: TDynArrayOfString): boolean;
+    function UpdateTableBatch(var _updateQueries: TDynArrayOfString): boolean;
+
+
     function CheckDataBaseExistsByName(_dbName: string): boolean;
     procedure UpdateImageBatch(var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
 
@@ -772,6 +783,9 @@ type
     function DatabaseExists(_databaseName: string): boolean;
     procedure SetAssetsSearchFolder(_folderName: string);
     procedure SetReturnHeaderOnSelect(_returnHeader: boolean);
+    procedure SetBatchAsyncTaskType(_batchAsyncTaskType: TBatchAsyncTaskType);
+    procedure ExecSQLBatchAsync(var _execSql: TDynArrayOfString);
+    procedure GenEvent_OnSqliteDataAccessAsyncPostExecute(Sender:TObject;count:integer;msgResult:string);
 
     property FullPathDataBaseName: string read GetFullPathDataBaseName;
 
@@ -783,6 +797,7 @@ type
     property CreateTableQuery: TStrings read FCreateTableQuery write FCreateTableQuery;
     property TableName: TStrings read FTableName write FTableName;
     property ReturnHeaderOnSelect: boolean read FReturnHeaderOnSelect write SetReturnHeaderOnSelect;
+    property OnAsyncPostExecute: TOnSqliteDataAccessAsyncPostExecute read FOnAsyncPostExecute write FOnAsyncPostExecute;
   end;
   
   TOnClickDBListItem = procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
@@ -2128,6 +2143,8 @@ type
 
   Procedure Java_Event_pOnClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
   Procedure Java_Event_pOnLongClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
+  procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
+
 
   //Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
@@ -3490,6 +3507,18 @@ begin
     jHorizontalScrollView(Obj).GenEvent_OnChanged(Obj, currenthorizontal, currentVertical, previousHorizontal, previousVertical, onPosition, scrolldiff);
   end;
 end;
+
+procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jSqliteDataAccess then
+  begin
+    jForm(jSqliteDataAccess(Sender).Owner).UpdateJNI(gApp);
+    jSqliteDataAccess(Sender).GenEvent_OnSqliteDataAccessAsyncPostExecute(Sender,count,GetPString(env,msgResult));
+  end;
+end;
+
 //------------------------------------------------------------------------------
 // jTextView
 //------------------------------------------------------------------------------
@@ -11233,6 +11262,7 @@ begin
   Result := jSqliteDataAccess_UpdateImage(FjEnv, FjObject, _tabName ,_imageFieldName ,_keyFieldName ,_imageResIdentifier ,_keyValue);
 end;
 
+(*
 procedure jSqliteDataAccess.InsertIntoTableBatch(var _insertQueries: TDynArrayOfString);
 begin
   //in designing component state: set value here...
@@ -11245,6 +11275,21 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jSqliteDataAccess_UpdateTableBatch(FjEnv, FjObject, _updateQueries);
+end;
+*)
+
+function jSqliteDataAccess.InsertIntoTableBatch(var _insertQueries: TDynArrayOfString): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSqliteDataAccess_InsertIntoTableBatch(FjEnv, FjObject, _insertQueries);
+end;
+
+function jSqliteDataAccess.UpdateTableBatch(var _updateQueries: TDynArrayOfString): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSqliteDataAccess_UpdateTableBatch(FjEnv, FjObject, _updateQueries);
 end;
 
 function jSqliteDataAccess.CheckDataBaseExistsByName(_dbName: string): boolean;
@@ -11306,6 +11351,25 @@ begin
      jSqliteDataAccess_SetReturnHeaderOnSelect(FjEnv, FjObject, _returnHeader);
 end;
 
+procedure jSqliteDataAccess.SetBatchAsyncTaskType(_batchAsyncTaskType: TBatchAsyncTaskType);
+begin
+  //in designing component state: set value here...
+  FBatchAsyncTaskType:= _batchAsyncTaskType;
+  if FInitialized then
+     jSqliteDataAccess_SetBatchAsyncTaskType(FjEnv, FjObject, Ord(_batchAsyncTaskType));
+end;
+
+procedure jSqliteDataAccess.ExecSQLBatchAsync(var _execSql: TDynArrayOfString);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSqliteDataAccess_ExecSQLBatchAsync(FjEnv, FjObject, _execSql);
+end;
+
+procedure jSqliteDataAccess.GenEvent_OnSqliteDataAccessAsyncPostExecute(Sender:TObject;count:integer;msgResult:string);
+begin
+  if Assigned(FOnAsyncPostExecute) then FOnAsyncPostExecute(Sender,count,msgResult);
+end;
    {jPanel}
 
 constructor jPanel.Create(AOwner: TComponent);

@@ -1745,20 +1745,20 @@ Function  jSysInfo_DevicePhoneNumber   (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 
 
-  Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
-  function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
-  Procedure jSystem_SetOrientation       (env:PJNIEnv;this:jobject; orientation : Integer);
-  function jSystem_GetOrientation        (env:PJNIEnv;this:jobject): integer;
-  Procedure jClassMethod(FuncName, FuncSig : PChar;
+Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
+function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
+Procedure jSystem_SetOrientation       (env:PJNIEnv;this:jobject; orientation : Integer);
+function jSystem_GetOrientation        (env:PJNIEnv;this:jobject): integer;
+Procedure jClassMethod(FuncName, FuncSig : PChar;
                        env : PJNIEnv; var Class_ : jClass; var Method_ :jMethodID);
-  function Get_gjClass(env: PJNIEnv): jClass;
+function Get_gjClass(env: PJNIEnv): jClass;
 
 //-----
 // Helper Function
-Function  xy  (x, y: integer): TXY;
-Function  xyWH(x, y, w, h: integer): TXYWH;
-Function  fxy (x, y: Single): TfXY;
-Function  getAnimation(i,o : TEffect ): TAnimation;
+Function xy  (x, y: integer): TXY;
+Function xyWH(x, y, w, h: integer): TXYWH;
+Function fxy (x, y: Single): TfXY;
+Function getAnimation(i,o : TEffect ): TAnimation;
 function DoTouchPoint(x, y: Single): TTouchPoint;
 // App
 Procedure App_Lock; {just for Object Orientad model!}
@@ -1791,8 +1791,9 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject;  layout:jobject; intent: jobject);
 
   function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
-  function  sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
-  function  sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
+  function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
+  function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
+  function GetPString(env: PJNIEnv; jstr: JString): string;
 
 var
   gApp:       jApp;       //global App !
@@ -1806,6 +1807,18 @@ var
 
 
 implementation
+
+function GetPString(env: PJNIEnv; jstr: JString): string;
+var
+ _jBoolean: JBoolean;
+begin
+    Result := '';
+    if jstr <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      Result:= string(env^.GetStringUTFChars(env,jstr,@_jBoolean) );
+    end;
+end;
 
 function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
 begin

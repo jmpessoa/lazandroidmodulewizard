@@ -998,14 +998,22 @@ procedure jSqliteDataAccess_SetForeignKeyConstraintsEnabled(env: PJNIEnv; _jsqli
 procedure jSqliteDataAccess_SetDefaultLocale(env: PJNIEnv; _jsqlitedataaccess: JObject);
 procedure jSqliteDataAccess_DeleteDatabase(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
 function  jSqliteDataAccess_UpdateImage(env: PJNIEnv; _jsqlitedataaccess: JObject; _tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean; overload;
-procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
-procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString);
+
+//procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
+//procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString);
+function jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString): boolean;
+function jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString): boolean;
+
 function jSqliteDataAccess_CheckDataBaseExistsByName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string): boolean;
 procedure jSqliteDataAccess_UpdateImageBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
 procedure jSqliteDataAccess_SetDataBaseName(env: PJNIEnv; _jsqlitedataaccess: JObject; _dbName: string);
 function jSqliteDataAccess_DatabaseExists(env: PJNIEnv; _jsqlitedataaccess: JObject; _databaseName: string): boolean;
 procedure jSqliteDataAccess_SetAssetsSearchFolder(env: PJNIEnv; _jsqlitedataaccess: JObject; _folderName: string);
 procedure jSqliteDataAccess_SetReturnHeaderOnSelect(env: PJNIEnv; _jsqlitedataaccess: JObject; _returnHeader: boolean);
+procedure jSqliteDataAccess_SetBatchAsyncTaskType(env: PJNIEnv; _jsqlitedataaccess: JObject; _batchAsyncTaskType: integer);
+procedure jSqliteDataAccess_ExecSQLBatchAsync(env: PJNIEnv; _jsqlitedataaccess: JObject; var _execSql: TDynArrayOfString);
+
+
 
      { jDBListView by Martin Lowry}
 
@@ -10677,10 +10685,10 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
-{
-procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
+(*
+function jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString): boolean;
 var
+  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -10696,23 +10704,25 @@ begin
   end;
   jParams[0].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
-  jMethod:= env^.GetMethodID(env, jCls, 'InsertIntoTableBatch', '([Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  jMethod:= env^.GetMethodID(env, jCls, 'InsertIntoTableBatch', '([Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-}
-
+*)
 //fixed by Martin Lowry
-procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
+
+function jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString): boolean;
 var
+  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
   newSize0: integer;
   jNewArray0: jObject=nil;
-  jStrings: array of jObject;
   i: integer;
+  jStrings: array of jObject;
 begin
   newSize0:= Length(_insertQueries);
   SetLength(jStrings, newSize0+1);
@@ -10725,8 +10735,9 @@ begin
   end;
   jParams[0].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
-  jMethod:= env^.GetMethodID(env, jCls, 'InsertIntoTableBatch', '([Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  jMethod:= env^.GetMethodID(env, jCls, 'InsertIntoTableBatch', '([Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  Result:= boolean(jBoo);
   for i:= 0 to newSize0 do
   begin
      env^.DeleteLocalRef(env,jStrings[i]);
@@ -10736,7 +10747,7 @@ begin
   SetLength(jStrings, 0);
 end;
 
-
+(*
 procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString);
 var
   jParams: array[0..0] of jValue;
@@ -10756,6 +10767,32 @@ begin
   jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
   jMethod:= env^.GetMethodID(env, jCls, 'UpdateTableBatch', '([Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+*)
+
+function jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_updateQueries);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_updateQueries[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'UpdateTableBatch', '([Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -10846,7 +10883,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jSqliteDataAccess_SetReturnHeaderOnSelect(env: PJNIEnv; _jsqlitedataaccess: JObject; _returnHeader: boolean);
 var
   jParams: array[0..0] of jValue;
@@ -10859,6 +10895,44 @@ begin
   env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jSqliteDataAccess_SetBatchAsyncTaskType(env: PJNIEnv; _jsqlitedataaccess: JObject; _batchAsyncTaskType: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _batchAsyncTaskType;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBatchAsyncTaskType', '(I)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jSqliteDataAccess_ExecSQLBatchAsync(env: PJNIEnv; _jsqlitedataaccess: JObject; var _execSql: TDynArrayOfString);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_execSql);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_execSql[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  jMethod:= env^.GetMethodID(env, jCls, 'ExecSQLBatchAsync', '([Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
    { jDBListView}
 

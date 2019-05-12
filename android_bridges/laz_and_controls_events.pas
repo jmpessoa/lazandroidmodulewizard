@@ -189,7 +189,6 @@ uses
    Procedure Java_Event_pOnZBarcodeScannerViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
                                                        codedata: JString; codetype: integer);
 
-
 implementation
 
 uses
