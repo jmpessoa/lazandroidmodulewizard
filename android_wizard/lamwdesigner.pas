@@ -1749,13 +1749,26 @@ begin
   FCustomDialogs := TFPList.Create;
   FShownCustomDialogs := TFPList.Create;
   FSelection := TFPList.Create;
-
   FImageCache := TImageCache.Create;
 
 end;
 
 destructor TAndroidWidgetMediator.Destroy;
 begin
+
+  if GlobalDesignHook <> nil then
+  begin
+    //GlobalDesignHook.RemoveAllHandlersForObject(Self);
+    GlobalDesignHook.RemoveHandlerModified(@OnDesignerModified);
+    GlobalDesignHook.RemoveHandlerPersistentAdded(@OnPersistentAdded);
+    GlobalDesignHook.RemoveHandlerPersistentDeleted(@OnPersistentDeleted);
+    GlobalDesignHook.RemoveHandlerPersistentDeleting(@OnPersistentDeleting);
+    GlobalDesignHook.RemoveHandlerSetSelection(@OnSetSelection);
+  end;
+
+  if LazarusIDE <> nil then
+    LazarusIDE.RemoveAllHandlersOfObject(Self);
+
   if Assigned(AndroidForm) then
     AndroidForm.Designer := nil;
 
@@ -1765,11 +1778,6 @@ begin
   FSelection.Free;
   FCustomDialogs.Free;
   FShownCustomDialogs.Free;
-
-  if GlobalDesignHook <> nil then
-    GlobalDesignHook.RemoveAllHandlersForObject(Self);
-  if LazarusIDE <> nil then
-    LazarusIDE.RemoveAllHandlersOfObject(Self);
 
   inherited Destroy;
 end;
