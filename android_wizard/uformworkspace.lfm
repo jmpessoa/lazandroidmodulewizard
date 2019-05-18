@@ -95,6 +95,7 @@ object FormWorkspace: TFormWorkspace
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
+  LCLVersion = '2.0.0.4'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
@@ -164,6 +165,7 @@ object FormWorkspace: TFormWorkspace
         'x86'
         'Mipsel'
         'Aarch64 (*)'
+        'x86_64  (*)'
       )
       OnClick = RGInstructionClick
       ParentColor = False

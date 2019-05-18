@@ -292,7 +292,7 @@ object FormSettingsPaths: TFormSettingsPaths
     Left = 8
     Height = 61
     Top = 268
-    Width = 321
+    Width = 350
     Anchors = [akTop, akLeft, akRight]
     AutoFill = True
     BorderSpacing.Around = 8
@@ -307,15 +307,15 @@ object FormSettingsPaths: TFormSettingsPaths
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 6
     ClientHeight = 36
-    ClientWidth = 317
+    ClientWidth = 346
     Columns = 6
     Items.Strings = (
-      '7'
-      '9'
-      '10c'
-      '10e'
-      '11c'
-      '"> 11"'
+      '7x'
+      '9x'
+      '10a,b,c'
+      '10e...'
+      '11x'
+      '">11"'
     )
     TabOrder = 4
   end
@@ -1555,7 +1555,7 @@ object FormSettingsPaths: TFormSettingsPaths
     OnClick = SpBPathToGradleClick
   end
   object SpeedButtonHelp: TSpeedButton
-    Left = 512
+    Left = 510
     Height = 28
     Top = 8
     Width = 25
@@ -1601,20 +1601,20 @@ object FormSettingsPaths: TFormSettingsPaths
   object GroupBox1: TGroupBox
     AnchorSideTop.Control = EditPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
-    Left = 334
+    Left = 360
     Height = 61
     Top = 268
-    Width = 170
+    Width = 175
     Anchors = [akTop, akRight]
-    Caption = 'NDK Prebuild/System'
+    Caption = 'NDK Prebuild'
     ClientHeight = 36
-    ClientWidth = 166
+    ClientWidth = 171
     TabOrder = 9
     object ComboBoxPrebuild: TComboBox
       Left = 6
       Height = 28
       Top = 4
-      Width = 140
+      Width = 157
       Anchors = [akTop, akRight]
       ItemHeight = 20
       OnChange = ComboBoxPrebuildChange
