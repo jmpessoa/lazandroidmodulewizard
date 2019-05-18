@@ -591,7 +591,8 @@ type
                     dirSdCard,
                     dirInternalAppStorage,
                     dirDatabase,
-                    dirSharedPrefs);
+                    dirSharedPrefs,
+                    dirCache);
 
   TEffect        = DWord;
 
@@ -2153,7 +2154,7 @@ destructor TAndroidWidget.Destroy;
 begin
   Parent:=nil;
   while ChildCount > 0 do Children[ChildCount-1].Free;
-  FreeAndNil(FChilds);
+  if FChilds <> nil then FreeAndNil(FChilds);
   inherited Destroy;
 end;
 
@@ -2791,12 +2792,14 @@ end;
 
 destructor jForm.Destroy;
 begin
-  if FInitialized and (not Finished) then
+  if not (csDesigning in ComponentState) then
   begin
-    jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
-    jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni jForm Layout global reference
-
-    jForm_Free2(FjEnv, FjObject);
+    if FInitialized and (not Finished) then
+    begin
+      jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
+      jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni jForm Layout global reference
+      jForm_Free2(FjEnv, FjObject);
+    end;
   end;
   inherited Destroy;
 end;
@@ -2805,10 +2808,8 @@ procedure jForm.Finish;
 begin
   if FInitialized  and (not Finished)  then
   begin
-    jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
-
-    jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni jForm Layout global reference
-
+    jForm_FreeLayout(FjEnv, FjRLayout);      //free jni jForm Layout global reference
+    jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni [saved copy] jForm Layout global reference
     jForm_Free2(FjEnv, FjObject);
     Finished:= True;
   end;

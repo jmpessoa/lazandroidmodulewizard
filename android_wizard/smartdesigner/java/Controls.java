@@ -1,6 +1,6 @@
-package org.lamw.appjcenterscrollingimageviewdemo1;
+package com.example.appsqlitedemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.4.2  - 01 May - 2019
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.3  - 17 May - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -463,8 +463,11 @@ public String GetEnvironmentDirectoryPath(int _directory) {
 	    case 10: absPath = this.controls.activity.getFilesDir().getPath();
 	             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
 	    case 11: absPath = this.controls.activity.getFilesDir().getPath();
-                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             
-	           
+                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;
+
+		  case 12: absPath = this.controls.activity.getFilesDir().getPath();
+			  absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/cache"; break;
+
 	  }
 	  	  
 	  //Make sure the directory exists.

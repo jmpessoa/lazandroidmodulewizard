@@ -1,4 +1,4 @@
-package org.lamw.appmodaldialogdemo1;
+package com.example.appfileproviderdemo1;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -83,7 +83,8 @@ public class jOpenDialog /*extends ...*/ {
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    
    private File GetEnvironmentDirectoryPath(int _directory) {		
-		File filePath= null;		  
+		File filePath= null;
+		String absPath;
 		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
 		if (_directory != 8) {		  	   	 
 		  switch(_directory) {	                       
@@ -97,9 +98,15 @@ public class jOpenDialog /*extends ...*/ {
 		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
 		    
 		    case 9: filePath  = this.controls.activity.getFilesDir(); break;      //Result : /data/data/com/MyApp/files	    	    
-		    case 10: filePath  = this.controls.activity.getFilesDir(); break;      //TODO		    
-		    case 11: filePath  = this.controls.activity.getFilesDir(); break;      //TODO	             
-		           
+		    //case 10: filePath  = this.controls.activity.getFilesDir(); break;      //TODO		//databases
+              case 10: absPath = this.controls.activity.getFilesDir().getPath();
+                  absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases";
+                  filePath= new File(absPath);break;
+              //case 11: filePath  = this.controls.activity.getFilesDir(); break;      //TODO      //shared_prefs
+              case 11: absPath = this.controls.activity.getFilesDir().getPath();
+                  absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs";
+                  filePath= new File(absPath);break;
+              case 12: filePath = this.controls.activity.getCacheDir();break;
 		  }		  	  	     
 		}else {  //== 8 
 		    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) == true) {
