@@ -1,0 +1,1 @@
+public native int pOnMidiManagerEvent(long pasobj, int info, long data);

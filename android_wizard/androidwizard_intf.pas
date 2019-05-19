@@ -3170,31 +3170,25 @@ begin
      auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt');
 
   auxList.Clear;
-  auxList.Add('How To Get More Builds:');
+  auxList.Add('How to get more ".so" chipset builds:');
   auxList.Add(' ');
-  auxList.Add('   :: Warning: Your system [Laz4Android ?] needs to be prepared [cross-compile] for the various builds!');
+  auxList.Add('   :: Warning 1: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds!');
+  auxList.Add('   :: Warning 2: Laz4Android [out-of-box] support only 32 Bits chipset: "armV6", "armV7a+Soft", "x86"!');
   auxList.Add(' ');
-  auxList.Add('1. Edit Lazarus project file "*.lpi": [use notepad like editor]');
+  auxList.Add('1. From LazarusIDE menu:');
   auxList.Add(' ');
-  auxList.Add('   > Open the "*.lpi" project file');
+  auxList.Add('   > Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]');
   auxList.Add(' ');
-  auxList.Add('       -If needed replace the line <Libraries ..... /> in the "*.lpi" by line from "build_*.txt"');
-  auxList.Add('       -If needed replace the line <TargetCPU ..... /> in the "*.lpi" by line from "build_*.txt"');
-  auxList.Add('       -If needed replace the line <CustomOptions ..... /> in the "*.lpi" by line from "build_*.txt"');
-  auxList.Add('       -If needed replace the line <TargetProcessor...../> in the "*.lpi" by line from "build_*.txt"');
+  auxList.Add('2. From LazarusIDE  menu:');
   auxList.Add(' ');
-  auxList.Add('   > Save the modified "*.lpi" project file ');
+  auxList.Add('   > Run -> Clean up and Build...');
   auxList.Add(' ');
-  auxList.Add('2. From Lazarus/Laz4Android IDE');
+  auxList.Add('3. From LazarusIDE menu:');
   auxList.Add(' ');
-  auxList.Add('   >Reopen the Project');
+  auxList.Add('   > [LAMW] Build Android Apk and Run');
   auxList.Add(' ');
-  auxList.Add('   > Run -> Build');
-  auxList.Add(' ');
-  auxList.Add('3. Repeat for others "build_*.txt" if needed...');
-  auxList.Add(' ');
-  auxList.Add('4. [Ant users] Execute [double click] the "ant-build-debug.bat" [or .sh] file to get the Apk !');
 
+  (*
   if FProjectModel = 'Eclipse' then
   begin
     auxList.Add(' or [Eclipse IDE]');
@@ -3203,11 +3197,7 @@ begin
     auxList.Add(' ');
     auxList.Add('   -right click your  project: -> Run as -> Android Application');
   end;
-
-  auxList.Add(' ');
-  auxList.Add(' ');
-  auxList.Add('      Thank you!');
-  auxList.Add('      By  ___jmpessoa_hotmail.com_____');
+  *)
 
   if FModuleType < 2 then
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt')

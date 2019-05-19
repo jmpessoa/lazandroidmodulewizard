@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  midimanager,
   expression,
   oraclejdbcconnection,
   uploadservice,
@@ -81,6 +82,7 @@ begin
   {$I jDialogYN_icon.lrs}
   {$I jDialogProgress_icon.lrs}
   {$I jmediaplayer_icon.lrs}
+  {$I jmidimanager_icon.lrs}
   {$I jmediarecorder_icon.lrs}
   {$I jdownloadmanager_icon.lrs}
   {$I jdownloadservice_icon.lrs}
@@ -142,6 +144,7 @@ begin
       jContactManager,
       jMediaRecorder,
       jMediaPlayer,
+      jMidiManager,
       jDownloadManager,
       jDownloadService,
       jUploadService,
