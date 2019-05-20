@@ -9,7 +9,7 @@ uses
   Classes, SysUtils, Types, LazFileUtils, laz2_XMLRead, Laz2_DOM, LCLVersion,
   AvgLvlTree, LazIDEIntf, IDEOptionsIntf, ProjectIntf, SourceChanger, Forms, Controls,
   Dialogs, Grids, StdCtrls, LResources, ExtCtrls, Spin, ComCtrls, Buttons,
-  Themes;
+  Themes{, IDEOptEditorIntf};
 
 const
   cMinAPI = 10;
@@ -61,6 +61,7 @@ type
     //property ThemeName: string read GetThemeName;
   end;
 
+
 implementation
 
 uses
@@ -78,106 +79,115 @@ type
 
   { TLamwProjectOptions }
 
- TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
-   cbTheme: TComboBox;
-   cbLaunchIconSize: TComboBox;
-   cbBuildSystem: TComboBox;
-   edLabel: TEdit;
-   edVersionName: TEdit;
-   ErrorPanel: TPanel;
-   gbVersion: TGroupBox;
-   GroupBox1: TGroupBox;
-   ImageList1: TImageList;
-   imLauncherIcon: TImage;
-   Label1: TLabel;
-   lblGradleHint: TLabel;
-   Label2: TLabel;
-   Label3: TLabel;
-   Label4: TLabel;
-   Label5: TLabel;
-   Label6: TLabel;
-   Label7: TLabel;
-   Label8: TLabel;
-   Label9: TLabel;
-   lblErrorMessage: TLabel;
-   PageControl1: TPageControl;
-   PermissonGrid: TStringGrid;
-   rbOrientation: TRadioGroup;
-   seMinSdkVersion: TSpinEdit;
-   seTargetSdkVersion: TComboBox;
-   seVersionCode: TSpinEdit;
-   SpeedButton1: TSpeedButton;
-   SpeedButtonHintTheme: TSpeedButton;
-   tsMiscellaneous: TTabSheet;
-   tsAppl: TTabSheet;
-   tsManifest: TTabSheet;
-   procedure cbBuildSystemChange(Sender: TObject);
-   procedure cbBuildSystemSelect(Sender: TObject);
-   procedure cbLaunchIconSizeSelect(Sender: TObject);
-   procedure cbThemeChange(Sender: TObject);
-   procedure PermissonGridCheckboxToggled({%H-}Sender: TObject; {%H-}aCol,
-   {%H-}aRow: integer; {%H-}aState: TCheckboxState);
-   procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: integer;
-     aRect: TRect; {%H-}aState: TGridDrawState);
-   procedure PermissonGridMouseDown(Sender: TObject; Button: TMouseButton;
-     Shift: TShiftState; X, Y: integer);
-   procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState;
-     X, Y: integer);
-   procedure seTargetSdkVersionEditingDone(Sender: TObject);
-   procedure SpeedButton1Click(Sender: TObject);
-   procedure SpeedButtonHintThemeClick(Sender: TObject);
- private
-   { private declarations }
- const
-   Drawable: array [0..4] of record
-       Size: integer;
-       Suffix: string;
-     end
-   = ((Size: 36; Suffix: 'ldpi'),
-     (Size: 48; Suffix: 'mdpi'),
-     (Size: 72; Suffix: 'hdpi'),
-     (Size: 96; Suffix: 'xhdpi'),
-     (Size: 144; Suffix: 'xxhdpi'));
- private
-   IsLamwProject: boolean;
-   FManifest: TLamwAndroidManifestOptions;
-   FIconsPath: string; // ".../res/drawable-"
-   FChkBoxDrawData: array [TCheckBoxState] of record
-     Details, DetailsHot: TThemedElementDetails;
-     CSize: TSize;
-   end;
-   FBuildSystem: string;
-   FProjectPath: string;
-   FDefaultTheme: string;
-
-   FAllPermissionsState: TCheckBoxState;
-   FAllPermissionsHot: boolean;
-   function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
-   procedure ErrorMessage(const msg: string);
-   procedure FillPermissionGrid(Permissions: TStringList;
-     PermNames: TStringToStringTree);
-   procedure SetControlsEnabled(ts: TTabSheet; en: boolean);
-   procedure ShowLauncherIcon;
- private
-   // gApp.Screen.Style := <orientation> statements
-   function GetCurrentAppScreenStyle: string;
-   function FindAppScreenStyleStatement(
-     out StartPos, ssConstStartPos, EndPos: integer): boolean;
-   function GetAppScreenStyleStatement(ssConstStartPos: integer;
-     out ssConstVal: string): boolean;
-   function SetAppScreenStyleStatement(const ssNewConstVal: string): boolean;
-   function RemoveAppScreenStyleStatement: boolean;
-   procedure TryUpdateStyleXML();
- public
-   { public declarations }
-   constructor Create(AOwner: TComponent); override;
-   destructor Destroy; override;
-   class function SupportedOptionsClass: TAbstractIDEOptionsClass; override;
-   function GetTitle: string; override;
-   procedure Setup({%H-}ADialog: TAbstractOptionsEditorDialog); override;
-   procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
-   procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
+TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
+ cbChipset: TComboBox;
+ cbTheme: TComboBox;
+ cbLaunchIconSize: TComboBox;
+ cbBuildSystem: TComboBox;
+ edLabel: TEdit;
+ edVersionName: TEdit;
+ ErrorPanel: TPanel;
+ gbVersion: TGroupBox;
+ GroupBox1: TGroupBox;
+ ImageList1: TImageList;
+ imLauncherIcon: TImage;
+ Label1: TLabel;
+ lblGradleHint: TLabel;
+ Label2: TLabel;
+ Label3: TLabel;
+ Label4: TLabel;
+ Label5: TLabel;
+ Label6: TLabel;
+ Label7: TLabel;
+ Label8: TLabel;
+ Label9: TLabel;
+ lblErrorMessage: TLabel;
+ PageControl1: TPageControl;
+ PermissonGrid: TStringGrid;
+ rbOrientation: TRadioGroup;
+ seMinSdkVersion: TSpinEdit;
+ seTargetSdkVersion: TComboBox;
+ seVersionCode: TSpinEdit;
+ SpeedButton1: TSpeedButton;
+ SpeedButtonHintTheme: TSpeedButton;
+ tsMiscellaneous: TTabSheet;
+ tsAppl: TTabSheet;
+ tsManifest: TTabSheet;
+ procedure cbBuildSystemChange(Sender: TObject);
+ procedure cbBuildSystemSelect(Sender: TObject);
+ procedure cbChipsetChange(Sender: TObject);
+ procedure cbLaunchIconSizeSelect(Sender: TObject);
+ procedure cbThemeChange(Sender: TObject);
+ procedure PermissonGridCheckboxToggled({%H-}Sender: TObject; {%H-}aCol,
+ {%H-}aRow: integer; {%H-}aState: TCheckboxState);
+ procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: integer;
+   aRect: TRect; {%H-}aState: TGridDrawState);
+ procedure PermissonGridMouseDown(Sender: TObject; Button: TMouseButton;
+   Shift: TShiftState; X, Y: integer);
+ procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState;
+   X, Y: integer);
+ procedure seTargetSdkVersionEditingDone(Sender: TObject);
+ procedure SpeedButton1Click(Sender: TObject);
+ procedure SpeedButton2Click(Sender: TObject);
+ procedure SpeedButtonHintThemeClick(Sender: TObject);
+private
+ { private declarations }
+const
+ Drawable: array [0..4] of record
+     Size: integer;
+     Suffix: string;
+   end
+ = ((Size: 36; Suffix: 'ldpi'),
+   (Size: 48; Suffix: 'mdpi'),
+   (Size: 72; Suffix: 'hdpi'),
+   (Size: 96; Suffix: 'xhdpi'),
+   (Size: 144; Suffix: 'xxhdpi'));
+private
+ IsLamwProject: boolean;
+ FManifest: TLamwAndroidManifestOptions;
+ FIconsPath: string; // ".../res/drawable-"
+ FChkBoxDrawData: array [TCheckBoxState] of record
+   Details, DetailsHot: TThemedElementDetails;
+   CSize: TSize;
  end;
+
+ FBuildSystem: string;
+ FProjectPath: string;
+ FDefaultTheme: string;
+ FChipSetTarget: string;
+
+ FAllPermissionsState: TCheckBoxState;
+ FAllPermissionsHot: boolean;
+ function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
+ procedure ErrorMessage(const msg: string);
+ procedure FillPermissionGrid(Permissions: TStringList;
+   PermNames: TStringToStringTree);
+ procedure SetControlsEnabled(ts: TTabSheet; en: boolean);
+ procedure ShowLauncherIcon;
+private
+ // gApp.Screen.Style := <orientation> statements
+ function GetCurrentAppScreenStyle: string;
+ function FindAppScreenStyleStatement(
+   out StartPos, ssConstStartPos, EndPos: integer): boolean;
+ function GetAppScreenStyleStatement(ssConstStartPos: integer;
+   out ssConstVal: string): boolean;
+ function SetAppScreenStyleStatement(const ssNewConstVal: string): boolean;
+ function RemoveAppScreenStyleStatement: boolean;
+ procedure TryUpdateStyleXML();
+ function GetChipSetTarget(var cbIndex: integer): string;
+ function GetBuildMode(filename: string; index: integer): string;
+ procedure TryChangeChipset();
+public
+ { public declarations }
+ constructor Create(AOwner: TComponent); override;
+ destructor Destroy; override;
+ class function SupportedOptionsClass: TAbstractIDEOptionsClass; override;
+ function GetTitle: string; override;
+ procedure Setup({%H-}ADialog: TAbstractOptionsEditorDialog); override;
+ procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
+ procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
+end;
+
 
   { TMyCanvas }
 
@@ -1134,6 +1144,112 @@ begin
   lblGradleHint.Visible := cbBuildSystem.Text = 'Gradle';
 end;
 
+{
+<Libraries Value="C:\android\ndkr18b\platforms\android-22\arch-arm\usr\lib;C:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x"/>
+<TargetCPU Value="arm"/>
+<CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
+}
+
+function TLamwProjectOptions.GetBuildMode(filename: string; index: integer): string;
+var
+  list: TStringList;
+  p1, p2: integer;
+  temp: string;
+begin
+  list:= TStringList.Create;
+  list.LoadFromFile(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ filename);
+  temp:= list.Strings[index];
+  p1:= Pos('"', temp) +1; //0 = Libraries ; 2 =CustomOptions
+  p2:= LastDelimiter('"',temp);
+  Result:= Copy(temp, p1, p2 - p1);
+  list.Free;
+end;
+
+procedure TLamwProjectOptions.TryChangeChipset();
+var
+  index: integer;
+begin
+  if cbChipset.Text <> '' then
+  begin
+    if cbChipset.Text <> FChipSetTarget then
+    begin
+       index:= cbChipset.ItemIndex;
+       case index of
+         0: begin  //ARMv6
+           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_armV6.txt') then
+           begin
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'armeabi'+PathDelim+'libcontrols';
+             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_armV6.txt', 2);
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
+             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_armV6.txt', 0);
+           end;
+         end;
+         1: begin  //ARMv7a+Soft
+           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_armV7a.txt') then
+           begin
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'armeabi-v7a'+PathDelim+'libcontrols';
+             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_armV7a.txt', 2);
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
+             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_armV7a.txt', 0);
+           end;
+         end;
+         2: begin //ARMv7a+VFPv3
+           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_armV7a_VFPv3.txt') then
+           begin
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'armeabi-v7a'+PathDelim+'libcontrols';
+             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_armV7a_VFPv3.txt', 2);
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
+             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_armV7a_VFPv3.txt', 0);
+           end;
+         end;
+         3: begin //x86
+           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_x86.txt') then
+           begin
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'x86'+PathDelim+'libcontrols';
+             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_x86.txt', 2);
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'x86';
+             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_x86.txt', 0);
+           end;
+         end;
+         4: begin //Mipsel
+           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_mipsel.txt') then
+           begin
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'mips'+PathDelim+'libcontrols';
+             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_mipsel.txt', 2);
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'mipsel';
+             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_mipsel.txt', 0);
+           end
+         end;
+         5: begin //Aarch64    //build_arm64.txt
+           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_arm64.txt') then
+           begin
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'arm64-v8a'+PathDelim+'libcontrols';
+             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_arm64.txt', 2);
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'aarch64';
+             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_arm64.txt', 0);
+           end;
+         end;
+         6: begin  //x86_64
+           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_x86_64.txt') then
+           begin
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'x86_64'+PathDelim+'libcontrols';
+             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_x86_64.txt', 2);
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'x86_64';
+             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_x86_64.txt', 0);
+           end;
+         end;
+       end;
+    end
+    else  ShowMessage('nochanged .. ' +cbChipset.Text);
+  end;
+end;
+
+
+procedure TLamwProjectOptions.cbChipsetChange(Sender: TObject);
+begin
+//
+end;
+
 procedure TLamwProjectOptions.cbBuildSystemChange(Sender: TObject);
 begin
   if Pos('AppCompat', FDefaultTheme) > 0 then
@@ -1321,6 +1437,31 @@ begin
     end;
 end;
 
+procedure TLamwProjectOptions.SpeedButton2Click(Sender: TObject);
+var
+  listInfo: TStringList;
+begin
+   listInfo:= TStringList.Create;
+   listInfo.Add('How to get more ".so" chipset builds:');
+   listInfo.Add(' ');
+   listInfo.Add('Hint1: Lazarus needs to be prepared [cross-compile] for selected chipset!');
+   listInfo.Add(' ');
+   listInfo.Add('Hint2: Laz4Android supports only 32bits: "armV6", "armV7a+Soft", "x86"!');
+   listInfo.Add(' ');
+   listInfo.Add('1.  > Chipset [select!] -> [OK]');
+   listInfo.Add(' ');
+   listInfo.Add('2. From LazarusIDE  menu:');
+   listInfo.Add(' ');
+   listInfo.Add('   > Run -> Clean up and Build...');
+   listInfo.Add(' ');
+   listInfo.Add('3. From LazarusIDE menu:');
+   listInfo.Add(' ');
+   listInfo.Add('   > [LAMW] Run Build Android Apk and Run');
+   listInfo.Add(' ');
+   ShowMessage(listInfo.Text);
+   listInfo.Free;
+end;
+
 procedure TLamwProjectOptions.SpeedButtonHintThemeClick(Sender: TObject);
 begin
   ShowMessage('Hint 1:'+ sLineBreak +
@@ -1406,7 +1547,64 @@ end;
 
 procedure TLamwProjectOptions.Setup(ADialog: TAbstractOptionsEditorDialog);
 begin
-  // localization
+  //localization
+end;
+
+{
+ARMv6 0
+ARMv7a+Soft 1
+ARMv7a+VFPv3 2 (*)
+x86 3
+Mipsel 4
+Aarch64 5 (*)
+x86_64 6
+}
+
+function TLamwProjectOptions.GetChipSetTarget(var cbIndex: integer): string;
+var
+  projectTarget: string;
+  projectCustom: string;
+begin
+
+  projectTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;  //..\libs\armeabi-v7a\libcontrols
+  projectCustom:= UpperCase(LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions);
+
+  if Pos('arm64-v8a', projectTarget) > 0 then     //arm64-v8a
+  begin
+     Result:= 'Aarch64';
+     cbIndex:= 5;
+  end
+  else if Pos('armeabi-v7a', projectTarget) > 0 then
+  begin
+     Result:= 'ARMv7a+Soft';
+     cbIndex:= 1;
+     if Pos('VFPV3', projectCustom) > 0 then
+     begin
+       Result:= 'ARMv7a+VFPv3';
+       cbIndex:= 2;
+     end;
+  end
+  else if Pos('armeabi', projectTarget) > 0 then
+  begin
+     Result:= 'ARMv6';
+     cbIndex:= 0;
+  end
+  else if Pos('x86_64', projectTarget) > 0 then
+  begin
+     Result:= 'x86_64';
+     cbIndex:= 6;
+  end
+  else if Pos('x86', projectTarget) > 0 then
+  begin
+     Result:= 'x86';
+     cbIndex:= 3;
+  end
+  else if Pos('mips', projectTarget) > 0 then    //droped >= NDK r17
+  begin
+     Result:= 'Mipsel';
+     cbIndex:= 4;
+  end;
+
 end;
 
 procedure TLamwProjectOptions.ReadSettings(AOptions: TAbstractIDEOptions);
@@ -1414,12 +1612,22 @@ var
   proj: TLazProject;
   fn, s: string;
   i: integer;
+  cbIndex: integer;
 begin
   // reading manifest
   SetControlsEnabled(tsManifest, False);
-  proj := LazarusIDE.ActiveProject;
+
+  proj:= LazarusIDE.ActiveProject;
   if (proj = nil) or (proj.IsVirtual) then
     Exit;
+
+  cbIndex:= -1;
+  FChipSetTarget:= GetChipSetTarget(cbIndex);
+
+  if cbIndex >= 0 then
+    cbChipset.ItemIndex := cbIndex;
+
+
   FBuildSystem := proj.CustomData['BuildSystem'];
   i := cbBuildSystem.Items.IndexOf(FBuildSystem);
   if i >= 0 then
@@ -1527,10 +1735,12 @@ begin
         TPortableNetworkGraphic(Objects[i]).SaveToFile(FIconsPath +
           Drawable[i].Suffix + PathDelim + FManifest.IconFileName + '.png');
 
-  if  cbBuildSystem.Text <> '' then
+  if cbBuildSystem.Text <> '' then
     LazarusIDE.ActiveProject.CustomData['BuildSystem'] := cbBuildSystem.Text;
 
   TryUpdateStyleXML();
+
+  TryChangeChipset();
 
 end;
 

@@ -189,6 +189,8 @@ uses
    Procedure Java_Event_pOnZBarcodeScannerViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
                                                        codedata: JString; codetype: integer);
 
+   procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
+   procedure Java_Event_pOnMidiManagerDeviceRemoved(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
 
 implementation
 
@@ -202,7 +204,7 @@ uses
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
    customcamera, calendarview, searchview, telephonymanager,
-   sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview;
+   sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview, midimanager;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2266,6 +2268,29 @@ begin
     jZBarcodeScannerView(Obj).GenEvent_OnZBarcodeScannerViewResult(Obj,pascodedata, codetype);
   end;
 end;
+
+procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jMidiManager then
+  begin
+    jForm(jMidiManager(Sender).Owner).UpdateJNI(gApp);
+    jMidiManager(Sender).GenEvent_OnMidiManagerDeviceAdded(Sender,deviceId,GetString(env,deviceName),GetString(env,productId),GetString(env,manufacture));
+  end;
+end;
+
+procedure Java_Event_pOnMidiManagerDeviceRemoved(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jMidiManager then
+  begin
+    jForm(jMidiManager(Sender).Owner).UpdateJNI(gApp);
+    jMidiManager(Sender).GenEvent_OnMidiManagerDeviceRemoved(Sender,deviceId,GetString(env,deviceName),GetString(env,productId),GetString(env,manufacture));
+  end;
+end;
+
 
 end.
 

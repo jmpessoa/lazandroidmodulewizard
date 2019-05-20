@@ -1,57 +1,142 @@
 object frmEditor: TfrmEditor
   Left = 451
-  Height = 393
+  Height = 491
   Top = 161
-  Width = 465
+  Width = 581
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
   Caption = 'String resource editor'
-  ClientHeight = 393
-  ClientWidth = 465
-  Constraints.MinHeight = 150
-  Constraints.MinWidth = 380
+  ClientHeight = 491
+  ClientWidth = 581
+  Constraints.MinHeight = 188
+  Constraints.MinWidth = 475
+  DesignTimePPI = 120
+  FormStyle = fsStayOnTop
+  Icon.Data = {
+    9E09000000000100010018180000010020008809000016000000280000001800
+    0000300000000100200000000000000900006400000064000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    00000000000000000000000000000000000000000000000000000000000094CF
+    908FA4D5A1F7A7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FF76B973FF367633FFDCEF
+    DBFFCBE3CAF7ABCBAACB7DAA7939000000000000000000000000000000000000
+    000000000000000000000000000000000000000000000000000098D196BDA7D7
+    A5FFA7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FF478A43FFDCEF
+    DBFFDCEFDBFFDCEFDBFF5F955DFF3A8036840000000000000000000000000000
+    000000000000000000000000000000000000000000008DCA8943A7D7A5FFA7D7
+    A5FFA7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FF90CA8DFFDCEF
+    DBFFDCEFDBFF9EC29CFF367633FF367633FF3A81357300000000000000000000
+    000000000000000000000000000000000000000000008ECB8B58A7D7A5FFA7D7
+    A5FFA7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FFA7D7A5FF96CF93FF66B962FF51A6
+    4D427BAA777841813FDC367633FF4B8648FF9BC099F980B6801C000000000000
+    000000000000000000000000000000000000000000008BC8852EA7D7A5FFA7D7
+    A5FFA7D7A5FFA7D7A5FFA7D7A5FFA1D49FFF70BD6CFF50AF4CFF50AF4CFF50AF
+    4C80000000003D863D1584AF82EFD2E8D1FFDCEFDBFF8CBB8A8E000000000000
+    00000000000000000000000000000000000000000000000000008DCA8AA5A7D7
+    A5FFA7D7A5FFA7D7A5FF82C67FFF55B151FF50AF4CFF50AF4CFF50AF4CFF50AE
+    4CC00000000000000000A6C8A5BDDCEFDBFFDCEFDBFF9FC59DD7000000000000
+    000000000000000000000000000000000000000000000000000084C682DC87C7
+    84FF8AC887FF6EBC6AFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AE
+    4BB000000000000000003A81374F367633FF367633FF3E863ACB000000000000
+    0000000000000000000000000000000000000000000074C06F6E88C885FF88C8
+    85FF81C57EFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF
+    4B7000000000000000003A813573367633FF367633FF3E883BAE000000000000
+    0000000000000000000000000000000000000000000077C172AE88C885FF88C8
+    85FF65B861FF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF
+    4820000000000000000093BA91C1B3D1B2FFB3D1B2FF82B47FA7000000000000
+    0000000000000000000000000000000000000000000077C075CB88C885FF88C8
+    85FF61B75EFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF4CFF50AF4A600000
+    00000000000000000000CBE3CAF7DCEFDBFFDCEFDBFF84B5814F000000000000
+    0000000000000000000000000000000000000000000077C172AE88C885FF88C8
+    85FF76C073FF50AF4CFF50AF4CFF50AF4CFF50AF4CEF50AF4A60000000000000
+    0000000000003A8135735F955DFFB2D1B1FFCCE3CBF600000000000000000000
+    0000000000000000000000000000000000000000000098D0965C88C885FF88C8
+    85FF88C885FF5DB55AFF50AF4CFF50AF4CAF50AF482000000000000000000000
+    000000000000377833E9367633FF367633FF69A066A300000000000000000000
+    00000000000000000000000000000000000080BC7D6AD0E9CEF58FCC8CFF88C8
+    85FF88C885FF7DC47AFF50AF4C40000000000000000000000000000000000000
+    00009BC19A9CB3D1B2FF558D53FF367833F43380331400000000000000000000
+    0000000000000000000000000000377B35C190C18DFFDCEFDBFFA4D5A2FF8AC8
+    87FF94CE91FF8AC887FF67BA6268000000000000000000000000000000006DA4
+    6D1CCBE3CAF7DCEFDBFFDCEFDBFF76A875A80000000000000000000000000000
+    000000000000000000003E893B8F367633FF90C18DFFC6D6C6FF7B917CFFB2DC
+    B0FFDCEFDBFFD4ECD3FF9FD49BCF00000000000000000000000000000000619A
+    5FA1C7E0C6FFDCEFDBFFCCE3CBF66C9D6C1A0000000000000000000000000000
+    0000000000000000000042923F9B3E863ACB8CC18AECD4E6D3FF99BE99FF8AC8
+    87FFD4EBD3FFDCEFDBFFD6ECD5FC000000000000000000000000000000003677
+    33F4367633FF89B287FF91BA9097000000000000000000000000000000000000
+    00000000000000000000000000000000000082C47D2BD5ECD4FB9AD198FF88C8
+    85FFA6D7A4FFDCEFDBFFDCEFDBFFA1D4A136000000000000000000000000377A
+    35CF367633FF387B35CE00000000000000000000000000000000000000000000
+    000000000000000000000000000000000000000000006FBE6B375DB659425DB6
+    594250AF5010CFE9CDF6D5ECD4FB000000000000000000000000000000000000
+    000048A445430000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    000000000000A9D8A97CA5D5A14F000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000
+  }
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poDesktopCenter
-  LCLVersion = '1.3'
+  LCLVersion = '2.0.0.4'
   object pnlResString: TPanel
     Left = 0
-    Height = 223
-    Top = 120
-    Width = 465
+    Height = 279
+    Top = 150
+    Width = 581
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 223
-    ClientWidth = 465
+    ClientHeight = 279
+    ClientWidth = 581
+    ParentFont = False
     TabOrder = 0
     object Panel1: TPanel
       Left = 0
-      Height = 223
+      Height = 279
       Top = 0
-      Width = 220
+      Width = 336
       Align = alLeft
       Anchors = [akTop, akLeft, akRight, akBottom]
       BevelOuter = bvNone
-      ClientHeight = 223
-      ClientWidth = 220
+      ClientHeight = 279
+      ClientWidth = 336
+      ParentFont = False
       TabOrder = 1
       OnResize = Panel1Resize
       object lvResources: TListView
-        Left = 10
-        Height = 173
-        Top = 50
-        Width = 185
+        Left = 12
+        Height = 217
+        Top = 62
+        Width = 293
         Align = alClient
         AutoSort = False
         Columns = <        
           item
             AutoSize = True
             Caption = 'Resources'
-            Width = 181
+            Width = 86
           end>
+        ParentFont = False
         ParentShowHint = False
         ReadOnly = True
         RowSelect = True
@@ -64,13 +149,14 @@ object frmEditor: TfrmEditor
         OnDblClick = lvResourcesDblClick
       end
       object tbAction: TToolBar
-        Left = 195
-        Height = 173
-        Top = 50
-        Width = 25
+        Left = 305
+        Height = 217
+        Top = 62
+        Width = 31
         Align = alRight
         Caption = 'tbAction'
         Images = ImageList1
+        ParentFont = False
         ParentShowHint = False
         ShowHint = True
         TabOrder = 1
@@ -87,14 +173,14 @@ object frmEditor: TfrmEditor
         object tbNew: TToolButton
           Left = 1
           Hint = 'New'
-          Top = 24
+          Top = 30
           Caption = 'tbNew'
           ImageIndex = 1
         end
         object tbAdd: TToolButton
           Left = 1
           Hint = 'Add'
-          Top = 51
+          Top = 64
           Caption = 'tbAdd'
           ImageIndex = 2
           OnClick = tbAddClick
@@ -102,7 +188,7 @@ object frmEditor: TfrmEditor
         object tbEdit: TToolButton
           Left = 1
           Hint = 'Edit'
-          Top = 73
+          Top = 92
           Caption = 'tbEdit'
           ImageIndex = 3
           OnClick = tbEditClick
@@ -110,7 +196,7 @@ object frmEditor: TfrmEditor
         object tbDelete: TToolButton
           Left = 1
           Hint = 'Delete'
-          Top = 95
+          Top = 120
           Caption = 'tbDelete'
           ImageIndex = 4
           OnClick = tbDeleteClick
@@ -118,7 +204,7 @@ object frmEditor: TfrmEditor
         object tbUp: TToolButton
           Left = 1
           Hint = 'Move up'
-          Top = 122
+          Top = 154
           Caption = 'tbUp'
           ImageIndex = 5
           OnClick = tbUpClick
@@ -126,50 +212,52 @@ object frmEditor: TfrmEditor
         object tbDown: TToolButton
           Left = 1
           Hint = 'Move down'
-          Top = 144
+          Top = 182
           Caption = 'tbDown'
           ImageIndex = 6
           OnClick = tbDownClick
         end
         object ToolButton1: TToolButton
           Left = 1
-          Top = 117
-          Width = 23
+          Top = 148
+          Width = 5
           Caption = 'ToolButton1'
           Style = tbsDivider
         end
         object ToolButton2: TToolButton
           Left = 1
-          Top = 46
-          Width = 23
+          Top = 58
+          Width = 5
           Caption = 'ToolButton2'
           Style = tbsDivider
         end
       end
       object Panel4: TPanel
         Left = 0
-        Height = 50
+        Height = 62
         Top = 0
-        Width = 220
+        Width = 336
         Align = alTop
         BevelOuter = bvNone
-        ClientHeight = 50
-        ClientWidth = 220
+        ClientHeight = 62
+        ClientWidth = 336
+        ParentFont = False
         TabOrder = 2
         object Label5: TLabel
-          Left = 8
-          Height = 15
+          Left = 10
+          Height = 20
           Top = 0
-          Width = 75
+          Width = 96
           Caption = 'Select xml file:'
           ParentColor = False
+          ParentFont = False
         end
         object ComboBox2: TComboBox
-          Left = 8
-          Height = 23
-          Top = 16
-          Width = 184
-          ItemHeight = 15
+          Left = 10
+          Height = 28
+          Top = 20
+          Width = 230
+          ItemHeight = 20
           ItemIndex = 0
           Items.Strings = (
             'res/value/strings.xml'
@@ -177,109 +265,119 @@ object frmEditor: TfrmEditor
             'build.xml'
           )
           OnChange = ComboBox2Change
+          ParentFont = False
           TabOrder = 0
           Text = 'res/value/strings.xml'
         end
       end
       object Panel5: TPanel
         Left = 0
-        Height = 173
-        Top = 50
-        Width = 10
+        Height = 217
+        Top = 62
+        Width = 12
         Align = alLeft
         BevelOuter = bvNone
+        ParentFont = False
         TabOrder = 3
       end
     end
     object pnlRight: TPanel
-      Left = 220
-      Height = 223
+      Left = 336
+      Height = 279
       Top = 0
       Width = 245
       Align = alClient
       BevelOuter = bvNone
-      ClientHeight = 223
+      ClientHeight = 279
       ClientWidth = 245
+      ParentFont = False
       TabOrder = 0
       object bbOk: TBitBtn
-        Left = 123
-        Height = 30
+        Left = 130
+        Height = 38
         Hint = 'Validate'
-        Top = 160
-        Width = 111
+        Top = 200
+        Width = 100
         Anchors = [akTop, akRight]
         DefaultCaption = True
         Kind = bkOK
         ModalResult = 1
         OnClick = bbOkClick
+        ParentFont = False
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
       end
       object bbCancel: TBitBtn
-        Left = 17
-        Height = 30
+        Left = 20
+        Height = 38
         Hint = 'Cancel'
-        Top = 160
-        Width = 104
+        Top = 200
+        Width = 100
         Cancel = True
         DefaultCaption = True
         Kind = bkCancel
         ModalResult = 2
         OnClick = bbCancelClick
+        ParentFont = False
         ParentShowHint = False
         ShowHint = True
         TabOrder = 1
       end
       object Label1: TLabel
-        Left = 17
-        Height = 15
-        Top = 48
-        Width = 35
+        Left = 21
+        Height = 20
+        Top = 60
+        Width = 43
         Caption = 'Name:'
         ParentColor = False
+        ParentFont = False
       end
       object edtName: TEdit
-        Left = 16
-        Height = 23
-        Top = 64
-        Width = 217
+        Left = 20
+        Height = 28
+        Top = 80
+        Width = 210
         Anchors = [akTop, akLeft, akRight]
+        ParentFont = False
         TabOrder = 2
       end
       object Label2: TLabel
-        Left = 20
-        Height = 15
-        Top = 104
-        Width = 32
+        Left = 25
+        Height = 20
+        Top = 130
+        Width = 39
         Caption = 'Value:'
         ParentColor = False
+        ParentFont = False
       end
       object edtValue: TEdit
-        Left = 16
-        Height = 23
-        Top = 128
-        Width = 217
+        Left = 20
+        Height = 28
+        Top = 160
+        Width = 210
         Anchors = [akTop, akLeft, akRight]
+        ParentFont = False
         TabOrder = 3
       end
     end
   end
   object Panel3: TPanel
     Left = 0
-    Height = 50
-    Top = 343
-    Width = 465
+    Height = 62
+    Top = 429
+    Width = 581
     Align = alBottom
     BevelOuter = bvNone
-    ClientHeight = 50
-    ClientWidth = 465
+    ClientHeight = 62
+    ClientWidth = 581
+    ParentFont = False
     TabOrder = 1
     object bbSave: TBitBtn
-      Left = 8
-      Height = 30
-      Top = 8
-      Width = 215
+      Left = 10
+      Height = 38
+      Top = 9
+      Width = 269
       Anchors = [akLeft, akBottom]
       Caption = 'Save'
       Glyph.Data = {
@@ -319,69 +417,76 @@ object frmEditor: TfrmEditor
         09FFB57C09FFB57C09FFB57C0BFFB57E0FFFB78114FFB782187C
       }
       OnClick = bbSaveClick
+      ParentFont = False
       TabOrder = 0
     end
     object bbClose: TBitBtn
-      Left = 235
-      Height = 30
-      Top = 8
-      Width = 220
+      Left = 294
+      Height = 38
+      Top = 9
+      Width = 275
       Anchors = [akRight, akBottom]
       DefaultCaption = True
       Kind = bkClose
       ModalResult = 11
       OnClick = bbCloseClick
+      ParentFont = False
       TabOrder = 1
     end
   end
   object Panel2: TPanel
     Left = 0
-    Height = 120
+    Height = 150
     Top = 0
-    Width = 465
+    Width = 581
     Align = alTop
     BevelOuter = bvNone
-    ClientHeight = 120
-    ClientWidth = 465
+    ClientHeight = 150
+    ClientWidth = 581
+    ParentFont = False
     TabOrder = 2
     object Label3: TLabel
-      Left = 8
-      Height = 15
-      Top = 12
-      Width = 189
+      Left = 10
+      Height = 20
+      Top = 15
+      Width = 236
       Caption = 'Path to [projects folder] Workspace:'
       ParentColor = False
+      ParentFont = False
     end
     object edtWorkpspacePath: TEdit
-      Left = 8
-      Height = 23
-      Top = 30
-      Width = 414
+      Left = 10
+      Height = 28
+      Top = 38
+      Width = 517
       Anchors = [akTop, akLeft, akRight]
+      ParentFont = False
       TabOrder = 0
     end
     object SpeedButton1: TSpeedButton
-      Left = 432
-      Height = 22
-      Top = 31
-      Width = 23
+      Left = 540
+      Height = 28
+      Top = 39
+      Width = 29
       Anchors = [akTop, akRight]
       Caption = '...'
       OnClick = SpeedButton1Click
+      ParentFont = False
     end
     object Label4: TLabel
-      Left = 8
-      Height = 15
-      Top = 66
-      Width = 74
+      Left = 10
+      Height = 20
+      Top = 82
+      Width = 93
       Caption = 'Select Project:'
       ParentColor = False
+      ParentFont = False
     end
     object SpeedButton2: TSpeedButton
-      Left = 432
-      Height = 22
-      Top = 88
-      Width = 23
+      Left = 540
+      Height = 28
+      Top = 110
+      Width = 29
       Anchors = [akTop, akRight]
       Glyph.Data = {
         36040000424D3604000000000000360000002800000010000000100000000100
@@ -420,21 +525,23 @@ object frmEditor: TfrmEditor
         FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
       }
       OnClick = SpeedButton2Click
+      ParentFont = False
     end
     object ComboBox1: TComboBox
-      Left = 8
-      Height = 23
-      Top = 87
-      Width = 412
+      Left = 10
+      Height = 28
+      Top = 109
+      Width = 515
       Anchors = [akTop, akLeft, akRight]
-      ItemHeight = 15
+      ItemHeight = 20
       OnChange = ComboBox1Change
+      ParentFont = False
       TabOrder = 1
     end
   end
   object ImageList1: TImageList
-    left = 128
-    top = 200
+    left = 160
+    top = 250
     Bitmap = {
       4C69070000001000000010000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
@@ -664,7 +771,7 @@ object frmEditor: TfrmEditor
     }
   end
   object sddPath: TSelectDirectoryDialog
-    left = 356
-    top = 10
+    left = 445
+    top = 13
   end
 end

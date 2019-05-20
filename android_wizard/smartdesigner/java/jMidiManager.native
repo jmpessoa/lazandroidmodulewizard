@@ -1,0 +1,3 @@
+public native void pOnMidiManagerDeviceAdded(long pasobj, int deviceId, String deviceName, String productId, String manufacture);
+public native void pOnMidiManagerDeviceRemoved(long pasobj, int deviceId, String deviceName, String productId, String manufacture);
+

@@ -98,6 +98,7 @@ type
     FAntBuildMode: string;
     FMainActivity: string;  //Simon "App"
     FNDK: string;
+    FNDKIndex: integer;
     FAndroidNdkPlatform: string;   //android-15
 
     FPrebuildOSYS: string;
@@ -163,6 +164,7 @@ type
     property AntBuildMode: string read FAntBuildMode write FAntBuildMode;
     property MainActivity: string read FMainActivity write FMainActivity;
     property NDK: string read FNDK write FNDK;
+    property NDKIndex: integer read FNDKIndex write FNDKIndex;
     property AndroidPlatform: string read FAndroidNdkPlatform write FAndroidNdkPlatform;
 
     property PrebuildOSYS: string read FPrebuildOSYS write FPrebuildOSYS;
@@ -360,6 +362,9 @@ begin
  if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 5) then
     ShowMessage('Warning: ARMv8 [aarch64] nedd  NDK Api >= 21');
 
+ if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 6) then
+    ShowMessage('Warning: x86_64 nedd  NDK Api >= 21');
+
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIChange(Sender: TObject);
@@ -399,6 +404,9 @@ begin
    5:  begin //need Api tarqet >= 21
          FInstructionSet:='ARMV8';    //aarch64
        end;
+   6:  begin //need Api tarqet >= 21
+         FInstructionSet:='x86_64';    //x86_64
+       end;
   end;
 
   if (FInstructionSetIndex = 2) and (IsLaz4Android) then
@@ -413,10 +421,22 @@ begin
     sLineBreak +'Hint: Select "ARMv7a + Soft"');
   end;
 
+  if (FInstructionSetIndex = 6) and (IsLaz4Android) then
+  begin
+    ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0" [out-of-box]' + sLineBreak + 'don''t support "x86_64"' + sLineBreak +
+    sLineBreak +'Hint: Select "x86"');
+  end;
+
   if FInstructionSetIndex = 5 then
   begin
      minNdkApi:=StrToInt(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]);
      if minNdkApi < 21 then ShowMessage('Warning: "aarch64" need NDK Api >= 21 ...');
+  end;
+
+  if FInstructionSetIndex = 6 then
+  begin
+     minNdkApi:=StrToInt(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]);
+     if minNdkApi < 21 then ShowMessage('Warning: "x86_64" need NDK Api >= 21 ...');
   end;
 
 end;
@@ -919,8 +939,11 @@ begin
            FPrebuildOSYS:= GetPrebuiltDirectory();
 
       strIndexNdk:= ReadString('NewProject','NDK', ''); //ndk 10e   ... default
+
       if strIndexNdk = '' then strIndexNdk:= '5';
+
       indexNdk:= StrToInt(strIndexNdk);
+
       case indexNdk of
          0: FNDK:= '7';
          1: FNDK:= '9';
@@ -929,6 +952,8 @@ begin
          4: FNDK:= '11c';
          5: FNDK:= '>11';
       end;
+
+      FNDKIndex:= indexNdk;
 
       FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
       if FPathToJavaTemplates = '' then
@@ -1324,7 +1349,7 @@ procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by "An
 var
   auxInstSet: string;
   tagVersion: integer;
-  ndkIndex: integer;
+  ndk_index: integer;
 begin
    //run before "OnFormActive"
 
@@ -1379,14 +1404,17 @@ begin
     Free;
   end;
 
-  FInstructionSet:= 'x86'; //RGInstruction.Items[RGInstruction.ItemIndex];
-  FFPUSet:= ''; //x86
-  if FInstructionSetIndex = 0 then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMV6'; end;
-  if FInstructionSetIndex = 1 then begin FFPUSet:= 'Soft';  FInstructionSet:='ARMV7A';end;
-  if FInstructionSetIndex = 2 then begin FFPUSet:= 'VFPV3'; FInstructionSet:='ARMV7A';end;
-  if FInstructionSetIndex = 3 then FInstructionSet:='x86';
-  if FInstructionSetIndex = 4 then FInstructionSet:='Mipsel';
-  if FInstructionSetIndex = 5 then begin FFPUSet:= ''; FInstructionSet:='ARMV8' end; //aarch64
+  if FInstructionSetIndex < 0 then  FInstructionSetIndex:= 1;
+  FFPUSet:= '';
+  case  FInstructionSetIndex of
+     0: begin FFPUSet:= 'Soft';  FInstructionSet:='ARMV6'; end;
+     1: begin FFPUSet:= 'Soft';  FInstructionSet:='ARMV7A';end;
+     2: begin FFPUSet:= 'VFPV3'; FInstructionSet:='ARMV7A';end;
+     3: FInstructionSet:='x86';
+     4: FInstructionSet:='Mipsel';
+     5: FInstructionSet:='ARMV8'; //aarch64
+     6: FInstructionSet:='x86_64';
+  end;
 
   EditPathToWorkspace.Text := FPathToWorkspace;
   EditPackagePrefaceName.Text := FPackagePrefaceName;
@@ -1395,13 +1423,13 @@ begin
   if FMaxSdkPlatform = 0 then    //  try fix "android-0"
       FMaxSdkPlatform:= FCandidateSdkPlatform;
 
-  ndkIndex:= 22;
+  ndk_Index:= 22;
 
-  FMaxNdkPlatform:= Self.GetMaxNdkPlatform(ndkIndex);    //ndkIndex Max =  22 for old 4.x, 5.x devices compatibility!!!!
+  FMaxNdkPlatform:= Self.GetMaxNdkPlatform(ndk_Index);    //ndkIndex Max =  22 for old 4.x, 5.x devices compatibility!!!!
 
   if ListBoxNdkPlatform.Items.Count > 0 then
   begin
-    ListBoxNdkPlatform.ItemIndex:= ndkIndex;
+    ListBoxNdkPlatform.ItemIndex:= ndk_Index;
     StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
   end;
 

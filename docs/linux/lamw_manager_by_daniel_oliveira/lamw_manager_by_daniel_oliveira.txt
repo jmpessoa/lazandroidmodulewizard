@@ -1,0 +1,73 @@
+LAMW Manager 
+   version 0.3.0  
+   	
+		by Daniel Oliveira
+ 
+"A  installer  to  generate Lazarus IDE [and all equirements!] ready to develop for Android!"
+
+(I) LAMW4Linux-installer
+
+   A complete installer and manager of LAMW for Linux
+      ref. https://github.com/DanielOliveiraSouza/LAMW4Linux-installer
+
+   1) Download [and unzip]: 
+      https://github.com/DanielOliveiraSouza/LAMW4Linux-installer/archive/master.zip
+
+   2) Install LAzarus + LAMW and all dependencies:
+
+      Go to directory lamw_manager and run:
+         ./lamw_manager
+   
+   3) Install LAzarus + LAMW and dependencies and Run Android  GUI SDK Manager
+
+      Go to directory lamw_manager and run:      
+         ./lamw_manager --sdkmanager
+
+   4) Update LAMW framework from github   [warning: close the Lazarus IDE]
+      Go to directory lamw_manager and run:
+         ./lamw_manager --update_lamw
+
+
+   Important Note:
+
+      Always launcher  Lazarus IDE using the icon LAMW4Linux on Start Menu.
+
+
+   For more info read "LAMW Manager v0.3.0 Manual"
+        https://github.com/DanielOliveiraSouza/LAMW4Linux-installer/blob/master/lamw_manager/docs/man.md
+
+(II) LAMW4Windows-installer
+
+   A complete installer and manager of LAMW for Windows
+      ref https://github.com/DanielOliveiraSouza/LAMW4Windows-installer
+
+   1) Download "lamw_manager_setup.exe" here:
+
+      https://raw.githubusercontent.com/DanielTimelord/Laz4LAMW-win-installer/master/lamw_manager/lamw_manager_setup.exe
+
+      [Optional] 
+      https://github.com/DanielOliveiraSouza/LAMW4Windows-installer/archive/master.zip
+
+   2) Install Laz4Android + LAMW and all dependencies:
+   
+          Double-click "lamw_manager_setup.exe"
+
+          [Optional]
+          Go to folder C:\lamw_manager
+          Right-click "lamw_manager.bat" and "Run as administrator"
+
+   3) Update LAMW from github [warning: close the Lazarus IDE]
+       
+      Go to folder C:\lamw_manager
+          Right-click "lamw_manager.bat" and "Run as administrator"
+
+   Important Note:
+      Always launcher  Lazarus IDE using the icon LAMW4Windows on Start Menu.
+
+
+Congratulations!!
+
+   You are now a Lazarus for Android developer! 
+      Building Android application with LAMW is RAD!
+
+Have fun!

@@ -1,0 +1,41 @@
+object AndroidModule1: TAndroidModule1
+  Left = 403
+  Top = 204
+  Width = 309
+  Height = 512
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'Test 01'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnActivityResume = AndroidModule1ActivityResume
+  object jWebView1: jWebView
+    Left = 0
+    Top = 0
+    Width = 309
+    Height = 512
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    JavaScript = True
+    BackgroundColor = colbrDefault
+    ZoomControl = True
+    OnStatus = jWebView1Status
+  end
+  object MM: jMidiManager
+    left = 102
+    top = 121
+  end
+end

@@ -39,6 +39,8 @@ type
     FPathToGradle: string;
     FPathToSmartDesigner: string;
     FChipArchitecture: string;
+    FNDKIndex: string;
+    FMaxNdk: integer;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
@@ -81,6 +83,7 @@ type
     procedure TryChangeDemoProjecAntBuildScripts();
 
     function GetPathToSmartDesigner(): string;
+    procedure UpdateBuildModes();
 
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
@@ -1328,9 +1331,8 @@ begin
             ShowMessage(alertMsg);
 
       end;
-
-    end;
-
+      UpdateBuildModes();
+    end; //not is brandNews
   end;
 end;
 
@@ -2767,6 +2769,95 @@ begin
 
 end;
 
+procedure TLamwSmartDesigner.UpdateBuildModes();
+var
+ listBuildMode: TStringList;
+ x,  ndkApi: string;
+begin
+
+  if FMaxNdk = 0 then FMaxNdk:= GetMaxNdkPlatform();
+
+   if FMaxNdk > 22 then FMaxNdk := 22;  //android 4.x and 5.x compatibulty....
+
+   ndkApi:= IntToStr(FMaxNdk);
+
+   if FNDKIndex = '' then
+      FNDKIndex := LamwGlobalSettings.GetNDK;
+
+   if FNDKIndex = ''  then FNDKIndex:= '5';
+
+   x:='';
+   if StrToInt(FNDKIndex) > 4 then
+     x:='.x';
+
+   listBuildMode:= TStringList.Create;
+
+   listBuildMode.Clear;
+   listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-arm64'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'aarch64-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'aarch64-linux-android'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="aarch64"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -XPaarch64-linux-android- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'aarch64-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_arm64.txt');
+
+   listBuildMode.Clear;
+   listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-arm'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="arm"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_armV6.txt');
+
+   listBuildMode.Clear;
+   listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-arm'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="arm"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_armV7a.txt');
+
+   listBuildMode.Clear;
+   listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-arm'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="arm"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_armV7a_VFPv3.txt');
+
+   listBuildMode.Clear;
+   listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-x86'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'x86-linux-android'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="i386"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -XPi686-linux-android- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_x86.txt');
+
+   listBuildMode.Clear;
+   listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-x86_64'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86_64-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'x86_64-linux-android'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="x86_64"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -XPx86_64-linux-android- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86_64-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_x86_64.txt');
+
+   listBuildMode.Clear;
+   listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-mips'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'mipsel-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'mipsel-linux-android'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="mipsel"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -XPmipsel-linux-android- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'mipsel-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_mipsel.txt');
+
+   listBuildMode.Clear;
+   listBuildMode.Add('How to get more ".so" chipset builds:');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('   :: Warning 1: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds!');
+   listBuildMode.Add('   :: Warning 2: Laz4Android [out-of-box] support only 32 Bits chipset: "armV6", "armV7a+Soft", "x86"!');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('1. From LazarusIDE menu:');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('   > Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('2. From LazarusIDE  menu:');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('   > Run -> Clean up and Build...');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('3. From LazarusIDE menu:');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('   > [LAMW] Build Android Apk and Run');
+   listBuildMode.Add(' ');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'readme.txt');
+
+   listBuildMode.Free;
+
+end;
+
 //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
 function TLamwSmartDesigner.TryChangeTo49x(path: string): string;
 var
@@ -2956,9 +3047,8 @@ var
   strTemp: string;
   strCustom,  strLibrary: string;
   pathToDemoNDK,  pathToDemoNDKConverted: string;
-  pathToDemoSDK, FNDKIndex: string;
+  pathToDemoSDK: string;
   localSys: string;
-  maxNdk: integer;
   strMaxNdk: string;
 begin
 
@@ -3003,7 +3093,9 @@ begin
   lpiFileName := LazarusIDE.ActiveProject.ProjectInfoFile; //full path to 'controls.lpi';
   CopyFile(lpiFileName, lpiFileName+'.bak2');
 
-  FNDKIndex := LamwGlobalSettings.GetNDK;
+  if FNDKIndex = '' then
+    FNDKIndex := LamwGlobalSettings.GetNDK;
+
   if  FNDKIndex = '' then FNDKIndex:= '5';
 
   if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
@@ -3021,20 +3113,22 @@ begin
       strResult:= StringReplace(strLibrary, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
       //C:\android\ndkr14b\platforms\android-22
-      maxNdk:= GetMaxNdkPlatform();
-      if maxNdk > 22 then maxNdk := 22;  //android 4.x and 5.x compatibulty....
+      if FMaxNdk = 0 then FMaxNdk:= GetMaxNdkPlatform();
 
-      strMaxNdk:= IntToStr(maxNdk);      //'22'
+      if FMaxNdk > 22 then FMaxNdk := 22;  //android 4.x and 5.x compatibulty....
+
+      strMaxNdk:= IntToStr(FMaxNdk);      //'22'
 
       strResult:= TryChangePrebuildOSY(strResult); //LAMW 0.8
-
       if StrToInt(FNDKIndex) > 4 then  //LAMW 0.8
+      begin
          strResult:= TryChangeTo49x(strResult)
+      end
       else
          strResult:= TryChangeTo49(strResult);
 
-      if maxNdk > 0 then
-        strResult:= TryChangeNdkPlatformsApi(strResult, maxNdk);
+      if FMaxNdk > 0 then
+        strResult:= TryChangeNdkPlatformsApi(strResult, FMaxNdk);
 
       LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= strResult;
 

@@ -12,7 +12,7 @@ uses
   uFormGetFPCSource, uformsettingspaths, uFormStartEmulator, ufrmCompCreate, 
   ufrmEditor, uimportcstuff, uimportjavastuff, uimportjavastuffchecked, 
   uregistercompform, uformimportlamwstuff, unitformimportpicture, 
-  LazarusPackageIntf;
+  uFormComplements, uformimportjarstuff, LazarusPackageIntf;
 
 implementation
 

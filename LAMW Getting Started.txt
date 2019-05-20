@@ -7,6 +7,8 @@
 	"Getting Started" for Windows [by Jose Marques Pessoa]
 
 	Linux Install Tutorial:  LAMW folder  "...docs\linux"
+
+	New! LAMW Manager https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html
                   
 
 	About MacOS: X11 [libGL.dylib] is no longer bundled with Mountain Lion (and later!)			

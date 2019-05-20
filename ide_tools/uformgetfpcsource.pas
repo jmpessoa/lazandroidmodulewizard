@@ -29,6 +29,7 @@ type
     SpeedButton6: TSpeedButton;
     StatusBar1: TStatusBar;
     procedure Button1Click(Sender: TObject);
+    procedure GroupBox1Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
     procedure SpeedButton6Click(Sender: TObject);
@@ -107,6 +108,11 @@ begin
     Params.Free;
   end;
   StatusBar1.SimpleText:='Success! [Downloaded FPC Trunk]!';
+end;
+
+procedure TFormGetFPCSource.GroupBox1Click(Sender: TObject);
+begin
+
 end;
 
 procedure TFormGetFPCSource.SpeedButton1Click(Sender: TObject);

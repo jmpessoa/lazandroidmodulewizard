@@ -43,7 +43,7 @@ object LamwProjectOptions: TLamwProjectOptions
           item
             ReadOnly = True
             Title.Caption = 'Permissions'
-            Width = 429
+            Width = 454
           end        
           item
             ButtonStyle = cbsCheckboxColumn
@@ -62,7 +62,7 @@ object LamwProjectOptions: TLamwProjectOptions
         OnMouseDown = PermissonGridMouseDown
         OnMouseMove = PermissonGridMouseMove
         ColWidths = (
-          429
+          454
           64
         )
       end
@@ -481,7 +481,7 @@ object LamwProjectOptions: TLamwProjectOptions
       end
     end
     object tsMiscellaneous: TTabSheet
-      Caption = 'Miscellaneous'
+      Caption = 'Build'
       ClientHeight = 574
       ClientWidth = 530
       object Label9: TLabel
@@ -491,19 +491,19 @@ object LamwProjectOptions: TLamwProjectOptions
         Left = 6
         Height = 20
         Top = 10
-        Width = 164
+        Width = 80
         BorderSpacing.Around = 6
-        Caption = 'Build Automated System'
+        Caption = 'Apk Builder:'
         ParentColor = False
       end
       object cbBuildSystem: TComboBox
         AnchorSideLeft.Control = Label9
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = tsMiscellaneous
-        Left = 176
+        Left = 92
         Height = 28
         Top = 6
-        Width = 100
+        Width = 140
         BorderSpacing.Around = 6
         ItemHeight = 20
         ItemIndex = 0
@@ -522,13 +522,86 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = cbBuildSystem
         AnchorSideTop.Side = asrCenter
-        Left = 282
+        Left = 238
         Height = 20
         Top = 10
         Width = 119
         Caption = '(require JDK 1.8+)'
         ParentColor = False
         Visible = False
+      end
+      object Label10: TLabel
+        Left = 2
+        Height = 20
+        Top = 59
+        Width = 52
+        BorderSpacing.Around = 6
+        Caption = 'Chipset:'
+        ParentColor = False
+      end
+      object cbChipset: TComboBox
+        Left = 92
+        Height = 28
+        Top = 56
+        Width = 140
+        ItemHeight = 20
+        ItemIndex = 1
+        Items.Strings = (
+          'ARMv6             '
+          'ARMv7a+Soft'
+          'ARMv7a+VFPv3 '
+          'x86'
+          'Mipsel'
+          'Aarch64'
+          'x86_64'
+        )
+        OnChange = cbChipsetChange
+        Style = csDropDownList
+        TabOrder = 1
+        Text = 'ARMv7a+Soft'
+      end
+      object SpeedButton2: TSpeedButton
+        Left = 248
+        Height = 28
+        Top = 56
+        Width = 29
+        Glyph.Data = {
+          36040000424D3604000000000000360000002800000010000000100000000100
+          2000000000000004000064000000640000000000000000000000000000000000
+          000000000000000000009D6D0B48AD7F0F98B08312E9B68813F4B68813F4B083
+          12E9AD7F0F989D6D0B4800000000000000000000000000000000000000000000
+          00009A6A09069E6F0DBAC29319FFC79A1BFFCD990FFFDD9E03FFD89C09FFC898
+          16FFC6991CFFBF9118FF9E6F0DBA9A6A09060000000000000000000000009362
+          0B05A1720DEAD0A41EFFCE9B18FFB98705FFEBCC81FFF2D491FFEBCC81FFBA85
+          01FFC89413FFD19E1CFFCB9F1CFFA1720DEA93620B0500000000000000009461
+          0BBACEA21DFFC9991FFFB78206FFBC890EFFF2E7CEFFFFFFFFFFF4EBD1FFC99D
+          30FFB47C00FFC2911DFFCE9C1BFFC99D1CFF94610BBA00000000854E0B46BE92
+          18FFC99D1BFFC1921CFFBC8607FFBA8505FFF2E7CEFFFFFFFFFFF4EAD0FFC99B
+          2DFFB67D00FFC3931EFFC08F17FFD29F1BFFB78D16FF854E0B468F5B089ACCA1
+          1AFFC39318FFC2921CFFBC8608FFB98403FFF2E7CEFFFFFFFFFFF4E9CDFFC998
+          26FFB67E00FFC4931EFFC08F17FFC5951BFFC59A15FF8F5B089A97691CE9BF94
+          14FFBE8E16FFC4941EFFBC8708FFBB8501FFF2E7CEFFFFFFFFFFF3E9CCFFC898
+          25FFB87E00FFC4941EFFBD8F18FFB7870DFFDFAF25FF986B1CE9A07729F7C28E
+          08FFBC8A0DFFBC8D1BFFBA8409FFB78200FFF2E7CEFFFFFFFFFFF3E8CCFFC697
+          25FFB67F00FFC5951FFFBC8A0DFFBA8707FFFED776FF9D7529F7916A1BF7E5BE
+          60FFDCA828FFCC9610FFC18A07FFBD8805FFF2E7CEFFFFFFFFFFF2E7CEFFC293
+          2AFFB47B00FFC59414FFC8940EFFE2BC64FFFBD77AFF91681BF7885E1FE9E3C8
+          67FFE4C168FFDCAC33FFD59A06FFDCA825FFEFDDB3FFF8EED9FFEFDDB3FFD2A2
+          26FFCB9000FFCA9719FFE3BE6BFFE3C065FFF6D363FF885E1FE97338019AE3CE
+          6DFFDFBD54FFDFBB5FFFE2C26DFFDDB34CFFD8A427FFCE9A16FFC69003FFDDAC
+          32FFE8CA7BFFE2C066FFDDB651FFE3BC59FFE2D181FF7338019A5F2F0046C0AA
+          62FFE7D680FFD8AB3FFFDBAD3AFFD8A627FFF6EACCFFFFFFFFFFF6EACCFFDCAE
+          3BFFDBAC39FFDDB14AFFDDB650FFFAF3B8FFB19849FF5F2F0046000000005C2E
+          00BAE4DE8DFFEDE09FFFD9AE46FFD8A72FFFF7EED5FFFFFFFFFFF7EED5FFDCB3
+          48FFD6A52FFFE8CE86FFFDFACAFFDACD76FF5C2E00BA00000000000000006834
+          0005653200EADEDE82FFFAF6C2FFE5BE60FFD6A834FFE8CD8CFFDDB85BFFDAAD
+          3BFFFFF3C5FFF8F6BAFFD5C766FF653200EA6834000500000000000000000000
+          00005E2F0006582C00BAAD9B41FFDED57BFFF9EE9BFFFEE096FFFFE392FFF4E2
+          91FFD3C66EFFAA9231FF582C00BA5E2F00060000000000000000000000000000
+          000000000000000000004E27004868340098704F0FE9815F1EF4815F1EF4704F
+          0FE9683400984E27004800000000000000000000000000000000
+        }
+        OnClick = SpeedButton2Click
       end
     end
   end
