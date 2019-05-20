@@ -1433,6 +1433,9 @@ type
   jListView = class(jVisualControl)
   private
     FOnClickItem  : TOnClickCaptionItem;
+    FOnClickTextLeft : TOnClickCaptionItem; // by tr3e
+    FOnClickTextCenter : TOnClickCaptionItem; // by tr3e
+    FOnClickTextRight : TOnClickCaptionItem; // by tr3e
     FOnClickWidgetItem: TOnClickWidgetItem;
     FOnClickImageItem: TOnClickImageItem; // by tr3e
     FOnLongClickItem:  TOnClickCaptionItem;
@@ -1469,6 +1472,9 @@ type
     FTextMarginInner : integer; // by tr3e
 
     FTextWordWrap : boolean; // by tr3e
+    FEnableOnClickTextLeft : boolean; // by tr3e
+    FEnableOnClickTextCenter : boolean; // by tr3e
+    FEnableOnClickTextRight : boolean; // by tr3e
 
     FWidgetTextColor: TARGBColorBridge;
 
@@ -1491,7 +1497,12 @@ type
   protected
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickImageItem(Obj: TObject; index: integer ); // by tr3e
+
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
+    procedure GenEvent_OnClickTextLeft(Obj: TObject; index: integer; caption: string); // by tr3e
+    procedure GenEvent_OnClickTextCenter(Obj: TObject; index: integer; caption: string); // by tr3e
+    procedure GenEvent_OnClickTextRight(Obj: TObject; index: integer; caption: string); // by tr3e
+
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
 
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
@@ -1527,7 +1538,8 @@ type
     procedure Add(item: string; delim: string; fontColor: TARGBColorBridge;
                   fontSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
     Procedure Delete(index: Integer);
-    function GetItemText(index: integer): string;
+    function  GetItemText(index: integer): string;
+    procedure SetItemText( txt: string; index: integer); // by tr3e
     Procedure Clear;
     Procedure SetFontColorByIndex(Value : TARGBColorBridge; index: integer);
     Procedure SetFontSizeByIndex(Value : DWord; index: integer  );
@@ -1546,6 +1558,9 @@ type
     procedure SetTextAlignByIndex(Value: TTextAlign; index: integer);
     procedure SetTextPositionByIndex(Value: TTextPosition; index: integer); // by tr3e
     procedure SetTextWordWrap(_value: boolean); // by tr3e
+    procedure SetEnableOnClickTextLeft(_value: boolean); // by tr3e
+    procedure SetEnableOnClickTextCenter(_value: boolean); // by tr3e
+    procedure SetEnableOnClickTextRight(_value: boolean); // by tr3e
 
     procedure SetLayoutByIndex(Value: TItemLayout; index: integer);
 
@@ -1629,6 +1644,9 @@ type
     property TextAlign: TTextAlign read FTextAlign write FTextAlign;
     property TextPosition: TTextPosition read FTextPosition write FTextPosition; // by tr3e
     property TextWordWrap: boolean read FTextWordWrap write SetTextWordWrap; // by tr3e
+    property EnableOnClickTextLeft: boolean read FEnableOnClickTextLeft write SetEnableOnClickTextLeft; // by tr3e
+    property EnableOnClickTextCenter: boolean read FEnableOnClickTextCenter write SetEnableOnClickTextCenter; // by tr3e
+    property EnableOnClickTextRight: boolean read FEnableOnClickTextRight write SetEnableOnClickTextRight; // by tr3e
     property HighLightSelectedItemColor: TARGBColorBridge read FHighLightSelectedItemColor write SetHighLightSelectedItemColor;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
@@ -1647,6 +1665,10 @@ type
 
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
+    property OnClickItemTextLeft : TOnClickCaptionItem read FOnClickTextLeft write FOnClickTextLeft; // by tr3e
+    property OnClickItemTextCenter : TOnClickCaptionItem read FOnClickTextCenter write FOnClickTextCenter; // by tr3e
+    property OnClickItemTextRight : TOnClickCaptionItem read FOnClickTextRight write FOnClickTextRight; // by tr3e
+    
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
     property OnClickImageItem: TOnClickImageItem read FOnClickImageItem write FOnClickImageItem;
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
@@ -2074,7 +2096,10 @@ type
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);  overload;
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);  overload; //deprecated
   //by tr3e
-  procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer);
+  procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer); //by tr3e
+  Procedure Java_Event_pOnClickItemTextLeft(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by tr3e
+  Procedure Java_Event_pOnClickItemTextCenter(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by tr3e
+  Procedure Java_Event_pOnClickItemTextRight(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by tr3e
 
   Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
@@ -2877,6 +2902,72 @@ begin
       pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
     end;
     jListVIew(Obj).GenEvent_OnClickCaptionItem(Obj, index, pasCaption);
+  end;
+end;
+
+// by tr3e
+Procedure Java_Event_pOnClickItemTextLeft(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+var
+   pasCaption: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnClickTextLeft(Obj, index, pasCaption);
+  end;
+end;
+
+// by tr3e
+Procedure Java_Event_pOnClickItemTextCenter(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+var
+   pasCaption: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnClickTextCenter(Obj, index, pasCaption);
+  end;
+end;
+
+// by tr3e
+Procedure Java_Event_pOnClickItemTextRight(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+var
+   pasCaption: string;
+ _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jListVIew then
+  begin
+    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
+    pasCaption := '';
+    if caption <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasCaption:= string( env^.GetStringUTFChars(env,caption,@_jBoolean) );
+    end;
+    jListVIew(Obj).GenEvent_OnClickTextRight(Obj, index, pasCaption);
   end;
 end;
 
@@ -7251,6 +7342,9 @@ begin
   FTextMarginInner   := 2;
 
   FTextWordWrap := false;
+  FEnableOnClickTextLeft   := false;
+  FEnableOnClickTextCenter := false;
+  FEnableOnClickTextRight  := false;
 
   FWidgetTextColor:= colbrDefault;
 
@@ -7392,6 +7486,10 @@ begin
    end;
 
    jListView_SetWordWrap(FjEnv, FjObject, FTextWordWrap);
+
+   jListView_SetEnableOnClickTextLeft(FjEnv, FjObject, FEnableOnClickTextLeft);
+   jListView_SetEnableOnClickTextCenter(FjEnv, FjObject, FEnableOnClickTextCenter);
+   jListView_SetEnableOnClickTextRight(FjEnv, FjObject, FEnableOnClickTextRight);
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -7796,6 +7894,24 @@ begin
   if Assigned(FOnClickItem) then FOnClickItem(Obj,index, caption);
 end;
 
+//by tr3e
+procedure jListView.GenEvent_OnClickTextLeft(Obj: TObject; index: integer;  caption: string);
+begin
+  if Assigned(FOnClickTextLeft) then FOnClickTextLeft(Obj,index, caption);
+end;
+
+//by tr3e
+procedure jListView.GenEvent_OnClickTextCenter(Obj: TObject; index: integer;  caption: string);
+begin
+  if Assigned(FOnClickTextCenter) then FOnClickTextCenter(Obj,index, caption);
+end;
+
+//by tr3e
+procedure jListView.GenEvent_OnClickTextRight(Obj: TObject; index: integer;  caption: string);
+begin
+  if Assigned(FOnClickTextRight) then FOnClickTextRight(Obj,index, caption);
+end;
+
 procedure jListView.GenEvent_OnWidgeItemLostFocus(Obj: TObject; index: integer; caption: string);
 begin
   if Assigned(FOnWidgeItemLostFocus) then FOnWidgeItemLostFocus(Obj,index, caption);
@@ -8149,6 +8265,40 @@ begin
   FTextWordWrap := _value;
   if FInitialized then
      jListView_SetWordWrap(FjEnv, FjObject, _value);
+end;
+
+// by tr3e
+procedure jListView.SetEnableOnClickTextLeft(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FEnableOnClickTextLeft := _value;
+  if FInitialized then
+     jListView_SetEnableOnClickTextLeft(FjEnv, FjObject, _value);
+end;
+
+// by tr3e
+procedure jListView.SetEnableOnClickTextCenter(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FEnableOnClickTextCenter := _value;
+  if FInitialized then
+     jListView_SetEnableOnClickTextCenter(FjEnv, FjObject, _value);
+end;
+
+// by tr3e
+procedure jListView.SetEnableOnClickTextRight(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FEnableOnClickTextRight := _value;
+  if FInitialized then
+     jListView_SetEnableOnClickTextRight(FjEnv, FjObject, _value);
+end;
+
+// by tr3e
+procedure jListView.SetItemText(txt: string; index: integer);
+begin
+  if FInitialized then
+     jListView_SetItemText(FjEnv, FjObject , txt, index);
 end;
 
 procedure jListView.SetWidgetTextColor(_textcolor: TARGBColorBridge);

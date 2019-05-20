@@ -507,6 +507,10 @@ Procedure jListView_clear              (env:PJNIEnv;
 Procedure jListView_delete             (env:PJNIEnv;
                                         ListView : jObject; index : integer);
 
+procedure jListView_SetEnableOnClickTextLeft(env:PJNIEnv; _jlistview : jObject; _value : Boolean); // ty tr3e
+procedure jListView_SetEnableOnClickTextCenter(env:PJNIEnv; _jlistview : jObject; _value : Boolean); // ty tr3e
+procedure jListView_SetEnableOnClickTextRight(env:PJNIEnv; _jlistview : jObject; _value : Boolean); // ty tr3e
+
 Procedure jListView_setId(env:PJNIEnv; ListView : jObject; id: DWord);
 Procedure jListView_setWidgetItem(env:PJNIEnv; ListView : jObject; value: integer);
 Procedure jListView_setWidgetItem2(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
@@ -519,6 +523,7 @@ Procedure jListView_setTextSizeDecorated(env:PJNIEnv; ListView : jObject; value:
 Procedure jListView_setItemLayout(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
 Procedure jListView_setImageItem(env:PJNIEnv; ListView : jObject; bitmap: jObject; index: integer); overload;
 Procedure jListView_setImageItem(env:PJNIEnv; ListView : jObject; imgResIdentifier: string; index: integer); overload;
+procedure jListView_SetItemText(env:PJNIEnv; ListView : jObject; txt: string; index: integer); // by tr3e
 Procedure jListView_setTextAlign(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
 Procedure jListView_setTextPosition(env:PJNIEnv; ListView : jObject; value: integer; index: integer); //by tr3e
 function jListView_IsItemChecked(env:PJNIEnv; ListView : jObject; index: integer): boolean;
@@ -5272,6 +5277,64 @@ begin
    env^.DeleteLocalRef(env,_jParams[0].l);
    env^.DeleteLocalRef(env, cls);
 end;
+
+// by tr3e
+procedure jListView_SetItemText(env:PJNIEnv; ListView : jObject; txt: string; index: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..1] of jValue;
+   cls: jClass;
+begin
+ _jParams[0].l := env^.NewStringUTF(env, PChar(txt) );;
+ _jParams[1].i := index;
+ cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setItemTextByIndex', '(Ljava/lang/String;I)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
+   env^.DeleteLocalRef(env,_jParams[0].l);
+   env^.DeleteLocalRef(env, cls);
+end;
+
+// by tr3e
+procedure jListView_SetEnableOnClickTextLeft(env:PJNIEnv; _jlistview : jObject; _value : Boolean);
+var
+  jMethod : jMethodID = nil;
+  jParams : Array[0..0] of jValue;
+  cls: jClass;
+ begin
+  jParams[0].z := JBool(_value);
+  cls := env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, cls, 'SetEnableOnClickTextLeft', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod,@jParams);
+  env^.DeleteLocalRef(env, cls);
+ end;
+
+// by tr3e
+procedure jListView_SetEnableOnClickTextCenter(env:PJNIEnv; _jlistview : jObject; _value : Boolean);
+var
+  jMethod : jMethodID = nil;
+  jParams : Array[0..0] of jValue;
+  cls: jClass;
+ begin
+  jParams[0].z := JBool(_value);
+  cls := env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, cls, 'SetEnableOnClickTextCenter', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod,@jParams);
+  env^.DeleteLocalRef(env, cls);
+ end;
+
+// by tr3e
+procedure jListView_SetEnableOnClickTextRight(env:PJNIEnv; _jlistview : jObject; _value : Boolean);
+var
+  jMethod : jMethodID = nil;
+  jParams : Array[0..0] of jValue;
+  cls: jClass;
+ begin
+  jParams[0].z := JBool(_value);
+  cls := env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, cls, 'SetEnableOnClickTextRight', '(Z)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod,@jParams);
+  env^.DeleteLocalRef(env, cls);
+ end;
 
 // by tr3e
 procedure jListView_SetDrawAlphaBackground(env:PJNIEnv; _listview : jObject; _alpha: integer);
