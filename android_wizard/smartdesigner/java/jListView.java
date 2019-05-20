@@ -711,17 +711,15 @@ class jArrayAdapter extends ArrayAdapter {
 				float auxf = setTextSizeAndGetAuxf( position );
 				// tr3e Code optimization
 				
-				itemText[i] = textViewnew;
-				itemText[i].setPadding(20, 40, 20, 40);  
+				itemText[i] = textViewnew;				
 				itemText[i].setPadding(mItemCenterMarginLeft, mItemPaddingTop, mItemCenterMarginRight, mItemPaddingBottom);
 				
 				if (lines.length > 1) {				   	
 					if (i == 0) {
-						itemText[i].setPadding(20, 40, 20, 3);  ////left, top, right, bottom
+						////left, top, right, bottom
 						itemText[i].setPadding(mItemCenterMarginLeft, mItemPaddingTop, mItemCenterMarginRight, mItemCenterMarginInner);						
 					}
-					else if (i== lines.length-1) { 
-						itemText[i].setPadding(20, 3, 20, 40);
+					else if (i== lines.length-1) { 						
 						itemText[i].setPadding(mItemCenterMarginLeft, mItemCenterMarginInner, mItemCenterMarginRight, mItemPaddingBottom);
 					}	
 					else {
