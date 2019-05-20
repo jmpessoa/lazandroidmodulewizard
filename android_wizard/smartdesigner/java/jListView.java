@@ -120,6 +120,9 @@ class jArrayAdapter extends ArrayAdapter {
     int mItemCenterMarginInner  = 2;
     
     boolean mWordWrap;
+    boolean mEnableOnClickTextLeft   = false;
+    boolean mEnableOnClickTextCenter = false;
+    boolean mEnableOnClickTextRight  = false;
     
     int mItemImageWidgetSide = 0; // left, right, top, bottom
     
@@ -211,6 +214,10 @@ class jArrayAdapter extends ArrayAdapter {
 		mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP;
 		
 		mWordWrap = false;
+		
+		mEnableOnClickTextLeft   = false;
+	    mEnableOnClickTextCenter = false;
+	    mEnableOnClickTextRight  = false;
 	}
 
 	public void SetChangeFontSizeByComplexUnitPixel(boolean _value) {
@@ -288,12 +295,24 @@ class jArrayAdapter extends ArrayAdapter {
 	public void SetItemCenterWordWrap2( boolean _value ){ //+++
 		mWordWrap = _value;
 	}
+	
+	public void SetEnableOnClickTextLeft2( boolean _value ){ //+++
+		mEnableOnClickTextLeft = _value;
+	}
+		
+	public void SetEnableOnClickTextCenter2( boolean _value ){ //+++
+		mEnableOnClickTextCenter = _value;
+	}
+
+	public void SetEnableOnClickTextRight2( boolean _value ){ //+++
+		mEnableOnClickTextRight = _value;
+	}
 		
 	public void SetWidgetImageSide( int _side ){
 		mItemImageWidgetSide = _side;
 	}
 	
-	// by tr3e
+	// end by tr3e
 
     public void SetWidgetFontFromAssets(String _fontName) {			
          mWidgetCustomFont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);		
@@ -338,10 +357,9 @@ class jArrayAdapter extends ArrayAdapter {
 
 	
 	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 )
-			  return null;
-		else
-		 	  return ctx.getResources().getDrawable(_resID);
+		if( _resID == 0 ) return null; // by tr3e
+		
+		return ctx.getResources().getDrawable(_resID);
 	}
 	
 	private int GetDrawableResourceId(String _resName) {
@@ -528,6 +546,10 @@ class jArrayAdapter extends ArrayAdapter {
 					   if (items.get(position).textSize != 0) 
 						   itemTextLeft.setTextSize(items.get(position).textSize);
 					   
+					   if( mEnableOnClickTextLeft )
+					       itemTextLeft.setOnClickListener( getOnClickTextLeft( itemTextLeft, position) );
+					   else
+						   itemTextLeft.setClickable(false);
 				     }
 				   }			 
 				   else {
@@ -566,10 +588,15 @@ class jArrayAdapter extends ArrayAdapter {
 					   itemTextRight.setTextColor(items.get(position).textColor);				
 				     }
 				     itemTextRight.setTypeface(items.get(position).typeFace, faceTitle);
+				     
 				     // tr3e fix change font size
-					 if (items.get(position).textSize != 0) {
+					 if (items.get(position).textSize != 0)
 						 itemTextRight.setTextSize(items.get(position).textSize);
-					 }
+					 
+					 if( mEnableOnClickTextRight )
+					     itemTextRight.setOnClickListener( getOnClickTextRight( itemTextRight, position) );
+					 else
+						 itemTextRight.setClickable(false);
 				   }
 				}
 			}
@@ -652,27 +679,27 @@ class jArrayAdapter extends ArrayAdapter {
 			RelativeLayout.LayoutParams rightParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h
 						
 			leftParam.leftMargin   = mItemPaddingLeft;			
-			rightParam.rightMargin = mItemPaddingRight;													
-			
-			String line = items.get(position).label;
+			rightParam.rightMargin = mItemPaddingRight;
+						
+			String line = items.get(position).label;			
 			
 			// tr3e Code optimization
 			int faceTitle = getFaceTitle( items.get(position).textDecorated );
 			int faceBody  = getFaceBody( items.get(position).textDecorated );
 					
 			line = getItemTextLeft( line, position, faceTitle );
-			line = getItemTextRight( line, position, faceTitle );
+			line = getItemTextRight( line, position, faceTitle );			
 			
 			getItemImage( position );
 			// tr3e Code optimization
 									
 			String[] lines = line.split(Pattern.quote(items.get(position).delimiter));
 						
-			RelativeLayout itemLayout = new RelativeLayout(ctx);	
+			RelativeLayout itemLayout = new RelativeLayout(ctx);			
 			
 			TextView[] itemText = new TextView[lines.length];				    	
             			
-		    LinearLayout txtLayout = new LinearLayout(ctx);
+		    LinearLayout txtLayout = new LinearLayout(ctx);			
 		    
     		txtLayout.setOrientation(LinearLayout.VERTICAL);
     		    		    		
@@ -680,21 +707,19 @@ class jArrayAdapter extends ArrayAdapter {
 
 				// tr3e Code optimization
 				textViewnew = new TextView(ctx);
-				
+								
 				float auxf = setTextSizeAndGetAuxf( position );
 				// tr3e Code optimization
 				
-				itemText[i] = textViewnew;
-				//itemText[i].setPadding(20, 40, 20, 40);  
+				itemText[i] = textViewnew;				
 				itemText[i].setPadding(mItemCenterMarginLeft, mItemPaddingTop, mItemCenterMarginRight, mItemPaddingBottom);
 				
 				if (lines.length > 1) {				   	
 					if (i == 0) {
-						//itemText[i].setPadding(20, 40, 20, 3);  ////left, top, right, bottom
+						////left, top, right, bottom
 						itemText[i].setPadding(mItemCenterMarginLeft, mItemPaddingTop, mItemCenterMarginRight, mItemCenterMarginInner);						
 					}
-					else if (i== lines.length-1) { 
-						//itemText[i].setPadding(20, 3, 20, 40);
+					else if (i== lines.length-1) { 						
 						itemText[i].setPadding(mItemCenterMarginLeft, mItemCenterMarginInner, mItemCenterMarginRight, mItemPaddingBottom);
 					}	
 					else {
@@ -739,8 +764,14 @@ class jArrayAdapter extends ArrayAdapter {
 				
 				if (items.get(position).textAlign == 1)   //right  ***
 				   itemText[i].setGravity(Gravity.RIGHT);
-															
+				
+				if( mEnableOnClickTextCenter )
+				    itemText[i].setOnClickListener( getOnClickTextCenter( itemText[i], position) );
+				else
+					itemText[i].setClickable(false);
+																							
 				txtLayout.addView(itemText[i]);				
+				
 			}
 			
 			itemWidget = null;
@@ -1103,13 +1134,13 @@ class jArrayAdapter extends ArrayAdapter {
 				widgetParam.leftMargin  = mItemPaddingLeft;
 				
 				int flagItemLeft = 2;
-				int flagItemRight = 2;				   
+				int flagItemRight = 2;												
 				
 				if (itemWidget != null) {
-					flagItemLeft = 0;
+					flagItemLeft = 0;					
 					txtParam.leftMargin = mItemCenterMarginLeft;
-					widgetParam.addRule(relativePosition);
-					leftParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+					widgetParam.addRule(relativePosition);										
+					leftParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);					
 					itemLayout.addView(itemWidget, widgetParam);
 				}
 				else {
@@ -1273,8 +1304,8 @@ class jArrayAdapter extends ArrayAdapter {
 			// tr3e            
             			
 			if (items.get(position).highLightColor != Color.TRANSPARENT)
-				itemLayout.setBackgroundColor(items.get(position).highLightColor); 
-						
+				itemLayout.setBackgroundColor(items.get(position).highLightColor);
+			
 			listLayout.addView(itemLayout);
 			
 			return listLayout;
@@ -1291,6 +1322,41 @@ class jArrayAdapter extends ArrayAdapter {
 				}				
 			}
 		};
+	}
+	
+	// by tr3e
+	View.OnClickListener getOnClickTextLeft(final View cb, final int position) {
+		return new View.OnClickListener() {
+			public void onClick(View v) {
+				if (cb.getClass().getName().equals("android.widget.TextView")) {
+					controls.pOnClickItemTextLeft(PasObj, position, ((TextView)cb).getText().toString());
+				}				
+			}
+		};
+	}
+	
+	// by tr3e
+	View.OnClickListener getOnClickTextCenter(final View cb, final int position) {
+			return new View.OnClickListener() {
+				public void onClick(View v) {
+					if (cb.getClass().getName().equals("android.widget.TextView")) {
+						
+						controls.pOnClickItemTextCenter(PasObj, position, ((TextView)cb).getText().toString());
+					}				
+				}
+			};
+	}
+		
+		
+	// by tr3e
+	View.OnClickListener getOnClickTextRight(final View cb, final int position) {
+			return new View.OnClickListener() {
+				public void onClick(View v) {
+					if (cb.getClass().getName().equals("android.widget.TextView")) {
+						controls.pOnClickItemTextRight(PasObj, position, ((TextView)cb).getText().toString());
+					}				
+				}
+			};
 	}
 
 	View.OnClickListener getOnCheckItem(final View cb, final int position) {
@@ -1596,6 +1662,10 @@ public class jListView extends ListView {
 	}
 	
 	// by tr3e
+	public void setItemTextByIndex( String _fullItemCaption, int index ) {
+		alist.get(index).label = _fullItemCaption;        
+	}
+	
 	public  int GetFontSizeByIndex(int index) {
 		return alist.get(index).textSize;		
 	}
@@ -1906,7 +1976,7 @@ public class jListView extends ListView {
 
 	public void setWidgetCheck(boolean _value, int _index){
 		alist.get(_index).checked = _value;
-		aadapter.notifyDataSetChanged();
+		aadapter.notifyDataSetChanged();		
 	}
 
 	public void setItemTagString(String _tagString, int _index){
@@ -2197,6 +2267,18 @@ public class jListView extends ListView {
 	
 	public void SetItemCenterWordWrap(boolean _value) { // by tr3e
 		aadapter.SetItemCenterWordWrap2(_value);
+	}
+	
+	public void SetEnableOnClickTextLeft(boolean _value) { // by tr3e
+		aadapter.SetEnableOnClickTextLeft2(_value);
+	}
+	
+	public void SetEnableOnClickTextCenter(boolean _value) { // by tr3e
+		aadapter.SetEnableOnClickTextCenter2(_value);
+	}
+	
+	public void SetEnableOnClickTextRight(boolean _value) { // by tr3e
+		aadapter.SetEnableOnClickTextRight2(_value);
 	}
 	
 	public void SetSelection(int _index) {
