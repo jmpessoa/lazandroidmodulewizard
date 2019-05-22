@@ -92,7 +92,6 @@ object FormBuildFPCCross: TFormBuildFPCCross
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
-  LCLVersion = '2.0.0.4'
   object StatusBar1: TStatusBar
     Left = 0
     Height = 29
@@ -115,9 +114,9 @@ object FormBuildFPCCross: TFormBuildFPCCross
       Height = 473
       Top = 0
       Width = 515
-      ActivePage = TabSheet3
+      ActivePage = TabSheet2
       Align = alClient
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 0
       OnChange = PageControl1Change
       object TabSheet2: TTabSheet
@@ -255,7 +254,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
         end
       end
       object TabSheet3: TTabSheet
-        Caption = 'Instal'
+        Caption = 'Install'
         ClientHeight = 440
         ClientWidth = 507
         object GroupBox3: TGroupBox

@@ -283,7 +283,6 @@ object LamwProjectOptions: TLamwProjectOptions
         Top = 6
         Width = 350
         BorderSpacing.Top = 6
-        Enabled = False
         TabOrder = 1
       end
       object GroupBox1: TGroupBox

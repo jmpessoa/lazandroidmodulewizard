@@ -333,7 +333,7 @@ begin
           Params.Add('OPT="-vw-n-h-l-d-u-t-p-c- "');
 
        if FBuildMode = bmArmV6  then
-          Params.Add('CROSSOPT="-CpARMv6 -CfSoft"');   //Softfp means that all fp operations are performed by software, no FPU support.
+          Params.Add('CROSSOPT="-CpARMv6 -CfSoft"');   //Soft means that all fp operations are performed by software, no FPU support.
 
        if FBuildMode = bmArmV7a then  //                      //[FPU] vfpv3 means that fp operations are performed by the hardware.
           Params.Add('CROSSOPT="-CpARMv7a -Cf'+FFPUSet+'"');   //-OoFASTMATH to sacrifice precision for performance.

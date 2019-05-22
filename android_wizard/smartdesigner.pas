@@ -71,6 +71,10 @@ type
     function GetBuildTool(sdkApi: integer): string;
     function GetPluginVersion(buildTool: string): string;
     function TryGradleCompatibility(plugin: string; gradleVers: string): string;
+
+    function GetGradleVerAsNumber(gradleVers: string): integer;
+    function TryUndoFakeVersion(grVer: string): string;
+
     function GetGradleVersion(path: string): string;
     function GetGradleVersionFromGradle(path: string): string;
 
@@ -84,6 +88,7 @@ type
 
     function GetPathToSmartDesigner(): string;
     procedure UpdateBuildModes();
+
 
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
@@ -475,16 +480,51 @@ begin
         Result:= '3.0.1';
         //gradleVer:= '4.1';
     end
-    else if maxBuilderNumber >= 2700  then
+    else if (maxBuilderNumber >= 2700) and (maxBuilderNumber < 2703)   then
     begin
-        Result:= '3.0.1';
-        //gradleVer:= '4.1';
+        Result:= '3.1.0';
+        //gradleVer:= '4.4';
+    end
+    else if (maxBuilderNumber >= 2703) and (maxBuilderNumber < 2803)   then
+    begin
+        Result:= '3.2.0';
+        //gradleVer:= '4.6';
+    end
+    else if maxBuilderNumber >= 2803   then
+    begin
+        Result:= '3.3.0';
+        //gradleVer:= 'Gradle 4.10.1';
+
+        //Result:= '3.4.0';
+        //gradleVer:= 'Gradle Gradle 5.1.1'
     end;
 
   end;
 
 end;
 
+function TLamwSmartDesigner.TryUndoFakeVersion(grVer: string): string;
+begin
+  Result:=  grVer;
+  if grVer = '4.9.1' then Result := '4.10'
+  else if grVer = '4.9.2' then Result := '4.10.1'
+  else if grVer = '4.9.3' then Result := '4.10.2'
+  else if grVer = '4.9.4' then Result := '4.10.3';
+end;
+
+function TLamwSmartDesigner.GetGradleVerAsNumber(gradleVers: string): integer;
+var
+  numberAsString: string;
+  len: integer;
+begin
+  numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]);
+  len:= Length(numberAsString);
+  if len = 2 then numberAsString:= numberAsString + '00';
+  if len = 3 then numberAsString:= numberAsString + '0';
+  Result:= StrToInt(numberAsString);
+end;
+
+//https://developer.android.com/studio/releases/gradle-plugin.html#updating-plugin
 function TLamwSmartDesigner.TryGradleCompatibility(plugin: string; gradleVers: string): string;
 var
   pluginNumber: integer;
@@ -517,25 +557,38 @@ begin
       tryGradleVer:= '2.14.1';  //        2141
     end;
 
-    if (pluginNumber >= 233) and (pluginNumber <  301) then
+    if (pluginNumber >= 233) and (pluginNumber <  310) then
     begin
        tryGradleVer:= '4.1';
     end;
 
-    if pluginNumber >= 301 then
+    if (pluginNumber >= 310) and  (pluginNumber <  320) then
     begin
-       tryGradleVer:= '4.1';
+       tryGradleVer:= '4.4';         //27.0.3
+    end;
+
+    if (pluginNumber >= 320) and  (pluginNumber <  330) then
+    begin
+       tryGradleVer:= '4.6';         //28.0.3
+    end;
+
+    if (pluginNumber >= 330) and  (pluginNumber <  340) then
+    begin
+       tryGradleVer:= '4.9.2';   //fake -> '4.10.1'      //28.0.3
+    end;
+
+    if (pluginNumber >= 340) then
+    begin
+        tryGradleVer:= '5.1.1';         //28.0.3
     end;
 
     numberAsString:= StringReplace(tryGradleVer,'.', '', [rfReplaceAll]); //4.1
-
     len:= Length(numberAsString);
     if len = 2 then numberAsString:= numberAsString + '00'; //4100
     if len = 3 then numberAsString:= numberAsString + '0';
 
     if IsAllCharNumber(PChar(numberAsString))  then
     begin
-
       tryGradleNumber:= StrToInt(numberAsString);
       if gradleVers <> '' then
       begin
@@ -553,14 +606,14 @@ begin
             end
             else
             begin
-               Result:= '4.1'; //tryGradleVer;
+               Result:= '4.4.1'; //tryGradleVer;
             end;
-        end else Result:= '4.1'; //tryGradleVer;
+        end else Result:= '4.4.1'; //tryGradleVer;
 
       end
       else
       begin
-        Result:= '4.1';
+        Result:= '4.4.1';
       end;
 
     end;
@@ -580,6 +633,7 @@ var
   androidPluginNumber: integer;
   pluginVersion: string;
   gradleCompatible: string;
+  gradleCompatibleAsNumber: integer;
   linuxPathToAndroidSdk: string;
   linuxPathToGradle: string;
   linuxDirSeparator: string;
@@ -741,7 +795,7 @@ begin
        else
        begin
          buildToolApi:= '26';
-         pluginVersion:= '3.0.0';
+         pluginVersion:= '3.0.1';  //gradle 4.1
        end;
 
        if pluginVersion <> '' then
@@ -952,9 +1006,19 @@ begin
          strList.Add('	}');
          strList.Add('}');
          strList.Add(' ');
-         strList.Add('task wrapper(type: Wrapper) {');
-         strList.Add('    gradleVersion = '''+gradleCompatible+'''');
-         strList.Add('}');
+         gradleCompatibleAsNumber:= Self.GetGradleVerAsNumber(gradleCompatible);
+         if  gradleCompatibleAsNumber < 5000 then
+         begin
+           strList.Add('task wrapper(type: Wrapper) {');
+           strList.Add('    gradleVersion = '''+TryUndoFakeVersion(gradleCompatible)+'''');
+           strList.Add('}');
+         end
+         else
+         begin
+           strList.Add('wrapper {');
+           strList.Add('    gradleVersion = '''+TryUndoFakeVersion(gradleCompatible)+'''');
+           strList.Add('}');
+         end;
          strList.Add('//how to use: look for "gradle_readme.txt"');
          strList.SaveToFile(FPathToAndroidProject+'build.gradle');
 
@@ -1128,6 +1192,12 @@ begin
        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Please, wait... trying find Gradle version from Gradle ['+path+']');
        Result:= GetGradleVersionFromGradle(path);
      end;
+
+     if Result = '4.10'   then Result:= '4.9.1'  //fake
+     else if Result = '4.10.1' then Result:= '4.9.2'  //fake
+     else if Result = '4.10.2' then Result:= '4.9.3'  //fake
+     else if Result = '4.10.3' then Result:= '4.9.4';  //fake
+
   end;
 end;
 

@@ -1239,8 +1239,7 @@ begin
            end;
          end;
        end;
-    end
-    else  ShowMessage('nochanged .. ' +cbChipset.Text);
+    end;
   end;
 end;
 
@@ -1456,7 +1455,7 @@ begin
    listInfo.Add(' ');
    listInfo.Add('3. From LazarusIDE menu:');
    listInfo.Add(' ');
-   listInfo.Add('   > [LAMW] Run Build Android Apk and Run');
+   listInfo.Add('   > [LAMW] Build Android Apk and Run');
    listInfo.Add(' ');
    ShowMessage(listInfo.Text);
    listInfo.Free;
@@ -1599,7 +1598,7 @@ begin
      Result:= 'x86';
      cbIndex:= 3;
   end
-  else if Pos('mips', projectTarget) > 0 then    //droped >= NDK r17
+  else if Pos('mips', projectTarget) > 0 then    //droped for >= NDK r17
   begin
      Result:= 'Mipsel';
      cbIndex:= 4;
