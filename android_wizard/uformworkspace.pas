@@ -1391,12 +1391,12 @@ begin
 
     if FPathToGradle <> '' then
     begin
+       FGradleVersion:= GetGradleVersion({out}tagVersion);   
        cbBuildSystem.Items.Add('Gradle');
        if cbBuildSystem.Items.Count = 1 then
        begin
          cbBuildSystem.Text:= 'Gradle';
          cbBuildSystem.ItemIndex:= 0;
-         FGradleVersion:= GetGradleVersion({out}tagVersion);
        end;
     end;
 
