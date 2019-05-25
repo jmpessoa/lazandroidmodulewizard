@@ -186,6 +186,7 @@ procedure jTextView_ClearLayoutAll(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetFrameGravity(env: PJNIEnv; _jtextview: JObject; _value: integer);
 procedure jTextView_RemoveFromViewParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetAllCaps(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+procedure jTextView_SetTextAsHtml(env: PJNIEnv; _jtextview: JObject; _htmlText: string);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -2012,6 +2013,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jtextview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetAllCaps', '(Z)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_SetTextAsHtml(env: PJNIEnv; _jtextview: JObject; _htmlText: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_htmlText));
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextAsHtml', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

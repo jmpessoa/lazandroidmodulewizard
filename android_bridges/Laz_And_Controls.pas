@@ -945,6 +945,7 @@ type
     procedure RemoveFromViewParent; override;
     procedure ResetViewParent();  override;
     procedure SetAllCaps(_value: boolean);
+    procedure SetTextAsHtml(_htmlText: string);
 
   published
     property Text: string read GetText write SetText;
@@ -4072,6 +4073,13 @@ begin
   FAllCaps:= _value;
   if FInitialized then
      jTextView_SetAllCaps(FjEnv, FjObject, _value);
+end;
+
+procedure jTextView.SetTextAsHtml(_htmlText: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetTextAsHtml(FjEnv, FjObject, _htmlText);
 end;
 
 //------------------------------------------------------------------------------

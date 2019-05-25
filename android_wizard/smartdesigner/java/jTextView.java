@@ -1,4 +1,4 @@
-package org.lamw.appcompatcollapsingtoolbardemo1;
+package com.example.appspinnerdemo;
 
 import java.lang.reflect.Field;
 
@@ -499,4 +499,13 @@ public class jTextView extends TextView {
 	public void SetAllCaps(boolean _value) {
 		this.setAllCaps(_value);
 	}
+
+	public void SetTextAsHtml(String _htmlText) {
+		//[ifdef_api24up]
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+			this.setText(Html.fromHtml(_htmlText, Html.FROM_HTML_MODE_LEGACY));
+		}else //[endif_api24up]
+			this.setText(Html.fromHtml(_htmlText)); //Html.fromHtml("5x<sup>2</sup>")
+	}
+
 }
