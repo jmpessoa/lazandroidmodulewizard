@@ -330,6 +330,13 @@ type
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
   end;
 
+  {TDraftCOpenMapView}
+
+  TDraftCOpenMapView = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
+
   {TDraftCustomCamera}
 
   TDraftCustomCamera = class(TDraftWidget)
@@ -730,7 +737,8 @@ uses
   snavigationview, scardview, srecyclerview, stextinput,
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
   sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView},
-  customcamera, sadmob, calendarview, searchview, zbarcodescannerview, scontinuousscrollableimageview;
+  customcamera, sadmob, calendarview, searchview, zbarcodescannerview,
+  scontinuousscrollableimageview, copenmapview;
 
 const
   DrawableSearchPaths: array [0..4] of string = (
@@ -3932,6 +3940,21 @@ begin
     Color := GetParentBackgroundColor;
 end;
 
+
+{ TDraftCOpenMapView }
+
+constructor TDraftCOpenMapView.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+
+  Color := jcOpenMapView(AWidget).BackgroundColor;
+  FontColor := colbrGray;
+  BackGroundColor := clActiveCaption; //clMenuHighlight;
+
+  if jcOpenMapView(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
 { TDraftCustomCamera }
 
 constructor TDraftCustomCamera.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -4682,7 +4705,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jsAdMob, TDraftSAdMob);
 
   RegisterAndroidWidgetDraftClass(jsContinuousScrollableImageView, TDraftSContinuousScrollableImageView);
-
+  RegisterAndroidWidgetDraftClass(jcOpenMapView, TDraftCOpenMapView);
 
 finalization
   DraftClassesMap.Free;

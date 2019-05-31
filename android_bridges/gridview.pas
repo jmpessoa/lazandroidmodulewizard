@@ -638,8 +638,8 @@ var
 begin
   outColor := Self.FontColor;
   color := 0; //default;
-  if Assigned(FOnDrawItemTextColor) then
-    FOnDrawItemTextColor(Obj, index, Caption, outColor);
+  if Assigned(FOnDrawItemTextColor) then FOnDrawItemTextColor(Obj, index, Caption, outColor);
+
   if (outColor <> colbrNone) and (outColor <> colbrDefault) then
     color := GetARGB(FCustomColor, outColor);
 end;

@@ -1239,6 +1239,14 @@ begin
      end;
 
      count:= frm.ListBoxGradleDep.Count; //dependencies
+
+    if count > 0 then
+     begin
+       list.Clear;
+       list.Add('Gradle');
+       list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.buildsys');
+     end;
+
      for i:= 0 to count-1 do
      begin
         aux:= frm.ListBoxGradleDep.Items.Strings[i];

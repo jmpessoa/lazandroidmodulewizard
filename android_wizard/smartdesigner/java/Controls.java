@@ -1,6 +1,6 @@
 package com.example.appsqlitedemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.4.3  - 17 May - 2019
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.4  - 30 May - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -1618,9 +1618,13 @@ public String getStringResourceByName(String _resName) {
 //  App Related
 // -------------------------------------------------------------------------
 //
-public  void appFinish () {
+public  void appFinish() {
 	   activity.finish();
 	   System.exit(0); //<< ------- fix by jmpessoa
+}
+
+public void appRecreate() {
+	activity.recreate();
 }
 
 public  void appKillProcess() {

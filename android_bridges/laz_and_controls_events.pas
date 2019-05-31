@@ -191,6 +191,7 @@ uses
 
    procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
    procedure Java_Event_pOnMidiManagerDeviceRemoved(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
+   function Java_Event_pOnOpenMapViewRoadDraw(env:PJNIEnv;this:JObject;Sender:TObject;roadCode:integer;roadStatus:integer;roadDuration:double;roadDistance:double):jintArray;
 
 implementation
 
@@ -204,7 +205,7 @@ uses
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
    customcamera, calendarview, searchview, telephonymanager,
-   sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview, midimanager;
+   sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview, midimanager, copenmapview;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2289,6 +2290,27 @@ begin
     jForm(jMidiManager(Sender).Owner).UpdateJNI(gApp);
     jMidiManager(Sender).GenEvent_OnMidiManagerDeviceRemoved(Sender,deviceId,GetString(env,deviceName),GetString(env,productId),GetString(env,manufacture));
   end;
+end;
+
+function Java_Event_pOnOpenMapViewRoadDraw(env:PJNIEnv;this:JObject;Sender:TObject;roadCode:integer;roadStatus:integer; roadDuration:double;roadDistance:double):jintArray;
+var
+  outReturn: TDynArrayOfInteger;
+  outReturnColor: dword;
+  outReturnWidth: integer;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outReturn:=nil;
+  if Sender is jcOpenMapView then
+  begin
+    jForm(jcOpenMapView(Sender).Owner).UpdateJNI(gApp);
+    jcOpenMapView(Sender).GenEvent_OnOpenMapViewRoadDraw(Sender,roadCode,roadStatus,roadDuration,roadDistance,outReturnColor,outReturnWidth);
+  end;
+  SetLength(outReturn, 2);
+  outReturn[0]:= outReturnColor;
+  outReturn[1]:= outReturnWidth;
+  Result:=GetJObjectOfDynArrayOfInteger(env,outReturn);
+  SetLength(outReturn, 0);
 end;
 
 

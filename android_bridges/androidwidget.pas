@@ -833,8 +833,9 @@ type
     procedure CreateForm(InstanceClass: TComponentClass; out Reference);
     procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject; intent: jobject);
 
-    procedure Finish;
-    function  GetContext: jObject;
+    procedure Finish();
+    Procedure Recreate();
+    function  GetContext(): jObject;
     function  GetContextTop: integer;
     function  GetStatusBarHeight : integer;
     function  GetActionBarHeight : integer;
@@ -1600,17 +1601,18 @@ procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; f
 //------------------------------------------------------------------------------
 
 //Please, use jForm_getDateTime...
-Function jApp_GetControlsVersionFeatures          (env:PJNIEnv;this:jobject): String;
+Function jApp_GetControlsVersionFeatures(env:PJNIEnv;this:jobject): String;
 
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
 function jApp_GetDriverList(env: PJNIEnv; this: JObject): TDynArrayOfString;
 function jApp_GetFolderList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
 function jApp_GetFileList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
 
-Procedure jApp_Finish                  (env:PJNIEnv;this:jobject);
+Procedure jApp_Finish(env:PJNIEnv;this:jobject);
+Procedure jApp_Recreate(env:PJNIEnv;this:jobject);
 
-Procedure jApp_Finish2                  (env:PJNIEnv;this:jobject);
-function  jApp_GetContext               (env:PJNIEnv;this:jobject): jObject;
+Procedure jApp_Finish2(env:PJNIEnv;this:jobject);
+function  jApp_GetContext(env:PJNIEnv;this:jobject): jObject;
 function  jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
 
 function  jApp_GetContextTop(env:PJNIEnv; this:jobject): integer;
@@ -6044,12 +6046,17 @@ begin
   FjClassName:= Value;
 end;
 
-procedure jApp.Finish;
+procedure jApp.Finish();
 begin
   jApp_Finish2(Self.Jni.jEnv, Self.Jni.jThis);
 end;
 
-function jApp.GetContext: jObject;
+procedure jApp.Recreate();
+begin
+  jApp_Recreate(Self.Jni.jEnv, Self.Jni.jThis);
+end;
+
+function jApp.GetContext(): jObject;
 begin
   Result:= jApp_GetContext(Self.Jni.jEnv, Self.Jni.jThis);
 end;
@@ -6982,6 +6989,16 @@ end;
 Procedure jApp_Finish(env:PJNIEnv;this:jobject);
 Const
   _cFuncName = 'appFinish';
+  _cFuncSig  = '()V';
+  _jMethod: jMethodID = nil;
+begin
+  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
+  env^.CallVoidMethod(env,this,_jMethod);
+end;
+
+Procedure jApp_Recreate(env:PJNIEnv;this:jobject);
+Const
+  _cFuncName = 'appRecreate';
   _cFuncSig  = '()V';
   _jMethod: jMethodID = nil;
 begin

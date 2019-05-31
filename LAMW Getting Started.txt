@@ -232,7 +232,7 @@ III. USING LAMW
 
 	[Congratulations!!!]
 
-10. NOTE1: All LAMW projects [and demos] are AndroidStudio/Eclipse compatible!
+10. NOTE1: All LAMW projects [and demos] are AndroidStudio/Eclipse compatibles!
 	Please,  read the "How_to_open_LAMW_project_with_AndroidStudio.txt"
 
     NOTE2: Components from  Palettes "Android Bridges AppCompat"  and "Android Bridges JCenter" need build system "Gradle" [and Internet connection]

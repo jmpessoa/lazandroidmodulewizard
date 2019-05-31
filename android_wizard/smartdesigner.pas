@@ -1875,11 +1875,11 @@ begin
      end;
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then   //JCenter component palette
    begin
       if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
       begin
-         ShowMessage(jclassname+'.java require Gradle'+sLineBreak+'Build system Changed to Gradle...');
+         ShowMessage(jclassname+'.java require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
          LazarusIDE.ActiveProject.Modified:= True;
          LazarusIDE.ActiveProject.CustomData['BuildSystem']:= 'Gradle';
       end;

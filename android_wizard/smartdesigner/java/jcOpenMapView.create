@@ -1,0 +1,3 @@
+public java.lang.Object jcOpenMapView_jCreate(long _Self, boolean _showScale, int _tileSource,  int _zoom) {
+  return (java.lang.Object)(new jcOpenMapView(this,_Self, _showScale, _tileSource, _zoom));
+}

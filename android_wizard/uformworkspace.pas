@@ -1290,7 +1290,10 @@ begin
     begin
         Result:= Copy(strAux, p+1, MaxInt);  // 3.3
 
-        if Result = '4.10' then Result:= '4.100';
+        if Result = '4.10'   then Result:= '4.9.1'
+        else if Result = '4.10.1' then Result:= '4.9.2'
+        else if Result = '4.10.2' then Result:= '4.9.3'
+        else if Result = '4.10.3' then Result:= '4.9.4';
 
         numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
         if Length(numberAsString) < 3 then
@@ -1300,9 +1303,9 @@ begin
         tagVersion:= StrToInt(Trim(numberAsString));
     end;
 
-    if Result = '' then
+    if Result = '' then  //gradle-4.4.1
     begin
-      userString:= '4.1';
+      userString:= '4.4.1';
       if InputQuery('Gradle', 'Please, Enter Gradle Version ', userString) then
       begin
         if UserString <> '' then
@@ -1317,7 +1320,7 @@ begin
         end
         else
         begin
-          Result:= '4.1';
+          Result:= '4.4.1';
           numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 41
           if Length(numberAsString) < 3 then
           begin
@@ -1391,7 +1394,7 @@ begin
 
     if FPathToGradle <> '' then
     begin
-       FGradleVersion:= GetGradleVersion({out}tagVersion);   
+       FGradleVersion:= GetGradleVersion({out}tagVersion);
        cbBuildSystem.Items.Add('Gradle');
        if cbBuildSystem.Items.Count = 1 then
        begin
