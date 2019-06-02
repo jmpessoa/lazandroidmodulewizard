@@ -3,12 +3,11 @@ package com.example.appdrawingviewdemo1;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
-
 import javax.microedition.khronos.opengles.GL10;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.CornerPathEffect;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
@@ -20,8 +19,12 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -44,8 +47,11 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     private Boolean enabled = true;           // click-touch enabled!
 
-    private Canvas mCanvas = null;
-    private Paint mPaint = null;
+    private Bitmap mBitmap;
+    private Canvas mCanvas = null; //offscreen canvas
+    private Paint mDrawPaint = null;
+    private TextPaint mTextPaint = null;
+
     private Path mPath = null;
     private OnClickListener onClickListener;   // click event
     private GestureDetector gDetect;
@@ -62,22 +68,38 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     float mPointY[];  //five fingers
 
     int mCountPoint = 0;
-
     private SparseArray<PointF> mActivePointers;
 
+    private int mBackgroundColor; // = Color.WHITE;
+    private boolean mBufferedDraw = false;
+    private int mWidth;
+    private int mHeight;
+    private Paint.Style mStyle;
+
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public jDrawingView(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+    public jDrawingView(Controls _ctrls, long _Self, boolean _bufferedDraw, int _backgroundColor) { //Add more others news "_xxx"p arams if needed!
         super(_ctrls.activity);
         context = _ctrls.activity;
         pascalObj = _Self;
         controls = _ctrls;
+        mBufferedDraw = _bufferedDraw;
 
+        if (_backgroundColor != 0)
+            mBackgroundColor = _backgroundColor;
+        else
+            mBackgroundColor = Color.TRANSPARENT;
+
+        this.setBackgroundColor(mBackgroundColor);
+
+        this.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         LAMWCommon = new jCommons(this, context, pascalObj);
-
-        mPaint = new Paint();
-        mPaint.setStyle(Paint.Style.STROKE);
-        //this.setWillNotDraw(false); //fire OnDraw
-        mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        mTextPaint = new TextPaint();//new Paint();
+        //mPaint.setStyle(Paint.Style.STROKE);
+        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        float ts = mTextPaint.getTextSize();  //default 12
+        float unit = controls.activity.getResources().getDisplayMetrics().density;
+        mTextPaint.setTextSize(ts*unit); //ts * unit
+        mDrawPaint = new Paint(); //used to draw shapes and  lines ...
 
         mPath = new Path();
         mCountPoint = 0;
@@ -98,13 +120,17 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         gDetect = new GestureDetector(controls.activity, new GestureListener());
         scaleGestureDetector = new ScaleGestureDetector(controls.activity, new simpleOnScaleGestureListener());
 
+        mStyle = mTextPaint.getStyle();
     } //end constructor
 
     public void jFree() {
         //free local objects...
-        mPaint = null;
+        mTextPaint = null;
         mCanvas = null;
         gDetect = null;
+        mDrawPaint = null;
+        mBitmap = null;
+        mPath = null;
         setOnClickListener(null);
         scaleGestureDetector = null;
         LAMWCommon.free();
@@ -174,7 +200,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         return this;
     }
 
-
     public void SetId(int _id) { //wrapper method pattern ...
         this.setId(_id);
     }
@@ -195,21 +220,17 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int act = event.getAction() & MotionEvent.ACTION_MASK;
-
-        //get pointer index from the event object
+     //get pointer index from the event object
         int pointerIndex = event.getActionIndex();
         // get pointer ID
         int pointerId = event.getPointerId(pointerIndex);
 
         switch (act) {
-
             case MotionEvent.ACTION_DOWN: {
-
                 PointF f = new PointF();
                 f.x = event.getX(pointerIndex);
                 f.y = event.getY(pointerIndex);
                 mActivePointers.put(pointerId, f);
-
 
                 mPointX = new float[mActivePointers.size()];  //fingers
                 mPointY = new float[mActivePointers.size()];  //fingers
@@ -224,13 +245,10 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
                 controls.pOnDrawingViewTouch(pascalObj, Const.TouchDown, mActivePointers.size(),
                         mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
-
                 break;
             }
 
-
             case MotionEvent.ACTION_MOVE: {
-
                 for (int size = event.getPointerCount(), i = 0; i < size; i++) {
                     PointF point = mActivePointers.get(event.getPointerId(i));
                     if (point != null) {
@@ -255,9 +273,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
                 break;
             }
 
-
             case MotionEvent.ACTION_UP: {
-
                 for (int size = event.getPointerCount(), i = 0; i < size; i++) {
                     PointF point = mActivePointers.get(event.getPointerId(i));
                     if (point != null) {
@@ -282,9 +298,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
                 break;
             }
 
-
             case MotionEvent.ACTION_POINTER_DOWN: {
-
                 PointF f = new PointF();
                 f.x = event.getX(pointerIndex);
                 f.y = event.getY(pointerIndex);
@@ -303,12 +317,10 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
                 controls.pOnDrawingViewTouch(pascalObj, Const.TouchDown, mActivePointers.size(),
                         mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
-
                 break;
             }
 
             case MotionEvent.ACTION_POINTER_UP: {
-
                 for (int size = event.getPointerCount(), i = 0; i < size; i++) {
                     PointF point = mActivePointers.get(event.getPointerId(i));
                     if (point != null) {
@@ -330,7 +342,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
                 controls.pOnDrawingViewTouch(pascalObj, Const.TouchUp, mActivePointers.size(),
                         mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
-
                 break;
             }
 
@@ -338,10 +349,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
                 mActivePointers.remove(pointerId);
                 break;
             }
-
-
         }
-
         return true;
     }
 
@@ -377,7 +385,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
                 mFling = 3; //onTopToBottom();
                 return false;
             }
-
             return false;
         }
     }
@@ -389,7 +396,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         public boolean onScale(ScaleGestureDetector detector) {
             mScaleFactor *= detector.getScaleFactor();
             mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
-            // Log.i("tag", "onScale = "+ mScaleFactor);
             mPinchZoomGestureState = 1;
             return true;
         }
@@ -398,7 +404,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         public boolean onScaleBegin(ScaleGestureDetector detector) {
             mScaleFactor = detector.getScaleFactor();
             mPinchZoomGestureState = 0;
-            //Log.i("tag", "onScaleBegin");
             return true;
         }
 
@@ -406,26 +411,49 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         public void onScaleEnd(ScaleGestureDetector detector) {
             mScaleFactor = detector.getScaleFactor();
             mPinchZoomGestureState = 2;
-            //Log.i("tag", "onScaleEnd");
             super.onScaleEnd(detector);
         }
-
     }
 
     public Bitmap GetDrawingCache() {
-        this.setDrawingCacheEnabled(true);
-        Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
-        this.setDrawingCacheEnabled(false);
-        return b;
+        if (mBufferedDraw) {
+            return mBitmap;
+        } else {
+            this.setDrawingCacheEnabled(true);
+            Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+            this.setDrawingCacheEnabled(false);
+            return b;
+        }
+    }
+
+    @Override
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
+        mWidth = width;
+        mHeight = height;
+        if (mBufferedDraw) {
+            // Create bitmap, create canvas with bitmap, fill canvas with color.
+            mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            mCanvas = new Canvas(mBitmap);
+            // Fill the Bitmap with the background color.
+            if (mBackgroundColor != 0 )
+               mCanvas.drawColor(mBackgroundColor);
+            else
+                mCanvas.drawColor(Color.WHITE);
+        }
+        controls.pOnDrawingViewSizeChanged(pascalObj, width, height, oldWidth, oldHeight);
     }
 
     //
     @Override
     /*.*/ public void onDraw(Canvas canvas) {
-        mCanvas = canvas;
+        //super.onDraw(canvas);
+        if (mBufferedDraw)
+            canvas.drawBitmap(mBitmap,0,0,null); //mDrawPaint  draw offscreen changes
+        else
+            mCanvas = canvas;
         controls.pOnDrawingViewDraw(pascalObj, Const.TouchUp, mActivePointers.size(),
                 mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
-
     }
 
     public void SaveToFile(String _filename) {
@@ -436,12 +464,10 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         try {
             fos = new FileOutputStream(_filename);
             if (fos != null) {
-
                 if (_filename.toLowerCase().contains(".jpg"))
                     image.compress(Bitmap.CompressFormat.JPEG, 90, fos);
                 if (_filename.toLowerCase().contains(".png"))
                     image.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
                 fos.close();
             }
         } catch (Exception e) {
@@ -493,11 +519,22 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     public void DrawBitmap(Bitmap _bitmap, int _width, int _height) {
         Bitmap bmp = GetResizedBitmap(_bitmap, _width, _height);
         Rect rect = new Rect(0, 0, _width, _height);
-        mCanvas.drawBitmap(bmp, null, rect, mPaint);
+        mCanvas.save();
+        mCanvas.drawBitmap(bmp, null, rect, mDrawPaint);
+        mCanvas.restore();
     }
 
-    //0 , 0, w, h //int left/b, int top/l, int right/r, int bottom/t)
-    public void DrawBitmap(Bitmap _bitmap, int _left, int _top, int _right, int _bottom) {  //int b, int l, int r, int t
+    public void DrawBitmap(Bitmap _bitmap, float _x, float _y, float _angleDegree) {
+        int x = (int) _x;
+        int y = (int) _y;
+        Bitmap bmp = GetResizedBitmap(_bitmap, _bitmap.getWidth(), _bitmap.getHeight());
+        mCanvas.save();
+        mCanvas.rotate(_angleDegree, x + _bitmap.getWidth() / 2, y + _bitmap.getHeight() / 2);
+        mCanvas.drawBitmap(bmp, x, y, null);
+        mCanvas.restore();
+    }
+
+    public void DrawBitmap(Bitmap _bitmap, int _left, int _top, int _right, int _bottom) {
         /* Figure out which way needs to be reduced less */
 			/*
 		    int scaleFactor = 1;
@@ -509,209 +546,235 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         if ((_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {
             int nh = (int) (_bitmap.getHeight() * (512.0 / _bitmap.getWidth()));
             Bitmap scaled = Bitmap.createScaledBitmap(_bitmap, 512, nh, true);
-            mCanvas.drawBitmap(scaled, null, rect, mPaint);
+            mCanvas.save();
+            mCanvas.drawBitmap(scaled, null, rect, mDrawPaint);
         } else {
-            mCanvas.drawBitmap(_bitmap, null, rect, mPaint);
+            mCanvas.save();
+            mCanvas.drawBitmap(_bitmap, null, rect, mDrawPaint);
+            mCanvas.restore();
         }
     }
 
     public void SetPaintWidth(float _width) {
-        mPaint.setStrokeWidth(_width);
+        mTextPaint.setStrokeWidth(_width);
     }
 
     public void SetPaintStyle(int _style) {
         switch (_style) {
             case 0: {
-                mPaint.setStyle(Paint.Style.FILL);
+                mDrawPaint.setStyle(mStyle);
                 break;
             }
             case 1: {
-                mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+                mDrawPaint.setStyle(Paint.Style.FILL);
                 break;
             }
             case 2: {
-                mPaint.setStyle(Paint.Style.STROKE);
+                mDrawPaint.setStyle(Paint.Style.FILL_AND_STROKE);
                 break;
             }
-            default: {
-                mPaint.setStyle(Paint.Style.FILL);
+            case 3: {
+                mDrawPaint.setStyle(Paint.Style.STROKE);
                 break;
             }
         }
-        ;
     }
 
     //https://guides.codepath.com/android/Basic-Painting-with-Views :: TODO DeviceDimensionsHelper.java utility
     public void SetPaintStrokeJoin(int _strokeJoin) {
         switch (_strokeJoin) {
             case 1: {
-                mPaint.setStrokeJoin(Paint.Join.ROUND);
+                mDrawPaint.setStrokeJoin(Paint.Join.ROUND);
                 break;
             }
         }
-
     }
 
     public void SetPaintStrokeCap(int _strokeCap) {
         switch (_strokeCap) {
             case 1: {
-                mPaint.setStrokeCap(Paint.Cap.ROUND);
+                mDrawPaint.setStrokeCap(Paint.Cap.ROUND);
                 break;
             }
         }
-
     }
 
     public void SetPaintCornerPathEffect(float _radius) {
-        mPaint.setPathEffect(new CornerPathEffect(_radius));
+        mDrawPaint.setPathEffect(new CornerPathEffect(_radius));
     }
 
     public void SetPaintDashPathEffect(float _lineDash, float _dashSpace, float _phase) {
-        mPaint.setPathEffect(new DashPathEffect(new float[]{_lineDash, _dashSpace}, _phase));
+        mDrawPaint.setPathEffect(new DashPathEffect(new float[]{_lineDash, _dashSpace}, _phase));
     }
 
     public void SetPaintColor(int _color) {
-        mPaint.setColor(_color);
+        mTextPaint.setColor(_color);
+        mDrawPaint.setColor(_color);
     }
 
     public void SetTextSize(float _textSize) {
-        mPaint.setTextSize(_textSize);
+        float unit = controls.activity.getResources().getDisplayMetrics().density;
+        mTextPaint.setTextSize(_textSize*unit); //_textSize * unit
     }
 
     public void SetTypeface(int _typeface) {
         Typeface t = null;
         switch (_typeface) {
-            case 0:
+            case 0: {
                 t = Typeface.DEFAULT;
-                break;
-            case 1:
+                break;}
+            case 1: {
                 t = Typeface.SANS_SERIF;
-                break;
-            case 2:
+                break;}
+            case 2: {
                 t = Typeface.SERIF;
-                break;
-            case 3:
+                break;}
+            case 3: {
                 t = Typeface.MONOSPACE;
-                break;
+                break;}
         }
-        mPaint.setTypeface(t);
+        mTextPaint.setTypeface(t);
     }
 
     public void DrawLine(float _x1, float _y1, float _x2, float _y2) {
-        mCanvas.drawLine(_x1, _y1, _x2, _y2, mPaint);
+        mCanvas.drawLine(_x1, _y1, _x2, _y2, mDrawPaint);
     }
 
     public void DrawText(String _text, float _x, float _y) {
-        mCanvas.drawText(_text, _x, _y, mPaint);
+        mCanvas.drawText(_text, _x, _y, mTextPaint);
+        //float[] r = GetTextBox(_text, _x, _y);
+        //DrawRect(r[0],r[1],r[2], r[3]);
+    }
+
+    public float[] GetTextBox(String _text, float _x, float _y) {
+        float[] r = new float[4];
+        r[0]= _x; //left
+        r[1]= _y-GetTextHeight(_text); //top
+        r[2]= _x+GetTextWidth(_text); //right
+        r[3]= _y; //bottom
+        return r;
+    }
+
+    //http://spacetech.dk/android-graphics-rotate-example.html
+    public void DrawText(String _text, float _x, float _y, float _angleDegree) {
+        DrawText(_text, _x, _y, _angleDegree, false);
+    }
+
+    public void DrawText(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
+        //draw bounding rect before rotating text
+        Rect rect = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+        mCanvas.save();
+        //rotate the canvas on center of the text to draw
+        if (_rotateCenter)
+           mCanvas.rotate(_angleDegree, _x + rect.exactCenterX(), _y + rect.exactCenterY());
+        else
+           mCanvas.rotate(_angleDegree, _x, _y);
+
+        mCanvas.drawText(_text, _x, _y, mTextPaint);
+        mCanvas.restore();
     }
 
     public void DrawLine(float[] _points) {
-        mCanvas.drawLines(_points, mPaint);
+        mCanvas.drawLines(_points, mDrawPaint);
     }
 
     public void DrawPoint(float _x1, float _y1) {
-        mCanvas.drawPoint(_x1, _y1, mPaint);
+        mCanvas.drawPoint(_x1, _y1, mDrawPaint);
     }
 
     public void DrawCircle(float _cx, float _cy, float _radius) {
-        mCanvas.drawCircle(_cx, _cy, _radius, mPaint);
+        mCanvas.drawCircle(_cx, _cy, _radius, mDrawPaint);
     }
 
     public void DrawBackground(int _color) {
+        //mBackgroundColor = _color;
         mCanvas.drawColor(_color);
     }
 
     public void DrawRect(float _left, float _top, float _right, float _bottom) {
-        mCanvas.drawRect(_left, _top, _right, _bottom, mPaint);
+        mCanvas.drawRect(_left, _top, _right, _bottom, mDrawPaint);
     }
 
     //https://thoughtbot.com/blog/android-canvas-drawarc-method-a-visual-guide
     public void DrawArc(float _leftRectF, float _topRectF, float _rightRectF, float _bottomRectF, float _startAngle, float _sweepAngle, boolean _useCenter) {
         RectF oval = new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF);
-        mCanvas.drawArc(oval, _startAngle, _sweepAngle, _useCenter, mPaint);
+        mCanvas.drawArc(oval, _startAngle, _sweepAngle, _useCenter, mDrawPaint);
     }
 
     public void DrawOval(float _leftRectF, float _topRectF, float _rightRectF, float _bottomRectF) {
-        mCanvas.drawOval(new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF), mPaint);
+        mCanvas.drawOval(new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF), mDrawPaint);
     }
 
     private int GetDrawableResourceId(String _resName) {
-		try {
-			Class<?> res = R.drawable.class;
-			Field field = res.getField(_resName);  //"drawableName"
-			int drawableId = field.getInt(null);
-			return drawableId;
-		} catch (Exception e) {
-			//Log.e("jDrawingView", "Failure to get drawable id.", e);
-			return 0;
-		}
-	}
+        try {
+            Class<?> res = R.drawable.class;
+            Field field = res.getField(_resName);  //"drawableName"
+            int drawableId = field.getInt(null);
+            return drawableId;
+        } catch (Exception e) {
+            //Log.e("jDrawingView", "Failure to get drawable id.", e);
+            return 0;
+        }
+    }
 
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable) (this.controls.activity.getResources().getDrawable(_resID));
-	}
+    private Drawable GetDrawableResourceById(int _resID) {
+        if (_resID == 0) return null; // by tr3e
+        return (Drawable) (this.controls.activity.getResources().getDrawable(_resID));
+    }
 
-	public void SetImageByResourceIdentifier(String _imageResIdentifier) {
-		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
-		Bitmap bmp = ((BitmapDrawable) d).getBitmap();
-		this.DrawBitmap(bmp);
-		this.invalidate();
-	}
+    public void SetImageByResourceIdentifier(String _imageResIdentifier) {
+        int id = GetDrawableResourceId(_imageResIdentifier);
+        if (id == 0) return; // by tr3e
+        Drawable d = GetDrawableResourceById(id);
+        if (d == null) return;
 
-	public void DrawBitmap(Bitmap _bitmap) {
-		int w = _bitmap.getWidth();
-		int h = _bitmap.getHeight();
-		Rect rect = new Rect(0, 0, w, h);
-		Bitmap bmp = GetResizedBitmap(_bitmap, w, h);
-		mCanvas.drawBitmap(bmp, null, rect, mPaint);
-		/*					  
-	    if ( (_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {								                   	   
-			int nh = (int) ( _bitmap.getHeight() * (512.0 / _bitmap.getWidth()) );	
-			Bitmap scaled = Bitmap.createScaledBitmap(_bitmap,512, nh, true);
-			mCanvas.drawBitmap(scaled,null,rect,mPaint);			
-		}
-		else {
-			mCanvas.drawBitmap(_bitmap,null,rect,mPaint);
-		}
-	    */
-	}
+        Bitmap bmp = ((BitmapDrawable) d).getBitmap();
+        this.DrawBitmap(bmp);
+        this.invalidate();
+    }
 
-	public void SetMinZoomFactor(float _minZoomFactor) {
-		MIN_ZOOM = _minZoomFactor;
-	}
+    public void DrawBitmap(Bitmap _bitmap) {
+        int w = _bitmap.getWidth();
+        int h = _bitmap.getHeight();
+        Rect rect = new Rect(0, 0, w, h);
+        Bitmap bmp = GetResizedBitmap(_bitmap, w, h);
+        mCanvas.drawBitmap(bmp, null, rect, mDrawPaint);
+    }
 
-	public void SetMaxZoomFactor(float _maxZoomFactor) {
-		MAX_ZOOM = _maxZoomFactor;
-	}
+    public void SetMinZoomFactor(float _minZoomFactor) {
+        MIN_ZOOM = _minZoomFactor;
+    }
 
-	public Canvas GetCanvas() {
-		return mCanvas;
-	}
+    public void SetMaxZoomFactor(float _maxZoomFactor) {
+        MAX_ZOOM = _maxZoomFactor;
+    }
 
-	//by CC
-	public void DrawTextAligned(String _text, float _left, float _top, float _right, float _bottom, float _alignHorizontal, float _alignVertical) {
-		Rect bounds = new Rect();
-		mPaint.getTextBounds(_text, 0, _text.length(), bounds);
-		float x = _left + (_right - _left - bounds.width()) * _alignHorizontal;
-		float y = _top + (_bottom - _top - bounds.height()) * _alignVertical + bounds.height();
-		mCanvas.drawText(_text, x, y, mPaint);
-	}
+    public Canvas GetCanvas() {
+        return mCanvas;
+    }
 
-	public Path GetPath(float[] _points) { // path.reset();
-		int len = _points.length;
-		//Log.i("len=",""+ len);
-		mPath.reset();
-		mPath.moveTo(_points[0], _points[1]);
-		//Log.i("px="+_points[0],"py="+_points[1]);
-		int i = 2;
-		while ((i + 1) < len) {
-			//Log.i("px="+_points[i],"py="+_points[i+1]);
-			mPath.lineTo(_points[i], _points[i + 1]); //2,3  4,5
-			i = i + 2;
-		}
-		//mPath.close();
-		return mPath;
-	}
+    //by CC
+    public void DrawTextAligned(String _text, float _left, float _top, float _right, float _bottom, float _alignHorizontal, float _alignVertical) {
+        Rect bounds = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), bounds);
+        float x = _left + (_right - _left - bounds.width()) * _alignHorizontal;
+        float y = _top + (_bottom - _top - bounds.height()) * _alignVertical + bounds.height();
+        mCanvas.drawText(_text, x, y, mTextPaint);
+    }
+
+    public Path GetPath(float[] _points) { // path.reset();
+        int len = _points.length;
+        mPath.reset();
+        mPath.moveTo(_points[0], _points[1]);
+        int i = 2;
+        while ((i + 1) < len) {
+            mPath.lineTo(_points[i], _points[i + 1]); //2,3  4,5
+            i = i + 2;
+        }
+        //mPath.close();
+        return mPath;
+    }
 
     public Path GetPath() { // path.reset();
         return mPath;
@@ -748,10 +811,8 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         //Log.i("len=",""+ len);
         Path path = new Path();
         path.moveTo(_points[0], _points[1]);
-        //Log.i("px="+_points[0],"py="+_points[1]);
         int i = 2;
         while ((i + 1) < len) {
-            //Log.i("px="+_points[i],"py="+_points[i+1]);
             path.lineTo(_points[i], _points[i + 1]); //2,3  4,5
             i = i + 2;
         }
@@ -766,12 +827,9 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     public Path AddPointsToPath(Path _path, float[] _points) {
         int len = _points.length;
-        //Log.i("len=",""+ len);
         _path.moveTo(_points[0], _points[1]);
-        //Log.i("px="+_points[0],"py="+_points[1]);
         int i = 2;
         while ((i + 1) < len) {
-            //Log.i("px="+_points[i],"py="+_points[i+1]);
             _path.lineTo(_points[i], _points[i + 1]); //2,3  4,5
             i = i + 2;
         }
@@ -780,49 +838,167 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public Path AddPathToPath(Path _srcPath, Path _targetPath, float _dx, float _dy) {
-       _targetPath.addPath(_srcPath, _dx, _dy);
-       return _targetPath;
+        _targetPath.addPath(_srcPath, _dx, _dy);
+        return _targetPath;
     }
 
-	public void DrawPath(Path _path) {
-		//mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
-		mCanvas.drawPath(_path, mPaint);
-	}
-
-	public void DrawPath(float[] _points) {
-		//mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
-		mCanvas.drawPath(GetPath(_points), mPaint);
-	}
-
-	public void DrawTextOnPath(Path _path, String _text, int _horOffest, int _verOffeset) {
-        mCanvas.drawTextOnPath(_text, _path, _horOffest, _verOffeset, mPaint);
-        //setLayerType(View.LAYER_TYPE_SOFTWARE, null); // Required for API level 11 or higher.
+    public void DrawPath(Path _path) {
+        //mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
+        mCanvas.drawPath(_path, mDrawPaint);
     }
 
-    public void DrawTextOnPath(String _text, int _xOffest, int _yOffeset) {
-	    if (! mPath.isEmpty()) {
-            mCanvas.drawTextOnPath(_text, mPath, _xOffest, _yOffeset, mPaint);
-            //setLayerType(View.LAYER_TYPE_SOFTWARE, null); // Required for API level 11 or higher.
+    public void DrawPath(float[] _points) {
+        //mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
+        mCanvas.drawPath(GetPath(_points), mDrawPaint);
+    }
+
+    public void DrawTextOnPath(Path _path, String _text, float _xOffset, float _yOffset) {
+        //setLayerType(View.LAYER_TYPE_SOFTWARE, mPaint); // Required for API level 11 or higher.
+        mCanvas.drawTextOnPath(_text, _path, _xOffset, _yOffset, mTextPaint);
+        //setLayerType(View.LAYER_TYPE_SOFTWARE, mPaint); // Required for API level 11 or higher.
+    }
+
+    public void DrawTextOnPath(String _text, float _xOffset, float _yOffset) {
+        if (!mPath.isEmpty()) {
+            //setLayerType(View.LAYER_TYPE_SOFTWARE, mPaint); // Required for API level 11 or higher.
+            mCanvas.drawTextOnPath(_text, mPath, _xOffset, _yOffset, mTextPaint);
         }
     }
 
-    public int GetViewPortX(float _worldX, float _minWorldX, float _maxWorldX,  int  _viewPortWidth) {
-	   float escX;
-	   int r;
-	   escX = _viewPortWidth/(_maxWorldX-_minWorldX);
-	   r =(int)(escX*(_worldX-_minWorldX)); //round
-        // Log.i("X="+ _worldX, "rx = " + r );
-	   return r;
+    //https://blog.danlew.net/2013/10/03/centering_single_line_text_in_a_canvas/   TODO
+    //https://ivankocijan.xyz/android-drawing-multiline-text-on-canvas/
+    public void DrawTextMultiLine(String _text, float _left, float _top, float _right, float _bottom) {
+        Rect bounds = new Rect((int) _left, (int) _top, (int) _right, (int) _bottom);
+        //Static layout which will be drawn on canvas
+        //bounds.width - width of the layout
+        //Layout.Alignment.ALIGN_CENTER - layout alignment
+        //1 - text spacing multiply
+        //1 - text spacing add
+        //true - include padding
+        StaticLayout sl = new StaticLayout(_text, mTextPaint, bounds.width(), Layout.Alignment.ALIGN_CENTER, 1, 1, true);
+        mCanvas.save();
+        //calculate X and Y coordinates - In this case we want to draw the text in the
+        //center of canvas so we calculate
+        //text height and number of lines to move Y coordinate to center.
+        float textHeight = getTextHeight(_text, mTextPaint);
+        int numberOfTextLines = sl.getLineCount();
+        float textYCoordinate = bounds.exactCenterY() - ((numberOfTextLines * textHeight) / 2);
+        //text will be drawn from left
+        float textXCoordinate = bounds.left;
+        mCanvas.translate(textXCoordinate, textYCoordinate);
+        //draws static layout on canvas
+        sl.draw(mCanvas);
+        mCanvas.restore();
     }
 
-	public int GetViewPortY(float _worldY, float _minWorldY, float _maxWorldY, int  _viewPortHeight) {
-		float escY;
-		int r;
-		escY = -(_viewPortHeight-10)/(_maxWorldY-_minWorldY);
-		r = (int)(escY*(_worldY-_maxWorldY)); //round]
-        //Log.i("Y="+_worldY, "ry = " + r);
-		return r;
-	}
+    private float getTextHeight(String text, Paint paint /*textPaint*/) {
+        Rect rect = new Rect();
+        paint.getTextBounds(text, 0, text.length(), rect);
+        return rect.height();
+    }
+
+    public float GetTextHeight(String _text) {
+        Rect rect = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+        return rect.height();
+    }
+
+    public float GetTextWidth(String _text) {
+        Rect rect = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+        return rect.width();
+    }
+
+    public int GetViewportX(float _worldX, float _minWorldX, float _maxWorldX, int _viewPortWidth) {
+        float escX;
+        int r;
+        escX = _viewPortWidth / (_maxWorldX - _minWorldX);
+        r = (int) (escX * (_worldX - _minWorldX)); //round
+        return r;
+    }
+
+    public int GetViewportY(float _worldY, float _minWorldY, float _maxWorldY, int _viewPortHeight) {
+        float escY;
+        int r;
+        escY = -(_viewPortHeight - 10) / (_maxWorldY - _minWorldY);
+        r = (int) (escY * (_worldY - _maxWorldY)); //round]
+        return r;
+    }
+
+    public void Invalidate() {
+        this.invalidate();
+    }
+
+    public void Clear(int _color) {
+        if (_color != 0)
+           mCanvas.drawColor(_color);
+        else
+            mCanvas.drawColor(Color.WHITE);
+    }
+
+    public void Clear() {
+        if (mBackgroundColor != 0)
+            mCanvas.drawColor(mBackgroundColor);
+        else
+            mCanvas.drawColor(Color.WHITE);
+    }
+
+    public void SetBufferedDraw(boolean _value) {
+        mBufferedDraw = _value;
+        if (mBufferedDraw) {
+            // Create bitmap, create canvas with bitmap, fill canvas with color.
+            if (mBitmap == null) {
+                mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+                mCanvas = new Canvas(mBitmap);
+                // Fill the Bitmap with the background color.
+                if (mBackgroundColor != 0)
+                    mCanvas.drawColor(mBackgroundColor);
+                else
+                    mCanvas.drawColor(Color.WHITE);
+            }
+        }
+    }
+
+    public void SetFontAndTextTypeFace(int fontFace, int fontStyle) {
+        Typeface t = null;
+        switch (fontFace) {
+            case 0: {
+                t = Typeface.DEFAULT;
+                break;}
+            case 1: {
+                t = Typeface.SANS_SERIF;
+                break;}
+            case 2: {
+                t = Typeface.SERIF;
+                break;}
+            case 3:{
+                t = Typeface.MONOSPACE;
+                break;}
+        }  //fontStyle = (tfNormal/0, tfBold/1, tfItalic/2, tfBoldItalic/3); //Typeface.BOLD_ITALIC
+        mTextPaint.setTypeface(Typeface.create(t, fontStyle));
+    }
+
+    public void SetFontFromAssets(String _fontName) {   //   "fonts/font1.ttf"  or  "font1.ttf"
+        Typeface customfont = Typeface.createFromAsset(controls.activity.getAssets(), _fontName);
+        mTextPaint.setTypeface(customfont);
+    }
+
+    public void DrawTextFromAssetsFont(String _text, float _x, float _y, String _assetsFontName, int _size, int _color) {
+        TextPaint textPaint = new TextPaint();
+        textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setColor(_color);
+        float unit = controls.activity.getResources().getDisplayMetrics().density;
+        textPaint.setTextSize(_size*unit); //
+        Typeface assetsfont = Typeface.createFromAsset(controls.activity.getAssets(), _assetsFontName);
+        textPaint.setTypeface(assetsfont);
+        mCanvas.drawText(_text, _x, _y, textPaint);
+    }
+
+    public void SetBackgroundColor(int _backgroundColor) {
+        mBackgroundColor = _backgroundColor;
+        this.setBackgroundColor(mBackgroundColor);
+        //mCanvas.drawColor(mBackgroundColor);
+    }
 
 } //end class
 

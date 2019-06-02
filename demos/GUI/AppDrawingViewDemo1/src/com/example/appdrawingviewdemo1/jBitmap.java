@@ -62,12 +62,19 @@ private int GetDrawableResourceId(String _resName) {
 
 //by jmpessoa
 private Drawable GetDrawableResourceById(int _resID) {
+	if( _resID == 0 ) return null; // by tr3e
+	
 	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
 }
 
 //by jmpessoa
-public  void loadRes(String imgResIdentifier) { 
-	   int id =	GetDrawableResourceId(imgResIdentifier);	
+public  void loadRes(String imgResIdentifier) {
+	    bmp = null;
+	    
+	    int id =	GetDrawableResourceId(imgResIdentifier);
+	    
+	    if( id == 0 ) return; // by tr3e
+	    
 	    BitmapFactory.Options bo = new BitmapFactory.Options();
 	    bo.inScaled = false; 
 	    bmp =  BitmapFactory.decodeResource(this.controls.activity.getResources(), id, bo);	
@@ -106,14 +113,17 @@ public Bitmap LoadFromFile(String _fullFilename) {  //pascal  "GetImageFromFile"
 }
 
 public  int[] getWH() {
-int[] wh = new int[2];
-wh[0] = 0; // width
-wh[1] = 0; // height
-if ( bmp != null ) {
-wh[0] = bmp.getWidth();
-wh[1] = bmp.getHeight();
-}
-return ( wh );
+ int[] wh = new int[2];
+ 
+ wh[0] = 0; // width
+ wh[1] = 0; // height
+ 
+ if ( bmp != null ) {
+  wh[0] = bmp.getWidth();
+  wh[1] = bmp.getHeight();
+ }
+ 
+ return ( wh );
 }
 
 public  int GetWidth() {
@@ -144,6 +154,8 @@ public  Bitmap jInstance() {
 }
 
 public byte[] GetByteArrayFromBitmap() {
+  if(bmp == null) return null;
+  
   ByteArrayOutputStream stream = new ByteArrayOutputStream();
   this.bmp.compress(CompressFormat.PNG, 0, stream); //O: PNG will ignore the quality setting...
   //Log.i("GetByteArrayFromBitmap","size="+ stream.size());
@@ -151,12 +163,16 @@ public byte[] GetByteArrayFromBitmap() {
 }
 
 public void SetByteArrayToBitmap(byte[] image) {
+	if(image == null) return;
+	
 	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
 	//Log.i("SetByteArrayToBitmap","size="+ image.length);
 }
 
 //http://androidtrainningcenter.blogspot.com.br/2012/05/bitmap-operations-like-re-sizing.html
 public Bitmap ClockWise(Bitmap _bmp, ImageView _imageView){
+  if(_bmp == null) return null;
+	
   Matrix mMatrix = new Matrix();
   Matrix mat= _imageView.getImageMatrix();    
   mMatrix.set(mat);
@@ -165,6 +181,8 @@ public Bitmap ClockWise(Bitmap _bmp, ImageView _imageView){
 } 
 
 public Bitmap AntiClockWise(Bitmap _bmp, ImageView _imageView){
+  if(_bmp == null) return null;
+	
   Matrix mMatrix = new Matrix();
   Matrix mat= _imageView.getImageMatrix();    
   mMatrix.set(mat);
@@ -172,7 +190,9 @@ public Bitmap AntiClockWise(Bitmap _bmp, ImageView _imageView){
   return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);    
 }
 
-public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {  
+public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {
+  if(_bmp == null) return null;
+	
   Matrix mMatrix = new Matrix();
   Matrix mat= _imageView.getImageMatrix();    
   mMatrix.set(mat);        
@@ -187,6 +207,7 @@ public Bitmap SetScale(ImageView _imageView, float _scaleX, float _scaleY ) {
 	mMatrix.setScale(_scaleX, _scaleY);		
 	bmp = Bitmap.createBitmap(bmp , 0, 0, bmp.getWidth(), bmp.getHeight(), mMatrix, false);
 	return bmp;*/
+	if(_imageView == null) return null;
 	// CREATE A MATRIX FOR THE MANIPULATION	 
 	Matrix matrix = new Matrix();
 	// RESIZE THE BIT MAP
@@ -204,6 +225,7 @@ public Bitmap LoadFromAssets(String strName)
       istr = assetManager.open(strName);
   } catch (IOException e) {
       e.printStackTrace();
+      return null;
   }
   bmp = BitmapFactory.decodeStream(istr);    
   return bmp;
@@ -211,6 +233,8 @@ public Bitmap LoadFromAssets(String strName)
 
 //ref http://sunil-android.blogspot.com.br/2013/03/resize-bitmap-bitmapcreatescaledbitmap.html
 public Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
+ if( _bmp == null ) return null;
+	
  float factorH = _newHeight / (float)_bmp.getHeight();
  float factorW = _newWidth / (float)_bmp.getWidth();
  float factorToUse = (factorH > factorW) ? factorW : factorH;
@@ -221,6 +245,8 @@ public Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
 }
 
 public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
+ if(bmp == null) return null;
+	
  float factorH = _newHeight / (float)bmp.getHeight();
  float factorW = _newWidth / (float)bmp.getWidth();
  float factorToUse = (factorH > factorW) ? factorW : factorH;
@@ -231,6 +257,8 @@ public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
 }
 
 public Bitmap GetResizedBitmap(float _factorScaleX, float _factorScaleY ){
+ if(bmp == null) return null;
+	
  float factorToUse = (_factorScaleY > _factorScaleX) ? _factorScaleX : _factorScaleY;
  Bitmap bm = Bitmap.createScaledBitmap(bmp,
    (int) (bmp.getWidth() * factorToUse),
@@ -244,7 +272,9 @@ public ByteBuffer GetByteBuffer(int _width, int _height) {
 }
 
 
-public ByteBuffer GetByteBufferFromBitmap(Bitmap _bmap) {	  
+public ByteBuffer GetByteBufferFromBitmap(Bitmap _bmap) {
+	if( _bmap == null ) return null;
+	
 	int w =  _bmap.getWidth();
 	int h =_bmap.getHeight();
 	//Log.i("w="+w, "h="+h); ok
@@ -269,14 +299,17 @@ public ByteBuffer GetByteBufferFromBitmap() {
   return graphicBuffer;    
 }
 
-public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	 
-	  _byteBuffer.rewind();  //reset position
-	  bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
+public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {
+	if( (_byteBuffer == null) || (bmp == null) ) return null;
+	
+	_byteBuffer.rewind();  //reset position
+	bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
     bmp.copyPixelsFromBuffer(_byteBuffer); 	
     return bmp;
 }
 
 public Bitmap GetBitmapFromByteArray(byte[] _image) {
+	if( _image == null ) return null;
  //this.bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
 	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
 	return bmp;	
@@ -288,6 +321,7 @@ public Bitmap GetBitmapFromByteArray(byte[] _image) {
  * http://www.androiddevelopersolutions.com/2012/09/crop-image-in-circular-shape-in-android.html
  */
 public Bitmap GetRoundedShape(Bitmap _bitmapImage, int _diameter) {
+ if(_bitmapImage == null) return null;
  // TODO Auto-generated method stub	
  Bitmap sourceBitmap = _bitmapImage;
  Path path = new Path();

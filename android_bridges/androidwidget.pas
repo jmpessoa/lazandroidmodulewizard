@@ -630,7 +630,7 @@ type
 
   TLayoutRelativeTo = (lrParent, lrAnchor);
 
-  TPaintStyle = (psFill , psFillAndStroke, psStroke);
+  TPaintStyle = (psDefault, psFill , psFillAndStroke, psStroke);
 
   TActivityMode = (actMain, actRecyclable, actSplash, actEasel);  //Conteiner
 

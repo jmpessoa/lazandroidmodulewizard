@@ -1,3 +1,3 @@
-public java.lang.Object jDrawingView_jCreate(long _Self, boolean _bufferedDraw) {
-  return (java.lang.Object)(new jDrawingView(this,_Self,_bufferedDraw));
+public java.lang.Object jDrawingView_jCreate(long _Self, boolean _bufferedDraw, int _backgroundColor) {
+  return (java.lang.Object)(new jDrawingView(this,_Self,_bufferedDraw, _backgroundColor));
 }

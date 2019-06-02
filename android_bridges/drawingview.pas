@@ -58,10 +58,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure Init(refApp: jApp); override;
     procedure Refresh;
     procedure UpdateLayout; override;
-
-   // procedure GenEvent_OnClick(Obj: TObject);
-    //function jCreate(): jObject;
-    function jCreate( _bufferedDraw: boolean): jObject;
+    function jCreate( _bufferedDraw: boolean; _backgroundColor: integer): jObject;
 
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
@@ -83,7 +80,6 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
     procedure DrawBitmap(_bitmap: jObject; _left: integer; _top: integer; _right: integer; _bottom: integer); overload;
 
-    procedure SetTypeface(_typeface: TFontFace);
     procedure SetPaintStrokeWidth(_width: single);
     procedure SetPaintStyle(_style: TPaintStyle);  //TPaintStyle
     procedure SetPaintColor( _color: TARGBColorBridge); //
@@ -156,6 +152,14 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure Clear(_color: TARGBColorBridge); overload;
     procedure Clear();  overload;
     procedure SetBufferedDraw(_value: boolean);
+    function GetTextHeight(_text: string): single;
+    function GetTextWidth(_text: string): single;
+
+    procedure SetFontFace(AValue: TFontFace);
+    procedure SetTextTypeFace(AValue: TTextTypeFace);
+    procedure SetFontFromAssets(_fontName: string);
+    procedure DrawTextFromAssetsFont(_text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: TARGBColorBridge);
+    function GetTextBox(_text: string; _x: single; _y: single): TDynArrayOfSingle;
 
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
@@ -168,7 +172,9 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
 
     property FontSize: DWord read FFontSize write SetTextSize;
-    property FontFace: TFontFace read FFontFace write SetTypeface;
+    property FontFace: TFontFace read FFontFace write SetFontface;
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
+
     property PaintStrokeWidth: single read FPaintStrokeWidth write SetPaintStrokeWidth;
     property PaintStyle: TPaintStyle read FPaintStyle write SetPaintStyle;
     property PaintColor: TARGBColorBridge read FPaintColor write SetPaintColor;
@@ -192,8 +198,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView
 
 end;
 
-//function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean; this: jObject): jObject;
+function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean;  _backgroundColor: integer; this: jObject): jObject;
 procedure jDrawingView_jFree(env: PJNIEnv; _jdrawingview: JObject);
 procedure jDrawingView_SetViewParent(env: PJNIEnv; _jdrawingview: JObject; _viewgroup: jObject);
 procedure jDrawingView_RemoveFromViewParent(env: PJNIEnv; _jdrawingview: JObject);
@@ -270,6 +275,14 @@ procedure jDrawingView_Clear(env: PJNIEnv; _jdrawingview: JObject; _color: integ
 procedure jDrawingView_Clear(env: PJNIEnv; _jdrawingview: JObject); overload;
 procedure jDrawingView_SetBufferedDraw(env: PJNIEnv; _jdrawingview: JObject; _value: boolean);
 
+function jDrawingView_GetTextHeight(env: PJNIEnv; _jdrawingview: JObject; _text: string): single;
+function jDrawingView_GetTextWidth(env: PJNIEnv; _jdrawingview: JObject; _text: string): single;
+procedure jDrawingView_SetFontAndTextTypeFace(env: PJNIEnv; _jdrawingview: JObject; _fontFace: integer; _fontStyle: integer);
+
+procedure jDrawingView_SetFontFromAssets(env: PJNIEnv; _jdrawingview: JObject; _fontName: string);
+procedure jDrawingView_DrawTextFromAssetsFont(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: integer);
+procedure jDrawingView_SetBackgroundColor(env: PJNIEnv; _jdrawingview: JObject; _backgroundColor: integer);
+function jDrawingView_GetTextBox(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single): TDynArrayOfSingle;
 
 implementation
 
@@ -286,19 +299,18 @@ begin
   FLParamWidth  := lpWrapContent; //lpMatchParent;
   FLParamHeight := lpWrapContent;
   FHeight       := 100;
-  FWidth        := 100;
+  FWidth        := 200;
   FAcceptChildrenAtDesignTime:= False;
-
 //your code here....
 (*  FMouches.Mouch.Active := False;
   FMouches.Mouch.Start  := False;
   FMouches.Mouch.Zoom   := 1.0;
   FMouches.Mouch.Angle  := 0.0; *)
-
   FFontFace:= ffNormal;
+  FTextTypeFace:= tfNormal;
   FFontSize:= 0;
   FPaintStrokeWidth:= 1;
-  FPaintStyle:= psStroke;
+  FPaintStyle:= psDefault;
   FPaintColor:= colbrRed;
 
   FMinZoomFactor:= 1/4;
@@ -307,6 +319,7 @@ begin
   FPaintStrokeJoin:= sjDefault;
   FPaintStrokeCap:= scDefault;
   FBufferedDraw:= False;
+  FColor:= colbrWhite;
 
 end;
 
@@ -333,8 +346,7 @@ begin
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   //FjObject:= jCreate(); //jSelf !
-   FjObject:= jCreate(FBufferedDraw); //jSelf !
+   FjObject:= jCreate(FBufferedDraw, GetARGB(FCustomColor, FColor)); //jSelf !
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -377,7 +389,8 @@ begin
    if FPaintStrokeWidth > 1 then
      jDrawingView_SetPaintWidth(FjEnv, FjObject, FPaintStrokeWidth);
 
-   jDrawingView_SetPaintStyle(FjEnv, FjObject, ord(FPaintStyle));
+   if  FPaintStyle <> psDefault then
+     jDrawingView_SetPaintStyle(FjEnv, FjObject, ord(FPaintStyle));
 
    if  FPaintColor <> colbrDefault then
    jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
@@ -385,8 +398,8 @@ begin
    if FFontSize <> 0 then
      jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
 
-   if FFontFace <> ffNormal then
-     jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
+   if (FFontFace <> ffNormal) or (FTextTypeFace <> tfNormal) then //jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
+     jDrawingView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
    if FPaintStrokeJoin <>  sjDefault then
         jDrawingView_SetPaintStrokeJoin(FjEnv, FjObject, Ord(FPaintStrokeJoin));
@@ -397,8 +410,8 @@ begin
    if FImageIdentifier <> '' then
      jDrawingView_SetImageByResourceIdentifier(FjEnv, FjObject , FImageIdentifier);
 
-   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+  // if  FColor <> colbrDefault then
+    //View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
@@ -407,8 +420,8 @@ end;
 procedure jDrawingView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
-  if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+  if (FInitialized = True) and (FColor <> colbrDefault)  then //View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    jDrawingView_SetBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jDrawingView.SetVisible(Value : Boolean);
 begin
@@ -442,16 +455,9 @@ begin
 end;
 *)
 
-{
-function jDrawingView.jCreate(): jObject;
+function jDrawingView.jCreate( _bufferedDraw: boolean;  _backgroundColor: integer): jObject;
 begin
-   Result:= jDrawingView_jCreate(FjEnv, int64(Self), FjThis);
-end;
-}
-
-function jDrawingView.jCreate( _bufferedDraw: boolean): jObject;
-begin
-   Result:= jDrawingView_jCreate(FjEnv, int64(Self) ,_bufferedDraw, FjThis);
+   Result:= jDrawingView_jCreate(FjEnv, int64(Self) ,_bufferedDraw, _backgroundColor, FjThis);
 end;
 
 
@@ -632,14 +638,6 @@ begin
   FFontSize:= _textSize;
   if FInitialized then
      jDrawingView_SetTextSize(FjEnv, FjObject, _textSize);
-end;
-
-procedure jDrawingView.SetTypeface(_typeface: TFontFace);
-begin
-  //in designing component state: set value here...
-  FFontFace:= _typeface;
-  if FInitialized then
-     jDrawingView_SetTypeface(FjEnv, FjObject, Ord(_typeface));
 end;
 
 procedure jDrawingView.DrawLine(_x1: single; _y1: single; _x2: single; _y2: single);
@@ -1043,6 +1041,56 @@ begin
      jDrawingView_SetBufferedDraw(FjEnv, FjObject, _value);
 end;
 
+function jDrawingView.GetTextHeight(_text: string): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetTextHeight(FjEnv, FjObject, _text);
+end;
+
+function jDrawingView.GetTextWidth(_text: string): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetTextWidth(FjEnv, FjObject, _text);
+end;
+
+
+procedure jDrawingView.SetFontFace(AValue: TFontFace);
+begin
+ FFontFace:= AValue;
+ if(FInitialized) then
+   jDrawingView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+
+procedure jDrawingView.SetTextTypeFace(AValue: TTextTypeFace);
+begin
+  FTextTypeFace:= AValue ;
+  if(FInitialized) then
+    jDrawingView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+
+procedure jDrawingView.SetFontFromAssets(_fontName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_SetFontFromAssets(FjEnv, FjObject, _fontName);
+end;
+
+procedure jDrawingView.DrawTextFromAssetsFont(_text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawTextFromAssetsFont(FjEnv, FjObject, _text ,_x ,_y ,_assetsFontName ,_size ,GetARGB(FCustomColor, _color));
+end;
+
+function jDrawingView.GetTextBox(_text: string; _x: single; _y: single): TDynArrayOfSingle;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetTextBox(FjEnv, FjObject, _text ,_x ,_y);
+end;
+
 procedure jDrawingView.SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);
 begin
     FMinWorldX:= minX;
@@ -1109,31 +1157,17 @@ end;
 
 {-------- jDrawingView_JNI_Bridge ----------}
 
-(*
-function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean; _backgroundColor: integer; this: jObject): jObject;
 var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].j:= _Self;
-  jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jDrawingView_jCreate', '(J)Ljava/lang/Object;');
-  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
-end;
-*)
-
-function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean; this: jObject): jObject;
-var
-  jParams: array[0..1] of jValue;
+  jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
   jParams[1].z:= JBool(_bufferedDraw);
+  jParams[2].i:= _backgroundColor;
   jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jDrawingView_jCreate', '(JZ)Ljava/lang/Object;');
+  jMethod:= env^.GetMethodID(env, jCls, 'jDrawingView_jCreate', '(JZI)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
@@ -2220,5 +2254,119 @@ begin
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jDrawingView_GetTextHeight(env: PJNIEnv; _jdrawingview: JObject; _text: string): single;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextHeight', '(Ljava/lang/String;)F');
+  Result:= env^.CallFloatMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jDrawingView_GetTextWidth(env: PJNIEnv; _jdrawingview: JObject; _text: string): single;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextWidth', '(Ljava/lang/String;)F');
+  Result:= env^.CallFloatMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_SetFontAndTextTypeFace(env: PJNIEnv; _jdrawingview: JObject; _fontFace: integer; _fontStyle: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _fontFace;
+  jParams[1].i:= _fontStyle;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontAndTextTypeFace', '(II)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_SetFontFromAssets(env: PJNIEnv; _jdrawingview: JObject; _fontName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fontName));
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawTextFromAssetsFont(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: integer);
+var
+  jParams: array[0..5] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].l:= env^.NewStringUTF(env, PChar(_assetsFontName));
+  jParams[4].i:= _size;
+  jParams[5].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextFromAssetsFont', '(Ljava/lang/String;FFLjava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[3].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_SetBackgroundColor(env: PJNIEnv; _jdrawingview: JObject; _backgroundColor: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _backgroundColor;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundColor', '(I)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jDrawingView_GetTextBox(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single): TDynArrayOfSingle;
+var
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextBox', '(Ljava/lang/String;FF)[F');
+  jResultArray:= env^.CallObjectMethodA(env, _jdrawingview, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    env^.GetFloatArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

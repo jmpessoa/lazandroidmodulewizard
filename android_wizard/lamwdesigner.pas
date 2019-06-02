@@ -1988,9 +1988,6 @@ end;
 
 procedure TAndroidWidgetMediator.GetObjInspNodeImageIndex(APersistent: TPersistent; var AIndex: integer);
 begin
-
-  //if (APersistent as TAndroidWidget).Name = '' then Exit;  //+++
-
   if (APersistent is TAndroidWidget) and (TAndroidWidget(APersistent).AcceptChildrenAtDesignTime) then
     AIndex:= FormEditingHook.GetCurrentObjectInspector.ComponentTree.ImgIndexBox
   else if (APersistent is TAndroidWidget) then
