@@ -12,6 +12,7 @@ import android.graphics.CornerPathEffect;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -220,7 +221,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int act = event.getAction() & MotionEvent.ACTION_MASK;
-     //get pointer index from the event object
+        //get pointer index from the event object
         int pointerIndex = event.getActionIndex();
         // get pointer ID
         int pointerId = event.getPointerId(pointerIndex);
@@ -437,7 +438,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
             mCanvas = new Canvas(mBitmap);
             // Fill the Bitmap with the background color.
             if (mBackgroundColor != 0 )
-               mCanvas.drawColor(mBackgroundColor);
+                mCanvas.drawColor(mBackgroundColor);
             else
                 mCanvas.drawColor(Color.WHITE);
         }
@@ -540,7 +541,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 		    int scaleFactor = 1;
 		    if ((right > 0) && (bottom > 0)) {
 		        scaleFactor = Math.min(bitmap.getWidth()/(right-left), bitmap.getHeight()/(bottom-top));
-		    }	
+		    }
 			*/
         Rect rect = new Rect(_left, _top, _right, _bottom);
         if ((_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {
@@ -640,39 +641,243 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         mCanvas.drawLine(_x1, _y1, _x2, _y2, mDrawPaint);
     }
 
+    public float[] GetTextBox(String _text, float _x, float _y) {
+        float[] r = new float[4];
+        r[0]= _x; //left
+        r[1]= _y - GetTextHeight(_text); //top
+        r[2]= _x + GetTextWidth(_text); //right
+        r[3]= _y; //bottom
+        return r;
+    }
+
+    class Pointf{
+        public float x;
+        public float y;
+    }
+
+    private Pointf[] GetTextBoxEx(String _text, float _x, float _y) {
+
+        Pointf[] box = new Pointf[4];
+
+        for(int i = 0; i < 4 ; i++)  {
+            box[i] = new Pointf();
+        }
+
+        box[0].x = _x; //left
+        box[0].y = _y - GetTextHeight(_text); //top
+
+        box[1].x = _x + GetTextWidth(_text); //right
+        box[1].y = _y - GetTextHeight(_text); //top
+
+        box[2].x = _x; //left
+        box[2].y = _y; //bottom
+
+        box[3].x = _x + GetTextWidth(_text); //right
+        box[3].y = _y; //bottom
+        //DrawLine(box[0].x, box[0].y, box[1].x, box[1].y);
+        //DrawLine(box[2].x, box[2].y, box[3].x, box[3].y);
+        //DrawLine(box[0].x, box[0].y, box[2].x, box[2].y);
+        //DrawLine(box[1].x, box[1].y, box[3].x, box[3].y);
+        return box;
+    }
+
+    public float[] GetTextBox(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
+        //draw bounding rect before rotating text
+        Pointf[] box = GetTextBoxEx(_text, _x, _y);
+        Pointf c;  //center
+        float[] r8 = new float[8]; //return
+        Rect rect = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+        mCanvas.save();
+        //rotate the canvas on center of the text to draw
+        if (_rotateCenter) {
+            mCanvas.rotate(_angleDegree, _x + rect.exactCenterX(), _y + rect.exactCenterY());
+        }
+        else {
+            mCanvas.rotate(_angleDegree, _x, _y);
+        }
+        //mCanvas.drawText(_text, _x, _y, mTextPaint);
+        mCanvas.restore();
+        if (_rotateCenter) {
+            c = GetTextCenter(box[0],box[3]);
+        }else {
+            c =  box[2];
+        }
+        Pointf[] rotatedBox =  GetRotatedBoxEx(box, c, _angleDegree);
+        r8[0] = rotatedBox[0].x; //left-top
+        r8[1] = rotatedBox[0].y;
+
+        r8[2] = rotatedBox[1].x; //right-top
+        r8[3] = rotatedBox[1].y;
+
+        r8[4] = rotatedBox[2].x; //left-bottom
+        r8[5] = rotatedBox[2].y;
+
+        r8[6] = rotatedBox[3].x; //right-bottom
+        r8[7] = rotatedBox[3].y;
+
+        return r8;
+    }
+
     public void DrawText(String _text, float _x, float _y) {
         mCanvas.drawText(_text, _x, _y, mTextPaint);
         //float[] r = GetTextBox(_text, _x, _y);
         //DrawRect(r[0],r[1],r[2], r[3]);
     }
 
-    public float[] GetTextBox(String _text, float _x, float _y) {
-        float[] r = new float[4];
-        r[0]= _x; //left
-        r[1]= _y-GetTextHeight(_text); //top
-        r[2]= _x+GetTextWidth(_text); //right
-        r[3]= _y; //bottom
+    public float[] DrawTextEx(String _text, float _x, float _y) {
+        DrawText(_text, _x, _y);
+        float[] r = GetTextBox(_text, _x, _y);
+        //DrawRect(r[0],r[1],r[2], r[3]);
         return r;
     }
 
-    //http://spacetech.dk/android-graphics-rotate-example.html
     public void DrawText(String _text, float _x, float _y, float _angleDegree) {
         DrawText(_text, _x, _y, _angleDegree, false);
     }
 
+    public Pointf GetTextCenter(Pointf d1, Pointf d2) {
+        Pointf c = new Pointf();
+        c.x = (d1.x +d2.x)/2;
+        c.y = (d1.y + d2.y)/2;
+        return c;
+    }
+    //https://stackoverflow.com/questions/20936429/rotating-a-rectangle-shaped-polygon-around-its-center-java
+    public float[] rotatePoint(float x, float y, float cx, float cy, float angle) {
+
+        float[] r = new float[2];
+
+        float radian=(float)angle*3.14f/180;
+
+        //TRANSLATE TO ORIGIN
+        float x1 = x - cx;
+        float y1 = y - cy;
+
+        //APPLY ROTATION
+        double temp_x1 =  (x1 * Math.cos(radian) - y1 * Math.sin(radian));
+        double temp_y1 =  (x1 * Math.sin(radian) + y1 * Math.cos(radian));
+
+        //TRANSLATE BACK
+        r[0] = (float) temp_x1 + cx;
+        r[1] = (float) temp_y1 + cy;
+
+        return r;
+    }
+
+    public float[] GetRotatedBox(float x1, float y1, float x2, float y2, float _angleDegree) {
+        float[] r = new float[4];
+        float[] p;
+
+        r[0] = x1;
+        r[1] = y1;
+
+        p = rotatePoint(x2, y2, x1, y1, _angleDegree);
+
+        r[2] = p[0];
+        r[3] = p[1];
+
+        return r;
+    }
+
+    private Pointf[] GetRotatedBoxEx(Pointf[] box, Pointf _rotateCenter, float _angleDegree) {
+        int count = box.length;
+        float[] p;
+        Pointf[] r = new Pointf[count];
+        for(int i = 0; i < count ; i++)  {
+            r[i] = new Pointf();
+        }
+        for(int i = 0; i < count; i++) {
+            p = rotatePoint(box[i].x, box[i].y, _rotateCenter.x, _rotateCenter.y, _angleDegree);
+            r[i].x = p[0];
+            r[i].y = p[1];
+        }
+        return r;
+    }
+
     public void DrawText(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
-        //draw bounding rect before rotating text
         Rect rect = new Rect();
         mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
         mCanvas.save();
         //rotate the canvas on center of the text to draw
-        if (_rotateCenter)
-           mCanvas.rotate(_angleDegree, _x + rect.exactCenterX(), _y + rect.exactCenterY());
-        else
-           mCanvas.rotate(_angleDegree, _x, _y);
-
+        if (_rotateCenter) {
+            mCanvas.rotate(_angleDegree, _x + rect.exactCenterX(), _y + rect.exactCenterY());
+        }
+        else {
+            mCanvas.rotate(_angleDegree, _x, _y);
+        }
         mCanvas.drawText(_text, _x, _y, mTextPaint);
         mCanvas.restore();
+    }
+
+    public float[] DrawTextEx(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
+        //draw bounding rect before rotating text
+        Pointf[] box = GetTextBoxEx(_text, _x, _y);
+        Pointf c;  //center
+        float[] r8 = new float[8]; //return
+
+        Rect rect = new Rect();
+
+        mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+        mCanvas.save();
+        //rotate the canvas on center of the text to draw
+        if (_rotateCenter) {
+            mCanvas.rotate(_angleDegree, _x + rect.exactCenterX(), _y + rect.exactCenterY());
+        }
+        else {
+            mCanvas.rotate(_angleDegree, _x, _y);
+        }
+        mCanvas.drawText(_text, _x, _y, mTextPaint);
+        mCanvas.restore();
+
+        if (_rotateCenter) {
+            c = GetTextCenter(box[0],box[3]);
+        }else {
+            c =  box[2];
+        }
+        Pointf[] rotatedBox =  GetRotatedBoxEx(box, c, _angleDegree);
+        //DrawLine(rotatedBox[0].x, rotatedBox[0].y, rotatedBox[1].x, rotatedBox[1].y);
+        // DrawLine(rotatedBox2].x, rotatedBox[2].y, rotatedBox[3].x, rotatedBox[3].y);
+        //DrawLine(rotatedBox[0].x, rotatedBox[0].y, rotatedBox[2].x, rotatedBox[2].y);
+        //DrawLine(rotatedBox[1].x, rotatedBox[1].y, rotatedBox[3].x, rotatedBox[3].y);
+        r8[0] = rotatedBox[0].x; //left-top
+        r8[1] = rotatedBox[0].y;
+
+        r8[2] = rotatedBox[1].x; //right-top
+        r8[3] = rotatedBox[1].y;
+
+        r8[4] = rotatedBox[2].x; //left-bottom
+        r8[5] = rotatedBox[2].y;
+
+        r8[6] = rotatedBox[3].x; //right-bottom
+        r8[7] = rotatedBox[3].y;
+
+        return r8;
+    }
+
+    public float[] DrawTextEx(String _text, float _x, float _y, float _angleDegree) {
+        float[] r8;
+        r8 = DrawTextEx(_text,_x, _y, _angleDegree, false);
+        return r8;
+    }
+
+        //by CC
+    public void DrawTextAligned(String _text, float _left, float _top, float _right, float _bottom, float _alignHorizontal, float _alignVertical) {
+        Rect bounds = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), bounds);
+        float x = _left + (_right - _left - bounds.width()) * _alignHorizontal;
+        float y = _top + (_bottom - _top - bounds.height()) * _alignVertical + bounds.height();
+        mCanvas.drawText(_text, x, y, mTextPaint);
+    }
+
+    public float[] DrawTextAlignedEx(String _text, float _left, float _top, float _right, float _bottom, float _alignHorizontal, float _alignVertical) {
+        Rect bounds = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), bounds);
+        float x = _left + (_right - _left - bounds.width()) * _alignHorizontal;
+        float y = _top + (_bottom - _top - bounds.height()) * _alignVertical + bounds.height();
+        mCanvas.drawText(_text, x, y, mTextPaint);
+        float[] r = GetTextBox(_text, x, y);
+        //DrawRect(r[0],r[1],r[2], r[3]);
+        return r;
     }
 
     public void DrawLine(float[] _points) {
@@ -694,6 +899,26 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     public void DrawRect(float _left, float _top, float _right, float _bottom) {
         mCanvas.drawRect(_left, _top, _right, _bottom, mDrawPaint);
+    }
+
+    public void DrawRect(float _P0x, float _P0y,
+                         float _P1x, float _P1y,
+                         float _P2x, float _P2y,
+                         float _P3x, float _P3y) {
+        DrawLine(_P0x, _P0y, _P1x, _P1y); //top horiz
+        DrawLine(_P1x, _P1y, _P3x, _P3y); //rigth vert
+        DrawLine(_P3x, _P3y, _P2x, _P2y); //bottom horiz
+        DrawLine(_P2x, _P2y, _P0x, _P0y); //left vert
+    }
+
+    public void DrawRect(float[] _box) {
+
+        if (_box.length != 8) return;
+
+        DrawLine(_box[0], _box[1], _box[2], _box[3]); //PO - P1
+        DrawLine(_box[2], _box[3], _box[6], _box[7]); //P1 - P3
+        DrawLine(_box[6], _box[7], _box[4], _box[5]); //P3 - P2
+        DrawLine(_box[4], _box[5], _box[0], _box[1]); //P2 - P0
     }
 
     //https://thoughtbot.com/blog/android-canvas-drawarc-method-a-visual-guide
@@ -752,15 +977,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     public Canvas GetCanvas() {
         return mCanvas;
-    }
-
-    //by CC
-    public void DrawTextAligned(String _text, float _left, float _top, float _right, float _bottom, float _alignHorizontal, float _alignVertical) {
-        Rect bounds = new Rect();
-        mTextPaint.getTextBounds(_text, 0, _text.length(), bounds);
-        float x = _left + (_right - _left - bounds.width()) * _alignHorizontal;
-        float y = _top + (_bottom - _top - bounds.height()) * _alignVertical + bounds.height();
-        mCanvas.drawText(_text, x, y, mTextPaint);
     }
 
     public Path GetPath(float[] _points) { // path.reset();
@@ -931,7 +1147,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     public void Clear(int _color) {
         if (_color != 0)
-           mCanvas.drawColor(_color);
+            mCanvas.drawColor(_color);
         else
             mCanvas.drawColor(Color.WHITE);
     }

@@ -119,7 +119,11 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure DrawPoint(_x1: single; _y1: single);
     procedure DrawCircle(_cx: single; _cy: single; _radius: single);
     procedure DrawBackground(_color: integer);
-    procedure DrawRect(_left: single; _top: single; _right: single; _bottom: single);
+
+    procedure DrawRect(_left: single; _top: single; _right: single; _bottom: single); overload;
+    //procedure DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
+    procedure DrawRect(var _xyArray8: TDynArrayOfSingle); overload;
+    procedure DrawRect(var _xyArray8: array of single); overload;
 
     procedure SetImageByResourceIdentifier(_imageResIdentifier: string);    // ../res/drawable
     procedure DrawBitmap(_bitmap: jObject);  overload;
@@ -159,7 +163,63 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure SetTextTypeFace(AValue: TTextTypeFace);
     procedure SetFontFromAssets(_fontName: string);
     procedure DrawTextFromAssetsFont(_text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: TARGBColorBridge);
-    function GetTextBox(_text: string; _x: single; _y: single): TDynArrayOfSingle;
+
+    {GetTextBox :: result len=4
+     array[0] => x //left-top
+     array[1] => y
+     array[2] => x //right-bottom
+     array[3] => y}
+    function GetTextBox(_text: string; _x: single; _y: single): TDynArrayOfSingle; overload;
+
+    {GetTextBox :: result len=8
+     array[0] => x //left-top
+     array[1] => y
+     array[2] => x //right-top
+     array[3] => y
+     array[4] => x //left-bottom
+     array[5] => y
+     array[6] => x //right-bottom
+     array[7] => y}
+    function GetTextBox(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;overload;
+
+    {DrawTextEx :: result len=4
+     array[0] => x //left-top
+     array[1] => y
+     array[2] => x //right-bottom
+     array[3] => y}
+    function DrawTextEx(_text: string; _x: single; _y: single): TDynArrayOfSingle; overload;
+
+    {DrawTextEx :: result len=8
+    array[0] => x //left-top
+    array[1] => y
+    array[2] => x //right-top
+    array[3] => y
+    array[4] => x //left-bottom
+    array[5] => y
+    array[6] => x //right-bottom
+    array[7] => y}
+    function DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle; overload;
+
+
+    {DrawTextEx :: result len=8
+    array[0] => x //left-top
+    array[1] => y
+    array[2] => x //right-top
+    array[3] => y
+    array[4] => x //left-bottom
+    array[5] => y
+    array[6] => x //right-bottom
+    array[7] => y}
+    function DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;  overload;
+
+
+    {DrawTextAlignedEx  :: result len=4
+    array[0] => x //left-top
+    array[1] => y
+    array[2] => x //right-bottom
+    array[3] => y}
+    function DrawTextAlignedEx(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
+
 
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
@@ -231,7 +291,11 @@ procedure jDrawingView_DrawLine(env: PJNIEnv; _jdrawingview: JObject; var _point
 procedure jDrawingView_DrawPoint(env: PJNIEnv; _jdrawingview: JObject; _x1: single; _y1: single);
 procedure jDrawingView_DrawCircle(env: PJNIEnv; _jdrawingview: JObject; _cx: single; _cy: single; _radius: single);
 procedure jDrawingView_DrawBackground(env: PJNIEnv; _jdrawingview: JObject; _color: integer);
-procedure jDrawingView_DrawRect(env: PJNIEnv; _jdrawingview: JObject; _left: single; _top: single; _right: single; _bottom: single);
+
+procedure jDrawingView_DrawRect(env: PJNIEnv; _jdrawingview: JObject; _left: single; _top: single; _right: single; _bottom: single);  overload;
+//procedure jDrawingView_DrawRect(env: PJNIEnv; _jdrawingview: JObject; _P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
+procedure jDrawingView_DrawRect(env: PJNIEnv; _jdrawingview: JObject; var _xyArray8: TDynArrayOfSingle); overload;
+procedure jDrawingView_DrawRect(env: PJNIEnv; _jdrawingview: JObject; var _xyArray8: array of single); overload;
 
 procedure jDrawingView_SetImageByResourceIdentifier(env: PJNIEnv; _jdrawingview: JObject; _imageResIdentifier: string);
 procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject);  overload;
@@ -282,7 +346,14 @@ procedure jDrawingView_SetFontAndTextTypeFace(env: PJNIEnv; _jdrawingview: JObje
 procedure jDrawingView_SetFontFromAssets(env: PJNIEnv; _jdrawingview: JObject; _fontName: string);
 procedure jDrawingView_DrawTextFromAssetsFont(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: integer);
 procedure jDrawingView_SetBackgroundColor(env: PJNIEnv; _jdrawingview: JObject; _backgroundColor: integer);
-function jDrawingView_GetTextBox(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single): TDynArrayOfSingle;
+function jDrawingView_GetTextBox(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single): TDynArrayOfSingle; overload;
+function jDrawingView_GetTextBox(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle; overload;
+
+function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single): TDynArrayOfSingle; overload;
+function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle; overload;
+function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;  overload;
+function jDrawingView_DrawTextAlignedEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
+
 
 implementation
 
@@ -751,6 +822,20 @@ begin
      jDrawingView_DrawRect(FjEnv, FjObject, _left ,_top ,_right ,_bottom);
 end;
 
+procedure jDrawingView.DrawRect(var _xyArray8: TDynArrayOfSingle);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawRect(FjEnv, FjObject, _xyArray8);
+end;
+
+procedure jDrawingView.DrawRect(var _xyArray8: array of single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawRect(FjEnv, FjObject, _xyArray8);
+end;
+
 procedure jDrawingView.SetImageByResourceIdentifier(_imageResIdentifier: string);
 begin
   //in designing component state: set value here...
@@ -1090,6 +1175,50 @@ begin
   if FInitialized then
    Result:= jDrawingView_GetTextBox(FjEnv, FjObject, _text ,_x ,_y);
 end;
+
+function jDrawingView.GetTextBox(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetTextBox(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
+end;
+
+function jDrawingView.DrawTextEx(_text: string; _x: single; _y: single): TDynArrayOfSingle;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_DrawTextEx(FjEnv, FjObject, _text ,_x ,_y);
+end;
+
+function jDrawingView.DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_DrawTextEx(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
+end;
+
+function jDrawingView.DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_DrawTextEx(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree);
+end;
+
+function jDrawingView.DrawTextAlignedEx(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_DrawTextAlignedEx(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom ,_alignHorizontal ,_alignVertical);
+end;
+
+(*
+procedure jDrawingView.DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawRect(FjEnv, FjObject, _P0x ,_P0y ,_P1x ,_P1y ,_P2x ,_P2y ,_P3x ,_P3y);
+end;
+*)
 
 procedure jDrawingView.SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);
 begin
@@ -2169,7 +2298,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jDrawingView_DrawText(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);
 var
   jParams: array[0..4] of jValue;
@@ -2368,5 +2496,196 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single): TDynArrayOfSingle;
+var
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextEx', '(Ljava/lang/String;FF)[F');
+  jResultArray:= env^.CallObjectMethodA(env, _jdrawingview, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    env^.GetFloatArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;
+var
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _angleDegree;
+  jParams[4].z:= JBool(_rotateCenter);
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextEx', '(Ljava/lang/String;FFFZ)[F');
+  jResultArray:= env^.CallObjectMethodA(env, _jdrawingview, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    env^.GetFloatArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;
+var
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _angleDegree;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextEx', '(Ljava/lang/String;FFF)[F');
+  jResultArray:= env^.CallObjectMethodA(env, _jdrawingview, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    env^.GetFloatArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_DrawTextAlignedEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
+var
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _left;
+  jParams[2].f:= _top;
+  jParams[3].f:= _right;
+  jParams[4].f:= _bottom;
+  jParams[5].f:= _alignHorizontal;
+  jParams[6].f:= _alignVertical;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextAlignedEx', '(Ljava/lang/String;FFFFFF)[F');
+  jResultArray:= env^.CallObjectMethodA(env, _jdrawingview, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    env^.GetFloatArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jDrawingView_GetTextBox(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;
+var
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _angleDegree;
+  jParams[4].z:= JBool(_rotateCenter);
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextBox', '(Ljava/lang/String;FFFZ)[F');
+  jResultArray:= env^.CallObjectMethodA(env, _jdrawingview, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    env^.GetFloatArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+(*
+procedure jDrawingView_DrawRect(env: PJNIEnv; _jdrawingview: JObject; _P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single);
+var
+  jParams: array[0..7] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _P0x;
+  jParams[1].f:= _P0y;
+  jParams[2].f:= _P1x;
+  jParams[3].f:= _P1y;
+  jParams[4].f:= _P2x;
+  jParams[5].f:= _P2y;
+  jParams[6].f:= _P3x;
+  jParams[7].f:= _P3y;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawRect', '(FFFFFFFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+*)
+
+procedure jDrawingView_DrawRect(env: PJNIEnv; _jdrawingview: JObject; var _xyArray8: TDynArrayOfSingle);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_xyArray8);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_xyArray8[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawRect', '([F)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawRect(env: PJNIEnv; _jdrawingview: JObject; var _xyArray8: array of single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_xyArray8);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_xyArray8[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawRect', '([F)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

@@ -150,7 +150,11 @@ III. USING LAMW
 
 			[This is your Android App/Apk name]
 
-	2.6-[MinSdk] Select the  Min. Device Api need to run your App:
+	2.6-[MinNkd] Select the  Min. NDK api:
+
+		example: 22         [warning ndkpi > 22 will not run on old 4.x devices]
+
+	2.7-[MinSdk] Select the  Min. Device Api need to run your App:
 
 		example: 14
 

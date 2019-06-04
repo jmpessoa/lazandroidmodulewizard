@@ -131,7 +131,8 @@ var
    path: jObjectRef;
    i, j: integer;
    px, py: single;
-   boxArray: TDynArrayOfSingle;
+   boxArray4: TDynArrayOfSingle;
+   boxArray8: TDynArrayOfSingle;
 begin
 
    w1:= jDrawingView1.Width;
@@ -175,7 +176,11 @@ begin
    jDrawingView1.DrawPath(path);
    SetLength(points, 0);
 
-   jDrawingView1.DrawText('F(X) = X * X - 4', jDrawingView1.GetViewportX(0), jDrawingView1.GetViewportY(0), -45);
+   //NEW!
+   boxArray8:= jDrawingView1.DrawTextEx('F(X) = X * X - 4', jDrawingView1.GetViewportX(0), jDrawingView1.GetViewportY(0), -45, True);
+   //jDrawingView1.DrawPath(boxArray8); //just to be noted...
+   jDrawingView1.DrawRect(boxArray8);
+   SetLength(boxArray8, 0);
 
    jDrawingView1.DrawTextMultiLine('All theory is gray... But forever green is the tree of life. Johann Wolfgang von Goethe',
                                    jDrawingView1.GetViewportX(-2), jDrawingView1.GetViewportY(2),  //p1
@@ -197,10 +202,14 @@ begin
 
   jDrawingView1.DrawBitmap(jBitmap1.GetImage(), P.X, P.Y, -45);
 
-  jDrawingView1.DrawText('P(x,y)=(' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',10,h1-30);
-  boxArray:= jDrawingView1.GetTextBox('P(x,y)=(' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',10,h1-30);
-  jDrawingView1.DrawRect(boxArray[0] {left}, boxArray[1]{top}, boxArray[2]{}, boxArray[3]{bottom});
-  SetLength(boxArray, 0);
+  //jDrawingView1.DrawTextEx('P(x,y)=(' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',10,h1-30);
+  //boxArray4:= jDrawingView1.GetTextBox('P(x,y)=(' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',10,h1-30);
+
+  //NEW!
+  boxArray4:= jDrawingView1.DrawTextEx('P(x,y)=(' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',10,h1-30);
+  jDrawingView1.DrawRect(boxArray4[0] {left}, boxArray4[1]{top}, boxArray4[2]{right}, boxArray4[3]{bottom});
+
+  SetLength(boxArray4, 0);
 
 end;
 

@@ -1362,7 +1362,7 @@ end;
     FFontSize     : DWord;
     FFontSizeUnit: TFontSizeUnit;
 
-    FFontColor     : TARGBColorBridge;
+    //FFontColor     : TARGBColorBridge;
     FFontFace: TFontFace;
     FTextTypeFace: TTextTypeFace;
     FHintTextColor: TARGBColorBridge;
@@ -2396,7 +2396,7 @@ begin
   FVisible   := True;
 
   FColor     := colbrDefault;  //background
-  FFontColor := colbrDefault;
+ // FFontColor := colbrDefault;
   FFontFace := ffNormal;
 
   FFontSize  := 0; //default size!
