@@ -622,8 +622,8 @@ end;
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
   strList, listRequirements, requiredList: TStringList;
-  i, p, k, minsdkApi: integer;
-  strTargetApi, tempStr, sdkManifestTarqet, sdkManifestMinApi: string;
+  i, p, k, minsdkApi, sdkManifMInApiNumber: integer;
+  strTargetApi, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
   AndroidTheme: string;
   androidPluginStr: string;
   androidPluginNumber: integer;
@@ -671,6 +671,24 @@ begin
                      FPathToAndroidProject+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
        end;
     end;
+  end;
+
+  minsdkApi:= 14;
+
+  sdkManifMinApi:= GetMinSDKFromManifest();
+  if sdkManifMinApi <> '' then
+    sdkManifMInApiNumber:= StrToInt(sdkManifMinApi)
+  else
+    sdkManifMInApiNumber:= 0;
+
+  if sdkManifMInApiNumber < minsdkApi  then
+  begin
+    strList.Clear;
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+    tempStr:= strList.Text;
+    tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+sdkManifMinApi+'"' , 'android:minSdkVersion="'+IntToStr(minsdkApi)+'"', [rfReplaceAll,rfIgnoreCase]);
+    strList.Text:= tempStr;
+    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
   end;
 
   sdkManifestTarqet:= GetTargetFromManifest();
@@ -802,14 +820,16 @@ begin
          gradleCompatible:= FGradleVersion;
          if not TryGradleCompatibility(pluginVersion, FGradleVersion, outgradleCompatible) then
          begin
-             if MessageDlg('Warning ','plugin "'+pluginVersion+'", "build-tools "'+buildTool+ '" require Gradle "'+outgradleCompatible+'"' +sLineBreak + '[current: "'+FGradleVersion+'"]',
+             if MessageDlg('Warning ','plugin "'+pluginVersion+'" [build-tools "'+buildTool+ '"] require Gradle "'+outgradleCompatible+'"' +sLineBreak + '[current Gradle: "'+FGradleVersion+'"]' + sLineBreak + 'Select [Ignore] to try compatibility...',
                 mtConfirmation, [mbOk, mbIgnore], 0) = mrOk then
                 begin
                    gradleCompatible:= outgradleCompatible;
-                   ShowMessage('Please, update to Gradle "'+outgradleCompatible+'" ' + sLineBreak + 'https://gradle.org/releases/');
+                   ShowMessage('[Ok] Please, update to Gradle "'+outgradleCompatible+'" ' + sLineBreak + 'https://gradle.org/releases/');
                 end
                 else
+                begin
                    pluginVersion:= TryPluginCompatibility(FGradleVersion);
+                end;
          end;
 
          androidPluginStr:= StringReplace(pluginVersion,'.', '', [rfReplaceAll]);
@@ -923,16 +943,10 @@ begin
 
          strList.Add('    defaultConfig {');
 
-         sdkManifestMinApi:= GetMinSDKFromManifest();
-
-         if  sdkManifestMinApi <> '' then
-            minsdkApi:= StrToInt(sdkManifestMinApi)
+         if sdkManifMInApiNumber >= minsdkApi then
+            strList.Add('            minSdkVersion ' + sdkManifMInApi)
          else
-            minsdkApi:= 14;
-
-         if minsdkApi < 14 then minsdkApi:= 14;
-
-         strList.Add('            minSdkVersion '+sdkManifestMinApi);
+            strList.Add('            minSdkVersion '+IntToStr(minsdkApi));
 
          if targetApi <= StrToInt(buildToolApi) then
             strList.Add('            targetSdkVersion '+IntToStr(targetApi))
