@@ -281,6 +281,7 @@ procedure jEditText_SetFontFromAssets(env: PJNIEnv; _jedittext: JObject; _fontNa
 procedure jEditText_RequestFocus(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetCloseSoftInputOnEnter(env: PJNIEnv; _jedittext: JObject; _closeSoftInput: boolean);
 procedure jEditText_SetCapSentence(env: PJNIEnv; _jedittext: JObject; _capSentence: boolean);
+procedure jEditText_SetCaptureBackPressed(env: PJNIEnv; _jedittext: JObject; _capBackPressed: boolean); // by tr3e
 
 procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _path: string; _fileName: string);  overload;
 procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
@@ -2879,6 +2880,20 @@ begin
   jParams[0].z:= JBool(_capSentence);
   jCls:= env^.GetObjectClass(env, _jedittext);
   jMethod:= env^.GetMethodID(env, jCls, 'SetCapSentence', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// by tr3e
+procedure jEditText_SetCaptureBackPressed(env: PJNIEnv; _jedittext: JObject; _capBackPressed: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_capBackPressed);
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCaptureBackPressed', '(Z)V');
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

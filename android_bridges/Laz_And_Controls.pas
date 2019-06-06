@@ -982,6 +982,7 @@ type
 
     FOnLostFocus: TOnEditLostFocus;
     FOnEnter  : TOnNotify;
+    FOnBackPressed : TOnNotify; // by tr3e
     FOnChange : TOnChange;
     FOnChanged : TOnChange;
     FEditable: boolean;
@@ -989,6 +990,7 @@ type
     FTextAlignment: TTextAlignment;
     FCloseSoftInputOnEnter: boolean;
     FCapSentence: boolean;
+    FCaptureBackPressed: boolean; // by tr3e
 
     procedure AllCaps();
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -1020,6 +1022,7 @@ type
     procedure SetHintTextColor(Value: TARGBColorBridge);
 
     Procedure GenEvent_OnEnter (Obj: TObject);
+    Procedure GenEvent_OnBackPressed(Obj: TObject); // by tr3e
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -1076,6 +1079,7 @@ type
     procedure RequestFocus();
     procedure SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
     procedure SetCapSentence(_capSentence: boolean);
+    procedure SetCaptureBackPressed(_capBackPressed: boolean); // by tr3e
 
     procedure LoadFromFile(_path: string; _filename: string);  overload;
     procedure LoadFromFile(_filename: string);  overload;
@@ -1115,10 +1119,12 @@ type
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property CloseSoftInputOnEnter: boolean read FCloseSoftInputOnEnter write SetCloseSoftInputOnEnter;
     property CapSentence: boolean read FCapSentence write SetCapSentence;
+    property CaptureBackPressed: boolean read FCaptureBackPressed write SetCaptureBackPressed; // by tr3e
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     // Event
     property OnLostFocus: TOnEditLostFocus read FOnLostFocus write FOnLostFocus;
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
+    property OnBackPressed: TOnNotify  read FOnBackPressed write FOnBackPressed; // by tr3e
     property OnChange: TOnChange read FOnChange write FOnChange;
     property OnChanged: TOnChange read FOnChanged write FOnChanged;
     property OnClick : TOnNotify read FOnClick   write FOnClick;
@@ -2122,6 +2128,7 @@ type
   Procedure Java_Event_pOnChanged(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
 
   Procedure Java_Event_pOnEnter                  (env: PJNIEnv; this: jobject; Obj: TObject);
+  Procedure Java_Event_pOnBackPressed            (env: PJNIEnv; this: jobject; Obj: TObject); // by tr3e
   Procedure Java_Event_pOnTimer                  (env: PJNIEnv; this: jobject; Obj: TObject);
   Procedure Java_Event_pOnTouch                  (env: PJNIEnv; this: jobject; Obj: TObject;act,cnt: integer; x1,y1,x2,y2: single);
 
@@ -3232,6 +3239,37 @@ begin
 
 end;
 
+// by tr3e
+Procedure Java_Event_pOnBackPressed(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if not Assigned(Obj) then Exit;
+
+  if Obj is jEditText then
+  begin
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnBackPressed(Obj);
+    Exit;
+  end;
+
+  (*if Obj is jComboEditText then
+  begin
+    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
+    jComboEditText(Obj).GenEvent_OnEnter(Obj);
+    Exit;
+  end;
+
+  if Obj is jAutoTextView then
+  begin
+    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
+    jAutoTextView(Obj).GenEvent_OnEnter(Obj);
+    Exit;
+  end; *)
+
+end;
+
 Procedure Java_Event_pOnTimer(env: PJNIEnv; this: jobject; Obj: TObject);
 Var
   Timer : jTimer;
@@ -4117,7 +4155,8 @@ begin
   FLParamWidth  := lpHalfOfParent;
   FLParamHeight := lpWrapContent;
   FCloseSoftInputOnEnter:= True;
-  FCapSentence  := False;
+  FCapSentence        := False;
+  FCaptureBackPressed := False;
 end;
 
 Destructor jEditText.Destroy;
@@ -4215,6 +4254,9 @@ begin
 
    if FCapSentence then
     jEditText_SetCapSentence(FjEnv, FjObject, FCapSentence);
+
+   if FCaptureBackPressed then
+    jEditText_SetCaptureBackPressed(FjEnv, FjObject, FCaptureBackPressed);
 
    jEditText_setSingleLine(FjEnv, FjObject , True);
 
@@ -4487,6 +4529,12 @@ begin
   if Assigned(FOnEnter) then FOnEnter(Obj);
 end;
 
+// by tr3e
+Procedure jEditText.GenEvent_OnBackPressed(Obj: TObject);
+begin
+  if Assigned(FOnBackPressed) then FOnBackPressed(Obj);
+end;
+
 Procedure jEditText.GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
 begin
   if jForm(Owner).FormState = fsFormClose then Exit;
@@ -4731,6 +4779,17 @@ begin
      jEditText_SetCapSentence(FjEnv, FjObject, _capSentence);
   // activate above setting
   SetInputTypeEx(FInputTypeEx);
+end;
+
+// by tr3e
+procedure jEditText.SetCaptureBackPressed(_capBackPressed: boolean);
+begin
+  //in designing component state: set value here...
+  FCaptureBackPressed:= _capBackPressed;
+
+  if FInitialized then
+     jEditText_SetCaptureBackPressed(FjEnv, FjObject, _capBackPressed);
+
 end;
 
 procedure jEditText.LoadFromFile(_path: string; _filename: string);

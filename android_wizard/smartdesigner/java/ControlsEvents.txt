@@ -28,6 +28,7 @@ pOnDoubleClick=Java_Event_pOnDoubleClick(PEnv,this,TObject(pasobj),value);
 pOnChange=Java_Event_pOnChange(PEnv,this,TObject(pasobj),txt,count);
 pOnChanged=Java_Event_pOnChanged(PEnv,this,TObject(pasobj),txt,count);
 pOnEnter=Java_Event_pOnEnter(PEnv,this,TObject(pasobj));
+pOnBackPressed=Java_Event_pOnBackPressed(PEnv,this,TObject(pasobj));
 pOnClose=Java_Event_pOnClose(PEnv,this,TObject(pasobj));
 pAppOnViewClick=Java_Event_pAppOnViewClick(PEnv,this,view,id);
 pAppOnListItemClick=Java_Event_pAppOnListItemClick(PEnv,this,adapter,view,position,id);
