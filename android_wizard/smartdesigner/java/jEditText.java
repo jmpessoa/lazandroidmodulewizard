@@ -51,6 +51,7 @@ public class jEditText extends EditText {
 	private boolean canDispatchChangedEvent = false;
 	private boolean mFlagSuggestion = false;
 	private boolean mFlagCapSentence = false;
+	private boolean mFlagCaptureBackPressed = false; // by tr3e
 
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
@@ -98,6 +99,16 @@ public class jEditText extends EditText {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
 				//if (event.getAction() == KeyEvent.ACTION_UP) {
 				    final EditText caption = (EditText)v;
+				    
+				    // by tr3e fix back_key close app
+				    if( mFlagCaptureBackPressed && (KeyEvent.KEYCODE_BACK == keyCode) )
+			        {			            
+				    	InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						controls.pOnBackPressed(LAMWCommon.getPasObj());
+						return true;
+			        }
+				    
 					//if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok
 				    if((event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
 						if (mCloseSoftInputOnEnter) {
@@ -405,6 +416,11 @@ public class jEditText extends EditText {
 
 	public void SetCapSentence(boolean _value) {
 		mFlagCapSentence = _value;
+	}
+	
+	// by tr3e
+	public void SetCaptureBackPressed(boolean _value) {
+		mFlagCaptureBackPressed = _value;
 	}
 
 	public void CopyToClipboard() {
