@@ -307,7 +307,7 @@ begin
   else if api='25' then Result:= 'Nougat 7.1'
   else if api='26' then Result:= 'Oreo 8.0'
   else if api='27' then Result:= 'Oreo 8.1'
-  else if api='28' then Result:= 'Oreo 8.2';
+  else if api='28' then Result:= 'Pie 9.0';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -334,6 +334,7 @@ begin
      12: Result:= 'Nougat 7.1'; // Api(25)
      13: Result:= 'Oreo 8.0'; // Api(26)
      14: Result:= 'Oreo 8.1'; // Api(27)
+     15: Result:= 'Pie 9.0'; // Api(28)
    end;
 end;
 
@@ -344,39 +345,47 @@ var
   intNdkApi: integer;
 begin
 
- ndkApi:= ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
- if ndkApi = '' then Exit;
+ if ListBoxNdkPlatform.ItemIndex >=  0 then
+ begin
 
- FAndroidNdkPlatform:= 'android-'+ ndkApi;
- StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
+   ndkApi:= ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
+   if ndkApi = '' then Exit;
 
- if IsAllCharNumber(PChar(ndkApi))  then  //skip android-P
-      intNdkApi:=StrToInt(ndkApi)
- else
-     intNdkApi:= 22;
+   FAndroidNdkPlatform:= 'android-'+ ndkApi;
+   StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
 
- if intNdkApi  > 22 then
-    ShowMessage('Warning: for compatibility with old devices [4.x, 5.x]'+sLIneBreak+
-                'is strongly recommended NDK API < 23!');
+   if IsAllCharNumber(PChar(ndkApi))  then  //skip android-P
+        intNdkApi:=StrToInt(ndkApi)
+   else
+       intNdkApi:= 22;
 
- if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 5) then
-    ShowMessage('Warning: ARMv8 [aarch64] nedd  NDK Api >= 21');
+   if intNdkApi  > 22 then
+      ShowMessage('Warning: for compatibility with old devices [4.x, 5.x]'+sLIneBreak+
+                  'is strongly recommended NDK API < 23!');
 
- if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 6) then
-    ShowMessage('Warning: x86_64 nedd  NDK Api >= 21');
+   if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 5) then
+      ShowMessage('Warning: ARMv8 [aarch64] nedd  NDK Api >= 21');
+
+   if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 6) then
+      ShowMessage('Warning: x86_64 nedd  NDK Api >= 21');
+ end;
+ //else ShowMessage('Fail! Folder ' + IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms is empty!');
 
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIChange(Sender: TObject);
 begin
-  if ListBoxTargetAPI.Text <> '' then
-     FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
+  if ListBoxTargetAPI.ItemIndex >=0 then
+  begin
+    if ListBoxTargetAPI.Text <> '' then
+       FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
-  if not IsAllCharNumber(PChar(FTargetApi))  then
-    FTargetApi:= '26';
+    if not IsAllCharNumber(PChar(FTargetApi))  then
+      FTargetApi:= '26';
 
-  if StrToInt(FTargetApi) < 26 then
-     ShowMessage('Warning: remember that "google play" store NOW  requires Target Api >= 26 !');
+    if StrToInt(FTargetApi) < 26 then
+       ShowMessage('Warning: remember that "google play" store NOW equires Target Api >= 26 !');
+  end;
 end;
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
