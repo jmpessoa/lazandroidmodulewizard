@@ -467,6 +467,8 @@ procedure jImageView_SetImageFromByteBuffer(env: PJNIEnv; _jimageview: JObject; 
 procedure jImageView_LoadFromURL(env: PJNIEnv; _jimageview: JObject; _url: string);
 procedure jImageView_SaveToFile(env: PJNIEnv; _jimageview: JObject; _filename: string);
 function jImageView_GetView(env: PJNIEnv; _jimageview: JObject): jObject;
+procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; var _items: TDynArrayOfString); overload;
+procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: array of string); overload;
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -4942,6 +4944,51 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; var _items: TDynArrayOfString);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_items);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_items[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowPopupMenu', '([Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: array of string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+begin
+  newSize0:= Length(_items);
+  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+  for i:= 0 to newSize0 - 1 do
+  begin
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_items[i])));
+  end;
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowPopupMenu', '([Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //------------------------------------------------------------------------------
 // ListView

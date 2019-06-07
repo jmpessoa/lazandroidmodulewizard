@@ -1319,6 +1319,8 @@ type
 
   end;
 
+  TOnImageViewPopupItemSelected=procedure(Sender:TObject; caption:string) of object;
+
   jImageView = class(jVisualControl)
   private
     FImageName : string;
@@ -1334,6 +1336,7 @@ type
     FOnTouchUp   : TOnTouchEvent;
     //end tr3e
     FRoundedShape: boolean;
+    FOnPopupItemSelected: TOnImageViewPopupItemSelected;
 
     Procedure SetColor    (Value : TARGBColorBridge);
 
@@ -1415,6 +1418,9 @@ type
     procedure LoadFromURL(_url: string);
     procedure SaveToFile(_filename: string);
     function GetView(): jObject; override;
+    procedure ShowPopupMenu(var _items: TDynArrayOfString); overload;
+    procedure ShowPopupMenu(_items: array of string);   overload;
+    procedure GenEvent_OnImageViewPopupItemSelected(Sender:TObject; caption:string);
 
     property Count: integer read GetCount;
   published
@@ -1427,6 +1433,7 @@ type
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     property RoundedShape: boolean read FRoundedShape write SetRoundedShape;
     // Events
+    property OnPopupItemSelected: TOnImageViewPopupItemSelected read FOnPopupItemSelected write FOnPopupItemSelected;
      property OnClick: TOnNotify read FOnClick write FOnClick;
     //by tre3
     property OnTouchDown : TOnTouchEvent read FOnTouchDown write FOnTouchDown;
@@ -2177,7 +2184,7 @@ type
   Procedure Java_Event_pOnClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
   Procedure Java_Event_pOnLongClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
   procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
-
+  procedure Java_Event_pOnImageViewPopupItemSelected(env:PJNIEnv;this:JObject;Sender:TObject;caption:jString);
 
   //Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
@@ -6501,14 +6508,44 @@ begin
      jImageView_SaveToFile(FjEnv, FjObject, _filename);
 end;
 
+procedure jImageView.ShowPopupMenu(var _items: TDynArrayOfString);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_ShowPopupMenu(FjEnv, FjObject, _items);
+end;
+
+procedure jImageView.ShowPopupMenu(_items: array of string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_ShowPopupMenu(FjEnv, FjObject, _items);
+end;
+
+procedure jImageView.GenEvent_OnImageViewPopupItemSelected(Sender:TObject;caption:string);
+begin
+  if Assigned(FOnPopupItemSelected) then FOnPopupItemSelected(Sender,caption);
+end;
+
 // Event : Java Event -> Pascal
 Procedure jImageView.GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
 begin
-case Act of
- cTouchDown : VHandler_touchesBegan_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchDown,FMouches);
- cTouchMove : VHandler_touchesMoved_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchMove,FMouches);
- cTouchUp   : VHandler_touchesEnded_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchUp  ,FMouches);
+  case Act of
+    cTouchDown : VHandler_touchesBegan_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchDown,FMouches);
+    cTouchMove : VHandler_touchesMoved_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchMove,FMouches);
+    cTouchUp   : VHandler_touchesEnded_withEvent(Obj,Cnt,fXY(X1,Y1),fXY(X2,Y2),FOnTouchUp  ,FMouches);
+  end;
 end;
+
+procedure Java_Event_pOnImageViewPopupItemSelected(env:PJNIEnv;this:JObject;Sender:TObject;caption:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jImageView then
+  begin
+    jForm(jImageView(Sender).Owner).UpdateJNI(gApp);
+    jImageView(Sender).GenEvent_OnImageViewPopupItemSelected(Sender,GetPString(env,caption));
+  end;
 end;
 
   { jImageList }
