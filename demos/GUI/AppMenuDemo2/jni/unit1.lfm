@@ -1,0 +1,112 @@
+object AndroidModule1: TAndroidModule1
+  Left = 374
+  Top = 32
+  Width = 320
+  Height = 400
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  OnCreateOptionMenu = AndroidModule1CreateOptionMenu
+  OnClickOptionMenuItem = AndroidModule1ClickOptionMenuItem
+  object jTextView1: jTextView
+    Left = 87
+    Top = 5
+    Width = 145
+    Height = 26
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Menu Demo 2'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jSpinner1: jSpinner
+    Left = 74
+    Top = 259
+    Width = 106
+    Height = 40
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 2
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Items.Strings = (
+      'Item0'
+      'Item1'
+      'Item2'
+      'Item3'
+    )
+    BackgroundColor = colbrDefault
+    SelectedFontColor = colbrDefault
+    DropListTextColor = colbrDefault
+    DropListBackgroundColor = colbrDefault
+    LastItemAsPrompt = False
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    Alignment = taCenter
+    TextTypeFace = tfNormal
+    SelectedIndex = -1
+    GravityInParent = lgNone
+    SelectedPaddingTop = 15
+    SelectedPaddingBottom = 5
+    OnItemSelected = jSpinner1ItemSelected
+  end
+  object jImageView1: jImageView
+    Left = 52
+    Top = 73
+    Width = 72
+    Height = 72
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Visible = True
+    Id = 3
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    ImageIdentifier = 'bullet_key'
+    ImageScaleType = scaleCenter
+    GravityInParent = lgNone
+    RoundedShape = False
+    OnClick = jImageView1Click
+  end
+  object jMenu1: jMenu
+    Options.Strings = (
+      ''
+    )
+    IconIdentifiers.Strings = (
+      ''
+    )
+    left = 152
+    top = 152
+  end
+end

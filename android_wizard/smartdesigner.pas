@@ -204,7 +204,6 @@ end;
 
 { TLamwSmartDesigner }
 
-
 //http://wiki.freepascal.org/Extending_the_IDE#Event_handlers
 function TLamwSmartDesigner.AddClicked(ADesigner: TIDesigner;
              MouseDownComponent: TComponent; Button: TMouseButton;

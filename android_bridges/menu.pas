@@ -64,6 +64,7 @@ jMenu = class(jControl)
     function GetItemIndexById(_menu: jObject; _id: integer): integer;
     procedure RemoveItemById(_menu: jObject; _id: integer);
     procedure RemoveItemByIndex(_menu: jObject; _index: integer);
+    procedure AddDropDownItem(_menu: jObject; _view: jObject);
 
  published
     property Options: TStrings read FOptions write SetOptions;
@@ -107,7 +108,7 @@ function jMenu_GetItemIdByIndex(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _
 function jMenu_GetItemIndexById(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _id: integer): integer;
 procedure jMenu_RemoveItemById(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _id: integer);
 procedure jMenu_RemoveItemByIndex(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer);
-
+procedure jMenu_AddDropDownItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _view: jObject);
 
 implementation
 
@@ -404,6 +405,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jMenu_RemoveItemByIndex(FjEnv, FjObject, _menu ,_index);
+end;
+
+procedure jMenu.AddDropDownItem(_menu: jObject; _view: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMenu_AddDropDownItem(FjEnv, FjObject, _menu ,_view);
 end;
 
 {-------- jMenu_JNI_Bridge ----------}
@@ -941,7 +949,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jMenu_RemoveItemByIndex(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer);
 var
   jParams: array[0..1] of jValue;
@@ -952,6 +959,20 @@ begin
   jParams[1].i:= _index;
   jCls:= env^.GetObjectClass(env, _jmenu);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveItemByIndex', '(Landroid/view/Menu;I)V');
+  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMenu_AddDropDownItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _view: jObject);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _menu;
+  jParams[1].l:= _view;
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddDropDownItem', '(Landroid/view/Menu;Landroid/view/View;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
