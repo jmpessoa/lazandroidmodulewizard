@@ -93,6 +93,10 @@ jExpandableListView = class(jVisualControl)
     procedure SetFontChildSize(_fontSize: DWord);
     procedure SetImageItemIdentifier(_imageResIdentifier: string);
     procedure SetImageChildItemIdentifier(_imageResIdentifier: string);
+    procedure Clear();
+    procedure ClearChildren(_groupPosition: integer);
+    procedure ClearGroup(_groupPosition: integer);
+
 
     procedure GenEvent_OnGroupExpand(Obj: TObject;  groupPosition: integer; groupHeader: string);
     procedure GenEvent_OnGroupCollapse(Obj: TObject;  groupPosition: integer; groupHeader: string);
@@ -170,6 +174,9 @@ procedure jExpandableListView_SetBackgroundChild(env: PJNIEnv; _jexpandablelistv
 procedure jExpandableListView_SetImageItemIdentifier(env: PJNIEnv; _jexpandablelistview: JObject; _imageResIdentifier: string);
 procedure jExpandableListView_SetImageChildItemIdentifier(env: PJNIEnv; _jexpandablelistview: JObject; _imageResIdentifier: string);
 procedure jExpandableListView_SetHighLightSelectedChildItemColor(env: PJNIEnv; _jexpandablelistview: JObject; _color: integer);
+procedure jExpandableListView_Clear(env: PJNIEnv; _jexpandablelistview: JObject);
+procedure jExpandableListView_ClearChildren(env: PJNIEnv; _jexpandablelistview: JObject; _groupPosition: integer);
+procedure jExpandableListView_ClearGroup(env: PJNIEnv; _jexpandablelistview: JObject; _groupPosition: integer);
 
 
 implementation
@@ -181,7 +188,7 @@ begin
   inherited Create(AOwner);
 
   FHeight       := 96; //??
-  FWidth        := 100; //??
+  FWidth        := 200; //??
 
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
@@ -668,6 +675,28 @@ begin
   if FInitialized then
      jExpandableListView_SetHighLightSelectedChildItemColor(FjEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedChildItemColor));
 end;
+
+procedure jExpandableListView.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jExpandableListView_Clear(FjEnv, FjObject);
+end;
+
+procedure jExpandableListView.ClearChildren(_groupPosition: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jExpandableListView_ClearChildren(FjEnv, FjObject, _groupPosition);
+end;
+
+procedure jExpandableListView.ClearGroup(_groupPosition: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jExpandableListView_ClearGroup(FjEnv, FjObject, _groupPosition);
+end;
+
 
 procedure jExpandableListView.GenEvent_OnGroupCollapse(Obj: TObject;  groupPosition: integer; groupHeader: string);
 begin
@@ -1210,5 +1239,41 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jExpandableListView_Clear(env: PJNIEnv; _jexpandablelistview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jexpandablelistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _jexpandablelistview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jExpandableListView_ClearChildren(env: PJNIEnv; _jexpandablelistview: JObject; _groupPosition: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _groupPosition;
+  jCls:= env^.GetObjectClass(env, _jexpandablelistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearChildren', '(I)V');
+  env^.CallVoidMethodA(env, _jexpandablelistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jExpandableListView_ClearGroup(env: PJNIEnv; _jexpandablelistview: JObject; _groupPosition: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _groupPosition;
+  jCls:= env^.GetObjectClass(env, _jexpandablelistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearGroup', '(I)V');
+  env^.CallVoidMethodA(env, _jexpandablelistview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

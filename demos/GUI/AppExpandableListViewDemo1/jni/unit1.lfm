@@ -8,17 +8,16 @@ object AndroidModule1: TAndroidModule1
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
-  OnCreate = AndroidModule1Create
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 64
+    Left = 35
     Top = 5
-    Width = 192
-    Height = 20
+    Width = 250
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -37,12 +36,13 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jExpandableListView1: jExpandableListView
     Left = 5
-    Top = 95
+    Top = 108
     Width = 310
-    Height = 119
+    Height = 133
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -82,9 +82,9 @@ object AndroidModule1: TAndroidModule1
   end
   object jButton1: jButton
     Left = 5
-    Top = 35
-    Width = 310
-    Height = 50
+    Top = 41
+    Width = 213
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -94,14 +94,40 @@ object AndroidModule1: TAndroidModule1
     Anchor = jTextView1
     Id = 3
     PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = [rpCenterHorizontal]
-    LayoutParamWidth = lpMatchParent
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpTwoThirdOfParent
     LayoutParamHeight = lpWrapContent
     Text = 'Add Item'
     BackgroundColor = colbrRoyalBlue
     FontColor = colbrWhite
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
+  end
+  object jButton2: jButton
+    Left = 209
+    Top = 41
+    Width = 106
+    Height = 57
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView1
+    Id = 4
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpOneThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Clear'
+    BackgroundColor = colbrLavenderBlush
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton2Click
   end
 end

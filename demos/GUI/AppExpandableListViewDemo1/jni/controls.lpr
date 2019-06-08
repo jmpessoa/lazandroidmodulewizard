@@ -212,6 +212,15 @@ begin
 end;
 
 { Class:     org_lamw_appexpandablelistviewdemo1_Controls
+  Method:    pOnDown
+  Signature: (JI)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
+  cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_appexpandablelistviewdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
@@ -227,6 +236,15 @@ procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
   ); cdecl;
 begin
   Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_appexpandablelistviewdemo1_Controls
+  Method:    pOnDoubleClick
+  Signature: (JI)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  value: JInt); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     org_lamw_appexpandablelistviewdemo1_Controls
@@ -253,6 +271,14 @@ end;
 procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnEnter(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appexpandablelistviewdemo1_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     org_lamw_appexpandablelistviewdemo1_Controls
@@ -337,6 +363,16 @@ begin
 end;
 
 { Class:     org_lamw_appexpandablelistviewdemo1_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     org_lamw_appexpandablelistviewdemo1_Controls
   Method:    pOnExpandableListViewChildClick
   Signature: (JILjava/lang/String;ILjava/lang/String;)V }
 procedure pOnExpandableListViewChildClick(PEnv: PJNIEnv; this: JObject;
@@ -367,7 +403,7 @@ begin
     groupPosition, groupHeader);
 end;
 
-const NativeMethods: array[0..39] of JNINativeMethod = (
+const NativeMethods: array[0..43] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -438,12 +474,18 @@ const NativeMethods: array[0..39] of JNINativeMethod = (
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(JI)V';
+    fnPtr: @pOnDown; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
    (name: 'pOnLongClick';
     signature: '(JI)V';
     fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(JI)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -453,6 +495,9 @@ const NativeMethods: array[0..39] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -480,6 +525,9 @@ const NativeMethods: array[0..39] of JNINativeMethod = (
    (name: 'pOnLayouting';
     signature: '(JZ)V';
     fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
    (name: 'pOnExpandableListViewChildClick';
     signature: '(JILjava/lang/String;ILjava/lang/String;)V';
     fnPtr: @pOnExpandableListViewChildClick; ),
@@ -593,13 +641,18 @@ exports
     +'pOnClickGeneric',
   pAppOnSpecialKeyDown name 'Java_org_lamw_appexpandablelistviewdemo1_Controls'
     +'_pAppOnSpecialKeyDown',
+  pOnDown name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_pOnDown',
   pOnClick name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_pOnClick',
   pOnLongClick name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_'
     +'pOnLongClick',
+  pOnDoubleClick name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_'
+    +'pOnDoubleClick',
   pOnChange name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_pOnChange',
   pOnChanged name
     'Java_org_lamw_appexpandablelistviewdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_pOnEnter',
+  pOnBackPressed name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_'
+    +'pOnBackPressed',
   pOnClose name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_pOnClose',
   pAppOnViewClick name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_'
     +'pAppOnViewClick',
@@ -617,6 +670,8 @@ exports
     +'_pOnAfterDispatchDraw',
   pOnLayouting name 'Java_org_lamw_appexpandablelistviewdemo1_Controls_'
     +'pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_org_lamw_appexpandablelistviewdemo1'
+    +'_Controls_pAppOnRequestPermissionResult',
   pOnExpandableListViewChildClick name 'Java_org_lamw_appexpandablelistviewdemo'
     +'1_Controls_pOnExpandableListViewChildClick',
   pOnExpandableListViewGroupExpand name 'Java_org_lamw_appexpandablelistviewdem'

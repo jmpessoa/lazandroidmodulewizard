@@ -1,0 +1,30 @@
+[
+    {
+        "merged": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\build\\intermediates\\res\\merged\\debug\\layout_activity_app.xml.flat",
+        "source": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\res\\layout\\activity_app.xml"
+    },
+    {
+        "merged": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi_ic_launcher.png.flat",
+        "source": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\res\\drawable-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_ic_launcher.png.flat",
+        "source": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\res\\drawable-hdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_ic_bullet_blue.png.flat",
+        "source": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\res\\drawable-hdpi\\ic_bullet_blue.png"
+    },
+    {
+        "merged": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_ic_bulb.png.flat",
+        "source": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\res\\drawable-hdpi\\ic_bulb.png"
+    },
+    {
+        "merged": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\build\\intermediates\\res\\merged\\debug\\menu_app.xml.flat",
+        "source": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\res\\menu\\app.xml"
+    },
+    {
+        "merged": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi_ic_launcher.png.flat",
+        "source": "C:\\eclipse\\demos\\GUI\\AppExpandableListViewDemo1\\res\\drawable-mdpi\\ic_launcher.png"
+    }
+]

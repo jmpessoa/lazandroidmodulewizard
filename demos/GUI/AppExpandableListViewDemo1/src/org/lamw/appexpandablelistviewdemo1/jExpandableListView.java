@@ -236,8 +236,13 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public int getChildrenCount(int groupPosition) {
         return this._listDataChild.get(this._listDataHeader.get(groupPosition)).size();
+
     }
- 
+
+    public void removeChild(int groupPosition, int _index) {
+		this._listDataChild.get(this._listDataHeader.get(groupPosition)).clear();  //remove(_index);
+	}
+
     @Override
     public Object getGroup(int groupPosition) {
         return this._listDataHeader.get(groupPosition);
@@ -639,8 +644,23 @@ public class jExpandableListView extends ExpandableListView /*dummy*/ { //please
        listDataChild.put( listDataHeader.get(index),  itemList ); // Header, Child data       
        listAdapter.notifyDataSetChanged();             
    }
-   
-   public void Add(String _delimitedItem, String _headerDelimiter, String _childInnerDelimiter) {
+
+   public void Clear() {
+	   listDataHeader.clear();
+	   listAdapter.notifyDataSetChanged();
+   }
+
+	public void ClearChildren(int _groupPosition) {
+		listDataChild.get(listDataHeader.get(_groupPosition)).clear();
+		listAdapter.notifyDataSetChanged();
+	}
+
+	public void ClearGroup(int _groupPosition) {
+		listDataHeader.remove(_groupPosition);
+		listAdapter.notifyDataSetChanged();
+	}
+
+	public void Add(String _delimitedItem, String _headerDelimiter, String _childInnerDelimiter) {
 	   	   	   	   
 	   List<ChildInfo> itemList = new ArrayList<ChildInfo>();
 	   
