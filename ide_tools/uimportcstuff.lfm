@@ -88,7 +88,6 @@ object FormImportCStuff: TFormImportCStuff
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
-  LCLVersion = '2.0.0.4'
   object Label1: TLabel
     Left = 26
     Height = 20
@@ -130,6 +129,7 @@ object FormImportCStuff: TFormImportCStuff
     Width = 94
     Cancel = True
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkCancel
     ModalResult = 2
     ParentFont = False
@@ -142,6 +142,7 @@ object FormImportCStuff: TFormImportCStuff
     Width = 94
     Default = True
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkOK
     ModalResult = 1
     ParentFont = False

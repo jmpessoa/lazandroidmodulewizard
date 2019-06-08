@@ -617,7 +617,7 @@ var
   pathToNdk, ndkPlatform: string;
   myLibName: string;
   linkLibrariesPath: string;
-  chip: string;
+  //chip: string;
   libChip: string;
   pathToNewLib: string;
   aux: string;
@@ -636,21 +636,23 @@ begin
        p:= Pos(';', aux);
        if p > 0 then
        begin
-          linkLibrariesPath:= Trim(Copy(aux, 1, p-1));
-          chip:= 'arm';
-          if Pos('-x86', linkLibrariesPath) > 0 then chip:= 'x86';
-          if chip = 'arm' then
+          linkLibrariesPath:= Trim(Copy(aux, 1, p-1)); //arch-arm :: arch-arm64 ::  arch-x86 :: arch-x86_64
+          libChip:= 'arm';  //dummy
+          if Pos('arch-x86_64', linkLibrariesPath) > 0 then libChip:= 'x86_64'
+          else if Pos('arch-x86', linkLibrariesPath) > 0 then libChip:= 'x86'
+          else if Pos('arch-arm64', linkLibrariesPath) > 0 then libChip:= 'arm64-v8a';
+
+          if libChip = 'arm' then
           begin
-             libChip:= 'armeabi';       //armeabi armeabi-v7a x86
-             if Pos('-CpARMV7', Project.LazCompilerOptions.CustomOptions) > 0 then
-               libChip:= 'armeabi-v7a'; //-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi-
+             libChip:= 'armeabi';
+             if Pos('-CpARMV7', Project.LazCompilerOptions.CustomOptions) > 0 then //-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi-
+               libChip:= 'armeabi-v7a';
           end
-          else
-            libChip:= 'x86';
+
        end;
 
        pathToNdk:= Project.CustomData.Values['NdkPath'];  //<Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
-       ndkPlatform:= GetNdkPlatform(AppendPathDelim(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+       ndkPlatform:= Project.CustomData.Values['NdkApi'];  //<Item3 Name="NdkApi" Value="android-22"/>
 
        p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
        pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
