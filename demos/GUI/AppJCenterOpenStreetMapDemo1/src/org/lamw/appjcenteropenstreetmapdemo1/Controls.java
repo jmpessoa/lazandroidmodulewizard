@@ -1468,6 +1468,7 @@ public native void pOnDoubleClick(long pasobj, int value);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
+public native void pOnBackPressed(long pasobj);
 public native void pOnClose(long pasobj);
 public native void pAppOnViewClick(View view, int id);
 public native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
@@ -2181,10 +2182,16 @@ public  java.lang.Object jButton_Create(long pasobj ) {
   return (java.lang.Object)( new jButton(this.activity,this,pasobj));
 }
 
+public  java.lang.Object jCheckBox_Create(long pasobj ) {
+  return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
+}
+
 public java.lang.Object jcOpenMapView_jCreate(long _Self, boolean _showScale, int _tileSource,  int _zoom) {
   return (java.lang.Object)(new jcOpenMapView(this,_Self, _showScale, _tileSource, _zoom));
 }
 public native int[] pOnOpenMapViewRoadDraw(long pasobj, int roadCode, int roadStatus, double roadDuration, double roadDistance);
+public native void pOnOpenMapViewClick(long pasobj, double latitude, double longitude);
+public native void pOnOpenMapViewLongClick(long pasobj, double latitude, double longitude);
 
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));

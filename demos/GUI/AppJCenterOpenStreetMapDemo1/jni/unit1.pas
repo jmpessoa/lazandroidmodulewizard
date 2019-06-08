@@ -15,6 +15,9 @@ type
   TAndroidModule1 = class(jForm)
     jButton1: jButton;
     jButton2: jButton;
+    jButton3: jButton;
+    jCheckBox1: jCheckBox;
+    jCheckBox2: jCheckBox;
     jcOpenMapView1: jcOpenMapView;
     jTextView1: jTextView;
     procedure AndroidModule1JNIPrompt(Sender: TObject);
@@ -23,11 +26,18 @@ type
       grantResult: TManifestPermissionResult);
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
+    procedure jButton3Click(Sender: TObject);
+    procedure jCheckBox2Click(Sender: TObject);
+    procedure jcOpenMapView1Click(Sender: TObject; latitude: double;
+      longitude: double);
+    procedure jcOpenMapView1LongClick(Sender: TObject; latitude: double;
+      longitude: double);
     procedure jcOpenMapView1RoadDraw(Sender: TObject; roadCode: integer;
       roadStatus: TRoadStatus; roadDuration: double; roadLength: double; out
       outColor: TARGBColorBridge; out outWidth: integer);
   private
     {private declarations}
+    IsPickingPoints: boolean;
   public
     {public declarations}
     procedure ShowMap();
@@ -68,6 +78,7 @@ end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
+  IsPickingPoints:= False;
   if Self.IsRuntimePermissionNeed() then
   begin
     Self.RequestRuntimePermission('android.permission.WRITE_EXTERNAL_STORAGE', 1234); //need by OpenMapView images/tiles cache...
@@ -122,6 +133,43 @@ begin
    else
       ShowMessage('Sorry... "android.permission.WRITE_EXTERNAL_STORAGE" DENIED...');
 
+end;
+
+procedure TAndroidModule1.jButton3Click(Sender: TObject);
+begin
+
+  jcOpenMapView1.PolygonDraw('Polygon1', colbrBlue {line color}, 5 {0 = total background transparency!});
+  jcOpenMapView1.PolygonClear();
+
+  jCheckBox2.Checked:= False;
+  IsPickingPoints:= False;
+
+end;
+
+procedure TAndroidModule1.jCheckBox2Click(Sender: TObject);
+begin
+  if  jCheckBox2.Checked then
+     IsPickingPoints:= True
+  else
+     IsPickingPoints:= False;
+end;
+
+procedure TAndroidModule1.jcOpenMapView1Click(Sender: TObject;
+  latitude: double; longitude: double);
+var
+  count: integer;
+begin
+  if IsPickingPoints then
+  begin
+    count:= jcOpenMapView1.PolygonAdd(latitude,  longitude);
+    ShowMessage('Picking count   = ' + IntToStr(count));
+  end;
+end;
+
+procedure TAndroidModule1.jcOpenMapView1LongClick(Sender: TObject;
+  latitude: double; longitude: double);
+begin
+  //
 end;
 
 end.

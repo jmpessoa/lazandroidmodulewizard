@@ -11,18 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.overlays.GroundOverlay;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
+import org.osmdroid.views.overlay.infowindow.BasicInfoWindow;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -34,14 +39,14 @@ import java.util.List;
 
 // https://github.com/MKergall/osmbonuspack/releases
 //https://github.com/osmdroid/osmdroid/wiki/Important-notes-on-using-osmdroid-in-your-app
-public class jcOpenMapView extends MapView  { //please, fix what GUI object will be extended!
+public class jcOpenMapView extends MapView implements MapEventsReceiver { //please, fix what GUI object will be extended!
 
     private long pascalObj = 0;        // Pascal Object
     private Controls controls = null; //Java/Pascal [events] Interface ...
     private jCommons LAMWCommon;
     private Context context = null;
 
-    private OnClickListener onClickListener;   // click event
+    //private OnClickListener onClickListener;   // click event
     private Boolean enabled = true;           // click-touch enabled!
 
     private IMapController mapController;
@@ -50,6 +55,10 @@ public class jcOpenMapView extends MapView  { //please, fix what GUI object will
     private MapView mThis;
     private RoadManager mRoadManager;
 
+    MapEventsOverlay mapEventsOverlay;
+
+    List<GeoPoint> mGeoPointsList;
+
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jcOpenMapView(Controls _ctrls, long _Self, boolean _showScale, int _tileSource, int _zoom) { //Add more others news "_xxx" params if needed!
         super(_ctrls.activity);
@@ -57,8 +66,9 @@ public class jcOpenMapView extends MapView  { //please, fix what GUI object will
         pascalObj = _Self;
         controls = _ctrls;
         LAMWCommon = new jCommons(this, context, pascalObj);
+
+        /*
         onClickListener = new OnClickListener() {
-            /*.*/
             public void onClick(View view) {     // *.* is a mask to future parse...;
                 if (enabled) {
                     controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
@@ -66,6 +76,8 @@ public class jcOpenMapView extends MapView  { //please, fix what GUI object will
             };
         };
         setOnClickListener(onClickListener);
+        */
+
         //Fonte de imagens
         switch(_tileSource) {
             case 0: this.setTileSource(TileSourceFactory.MAPNIK); break;//MAPNIK-HIKEBIKEMAP-OpenTopo ok
@@ -76,11 +88,16 @@ public class jcOpenMapView extends MapView  { //please, fix what GUI object will
         mapController = this.getController();
         mapController.setZoom((double)_zoom);
 
-        mPath = new ArrayList<GeoPoint>();
+        mGeoPointsList = new ArrayList<GeoPoint>(); //polygon
+        mPath = new ArrayList<GeoPoint>();   //road
+
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
         mRoadManager = new OSRMRoadManager(controls.activity);
         mThis = this;
+        mapEventsOverlay = new MapEventsOverlay(this);
+        this.getOverlays().add(0, mapEventsOverlay);
+
         //show scale
         if (_showScale) {
             ScaleBarOverlay scale = new ScaleBarOverlay(this);
@@ -88,9 +105,26 @@ public class jcOpenMapView extends MapView  { //please, fix what GUI object will
         }
     } //end constructor
 
+    //https://code.google.com/archive/p/osmbonuspack/wikis/Tutorial_5.wiki
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        //Toast.makeText(this, "Tapped", Toast.LENGTH_SHORT).show();
+        //Log.i("singleTap", "Latitude" + p.getLatitude());
+        controls.pOnOpenMapViewClick(pascalObj, p.getLatitude(),p.getLongitude());
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+        //DO NOTHING FOR NOW: return false
+        //Log.i("longPress", "Latitude" + p.getLatitude());
+        controls.pOnOpenMapViewLongClick(pascalObj, p.getLatitude(),p.getLongitude());
+        return false;
+    }
+
     public void jFree() {
         //free local objects...
-        setOnClickListener(null);
+        //setOnClickListener(null);
         LAMWCommon.free();
     }
 
@@ -349,5 +383,147 @@ public class jcOpenMapView extends MapView  { //please, fix what GUI object will
         }
     }
 
+    public void SetCircle(double _latitude, double _longitude, double _radiusInMetters, String _title, int _strokeColor, float _strokeWidth) {
+        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
+        Polygon circle = new Polygon(this); //radiusInMetter
+        circle.setPoints(Polygon.pointsAsCircle(geoPoint, _radiusInMetters)); //2000.0
+        //And we adjust some design aspects:
+        circle.setFillColor(0x12121212);
+        circle.setStrokeColor(_strokeColor);  //Color.RED
+        circle.setStrokeWidth(_strokeWidth); //2
+       //And as Polygon supports bubbles, let's add one:
+        circle.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, this));
+        //circle.setTitle("Centered on "+geoPoint.getLatitude()+","+geoPoint.getLongitude());
+        circle.setTitle(_title);
+        this.getOverlays().add(circle);
+        //this.invalidate();
+    }
+
+    public void SetGroundImageOverlay(double _latitude, double _longitude, String _imageIdentifier, float _dimMetters) {
+        int resId = GetDrawableResourceId(_imageIdentifier);
+        Drawable d = GetDrawableResourceById(resId);
+        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
+        GroundOverlay myGroundOverlay = new GroundOverlay();
+        myGroundOverlay.setPosition(geoPoint);
+        myGroundOverlay.setImage(d.mutate()); //
+        myGroundOverlay.setDimensions(_dimMetters); //2000.0f
+        this.getOverlays().add(myGroundOverlay);
+    }
+
+    //https://github.com/osmdroid/osmdroid/wiki/Markers,-Lines-and-Polygons
+    public void DrawPolygon(double[] _latitude, double[] _longitude, String _title, int _color, int _alphaTransparency) {
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        int count = _latitude.length;
+        //add points
+        for (int i = 0; i < count; i++) {
+            geoPoints.add(new GeoPoint(_latitude[i], _longitude[i]));
+        }
+        geoPoints.add(geoPoints.get(0));    //forces the loop to close
+
+        Polygon polygon = new Polygon();
+
+        polygon.setFillColor(Color.argb(_alphaTransparency, 255,0,0)); //5     0=total transparency
+
+        polygon.setStrokeColor(_color);
+        polygon.setStrokeWidth(3);
+
+        polygon.setPoints(geoPoints);
+        polygon.setTitle(_title); //"A sample polygon"
+        //polygons supports holes too, points should be in a counter-clockwise order
+        /*
+        if (_holes) {
+            List<List<GeoPoint>> holes = new ArrayList<>();
+            holes.add(geoPointsHoles);
+            polygon.setHoles(holes);
+        }
+        */
+        this.getOverlayManager().add(polygon);
+        this.invalidate();
+    }
+
+    public void DrawPolyline(double[] _latitude, double[] _longitude) {
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        Polyline line = new Polyline();   //see note below!
+        int count = _latitude.length;
+        //add points
+        for (int i = 0; i < count; i++) {
+            geoPoints.add(new GeoPoint(_latitude[i], _longitude[i]));
+        }
+        line.setPoints(geoPoints);
+        /*
+        line.setOnClickListener(new Polyline.OnClickListener() {
+            @Override
+            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
+               //Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+        */
+        this.getOverlayManager().add(line);
+        this.invalidate();
+    }
+
+    private void setMarkerListeners(Marker locationMarker) {
+        locationMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView map) {
+                if (marker.isInfoWindowShown() != true) {
+                    //hideInfoWindows();
+                    marker.showInfoWindow();
+                } else {
+                    //hideInfoWindows();
+                }
+                return false;
+            }
+        });
+    }
+
+    public int PolygonAdd(double _latitude, double _longitude) {
+        mGeoPointsList.add(new GeoPoint(_latitude, _longitude));
+        return mGeoPointsList.size();
+    }
+
+    public void PolygonClear() {
+        mGeoPointsList.clear();
+    }
+
+    public void PolygonDraw(String _title, int _color, int _alphaTransparency) {
+
+        if (mGeoPointsList.size() < 3) return;
+
+        Polygon polygon = new Polygon();
+
+        polygon.setFillColor(Color.argb(_alphaTransparency, 255,0,0)); //5     0=total transparency
+
+        polygon.setStrokeColor(_color);
+        polygon.setStrokeWidth(3);
+        polygon.setPoints(mGeoPointsList);
+        polygon.setTitle(_title); //"A sample polygon"
+
+        /*
+        //polygons supports holes too, points should be in a counter-clockwise order
+        if (_holes) {
+            List<List<GeoPoint>> holes = new ArrayList<>();
+            holes.add(mGeoPointsHolesList);
+            polygon.setHoles(holes);
+        }
+        */
+
+        this.getOverlayManager().add(polygon);
+        this.invalidate();
+    }
+
+    public double[] GetPolygon() {
+        int count = mGeoPointsList.size();
+        double[] array = new double[2*count];
+        int j = 0;
+        for (int i=0; i < count; i++) {
+            GeoPoint gp =mGeoPointsList.get(i);
+            array[j] = gp.getLatitude(); // 0 2 4 6
+            array[j+1] = gp.getLongitude(); //1 3 5 7
+            j = j+2; //2 4 6
+        }
+        return array;
+    }
 
 }

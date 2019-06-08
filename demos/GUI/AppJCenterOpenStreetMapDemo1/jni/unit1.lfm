@@ -41,7 +41,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jButton1: jButton
     Left = 5
-    Top = 41
+    Top = 83
     Width = 172
     Height = 57
     MarginLeft = 5
@@ -50,7 +50,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Enabled = True
     Visible = True
-    Anchor = jTextView1
+    Anchor = jCheckBox1
     Id = 2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
@@ -66,7 +66,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jButton2: jButton
     Left = 168
-    Top = 41
+    Top = 83
     Width = 172
     Height = 57
     MarginLeft = 5
@@ -75,7 +75,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Enabled = True
     Visible = True
-    Anchor = jTextView1
+    Anchor = jCheckBox1
     Id = 3
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpRight]
@@ -91,9 +91,9 @@ object AndroidModule1: TAndroidModule1
   end
   object jcOpenMapView1: jcOpenMapView
     Left = 5
-    Top = 108
+    Top = 150
     Width = 335
-    Height = 317
+    Height = 238
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -105,11 +105,87 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpTwoThirdOfParent
+    LayoutParamHeight = lpHalfOfParent
     BackgroundColor = colbrDefault
     ShowScale = False
     TileSource = tsMapNik
     Zoom = 14
+    OnClick = jcOpenMapView1Click
+    OnLongClick = jcOpenMapView1LongClick
     OnRoadDraw = jcOpenMapView1RoadDraw
+  end
+  object jCheckBox1: jCheckBox
+    Left = 5
+    Top = 41
+    Width = 144
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView1
+    Id = 5
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Internet/Wifi'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+  end
+  object jCheckBox2: jCheckBox
+    Left = 5
+    Top = 398
+    Width = 155
+    Height = 32
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jcOpenMapView1
+    Id = 6
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Picking Points'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    Checked = False
+    FontSizeUnit = unitDefault
+    OnClick = jCheckBox2Click
+  end
+  object jButton3: jButton
+    Left = 168
+    Top = 398
+    Width = 172
+    Height = 57
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jcOpenMapView1
+    Id = 7
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Draw Polygon'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton3Click
   end
 end

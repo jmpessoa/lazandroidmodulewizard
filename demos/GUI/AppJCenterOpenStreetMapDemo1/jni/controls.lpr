@@ -274,6 +274,14 @@ begin
 end;
 
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnClose
   Signature: (J)V }
 procedure pOnClose(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -375,7 +383,27 @@ begin
     roadCode, roadStatus, roadDuration, roadDistance);
 end;
 
-const NativeMethods: array[0..40] of JNINativeMethod = (
+{ Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
+  Method:    pOnOpenMapViewClick
+  Signature: (JDD)V }
+procedure pOnOpenMapViewClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+  latitude: JDouble; longitude: JDouble); cdecl;
+begin
+  Java_Event_pOnOpenMapViewClick(PEnv, this, TObject(pasobj), latitude, 
+    longitude);
+end;
+
+{ Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
+  Method:    pOnOpenMapViewLongClick
+  Signature: (JDD)V }
+procedure pOnOpenMapViewLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+  latitude: JDouble; longitude: JDouble); cdecl;
+begin
+  Java_Event_pOnOpenMapViewLongClick(PEnv, this, TObject(pasobj), latitude, 
+    longitude);
+end;
+
+const NativeMethods: array[0..43] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -467,6 +495,9 @@ const NativeMethods: array[0..40] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -499,7 +530,13 @@ const NativeMethods: array[0..40] of JNINativeMethod = (
     fnPtr: @pAppOnRequestPermissionResult; ),
    (name: 'pOnOpenMapViewRoadDraw';
     signature: '(JIIDD)[I';
-    fnPtr: @pOnOpenMapViewRoadDraw; )
+    fnPtr: @pOnOpenMapViewRoadDraw; ),
+   (name: 'pOnOpenMapViewClick';
+    signature: '(JDD)V';
+    fnPtr: @pOnOpenMapViewClick; ),
+   (name: 'pOnOpenMapViewLongClick';
+    signature: '(JDD)V';
+    fnPtr: @pOnOpenMapViewLongClick; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; 
@@ -615,6 +652,8 @@ exports
   pOnChanged name 'Java_org_lamw_appjcenteropenstreetmapdemo1_Controls_'
     +'pOnChanged',
   pOnEnter name 'Java_org_lamw_appjcenteropenstreetmapdemo1_Controls_pOnEnter',
+  pOnBackPressed name 'Java_org_lamw_appjcenteropenstreetmapdemo1_Controls_'
+    +'pOnBackPressed',
   pOnClose name 'Java_org_lamw_appjcenteropenstreetmapdemo1_Controls_pOnClose',
   pAppOnViewClick name 'Java_org_lamw_appjcenteropenstreetmapdemo1_Controls_'
     +'pAppOnViewClick',
@@ -635,7 +674,11 @@ exports
   pAppOnRequestPermissionResult name 'Java_org_lamw_appjcenteropenstreetmapdemo'
     +'1_Controls_pAppOnRequestPermissionResult',
   pOnOpenMapViewRoadDraw name 'Java_org_lamw_appjcenteropenstreetmapdemo1_'
-    +'Controls_pOnOpenMapViewRoadDraw';
+    +'Controls_pOnOpenMapViewRoadDraw',
+  pOnOpenMapViewClick name 'Java_org_lamw_appjcenteropenstreetmapdemo1_'
+    +'Controls_pOnOpenMapViewClick',
+  pOnOpenMapViewLongClick name 'Java_org_lamw_appjcenteropenstreetmapdemo1_'
+    +'Controls_pOnOpenMapViewLongClick';
 
 {%endregion}
   

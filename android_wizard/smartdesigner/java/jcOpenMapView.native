@@ -1,1 +1,3 @@
 public native int[] pOnOpenMapViewRoadDraw(long pasobj, int roadCode, int roadStatus, double roadDuration, double roadDistance);
+public native void pOnOpenMapViewClick(long pasobj, double latitude, double longitude);
+public native void pOnOpenMapViewLongClick(long pasobj, double latitude, double longitude);

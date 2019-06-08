@@ -45,7 +45,6 @@ android {
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.github.nisrulz:lantern:2.0.0'
     implementation 'com.github.MKergall:osmbonuspack:6.6.0'
 }
  

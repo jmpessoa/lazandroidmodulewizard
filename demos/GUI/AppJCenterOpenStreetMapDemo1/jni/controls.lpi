@@ -53,7 +53,7 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jcOpenMapView;jForm;jTextView"/>
+          <Item0 Name="jControls" Value="jButton;jCheckBox;jcOpenMapView;jForm;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>

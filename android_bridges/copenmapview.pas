@@ -12,6 +12,8 @@ type
 TRoadStatus = (rsOk, rsInvalid, rsTechnicalIssue, rdNoPossible);
 TTileSource = (tsMapNik, tsHikeBikeMap, tsOpenTopo);
 
+TOnOpenMapViewClick=procedure(Sender:TObject;latitude:double;longitude:double) of object;
+TOnOpenMapViewLongClick=procedure(Sender:TObject;latitude:double;longitude:double) of object;
 TOnOpenMapViewRoadDraw=procedure(Sender: TObject; roadCode: integer; roadStatus: TRoadStatus; roadDuration: double; roadLength: double; out outColor: TARGBColorBridge; out outWidth: integer) of object;
 
 {Draft Component code by "LAMW: Lazarus Android Module Wizard" [5/25/2019 22:51:21]}
@@ -25,6 +27,9 @@ jcOpenMapView = class(jVisualControl)
     FTileSource: TTileSource;
     FZoom: integer;
     FOnRoadDraw: TOnOpenMapViewRoadDraw;
+    FOnOpenMapViewClick: TOnOpenMapViewClick;
+    FOnOpenMapViewLongClick: TOnOpenMapViewLongClick;
+
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
 
@@ -71,14 +76,28 @@ jcOpenMapView = class(jVisualControl)
     procedure SetMarker(_latitude: double; _longitude: double; _iconIdentifier: string); overload;
     procedure SetMarker(_latitude: double; _longitude: double; _title: string; _snippetInfo: string; _iconIdentifier: string);overload;
     procedure SetMarker(_latitude: double; _longitude: double; _title: string; _snippetInfo: string; _markerIconIdentifier: string; _snippetImageIdentifier: string); overload;
+
+    procedure SetCircle(_latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
+    procedure SetGroundImageOverlay(_latitude: double; _longitude: double; _imageIdentifier: string; _dimMetters: single);
+    procedure DrawPolyline(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble);
+    procedure DrawPolygon(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _title: string; _strokeColor: TARGBColorBridge; _alphaBackground: integer);
+
+    function PolygonAdd(_latitude: double; _longitude: double): integer;
+    procedure PolygonClear();
+    procedure PolygonDraw(_title: string; _strokeColor: TARGBColorBridge; _alphaBackground: integer);
+
     procedure GenEvent_OnOpenMapViewRoadDraw(Sender:TObject; roadCode:integer;roadStatus:integer;roadDuration:double; roadDistance:double; out color: dword; out width: integer);
+    procedure GenEvent_OnOpenMapViewClick(Sender:TObject;latitude:double;longitude:double);
+    procedure GenEvent_OnOpenMapViewLongClick(Sender:TObject;latitude:double;longitude:double);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property ShowScale: boolean read FShowScale write SetShowScale;
     property TileSource: TTileSource read FTileSource write SetTileSource;
     property Zoom: integer read FZoom write SetZoom;
-    property OnClick: TOnNotify read FOnClick write FOnClick;
+    //property OnClick: TOnNotify read FOnClick write FOnClick;
+    property OnClick: TOnOpenMapViewClick read FOnOpenMapViewClick write FOnOpenMapViewClick;
+    property OnLongClick: TOnOpenMapViewLongClick read FOnOpenMapViewLongClick write FOnOpenMapViewLongClick;
     property OnRoadDraw: TOnOpenMapViewRoadDraw read FOnRoadDraw write FOnRoadDraw;
 
 end;
@@ -115,6 +134,15 @@ procedure jcOpenMapView_RoadDraw(env: PJNIEnv; _jcopenmapview: JObject; _roadCod
 procedure jcOpenMapView_SetMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _iconIdentifier: string); overload;
 procedure jcOpenMapView_SetMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _title: string; _snippetInfo: string; _iconIdentifier: string); overload;
 procedure jcOpenMapView_SetMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _title: string; _snippetInfo: string; _markerIconIdentifier: string; _snippetImageIdentifier: string); overload;
+procedure jcOpenMapView_SetCircle(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
+procedure jcOpenMapView_SetGroundImageOverlay(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _imageIdentifier: string; _dimMetters: single);
+procedure jcOpenMapView_DrawPolyline(env: PJNIEnv; _jcopenmapview: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble);
+procedure jcOpenMapView_DrawPolygon(env: PJNIEnv; _jcopenmapview: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _title: string; _strokeColor: integer; _alphaBackground: integer);
+
+function jcOpenMapView_PolygonAdd(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double): integer;
+procedure jcOpenMapView_PolygonClear(env: PJNIEnv; _jcopenmapview: JObject);
+procedure jcOpenMapView_PolygonDraw(env: PJNIEnv; _jcopenmapview: JObject; _title: string; _strokeColor: integer; _alphaBackground: integer);
+
 
 implementation
 
@@ -509,6 +537,66 @@ begin
        width:= outWidth;
   end;
 end;
+
+procedure jcOpenMapView.SetCircle(_latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jcOpenMapView_SetCircle(FjEnv, FjObject, _latitude ,_longitude ,_radiusInMetters ,_title ,_strokeColor ,_strokeWidth);
+end;
+
+procedure jcOpenMapView.SetGroundImageOverlay(_latitude: double; _longitude: double; _imageIdentifier: string; _dimMetters: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jcOpenMapView_SetGroundImageOverlay(FjEnv, FjObject, _latitude ,_longitude ,_imageIdentifier ,_dimMetters);
+end;
+
+procedure jcOpenMapView.DrawPolygon(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _title: string; _strokeColor: TARGBColorBridge; _alphaBackground: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jcOpenMapView_DrawPolygon(FjEnv, FjObject, _latitude ,_longitude ,_title ,GetARGB(FCustomColor, _strokeColor) ,_alphaBackground);
+end;
+
+procedure jcOpenMapView.DrawPolyline(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jcOpenMapView_DrawPolyline(FjEnv, FjObject, _latitude ,_longitude);
+end;
+
+function jcOpenMapView.PolygonAdd(_latitude: double; _longitude: double): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jcOpenMapView_PolygonAdd(FjEnv, FjObject, _latitude ,_longitude);
+end;
+
+procedure jcOpenMapView.PolygonClear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jcOpenMapView_PolygonClear(FjEnv, FjObject);
+end;
+
+procedure jcOpenMapView.PolygonDraw(_title: string; _strokeColor: TARGBColorBridge; _alphaBackground: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jcOpenMapView_PolygonDraw(FjEnv, FjObject, _title ,GetARGB(FCustomColor, _strokeColor) ,_alphaBackground);
+end;
+
+procedure jcOpenMapView.GenEvent_OnOpenMapViewClick(Sender:TObject;latitude:double;longitude:double);
+begin
+  if Assigned(FOnOpenMapViewClick) then FOnOpenMapViewClick(Sender,latitude,longitude);
+end;
+
+procedure jcOpenMapView.GenEvent_OnOpenMapViewLongClick(Sender:TObject;latitude:double;longitude:double);
+begin
+  if Assigned(FOnOpenMapViewLongClick) then FOnOpenMapViewLongClick(Sender,latitude,longitude);
+end;
+
 {-------- jcOpenMapView_JNI_Bridge ----------}
 
 function jcOpenMapView_jCreate(env: PJNIEnv;_Self: int64; _showScale: boolean;  _tileSource: integer; _zoom: integer; this: jObject): jObject;
@@ -939,5 +1027,140 @@ begin
   env^.DeleteLocalRef(env,jParams[4].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jcOpenMapView_SetCircle(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
+var
+  jParams: array[0..5] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].d:= _latitude;
+  jParams[1].d:= _longitude;
+  jParams[2].d:= _radiusInMetters;
+  jParams[3].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[4].i:= _strokeColor;
+  jParams[5].f:= _strokeWidth;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCircle', '(DDDLjava/lang/String;IF)V');
+  env^.CallVoidMethodA(env, _jcopenmapview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[3].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jcOpenMapView_SetGroundImageOverlay(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _imageIdentifier: string; _dimMetters: single);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].d:= _latitude;
+  jParams[1].d:= _longitude;
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_imageIdentifier));
+  jParams[3].f:= _dimMetters;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetGroundImageOverlay', '(DDLjava/lang/String;F)V');
+  env^.CallVoidMethodA(env, _jcopenmapview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jcOpenMapView_DrawPolygon(env: PJNIEnv; _jcopenmapview: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _title: string; _strokeColor: integer; _alphaBackground: integer);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  newSize1: integer;
+  jNewArray1: jObject=nil;
+begin
+  newSize0:= Length(_latitude);
+  jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
+  env^.SetDoubleArrayRegion(env, jNewArray0, 0 , newSize0, @_latitude[0] {source});
+  jParams[0].l:= jNewArray0;
+  newSize1:= Length(_longitude);
+  jNewArray1:= env^.NewDoubleArray(env, newSize1);  // allocate
+  env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
+  jParams[1].l:= jNewArray1;
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[3].i:= _strokeColor;
+  jParams[4].i:= _alphaBackground;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPolygon', '([D[DLjava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jcopenmapview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jcOpenMapView_DrawPolyline(env: PJNIEnv; _jcopenmapview: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  newSize1: integer;
+  jNewArray1: jObject=nil;
+begin
+  newSize0:= Length(_latitude);
+  jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
+  env^.SetDoubleArrayRegion(env, jNewArray0, 0 , newSize0, @_latitude[0] {source});
+  jParams[0].l:= jNewArray0;
+  newSize1:= Length(_longitude);
+  jNewArray1:= env^.NewDoubleArray(env, newSize1);  // allocate
+  env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
+  jParams[1].l:= jNewArray1;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawPolyline', '([D[D)V');
+  env^.CallVoidMethodA(env, _jcopenmapview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jcOpenMapView_PolygonAdd(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double): integer;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].d:= _latitude;
+  jParams[1].d:= _longitude;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'PolygonAdd', '(DD)I');
+  Result:= env^.CallIntMethodA(env, _jcopenmapview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jcOpenMapView_PolygonClear(env: PJNIEnv; _jcopenmapview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'PolygonClear', '()V');
+  env^.CallVoidMethod(env, _jcopenmapview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jcOpenMapView_PolygonDraw(env: PJNIEnv; _jcopenmapview: JObject; _title: string; _strokeColor: integer; _alphaBackground: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[1].i:= _strokeColor;
+  jParams[2].i:= _alphaBackground;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'PolygonDraw', '(Ljava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jcopenmapview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

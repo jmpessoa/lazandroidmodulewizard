@@ -192,6 +192,8 @@ uses
    procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
    procedure Java_Event_pOnMidiManagerDeviceRemoved(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
    function Java_Event_pOnOpenMapViewRoadDraw(env:PJNIEnv;this:JObject;Sender:TObject;roadCode:integer;roadStatus:integer;roadDuration:double;roadDistance:double):jintArray;
+   procedure Java_Event_pOnOpenMapViewClick(env:PJNIEnv;this:JObject;Sender:TObject;latitude:double;longitude:double);
+   procedure Java_Event_pOnOpenMapViewLongClick(env:PJNIEnv;this:JObject;Sender:TObject;latitude:double;longitude:double);
 
 implementation
 
@@ -2313,6 +2315,27 @@ begin
   SetLength(outReturn, 0);
 end;
 
+procedure Java_Event_pOnOpenMapViewClick(env:PJNIEnv;this:JObject;Sender:TObject;latitude:double;longitude:double);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcOpenMapView then
+  begin
+    jForm(jcOpenMapView(Sender).Owner).UpdateJNI(gApp);
+    jcOpenMapView(Sender).GenEvent_OnOpenMapViewClick(Sender,latitude,longitude);
+  end;
+end;
+
+procedure Java_Event_pOnOpenMapViewLongClick(env:PJNIEnv;this:JObject;Sender:TObject;latitude:double;longitude:double);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcOpenMapView then
+  begin
+    jForm(jcOpenMapView(Sender).Owner).UpdateJNI(gApp);
+    jcOpenMapView(Sender).GenEvent_OnOpenMapViewLongClick(Sender,latitude,longitude);
+  end;
+end;
 
 end.
 
