@@ -28,11 +28,13 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 //import android.support.design.widget.CollapsingToolbarLayout;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.widget.PopupMenu;
 
 
 import java.io.FileOutputStream;
@@ -284,6 +286,7 @@ public class jImageView extends ImageView {
 	}
 
 	public Drawable GetDrawableResourceById(int _resID) {
+		if( _resID == 0 ) return null; // by tr3e
 		
 		Drawable res = null;
 		
@@ -301,7 +304,13 @@ public class jImageView extends ImageView {
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+		
+		if( d == null ) return;
+		
 		Bitmap b = ((BitmapDrawable)d).getBitmap();
+		
+		if( b == null ) return;
+		
 		bmp = GetResizedBitmap(b, b.getWidth(), b.getHeight());
 		this.setImageResource(android.R.color.transparent);
 		if (!mRounded)
@@ -727,6 +736,27 @@ public class jImageView extends ImageView {
 		} catch (Exception e) {
 			Log.e("SaveToFile", "Exception: " + e.toString());
 		}
+	}
+
+	public View GetView() {
+		return this;
+	}
+
+	public void ShowPopupMenu(String[] _items) {
+		PopupMenu dropDownMenu = new PopupMenu(controls.activity, this);
+		dropDownMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem menuItem) {
+				//.makeText(getApplicationContext(), "You have clicked " + menuItem.getTitle(), Toast.LENGTH_LONG).show();
+				controls.pOnImageViewPopupItemSelected(PasObj, menuItem.getTitle().toString());
+				return true;
+			}
+		});
+		//dropDownMenu.getMenu().add(caption);
+		for (int i = 0; i < _items.length; i++) {
+			dropDownMenu.getMenu().add(_items[i]);
+		}
+		dropDownMenu.show();
 	}
 
 }

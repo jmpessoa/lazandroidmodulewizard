@@ -51,6 +51,7 @@ public class jEditText extends EditText {
 	private boolean canDispatchChangedEvent = false;
 	private boolean mFlagSuggestion = false;
 	private boolean mFlagCapSentence = false;
+	private boolean mFlagCaptureBackPressed = false; // by tr3e
 
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
@@ -98,6 +99,16 @@ public class jEditText extends EditText {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
 				//if (event.getAction() == KeyEvent.ACTION_UP) {
 				    final EditText caption = (EditText)v;
+				    
+				    // by tr3e fix back_key close app
+				    if( mFlagCaptureBackPressed && (KeyEvent.KEYCODE_BACK == keyCode) )
+			        {			            
+				    	InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						controls.pOnBackPressed(LAMWCommon.getPasObj());
+						return true;
+			        }
+				    
 					//if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok
 				    if((event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
 						if (mCloseSoftInputOnEnter) {
@@ -406,6 +417,11 @@ public class jEditText extends EditText {
 	public void SetCapSentence(boolean _value) {
 		mFlagCapSentence = _value;
 	}
+	
+	// by tr3e
+	public void SetCaptureBackPressed(boolean _value) {
+		mFlagCaptureBackPressed = _value;
+	}
 
 	public void CopyToClipboard() {
 		mClipData = ClipData.newPlainText("text", this.getText().toString());
@@ -453,6 +469,8 @@ public class jEditText extends EditText {
 	}
 	
 	private Drawable GetDrawableResourceById(int _resID) {
+		if( _resID == 0 ) return null; // by tr3e
+		
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
 	}
 	
@@ -468,12 +486,16 @@ public class jEditText extends EditText {
 		  }
 	}	
 	
-	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
+	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
 		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));
 	}		
 
-	public void SetBackgroundByImage(Bitmap _image) {	
+	public void SetBackgroundByImage(Bitmap _image) {
+		if( _image == null ) return;
+		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		if( d == null ) return;
 //[ifdef_api16up]
 	if(Build.VERSION.SDK_INT >= 16) 
              this.setBackground(d);
@@ -505,7 +527,13 @@ public class jEditText extends EditText {
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
 		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		if( id == 0 ) return;
+		
+		Drawable d = GetDrawableResourceById(id);
+		
+		if( d == null ) return;
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );

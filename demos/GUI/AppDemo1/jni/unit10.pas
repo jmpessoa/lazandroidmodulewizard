@@ -20,6 +20,7 @@ type
       jCanvasES1_1: jCanvasES1;
       jImageList1: jImageList;
       jTextView1: jTextView;
+      jTimer1: jTimer;
       procedure AndroidModule10CloseQuery(Sender: TObject; var CanClose: boolean);
       procedure AndroidModule10JNIPrompt(Sender: TObject);
       procedure DataModuleCreate(Sender: TObject);
@@ -29,6 +30,7 @@ type
       procedure jCanvasES1_1GLChange(Sender: TObject; W, H: integer);
       procedure jCanvasES1_1GLCreate(Sender: TObject);
       procedure jCanvasES1_1GLDraw(Sender: TObject);
+      procedure jTimer1Timer(Sender: TObject);
 
     private
       {private declarations}
@@ -216,12 +218,14 @@ end;
 procedure TAndroidModule10.AndroidModule10CloseQuery(Sender: TObject;
   var CanClose: boolean);
 begin
+  jTimer1.Enabled:= False;
    gSpeed:= 0;
    CanClose:= True;
 end;
 
 procedure TAndroidModule10.jButton2Click(Sender: TObject);
 begin
+  jTimer1.Enabled:= True;
   gSpeed := gSpeed + 0.3;
 end;
 
@@ -244,6 +248,11 @@ end;
 procedure TAndroidModule10.jCanvasES1_1GLDraw(Sender: TObject);
 begin
    DoDraw(gAngle*gSpeed, gW, gH);
+end;
+
+procedure TAndroidModule10.jTimer1Timer(Sender: TObject);
+begin
+  jCanvasES1_1.Refresh;
 end;
 
 end.

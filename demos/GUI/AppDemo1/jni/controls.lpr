@@ -212,6 +212,15 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
+  Method:    pOnDown
+  Signature: (JI)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
+  cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     com_example_appdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
@@ -227,6 +236,15 @@ procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
   ); cdecl;
 begin
   Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnDoubleClick
+  Signature: (JI)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  value: JInt); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -253,6 +271,14 @@ end;
 procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnEnter(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -403,12 +429,31 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
+  Method:    pOnImageViewPopupItemSelected
+  Signature: (JLjava/lang/String;)V }
+procedure pOnImageViewPopupItemSelected(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; caption: JString); cdecl;
+begin
+  Java_Event_pOnImageViewPopupItemSelected(PEnv, this, TObject(pasobj), caption
+    );
+end;
+
+{ Class:     com_example_appdemo1_Controls
   Method:    pOnClickWidgetItem
   Signature: (JIZ)V }
 procedure pOnClickWidgetItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   position: JInt; checked: JBoolean); cdecl;
 begin
   Java_Event_pOnClickWidgetItem(PEnv, this, TObject(pasobj), position, checked);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnClickImageItem
+  Signature: (JI)V }
+procedure pOnClickImageItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt); cdecl;
+begin
+  Java_Event_pOnClickImageItem(PEnv, this, TObject(pasobj), position);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -419,6 +464,36 @@ procedure pOnClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
 begin
   Java_Event_pOnClickCaptionItem(PEnv, this, TObject(pasobj), position, caption
     );
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnClickItemTextLeft
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickItemTextLeft(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickItemTextLeft(PEnv, this, TObject(pasobj), position, caption
+    );
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnClickItemTextCenter
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickItemTextCenter(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickItemTextCenter(PEnv, this, TObject(pasobj), position,
+    caption);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnClickItemTextRight
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickItemTextRight(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickItemTextRight(PEnv, this, TObject(pasobj), position,
+    caption);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -439,6 +514,16 @@ function pOnListViewDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject;
 begin
   Result:=Java_Event_pOnListViewDrawItemCaptionColor(PEnv, this, TObject(pasobj
     ), position, caption);
+end;
+
+{ Class:     com_example_appdemo1_Controls
+  Method:    pOnListViewDrawItemBackgroundColor
+  Signature: (JI)I }
+function pOnListViewDrawItemBackgroundColor(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemBackgroundColor(PEnv, this, TObject(
+    pasobj), position);
 end;
 
 { Class:     com_example_appdemo1_Controls
@@ -483,6 +568,16 @@ begin
 end;
 
 { Class:     com_example_appdemo1_Controls
+  Method:    pOnListViewDrawItemWidgetText
+  Signature: (JILjava/lang/String;)Ljava/lang/String; }
+function pOnListViewDrawItemWidgetText(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; widgetText: JString): JString; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetText(PEnv, this, TObject(pasobj),
+    position, widgetText);
+end;
+
+{ Class:     com_example_appdemo1_Controls
   Method:    pOnListViewDrawItemWidgetImage
   Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
 function pOnListViewDrawItemWidgetImage(PEnv: PJNIEnv; this: JObject;
@@ -522,7 +617,7 @@ begin
     url);
 end;
 
-const NativeMethods: array[0..55] of JNINativeMethod = (
+const NativeMethods: array[0..65] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -593,12 +688,18 @@ const NativeMethods: array[0..55] of JNINativeMethod = (
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(JI)V';
+    fnPtr: @pOnDown; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
    (name: 'pOnLongClick';
     signature: '(JI)V';
     fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(JI)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -608,6 +709,9 @@ const NativeMethods: array[0..55] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -656,18 +760,36 @@ const NativeMethods: array[0..55] of JNINativeMethod = (
    (name: 'pOnHttpClientUploadFinished';
     signature: '(JILjava/lang/String;Ljava/lang/String;)V';
     fnPtr: @pOnHttpClientUploadFinished; ),
+   (name: 'pOnImageViewPopupItemSelected';
+    signature: '(JLjava/lang/String;)V';
+    fnPtr: @pOnImageViewPopupItemSelected; ),
    (name: 'pOnClickWidgetItem';
     signature: '(JIZ)V';
     fnPtr: @pOnClickWidgetItem; ),
+   (name: 'pOnClickImageItem';
+    signature: '(JI)V';
+    fnPtr: @pOnClickImageItem; ),
    (name: 'pOnClickCaptionItem';
     signature: '(JILjava/lang/String;)V';
     fnPtr: @pOnClickCaptionItem; ),
+   (name: 'pOnClickItemTextLeft';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnClickItemTextLeft; ),
+   (name: 'pOnClickItemTextCenter';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnClickItemTextCenter; ),
+   (name: 'pOnClickItemTextRight';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnClickItemTextRight; ),
    (name: 'pOnListViewLongClickCaptionItem';
     signature: '(JILjava/lang/String;)V';
     fnPtr: @pOnListViewLongClickCaptionItem; ),
    (name: 'pOnListViewDrawItemCaptionColor';
     signature: '(JILjava/lang/String;)I';
     fnPtr: @pOnListViewDrawItemCaptionColor; ),
+   (name: 'pOnListViewDrawItemBackgroundColor';
+    signature: '(JI)I';
+    fnPtr: @pOnListViewDrawItemBackgroundColor; ),
    (name: 'pOnListViewDrawItemBitmap';
     signature: '(JILjava/lang/String;)Landroid/graphics/Bitmap;';
     fnPtr: @pOnListViewDrawItemBitmap; ),
@@ -680,6 +802,9 @@ const NativeMethods: array[0..55] of JNINativeMethod = (
    (name: 'pOnListViewDrawItemWidgetTextColor';
     signature: '(JILjava/lang/String;)I';
     fnPtr: @pOnListViewDrawItemWidgetTextColor; ),
+   (name: 'pOnListViewDrawItemWidgetText';
+    signature: '(JILjava/lang/String;)Ljava/lang/String;';
+    fnPtr: @pOnListViewDrawItemWidgetText; ),
    (name: 'pOnListViewDrawItemWidgetImage';
     signature: '(JILjava/lang/String;)Landroid/graphics/Bitmap;';
     fnPtr: @pOnListViewDrawItemWidgetImage; ),
@@ -783,11 +908,14 @@ exports
   pOnClickGeneric name 'Java_com_example_appdemo1_Controls_pOnClickGeneric',
   pAppOnSpecialKeyDown name 'Java_com_example_appdemo1_Controls_'
     +'pAppOnSpecialKeyDown',
+  pOnDown name 'Java_com_example_appdemo1_Controls_pOnDown',
   pOnClick name 'Java_com_example_appdemo1_Controls_pOnClick',
   pOnLongClick name 'Java_com_example_appdemo1_Controls_pOnLongClick',
+  pOnDoubleClick name 'Java_com_example_appdemo1_Controls_pOnDoubleClick',
   pOnChange name 'Java_com_example_appdemo1_Controls_pOnChange',
   pOnChanged name 'Java_com_example_appdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_com_example_appdemo1_Controls_pOnEnter',
+  pOnBackPressed name 'Java_com_example_appdemo1_Controls_pOnBackPressed',
   pOnClose name 'Java_com_example_appdemo1_Controls_pOnClose',
   pAppOnViewClick name 'Java_com_example_appdemo1_Controls_pAppOnViewClick',
   pAppOnListItemClick name 'Java_com_example_appdemo1_Controls_'
@@ -814,14 +942,25 @@ exports
     +'pOnHttpClientUploadProgress',
   pOnHttpClientUploadFinished name 'Java_com_example_appdemo1_Controls_'
     +'pOnHttpClientUploadFinished',
+  pOnImageViewPopupItemSelected name 'Java_com_example_appdemo1_Controls_'
+    +'pOnImageViewPopupItemSelected',
   pOnClickWidgetItem name 'Java_com_example_appdemo1_Controls_'
     +'pOnClickWidgetItem',
+  pOnClickImageItem name 'Java_com_example_appdemo1_Controls_pOnClickImageItem',
   pOnClickCaptionItem name 'Java_com_example_appdemo1_Controls_'
     +'pOnClickCaptionItem',
+  pOnClickItemTextLeft name 'Java_com_example_appdemo1_Controls_'
+    +'pOnClickItemTextLeft',
+  pOnClickItemTextCenter name 'Java_com_example_appdemo1_Controls_'
+    +'pOnClickItemTextCenter',
+  pOnClickItemTextRight name 'Java_com_example_appdemo1_Controls_'
+    +'pOnClickItemTextRight',
   pOnListViewLongClickCaptionItem name 'Java_com_example_appdemo1_Controls_'
     +'pOnListViewLongClickCaptionItem',
   pOnListViewDrawItemCaptionColor name 'Java_com_example_appdemo1_Controls_'
     +'pOnListViewDrawItemCaptionColor',
+  pOnListViewDrawItemBackgroundColor name 'Java_com_example_appdemo1_Controls_'
+    +'pOnListViewDrawItemBackgroundColor',
   pOnListViewDrawItemBitmap name 'Java_com_example_appdemo1_Controls_'
     +'pOnListViewDrawItemBitmap',
   pOnWidgeItemLostFocus name 'Java_com_example_appdemo1_Controls_'
@@ -830,6 +969,8 @@ exports
     +'pOnListViewScrollStateChanged',
   pOnListViewDrawItemWidgetTextColor name 'Java_com_example_appdemo1_Controls_'
     +'pOnListViewDrawItemWidgetTextColor',
+  pOnListViewDrawItemWidgetText name 'Java_com_example_appdemo1_Controls_'
+    +'pOnListViewDrawItemWidgetText',
   pOnListViewDrawItemWidgetImage name 'Java_com_example_appdemo1_Controls_'
     +'pOnListViewDrawItemWidgetImage',
   pOnScrollViewChanged name 'Java_com_example_appdemo1_Controls_'

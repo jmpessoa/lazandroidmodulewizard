@@ -7,6 +7,7 @@ object AndroidModule10: TAndroidModule10
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
   OnCreate = DataModuleCreate
   Text = 'AndroidModule10'
   ActivityMode = actRecyclable
@@ -15,14 +16,15 @@ object AndroidModule10: TAndroidModule10
   OnCloseQuery = AndroidModule10CloseQuery
   OnJNIPrompt = AndroidModule10JNIPrompt
   object jTextView1: jTextView
-    Left = 76
+    Left = 52
     Top = 10
-    Width = 148
-    Height = 20
+    Width = 195
+    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Id = 19240
     PosRelativeToAnchor = []
@@ -31,23 +33,24 @@ object AndroidModule10: TAndroidModule10
     LayoutParamHeight = lpWrapContent
     Text = 'OpenGLES_v1 *2D* Demo'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jCanvasES1_1: jCanvasES1
     Tag = 1
-    Left = 19
-    Top = 100
-    Width = 261
-    Height = 226
+    Left = 10
+    Top = 123
+    Width = 280
+    Height = 240
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 31633
@@ -63,13 +66,14 @@ object AndroidModule10: TAndroidModule10
   end
   object jButton1: jButton
     Left = 5
-    Top = 45
-    Width = 136
-    Height = 40
+    Top = 51
+    Width = 150
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jTextView1
     Id = 72076
@@ -82,17 +86,19 @@ object AndroidModule10: TAndroidModule10
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jButton2: jButton
-    Left = 151
-    Top = 45
-    Width = 136
-    Height = 40
+    Left = 165
+    Top = 51
+    Width = 150
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jButton1
     Id = 0
@@ -105,17 +111,19 @@ object AndroidModule10: TAndroidModule10
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
   end
   object jButton3: jButton
     Left = 5
-    Top = 341
-    Width = 285
-    Height = 40
+    Top = 378
+    Width = 290
+    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
     Visible = True
     Anchor = jCanvasES1_1
     Id = 34322
@@ -128,6 +136,7 @@ object AndroidModule10: TAndroidModule10
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton3Click
   end
   object jImageList1: jImageList
@@ -140,5 +149,12 @@ object AndroidModule10: TAndroidModule10
     )
     left = 224
     top = 168
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = jTimer1Timer
+    left = 136
+    top = 80
   end
 end

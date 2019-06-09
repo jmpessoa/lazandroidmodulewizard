@@ -2747,7 +2747,7 @@ begin
   FCloseCallBack.Event  := nil;
   FCloseCallBack.EventData:= nil;
   FCloseCallBack.Sender := nil;
-  FActivityMode         := ActivityModeDesign; //actMain;  //actMain, actRecyclable, actSplash, actDesign
+  FActivityMode         := ActivityModeDesign; //actMain;  //actMain, actRecyclable, actSplash, act...
 
   FActionBarTitle:= abtDefault;
 
@@ -2786,7 +2786,6 @@ begin
   TryBacktrackOnClose:= False;
 
   DoJNIPromptOnShow:= True;
-  FVisible:= True;
 
   //now load the stream
   InitInheritedComponent(Self, TAndroidWidget {TAndroidForm}); {thanks to  x2nie !!}
@@ -2897,8 +2896,9 @@ begin
     end;
 
     //Show ...
-    if FVisible then
+    if not FVisible then
     begin
+       FVisible:= True;
        gApp.TopIndex:= FormIndex;
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
        if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
@@ -3092,7 +3092,7 @@ begin
   if jForm(Form).ActivityMode <> actMain then //actSplash or actRecycable
   begin
 
-      if  formBaseInx > -1 then
+      if formBaseInx > -1 then
       begin
         if jForm(gApp.Forms.Stack[formBaseInx].Form).PromptOnBackKey then
             jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt; //<<--- thanks to @arenabor

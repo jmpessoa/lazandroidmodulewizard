@@ -1,6 +1,6 @@
 package com.example.appdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.3.1  - 01 February- 2019 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.4  - 30 May - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -83,6 +83,7 @@ import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.net.ConnectivityManager;
@@ -462,8 +463,11 @@ public String GetEnvironmentDirectoryPath(int _directory) {
 	    case 10: absPath = this.controls.activity.getFilesDir().getPath();
 	             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
 	    case 11: absPath = this.controls.activity.getFilesDir().getPath();
-                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             
-	           
+                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;
+
+		  case 12: absPath = this.controls.activity.getFilesDir().getPath();
+			  absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/cache"; break;
+
 	  }
 	  	  
 	  //Make sure the directory exists.
@@ -670,6 +674,8 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
+	    if( _resID == 0 ) return null; // by tr3e
+	    		
         Drawable res = null;
 
         if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21
@@ -686,7 +692,10 @@ public Drawable GetDrawableResourceById(int _resID) {
 
 	public void SetBackgroundImage(String _imageIdentifier) {
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
-		Bitmap bmp = ((BitmapDrawable)d).getBitmap();
+		
+		if( d == null ) return; // by tr3e
+		
+		//Bitmap bmp = ((BitmapDrawable)d).getBitmap();
 		ImageView image = new ImageView(controls.activity);
         LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         image.setLayoutParams(param);
@@ -759,7 +768,9 @@ public void SetSubTitleActionBar(String _subtitle) {
 public void SetIconActionBar(String _iconIdentifier) {
 //[ifdef_api14up]
 	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
-	jCommons.ActionBarSetIcon(controls, d);
+	
+	if( d != null ) // by tr3e
+	 jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
 }
 
@@ -1450,11 +1461,14 @@ public native void pOnDraw(long pasobj);
 public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, float x2, float y2);
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
+public native void pOnDown(long pasobj, int value);
 public native void pOnClick(long pasobj, int value);
 public native void pOnLongClick(long pasobj, int value);
+public native void pOnDoubleClick(long pasobj, int value);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
+public native void pOnBackPressed(long pasobj);
 public native void pOnClose(long pasobj);
 public native void pAppOnViewClick(View view, int id);
 public native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
@@ -1545,6 +1559,10 @@ public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
 }
 
+public int getAPILevel() {
+  return android.os.Build.VERSION.SDK_INT;  
+}
+
 //by jmpessoa
 public  int  systemGetOrientation() {  
    return (this.activity.getResources().getConfiguration().orientation); 
@@ -1601,9 +1619,13 @@ public String getStringResourceByName(String _resName) {
 //  App Related
 // -------------------------------------------------------------------------
 //
-public  void appFinish () {
+public  void appFinish() {
 	   activity.finish();
 	   System.exit(0); //<< ------- fix by jmpessoa
+}
+
+public void appRecreate() {
+	activity.recreate();
 }
 
 public  void appKillProcess() {
@@ -1980,7 +2002,8 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
+
+	public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
 		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
@@ -2000,32 +2023,39 @@ public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 		return 0; //fail
 	}
 }
-
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {	
-	String SMS_DELIVERED = packageDeliveredAction;
-	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
-	SmsManager sms = SmsManager.getDefault();
-	try {
-		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-		if (multipartMessage) {
-			ArrayList<String> messages = sms.divideMessage(msg);    
-			ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
-			for (int i = 0; i < messages.size(); i++) {
-				deliveredPendingIntents.add(i, deliveredPendingIntent);
-			}			
-			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, deliveredPendingIntents);			  
-		} else {
-			List<String> messages = sms.divideMessage(msg);    
-			for (String message : messages) {
-				sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-			}			    
-		}	
-		//Log.i("Send_SMS",phoneNumber+": "+ msg);    
-		return 1; //ok	      
-	} catch (Exception e) {
-		return 0; //fail
+        //improved by CC
+        //http://forum.lazarus-ide.org/index.php/topic,44775.msg315109/topicseen.html
+	public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {
+		String SMS_DELIVERED = packageDeliveredAction;
+		PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+		SmsManager sms = SmsManager.getDefault();
+		int partsCount = 1;
+		try {
+			if (multipartMessage)
+			{
+				ArrayList<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+				for (int i = 0; i < messages.size(); i++)
+				{
+					deliveredPendingIntents.add(i, deliveredPendingIntent);
+				}
+				sms.sendMultipartTextMessage(phoneNumber, null, messages, deliveredPendingIntents, null  );
+			}
+			else
+			{
+				List<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				for (String message : messages)
+				{
+					sms.sendTextMessage(phoneNumber, null, message, deliveredPendingIntent, null );
+				}
+			}
+			return partsCount;
+		} catch (Exception e) {
+			return 0; //fail
+		}
 	}
-}
 
 public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
   //---get the SMS message passed in---	
@@ -2205,21 +2235,28 @@ public java.lang.Object jImageList_jCreate(long _Self) {
 public  java.lang.Object jImageView_Create(long pasobj ) {
   return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
 }
+public native void pOnImageViewPopupItemSelected(long pasobj, String caption);
 
-public  java.lang.Object jListView_Create2(long pasobj,  int widget, String widgetTxt, Bitmap bmp, int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
-  return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt,bmp,txtDecorated,itemLay,textSizeDecorated, textAlign));
+public  java.lang.Object jListView_Create2(long pasobj,  int widget, String widgetTxt, Bitmap bmp, int txtDecorated, int itemLay, int textSizeDecorated, int textAlign, int textPosition) {
+  return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt,bmp,txtDecorated,itemLay,textSizeDecorated, textAlign, textPosition));
 }
-public  java.lang.Object jListView_Create3(long pasobj,  int widget, String widgetTxt, int txtDecorated, int itemLay, int textSizeDecorated, int textAlign) {
-  return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt, null,txtDecorated,itemLay,textSizeDecorated, textAlign));
+public  java.lang.Object jListView_Create3(long pasobj,  int widget, String widgetTxt, int txtDecorated, int itemLay, int textSizeDecorated, int textAlign, int textPosition) {
+  return (java.lang.Object)(new jListView(this.activity,this,pasobj,widget,widgetTxt, null,txtDecorated,itemLay,textSizeDecorated, textAlign, textPosition));
 }
 public native void pOnClickWidgetItem(long pasobj, int position, boolean checked);
+public native void pOnClickImageItem(long pasobj, int position);
 public native void pOnClickCaptionItem(long pasobj, int position, String caption);
+public native void pOnClickItemTextLeft(long pasobj, int position, String caption);
+public native void pOnClickItemTextCenter(long pasobj, int position, String caption);
+public native void pOnClickItemTextRight(long pasobj, int position, String caption);
 public native void pOnListViewLongClickCaptionItem(long pasobj, int position, String caption);
 public native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
+public native int pOnListViewDrawItemBackgroundColor(long pasobj, int position);
 public native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String caption);
 public native void pOnWidgeItemLostFocus(long pasobj, int position, String widgetText);
 public native void pOnListViewScrollStateChanged(long pasobj, int firstVisibleItem, int visibleItemCount, int totalItemCount, boolean lastItemReached);
 public native int pOnListViewDrawItemWidgetTextColor(long pasobj, int position, String widgetText);
+public native String pOnListViewDrawItemWidgetText(long pasobj, int position, String widgetText);
 public native Bitmap pOnListViewDrawItemWidgetImage(long pasobj, int position, String widgetText);
 
 public  java.lang.Object jPanel_Create(long pasobj ) {
