@@ -1099,7 +1099,8 @@ end;
 
     procedure Init(refApp: jApp); override;
     procedure Finish;
-    Procedure Show;
+    Procedure Show; overload;
+    procedure Show(refApp: jApp); overload; //call ReInit to force the form to recreate the layout...
     Procedure DoJNIPrompt;
 
     Procedure Close;
@@ -1235,7 +1236,7 @@ end;
     function UriEncode(_message: string): string;
     function ParseHtmlFontAwesome(_htmlString: string): string;
 
-    procedure ReInit(refApp: jApp);
+    procedure ReInit(refApp: jApp); //force the form to recreate the layout...
     procedure SetLayoutParent(_viewgroup: jObject);   //FjPRLayout
     function GetLayoutParent: jObject;
     procedure RemoveFromLayoutParent();
@@ -2948,6 +2949,11 @@ begin
   end;
   self.Initialized:= False;
   Self.Init(refApp);
+end;
+
+procedure jForm.Show(refApp: jApp);
+begin
+   ReInit(refApp);
 end;
 
 function jForm.GetFormByIndex(index: integer): jForm;
