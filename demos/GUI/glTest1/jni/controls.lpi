@@ -60,7 +60,7 @@
       <Filename Value="../libs/armeabi/libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="/home/handoko/Android/ndk/platforms/android-21/arch-arm/usr/lib/"/>
+      <Libraries Value="/home/handoko/Android/android-ndk-r11c/platforms/android-21/arch-arm/usr/lib/"/>
       <UnitOutputDirectory Value="../obj/controls"/>
     </SearchPaths>
     <Parsing>
@@ -89,7 +89,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FD/home/handoko/Android/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86/bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FD/home/handoko/Android/android-ndk-r11c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86/bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>
