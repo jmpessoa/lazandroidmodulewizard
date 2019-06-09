@@ -57,7 +57,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="../libs/armeabi/libcontrols"/>
+      <Filename Value="../libs/armeabi-v7a/libcontrols"/>
     </Target>
     <SearchPaths>
       <Libraries Value="/home/handoko/Android/android-ndk-r11c/platforms/android-21/arch-arm/usr/lib/"/>
