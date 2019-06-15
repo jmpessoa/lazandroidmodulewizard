@@ -1,6 +1,0 @@
-public native void pOnSDL2NativeInit(long pasobj, Object openSDL);
-public native void pOnSDL2NativeQuit(long pasobj);
-public native void pOnSDL2NativeResize(long pasobj, int x, int y, int format);
-public native void pOnSDL2NativeKeyDown(long pasobj, int keycode);
-public native void pOnSDL2NativeKeyUp(long pasobj, int keycode);
-public native void pOnSDL2NativeTouch(long pasobj, int touchDevId, int pointerFingerId, int action, float x, float y, float p);

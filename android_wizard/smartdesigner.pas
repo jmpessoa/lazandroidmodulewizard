@@ -2606,7 +2606,7 @@ var
   ControlsJava, auxList, controlsList, libList: TStringList;
   i, j, p: Integer;
   nativeExists: Boolean;
-  aux, PathToJavaTemplates, LibPath: string;
+  aux, PathToJavaTemplates, LibPath, linkLibrariesPath: string;
   AndroidTheme: string;
   compoundList: TStringList;
   lprModuleName: string;
@@ -2677,7 +2677,12 @@ begin
     IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Taking libraries from folder: ' + LibPath);
     // end tk
 
-    //update all java code ...
+    linkLibrariesPath:='';
+    aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;  //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+    p:= Pos(';', aux);
+    if p > 0 then
+      linkLibrariesPath:= Trim(Copy(aux, 1, p-1));
+
     libList:= FindAllFiles(LibPath, '*.so', False);
     for j:= 0 to libList.Count-1 do
     begin
@@ -2687,11 +2692,21 @@ begin
       IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Found library: ' + aux);
       // end tk
 
+      if aux <> 'libcontrols.so' then
+      begin
+        if linkLibrariesPath <> '' then
+        begin
+        if not FileExists(linkLibrariesPath + aux) then  //prepare "exotic" library to Linker
+           CopyFile(LibPath +PathDelim+ aux, linkLibrariesPath + aux);
+        end;
+      end;
+
       p:= Pos('.', aux);
       aux:= Trim(copy(aux,4, p-4));
       auxList.Add(aux);
     end;
 
+    //update all java code ...
     libList.Clear;
     for j:= 0 to auxList.Count-1 do
     begin
@@ -3194,13 +3209,14 @@ begin
   if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
   begin
 
+      LazarusIDE.ActiveProject.Modified:= True;
+
       //Libraries
       strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;   //path already converted!!!
 
       strLibrary:= StringReplace(strTemp, pathToDemoNDKConverted,
                                          FPathToAndroidNDK,
                                          [rfReplaceAll,rfIgnoreCase]);
-
 
       //try
       strResult:= StringReplace(strLibrary, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
