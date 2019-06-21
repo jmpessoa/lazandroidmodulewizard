@@ -5,7 +5,7 @@ unit customcamera;
 interface
 
 uses
-  Classes, SysUtils, And_jni, AndroidWidget, systryparent;
+  Classes, SysUtils, And_jni, AndroidWidget, systryparent; 
 
 type
 
@@ -24,10 +24,11 @@ jCustomCamera = class(jVisualControl)
  private
     FColor: TARGBColorBridge;
     FOnClick: TOnNotify;
-
     //FOnSurfaceCreated: TCustomCameraSurfaceCreated;
     FOnSurfaceChanged: TCustomCameraSurfaceChanged;
     FOnPictureTaken: TCustomCameraPictureTaken;
+
+    FAutoFocusOnShot : boolean;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -66,6 +67,9 @@ jCustomCamera = class(jVisualControl)
     procedure TakePicture(); overload;
     procedure TakePicture(_filename: string); overload;
 
+    procedure AutoFocus(); // by tr3e
+    procedure SetAutoFocusOnShot( _autoFocusOnShot : boolean ); // by tr3e
+
     procedure SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string); overload;
     procedure SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string; _fileName: string); overload;
 
@@ -75,8 +79,10 @@ jCustomCamera = class(jVisualControl)
 
 
  published
+    property AutoFocusOnShot: boolean read FAutoFocusOnShot write SetAutoFocusOnShot;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
+
     //property OnSurfaceCreated: TCustomCameraSurfaceCreated read FOnSurfaceCreated write FOnSurfaceCreated;
     property OnSurfaceChanged: TCustomCameraSurfaceChanged read FOnSurfaceChanged write FOnSurfaceChanged;
     property OnPictureTaken: TCustomCameraPictureTaken read FOnPictureTaken write FOnPictureTaken;
@@ -110,6 +116,9 @@ function jCustomCamera_GetImage(env: PJNIEnv; _jcustomcamera: JObject; _width: i
 function jCustomCamera_GetImage(env: PJNIEnv; _jcustomcamera: JObject): jObject; overload;
 procedure jCustomCamera_surfaceUpdate(env: PJNIEnv; _jcustomcamera: JObject);
 
+procedure jCustomCamera_AutoFocus(env: PJNIEnv; _jcustomcamera: JObject); // by tr3e
+procedure jCustomCamera_SetAutoFocusOnShot(env: PJNIEnv; _jcustomcamera: JObject; _value: boolean); // by tr3e
+
 implementation
 
 {---------  jCustomCamera  --------------}
@@ -125,6 +134,9 @@ begin
   FWidth        := 96; //??
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
+
+  FAutoFocusOnShot := False; // by tr3e
+
   FAcceptChildrenAtDesignTime:= False;
 //your code here....
 end;
@@ -182,6 +194,8 @@ begin
       jCustomCamera_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
+
+  jCustomCamera_SetAutoFocusOnShot(FjEnv, FjObject, FAutoFocusOnShot);
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
@@ -404,6 +418,24 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCustomCamera_TakePicture(FjEnv, FjObject, _filename);
+end;
+
+// by tr3e
+procedure jCustomCamera.AutoFocus();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCustomCamera_AutoFocus(FjEnv, FjObject);
+end;
+
+// by tr3e
+procedure jCustomCamera.SetAutoFocusOnShot( _autoFocusOnShot: boolean );
+begin
+  //in designing component state: set value here...
+  FAutoFocusOnShot := _autoFocusOnShot;
+
+  if FInitialized then
+     jCustomCamera_SetAutoFocusOnShot(FjEnv, FjObject, _autoFocusOnShot);
 end;
 
 procedure jCustomCamera.SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string);
@@ -693,6 +725,32 @@ begin
   jCls:= env^.GetObjectClass(env, _jcustomcamera);
   jMethod:= env^.GetMethodID(env, jCls, 'TakePicture', '()V');
   env^.CallVoidMethod(env, _jcustomcamera, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// by tr3e
+procedure jCustomCamera_AutoFocus(env: PJNIEnv; _jcustomcamera: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'cameraAutoFocus', '()V');
+  env^.CallVoidMethod(env, _jcustomcamera, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// by tr3e
+procedure jCustomCamera_SetAutoFocusOnShot(env: PJNIEnv; _jcustomcamera: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'cameraSetAutoFocusOnShot', '(Z)V');
+  env^.CallVoidMethodA(env, _jcustomcamera, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

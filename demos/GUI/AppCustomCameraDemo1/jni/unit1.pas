@@ -20,6 +20,7 @@ type
       requestCode: integer; manifestPermission: string;
       grantResult: TManifestPermissionResult);
     procedure jButton1Click(Sender: TObject);
+    procedure jCustomCamera1Click(Sender: TObject);
     procedure jCustomCamera1PictureTaken(Sender: TObject;
       bitmapPicture: jObject; fullPath: string);
     procedure jCustomCamera1SurfaceChanged(Sender: TObject; width: integer;
@@ -43,22 +44,28 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  //jCustomCamera1.SetEnvironmentStorage(dirDownloads,'folder1');
-  //jCustomCamera1.TakePicture();
+  showmessage('Take Picture, wait...');
+  jCustomCamera1.SetEnvironmentStorage(dirDownloads,'folderTest');
+
   jCustomCamera1.TakePicture('MyPicture5.jpg');
+end;
+
+procedure TAndroidModule1.jCustomCamera1Click(Sender: TObject);
+begin
+  showmessage('Auto Focus');
+  jCustomCamera1.AutoFocus();
 end;
 
 procedure TAndroidModule1.jCustomCamera1PictureTaken(Sender: TObject;
   bitmapPicture: jObject; fullPath: string);
 begin
-   ShowMessage('Path= '+ fullPath);
+   ShowMessage('Picture Take to = '+ fullPath);
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 var
   manifestPermissions: TDynArrayOfString;
 begin
-  jCustomCamera1.SetEnvironmentStorage(dirDownloads,'folder2');
 
   //https://www.captechconsulting.com/blogs/runtime-permissions-best-practices-and-how-to-gracefully-handle-permission-removal
   //https://developer.android.com/guide/topics/security/permissions#normal-dangerous

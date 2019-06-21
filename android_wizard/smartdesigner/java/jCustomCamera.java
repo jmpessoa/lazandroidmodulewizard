@@ -1,6 +1,7 @@
 package lamw.org.appcustomcamerademo1;
 
 import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,8 +46,7 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     private boolean stopTimer = false;
     private String mPath;
     private String mFileName = "Picture1.jpg";
-    private String mFolder = "CustomCam";
-    private File mPictureFile;
+    private String mFolder = "CustomCam";    
     private String mEnvDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
 
     //The "holder" is the underlying surface.
@@ -54,6 +54,8 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     private Bitmap mPicture = null;
     private boolean mAutoInit = true;
     private boolean mFlashModeOn = false;
+    private boolean mAutoFocusOnShot = false;
+    private boolean mOnlyAutoFocus = false;
 
     public jCustomCamera(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
         super(_ctrls.activity);
@@ -71,9 +73,11 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
             };
         };
         setOnClickListener(onClickListener);
+        
         setCameraInstance();
+        
         surfaceHolder = this.getHolder();
-        surfaceHolder.addCallback(this);
+        surfaceHolder.addCallback(this);       
     }
 
     /**
@@ -92,6 +96,7 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
             //surfaceHolder is null, nothing to do...
             return;
         }
+                 
         controls.pOnCustomCameraSurfaceChanged(pascalObj,w,h);
         // stop preview before making changes!
         stopCameraPreview();
@@ -195,6 +200,8 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
             
         Camera.Parameters parameters = camera.getParameters();
         parameters.setPictureFormat(ImageFormat.JPEG); // JPEG for full resolution images
+        
+        //mFlashModeOn = true;
 
         try {
             if (! mFlashModeOn)
@@ -395,7 +402,7 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
         return null;
     }
 
-    private File getOutputMediaFile(){
+    private String getOutputMediaFile(){
         File mediaStorageDir = new File(mEnvDir, mFolder);
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
@@ -404,8 +411,7 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
         }
         mPath = mediaStorageDir.getPath() + File.separator + mFileName;
         //Log.i("0. getOutputMediaFile", mPath);
-        mPictureFile = new File(mPath);
-        return mPictureFile;
+        return mPath;
     }
 
     public String GetEnvironmentDirectoryPath(int _directory) {
@@ -457,69 +463,114 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            stopCameraPreview(); // better do that because we don't need a preview right now
+            
+        	stopCameraPreview(); // better do that because we don't need a preview right now
+        	
             // create a Bitmap from the raw data
             mPicture = BitmapFactory.decodeByteArray(data, 0, data.length);
+            
             // [IMPORTANT!] the image contained in the raw array is ALWAYS landscape-oriented.
             // We detect if the user took the picture in portrait mode and rotate it accordingly.
             int rotation = controls.activity.getWindowManager().getDefaultDisplay().getRotation();
-            if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+            
+            if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {            	
                 Matrix matrix = new Matrix();
                 matrix.postRotate(90);
                 // create a rotated version and replace the original bitmap
-                mPicture = Bitmap.createBitmap(mPicture, 0, 0, mPicture.getWidth(), mPicture.getHeight(), matrix, true);
+                Bitmap bmpRotate = Bitmap.createBitmap(mPicture, 0, 0, mPicture.getWidth(), mPicture.getHeight(), matrix, true);
+                matrix.reset();
+                
+                mPicture = bmpRotate;
             }
-            //save to file
-            File pictureFile = getOutputMediaFile();  //configure envDir, sub-folder, fileName...
-            if (pictureFile == null){
-                //Log.i("PictureCallback", "null");
-                return;
-            }
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
-                bos.write(data, 0, data.length);
-                bos.close();
-                fos.close();
-
-                startCameraPreview(surfaceHolder);
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            controls.pOnCustomCameraPictureTaken(pascalObj,  mPicture, pictureFile.getPath());
+            
+            String bmpPath = getOutputMediaFile();
+            
+            saveBitmapToJpg(mPicture, bmpPath);
+            	            
+            startCameraPreview(surfaceHolder);
+                        
+            controls.pOnCustomCameraPictureTaken(pascalObj,  mPicture, bmpPath);
         }
     };
+    
+    Camera.AutoFocusCallback mAutoFocusCallBack = new Camera.AutoFocusCallback(){
+        @Override
+        public void onAutoFocus(boolean success, Camera arg1) {
+            //camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+        	if( !mOnlyAutoFocus ){
+             if ((camera != null) && success)
+               camera.takePicture(null, null, mJPEGPictureCallback);             
+        	}
+        	
+        }
+     };
+    
+    // by tr3e
+    private void saveBitmapToJpg(Bitmap bitmap, String bmpPath) {
+        
+           OutputStream outStream = null;
+           
+           final File file = new File(bmpPath);
+           
+           try {
+            outStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
+            outStream.flush();
+            outStream.close();
 
-    public void TakePicture() {
+            //Toast.makeText(context, "Saved", Toast.LENGTH_LONG).show();
+
+           } catch (final FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            //Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+           } catch (final IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            //Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+           }
+
+          }
+    
+    // by tr3e
+    public void cameraAutoFocus(){
     	if(camera == null) return;
     	
-        camera.autoFocus(new Camera.AutoFocusCallback(){
-            @Override
-            public void onAutoFocus(boolean success, Camera arg1) {
-                //camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-                if (success)
-                   camera.takePicture(null, null, mJPEGPictureCallback);
-            }
-        });
+        if( mAutoFocusCallBack == null ) return;
+    	
+    	mOnlyAutoFocus = true;
+    	
+    	camera.cancelAutoFocus(); // Fix autoFocus
+    	camera.autoFocus(mAutoFocusCallBack);
+    }
+    
+    // by tr3e
+    public void cameraSetAutoFocusOnShot( boolean _autoFocusOnShot ){
+    	mAutoFocusOnShot = _autoFocusOnShot;
+    }
+
+    public void TakePicture() {    
+    	
+    	if( (camera == null) || (mJPEGPictureCallback == null) || (mAutoFocusCallBack == null) ) return;
+    	    	
+    	mOnlyAutoFocus = false;
+    	
+    	if( mAutoFocusOnShot ){
+    		camera.cancelAutoFocus(); // Fix autoFocus
+            camera.autoFocus(mAutoFocusCallBack);
+    	}else
+        	camera.takePicture(null, null, mJPEGPictureCallback);
     }
 
     //ABOUT: https://stackoverflow.com/questions/19804233/android-autofocuscallback-is-not-being-called-or-not-returning
     // https://stackoverflow.com/questions/25321968/trouble-with-focus-mode-continuous-picture-on-galaxy-s5
     public void TakePicture(String _filename) {
+    	    	
     	if(camera == null) return;
     	
         mFileName = _filename;
-        camera.autoFocus(new Camera.AutoFocusCallback(){
-            					@Override
-            					public void onAutoFocus(boolean success, Camera arg1) {
-            						//camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-                                    if (success)
-                                        camera.takePicture(null, null, mJPEGPictureCallback);
-            					}
-           				});
+        
+        TakePicture();        
     }
 
     public void SetEnvironmentStorage(int _environmentDir,  String _folderName) {
@@ -541,7 +592,9 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     }
 
     public Bitmap GetImage(int _width, int _height) {
-        return decodeSampleImage(mPictureFile,_width, _height);
+    	File fileBmp = new File(getOutputMediaFile());
+    	
+        return decodeSampleImage(fileBmp, _width, _height);
     }
 
     public Bitmap GetImage() {
