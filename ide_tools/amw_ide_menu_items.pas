@@ -1156,7 +1156,6 @@ begin
               if FileExists(fullPathToUnitSourceLFM) then
               begin
                 listUnit.LoadFromFile(fullPathToUnitSourceLFM);
-
                 p:= Pos(':', listUnit.Strings[0]);   //object AndroidModule1: TAndroidModule1
                 sourceFormName:=  Trim(Copy(listUnit.Strings[0], p+3, MaxInt)); //AndroidModule1
                 for i:= 1 to listUnit.Count-1 do
@@ -1165,7 +1164,7 @@ begin
                   begin
                      p:= Pos(':', listUnit.Strings[i]);
                      compName:= Trim(Copy(listUnit.Strings[i], p+2, MaxInt));
-                     if FileExists(pathToJavaTemplates+PathDelim+'smartdesigner'+PathDelim+compName+'.java')  then
+                     if FileExists(pathToJavaTemplates+PathDelim+compName+'.java')  then
                      begin
                        listComponent.Add(compName);
                      end;
@@ -1187,7 +1186,7 @@ begin
     begin
        if not FileExists(pathToJavasSrc+PathDelim+listComponent.Strings[i]+'.java') then
        begin
-          listTemp.LoadFromFile(pathToJavaTemplates+PathDelim+'smartdesigner'+PathDelim+listComponent.Strings[i]+'.java');
+          listTemp.LoadFromFile(pathToJavaTemplates+PathDelim+listComponent.Strings[i]+'.java');
           listTemp.Strings[0]:= 'package '+ package +';';
           listTemp.SaveToFile(pathToJavasSrc+PathDelim+listComponent.Strings[i]+'.java');
        end;
@@ -1208,7 +1207,7 @@ begin
     listTemp.Strings[1]:='//';
     listTemp.SaveToFile(fullPathToUnitTarget);
 
-    listComponent.Add('jForm');
+    //listComponent.Add('jForm');
     Project.Files[listIndex+1].CustomData['jControls']:= listComponent.DelimitedText;
 
     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
