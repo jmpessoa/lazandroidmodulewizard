@@ -55,7 +55,9 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpMatchParent
+    AutoFocusOnShot = True
     BackgroundColor = colbrDefault
+    OnClick = jCustomCamera1Click
     OnSurfaceChanged = jCustomCamera1SurfaceChanged
     OnPictureTaken = jCustomCamera1PictureTaken
   end
