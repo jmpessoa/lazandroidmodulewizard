@@ -1132,6 +1132,7 @@ begin
      FormImportLAMWStuff:= TFormImportLAMWStuff.Create(Application);
 
      unitsList:= FindAllFiles(pathToProject, '*.lfm', False);
+
      listProjComp.Clear;
      for k:= 0 to unitsList.Count-1 do
      begin
@@ -1141,16 +1142,19 @@ begin
        FormImportLAMWStuff.ListBoxTarget.Items.Add(ExtractFileName(ChangeFileExt(unitsList.Strings[k], '')));
      end;
 
+
      if FormImportLAMWStuff.ShowModal = mrOK then
      begin
 
          listIndex:= FormImportLAMWStuff.ListBoxTarget.ItemIndex;
-         if  listIndex >= 0 then
+         fullPathToUnitSourceLFM:= FormImportLAMWStuff.EditSource.Text;
+
+         if  (listIndex >= 0) and (fullPathToUnitSourceLFM <> '') then
          begin
             targetFormName:= listProjComp.Strings[listIndex]; //AndroidModule1 listIndex = selected unit to be replaced...
             fullPathToUnitTarget:=  unitsList.Strings[listIndex]; //.lfm
             fullPathToUnitTarget:= ChangeFileExt(fullPathToUnitTarget, '.pas');
-            fullPathToUnitSourceLFM:= FormImportLAMWStuff.EditSource.Text;
+
             if fullPathToUnitSourceLFM <> '' then
             begin
               if FileExists(fullPathToUnitSourceLFM) then
@@ -1173,10 +1177,8 @@ begin
               end;
             end else ShowMessage('Fail. None [target] LAMW Form were selected...');
          end else ShowMessage('Fail. None [candidate] Unit were selected...');
-
      end;
      unitsList.Free;
-
   end;
 
   if listComponent.Count > 0 then
@@ -1220,26 +1222,32 @@ begin
   else
   begin
      listTemp.Clear;
-     listTemp.LoadFromFile(fullPathToUnitSourceLFM);
-     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
-     listTemp.Text:= tempStr;
-     ShowMessage(fullPathToUnitTarget);
-     listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
+     if fullPathToUnitSourceLFM <> '' then
+     begin
+       if FileExists(fullPathToUnitSourceLFM) then
+       begin
+         listTemp.LoadFromFile(fullPathToUnitSourceLFM);
+         tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
+         listTemp.Text:= tempStr;
+         ShowMessage(fullPathToUnitTarget);
+         listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
 
-     listTemp.Clear;
-     listTemp.LoadFromFile(ChangeFileExt(fullPathToUnitSourceLFM, '.pas'));
-     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
-     listTemp.Text:= tempStr;
-     listTemp.Strings[0]:= 'unit '+ChangeFileExt(ExtractFileName(fullPathToUnitTarget),'') +';';
-     listTemp.Strings[1]:='//';
-     listTemp.SaveToFile(fullPathToUnitTarget);
+         listTemp.Clear;
+         listTemp.LoadFromFile(ChangeFileExt(fullPathToUnitSourceLFM, '.pas'));
+         tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
+         listTemp.Text:= tempStr;
+         listTemp.Strings[0]:= 'unit '+ChangeFileExt(ExtractFileName(fullPathToUnitTarget),'') +';';
+         listTemp.Strings[1]:='//';
+         listTemp.SaveToFile(fullPathToUnitTarget);
 
-     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
-                'Hints:'+ sLineBreak +
-                '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
-                '.(Re)"Open" the project to update the form display content ...' + sLineBreak +
-                '      Or close the form unit tab and reopen it [Project Inspector...]'+ sLineBreak +
-                '      to see the content changes...');
+         ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
+                    'Hints:'+ sLineBreak +
+                    '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
+                    '.(Re)"Open" the project to update the form display content ...' + sLineBreak +
+                    '      Or close the form unit tab and reopen it [Project Inspector...]'+ sLineBreak +
+                    '      to see the content changes...');
+       end;
+     end;
   end;
 
   listTemp.Free;
