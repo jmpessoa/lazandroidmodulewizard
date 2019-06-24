@@ -1,9 +1,30 @@
 unit AndroidWidget;
 
-//Lazarus Android Module Wizard: Form Designer and Components development model!
-//Author: jmpessoa@hotmail.com
-//https://github.com/jmpessoa/lazandroidmodulewizard
-//http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+//Legacy: based Simosays's Native Android Controls for Pascal
+
+(*
+LAMW: Lazarus Android Module Wizard:
+	:: RAD Android! Form Designer and Components Development Model!
+
+"A wizard to create JNI Android loadable module (.so) and Android Apk
+	widh Lazarus/Free Pascal using Form Designer and Components!"
+
+Authors:
+
+	Jose Marques Pessoa
+		jmpessoa@hotmail dot com
+		https://github.com/jmpessoa/lazandroidmodulewizard
+		http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+
+	Simon,Choi / Choi,Won-sik
+		simonsayz@naver dot com
+		http://blog.naver.com/simonsayz
+
+	Anton A. Panferov [@A.S.]
+		ast.a_s@mail dot ru
+		https://github.com/odisey1245
+
+*)
 
 {$mode delphi}
 
@@ -34,7 +55,6 @@ type
 const
 
   // Event id for Pascal & Java
-
   cTouchDown            = 0;
   cTouchMove            = 1;
   cTouchUp              = 2;
@@ -48,7 +68,7 @@ const
   cRenderer_onGLResume  = 6;
 
 
-  cjFormsMax = 40; // Max Form Stack Count
+  cjFormsMax = 60; // Max Form Stack Count
 
   TFPColorBridgeArray: array[0..144] of longint = (
     $000000,$98FB98,$9932CC,$9ACD32,$A0522D,
@@ -644,6 +664,7 @@ type
   TListItemClick = Procedure(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer) of object;
 
   TOnCallBackData = Procedure(Sender: TObject; strData: string; intData: integer; doubleData: double) of object;
+  TOnCallBackPointer = Procedure(Sender: TObject; _pointer: Pointer) of object;
 
   TOnClickEx         = Procedure(Sender: TObject; Value: integer) of object;
 
@@ -753,9 +774,10 @@ type
 
 
   TjCallBack =  record
-                 Event       : TOnNotify;
-                 EventData   : TOnCallBackData;
-                 Sender      : TObject;
+                  Event       : TOnNotify;
+                  EventData   : TOnCallBackData;
+                  EventPointer: TOnCallBackPointer;
+                  Sender      : TObject;
                 end;
 
   TEnvScreen =  record
@@ -1030,6 +1052,7 @@ end;
     FCBDataString: string;
     FCBDataInteger: integer;
     FCBDataDouble: double;
+    FCBPointer: Pointer;
 
     FjRLayout: jObject;      //form Relative Layout/view
     FjPRLayout: jObject; //base actvity layout/view
@@ -1115,6 +1138,7 @@ end;
 
     Procedure SetCloseCallBack(Func : TOnNotify; Sender : TObject);  overload;
     Procedure SetCloseCallBack(Func : TOnCallBackData; Sender : TObject); overload;
+    Procedure SetCloseCallBack(Func : TOnCallBackPointer; Sender : TObject); overload;
 
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
@@ -1287,6 +1311,7 @@ end;
     property CallBackDataString: string read FCBDataString write FCBDataString;
     property CallBackDataInteger: integer read FCBDataInteger write FCBDataInteger;
     property CallBackDataDouble: double read FCBDataDouble write FCBDataDouble;
+    property CallBackPointer: Pointer read FCBPointer write FCBPointer;
 
     property PackageName: string read FPackageName;
     property ActionBarHeight: integer read GetActionBarHeight;
@@ -1408,6 +1433,7 @@ end;
     procedure SetParent(const AValue: TAndroidWidget); override;
     // end tk
   public
+
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetParentComponent(Value: TComponent); override;  //+++
@@ -1988,29 +2014,29 @@ end;
 // Input  Touches
 // Output MTouch
 Procedure MultiTouch_Calc(Var Mouches : TMouches );
- begin
+begin
   //
   If Mouches.Cnt > 1 then
-   begin
+  begin
     If Not(Mouches.Mouch.Active) then
-     begin
+    begin
       Mouches.sPt    := csAvg  ( Mouches.XYs[0], Mouches.XYs[1] );
       Mouches.sLen   := csLen  ( Mouches.XYs[0], Mouches.XYs[1] );
       Mouches.sAngle := csAngle( Mouches.XYs[0], Mouches.XYs[1] );
       Mouches.Mouch.Active := True;
-     end;
+    end;
     Inc(Mouches.sCount);
     Mouches.Mouch.Start  := (Mouches.sCount = 1);
     //If Touches.MTouch.Start then dbg('Start###################################');
     Mouches.Mouch.Pt    :=  csAvg  ( Mouches.XYs[0],Mouches.XYs[1] );
     Mouches.Mouch.Zoom  :=  csLen  ( Mouches.XYs[0],Mouches.XYs[1] ) / Mouches.sLen;
     Mouches.Mouch.Angle :=  csAngle( Mouches.XYs[0],Mouches.XYs[1] ) - Mouches.sAngle;
-   end
+  end
   else
-   begin
+  begin
     Mouches.Mouch.Pt    :=  Mouches.XYs[0];
-   end;
- end;
+  end;
+end;
 
 Procedure MultiTouch_End(Var Mouches : TMouches);
  begin
@@ -2389,7 +2415,7 @@ begin
 
   inherited Create(AOwner);
 
-  FjPRLayout := nil;  //java parent
+  FjPRLayout := nil;  //java view parent
   FjPRLayoutHome:= nil;
 
   FjObject    := nil; //java object
@@ -2747,6 +2773,7 @@ begin
   FormState             := fsFormCreate;
   FCloseCallBack.Event  := nil;
   FCloseCallBack.EventData:= nil;
+  FCloseCallBack.EventPointer:= nil;
   FCloseCallBack.Sender := nil;
   FActivityMode         := ActivityModeDesign; //actMain;  //actMain, actRecyclable, actSplash, act...
 
@@ -2798,7 +2825,7 @@ begin
   begin
     if FInitialized and (not Finished) then
     begin
-      jForm_FreeLayout(FjEnv, FjRLayout); //free jni jForm Layout global reference
+      jForm_FreeLayout(FjEnv, FjRLayout);      //free jni jForm Layout global reference
       jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni jForm Layout global reference
       jForm_Free2(FjEnv, FjObject);
     end;
@@ -3015,7 +3042,7 @@ var
 begin
   //if FActivityMode = actEasel then Exit;
   if not FInitialized  then Exit;
-  for i := 0 to (Self.ComponentCount - 1) do
+  for i:= 0 to (Self.ComponentCount - 1) do
   begin
     if Self.Components[i] is jVisualControl then
     begin
@@ -3104,16 +3131,20 @@ begin
             jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt; //<<--- thanks to @arenabor
       end;
 
-      //LORDMAN - 2013-08-01 // Call Back
+      //LORDMAN - 2013-08-01 // Call Back event
       if Assigned(gApp.Forms.Stack[Inx].CloseCB.Event) then
          gApp.Forms.Stack[Inx].CloseCB.Event(gApp.Forms.Stack[Inx].CloseCB.Sender);
 
-      //by jmpessoa Call Back Data
       if Assigned(gApp.Forms.Stack[Inx].CloseCB.EventData) then
          gApp.Forms.Stack[Inx].CloseCB.EventData(gApp.Forms.Stack[Inx].CloseCB.Sender,
                                                  jForm(Form).FCBDataString,
                                                  jForm(Form).FCBDataInteger ,
                                                  jForm(Form).FCBDataDouble);
+
+      if Assigned(gApp.Forms.Stack[Inx].CloseCB.EventPointer) then
+         gApp.Forms.Stack[Inx].CloseCB.EventPointer(gApp.Forms.Stack[Inx].CloseCB.Sender,
+                                                 jForm(Form).FCBPointer);
+
       //BacktrackOnClose
       if jForm(Form).TryBacktrackOnClose then
       begin
@@ -3141,14 +3172,21 @@ end;
 procedure jForm.SetCloseCallBack(Func: TOnNotify; Sender: TObject);
 begin
   //if not FInitialized then Exit; // SetCloseCallBack is normally called before Init !!
-  FCloseCallBack.Event:= func;
+  FCloseCallBack.Event:= Func;
   FCloseCallBack.Sender:= Sender;
 end;
 
 procedure jForm.SetCloseCallBack(Func: TOnCallBackData; Sender: TObject);
 begin
   //if not FInitialized then Exit; // SetCloseCallBack is normally called before Init !!
-  FCloseCallBack.EventData:= func;
+  FCloseCallBack.EventData:= Func;
+  FCloseCallBack.Sender:= Sender;
+end;
+
+procedure jForm.SetCloseCallBack(Func: TOnCallBackPointer; Sender: TObject);
+begin
+  //if not FInitialized then Exit; // SetCloseCallBack is normally called before Init !!
+  FCloseCallBack.EventPointer:= Func;
   FCloseCallBack.Sender:= Sender;
 end;
 
@@ -6245,13 +6283,13 @@ begin
 
      lpHalfOfParent:         Result:= Trunc((1/2)*GetParamByParentSide(paren, side));
 
-     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide(paren, side));
-     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide(paren, side));
-     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide(paren, side));
-     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide(paren, side));
-     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide(paren, side));
-     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide(paren, side));
-     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide(paren, side));
+     lpOneQuarterOfParent:   Result:= Trunc((1/4)*GetParamByParentSide(paren, side)); //0.25
+     lpOneEighthOfParent:    Result:= Trunc((1/8)*GetParamByParentSide(paren, side)); //0.125
+     lpOneFifthOfParent:     Result:= Trunc((1/5)*GetParamByParentSide(paren, side)); //0.20
+     lpTwoFifthOfParent:     Result:= Trunc((2/5)*GetParamByParentSide(paren, side)); //0.40
+     lpThreeFifthOfParent:   Result:= Trunc((3/5)*GetParamByParentSide(paren, side)); //0.60
+     lpThreeQuarterOfParent: Result:= Trunc((3/4)*GetParamByParentSide(paren, side)); //0.75
+     lpFourFifthOfParent:    Result:= Trunc((4/5)*GetParamByParentSide(paren, side)); //0.80
 
      lpThreeEighthOfParent:  Result:= Trunc((3/8)*GetParamByParentSide(paren, side)); //0.375
      lpFiveEighthOfParent:   Result:= Trunc((5/8)*GetParamByParentSide(paren, side)); //0.625

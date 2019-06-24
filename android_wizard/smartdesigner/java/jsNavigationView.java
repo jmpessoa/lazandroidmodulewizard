@@ -56,7 +56,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    String headerText = "Hello World!";
    String headerSubText =  "LAMW 0.8";
    
-   int headerColor = R.color.primary_light;
+   int headerColor = 0xC5CAE9; // R.color.primary_light;
    
    int itemId;
    String itemCaption;
@@ -363,7 +363,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
  	}
 
    
-   public void AddHeaderView(int _color, String _drawableIdentifier, String _text, int _height) {
+   public void AddHeaderView(int _color, String _drawableLogoIdentifier, String _text, int _height) {
 	   	   
 	      String delimiter = "|";
 	      String[] words = _text.split(Pattern.quote(delimiter));
@@ -378,11 +378,9 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	      }
 	      	     	   
 	      headerColor = _color;
-	      //headerImageIdentifier = R.drawable.ic_launcher;
-	      
-	      headerImageIdentifier = context.getResources().getIdentifier(_drawableIdentifier, "drawable", context.getPackageName() );	      	  	      
-	      //headerImageIdentifier = GetDrawableResourceId(_drawableIdentifier);	    		  
-	      
+
+	      headerImageIdentifier = context.getResources().getIdentifier(_drawableLogoIdentifier, "drawable", context.getPackageName() );
+
 	      Bitmap bmp =  GetBitmapFromById(headerImageIdentifier);	      
 	      if (bmp != null) bmp = GetRoundedShape(bmp);
 	      	      	      
@@ -390,20 +388,21 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	      
 	      int h =  (int) (_height * getResources().getDisplayMetrics().density);  //_height = 192
 	      RelativeLayout.LayoutParams paramLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h);
-	      
-	      
-	      headerLayout.setLayoutParams(paramLayout);      
-	      headerLayout.setBackgroundColor(headerColor);	   
-	      headerImageView = new ImageView(context);	      	      
-	      //headerImageView.setImageResource(headerImageIdentifier);	      
+
+	      headerLayout.setLayoutParams(paramLayout);
+	      headerLayout.setBackgroundColor(headerColor);
+	      headerImageView = new ImageView(context);
+
+	      int id1 = 111111111;
 	      if (bmp != null) { 	    	  
 	    	  headerImageView.setImageBitmap(bmp);	      
 	          headerImageView.setPadding(10, 10, 10, 10);
-	          headerImageView.setId(111111111);	      
-          }        
-	      
+	          headerImageView.setId(id1);
+          }
+
+	      int id2 = 111111110;
 		  headerTextView = new TextView(context);
-		  headerTextView.setId(111111110);
+		  headerTextView.setId(id2);
 		  headerTextView.setText(headerText);      
 		  headerTextView.setPadding(10, 30, 10, 10);	      		  
 		  headerTextView.setTextColor(textColor);
@@ -413,32 +412,95 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	          paramImg.addRule(RelativeLayout.CENTER_IN_PARENT);            			  
 			  headerLayout.addView(headerImageView, paramImg);
 		  }	      
-		  
+
 		  RelativeLayout.LayoutParams paramText = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		  paramText.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		  paramText.addRule(RelativeLayout.BELOW, 111111111);	    	  
+		  paramText.addRule(RelativeLayout.BELOW, id1);
 		  headerLayout.addView(headerTextView, paramText);	    	  
-	      
-          if (countText >= 2) {        	  
+
+		  if (countText >= 2) {
   	          headerSubTextView = new TextView(context);
   	          headerSubTextView.setText(headerSubText);      
   	          headerSubTextView.setPadding(10, 10, 10, 20);	      
      	      headerSubTextView.setTextColor(subTextColor);        	  
     		  RelativeLayout.LayoutParams paramText2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     		  paramText2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-    		  paramText2.addRule(RelativeLayout.BELOW, 111111110);	    	      		     	  
+    		  paramText2.addRule(RelativeLayout.BELOW, id2);
     	      headerLayout.addView(headerSubTextView, paramText2);	    	  
 	      }
-	      
+
 	      this.addHeaderView(headerLayout);
 	      
    }
+
+	public void AddHeaderView(String _drawableBackgroundIdentifier, String _drawableLogoIdentifier, String _text, int _height) {
+
+		String delimiter = "|";
+		String[] words = _text.split(Pattern.quote(delimiter));
+		int countText = words.length;
+
+		if (countText >= 2) {
+			headerText = words[0];
+			headerSubText = words[1];
+		}
+		else {
+			headerText = _text;
+		}
+
+		headerImageIdentifier = context.getResources().getIdentifier(_drawableLogoIdentifier, "drawable", context.getPackageName() );
+		Bitmap bmp =  GetBitmapFromById(headerImageIdentifier);
+		if (bmp != null) bmp = GetRoundedShape(bmp);
+		headerLayout = new RelativeLayout(context);
+		int h =  (int) (_height * getResources().getDisplayMetrics().density);  //_height = 192
+		RelativeLayout.LayoutParams paramLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h);
+		headerLayout.setLayoutParams(paramLayout);
+		headerImageView = new ImageView(context);
+
+		int id1 = 111111111;
+		if (bmp != null) {
+			headerImageView.setImageBitmap(bmp);
+			headerImageView.setPadding(10, 10, 10, 10);
+			headerImageView.setId(id1);
+		}
+
+		int id2 = 111111110;
+		headerTextView = new TextView(context);
+		headerTextView.setId(id2);
+		headerTextView.setText(headerText);
+		headerTextView.setPadding(10, 30, 10, 10);
+		headerTextView.setTextColor(textColor);
+
+		if (bmp != null) {
+			RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			paramImg.addRule(RelativeLayout.CENTER_IN_PARENT);
+			headerLayout.addView(headerImageView, paramImg);
+		}
+
+		RelativeLayout.LayoutParams paramText = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		paramText.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		paramText.addRule(RelativeLayout.BELOW, id1);
+		headerLayout.addView(headerTextView, paramText);
+
+		if (countText >= 2) {
+			headerSubTextView = new TextView(context);
+			headerSubTextView.setText(headerSubText);
+			headerSubTextView.setPadding(10, 10, 10, 20);
+			headerSubTextView.setTextColor(subTextColor);
+			RelativeLayout.LayoutParams paramText2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			paramText2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			paramText2.addRule(RelativeLayout.BELOW, id2);
+			headerLayout.addView(headerSubTextView, paramText2);
+		}
+
+		headerLayout.setBackgroundResource(context.getResources().getIdentifier(_drawableBackgroundIdentifier, "drawable", context.getPackageName() ));
+		this.addHeaderView(headerLayout);
+
+	}
       
-   public void SetSubtitleTextColor(int _color) {
+    public void SetSubtitleTextColor(int _color) {
 	   subTextColor =  _color;
    }
-
-   public void SetTitleTextColor(int _color) {
+    public void SetTitleTextColor(int _color) {
 	   textColor = _color; 
    }
 

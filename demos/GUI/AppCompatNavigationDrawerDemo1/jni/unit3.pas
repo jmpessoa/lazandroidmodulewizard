@@ -17,6 +17,7 @@ type
     jPanel1: jPanel;
     jTextView1: jTextView;
     procedure AndroidModule3JNIPrompt(Sender: TObject);
+    procedure AndroidModule3Rotate(Sender: TObject; rotate: TScreenStyle);
     procedure jImageView1Click(Sender: TObject);
   private
     {private declarations}
@@ -41,7 +42,25 @@ end;
 
 procedure TAndroidModule3.AndroidModule3JNIPrompt(Sender: TObject);
 begin
-  ShowMessage('OnPrompt Scene 3');
+   if Self.GetScreenOrientationStyle =  ssLandscape then
+   begin
+     jTextView1.PosRelativeToParent:= [rpCenterHorizontal];
+     jTextView1.UpdateLayout;
+   end
+end;
+
+procedure TAndroidModule3.AndroidModule3Rotate(Sender: TObject;
+  rotate: TScreenStyle);
+begin
+   if rotate =  ssLandscape then
+   begin
+     jTextView1.PosRelativeToParent:= [rpCenterHorizontal];
+   end
+   else
+   begin
+     jTextView1.PosRelativeToParent:= [rpLeft];
+   end;
+   Self.UpdateLayout;
 end;
 
 end.

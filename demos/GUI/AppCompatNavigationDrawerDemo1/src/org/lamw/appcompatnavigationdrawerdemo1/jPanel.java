@@ -137,11 +137,34 @@ public class jPanel extends RelativeLayout {
 		@Override
 		public boolean onDown(MotionEvent event) {
 			//Log.i("Down", "------------");
+			controls.pOnDown(PasObj, Const.Click_Default);
 			return true;
 		}
+		
+		@Override
+		public boolean onSingleTapUp(MotionEvent e) {
+			//Log.i("Click", "------------");
+			controls.pOnClick(PasObj, Const.Click_Default);
+			return true;
+		}
+		
+		@Override
+		public boolean onDoubleTap(MotionEvent e) {
+			//Log.i("DoubleTap", "------------");
+			controls.pOnDoubleClick(PasObj, Const.Click_Default);
+			return true;
+		}
+		
+		@Override
+		public void onLongPress(MotionEvent e) {
+			//Log.i("LongPress", "------------");			
+			controls.pOnLongClick(PasObj, Const.Click_Default);
+		}			
 
 		@Override
 		public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
+			
+			
 
 			if(event1.getX() - event2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
 				controls.pOnFlingGestureDetected(PasObj, 0);                //onRightToLeft;
@@ -282,7 +305,8 @@ public class jPanel extends RelativeLayout {
 	       		parent.requestLayout();
 	       		parent.invalidate();	
 	       	}
-		}				
+		}		
+		this.setVisibility(android.view.View.VISIBLE);
 	}
 	
 	public void SetVisibilityGone() {

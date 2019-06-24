@@ -2081,7 +2081,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
 Procedure jEditText_setParent(env:PJNIEnv;
                               EditText : jObject;ViewGroup : jObject);
  var

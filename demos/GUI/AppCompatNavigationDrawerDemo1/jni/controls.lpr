@@ -5,7 +5,7 @@ library controls;  //[by LAMW: Lazarus Android Module Wizard: 12/18/2017 1:14:40
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
-  Laz_And_Controls_Events, unit1, unit2, unit3;
+  Laz_And_Controls_Events, unit1, unit2, unit3, unit4;
   
 {%region /fold 'LAMW generated code'}
 
@@ -212,6 +212,15 @@ begin
 end;
 
 { Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnDown
+  Signature: (JI)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
+  cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
@@ -227,6 +236,15 @@ procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
   ); cdecl;
 begin
   Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnDoubleClick
+  Signature: (JI)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  value: JInt); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
@@ -253,6 +271,14 @@ end;
 procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnEnter(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
@@ -337,6 +363,187 @@ begin
 end;
 
 { Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnImageViewPopupItemSelected
+  Signature: (JLjava/lang/String;)V }
+procedure pOnImageViewPopupItemSelected(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; caption: JString); cdecl;
+begin
+  Java_Event_pOnImageViewPopupItemSelected(PEnv, this, TObject(pasobj), caption
+    );
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnClickWidgetItem
+  Signature: (JIZ)V }
+procedure pOnClickWidgetItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; checked: JBoolean); cdecl;
+begin
+  Java_Event_pOnClickWidgetItem(PEnv, this, TObject(pasobj), position, checked);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnClickImageItem
+  Signature: (JI)V }
+procedure pOnClickImageItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt); cdecl;
+begin
+  Java_Event_pOnClickImageItem(PEnv, this, TObject(pasobj), position);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnClickCaptionItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickCaptionItem(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickCaptionItem(PEnv, this, TObject(pasobj), position, caption
+    );
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnClickItemTextLeft
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickItemTextLeft(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickItemTextLeft(PEnv, this, TObject(pasobj), position, caption
+    );
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnClickItemTextCenter
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickItemTextCenter(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickItemTextCenter(PEnv, this, TObject(pasobj), position,
+    caption);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnClickItemTextRight
+  Signature: (JILjava/lang/String;)V }
+procedure pOnClickItemTextRight(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnClickItemTextRight(PEnv, this, TObject(pasobj), position,
+    caption);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnListViewLongClickCaptionItem
+  Signature: (JILjava/lang/String;)V }
+procedure pOnListViewLongClickCaptionItem(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; caption: JString); cdecl;
+begin
+  Java_Event_pOnListViewLongClickCaptionItem(PEnv, this, TObject(pasobj),
+    position, caption);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnListViewDrawItemCaptionColor
+  Signature: (JILjava/lang/String;)I }
+function pOnListViewDrawItemCaptionColor(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; caption: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemCaptionColor(PEnv, this, TObject(pasobj
+    ), position, caption);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnListViewDrawItemBackgroundColor
+  Signature: (JI)I }
+function pOnListViewDrawItemBackgroundColor(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemBackgroundColor(PEnv, this, TObject(
+    pasobj), position);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnListViewDrawItemBitmap
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnListViewDrawItemBitmap(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; caption: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemBitmap(PEnv, this, TObject(pasobj),
+    position, caption);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnWidgeItemLostFocus
+  Signature: (JILjava/lang/String;)V }
+procedure pOnWidgeItemLostFocus(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  position: JInt; widgetText: JString); cdecl;
+begin
+  Java_Event_pOnWidgeItemLostFocus(PEnv, this, TObject(pasobj), position,
+    widgetText);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnListViewScrollStateChanged
+  Signature: (JIIIZ)V }
+procedure pOnListViewScrollStateChanged(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; firstVisibleItem: JInt; visibleItemCount: JInt;
+  totalItemCount: JInt; lastItemReached: JBoolean); cdecl;
+begin
+  Java_Event_pOnListViewScrollStateChanged(PEnv, this, TObject(pasobj),
+    firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnListViewDrawItemWidgetTextColor
+  Signature: (JILjava/lang/String;)I }
+function pOnListViewDrawItemWidgetTextColor(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; widgetText: JString): JInt; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetTextColor(PEnv, this, TObject(
+    pasobj), position, widgetText);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnListViewDrawItemWidgetText
+  Signature: (JILjava/lang/String;)Ljava/lang/String; }
+function pOnListViewDrawItemWidgetText(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; widgetText: JString): JString; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetText(PEnv, this, TObject(pasobj),
+    position, widgetText);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnListViewDrawItemWidgetImage
+  Signature: (JILjava/lang/String;)Landroid/graphics/Bitmap; }
+function pOnListViewDrawItemWidgetImage(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; position: JInt; widgetText: JString): JObject; cdecl;
+begin
+  Result:=Java_Event_pOnListViewDrawItemWidgetImage(PEnv, this, TObject(pasobj
+    ), position, widgetText);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
+  Method:    pOnScrollViewChanged
+  Signature: (JIIIIII)V }
+procedure pOnScrollViewChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  currenthorizontal: JInt; currentVertical: JInt; previousHorizontal: JInt;
+  previousVertical: JInt; onPosition: JInt; scrolldiff: JInt); cdecl;
+begin
+  Java_Event_pOnScrollViewChanged(PEnv, this, TObject(pasobj),
+    currenthorizontal, currentVertical, previousHorizontal, previousVertical,
+    onPosition, scrolldiff);
+end;
+
+{ Class:     org_lamw_appcompatnavigationdrawerdemo1_Controls
   Method:    pOnClickNavigationViewItem
   Signature: (JILjava/lang/String;)V }
 procedure pOnClickNavigationViewItem(PEnv: PJNIEnv; this: JObject;
@@ -346,7 +553,7 @@ begin
     itemCaption);
 end;
 
-const NativeMethods: array[0..37] of JNINativeMethod = (
+const NativeMethods: array[0..58] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -417,12 +624,18 @@ const NativeMethods: array[0..37] of JNINativeMethod = (
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(JI)V';
+    fnPtr: @pOnDown; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
    (name: 'pOnLongClick';
     signature: '(JI)V';
     fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(JI)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -432,6 +645,9 @@ const NativeMethods: array[0..37] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -459,6 +675,60 @@ const NativeMethods: array[0..37] of JNINativeMethod = (
    (name: 'pOnLayouting';
     signature: '(JZ)V';
     fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
+   (name: 'pOnImageViewPopupItemSelected';
+    signature: '(JLjava/lang/String;)V';
+    fnPtr: @pOnImageViewPopupItemSelected; ),
+   (name: 'pOnClickWidgetItem';
+    signature: '(JIZ)V';
+    fnPtr: @pOnClickWidgetItem; ),
+   (name: 'pOnClickImageItem';
+    signature: '(JI)V';
+    fnPtr: @pOnClickImageItem; ),
+   (name: 'pOnClickCaptionItem';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnClickCaptionItem; ),
+   (name: 'pOnClickItemTextLeft';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnClickItemTextLeft; ),
+   (name: 'pOnClickItemTextCenter';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnClickItemTextCenter; ),
+   (name: 'pOnClickItemTextRight';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnClickItemTextRight; ),
+   (name: 'pOnListViewLongClickCaptionItem';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnListViewLongClickCaptionItem; ),
+   (name: 'pOnListViewDrawItemCaptionColor';
+    signature: '(JILjava/lang/String;)I';
+    fnPtr: @pOnListViewDrawItemCaptionColor; ),
+   (name: 'pOnListViewDrawItemBackgroundColor';
+    signature: '(JI)I';
+    fnPtr: @pOnListViewDrawItemBackgroundColor; ),
+   (name: 'pOnListViewDrawItemBitmap';
+    signature: '(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr: @pOnListViewDrawItemBitmap; ),
+   (name: 'pOnWidgeItemLostFocus';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnWidgeItemLostFocus; ),
+   (name: 'pOnListViewScrollStateChanged';
+    signature: '(JIIIZ)V';
+    fnPtr: @pOnListViewScrollStateChanged; ),
+   (name: 'pOnListViewDrawItemWidgetTextColor';
+    signature: '(JILjava/lang/String;)I';
+    fnPtr: @pOnListViewDrawItemWidgetTextColor; ),
+   (name: 'pOnListViewDrawItemWidgetText';
+    signature: '(JILjava/lang/String;)Ljava/lang/String;';
+    fnPtr: @pOnListViewDrawItemWidgetText; ),
+   (name: 'pOnListViewDrawItemWidgetImage';
+    signature: '(JILjava/lang/String;)Landroid/graphics/Bitmap;';
+    fnPtr: @pOnListViewDrawItemWidgetImage; ),
+   (name: 'pOnScrollViewChanged';
+    signature: '(JIIIIII)V';
+    fnPtr: @pOnScrollViewChanged; ),
    (name: 'pOnClickNavigationViewItem';
     signature: '(JILjava/lang/String;)V';
     fnPtr: @pOnClickNavigationViewItem; )
@@ -567,16 +837,21 @@ exports
     +'pOnClickGeneric',
   pAppOnSpecialKeyDown name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
     +'Controls_pAppOnSpecialKeyDown',
+  pOnDown name 'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_pOnDown',
   pOnClick name
     'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_pOnClick',
   pOnLongClick name 'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_'
     +'pOnLongClick',
+  pOnDoubleClick name 'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_'
+    +'pOnDoubleClick',
   pOnChange name 'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_'
     +'pOnChange',
   pOnChanged name 'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_'
     +'pOnChanged',
   pOnEnter name
     'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_pOnEnter',
+  pOnBackPressed name 'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_'
+    +'pOnBackPressed',
   pOnClose name
     'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_pOnClose',
   pAppOnViewClick name 'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_'
@@ -595,6 +870,42 @@ exports
     +'Controls_pOnAfterDispatchDraw',
   pOnLayouting name 'Java_org_lamw_appcompatnavigationdrawerdemo1_Controls_'
     +'pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_org_lamw_appcompatnavigationdrawerde'
+    +'mo1_Controls_pAppOnRequestPermissionResult',
+  pOnImageViewPopupItemSelected name 'Java_org_lamw_appcompatnavigationdrawerde'
+    +'mo1_Controls_pOnImageViewPopupItemSelected',
+  pOnClickWidgetItem name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
+    +'Controls_pOnClickWidgetItem',
+  pOnClickImageItem name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
+    +'Controls_pOnClickImageItem',
+  pOnClickCaptionItem name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
+    +'Controls_pOnClickCaptionItem',
+  pOnClickItemTextLeft name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
+    +'Controls_pOnClickItemTextLeft',
+  pOnClickItemTextCenter name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
+    +'Controls_pOnClickItemTextCenter',
+  pOnClickItemTextRight name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
+    +'Controls_pOnClickItemTextRight',
+  pOnListViewLongClickCaptionItem name 'Java_org_lamw_appcompatnavigationdrawer'
+    +'demo1_Controls_pOnListViewLongClickCaptionItem',
+  pOnListViewDrawItemCaptionColor name 'Java_org_lamw_appcompatnavigationdrawer'
+    +'demo1_Controls_pOnListViewDrawItemCaptionColor',
+  pOnListViewDrawItemBackgroundColor name 'Java_org_lamw_appcompatnavigationdra'
+    +'werdemo1_Controls_pOnListViewDrawItemBackgroundColor',
+  pOnListViewDrawItemBitmap name 'Java_org_lamw_appcompatnavigationdrawerdemo1'
+    +'_Controls_pOnListViewDrawItemBitmap',
+  pOnWidgeItemLostFocus name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
+    +'Controls_pOnWidgeItemLostFocus',
+  pOnListViewScrollStateChanged name 'Java_org_lamw_appcompatnavigationdrawerde'
+    +'mo1_Controls_pOnListViewScrollStateChanged',
+  pOnListViewDrawItemWidgetTextColor name 'Java_org_lamw_appcompatnavigationdra'
+    +'werdemo1_Controls_pOnListViewDrawItemWidgetTextColor',
+  pOnListViewDrawItemWidgetText name 'Java_org_lamw_appcompatnavigationdrawerde'
+    +'mo1_Controls_pOnListViewDrawItemWidgetText',
+  pOnListViewDrawItemWidgetImage name 'Java_org_lamw_appcompatnavigationdrawerd'
+    +'emo1_Controls_pOnListViewDrawItemWidgetImage',
+  pOnScrollViewChanged name 'Java_org_lamw_appcompatnavigationdrawerdemo1_'
+    +'Controls_pOnScrollViewChanged',
   pOnClickNavigationViewItem name 'Java_org_lamw_appcompatnavigationdrawerdemo'
     +'1_Controls_pOnClickNavigationViewItem';
 

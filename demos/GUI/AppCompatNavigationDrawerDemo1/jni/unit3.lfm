@@ -2,7 +2,7 @@ object AndroidModule3: TAndroidModule3
   Left = 347
   Top = 132
   Width = 320
-  Height = 400
+  Height = 471
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -12,12 +12,13 @@ object AndroidModule3: TAndroidModule3
   ActivityMode = actEasel
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  OnRotate = AndroidModule3Rotate
   OnJNIPrompt = AndroidModule3JNIPrompt
   object jPanel1: jPanel
     Left = 4
     Top = 4
     Width = 312
-    Height = 392
+    Height = 463
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -33,10 +34,10 @@ object AndroidModule3: TAndroidModule3
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
     object jImageView1: jImageView
-      Left = 132
-      Top = 172
-      Width = 48
-      Height = 48
+      Left = 120
+      Top = 195
+      Width = 72
+      Height = 72
       MarginLeft = 0
       MarginTop = 0
       MarginRight = 0
@@ -52,13 +53,14 @@ object AndroidModule3: TAndroidModule3
       ImageIdentifier = 'ic_scene_3'
       ImageScaleType = scaleCenter
       GravityInParent = lgNone
+      RoundedShape = False
       OnClick = jImageView1Click
     end
     object jTextView1: jTextView
       Left = 20
-      Top = 240
-      Width = 378
-      Height = 20
+      Top = 287
+      Width = 495
+      Height = 26
       MarginLeft = 20
       MarginTop = 20
       MarginRight = 20

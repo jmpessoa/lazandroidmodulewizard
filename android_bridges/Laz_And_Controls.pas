@@ -1,19 +1,36 @@
-//------------------------------------------------------------------------------
-//
-//   Native Android Controls for Pascal
+unit Laz_And_Controls;
 
-//   [Lazarus Support by jmpessoa@hotmail.com - december 2013]
-//    https://github.com/jmpessoa/lazandroidmodulewizard
+//Start:26-october-2013
 
-//   Compiler   Free Pascal Compiler FPC 2.7.1, ( XE5 in near future )
-//
-//
+(*
+LAMW: Lazarus Android Module Wizard:
+	:: RAD Android! Form Designer and Components Development Model!
+"A wizard to create JNI Android loadable module (.so) and Android Apk
+	widh Lazarus/Free Pascal using Form Designer and Components!"
+
+Authors:
+
+	Jose Marques Pessoa
+		jmpessoa@hotmail dot com
+		https://github.com/jmpessoa/lazandroidmodulewizard
+		http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
+
+	Simon,Choi / Choi,Won-sik
+		simonsayz@naver dot com
+		http://blog.naver.com/simonsayz
+
+	Anton A. Panferov [@A.S.]
+		ast.a_s@mail dot ru
+		https://github.com/odisey1245
+*)
+
+//Legacy: Native Android Controls for Pascal
 //   Developer
-//              Simon,Choi / Choi,Won-sik , 최원식옹
+//              Simon,Choi / Choi,Won-sik
 //                           simonsayz@naver.com   
 //                           http://blog.naver.com/simonsayz
 //
-//              LoadMan    / Jang,Yang-Ho , 장양호
+//              LoadMan    / Jang,Yang-Ho
 //                           wkddidgh@naver.com    
 //                           http://blog.naver.com/wkddidgh
 //
@@ -121,24 +138,11 @@
 //
 //------------------------------------------------------------------------------
 
-unit Laz_And_Controls;
-
-//A modified and expanded version of the simonsayz's "And_Controls.pas"
-//for Lazarus Android Module Wizard: Form Designer and Components development model!
-//Author: jmpessoa@hotmail.com
-//https://github.com/jmpessoa/lazandroidmodulewizard
-//http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
-
-//Start:  - 26-october-2013
-//Ver_0.1 - 08-december-2013
-//Ver_0.2 - 08-february-2014: Added support to Android API > 13
-
 {$mode delphi}
 
 interface
 
 uses
-  {And_lib_Unzip,}
   SysUtils, Classes,
   And_bitmap_h, And_jni, And_jni_Bridge,
   AndroidWidget, systryparent;
@@ -828,7 +832,7 @@ type
     procedure SetVisible(Value: boolean);
     
   protected
-    FjPRLayoutHome: jObject; //Save parent origin
+    FjPRLayoutHome: jObject; //Save view parent origin
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -1086,6 +1090,7 @@ type
     procedure SaveToFile(_path: string; _filename: string);  overload;
     procedure SaveToFile(_filename: string); overload;
     procedure ClearLayout();
+
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
@@ -3767,7 +3772,7 @@ begin
    if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   if FEnabled =  False then
+   if FEnabled = False then
      jTextView_setEnabled(FjEnv, FjObject , False);
 
    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
@@ -11734,7 +11739,7 @@ end;
 
 procedure jPanel.SetParamWidth(Value: TLayoutParams);
 begin
-   inherited  SetParamWidth(Value);
+   inherited SetParamWidth(Value);
    if FInitialized then
    begin
      //
@@ -12296,6 +12301,7 @@ end;
 procedure jDBListView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
+  FjPRLayout:= _viewgroup;
   if FInitialized then
     jDBListView_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;

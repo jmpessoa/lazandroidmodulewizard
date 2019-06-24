@@ -1,33 +1,17 @@
-How To Get More Builds:
+How to get more ".so" chipset builds:
  
-   :: Warning: Your system [Laz4Android ?] needs to be prepared [cross-compile] for the various builds!
+   :: Warning 1: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds!
+   :: Warning 2: Laz4Android [out-of-box] support only 32 Bits chipset: "armV6", "armV7a+Soft", "x86"!
  
-1. Edit Lazarus project file "*.lpi": [use notepad like editor]
+1. From LazarusIDE menu:
  
-   > Open the "*.lpi" project file
+   > Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]
  
-       -If needed replace the line <Libraries ..... /> in the "*.lpi" by line from "build_*.txt"
-       -If needed replace the line <TargetCPU ..... /> in the "*.lpi" by line from "build_*.txt"
-       -If needed replace the line <CustomOptions ..... /> in the "*.lpi" by line from "build_*.txt"
-       -If needed replace the line <TargetProcessor...../> in the "*.lpi" by line from "build_*.txt"
+2. From LazarusIDE  menu:
  
-   > Save the modified "*.lpi" project file 
+   > Run -> Clean up and Build...
  
-2. From Lazarus/Laz4Android IDE
+3. From LazarusIDE menu:
  
-   >Reopen the Project
+   > [LAMW] Build Android Apk and Run
  
-   > Run -> Build
- 
-3. Repeat for others "build_*.txt" if needed...
- 
-4. Execute [double click] the "build.bat" [or .sh] file to get the Apk !
- or [Eclipse IDE]
- 
-   -right click your  project: -> Refresh [F5]
- 
-   -right click your  project: -> Run as -> Android Application
- 
- 
-      Thank you!
-      By  ___jmpessoa_hotmail.com_____

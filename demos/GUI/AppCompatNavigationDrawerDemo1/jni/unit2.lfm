@@ -1,8 +1,8 @@
 object AndroidModule2: TAndroidModule2
   Left = 266
   Top = 109
-  Width = 320
-  Height = 400
+  Width = 308
+  Height = 468
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -12,12 +12,13 @@ object AndroidModule2: TAndroidModule2
   ActivityMode = actEasel
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  OnRotate = AndroidModule2Rotate
   OnJNIPrompt = AndroidModule2JNIPrompt
   object jPanel1: jPanel
     Left = 4
     Top = 4
-    Width = 312
-    Height = 392
+    Width = 300
+    Height = 460
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -33,10 +34,10 @@ object AndroidModule2: TAndroidModule2
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
     object jImageView1: jImageView
-      Left = 132
-      Top = 172
-      Width = 48
-      Height = 48
+      Left = 114
+      Top = 0
+      Width = 72
+      Height = 72
       MarginLeft = 0
       MarginTop = 0
       MarginRight = 0
@@ -45,20 +46,21 @@ object AndroidModule2: TAndroidModule2
       Visible = True
       Id = 2
       PosRelativeToAnchor = []
-      PosRelativeToParent = [rpCenterInParent]
+      PosRelativeToParent = [rpTop, rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrDefault
       ImageIdentifier = 'ic_scene_2'
       ImageScaleType = scaleCenter
       GravityInParent = lgNone
+      RoundedShape = False
       OnClick = jImageView1Click
     end
     object jTextView1: jTextView
       Left = 20
-      Top = 240
-      Width = 676
-      Height = 20
+      Top = 92
+      Width = 890
+      Height = 26
       MarginLeft = 20
       MarginTop = 20
       MarginRight = 20
@@ -78,6 +80,132 @@ object AndroidModule2: TAndroidModule2
       FontSize = 0
       TextTypeFace = tfNormal
       FontSizeUnit = unitDefault
+      GravityInParent = lgNone
+    end
+    object jTextView2: jTextView
+      Left = 5
+      Top = 143
+      Width = 81
+      Height = 26
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jTextView1
+      Id = 4
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpLeft]
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'jTextView2'
+      Alignment = taLeft
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
+      GravityInParent = lgNone
+    end
+    object jEditText1: jEditText
+      Left = 5
+      Top = 179
+      Width = 150
+      Height = 39
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jTextView2
+      Id = 5
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpLeft]
+      LayoutParamWidth = lpHalfOfParent
+      LayoutParamHeight = lpWrapContent
+      Text = 'jEditText1'
+      Alignment = taLeft
+      InputTypeEx = itxText
+      MaxTextLength = -1
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      HintTextColor = colbrDefault
+      ScrollBarStyle = scrNone
+      MaxLines = 1
+      HorScrollBar = True
+      VerScrollBar = True
+      WrappingLine = False
+      Editable = True
+      FontSizeUnit = unitDefault
+      CloseSoftInputOnEnter = True
+      CapSentence = False
+      CaptureBackPressed = False
+      GravityInParent = lgNone
+    end
+    object jTextView3: jTextView
+      Left = 150
+      Top = 143
+      Width = 81
+      Height = 26
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jEditText2
+      Id = 6
+      PosRelativeToAnchor = [raAbove, raAlignLeft]
+      PosRelativeToParent = []
+      LayoutParamWidth = lpWrapContent
+      LayoutParamHeight = lpWrapContent
+      Text = 'jTextView3'
+      Alignment = taLeft
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      TextTypeFace = tfNormal
+      FontSizeUnit = unitDefault
+      GravityInParent = lgNone
+    end
+    object jEditText2: jEditText
+      Left = 145
+      Top = 179
+      Width = 150
+      Height = 39
+      MarginLeft = 5
+      MarginTop = 5
+      MarginRight = 5
+      MarginBottom = 5
+      Enabled = True
+      Visible = True
+      Anchor = jTextView2
+      Id = 7
+      PosRelativeToAnchor = [raBelow]
+      PosRelativeToParent = [rpRight]
+      LayoutParamWidth = lpHalfOfParent
+      LayoutParamHeight = lpWrapContent
+      Text = 'jEditText2'
+      Alignment = taLeft
+      InputTypeEx = itxText
+      MaxTextLength = -1
+      BackgroundColor = colbrDefault
+      FontColor = colbrDefault
+      FontSize = 0
+      HintTextColor = colbrDefault
+      ScrollBarStyle = scrNone
+      MaxLines = 1
+      HorScrollBar = True
+      VerScrollBar = True
+      WrappingLine = False
+      Editable = True
+      FontSizeUnit = unitDefault
+      CloseSoftInputOnEnter = True
+      CapSentence = False
+      CaptureBackPressed = False
       GravityInParent = lgNone
     end
   end

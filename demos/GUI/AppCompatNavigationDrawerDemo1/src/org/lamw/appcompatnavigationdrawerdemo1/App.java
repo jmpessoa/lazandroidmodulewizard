@@ -1,6 +1,6 @@
 package org.lamw.appcompatnavigationdrawerdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8 -  06 December - 2017
+//Lamw: Lazarus Android Module Wizard - version 0.8.4 - 12 March - 2019
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -69,12 +69,23 @@ public class App extends AppCompatActivity {
       // Event : Java -> Pascal
       //Log.i("jApp","02.Controls.jAppOnCreate");
       //Bundle extras = getIntent().getExtras();      
-      
+ 
       controls.jAppOnCreate(this, controls.appLayout, getIntent());
       
       //Log.i("jApp","03.Controls.jAppOnCreate");
     }
-       
+
+    //[ifdef_api23up]
+    @Override
+    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+        if ( (permissions.length > 0) && (grantResults.length > 0) ) {
+            for (int i = 0; i < permissions.length; i++) {
+                controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[i], grantResults[i]);
+            }
+        }
+    } //[endif_api23up]
+
+
     @Override    
     protected void onNewIntent(Intent intent) {
     	super.onNewIntent(intent);

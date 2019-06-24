@@ -1,8 +1,15 @@
 package org.lamw.appcompatnavigationdrawerdemo1;
 
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.View.MeasureSpec;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -49,10 +56,12 @@ public class jCommons {
  /* //[endif_api14up]
  private int lgravity = Gravity.TOP | Gravity.LEFT;
  //[ifdef_api14up] */
-	private float lweight = 0;
+	private float lweight = 1.0f;
 	private boolean mRemovedFromParent = false;
 	private int algravity;
 	private int algravityAnchorId;
+	
+	private android.content.Context context;
 	
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
 		aOwnerView = _view;       // set owner
@@ -61,6 +70,8 @@ public class jCommons {
 		lgravity = Gravity.NO_GRAVITY;
 		algravity = Gravity.NO_GRAVITY;
 		algravityAnchorId = -1;
+		
+		context = _context;
 		
 		if (aOwnerView != null) {
 			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
@@ -172,7 +183,7 @@ public class jCommons {
 		lparamH = _h;
 		lparamW = _w;		
 	}
-	
+
 	public void setLParamWidth(int _w) {
 		lparamW = _w;
 		lparams.width  = lparamW;
@@ -184,18 +195,34 @@ public class jCommons {
 	}
 		
 	public int getLParamHeight() {
-		int r = lparamH;		
+		int r = lparamH;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getHeight();
-		}		
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;				
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		    			
+			r = aOwnerView.getMeasuredHeight();
+		}
+		
 		return r;
 	}
 
 	public int getLParamWidth() {				
-		int r = lparamW;		
+		int r = lparamW;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getWidth();		
-		}				
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		   			
+			r = aOwnerView.getMeasuredWidth();		
+		}
+		
 		return r;		
 	}	
 	
@@ -208,7 +235,7 @@ public class jCommons {
 	      //[endif_api14up]
 	       /* //[endif_api14up]
 	       LEFT =  Gravity.LEFT;          
-	       RIGHT =  Gravity.RIGHT 
+	       RIGHT =  Gravity.RIGHT; 
 	       //[ifdef_api14up] */	   	   
 		   switch(_g) {	   
 		   case 0: lgravity = Gravity.NO_GRAVITY; break;
@@ -243,7 +270,7 @@ public class jCommons {
 	      //[endif_api14up]
 	       /* //[endif_api14up]
 	       LEFT =  Gravity.LEFT;          
-	       RIGHT =  Gravity.RIGHT 
+	       RIGHT =  Gravity.RIGHT; 
 	       //[ifdef_api14up] */	   	   
 	      
 	       algravityAnchorId = _anchorId;
@@ -311,7 +338,7 @@ public class jCommons {
 		}  
 		
 		
- 		if (lparams instanceof CoordinatorLayout.LayoutParams) { 		
+ 		if (lparams instanceof CoordinatorLayout.LayoutParams) {
 			((CoordinatorLayout.LayoutParams)lparams).gravity = lgravity;
 			
 			/*
@@ -323,29 +350,31 @@ public class jCommons {
 			
 		}		
  		if (lparams instanceof DrawerLayout.LayoutParams) { 	
-			((DrawerLayout.LayoutParams)lparams).gravity = lgravity;
+ 			((DrawerLayout.LayoutParams)lparams).gravity = lgravity;
 		}		
  		
  		if (lparams instanceof CollapsingToolbarLayout.LayoutParams) {
-			((CollapsingToolbarLayout.LayoutParams)lparams).gravity = lgravity;						
+ 			((CollapsingToolbarLayout.LayoutParams)lparams).gravity = lgravity;
 		} 		
  		 		
  		if (lparams instanceof NestedScrollView.LayoutParams) {
-			((NestedScrollView.LayoutParams)lparams).gravity = lgravity;
+ 			((NestedScrollView.LayoutParams)lparams).gravity = lgravity;
 		}
  		
  		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
+ 			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
 		}
  		
  		
  		if (lparams instanceof TabLayout.LayoutParams) {
-			((TabLayout.LayoutParams)lparams).gravity = lgravity;
+ 			((TabLayout.LayoutParams)lparams).gravity = lgravity;
 		}
  						
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}		
+		if (lparams instanceof LinearLayout.LayoutParams) { //weight
+			((LinearLayout.LayoutParams)lparams).weight = lweight; //lweight = 1 <-- the trick!!
+			((LinearLayout.LayoutParams)lparams).gravity = lgravity; //lweight;
+		}
+
 		if (lparams instanceof AppBarLayout.LayoutParams) {
 			((AppBarLayout.LayoutParams)lparams).weight = lweight;
 		}
@@ -496,5 +525,111 @@ public class jCommons {
     public int getColorAccentId() {
     	return  R.color.accent;
     }
-    
+
+	public static void RequestRuntimePermission(Controls controls, String androidPermission, int requestCode) {  //"android.permission.CAMERA"
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			ActivityCompat.requestPermissions(controls.activity, new String[]{androidPermission}, requestCode);
+		} //[endif_api23up]
+	}
+
+
+	public static void RequestRuntimePermission(Controls controls, String[] androidPermissions, int requestCode) {  
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			controls.activity.requestPermissions(androidPermissions, requestCode);
+		} //[endif_api23up]
+	}
+
+
+	public static boolean IsRuntimePermissionGranted(Controls controls, String _androidPermission) {  //"android.permission.CAMERA"
+		boolean r = true;
+		int IsGranted = PackageManager.PERMISSION_GRANTED; //0    PERMISSION_DENIED = -1
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			IsGranted =  ContextCompat.checkSelfPermission(controls.activity, _androidPermission);
+		} //[endif_api23up]
+		if (IsGranted != PackageManager.PERMISSION_GRANTED) r = false;
+
+		return r;
+	}
+
+	public static boolean HasActionBar(Controls controls) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null) return true;
+		else return false;
+	}
+
+	public static void SetActionBarSubTitle(Controls controls, String subtitle) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+		  ((AppCompatActivity) controls.activity).getSupportActionBar().setSubtitle(subtitle);
+	}
+
+	public static void SetActionBarTitle(Controls controls, String title) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setTitle(title);
+	}
+
+	public static void ActionBarHide(Controls controls) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().hide();
+	}
+
+	public static void ActionBarShow(Controls controls) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().show();
+	}
+
+	public static void ActionBarShowTitle(Controls controls, boolean value) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayShowTitleEnabled(value);
+	}
+
+	public static void ActionBarShowLogo(Controls controls, boolean value) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayUseLogoEnabled(value);
+	}
+
+	public static void ActionBarDisplayHomeAsUpEnabled(Controls controls, boolean value) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayHomeAsUpEnabled(value);
+	}
+
+	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setIcon(icon);;
+
+	}
+
+	public static void ActionBarSetTabNavigationMode(Controls controls) {
+      //not AppCompat ..
+	}
+
+	public static void ActionBarRemoveAllTabs(Controls controls) {
+		//not AppCompat ..
+	}
+
+	public static int ActionGetBarBarHeight(Controls controls) {
+		return 0; //not AppCompat ..
+	}
+
+	public static boolean ActionBarIsShowing(Controls controls) {
+		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		if (actionBar != null)
+			return actionBar.isShowing();
+		else return false;
+	}
+
+	public static boolean IsAppCompatProject() {
+		return true;
+	}
+
 }

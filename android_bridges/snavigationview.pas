@@ -52,6 +52,7 @@ jsNavigationView = class(jVisualControl)
     procedure SetLGravity(_value: TLayoutGravity);
 
     procedure AddHeaderView(_headerView: jObject);  overload;
+    procedure AddHeaderView(_drawableBackgroundIdentifier: string; _drawableLogoIdentifier: string; _text: string; _height: integer); overload;
 
     function AddMenu(_headerTitle: string): jObject; overload;
     procedure AddItemIcon(_menuItem: jObject; _drawableIdentifier: string);
@@ -61,7 +62,7 @@ jsNavigationView = class(jVisualControl)
     procedure ResetAllItemsTextColor();
     procedure SetFontColor(_color: TARGBColorBridge);
     procedure SetSelectedItemTextColor(_color: TARGBColorBridge);
-    procedure AddHeaderView(_color: TARGBColorBridge; _drawableIdentifier: string; _text: string; _height: integer);overload;
+    procedure AddHeaderView(_color: TARGBColorBridge; _drawableLogoIdentifier: string; _text: string; _height: integer);overload;
     function AddItem(_menu: jObject; _itemId: integer; _itemCaption: string): jObject;  overload;
     procedure AddItem(_menu: jObject; _itemId: integer; _itemCaption: string; _drawableIdentifier: string); overload;
     procedure SetSubtitleTextColor(_color: integer);
@@ -110,7 +111,7 @@ function jsNavigationView_AddItem(env: PJNIEnv; _jsnavigationview: JObject; _men
 procedure jsNavigationView_AddItem(env: PJNIEnv; _jsnavigationview: JObject; _menu: jObject; _itemId: integer; _itemCaption: string; _drawableIdentifier: string); overload;
 procedure jsNavigationView_SetSubtitleTextColor(env: PJNIEnv; _jsnavigationview: JObject; _color: integer);
 procedure jsNavigationView_SetTitleTextColor(env: PJNIEnv; _jsnavigationview: JObject; _color: integer);
-
+procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _drawableBackgroundIdentifier: string; _drawableLogoIdentifier: string; _text: string; _height: integer); overload;
 
 
 implementation
@@ -478,11 +479,11 @@ begin
      jsNavigationView_SetSelectedItemTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 end;
 
-procedure jsNavigationView.AddHeaderView(_color: TARGBColorBridge; _drawableIdentifier: string; _text: string; _height: integer);
+procedure jsNavigationView.AddHeaderView(_color: TARGBColorBridge; _drawableLogoIdentifier: string; _text: string; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddHeaderView(FjEnv, FjObject, GetARGB(FCustomColor, _color) ,_drawableIdentifier ,_text ,_height);
+     jsNavigationView_AddHeaderView(FjEnv, FjObject, GetARGB(FCustomColor, _color) ,_drawableLogoIdentifier ,_text ,_height);
 end;
 
 function jsNavigationView.AddItem(_menu: jObject; _itemId: integer; _itemCaption: string): jObject;
@@ -511,6 +512,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jsNavigationView_SetTitleTextColor(FjEnv, FjObject, _color);
+end;
+
+procedure jsNavigationView.AddHeaderView(_drawableBackgroundIdentifier: string; _drawableLogoIdentifier: string; _text: string; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_AddHeaderView(FjEnv, FjObject, _drawableBackgroundIdentifier ,_drawableLogoIdentifier ,_text ,_height);
 end;
 
 {-------- jsNavigationView_JNI_Bridge ----------}
@@ -1022,5 +1030,23 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _drawableBackgroundIdentifier: string; _drawableLogoIdentifier: string; _text: string; _height: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_drawableBackgroundIdentifier));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_drawableLogoIdentifier));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[3].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddHeaderView', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.
