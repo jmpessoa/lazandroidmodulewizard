@@ -52,8 +52,9 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
-        <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCheckBox;jcOpenMapView;jForm;jTextView"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jCheckBox;jcOpenMapView;jForm;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>

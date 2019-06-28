@@ -2192,6 +2192,7 @@ public java.lang.Object jcOpenMapView_jCreate(long _Self, boolean _showScale, in
 public native int[] pOnOpenMapViewRoadDraw(long pasobj, int roadCode, int roadStatus, double roadDuration, double roadDistance);
 public native void pOnOpenMapViewClick(long pasobj, double latitude, double longitude);
 public native void pOnOpenMapViewLongClick(long pasobj, double latitude, double longitude);
+public native void pOnOpenMapViewMarkerClick(long pasobj, String title, double latitude, double longitude);
 
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));

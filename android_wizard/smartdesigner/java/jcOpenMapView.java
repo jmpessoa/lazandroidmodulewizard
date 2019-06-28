@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -48,16 +49,15 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
 
     //private OnClickListener onClickListener;   // click event
     private Boolean enabled = true;           // click-touch enabled!
-
     private IMapController mapController;
 
-    private ArrayList<GeoPoint> mPath;
+    private ArrayList<GeoPoint> mBufferGeoPointsList;
     private MapView mThis;
     private RoadManager mRoadManager;
-
     MapEventsOverlay mapEventsOverlay;
-
-    List<GeoPoint> mGeoPointsList;
+    List<Marker> mMarkerList;
+    List<Polygon> mPolygonList;
+    private boolean IsMarkerDraggable;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jcOpenMapView(Controls _ctrls, long _Self, boolean _showScale, int _tileSource, int _zoom) { //Add more others news "_xxx" params if needed!
@@ -78,7 +78,16 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         setOnClickListener(onClickListener);
         */
 
-        //Fonte de imagens
+        /*
+        this.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+        */
+
+        //images sources
         switch(_tileSource) {
             case 0: this.setTileSource(TileSourceFactory.MAPNIK); break;//MAPNIK-HIKEBIKEMAP-OpenTopo ok
             case 1: this.setTileSource(TileSourceFactory.HIKEBIKEMAP); break; //MAPNIK-HIKEBIKEMAP-OpenTopo ok
@@ -88,14 +97,15 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         mapController = this.getController();
         mapController.setZoom((double)_zoom);
 
-        mGeoPointsList = new ArrayList<GeoPoint>(); //polygon
-        mPath = new ArrayList<GeoPoint>();   //road
+        mMarkerList = new ArrayList<Marker>();
+        mPolygonList = new ArrayList<Polygon>();
+        mBufferGeoPointsList = new ArrayList<GeoPoint>();
 
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
-
         mRoadManager = new OSRMRoadManager(controls.activity);
         mThis = this;
         mapEventsOverlay = new MapEventsOverlay(this);
+
         this.getOverlays().add(0, mapEventsOverlay);
 
         //show scale
@@ -103,6 +113,8 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             ScaleBarOverlay scale = new ScaleBarOverlay(this);
             this.getOverlays().add(scale);
         }
+
+        IsMarkerDraggable = true;
     } //end constructor
 
     //https://code.google.com/archive/p/osmbonuspack/wikis/Tutorial_5.wiki
@@ -125,6 +137,10 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
     public void jFree() {
         //free local objects...
         //setOnClickListener(null);
+        mMarkerList.clear();
+        mPolygonList.clear();
+        mBufferGeoPointsList.clear();
+
         LAMWCommon.free();
     }
 
@@ -214,6 +230,49 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         this.invalidate();
     }
 
+    public void SetShowScale(boolean _show) {//show scale
+        if (_show) {
+            ScaleBarOverlay scale = new ScaleBarOverlay(this);
+            this.getOverlays().add(scale);
+        }
+    }
+
+    public void SetTileSource(int _tileSource) {
+        //Fonte de imagens
+        switch(_tileSource) {
+            case 0: this.setTileSource(TileSourceFactory.MAPNIK); break;//MAPNIK-HIKEBIKEMAP-OpenTopo ok
+            case 1: this.setTileSource(TileSourceFactory.HIKEBIKEMAP); break; //MAPNIK-HIKEBIKEMAP-OpenTopo ok
+            case 2: this.setTileSource(TileSourceFactory.OpenTopo); break; //MAPNIK-HIKEBIKEMAP-OpenTopo ok
+        }
+    }
+
+    public void SetCircle(double _latitude, double _longitude, double _radiusInMetters, String _title, int _strokeColor, float _strokeWidth) {
+        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
+        Polygon circle = new Polygon(this); //radiusInMetter
+        circle.setPoints(Polygon.pointsAsCircle(geoPoint, _radiusInMetters)); //2000.0
+        //And we adjust some design aspects:
+        circle.setFillColor(0x12121212);
+        circle.setStrokeColor(_strokeColor);  //Color.RED
+        circle.setStrokeWidth(_strokeWidth); //2
+        //And as Polygon supports bubbles, let's add one:
+        circle.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, this));
+        //circle.setTitle("Centered on "+geoPoint.getLatitude()+","+geoPoint.getLongitude());
+        circle.setTitle(_title);
+        this.getOverlays().add(circle);
+        //this.invalidate();
+    }
+
+    public void SetGroundImageOverlay(double _latitude, double _longitude, String _imageIdentifier, float _dimMetters) {
+        int resId = GetDrawableResourceId(_imageIdentifier);
+        Drawable d = GetDrawableResourceById(resId);
+        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
+        GroundOverlay myGroundOverlay = new GroundOverlay();
+        myGroundOverlay.setPosition(geoPoint);
+        myGroundOverlay.setImage(d.mutate()); //
+        myGroundOverlay.setDimensions(_dimMetters); //2000.0f
+        this.getOverlays().add(myGroundOverlay);
+    }
+
     public int GetDrawableResourceId(String _resName) {
         try {
             Class<?> res = R.drawable.class;
@@ -301,48 +360,102 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         }
     }
 
-    public void RoadDraw(int _roadCode) {
-        if (mPath.size() == 0) return;
-        new MyAsyncTask(_roadCode).execute(mPath);
+    public void DrawRoad(int _roadCode) {
+        if (mBufferGeoPointsList.size() < 2) return;
+        new MyAsyncTask(_roadCode).execute(mBufferGeoPointsList);
     }
 
-    public void RoadDraw() {
-        if (mPath.size() == 0) return;
-        new MyAsyncTask(0).execute(mPath);
+    public void DrawRoad() {
+        if (mBufferGeoPointsList.size() < 2) return;
+        new MyAsyncTask(0).execute(mBufferGeoPointsList);
     }
 
-    public void RoadClear() {
-        mPath.clear();
+    public void DrawRoad(int _roadCode, int _geoPointStartIndex, int _count) {
+        ArrayList<GeoPoint> pointsList = new ArrayList<GeoPoint>();
+
+        int size = mBufferGeoPointsList.size();
+
+        int startIndex = _geoPointStartIndex;
+        if (startIndex < 0) startIndex = 0;
+
+        int cnt = _count;
+        if (cnt < 2) cnt = 2;
+
+        for (int i = 0; i < cnt; i++) {
+            if ((startIndex + i) < size)
+                pointsList.add(mBufferGeoPointsList.get(startIndex + i));
+        }
+        if (pointsList.size() < 2) return;
+
+        new MyAsyncTask(0).execute(pointsList);
     }
 
-    public void RoadAdd(double _latitude, double _longitude) {
-        mPath.add(new GeoPoint(_latitude, _longitude));
+    public void DrawRoad(int _roadCode, double[] _latitudeLongitude) {
+        int count = _latitudeLongitude.length;
+        ArrayList<GeoPoint> pointsList = new ArrayList<GeoPoint>();
+        int i = 0;
+        while ( (2*i+1) < count) { //0-> 0,1   1->2,3  2->4,5
+            pointsList.add(new GeoPoint(_latitudeLongitude[2*i], _latitudeLongitude[2*i+1]));
+            i = i +1;
+        }
+        if (pointsList.size() < 2) return;
+        new MyAsyncTask(0).execute(pointsList);
     }
 
-    public void SetMarker(double _latitude, double _longitude, String _iconIdentifier) {
+    public int AddMarker(double _latitude, double _longitude, String _iconIdentifier) {
         Marker marker = new Marker(this);
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
         marker.setPosition(geoPoint);
+        marker.setTitle(_iconIdentifier);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        //marker.setInfoWindow(null);
+        marker.setDraggable(true);
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                marker.showInfoWindow();
+                mapView.getController().animateTo(marker.getPosition());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(),  marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                return false;
+            }
+        });
+
         this.getOverlays().add(marker);
+        this.invalidate();
+        mMarkerList.add(marker);
+        return mMarkerList.size();
     }
 
-    public void SetMarker(double _latitude, double _longitude, String _title, String _iconIdentifier) {
+    public int AddMarker(double _latitude, double _longitude, String _title, String _iconIdentifier) {
         Marker marker = new Marker(this);
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
         marker.setPosition(geoPoint);
         marker.setTitle(_title);
-        marker.setSnippet("Département INFO, IUT de Lannion");
+        //marker.setSnippet("Département INFO, IUT de Lannion");
         //marker.setAlpha(0.75f);
         //nodeMarker.setSubDescription(Road.getLengthDurationText(controls.activity, _node.mLength, _node.mDuration));
         //nodeMarker.setImage(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setDraggable(IsMarkerDraggable);
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                marker.showInfoWindow();
+                mapView.getController().animateTo(marker.getPosition());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                return false;
+            }
+        });
+
         this.getOverlays().add(marker);
+        this.invalidate();
+        mMarkerList.add(marker);
+        return mMarkerList.size();
     }
 
-    public void SetMarker(double _latitude, double _longitude, String _title, String _snippetInfo, String _iconIdentifier) {
+    public int AddMarker(double _latitude, double _longitude, String _title, String _snippetInfo, String _iconIdentifier) {
         Marker marker = new Marker(this);
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
         marker.setPosition(geoPoint);
@@ -351,94 +464,236 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         //marker.setAlpha(0.75f);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setDraggable(IsMarkerDraggable);
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                marker.showInfoWindow();
+                mapView.getController().animateTo(marker.getPosition());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                return false;
+            }
+        });
+
         this.getOverlays().add(marker);
+        this.invalidate();
+        mMarkerList.add(marker);
+        return mMarkerList.size();
     }
 
-    public void SetMarker(double _latitude, double _longitude, String _title, String _snippetInfo, String _markerIconIdentifier, String _snippetImageIdentifier) {
+    public int AddMarkers(double[] _latitudeLongitude, String _title, String _snippetInfo, String _iconIdentifier) {
+        int count = _latitudeLongitude.length;
+        Marker marker;
+        int i = 0;
+        while ( (2*i+1) < count) { //0-> 0,1   1->2,3  2->4,5
+            marker = new Marker(this);
+            marker.setPosition(new GeoPoint(_latitudeLongitude[2*i], _latitudeLongitude[2*i+1]));
+            i = i +1;
+            marker.setTitle(_title);
+            marker.setSnippet(_snippetInfo);
+            //marker.setAlpha(0.75f);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+            marker.setDraggable(IsMarkerDraggable);
+            marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+                    marker.showInfoWindow();
+                    mapView.getController().animateTo(marker.getPosition());
+                    controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                    return false;
+                }
+            });
+            this.getOverlays().add(marker);
+            this.invalidate();
+            mMarkerList.add(marker);
+        }
+        return mMarkerList.size();
+    }
+
+    public int AddMarkers(double[] _latitudeLongitude, String _iconIdentifier) {
+        int count = _latitudeLongitude.length;
+        Marker marker;
+        int i = 0;
+        while ( (2*i+1) < count) { //0-> 0,1   1->2,3  2->4,5
+            marker = new Marker(this);
+            marker.setPosition(new GeoPoint(_latitudeLongitude[2*i], _latitudeLongitude[2*i+1]));
+            i = i +1;
+            //marker.setTitle(_title);
+            //marker.setSnippet(_snippetInfo);
+            //marker.setAlpha(0.75f);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+            marker.setDraggable(IsMarkerDraggable);
+            marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+                    marker.showInfoWindow();
+                    mapView.getController().animateTo(marker.getPosition());
+                    controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                    return false;
+                }
+            });
+            this.getOverlays().add(marker);
+            this.invalidate();
+            mMarkerList.add(marker);
+        }
+        return mMarkerList.size();
+    }
+
+    public int AddMarker(double _latitude, double _longitude, String _title, String _snippetInfo, String _markerIconIdentifier, String _snippetImageIdentifier) {
         Marker marker = new Marker(this);
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
         marker.setPosition(geoPoint);
+
         marker.setTitle(_title);
         marker.setSnippet(_snippetInfo);
         //marker.setAlpha(0.75f);
         marker.setImage(GetDrawableResourceById(GetDrawableResourceId(_snippetImageIdentifier)));
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_markerIconIdentifier)));
+        marker.setDraggable(IsMarkerDraggable);
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                marker.showInfoWindow();
+                mapView.getController().animateTo(marker.getPosition());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                return false;
+            }
+        });
+
         this.getOverlays().add(marker);
-    }
-
-    public void SetShowScale(boolean _show) {//show scale
-        if (_show) {
-            ScaleBarOverlay scale = new ScaleBarOverlay(this);
-            this.getOverlays().add(scale);
-        }
-    }
-
-    public void SetTileSource(int _tileSource) {
-        //Fonte de imagens
-        switch(_tileSource) {
-            case 0: this.setTileSource(TileSourceFactory.MAPNIK); break;//MAPNIK-HIKEBIKEMAP-OpenTopo ok
-            case 1: this.setTileSource(TileSourceFactory.HIKEBIKEMAP); break; //MAPNIK-HIKEBIKEMAP-OpenTopo ok
-            case 2: this.setTileSource(TileSourceFactory.OpenTopo); break; //MAPNIK-HIKEBIKEMAP-OpenTopo ok
-        }
-    }
-
-    public void SetCircle(double _latitude, double _longitude, double _radiusInMetters, String _title, int _strokeColor, float _strokeWidth) {
-        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
-        Polygon circle = new Polygon(this); //radiusInMetter
-        circle.setPoints(Polygon.pointsAsCircle(geoPoint, _radiusInMetters)); //2000.0
-        //And we adjust some design aspects:
-        circle.setFillColor(0x12121212);
-        circle.setStrokeColor(_strokeColor);  //Color.RED
-        circle.setStrokeWidth(_strokeWidth); //2
-       //And as Polygon supports bubbles, let's add one:
-        circle.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, this));
-        //circle.setTitle("Centered on "+geoPoint.getLatitude()+","+geoPoint.getLongitude());
-        circle.setTitle(_title);
-        this.getOverlays().add(circle);
-        //this.invalidate();
-    }
-
-    public void SetGroundImageOverlay(double _latitude, double _longitude, String _imageIdentifier, float _dimMetters) {
-        int resId = GetDrawableResourceId(_imageIdentifier);
-        Drawable d = GetDrawableResourceById(resId);
-        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
-        GroundOverlay myGroundOverlay = new GroundOverlay();
-        myGroundOverlay.setPosition(geoPoint);
-        myGroundOverlay.setImage(d.mutate()); //
-        myGroundOverlay.setDimensions(_dimMetters); //2000.0f
-        this.getOverlays().add(myGroundOverlay);
-    }
-
-    //https://github.com/osmdroid/osmdroid/wiki/Markers,-Lines-and-Polygons
-    public void DrawPolygon(double[] _latitude, double[] _longitude, String _title, int _color, int _alphaTransparency) {
-        List<GeoPoint> geoPoints = new ArrayList<>();
-        int count = _latitude.length;
-        //add points
-        for (int i = 0; i < count; i++) {
-            geoPoints.add(new GeoPoint(_latitude[i], _longitude[i]));
-        }
-        geoPoints.add(geoPoints.get(0));    //forces the loop to close
-
-        Polygon polygon = new Polygon();
-
-        polygon.setFillColor(Color.argb(_alphaTransparency, 255,0,0)); //5     0=total transparency
-
-        polygon.setStrokeColor(_color);
-        polygon.setStrokeWidth(3);
-
-        polygon.setPoints(geoPoints);
-        polygon.setTitle(_title); //"A sample polygon"
-        //polygons supports holes too, points should be in a counter-clockwise order
-        /*
-        if (_holes) {
-            List<List<GeoPoint>> holes = new ArrayList<>();
-            holes.add(geoPointsHoles);
-            polygon.setHoles(holes);
-        }
-        */
-        this.getOverlayManager().add(polygon);
         this.invalidate();
+        mMarkerList.add(marker);
+        return mMarkerList.size();
+    }
+
+    public Marker DrawMarker(double _latitude, double _longitude,  String _title, String _iconIdentifier) {
+        GeoPoint geoPoint = new GeoPoint(_latitude,_longitude);
+        Marker marker = new Marker(this);
+        marker.setPosition(geoPoint);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setTitle(_title);
+        marker.setDraggable(IsMarkerDraggable);
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                marker.showInfoWindow();
+                mapView.getController().animateTo(marker.getPosition());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                return false;
+            }
+        });
+        this.getOverlays().add(marker);
+        this.invalidate();
+        return marker;
+    }
+
+    public Marker DrawMarker(double _latitude, double _longitude, String _title, String _snippetInfo, String _iconIdentifier) {
+        GeoPoint geoPoint = new GeoPoint(_latitude,_longitude);
+        Marker marker = new Marker(this);
+        marker.setPosition(geoPoint);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setTitle(_title);
+        marker.setSnippet(_snippetInfo);
+        marker.setDraggable(IsMarkerDraggable);
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                marker.showInfoWindow();
+                mapView.getController().animateTo(marker.getPosition());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                return false;
+            }
+        });
+        this.getOverlays().add(marker);
+        this.invalidate();
+        return marker;
+    }
+
+    public void ClearMarker(Marker _marker) {
+        this.getOverlays().remove(_marker);
+        this.invalidate();
+    }
+
+    public void MoveMarker(Marker _marker, double _latitude, double _longitude) {
+        _marker.getPosition().setLatitude(_latitude);
+        _marker.getPosition().setLongitude(_longitude);
+        this.invalidate();
+    }
+
+    public void ClearMarker(int _index) {
+        Marker m = mMarkerList.get(_index);
+        this.getOverlays().remove(m);
+        this.invalidate();
+        mMarkerList.remove(_index);
+    }
+
+    public void ClearMarkers() {
+        int count = mMarkerList.size();
+        for (int i = 0; i < count; i++) {
+            this.getOverlays().remove((Marker)mMarkerList.get(i));
+        }
+        mMarkerList.clear();
+        this.invalidate();
+    }
+
+    public void ClearMarkers(boolean _invalidate) {  //TODO Pascal
+        int count = mMarkerList.size();
+        if (_invalidate) {
+            for (int i = 0; i < count; i++) {
+                this.getOverlays().remove((Marker) mMarkerList.get(i));
+            }
+            this.invalidate();
+        }
+        mMarkerList.clear();
+    }
+
+    public double[] GetMarkersPositions() {
+        int count = mMarkerList.size();
+        double[] array = new double[2*count];
+        int j = 0;
+        for (int i=0; i < count; i++) {
+            Marker marker = mMarkerList.get(i);
+            array[j] = marker.getPosition().getLatitude(); // 0 2 4 6
+            array[j+1] = marker.getPosition().getLongitude(); //1 3 5 7
+            j = j+2; //2 4 6
+        }
+        return array;
+    }
+
+    public int GetMarkersCount() {
+        return mMarkerList.size();
+    }
+
+    public double[] GetMarkerPosition(int _index) {
+        double r[] = new double[2];
+        Marker m = mMarkerList.get(_index);
+        r[0] = m.getPosition().getLatitude();
+        r[1] = m.getPosition().getLongitude();
+        return r;
+    }
+
+    public Marker GetMarker(int _index) {
+        return  (Marker)mMarkerList.get(_index);
+    }
+
+    public double[] GetMarkerPosition(Marker _marker) {
+        double r[] = new double[2];
+        r[0] = _marker.getPosition().getLatitude();
+        r[1] = _marker.getPosition().getLongitude();
+        return r;
+    }
+
+    public void SetIsMarkerDraggable(boolean _value) {
+        IsMarkerDraggable = _value;
+    }
+
+    public void SetMarkerDraggable(Marker _marker, boolean _draggable) {
+        _marker.setDraggable(_draggable);
     }
 
     public void DrawPolyline(double[] _latitude, double[] _longitude) {
@@ -463,43 +718,111 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         this.invalidate();
     }
 
-    private void setMarkerListeners(Marker locationMarker) {
-        locationMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+    public void DrawPolyline(int _geoPointStartIndex, int _count) {
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        Polyline line = new Polyline();   //see note below!
+        //add points
+        for (int i = 0; i < _count; i++) {
+            geoPoints.add(mBufferGeoPointsList.get(_geoPointStartIndex+ i));
+        }
+        line.setPoints(geoPoints);
+        /*
+        line.setOnClickListener(new Polyline.OnClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker, MapView map) {
-                if (marker.isInfoWindowShown() != true) {
-                    //hideInfoWindows();
-                    marker.showInfoWindow();
-                } else {
-                    //hideInfoWindows();
-                }
+            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
+               //Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
                 return false;
             }
         });
+        */
+        this.getOverlayManager().add(line);
+        this.invalidate();
     }
 
-    public int PolygonAdd(double _latitude, double _longitude) {
-        mGeoPointsList.add(new GeoPoint(_latitude, _longitude));
-        return mGeoPointsList.size();
-    }
-
-    public void PolygonClear() {
-        mGeoPointsList.clear();
-    }
-
-    public void PolygonDraw(String _title, int _color, int _alphaTransparency) {
-
-        if (mGeoPointsList.size() < 3) return;
-
+    //https://github.com/osmdroid/osmdroid/wiki/Markers,-Lines-and-Polygons
+    public int AddPolygon(double[] _latitude, double[] _longitude, String _title, int _color, int _alphaTransparency) {
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        int count = _latitude.length;
+        //add points
+        for (int i = 0; i < count; i++) {
+            geoPoints.add(new GeoPoint(_latitude[i], _longitude[i]));
+        }
+        geoPoints.add(geoPoints.get(0));    //forces the loop to close
         Polygon polygon = new Polygon();
-
         polygon.setFillColor(Color.argb(_alphaTransparency, 255,0,0)); //5     0=total transparency
-
         polygon.setStrokeColor(_color);
         polygon.setStrokeWidth(3);
-        polygon.setPoints(mGeoPointsList);
+        polygon.setPoints(geoPoints);
         polygon.setTitle(_title); //"A sample polygon"
+        //polygons supports holes too, points should be in a counter-clockwise order
+        /*
+        if (_holes) {
+            List<List<GeoPoint>> holes = new ArrayList<>();
+            holes.add(geoPointsHoles);
+            polygon.setHoles(holes);
+        }
+        */
+        this.getOverlayManager().add(polygon);
+        this.invalidate();
+        mPolygonList.add(polygon);
+        return mPolygonList.size();
+    }
 
+    public int AddPolygon(double[] _latitudeLongitude, String _title, int _color, int _alphaTransparency) {
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        int count = _latitudeLongitude.length;
+        //add points
+        int i = 0;
+        while ( (2*i+1) < count) { //0-> 0,1   1->2,3  2->4,5
+            geoPoints.add(new GeoPoint(_latitudeLongitude[2*i], _latitudeLongitude[2*i+1]));
+            i = i +1;
+        }
+        geoPoints.add(geoPoints.get(0));    //forces the loop to close
+        Polygon polygon = new Polygon();
+        polygon.setFillColor(Color.argb(_alphaTransparency, 255,0,0)); //5     0=total transparency
+        polygon.setStrokeColor(_color);
+        polygon.setStrokeWidth(3);
+        polygon.setPoints(geoPoints);
+        polygon.setTitle(_title); //"A sample polygon"
+        //polygons supports holes too, points should be in a counter-clockwise order
+        /*
+        if (_holes) {
+            List<List<GeoPoint>> holes = new ArrayList<>();
+            holes.add(geoPointsHoles);
+            polygon.setHoles(holes);
+        }
+        */
+        this.getOverlayManager().add(polygon);
+        this.invalidate();
+        mPolygonList.add(polygon);
+        return mPolygonList.size();
+    }
+
+    public int AddPolygon(int _geoPointStartIndex, int _count, String _title, int _color, int _alphaTransparency) {
+        if (mBufferGeoPointsList.size() < 3) return -1;
+        ArrayList<GeoPoint> pointsList = new ArrayList<GeoPoint>();
+
+        int size = mBufferGeoPointsList.size();
+
+        int startIndex = _geoPointStartIndex;
+        if (startIndex < 0) startIndex = 0;
+
+        int cnt = _count;
+        if (cnt < 3) cnt = 3;
+
+        for (int i = 0; i < cnt; i++) {
+            if ((startIndex + i) < size)
+                pointsList.add(mBufferGeoPointsList.get(startIndex + i));
+        }
+
+        if (pointsList.size() < 3) return -1;
+
+        Polygon polygon = new Polygon();
+        polygon.setFillColor(Color.argb(_alphaTransparency, 255,0,0)); //5     0=total transparency
+        polygon.setStrokeColor(_color);
+        polygon.setStrokeWidth(3);
+        polygon.setPoints(pointsList);
+        polygon.setTitle(_title); //"A sample polygon"
         /*
         //polygons supports holes too, points should be in a counter-clockwise order
         if (_holes) {
@@ -508,22 +831,77 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             polygon.setHoles(holes);
         }
         */
-
         this.getOverlayManager().add(polygon);
+        this.invalidate();
+        mPolygonList.add(polygon);
+        return mPolygonList.size();
+    }
+
+    public void ClearPolygon(int _index) {
+        Polygon p = mPolygonList.get(_index);
+        this.getOverlayManager().remove(p);
+        this.invalidate();
+        mPolygonList.remove(_index);
+    }
+
+    public void ClearPolygons() {
+        int count = mPolygonList.size();
+        for (int i = 0; i < count; i++) {
+            this.getOverlayManager().remove(mPolygonList.get(i));
+        }
+        mPolygonList.clear();
         this.invalidate();
     }
 
-    public double[] GetPolygon() {
-        int count = mGeoPointsList.size();
+    public int GetPolygonsCount() {
+        return mPolygonList.size();
+    }
+
+    public double[] GetGeoPoints() {
+        int count = mBufferGeoPointsList.size();
         double[] array = new double[2*count];
         int j = 0;
         for (int i=0; i < count; i++) {
-            GeoPoint gp =mGeoPointsList.get(i);
+            GeoPoint gp = mBufferGeoPointsList.get(i);
             array[j] = gp.getLatitude(); // 0 2 4 6
             array[j+1] = gp.getLongitude(); //1 3 5 7
             j = j+2; //2 4 6
         }
         return array;
+    }
+
+    public int AddGeoPoint(double _latitude, double _longitude) {
+        mBufferGeoPointsList.add(new GeoPoint(_latitude, _longitude));
+        return mBufferGeoPointsList.size();
+    }
+
+    public int AddGeoPoint(int _index, double _latitude, double _longitude) {
+        mBufferGeoPointsList.add(_index, new GeoPoint(_latitude, _longitude));
+        return mBufferGeoPointsList.size();
+    }
+
+    public void ClearGeoPoints() {
+        mBufferGeoPointsList.clear();
+    }
+
+    public void ClearGeoPoint(int _index) {
+        mBufferGeoPointsList.remove(_index);
+    }
+
+    public double[] GetGeoPoint(int _index) {
+        GeoPoint g = (GeoPoint)mBufferGeoPointsList.get(_index);
+        double[] r = new double[2];
+        r[0] = g.getLatitude();
+        r[1] = g.getLongitude();
+        return r;
+    }
+
+    public int GetGeoPointsCount() {
+        return mBufferGeoPointsList.size();
+    }
+
+    public void StopPanning() {
+        mapController.stopPanning();
     }
 
 }

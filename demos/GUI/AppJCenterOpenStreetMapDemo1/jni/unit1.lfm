@@ -1,13 +1,14 @@
 object AndroidModule1: TAndroidModule1
   Left = 374
   Top = 32
-  Width = 345
-  Height = 476
+  Width = 382
+  Height = 616
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
+  OnDestroy = AndroidModule1Destroy
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
@@ -15,7 +16,7 @@ object AndroidModule1: TAndroidModule1
   OnJNIPrompt = AndroidModule1JNIPrompt
   OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 68
+    Left = 87
     Top = 5
     Width = 208
     Height = 26
@@ -42,7 +43,7 @@ object AndroidModule1: TAndroidModule1
   object jButton1: jButton
     Left = 5
     Top = 83
-    Width = 172
+    Width = 191
     Height = 57
     MarginLeft = 5
     MarginTop = 5
@@ -65,9 +66,9 @@ object AndroidModule1: TAndroidModule1
     OnClick = jButton1Click
   end
   object jButton2: jButton
-    Left = 168
+    Left = 186
     Top = 83
-    Width = 172
+    Width = 191
     Height = 57
     MarginLeft = 5
     MarginTop = 5
@@ -92,8 +93,8 @@ object AndroidModule1: TAndroidModule1
   object jcOpenMapView1: jcOpenMapView
     Left = 5
     Top = 150
-    Width = 335
-    Height = 238
+    Width = 372
+    Height = 308
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -111,7 +112,6 @@ object AndroidModule1: TAndroidModule1
     TileSource = tsMapNik
     Zoom = 14
     OnClick = jcOpenMapView1Click
-    OnLongClick = jcOpenMapView1LongClick
     OnRoadDraw = jcOpenMapView1RoadDraw
   end
   object jCheckBox1: jCheckBox
@@ -140,7 +140,7 @@ object AndroidModule1: TAndroidModule1
   end
   object jCheckBox2: jCheckBox
     Left = 5
-    Top = 398
+    Top = 468
     Width = 155
     Height = 32
     MarginLeft = 5
@@ -164,9 +164,9 @@ object AndroidModule1: TAndroidModule1
     OnClick = jCheckBox2Click
   end
   object jButton3: jButton
-    Left = 168
-    Top = 398
-    Width = 172
+    Left = 186
+    Top = 468
+    Width = 191
     Height = 57
     MarginLeft = 5
     MarginTop = 5
@@ -187,5 +187,53 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     GravityInParent = lgNone
     OnClick = jButton3Click
+  end
+  object jButton4: jButton
+    Left = 5
+    Top = 554
+    Width = 191
+    Height = 57
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 8
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpBottom, rpLeft]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Clear Marker [Poly]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton4Click
+  end
+  object jButton5: jButton
+    Left = 186
+    Top = 554
+    Width = 191
+    Height = 57
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 9
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpBottom, rpRight]
+    LayoutParamWidth = lpHalfOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Clear Marker [Road]'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton5Click
   end
 end

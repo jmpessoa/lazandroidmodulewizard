@@ -16,10 +16,13 @@ type
     jButton1: jButton;
     jButton2: jButton;
     jButton3: jButton;
+    jButton4: jButton;
+    jButton5: jButton;
     jCheckBox1: jCheckBox;
     jCheckBox2: jCheckBox;
     jcOpenMapView1: jcOpenMapView;
     jTextView1: jTextView;
+    procedure AndroidModule1Destroy(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure AndroidModule1RequestPermissionResult(Sender: TObject;
       requestCode: integer; manifestPermission: string;
@@ -27,10 +30,10 @@ type
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
     procedure jButton3Click(Sender: TObject);
+    procedure jButton4Click(Sender: TObject);
+    procedure jButton5Click(Sender: TObject);
     procedure jCheckBox2Click(Sender: TObject);
     procedure jcOpenMapView1Click(Sender: TObject; latitude: double;
-      longitude: double);
-    procedure jcOpenMapView1LongClick(Sender: TObject; latitude: double;
       longitude: double);
     procedure jcOpenMapView1RoadDraw(Sender: TObject; roadCode: integer;
       roadStatus: TRoadStatus; roadDuration: double; roadLength: double; out
@@ -38,19 +41,34 @@ type
   private
     {private declarations}
     IsPickingPoints: boolean;
+    MyPolygon1: TDynArrayOfDouble;
   public
     {public declarations}
     procedure ShowMap();
+
   end;
 
 var
   AndroidModule1: TAndroidModule1;
+  globalMarker: jObjectRef;
 
 implementation
   
 {$R *.lfm}
 
 { TAndroidModule1 }
+
+procedure TAndroidModule1.jButton4Click(Sender: TObject);
+begin
+   if globalMarker <> nil then
+    jcOpenMapView1.ClearMarker(globalMarker); //remove not bufferized marker....
+end;
+
+procedure TAndroidModule1.jButton5Click(Sender: TObject);
+begin
+  if jcOpenMapView1.GetMarkersCount() > 0 then
+      jcOpenMapView1.ClearMarker(0);  //clear bufferized marker
+end;
 
 procedure TAndroidModule1.jcOpenMapView1RoadDraw(Sender: TObject;
   roadCode: integer; roadStatus: TRoadStatus; roadDuration: double;
@@ -70,10 +88,16 @@ end;
 procedure TAndroidModule1.ShowMap();
 begin
   jcOpenMapView1.SetCenter(-15.884559,-52.272295);  //center map
-  jcOpenMapView1.SetMarker(-15.905274,-52.246095, 'Start','Aragarcas City', 'marker24');  //my house
-  jcOpenMapView1.SetMarker(-15.891746,-52.261577,'Middleway','B. do Garcas City','marker_itinerary32');
-  jcOpenMapView1.SetMarker(-15.876128,-52.312421, 'Target', 'UFMT Campi', 'marker24'); //Target
-   //jcOpenMapView1.Invalidate(); //no need here...
+
+  //"Draw"  is not bufferized....
+  jcOpenMapView1.DrawMarker(-15.905274,-52.246095, 'Start','Aragarcas City', 'marker24');  //my house
+
+  //save a not bufferized marker...
+  globalMarker:= jcOpenMapView1.DrawMarker(-15.891746,-52.261577,'Middleway','B. do Garcas City','marker_itinerary32');
+  globalMarker:= Get_jObjGlobalRef(globalMarker); //JNI api...
+
+  jcOpenMapView1.DrawMarker(-15.876128,-52.312421, 'Target', 'UFMT Campi', 'marker24'); //Target
+  //jcOpenMapView1.StopPanning(); //dont working... why?
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
@@ -86,21 +110,21 @@ begin
   else ShowMap();
 end;
 
+procedure TAndroidModule1.AndroidModule1Destroy(Sender: TObject);
+begin
+  SetLength(MyPolygon1, 0); //free ...
+end;
+
 procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
   Sender: TObject; requestCode: integer; manifestPermission: string;
   grantResult: TManifestPermissionResult);
 begin
-  //android.permission.WRITE_EXTERNAL_STORAGE
   if requestCode = 1234 then
   begin
      if grantResult = PERMISSION_GRANTED then
-     begin
-         ShowMap(); // <<----- first App launcher
-     end
+        ShowMap() // <<----- first App launcher
      else
-     begin
         ShowMessage('Sorry... "android.permission.WRITE_EXTERNAL_STORAGE" DENIED...');
-     end;
   end;
 end;
 
@@ -109,12 +133,12 @@ begin
 
    if Self.IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
    begin
-      jcOpenMapView1.RoadClear();
-      jcOpenMapView1.RoadAdd(-15.905274,-52.246095);  //Start
-      jcOpenMapView1.RoadAdd(-15.905650,-52.246776);
-      jcOpenMapView1.RoadAdd(-15.905635,-52.247913);
-      jcOpenMapView1.RoadAdd(-15.891746,-52.261577); //Middleway
-      jcOpenMapView1.RoadDraw(1); //implicit invalidate...
+      jcOpenMapView1.ClearGeoPoints();
+      jcOpenMapView1.AddGeoPoint(-15.905274,-52.246095);  //Start
+      jcOpenMapView1.AddGeoPoint(-15.905650,-52.246776);
+      jcOpenMapView1.AddGeoPoint(-15.905635,-52.247913);
+      jcOpenMapView1.AddGeoPoint(-15.891746,-52.261577); //Middleway
+      jcOpenMapView1.DrawRoad(1); //implicit invalidate...
    end
    else
       ShowMessage('Sorry... "android.permission.WRITE_EXTERNAL_STORAGE" DENIED...');
@@ -123,53 +147,50 @@ end;
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
-   if Self.IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
-   begin
-     jcOpenMapView1.RoadClear();
-     jcOpenMapView1.RoadAdd(-15.891746,-52.261577);  //Middleway
-     jcOpenMapView1.RoadAdd(-15.876128,-52.312421);
-     jcOpenMapView1.RoadDraw(2); //implicit invalidate...
-   end
-   else
-      ShowMessage('Sorry... "android.permission.WRITE_EXTERNAL_STORAGE" DENIED...');
-
+  if Self.IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
+  begin
+    jcOpenMapView1.ClearGeoPoints();
+    jcOpenMapView1.AddGeoPoint(-15.891746,-52.261577);  //Middleway
+    jcOpenMapView1.AddGeoPoint(-15.876128,-52.312421);
+    jcOpenMapView1.DrawRoad(2); //implicit invalidate...
+  end
+  else
+    ShowMessage('Sorry... "android.permission.WRITE_EXTERNAL_STORAGE" DENIED...');
 end;
 
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
-
-  jcOpenMapView1.PolygonDraw('Polygon1', colbrBlue {line color}, 5 {0 = total background transparency!});
-  jcOpenMapView1.PolygonClear();
-
   jCheckBox2.Checked:= False;
   IsPickingPoints:= False;
+  MyPolygon1:= jcOpenMapView1.GetMarkersPositions();  //get markers points...
+  if MyPolygon1 <> nil then
+  begin
 
+     if jcOpenMapView1.GetPolygonsCount() > 0 then
+       jcOpenMapView1.ClearPolygons;
+
+     jcOpenMapView1.AddPolygon(MyPolygon1, 'Polygon1', colbrBlue, 5);
+  end
+  else ShowMessage('Sorry... MyPolygon1 = nil');
 end;
 
 procedure TAndroidModule1.jCheckBox2Click(Sender: TObject);
 begin
-  if  jCheckBox2.Checked then
+  if jCheckBox2.Checked then
+  begin
+     jcOpenMapView1.ClearMarkers();
      IsPickingPoints:= True
+  end
   else
      IsPickingPoints:= False;
 end;
 
 procedure TAndroidModule1.jcOpenMapView1Click(Sender: TObject;
   latitude: double; longitude: double);
-var
-  count: integer;
 begin
-  if IsPickingPoints then
-  begin
-    count:= jcOpenMapView1.PolygonAdd(latitude,  longitude);
-    ShowMessage('Picking count   = ' + IntToStr(count));
-  end;
+  if IsPickingPoints then    //"Add"  is bufferized
+    jcOpenMapView1.AddMarker(latitude,  longitude, 'location_pin'); //from "...res/drawable"
 end;
 
-procedure TAndroidModule1.jcOpenMapView1LongClick(Sender: TObject;
-  latitude: double; longitude: double);
-begin
-  //
-end;
 
 end.

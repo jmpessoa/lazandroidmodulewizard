@@ -12,10 +12,10 @@ uses
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnCreate
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;Landroid/content/Intent;)V }
-procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject; 
+procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
   layout: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnCreate(PEnv, this, context, layout, intent); 
+  Java_Event_pAppOnCreate(PEnv, this, context, layout, intent);
     AndroidModule1.Init(gApp);
 end;
 
@@ -110,7 +110,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnActivityResult
   Signature: (IILandroid/content/Intent;)V }
-procedure pAppOnActivityResult(PEnv: PJNIEnv; this: JObject; requestCode: JInt; 
+procedure pAppOnActivityResult(PEnv: PJNIEnv; this: JObject; requestCode: JInt;
   resultCode: JInt; data: JObject); cdecl;
 begin
   Java_Event_pAppOnActivityResult(PEnv, this, requestCode, resultCode, data);
@@ -119,7 +119,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnCreateOptionsMenu
   Signature: (Landroid/view/Menu;)V }
-procedure pAppOnCreateOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); 
+procedure pAppOnCreateOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject);
   cdecl;
 begin
   Java_Event_pAppOnCreateOptionsMenu(PEnv, this, menu);
@@ -128,18 +128,18 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnClickOptionMenuItem
   Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
-procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject; 
-  menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); 
+procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject;
+  menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean);
   cdecl;
 begin
-  Java_Event_pAppOnClickOptionMenuItem(PEnv, this, menuItem, itemID, 
+  Java_Event_pAppOnClickOptionMenuItem(PEnv, this, menuItem, itemID,
     itemCaption, checked);
 end;
 
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnPrepareOptionsMenu
   Signature: (Landroid/view/Menu;I)Z }
-function pAppOnPrepareOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject; 
+function pAppOnPrepareOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject;
   menuSize: JInt): JBoolean; cdecl;
 begin
   Result:=Java_Event_pAppOnPrepareOptionsMenu(PEnv, this, menu, menuSize);
@@ -148,17 +148,17 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnPrepareOptionsMenuItem
   Signature: (Landroid/view/Menu;Landroid/view/MenuItem;I)Z }
-function pAppOnPrepareOptionsMenuItem(PEnv: PJNIEnv; this: JObject; 
+function pAppOnPrepareOptionsMenuItem(PEnv: PJNIEnv; this: JObject;
   menu: JObject; menuItem: JObject; itemIndex: JInt): JBoolean; cdecl;
 begin
-  Result:=Java_Event_pAppOnPrepareOptionsMenuItem(PEnv, this, menu, menuItem, 
+  Result:=Java_Event_pAppOnPrepareOptionsMenuItem(PEnv, this, menu, menuItem,
     itemIndex);
 end;
 
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnCreateContextMenu
   Signature: (Landroid/view/ContextMenu;)V }
-procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject); 
+procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject);
   cdecl;
 begin
   Java_Event_pAppOnCreateContextMenu(PEnv, this, menu);
@@ -167,11 +167,11 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnClickContextMenuItem
   Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
-procedure pAppOnClickContextMenuItem(PEnv: PJNIEnv; this: JObject; 
-  menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean); 
+procedure pAppOnClickContextMenuItem(PEnv: PJNIEnv; this: JObject;
+  menuItem: JObject; itemID: JInt; itemCaption: JString; checked: JBoolean);
   cdecl;
 begin
-  Java_Event_pAppOnClickContextMenuItem(PEnv, this, menuItem, itemID, 
+  Java_Event_pAppOnClickContextMenuItem(PEnv, this, menuItem, itemID,
     itemCaption, checked);
 end;
 
@@ -186,7 +186,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnTouch
   Signature: (JIIFFFF)V }
-procedure pOnTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt; 
+procedure pOnTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt;
   cnt: JInt; x1: JFloat; y1: JFloat; x2: JFloat; y2: JFloat); cdecl;
 begin
   Java_Event_pOnTouch(PEnv, this, TObject(pasobj), act, cnt, x1, y1, x2, y2);
@@ -195,7 +195,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnClickGeneric
   Signature: (JI)V }
-procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   value: JInt); cdecl;
 begin
   Java_Event_pOnClickGeneric(PEnv, this, TObject(pasobj), value);
@@ -204,17 +204,17 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnSpecialKeyDown
   Signature: (CILjava/lang/String;)Z }
-function pAppOnSpecialKeyDown(PEnv: PJNIEnv; this: JObject; keyChar: JChar; 
+function pAppOnSpecialKeyDown(PEnv: PJNIEnv; this: JObject; keyChar: JChar;
   keyCode: JInt; keyCodeString: JString): JBoolean; cdecl;
 begin
-  Result:=Java_Event_pAppOnSpecialKeyDown(PEnv, this, keyChar, keyCode, 
+  Result:=Java_Event_pAppOnSpecialKeyDown(PEnv, this, keyChar, keyCode,
     keyCodeString);
 end;
 
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnDown
   Signature: (JI)V }
-procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); 
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
   cdecl;
 begin
   Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
@@ -223,7 +223,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
-procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt); 
+procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
   cdecl;
 begin
   Java_Event_pOnClick(PEnv, this, TObject(pasobj), value);
@@ -241,7 +241,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnDoubleClick
   Signature: (JI)V }
-procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   value: JInt); cdecl;
 begin
   Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
@@ -250,7 +250,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnChange
   Signature: (JLjava/lang/String;I)V }
-procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString; 
+procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString;
   count: JInt); cdecl;
 begin
   Java_Event_pOnChange(PEnv, this, TObject(pasobj), txt, count);
@@ -259,7 +259,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnChanged
   Signature: (JLjava/lang/String;I)V }
-procedure pOnChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString; 
+procedure pOnChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString;
   count: JInt); cdecl;
 begin
   Java_Event_pOnChanged(PEnv, this, TObject(pasobj), txt, count);
@@ -301,7 +301,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnListItemClick
   Signature: (Landroid/widget/AdapterView;Landroid/view/View;II)V }
-procedure pAppOnListItemClick(PEnv: PJNIEnv; this: JObject; adapter: JObject; 
+procedure pAppOnListItemClick(PEnv: PJNIEnv; this: JObject; adapter: JObject;
   view: JObject; position: JInt; id: JInt); cdecl;
 begin
   Java_Event_pAppOnListItemClick(PEnv, this, adapter, view, position, id);
@@ -310,7 +310,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnFlingGestureDetected
   Signature: (JI)V }
-procedure pOnFlingGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnFlingGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   direction: JInt); cdecl;
 begin
   Java_Event_pOnFlingGestureDetected(PEnv, this, TObject(pasobj), direction);
@@ -319,17 +319,17 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnPinchZoomGestureDetected
   Signature: (JFI)V }
-procedure pOnPinchZoomGestureDetected(PEnv: PJNIEnv; this: JObject; 
+procedure pOnPinchZoomGestureDetected(PEnv: PJNIEnv; this: JObject;
   pasobj: JLong; scaleFactor: JFloat; state: JInt); cdecl;
 begin
-  Java_Event_pOnPinchZoomGestureDetected(PEnv, this, TObject(pasobj), 
+  Java_Event_pOnPinchZoomGestureDetected(PEnv, this, TObject(pasobj),
     scaleFactor, state);
 end;
 
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnLostFocus
   Signature: (JLjava/lang/String;)V }
-procedure pOnLostFocus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnLostFocus(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   text: JString); cdecl;
 begin
   Java_Event_pOnLostFocus(PEnv, this, TObject(pasobj), text);
@@ -338,7 +338,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnBeforeDispatchDraw
   Signature: (JLandroid/graphics/Canvas;I)V }
-procedure pOnBeforeDispatchDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnBeforeDispatchDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   canvas: JObject; tag: JInt); cdecl;
 begin
   Java_Event_pOnBeforeDispatchDraw(PEnv, this, TObject(pasobj), canvas, tag);
@@ -347,7 +347,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnAfterDispatchDraw
   Signature: (JLandroid/graphics/Canvas;I)V }
-procedure pOnAfterDispatchDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnAfterDispatchDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   canvas: JObject; tag: JInt); cdecl;
 begin
   Java_Event_pOnAfterDispatchDraw(PEnv, this, TObject(pasobj), canvas, tag);
@@ -356,7 +356,7 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnLayouting
   Signature: (JZ)V }
-procedure pOnLayouting(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnLayouting(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   changed: JBoolean); cdecl;
 begin
   Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
@@ -365,45 +365,55 @@ end;
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pAppOnRequestPermissionResult
   Signature: (ILjava/lang/String;I)V }
-procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject; 
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
   requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
 begin
-  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission, 
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
     grantResult);
 end;
 
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnOpenMapViewRoadDraw
   Signature: (JIIDD)[I }
-function pOnOpenMapViewRoadDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+function pOnOpenMapViewRoadDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   roadCode: JInt; roadStatus: JInt; roadDuration: JDouble; roadDistance: JDouble
   ): JIntArray; cdecl;
 begin
-  Result:=Java_Event_pOnOpenMapViewRoadDraw(PEnv, this, TObject(pasobj), 
+  Result:=Java_Event_pOnOpenMapViewRoadDraw(PEnv, this, TObject(pasobj),
     roadCode, roadStatus, roadDuration, roadDistance);
 end;
 
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnOpenMapViewClick
   Signature: (JDD)V }
-procedure pOnOpenMapViewClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnOpenMapViewClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   latitude: JDouble; longitude: JDouble); cdecl;
 begin
-  Java_Event_pOnOpenMapViewClick(PEnv, this, TObject(pasobj), latitude, 
+  Java_Event_pOnOpenMapViewClick(PEnv, this, TObject(pasobj), latitude,
     longitude);
 end;
 
 { Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
   Method:    pOnOpenMapViewLongClick
   Signature: (JDD)V }
-procedure pOnOpenMapViewLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; 
+procedure pOnOpenMapViewLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
   latitude: JDouble; longitude: JDouble); cdecl;
 begin
-  Java_Event_pOnOpenMapViewLongClick(PEnv, this, TObject(pasobj), latitude, 
+  Java_Event_pOnOpenMapViewLongClick(PEnv, this, TObject(pasobj), latitude,
     longitude);
 end;
 
-const NativeMethods: array[0..43] of JNINativeMethod = (
+{ Class:     org_lamw_appjcenteropenstreetmapdemo1_Controls
+  Method:    pOnOpenMapViewMarkerClick
+  Signature: (JLjava/lang/String;DD)V }
+procedure pOnOpenMapViewMarkerClick(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; title: JString; latitude: JDouble; longitude: JDouble); cdecl;
+begin
+  Java_Event_pOnOpenMapViewMarkerClick(PEnv, this, TObject(pasobj), title,
+    latitude, longitude);
+end;
+
+const NativeMethods: array[0..44] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -536,10 +546,13 @@ const NativeMethods: array[0..43] of JNINativeMethod = (
     fnPtr: @pOnOpenMapViewClick; ),
    (name: 'pOnOpenMapViewLongClick';
     signature: '(JDD)V';
-    fnPtr: @pOnOpenMapViewLongClick; )
+    fnPtr: @pOnOpenMapViewLongClick; ),
+   (name: 'pOnOpenMapViewMarkerClick';
+    signature: '(JLjava/lang/String;DD)V';
+    fnPtr: @pOnOpenMapViewMarkerClick; )
 );
 
-function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; 
+function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
   methods: PJNINativeMethod; countMethods: integer): integer;
 var
   curClass: jClass;
@@ -548,7 +561,7 @@ begin
   curClass:= (PEnv^).FindClass(PEnv, className);
   if curClass <> nil then
   begin
-    if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 
+    if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0
       then Result:= JNI_TRUE;
   end;
 end;
@@ -647,7 +660,7 @@ exports
     +'pOnLongClick',
   pOnDoubleClick name 'Java_org_lamw_appjcenteropenstreetmapdemo1_Controls_'
     +'pOnDoubleClick',
-  pOnChange name 
+  pOnChange name
     'Java_org_lamw_appjcenteropenstreetmapdemo1_Controls_pOnChange',
   pOnChanged name 'Java_org_lamw_appjcenteropenstreetmapdemo1_Controls_'
     +'pOnChanged',
@@ -678,7 +691,9 @@ exports
   pOnOpenMapViewClick name 'Java_org_lamw_appjcenteropenstreetmapdemo1_'
     +'Controls_pOnOpenMapViewClick',
   pOnOpenMapViewLongClick name 'Java_org_lamw_appjcenteropenstreetmapdemo1_'
-    +'Controls_pOnOpenMapViewLongClick';
+    +'Controls_pOnOpenMapViewLongClick',
+  pOnOpenMapViewMarkerClick name 'Java_org_lamw_appjcenteropenstreetmapdemo1_'
+    +'Controls_pOnOpenMapViewMarkerClick';
 
 {%endregion}
   
