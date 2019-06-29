@@ -892,16 +892,20 @@ begin
   end
   else if (maxBuilderNumber >= 2703) and (maxBuilderNumber < 2803)   then
   begin
-      Result:= '3.2.0';
+      //Result:= '3.2.0';   //need build-tools 28.0.2 and need drop minSdk/targetSdk from AndroidManifest!!
       //gradleVer:= '4.6';
+
+       Result:= '3.1.0'; //just to support minSdk/targetSdk in AndroidManifest!!
   end
   else if maxBuilderNumber >= 2803   then
   begin
-      Result:= '3.3.0';
+      //Result:= '3.3.0';    //need droped minSdk/targetSdk in AndroidManifest!!
       //gradleVer:= 'Gradle 4.10.1';
 
       //Result:= '3.4.0';
       //gradleVer:= 'Gradle Gradle 5.1.1'
+
+      Result:= '3.1.0'; //just to support minSdk/targetSdk from AndroidManifest!!
   end;
 
 end;
@@ -3437,6 +3441,12 @@ begin
    if ModuleType = 3 then    sourceList.Add('{');
 
    sourceList.Add('uses');
+
+   sourceList.Add('  {$IFDEF UNIX}{$IFDEF UseCThreads}');
+   sourceList.Add('  cthreads,');
+   sourceList.Add('  {$ENDIF}{$ENDIF}');
+
+
    sourceList.Add('  ' + GetInterfaceUsesSection);
 
    if ModuleType = 3 then    sourceList.Add('}');

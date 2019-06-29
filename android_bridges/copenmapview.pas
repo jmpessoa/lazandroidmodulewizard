@@ -70,7 +70,7 @@ jcOpenMapView = class(jVisualControl)
     procedure SetTileSource(_tileSource: TTileSource);
     procedure ClearOverlays();
     procedure Invalidate();
-    procedure SetCircle(_latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
+    procedure DrawCircle(_latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: TARGBColorBridge; _strokeWidth: single);
     procedure SetGroundImageOverlay(_latitude: double; _longitude: double; _imageIdentifier: string; _dimMetters: single);
 
     procedure DrawRoad(_roadCode: integer); overload;
@@ -163,7 +163,7 @@ procedure jcOpenMapView_SetCenter(env: PJNIEnv; _jcopenmapview: JObject; _latitu
 procedure jcOpenMapView_SetTileSource(env: PJNIEnv; _jcopenmapview: JObject; _tileSource: integer);
 procedure jcOpenMapView_ClearOverlays(env: PJNIEnv; _jcopenmapview: JObject);
 procedure jcOpenMapView_Invalidate(env: PJNIEnv; _jcopenmapview: JObject);
-procedure jcOpenMapView_SetCircle(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
+procedure jcOpenMapView_DrawCircle(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
 procedure jcOpenMapView_SetGroundImageOverlay(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _imageIdentifier: string; _dimMetters: single);
 procedure jcOpenMapView_DrawRoad(env: PJNIEnv; _jcopenmapview: JObject; _roadCode: integer); overload;
 procedure jcOpenMapView_DrawRoad(env: PJNIEnv; _jcopenmapview: JObject); overload;
@@ -533,11 +533,11 @@ begin
      jcOpenMapView_Invalidate(FjEnv, FjObject);
 end;
 
-procedure jcOpenMapView.SetCircle(_latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
+procedure jcOpenMapView.DrawCircle(_latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: TARGBColorBridge; _strokeWidth: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetCircle(FjEnv, FjObject, _latitude ,_longitude ,_radiusInMetters ,_title ,_strokeColor ,_strokeWidth);
+     jcOpenMapView_DrawCircle(FjEnv, FjObject, _latitude ,_longitude ,_radiusInMetters ,_title ,GetARGB(FCustomColor, _strokeColor ),_strokeWidth);
 end;
 
 procedure jcOpenMapView.SetGroundImageOverlay(_latitude: double; _longitude: double; _imageIdentifier: string; _dimMetters: single);
@@ -1159,7 +1159,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jcOpenMapView_SetCircle(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
+procedure jcOpenMapView_DrawCircle(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: integer; _strokeWidth: single);
 var
   jParams: array[0..5] of jValue;
   jMethod: jMethodID=nil;
@@ -1172,7 +1172,7 @@ begin
   jParams[4].i:= _strokeColor;
   jParams[5].f:= _strokeWidth;
   jCls:= env^.GetObjectClass(env, _jcopenmapview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetCircle', '(DDDLjava/lang/String;IF)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawCircle', '(DDDLjava/lang/String;IF)V');
   env^.CallVoidMethodA(env, _jcopenmapview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[3].l);
   env^.DeleteLocalRef(env, jCls);

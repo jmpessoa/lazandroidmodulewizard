@@ -246,7 +246,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         }
     }
 
-    public void SetCircle(double _latitude, double _longitude, double _radiusInMetters, String _title, int _strokeColor, float _strokeWidth) {
+    public void DrawCircle(double _latitude, double _longitude, double _radiusInMetters, String _title, int _strokeColor, float _strokeWidth) {
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
         Polygon circle = new Polygon(this); //radiusInMetter
         circle.setPoints(Polygon.pointsAsCircle(geoPoint, _radiusInMetters)); //2000.0
