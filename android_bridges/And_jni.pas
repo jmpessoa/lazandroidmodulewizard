@@ -41,8 +41,8 @@ const JNI_FALSE=0;
 (*
  * Type definitions.
  *)
-type va_list=pointer;
-
+type
+     va_list=pointer;
      jboolean=byte;        // unsigned 8 bits
      jbyte=shortint;       // signed 8 bits
      jchar=word;           // unsigned 16 bits
