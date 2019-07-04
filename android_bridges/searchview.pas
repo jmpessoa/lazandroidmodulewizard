@@ -20,6 +20,8 @@ TOnQueryTextChange = procedure(Sender: TObject; newQuery: string) of object;
 
 jSearchView = class(jVisualControl)
  private
+    FHint: string;
+    FIconified: boolean;
     FOnFocusChange: TOnFocusChange;
     FOnQueryTextSubmit: TOnQueryTextSubmit;
     FOnQueryTextChange: TOnQueryTextChange;
@@ -36,7 +38,7 @@ jSearchView = class(jVisualControl)
     procedure UpdateLayout; override;
     
     procedure GenEvent_OnClick(Obj: TObject);
-    function jCreate(): jObject;
+    function jCreate( _iconified: boolean): jObject;
     procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetParent(): jObject;
@@ -60,6 +62,12 @@ jSearchView = class(jVisualControl)
     procedure SetIconifiedByDefault(_value: boolean);
     procedure SetQueryHint(_hint: string);
 
+    procedure SelectAll(); overload;
+    procedure SelectAll(_highlightColor: TARGBColorBridge);  overload;
+    procedure SetFocus();
+    procedure ClearFocus();
+    procedure SetIconified(_value: boolean);
+
     procedure GenEvent_OnSearchViewFocusChange(Sender: TObject; hasFocus: boolean);
     procedure GenEvent_OnSearchViewQueryTextSubmit(Sender: TObject; query: string);
     procedure GenEvent_OnSearchViewQueryTextChange(Sender: TObject; newText: string);
@@ -67,6 +75,8 @@ jSearchView = class(jVisualControl)
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
    // property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
+    property Hint: string read FHint write SetQueryHint;
+    property Iconified: boolean read FIconified write SetIconified;
     property OnXClick: TOnNotify read FOnXClick write FOnXClick;
     property OnFocusChange: TOnFocusChange read FOnFocusChange write FOnFocusChange;
     property OnQueryTextSubmit: TOnQueryTextSubmit read FOnQueryTextSubmit write FOnQueryTextSubmit;
@@ -74,7 +84,7 @@ jSearchView = class(jVisualControl)
 
 end;
 
-function jSearchView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function jSearchView_jCreate(env: PJNIEnv;_Self: int64; _iconified: boolean; this: jObject): jObject;
 procedure jSearchView_jFree(env: PJNIEnv; _jsearchview: JObject);
 procedure jSearchView_SetViewParent(env: PJNIEnv; _jsearchview: JObject; _viewgroup: jObject);
 function jSearchView_GetParent(env: PJNIEnv; _jsearchview: JObject): jObject;
@@ -98,6 +108,13 @@ function jSearchView_IsIconfiedByDefault(env: PJNIEnv; _jsearchview: JObject): b
 procedure jSearchView_SetIconifiedByDefault(env: PJNIEnv; _jsearchview: JObject; _value: boolean);
 procedure jSearchView_SetQueryHint(env: PJNIEnv; _jsearchview: JObject; _hint: string);
 
+procedure jSearchView_SelectAll(env: PJNIEnv; _jsearchview: JObject); overload;
+procedure jSearchView_SelectAll(env: PJNIEnv; _jsearchview: JObject; _color: integer);overload;
+procedure jSearchView_SetFocus(env: PJNIEnv; _jsearchview: JObject);
+procedure jSearchView_ClearFocus(env: PJNIEnv; _jsearchview: JObject);
+procedure jSearchView_SetIconified(env: PJNIEnv; _jsearchview: JObject; _value: boolean);
+
+
 
 implementation
 
@@ -115,6 +132,7 @@ begin
   FLParamWidth  := lpMatchParent;  //lpWrapContent
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= False;
+  FIconified:= True;
 //your code here....
 end;
 
@@ -141,7 +159,7 @@ begin
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject:= jCreate(); //jSelf !
+   FjObject:= jCreate(FIconified); //jSelf !
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -183,6 +201,9 @@ begin
    if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
+   if FHint <> '' then
+     jSearchView_SetQueryHint(FjEnv, FjObject, FHint);
+
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
 end;
@@ -223,9 +244,9 @@ begin
   if Assigned(FOnXClick) then FOnXClick(Obj);
 end;
 
-function jSearchView.jCreate(): jObject;
+function jSearchView.jCreate( _iconified: boolean): jObject;
 begin
-   Result:= jSearchView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jSearchView_jCreate(FjEnv, int64(Self), _iconified, FjThis);
 end;
 
 procedure jSearchView.jFree();
@@ -391,8 +412,45 @@ end;
 procedure jSearchView.SetQueryHint(_hint: string);
 begin
   //in designing component state: set value here...
+  FHint:= _hint;
   if FInitialized then
      jSearchView_SetQueryHint(FjEnv, FjObject, _hint);
+end;
+
+procedure jSearchView.SelectAll();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SelectAll(FjEnv, FjObject);
+end;
+
+procedure jSearchView.SelectAll(_highlightColor: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SelectAll(FjEnv, FjObject, GetARGB(FCustomColor, _highlightColor));
+end;
+
+procedure jSearchView.SetFocus();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetFocus(FjEnv, FjObject);
+end;
+
+procedure jSearchView.ClearFocus();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_ClearFocus(FjEnv, FjObject);
+end;
+
+procedure jSearchView.SetIconified(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FIconified:= _value;
+  if FInitialized then
+     jSearchView_SetIconified(FjEnv, FjObject, _value);
 end;
 
 procedure jSearchView.GenEvent_OnSearchViewFocusChange(Sender: TObject; hasFocus: boolean);
@@ -413,15 +471,16 @@ end;
 
 {-------- jSearchView_JNI_Bridge ----------}
 
-function jSearchView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function jSearchView_jCreate(env: PJNIEnv;_Self: int64; _iconified: boolean; this: jObject): jObject;
 var
-  jParams: array[0..0] of jValue;
+  jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+  jParams[1].z:= JBool(_iconified);
   jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jSearchView_jCreate', '(J)Ljava/lang/Object;');
+  jMethod:= env^.GetMethodID(env, jCls, 'jSearchView_jCreate', '(JZ)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
@@ -725,7 +784,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jSearchView_SetQueryHint(env: PJNIEnv; _jsearchview: JObject; _hint: string);
 var
   jParams: array[0..0] of jValue;
@@ -736,10 +794,68 @@ begin
   jCls:= env^.GetObjectClass(env, _jsearchview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetQueryHint', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSearchView_SelectAll(env: PJNIEnv; _jsearchview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SelectAll', '()V');
+  env^.CallVoidMethod(env, _jsearchview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
+procedure jSearchView_SetFocus(env: PJNIEnv; _jsearchview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFocus', '()V');
+  env^.CallVoidMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSearchView_SetIconified(env: PJNIEnv; _jsearchview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetIconified', '(Z)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSearchView_SelectAll(env: PJNIEnv; _jsearchview: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SelectAll', '(I)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSearchView_ClearFocus(env: PJNIEnv; _jsearchview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'ClearFocus', '()V');
+  env^.CallVoidMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

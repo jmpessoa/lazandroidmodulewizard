@@ -3,6 +3,7 @@ package org.lamw.appsearchviewdemo1;
 
 import android.content.Context;
 //import android.util.Log;
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -25,7 +26,7 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
     private SearchView thisView;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public jSearchView(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+    public jSearchView(Controls _ctrls, long _Self, boolean _iconified) { //Add more others news "_xxx" params if needed!
 
         super(_ctrls.activity);
         context = _ctrls.activity;
@@ -91,6 +92,9 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
             }
         });
 
+        this.setIconified(_iconified);
+
+        this.setFocusable(true);
     } //end constructor
 
     public void jFree() {
@@ -231,6 +235,30 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
     public void SetTextAndSubmit(String _query) {
         //Clear query
         this.setQuery(_query, true);
+    }
+
+    public void SelectAll() {
+        int id = this.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText editText = (EditText) this.findViewById(id);
+        editText.selectAll();
+        editText.setHighlightColor(Color.CYAN);
+    }
+
+    public void SelectAll(int _color) {
+        int id = this.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText editText = (EditText) this.findViewById(id);
+        editText.selectAll();
+        editText.setHighlightColor( _color);
+    }
+
+    public void SetFocus() {
+        this.setIconified(false);
+        this.requestFocus();
+    }
+
+    public void ClearFocus() {
+        this.clearFocus();
+        //this.setIconified(true);
     }
 
 }
