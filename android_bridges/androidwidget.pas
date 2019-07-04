@@ -1289,12 +1289,16 @@ end;
     function  GetDateTimeDecode(
                                  var day : integer; var month : integer; var year : integer;
                                  var hours : integer; var minutes: integer; var seconds : integer ) : boolean;
-    function GetScreenWidth(): integer;
-    function GetScreenHeight(): integer;
-    function GetSystemVersionString(): string;
+    function  GetScreenWidth(): integer;
+    function  GetScreenHeight(): integer;
+    function  GetSystemVersionString(): string;
+
+    procedure SetBackgroundImageIdentifier(_imageIdentifier: string); overload;
+    procedure SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer); overload; // by TR3E
+    procedure SetBackgroundImageMatrix( _scaleX, _scaleY, _degress,
+                                        _dx, _dy, _centerX, _centerY : real ); // by TR3E
     //end TR3E
 
-    procedure SetBackgroundImageIdentifier(_imageIdentifier: string);
     function GetJByteBuffer(_width: integer; _height: integer): jObject;
     function GetJByteBufferFromImage(_bitmap: jObject): jObject;
     function GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
@@ -1733,7 +1737,12 @@ function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_getScreenWidth(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
 function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
-procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string);
+procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string); overload;
+procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string; _scaleType : integer); overload;
+procedure jForm_SetBackgroundImageMatrix(env: PJNIEnv; _jform: JObject;
+                                              _scaleX, _scaleY, _degress,
+                                              _dx, _dy, _centerX, _centerY : real);
+
 function jForm_GetJByteBuffer(env: PJNIEnv; _jform: JObject; _width: integer; _height: integer): jObject;
 function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jObject): jObject;
 
@@ -4137,6 +4146,25 @@ begin
      jForm_SetBackgroundImage(FjEnv, FjObject, _imageIdentifier);
 end;
 
+// BY TR3E
+procedure jForm.SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer);
+begin
+  //in designing component state: set value here...
+ FBackgroundImageIdentifier:= _imageIdentifier;
+  if FInitialized then
+     jForm_SetBackgroundImage(FjEnv, FjObject, _imageIdentifier, _scaleType);
+end;
+
+// BY TR3E
+procedure jForm.SetBackgroundImageMatrix(_scaleX, _scaleY, _degress,
+                                         _dx, _dy, _centerX, _centerY : real);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SetBackgroundImageMatrix(FjEnv, FjObject, _scaleX, _scaleY, _degress,
+                                    _dx, _dy, _centerX, _centerY );
+end;
+
 function jForm.GetJByteBuffer(_width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
@@ -5902,6 +5930,44 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundImage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// BY TR3E
+procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string; _scaleType : integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageIdentifier));
+  jParams[1].i:= _scaleType;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundImage', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// BY TR3E
+procedure jForm_SetBackgroundImageMatrix(env: PJNIEnv; _jform: JObject;
+                                              _scaleX, _scaleY, _degress,
+                                              _dx, _dy, _centerX, _centerY : real);
+var
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f := _scaleX;
+  jParams[1].f := _scaleY;
+  jParams[2].f := _degress;
+  jParams[3].f := _dx;
+  jParams[4].f := _dy;
+  jParams[5].f := _centerX;
+  jParams[6].f := _centerY;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundImageMatrix', '(FFFFFFF)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
