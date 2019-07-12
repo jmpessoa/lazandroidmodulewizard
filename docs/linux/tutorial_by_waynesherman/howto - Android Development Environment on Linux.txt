@@ -1,33 +1,19 @@
-
-[HowTo] 
-
-Android Development Environment on Linux (FPCUPdeluxe / LAMW)
-
-ver 1.2: 2018-Sep-29 
-
-By WayneSherman
-
-REF. http://forum.lazarus.freepascal.org/index.php/topic,40750.0.html
-     
-See also here:  http://wiki.freepascal.org/LAMW_on_Linux
-
-Motivation:
-  Needed simple instructions to get an up-to-date Android build environment setup on Linux.
-
-Thanks to other developers for sharing their hard work, utilities, and helpful information.
-Please provide feedback if you find any issues, or if there are ways to simplify even more.
-
-I recommend running these commands one at a time so you can verify the results before moving on to the next step.
 # Setup Android Development Environment on Linux (FPCUPdeluxe / LAMW)
+
+   by WayneSherman
+   ref. https://forum.lazarus.freepascal.org/index.php/topic,40750.0.html
+ 
 # Tested on Xubuntu 16.04 64-bit and Xubuntu 18.04 64-bit
 # Target 32-bit ARM on Android
-# 2018-Sep-29 ver 1.2
+# Target 64-bit aarch64 on Android
+# 2019-May-20 ver 1.3
  
 # Install libraries and tools
 sudo apt-get install -y libx11-dev libgtk2.0-dev libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev libxtst-dev libatk1.0-dev libghc-x11-dev freeglut3 freeglut3-dev
 sudo apt-get install -y git subversion make build-essential gdb zip unzip unrar wget
 sudo apt-get install -y openjdk-8-jdk android-tools-adb ant
-// sudo apt-get install icedtea-8-plugin
+ 
+#Note:  Next line is not needed on Ubuntu 16.04
 sudo update-java-alternatives --set /usr/lib/jvm/java-1.8.0-openjdk-amd64
  
 mkdir -p "$HOME/android/sdk"
@@ -39,9 +25,9 @@ wget "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip"
 unzip "sdk-tools-linux-4333796.zip"
 rm "sdk-tools-linux-4333796.zip"
  
-#Install SDK packages and NDK (as of 2018-Sep-29 this pulls in NDK r18)
+#Install SDK packages and NDK (as of 2019-May-20 this pulls in NDK r19c)
 cd "$HOME/android/sdk/tools/bin"
-./sdkmanager "platforms;android-26" "build-tools;26.0.2" "tools" "ndk-bundle" "extras;android;m2repository"
+./sdkmanager "platforms;android-26" "build-tools;26.0.3" "tools" "ndk-bundle" "extras;android;m2repository"
  
 # make symbolic link to NDK toolchain
 ln -sf "$HOME/android/sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin" "$HOME/android/ndk-toolchain"
@@ -50,88 +36,49 @@ ln -sf "$HOME/android/sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9/prebui
 ln -sf "$HOME/android/sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9" "$HOME/android/sdk/ndk-bundle/toolchains/mips64el-linux-android-4.9"
 ln -sf "$HOME/android/sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9" "$HOME/android/sdk/ndk-bundle/toolchains/mipsel-linux-android-4.9"
  
-# download and extract Gradle 4.10.2
+# download and extract Gradle 4.10.3
 # from https://gradle.org/releases/
 cd "$HOME/android"
-wget "https://services.gradle.org/distributions/gradle-4.10.2-bin.zip"
-unzip "gradle-4.10.2-bin.zip"
-rm "gradle-4.10.2-bin.zip"
+wget "https://services.gradle.org/distributions/gradle-4.10.3-bin.zip"
+unzip "gradle-4.10.3-bin.zip"
+rm "gradle-4.10.3-bin.zip"
  
 # Use a text editor to open $HOME/.profile and add this text below:
 # example: mousepad $HOME/.profile
+export ANDROID_SDK_ROOT="${HOME}/android/sdk"
+export GRADLE_HOME="${HOME}/android/gradle-4.10.3"
 export PATH="${PATH}:${HOME}/android/ndk-toolchain"
-export PATH="${PATH}:${HOME}/android/gradle-4.10.2/bin"
-export ANDROID_SDK_ROOT="$HOME/android/sdk"
+export PATH="${PATH}:${GRADLE_HOME}/bin"
  
 # Reboot (or logout of session and login)
  
 # Download FPCUPdeluxe from https://github.com/newpascal/fpcupdeluxe/releases/latest
-# (tested with version v1.6.1m)
+# (tested with version 1.6.2v)
 mkdir "$HOME/fpcupdeluxe_app"
 cd "$HOME/fpcupdeluxe_app"
-wget "https://github.com/newpascal/fpcupdeluxe/releases/download/1.6.1m/fpcupdeluxe-x86_64-linux"
+wget "https://github.com/newpascal/fpcupdeluxe/releases/download/1.6.2v/fpcupdeluxe-x86_64-linux"
 chmod +x fpcupdeluxe-x86_64-linux
 ./fpcupdeluxe-x86_64-linux
 # Using FPCUPdeluxe install FPC/Lazarus, crosscompiler, and packages/modules:
-# 1) Select FPC version "trunk" and Lazarus version "trunk" and click "Install/update FPC+Laz" button (if this fails, please see comments in next post)
-# 2) Select CPU arm / OS android "Install cross-compiler" (select "yes" to missing tools message box)
-# 3) In module list:  Select LAMW, Install module
-# 4) (Optional but recommended) In module list: Select OPM, Install module (online package manager)
+# 1) On "Basic" tab, select FPC version "fixes3.2" & Lazarus version "fixes2.0" and click "Install/update FPC+Laz" button (if this fails, please see comments in next post)
+# 2) On "Cross" tab, select CPU arm & OS android, "Install compiler" (select "yes" to missing tools message box)
+# 3) On "Cross" tab, select CPU aarch64 & OS android, "Install compiler" (Ignore trunk warning, select "yes" to missing tools message box)
+# 4) On Modules tab, select LAMW, Install module
+# 5) (Optional but recommended) In module list: Select OPM, Install module (online package manager)
  
-# Run lazarus using the shortcut created by FPCUPdeluxe
+# Run Lazarus using the shortcut created by FPCUPdeluxe
+ 
 # NOTE: DO NOT forget to replace references to [user] with your user name in 3 paths below
 # Select Tools menu > [Lamw] Android Module Wizard > Paths Settings: [Jdk, Sdk, Ndk, ...]:
 # Path to Java JDK: /usr/lib/jvm/java-8-openjdk-amd64
 # Path to Ant bin: /usr/bin
-# Path to Gradle: /home/[user]/android/gradle-4.10.2
-# Path to Android SDK: /home/[user]/android/sdk
+# Path to Gradle: /home/[user]/android/gradle-4.10.3
 # Path to Android NDK: /home/[user]/android/sdk/ndk-bundle
 # NDK Version: >11
 # Your Desktop System: linux-x86_64
+# Path to Android SDK: /home/[user]/android/sdk
  
-# For new LAMW projects, use Gradle for Build Automated System and
-#  ARMv7a + VFPv3 for Architecture/Instructions 
-
-Comments 1: 
-
-Manjaro requires these changes:
-
-1) Instead of apt-get, use pacman with these packages:
-# Install libraries and tools
-sudo pacman -S --needed libx11 gtk2 gdk-pixbuf2 cairo pango libxtst atk freeglut
-sudo pacman -S --needed git subversion make gdb zip unzip unrar wget 
-sudo pacman -S --needed android-tools apache-ant jdk8-openjdk
-
-2) #Install SDK packages and NDK using sdkmanager
-In my test the NDK was not installing and sdkmanager gave an error "No space left on device".  By default /tmp is a tmpfs limited to half the size of your RAM, if your RAM size is small, you may have to temporarily unmount /tmp from tmpfs before installing sdk/ndk packages:
-sudo umount -l /tmp
-(remember to manually delete files in /tmp before rebooting)
-
-3) The PATH environment is setup in a different file:
-# Use a text editor to open $HOME/.bash_profile and add this text below:
-# example: kate $HOME/.bash_profile
-export PATH="${PATH}:${HOME}/android/ndk-toolchain"
-export PATH="${PATH}:${HOME}/android/gradle-4.10.2/bin"
-export ANDROID_SDK_ROOT="$HOME/android/sdk"
-
-4) When setting LAMW paths, the JDK has a different path on Manjaro
-# Select Tools menu > [Lamw] Android Module Wizard > Paths Settings: [Jdk, Sdk, Ndk, ...]:
-...
-# Path to Java JDK: /usr/lib/jvm/java-8-openjdk
-
-
-Comments 2:
-
-1) Work arounds were needed to deal with recent NDK / Gradle changes.
-2) Updated command line SDK tools to "sdk-tools-linux-4333796.zip".
-3) Using newer platform and build tools (ver 26 instead of ver 25)
-4) Added MIPS toolchain links to work around NDK and gradle plugin inconsistency.
-5) Using new Gradle:  gradle-4.10.2-bin.zip (previous was 4.1)
-6) Add new environment variable: export ANDROID_SDK_ROOT="$HOME/android/sdk"
-7) Tested with newer FPCUPdeluxe version (ver 1.6.1m)
-
-Comments 2:
-
-1) Tested and working with Xubuntu 18.04.
-2) Add "update-java-alternatives --set /usr/lib/jvm/java-1.8.0-openjdk-amd64" to set default java to openjdk-8-jdk
-3) Added commands to download and run fpcupdeluxe
+# For new LAMW projects, use Gradle for APK Builder and
+#  for 32-bit:  ARMv7a + VFPv3 for Architecture/Instructions
+#  for 64-bit:  Aarch64 for Architecture/Instructions
+ 
