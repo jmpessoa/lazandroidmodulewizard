@@ -1,0 +1,34 @@
+
+		Tutorial
+		
+	Prepare/build FPC/Lazarus/LAMW  using "fpcupdeluxe" to support 32 and 64 bits 
+
+
+	WARNING: Google Play NOW require APKs to include both 32 and 64 bit version of .so libraries.
+		ref. https://developer.android.com/distribute/best-practices/develop/64-bit
+
+1) Download Fpcupdeluxe
+
+	ref. https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases 
+
+2) Linux tutorial by WayneSherman
+
+	https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs/linux/tutorial_by_waynesherman
+
+3) Windows tutorial by jmpessoa
+
+	ref. https://od.lk/f/Ml8xNzA5ODY1NTVf
+		.download and unzip it!
+
+4) How to get more/others ".so" chipset builds:
+	
+	.warning: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds! 
+
+	4.1. From LazarusIDE menu:
+		> Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]
+	4.2. From LazarusIDE  menu:
+		> Run -> Clean up and Build...
+	4.3. From LazarusIDE menu:
+		> [LAMW] Build Android Apk and Run
+
+	NOTE: If desirable/wanted repeat 4.1/4.2/4.3 for other CPUs...

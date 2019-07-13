@@ -36,7 +36,7 @@ I. Infrastructure
  
 	Warning:  Java JDK > 8 don't support [anymore] "ant" build system!
 
-.Android SDK [old] ---  "ant" and "gradle" build supported...    [recommended!!!]
+.Android SDK [old/recommended!] ---  "ant" and "gradle" build supported...    [recommended!!!]
 
 	[Windows]	https://dl.google.com/android/repository/tools_r25.2.5-windows.zip
 	[Linux]		https://dl.google.com/android/repository/tools_r25.2.5-linux.zip
@@ -78,12 +78,16 @@ I. Infrastructure
 			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
 			2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
 
+	IMPORTANT!
+		Google Play NOW require APKs to include both 32 and 64 bit version of .so libraries.....
+		ref.  https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/how_to_64bits_Apk.txt
+
 .Ant [to build Apk]
 
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
 
-.Gradle 4.4.1 [to build Apk with "AppCompat" [material design] theme]
+.Gradle 4.4.1 [ "must have" to build Apk with "AppCompat" material theme]
 	https://gradle.org/next-steps/?version=4.4.1&format=bin
 
 	Simply extract the zip file to a convenient location...
@@ -115,8 +119,6 @@ III. USING LAMW
 1. Configure Paths:
 
 	Lazarus IDE menu "Tools" ---> "[LAMW] Android Module Wizard" -->  "Path Settings ..."
-
-		ref. https://od.lk/f/Ml8xNTU4Mjc1NDZf
 
 	NOTE: [MacOs >= 10.5] path to Java JDK auto setting as: ${/usr/libexec/java_home}
 
@@ -150,7 +152,11 @@ III. USING LAMW
 
 			[This is your Android App/Apk name]
 
-	2.6-[MinSdk] Select the  Min. Device Api need to run your App:
+	2.6-[MinNkd] Select the  Min. NDK api:
+
+		example: 22         [warning ndkpi > 22 will not run on old 4.x devices]
+
+	2.7-[MinSdk] Select the  Min. Device Api need to run your App:
 
 		example: 14
 
@@ -158,7 +164,7 @@ III. USING LAMW
 
 		example: ARMv7a + Soft
 		
-		NOTE: 	Laz4Android support  "ARMv6" and "ARMv7a + Soft"
+		NOTE: 	Laz4Android2.0.0 support  "ARMv6" and "ARMv7a + Soft"
 			Fpcupdeluxe support  "ARMv7a + VFPv3" and "Aarch64"
 		
         2.9.Select Android Theme
@@ -211,19 +217,24 @@ III. USING LAMW
 
 7.Lazarus IDE menu "Run" ---> "[Lamw] Build Apk and Run" [Congratulations!!!]
 
-8.PANIC? Fail to buid "Apk" or Run "Demos"...
+8) How to get more/others ".so" chipset builds:
+	
+	.warning: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds! 
+		ref.  https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/how_to_64bits_Apk.txt
 
-	.Try change project "AndroidManifest.xml" according your Android SDK system installation....
+	8.1. From LazarusIDE menu:
+		> Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]
+	8.2. From LazarusIDE  menu:
+		> Run -> Clean up and Build...
+	8.3. From LazarusIDE menu:
+		> [LAMW] Build Android Apk and Run
 
-			.<uses-sdk android:minSdkVersion="15" android:targetSdkVersion="17"/>
-
-		.Change your project "build.xml"  according your  Android SDK system installation and "AndroidManifest.xml"
-
-			.<property name="target"  value="android-17"/>			
+	NOTE: If desirable/wanted repeat 8.1/8.2/8.3 for other CPUs...
 
 
 9. Using/Testing "Demos":  [Please, before try a demo, do yourself a first "hello world" apk!]
-[so, you can test your environment settings ...]
+
+	[so, you can test your environment settings ...]
 
 	.Lazarus IDE menu --> Open the project *.lpi   [....\jni]
 	.Lazarus IDE menu --> Project -->  Project Inspector --> "Unit1.pas"  [etc...]
@@ -232,22 +243,21 @@ III. USING LAMW
 
 	[Congratulations!!!]
 
-10. NOTE1: All LAMW projects [and demos] are AndroidStudio/Eclipse compatible!
-	Please,  read the "How_to_open_LAMW_project_with_AndroidStudio.txt"
+10. NOTE1: All LAMW projects [and demos] are AndroidStudio/Eclipse compatibles!
+	ref. https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/How_to_open_LAMW_project_with_AndroidStudio.txt
 
     NOTE2: Components from  Palettes "Android Bridges AppCompat"  and "Android Bridges JCenter" need build system "Gradle" [and Internet connection]
 
 11. About "untitled" demos:
 
 AppTest1 : multi-form demo
-AppTest2: jni coding: the hard way
+AppTest2: jni coding "the hard way"
 AppTryCode1: jHello component demo [array, strings,  etc...]
 AppTryCode2: jMediaPlayer1 and  jSurfaceView1 components demo 
 AppTryCode2: jDumpJavaMethods component demo [about java to pascal converter...]
 
 
-
-Thanks to All!
+	Thanks to All!
 	
 
 [FAQ 2]: [Thanks to Ahmad Bohloolbandi (a.k.a. @developing) ]
