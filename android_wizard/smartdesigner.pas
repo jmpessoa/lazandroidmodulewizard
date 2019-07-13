@@ -1125,6 +1125,7 @@ begin
 
   end;
 
+  listRequirements.Free;
   strList.Free;
 end;
 
