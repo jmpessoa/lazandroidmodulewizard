@@ -2,6 +2,8 @@ package org.lamw.appjcenteropenstreetmapdemo1;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -57,7 +59,14 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
     MapEventsOverlay mapEventsOverlay;
     List<Marker> mMarkerList;
     List<Polygon> mPolygonList;
+    List<Polyline> mPolylineList;
+    List<Polyline> mLineList;
+
     private boolean IsMarkerDraggable;
+
+    private int mStrokeColor = Color.RED;
+    private float mStrokeWidth = 2;
+    private int mFillColor = 0x12121212;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jcOpenMapView(Controls _ctrls, long _Self, boolean _showScale, int _tileSource, int _zoom) { //Add more others news "_xxx" params if needed!
@@ -99,6 +108,9 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
 
         mMarkerList = new ArrayList<Marker>();
         mPolygonList = new ArrayList<Polygon>();
+        mPolylineList = new ArrayList<Polyline>();
+        mLineList = new ArrayList<Polyline>();
+
         mBufferGeoPointsList = new ArrayList<GeoPoint>();
 
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
@@ -139,6 +151,8 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         //setOnClickListener(null);
         mMarkerList.clear();
         mPolygonList.clear();
+        mPolylineList.clear();
+        mLineList.clear();
         mBufferGeoPointsList.clear();
 
         LAMWCommon.free();
@@ -251,7 +265,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         Polygon circle = new Polygon(this); //radiusInMetter
         circle.setPoints(Polygon.pointsAsCircle(geoPoint, _radiusInMetters)); //2000.0
         //And we adjust some design aspects:
-        circle.setFillColor(0x12121212);
+        circle.setFillColor(mFillColor);
         circle.setStrokeColor(_strokeColor);  //Color.RED
         circle.setStrokeWidth(_strokeWidth); //2
         //And as Polygon supports bubbles, let's add one:
@@ -696,7 +710,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         _marker.setDraggable(_draggable);
     }
 
-    public void DrawPolyline(double[] _latitude, double[] _longitude) {
+    public Polyline DrawPolyline(double[] _latitude, double[] _longitude) {
         List<GeoPoint> geoPoints = new ArrayList<>();
         Polyline line = new Polyline();   //see note below!
         int count = _latitude.length;
@@ -716,9 +730,10 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         */
         this.getOverlayManager().add(line);
         this.invalidate();
+        return line;
     }
 
-    public void DrawPolyline(int _geoPointStartIndex, int _count) {
+    public Polyline DrawPolyline(int _geoPointStartIndex, int _count) {
         List<GeoPoint> geoPoints = new ArrayList<>();
         Polyline line = new Polyline();   //see note below!
         //add points
@@ -737,6 +752,124 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         */
         this.getOverlayManager().add(line);
         this.invalidate();
+        return line;
+    }
+
+    public void ClearPolyline(Polyline _polyline) {
+        this.getOverlays().remove(_polyline);
+        this.invalidate();
+    }
+
+    public Polyline DrawLine(double _latitude1, double _longitude1, double _latitude2, double _longitude2, int _strokeColor, int _strokeWidth) {
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        Polyline line = new Polyline();   //see note below!
+        //add points
+        geoPoints.add(new GeoPoint(_latitude1, _longitude1));
+        geoPoints.add(new GeoPoint(_latitude2, _longitude2));
+        line.setPoints(geoPoints);
+
+        //line.setStrokeColor(_strokeColor);  //Color.RED
+        //line.setStrokeWidth(_strokeWidth); //2
+        line.setColor(_strokeColor);//0xAA0000FF
+        line.setWidth(_strokeWidth); //2.0f
+        //line.setStyle(1);
+        /*
+        line.setOnClickListener(new Polyline.OnClickListener() {
+            @Override
+            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
+               //Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+        */
+        this.getOverlayManager().add(line);
+        this.invalidate();
+        return line;
+    }
+
+    public int AddLine(double _latitude1, double _longitude1, double _latitude2, double _longitude2) {
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        Polyline line = new Polyline();   //see note below!
+        //add points
+        geoPoints.add(new GeoPoint(_latitude1, _longitude1));
+        geoPoints.add(new GeoPoint(_latitude2, _longitude2));
+        line.setPoints(geoPoints);
+        line.setColor(mStrokeColor);//0xAA0000FF
+        line.setWidth(mStrokeWidth); //2.0f
+        /*
+        line.setOnClickListener(new Polyline.OnClickListener() {
+            @Override
+            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
+               //Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+        */
+        this.getOverlayManager().add(line);
+        this.invalidate();
+        mLineList.add(line);
+        return mLineList.size();
+    }
+
+    public int AddLine(double _latitude1, double _longitude1, double _latitude2, double _longitude2, int _strokeColor, int _strokeWidth) {
+        List<GeoPoint> geoPoints = new ArrayList<>();
+
+        Polyline line = new Polyline();   //see note below!
+
+        /*
+        Paint paint = line.getPaint();
+        float[] intervals = new float[]{50.0f, 20.0f};
+        float phase = 0;
+        DashPathEffect dashPathEffect = new DashPathEffect(intervals, phase);
+        paint.setPathEffect(dashPathEffect);
+        */
+
+        //add points
+        geoPoints.add(new GeoPoint(_latitude1, _longitude1));
+        geoPoints.add(new GeoPoint(_latitude2, _longitude2));
+        line.setPoints(geoPoints);
+        // line.setStrokeColor(mStrokeColor);  //Color.RED
+        //line.setStrokeWidth(mStrokeWidth); //2
+        line.setColor(_strokeColor);//0xAA0000FF
+        line.setWidth(_strokeWidth); //2.0f
+    /*
+        line.setOnClickListener(new Polyline.OnClickListener() {
+            @Override
+            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
+               //Toast.makeText(mapView.getContext(), "polyline with " + polyline.getPoints().size() + "pts was tapped", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+        */
+        this.getOverlayManager().add(line);
+        this.invalidate();
+        mLineList.add(line);
+        return mLineList.size();
+    }
+
+    public void ClearLine(Polyline _line) {
+        this.getOverlays().remove(_line);
+        this.invalidate();
+    }
+
+    public void ClearLine(int _index) {
+        Polyline p = mLineList.get(_index);
+        this.getOverlayManager().remove(p);
+        this.invalidate();
+        mLineList.remove(_index);
+    }
+
+    public void ClearLines() {
+        int count = mLineList.size();
+        for (int i = 0; i < count; i++) {
+            this.getOverlayManager().remove(mLineList.get(i));
+        }
+        mLineList.clear();
+        this.invalidate();
+    }
+
+    public int GetLinesCount() {
+        return mLineList.size();
     }
 
     //https://github.com/osmdroid/osmdroid/wiki/Markers,-Lines-and-Polygons
@@ -902,6 +1035,44 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
 
     public void StopPanning() {
         mapController.stopPanning();
+    }
+
+    public void SetStrokeColor(int _strokeColor) {
+        mStrokeColor = _strokeColor;
+    }
+
+    public void SetStrokeWidth(float _strokeWidth) {
+        mStrokeWidth = _strokeWidth;
+    }
+
+    public void SetFillColor(int _fillColor) {
+        mFillColor = _fillColor;
+    }
+
+    //https://stackoverflow.com/questions/13721008/how-to-draw-dashed-polyline-with-android-google-map-sdk-v2
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+    public double GetDistance(double lat1, double lon1, double lat2,
+                                  double lon2, char unit) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        if (unit == 'K') {
+            dist = dist * 1.609344;
+        } else if (unit == 'N') {
+            dist = dist * 0.8684;
+        }
+        return (dist);
     }
 
 }
