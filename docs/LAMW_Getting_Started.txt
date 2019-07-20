@@ -42,7 +42,9 @@ I. Infrastructure
 	[Linux]		https://dl.google.com/android/repository/tools_r25.2.5-linux.zip
 	[Mac]		https://dl.google.com/android/repository/tools_r25.2.5-macosx.zip
 
-	Hint:	1)after unpacked/install, open a command line Terminal and go to folder "sdk/tools"
+	Hint:	
+		0)unpacked/install to a "sdk" folder
+		1)after unpacked/install, open a command line Terminal and go to folder "sdk/tools"
 		2)run the command  ">android update sdk"   to open a GUI "SDK Manager"
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
@@ -64,22 +66,69 @@ I. Infrastructure
 .Android NDK
 	https://developer.android.com/ndk/downloads/index.html
 
-.Lazarus
-	.Laz4Android [Windows] [cross-arm-android compiler installed!] 
+.Lazarus for Android
+
+	.Option 1) Laz4Android [Windows] [cross-arm-android compiler installed!] 
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
 			Hint: Install here: "C:\Laz4Android2.0.0"   [not "Program Files"  !!!]
-
-	.Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
+				
+			warning: Laz4Android2.0.0 don't support android-aarch64
+			
+	.Option 2) Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
 		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases		
 
-	.Lazarus [canonical]
-		"Do It Yourself" [windows]: 			
-			After install the LAMW go to:
+	.Option 3) Lazarus + FPC 3.2.0 [canonical/windows] "Do It Yourself"			
+
+		win64:  [need FPC 3.2.0 to support android-64 bits]
+		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2064/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793-win64.exe/download
+		
+		win32: [need FPC 3.2.0 to support android-64 bits]
+		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2032/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793-win32.exe/download
+
+			After install the LAMW packages [section II] go to:
 			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
 			2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
 
+				[ex. Armv7a + Soft]	<<---- tested!
+				.Build  
+				.Install
+
+				[ex. aarch64]	  	<<---- tested!
+				.Build  
+				.Install
+
+
+			3. After "build" and "install" the cross-compiler and before to create your first LAMW project
+
+				[How to fix "Fatal: Cannot find unit system used by fcllaz of package FCL."]
+
+				3.1) Go to "fpc.cfg"  [ex. "lazarus\fpc\3.2.0\bin"]
+
+					Change:
+ 
+					# searchpath for units and other system dependent things
+					-FuC:\lazarus1864\fpc\$FPCVERSION/units/$fpctarget
+					-FuC:\lazarus1864\fpc\$FPCVERSION/units/$fpctarget/*
+					-FuC:\lazarus1864\fpc\$FPCVERSION/units/$fpctarget/rtl
+
+					To:
+
+					# searchpath for units and other system dependent things
+					-FuC:\lazarus1864\fpc\3.2.0/units/$fpctarget
+					-FuC:\lazarus1864\fpc\3.2.0/units/$fpctarget/*
+					-FuC:\lazarus1864\fpc\3.2.0/units/$fpctarget/rtl
+
+				3.2) Go to Lazarus IDE menu "Tools" --> "Options" --> "Environment"  
+
+					[FPC Source]
+
+					Change:
+						$(LazarusDir)fpc\$(FPCVer)\source
+					To: 
+						$(LazarusDir)fpc\3.2.0\source
+
 	IMPORTANT!
-		Google Play NOW require APKs to include both 32 and 64 bit version of .so libraries.....
+		Google Play NOW require APKs to include both 32 and 64 bit version of .so libraries....
 		ref.  https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/how_to_64bits_Apk.txt
 
 .Ant [to build Apk]
@@ -106,9 +155,10 @@ I. Infrastructure
 		6. Android SDK/Extra	"Google Repository"
 		7. Android SDK/Extra	"Google Play Services"		
 
-II. LAMW:  Lazarus Android Module Wizard
-
-	.Packages Instalation order.
+II. LAMW: Lazarus Android Module Wizard
+	.ref. https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip
+	
+	.Packages Installations order.
 
 		tfpandroidbridge_pack.lpk	[..../android_bridges]
 		lazandroidwizardpack.lpk	[..../android_wizard]

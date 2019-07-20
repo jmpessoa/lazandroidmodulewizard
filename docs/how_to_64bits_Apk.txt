@@ -17,7 +17,7 @@
 
 3) Windows tutorial by jmpessoa
 
-	ref. https://od.lk/f/Ml8xNzA5ODY1NTVf
+	ref. https://od.lk/f/Ml8xNzEyOTI1NDlf
 		.download and unzip it!
 
 4) How to get more/others ".so" chipset builds:
