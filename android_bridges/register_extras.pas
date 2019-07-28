@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  wifimanager,
   midimanager,
   expression,
   oraclejdbcconnection,
@@ -63,6 +64,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jwifimanager_icon.lrs}
   {$I jexpression_icon.lrs}
   {$I jxlswriter_icon.lrs}
   {$I jmodaldialog_icon.lrs}
@@ -119,6 +121,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jWifiManager,
       jExpression,
       jXLSWriter,
       jModalDialog,
