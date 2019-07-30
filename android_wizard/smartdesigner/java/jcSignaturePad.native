@@ -1,0 +1,3 @@
+public native void pOnSignaturePadStartSigning(long pasobj);
+public native void pOnSignaturePadSigned(long pasobj);
+public native void pOnSignaturePadClear(long pasobj);

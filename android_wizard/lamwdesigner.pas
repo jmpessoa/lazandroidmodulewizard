@@ -337,6 +337,13 @@ type
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
   end;
 
+  {TDraftCSignaturePad}
+
+  TDraftCSignaturePad = class(TDraftWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+  end;
+
   {TDraftCustomCamera}
 
   TDraftCustomCamera = class(TDraftWidget)
@@ -738,7 +745,7 @@ uses
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
   sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView},
   customcamera, sadmob, calendarview, searchview, zbarcodescannerview,
-  scontinuousscrollableimageview, copenmapview;
+  scontinuousscrollableimageview, copenmapview, csignaturepad;
 
 const
   DrawableSearchPaths: array [0..4] of string = (
@@ -3952,6 +3959,20 @@ begin
     Color := GetParentBackgroundColor;
 end;
 
+{ TDraftCSignaturePad }
+
+constructor TDraftCSignaturePad.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+
+  Color := jcSignaturePad(AWidget).BackgroundColor;
+  FontColor := colbrGray;
+  BackGroundColor := clActiveCaption; //clMenuHighlight;
+
+  if jcSignaturePad(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
 { TDraftCustomCamera }
 
 constructor TDraftCustomCamera.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
@@ -4703,6 +4724,7 @@ initialization
 
   RegisterAndroidWidgetDraftClass(jsContinuousScrollableImageView, TDraftSContinuousScrollableImageView);
   RegisterAndroidWidgetDraftClass(jcOpenMapView, TDraftCOpenMapView);
+  RegisterAndroidWidgetDraftClass(jcSignaturePad, TDraftCSignaturePad);
 
 finalization
   DraftClassesMap.Free;

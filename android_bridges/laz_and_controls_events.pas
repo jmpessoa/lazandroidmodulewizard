@@ -196,6 +196,10 @@ uses
    procedure Java_Event_pOnOpenMapViewLongClick(env:PJNIEnv;this:JObject;Sender:TObject;latitude:double;longitude:double);
    procedure Java_Event_pOnOpenMapViewMarkerClick(env:PJNIEnv;this:JObject;Sender:TObject;title:jString;latitude:double;longitude:double);
 
+   procedure Java_Event_pOnSignaturePadStartSigning(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnSignaturePadSigned(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnSignaturePadClear(env:PJNIEnv;this:JObject;Sender:TObject);
+
 
 implementation
 
@@ -209,7 +213,8 @@ uses
    toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
    customcamera, calendarview, searchview, telephonymanager,
-   sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview, midimanager, copenmapview;
+   sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
+   midimanager, copenmapview, csignaturepad;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2350,6 +2355,38 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnSignaturePadStartSigning(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcSignaturePad then
+  begin
+    jForm(jcSignaturePad(Sender).Owner).UpdateJNI(gApp);
+    jcSignaturePad(Sender).GenEvent_OnSignaturePadStartSigning(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnSignaturePadSigned(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcSignaturePad then
+  begin
+    jForm(jcSignaturePad(Sender).Owner).UpdateJNI(gApp);
+    jcSignaturePad(Sender).GenEvent_OnSignaturePadSigned(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnSignaturePadClear(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcSignaturePad then
+  begin
+    jForm(jcSignaturePad(Sender).Owner).UpdateJNI(gApp);
+    jcSignaturePad(Sender).GenEvent_OnSignaturePadClear(Sender);
+  end;
+end;
 
 end.
 
