@@ -1,6 +1,6 @@
 unit AndroidWidget;
 
-//Legacy: based Simosays's Native Android Controls for Pascal
+//Legacy: based on Simosays's Native Android Controls for Pascal
 
 (*
 LAMW: Lazarus Android Module Wizard:
@@ -2933,15 +2933,14 @@ begin
     end;
 
     //Show ...
-    if FVisible or (FActivityMode = actMain) then
+    if not FVisible then
     begin
-       FVisible := True;
+       FVisible:= True;
        gApp.TopIndex:= FormIndex;
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
+       if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
+       if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
     end;
-
-    if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
-    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 
   end
   else    //actEasel ...
