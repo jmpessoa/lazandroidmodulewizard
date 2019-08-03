@@ -20,7 +20,6 @@ type
     jTextView1: jTextView;
     procedure AndroidModule1ActivityResult(Sender: TObject;
       requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
-    procedure AndroidModule1Create(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
     procedure jButton2Click(Sender: TObject);
     procedure jButton3Click(Sender: TObject);
@@ -42,7 +41,8 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-   jModalDialog1.SetDialogTitle('Hello World!');
+   jModalDialog1.SetDialogTitle('Nice Title');
+   jModalDialog1.SetDialogMessage('Hello World!');
    jModalDialog1.TitleFontSize:= 20;
    jModalDialog1.CaptionOK:= 'Close';
    jModalDialog1.ShowMessage(Self.PackageName);   //OR gApp.AppName OR 'org.lamw.appmodaldialogdemo1'
@@ -54,18 +54,17 @@ var
 begin
 
    SetLength(requestInfoList, 3);
-   requestInfoList[0]:= 'INFO_0';
-   requestInfoList[1]:= 'INFO_1';
-   requestInfoList[2]:= 'INFO_2';
+   requestInfoList[0]:= 'DATA_0|hint 0';  //DATA_NAME|Input Hint
+   requestInfoList[1]:= 'DATA_1|hint 1';
+   requestInfoList[2]:= 'DATA_2|hint 2';
 
    jModalDialog1.SetRequestCode(1001);
    jModalDialog1.TitleFontSize:= 20;
    jModalDialog1.CaptionOK:= 'OK';
    jModalDialog1.CaptionCancel:= 'Cancel';
 
-
-   jModalDialog1.SetDialogTitle('Please, input some info...');
-   jModalDialog1.SetInputHint('Enter data... ');
+   jModalDialog1.SetDialogTitle('Input Data');
+   jModalDialog1.SetDialogMessage('Please, enter some data...');
 
    jModalDialog1.InputForActivityResult(Self.PackageName, requestInfoList);
 
@@ -75,7 +74,8 @@ end;
 procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
    jModalDialog1.SetRequestCode(1002);
-   jModalDialog1.SetDialogTitle('Do you like LAMW ?');
+   jModalDialog1.SetDialogTitle('Question');
+   jModalDialog1.SetDialogMessage('Do you like LAMW ?');
    jModalDialog1.TitleFontSize:= 20;
    jModalDialog1.CaptionOK:= 'Yes';
    jModalDialog1.CaptionCancel:= 'No';
@@ -90,9 +90,9 @@ begin
    begin
      if resultCode  = RESULT_OK then
      begin
-         ShowMessage(jModalDialog1.GetStringValue(intentData, 'INFO_0'));
-         ShowMessage(jModalDialog1.GetStringValue(intentData, 'INFO_1'));
-         ShowMessage(jModalDialog1.GetStringValue(intentData, 'INFO_2'));
+         ShowMessage(jModalDialog1.GetStringValue(intentData, 'DATA_0'));
+         ShowMessage(jModalDialog1.GetStringValue(intentData, 'DATA_1'));
+         ShowMessage(jModalDialog1.GetStringValue(intentData, 'DATA_2'));
      end
      else
      begin
@@ -108,11 +108,6 @@ begin
        if resultCode = RESULT_CANCELED then
            ShowMessage('Sorry, I do not try LAMW, yet.');
    end;
-
-end;
-
-procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
-begin
 
 end;
 

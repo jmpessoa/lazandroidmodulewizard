@@ -9,7 +9,7 @@ uses
 
 type
 
-TDialogTheme = (thHoloLightDialog, thHoloDialog, thDialog);
+TDialogTheme = (thHoloLightDialog, thHoloDialog, thDialog, thDialogLightNoTitle);
 
 {Draft Component code by "Lazarus Android Module Wizard" [5/16/2017 0:28:03]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -46,6 +46,7 @@ jModalDialog = class(jControl)
     procedure SetCaptionButtonCancel(_captionBtnCancel: string);
     procedure SetTitleFontSize(_fontSize: integer);
     procedure SetInputHint(_hint: string);
+    procedure SetDialogMessage(_dialogMessage: string);
 
  published
     property Theme: TDialogTheme read  FTheme write SetTheme;
@@ -71,7 +72,7 @@ procedure jModalDialog_SetCaptionButtonOK(env: PJNIEnv; _jmodaldialog: JObject; 
 procedure jModalDialog_SetCaptionButtonCancel(env: PJNIEnv; _jmodaldialog: JObject; _captionCancel: string);
 procedure jModalDialog_SetTitleFontSize(env: PJNIEnv; _jmodaldialog: JObject; _fontSize: integer);
 procedure jModalDialog_SetInputHint(env: PJNIEnv; _jmodaldialog: JObject; _hint: string);
-
+procedure jModalDialog_SetDialogMessage(env: PJNIEnv; _jmodaldialog: JObject; _dialogMessage: string);
 
 implementation
 
@@ -234,6 +235,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jModalDialog_SetInputHint(FjEnv, FjObject, _hint);
+end;
+
+procedure jModalDialog.SetDialogMessage(_dialogMessage: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jModalDialog_SetDialogMessage(FjEnv, FjObject, _dialogMessage);
 end;
 
 {-------- jModalDialog_JNI_Bridge ----------}
@@ -493,5 +501,20 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jModalDialog_SetDialogMessage(env: PJNIEnv; _jmodaldialog: JObject; _dialogMessage: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_dialogMessage));
+  jCls:= env^.GetObjectClass(env, _jmodaldialog);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDialogMessage', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jmodaldialog, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.

@@ -3,11 +3,16 @@ package org.lamw.appmodaldialogdemo1;
 import android.content.Context;
 import android.content.Intent;
 import android.app.Activity;
+import android.content.res.Configuration;
+import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -31,26 +36,34 @@ public class jModalDialog extends Activity {
 	int lpH = RelativeLayout.LayoutParams.WRAP_CONTENT;
 	int lpW = RelativeLayout.LayoutParams.MATCH_PARENT; //w
 		
-	public String mTitle;	
-	public int mDlgTheme = android.R.style.Theme_Holo_Light_Dialog;
+	public String mTitle;
+    public String mMessage;
+	public int mDlgTheme = android.R.style.Theme_DeviceDefault_Light_Dialog;
+    //Theme_Material_Dialog;
+    //Theme_Dialog;
+    //Theme_DeviceDefault_Light_Dialog;
+    //Theme_DeviceDefault_Dialog;
+    //Theme_Holo_Light_Dialog;
 	
 	int mHasWindowTitle = 0; 
 	int mDlgType = 0;
 	
-	String[] mRequestInfo;	
-	EditText[] mEditInput;  
+	String[] mRequestInfo;
+    String[] mRequestHint;
+	EditText[] mEditInput;
 	
 	int mRequestInfoCount = 0;
 	
 	int mRequestCode = 1122;
 	String mDialogTitle = "LAMW Modal Dialog Title";
+    String mDialogMessage = "Hello World!";
 	
 	int mIndexAnchor;
 	
 	String mBtnOK = "Ok";
 	String mBtnCancel = "Cancel";
 	int mTitleFontSize = 0;
-	String mHint = "Enter data";
+	String mHint = "Enter data...";
     
     public jModalDialog() {    	
         super();  	 	      
@@ -69,19 +82,20 @@ public class jModalDialog extends Activity {
       mI = null;
     }
 
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	
         super.onCreate(savedInstanceState);
-        
+
         Intent intent = this.getIntent();
         
         mDlgTheme = intent.getIntExtra("dlg_theme", 0);        
         setTheme(mDlgTheme);
         
         mHasWindowTitle = intent.getIntExtra("dlg_has_window_title", 0);        
-        mTitle = intent.getStringExtra("dlg_title");  //_dialogTitle
+        mTitle = intent.getStringExtra("dlg_title");
+        mMessage = intent.getStringExtra("dlg_message");
         mBtnOK =  intent.getStringExtra("dlg_btn_ok"); 
         mBtnCancel = intent.getStringExtra("dlg_btn_cancel"); 
         mTitleFontSize = intent.getIntExtra("dlg_font_title_size", 0);        
@@ -90,34 +104,36 @@ public class jModalDialog extends Activity {
                         
         if (mHasWindowTitle == 1)            	
         	  requestWindowFeature(Window.FEATURE_NO_TITLE);  
-           	    	        
+        else {
+            setTitle(mTitle);
+        }
+
         mRequestInfoCount = intent.getIntExtra("dlg_request_info_count", 0); 
-       
+
+        String infoHint;
         if (mRequestInfoCount > 0) { 
-           mRequestInfo = new String[mRequestInfoCount];        
-           for (int i = 0; i < mRequestInfoCount;  i++) {        	           	  
-        	  mRequestInfo[i] = intent.getStringExtra(String.valueOf(i));  //get "0", "1", "2", ...
+           mRequestInfo = new String[mRequestInfoCount];
+           mRequestHint = new String[mRequestInfoCount];
+
+           for (int i = 0; i < mRequestInfoCount;  i++) {
+               infoHint =  intent.getStringExtra(String.valueOf(i)); //DATA_NAME|Input Hint
+        	  mRequestInfo[i] = infoHint.split("\\|")[0];  //get "DATA_0", "DATA_1", "DATA_2", ...
+               mRequestHint[i] = infoHint.split("\\|")[1];  //get "Input Hint 0", "Input Hint 1", "Input Hint 2", ...
            }                                        
         }
         
         mLayout = new android.widget.RelativeLayout(this);
-        
-        this.setContentView(mLayout);
-                
-        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-       
+
         /*
-        WindowManager.LayoutParams lp = getWindow().getAttributes();        
-        //When FLAG_DIM_BEHIND is set, this is the amount of dimming to apply. 
-        //Range is from 1.0 for completely opaque to 0.0 for no dim. 
-        lp.dimAmount = 0.5f;
-       // lp.screenBrightness = 0.5F;
-        getWindow().setAttributes(lp);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);         
-        */
-        
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+       */
+        android.widget.RelativeLayout.LayoutParams params = new android.widget.RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.MATCH_PARENT);     // W,H
+
+        this.setContentView(mLayout, params);
+
         this.setFinishOnTouchOutside(false);  // modal dialog
-        
     }
        
     @Override
@@ -126,10 +142,10 @@ public class jModalDialog extends Activity {
     	int screenWidth;
     	
         TextView title = new TextView(this);
-        
-        title.setId(1111);
-        title.setPadding(20, 20, 20, 20);
-        title.setText(mTitle);
+        int id1111 = 1111;
+        title.setId(id1111);
+        title.setPadding(20, 40, 20, 40);
+        title.setText(mMessage);
         
         if (mTitleFontSize > 0)
            title.setTextSize(mTitleFontSize);
@@ -146,18 +162,15 @@ public class jModalDialog extends Activity {
         if (mDlgType == 0) {  //inputBox
      	   
      	   mEditInput = new EditText[mRequestInfoCount]; //all edit inputs ...
-     	   
-     	   //Log.i("mRequestInfoCount", "count = "+ mRequestInfoCount);
-     	  
-     	   if (mRequestInfoCount > 0) {
+            int id2222 = 2222;
+
+            if (mRequestInfoCount > 0) {
      		   
-     	     mEditInput[0] = new EditText(this);        	  
-     	     mEditInput[0].setId(2222);
-     	     mEditInput[0].setPadding(20, 30, 20, 30);      
-     	     //mEditInput[0].setText();     	     
-     	     mEditInput[0].setHint(mHint);// +" "+ mRequestInfo[0].toLowerCase());
-     	     
-     	   
+     	     mEditInput[0] = new EditText(this);
+     	     mEditInput[0].setId(id2222);
+     	     mEditInput[0].setPadding(20, 30, 20, 30);
+     	     mEditInput[0].setHint(mRequestHint[0]);
+
              android.widget.RelativeLayout.LayoutParams lparams0 = new android.widget.RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
      		                                                        RelativeLayout.LayoutParams.WRAP_CONTENT);     // W,H                
              lparams0.addRule(RelativeLayout.CENTER_HORIZONTAL);      //parent       
@@ -172,14 +185,14 @@ public class jModalDialog extends Activity {
            for (int j = 1;  j < mRequestInfoCount; j++) { //others inputs...
         	           	  
         	  mEditInput[j] = new EditText(this);        	  
-        	  mEditInput[j].setId(2222+j);
+        	  mEditInput[j].setId(id2222+j);
         	  mEditInput[j].setPadding(20, 30, 20, 30);      
         	  //mEditInput[j].setText(mRequestInfo[j]);
-        	  mEditInput[j].setHint(mHint);// +" "+ mRequestInfo[j].toLowerCase());
+        	  mEditInput[j].setHint(mRequestHint[j]);// +" "+ mRequestInfo[j].toLowerCase());
         	  
               android.widget.RelativeLayout.LayoutParams lparamsEdit = new android.widget.RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
         		                                                        RelativeLayout.LayoutParams.WRAP_CONTENT);     // W,H                
-              lparamsEdit.addRule(RelativeLayout.CENTER_HORIZONTAL);      //parent       
+             // lparamsEdit.addRule(RelativeLayout.CENTER_HORIZONTAL);      //parent
               lparamsEdit.addRule(RelativeLayout.BELOW, mEditInput[j-1].getId());   //anchor        
               mEditInput[j].setLayoutParams(lparamsEdit);                
               mLayout.addView(mEditInput[j]);
@@ -188,31 +201,51 @@ public class jModalDialog extends Activity {
            }
            
         }
-        
-        DisplayMetrics metrics = getResources().getDisplayMetrics();        
-        screenWidth = (int) (metrics.widthPixels * 0.45);
-                 
+
+        Display display = getWindowManager().getDefaultDisplay();
+
+        int width = display.getWidth();
+        int height = display.getHeight();
+
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+
+        if (width > height)  //"LandScape",
+            screenWidth = (int) (metrics.widthPixels * 0.30);
+        else
+           screenWidth = (int) (metrics.widthPixels * 0.42);
+
         Button buttonOk = new Button(this);
-        
-        buttonOk.setId(3333);
-        buttonOk.setPadding(20, 20, 20, 20);
+
+        int id3333 = 3333;
+        buttonOk.setId(id3333);
+        buttonOk.setPadding(20, 40, 20, 40);
         buttonOk.setText(mBtnOK);
-        
-        android.widget.RelativeLayout.LayoutParams lparamsOk = new android.widget.RelativeLayout.LayoutParams(screenWidth,
-        		                                                  RelativeLayout.LayoutParams.WRAP_CONTENT);     // W,H                                               
+
+        android.widget.RelativeLayout.LayoutParams lparamsOk;
+
+        if (mDlgType != 1)
+            lparamsOk = new android.widget.RelativeLayout.LayoutParams(screenWidth,
+        		                                                  RelativeLayout.LayoutParams.WRAP_CONTENT);     // W,H
+        else  //showmessage
+            lparamsOk = new android.widget.RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);     // W,H
+
         if  (mDlgType == 0) {   //inputBox
         	lparamsOk.addRule(RelativeLayout.ALIGN_PARENT_LEFT);              //parent
         	lparamsOk.addRule(RelativeLayout.BELOW, mEditInput[mIndexAnchor].getId());   //anchor
         }	
 
-        if  (mDlgType > 0) {  //showmessage
+        if  (mDlgType > 0) {
         	
         	lparamsOk.addRule(RelativeLayout.BELOW, title.getId());   //anchor
-        	
-        	if (mDlgType == 1) 
-        	  lparamsOk.addRule(RelativeLayout.CENTER_HORIZONTAL); //parent
-        	
-        	if (mDlgType == 2) 
+
+            /*
+        	if (mDlgType == 1) { //showmessage
+                lparamsOk.addRule(RelativeLayout.CENTER_HORIZONTAL); //parent
+            }
+            */
+
+        	if (mDlgType == 2) //yes or no
           	  lparamsOk.addRule(RelativeLayout.ALIGN_PARENT_LEFT); //parent
         	        	
         }
@@ -245,21 +278,22 @@ public class jModalDialog extends Activity {
             }
         });
         
-        
+        int id3334 = 3334;
+
         if ( (mDlgType == 0)  || ((mDlgType == 2)) ){  //  == dlgInputBox,  dlgShowQuestion
         	
           Button buttonCancel = new Button(this);
-          buttonCancel.setId(3334);
-          buttonCancel.setPadding(20, 20, 20, 20);
+          buttonCancel.setId(id3334);
+          buttonCancel.setPadding(20, 40, 20, 40);
           buttonCancel.setText(mBtnCancel);
         
           android.widget.RelativeLayout.LayoutParams lparamsCancel = new android.widget.RelativeLayout.LayoutParams(screenWidth,
         		                                                  RelativeLayout.LayoutParams.WRAP_CONTENT);     // W,H
         
-          if (mDlgType == 0)
+          if (mDlgType == 0) //input
              lparamsCancel.addRule(RelativeLayout.BELOW, mEditInput[mIndexAnchor].getId());      //anchor
           
-          if (mDlgType == 2)  //dlgQuestion
+          if (mDlgType == 2)  //dlgQuestion - yes or no
         	  lparamsCancel.addRule(RelativeLayout.BELOW, title.getId());   //anchor
           
           lparamsCancel.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);                //parent       
@@ -282,6 +316,7 @@ public class jModalDialog extends Activity {
             }
            });
         }
+
     }
     
     private Class<?> GetClass(String _fullJavaclassName) {    	
@@ -308,19 +343,23 @@ public class jModalDialog extends Activity {
     
     public void SetRequestInfo(String[] _requestInfo) {
     	int count = _requestInfo.length;
-    	
-    	mRequestInfo = new String[count];    	
+
+    	mRequestInfo = new String[count];
     	for(int i = 0; i < count; i++) {
-    		 mRequestInfo[i] = _requestInfo[i];    		
+            String dataInfo = _requestInfo[i].split("\\|")[0];
+            String dataHint = _requestInfo[i].split("\\|")[1];
+
+            mRequestInfo[i] = dataInfo;
+            mRequestHint[i] = dataHint;
     	}
-    	
     }
     
     public void SetTheme(int _dialogTheme) {    	
     	switch(_dialogTheme) {
-    	  case 0: mDlgTheme = android.R.style.Theme_Holo_Light_Dialog; break;
-    	  case 1: mDlgTheme = android.R.style.Theme_Holo_Dialog; break;
-    	  case 2: mDlgTheme = android.R.style.Theme_Dialog; break;
+    	    case 0: mDlgTheme = android.R.style.Theme_DeviceDefault_Light_Dialog; break;
+    	    case 1: mDlgTheme = android.R.style.Theme_DeviceDefault_Dialog; break;
+    	    case 2: mDlgTheme = android.R.style.Theme_Dialog; break;
+            case 3: mDlgTheme = android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar;
     	}      
     }
     
@@ -340,6 +379,10 @@ public class jModalDialog extends Activity {
     public void SetDialogTitle(String _dialogTitle) {
     	 mDialogTitle = _dialogTitle;
     }
+
+    public void SetDialogMessage(String _dialogMessage) {
+        mDialogMessage = _dialogMessage;
+    }
     
     //dlgShowMessage
     public void ShowMessage(String _packageName) {
@@ -350,11 +393,12 @@ public class jModalDialog extends Activity {
            
            mDlgType = 1; // force dlgShowMessage
            mI.putExtra("dlg_title", mDialogTitle);
+           mI.putExtra("dlg_message", mDialogMessage);
            mI.putExtra("dlg_type", mDlgType);
            mI.putExtra("dlg_theme", mDlgTheme);
            mI.putExtra("dlg_has_window_title", mHasWindowTitle);
-           mI.putExtra("dlg_btn_ok", mBtnOK);  //_dialogTitle
-           mI.putExtra("dlg_btn_cancel", mBtnCancel);  //_dialogTitle
+           mI.putExtra("dlg_btn_ok", mBtnOK);
+           mI.putExtra("dlg_btn_cancel", mBtnCancel);
            mI.putExtra("dlg_font_title_size", mTitleFontSize);  
            
            mI.putExtra("dlg_request_info_count", 0);
@@ -376,8 +420,10 @@ public class jModalDialog extends Activity {
            
            mDlgType = 0; // force dlgInputBox
            
-           mI.putExtra("dlg_title", mDialogTitle);           
-           mI.putExtra("dlg_type", mDlgType);
+           mI.putExtra("dlg_title", mDialogTitle);
+            mI.putExtra("dlg_message", mDialogMessage);
+
+            mI.putExtra("dlg_type", mDlgType);
            mI.putExtra("dlg_theme", mDlgTheme);
            mI.putExtra("dlg_has_window_title", mHasWindowTitle);
 
@@ -409,6 +455,7 @@ public class jModalDialog extends Activity {
            
            mDlgType = 2; // force dlgShowQuestion
            mI.putExtra("dlg_title", mDialogTitle);
+           mI.putExtra("dlg_message", mDialogMessage);
            mI.putExtra("dlg_type", mDlgType);
            mI.putExtra("dlg_theme", mDlgTheme);
            mI.putExtra("dlg_has_window_title", mHasWindowTitle);

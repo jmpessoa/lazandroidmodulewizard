@@ -2,23 +2,22 @@ object AndroidModule1: TAndroidModule1
   Left = 307
   Top = 141
   Width = 320
-  Height = 400
+  Height = 485
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
-  OnCreate = AndroidModule1Create
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
   OnActivityResult = AndroidModule1ActivityResult
   object jButton1: jButton
-    Left = 60
-    Top = 34
-    Width = 199
-    Height = 40
+    Left = 53
+    Top = 40
+    Width = 213
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
@@ -36,13 +35,14 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jTextView1: jTextView
-    Left = 83
+    Left = 61
     Top = 5
-    Width = 154
-    Height = 20
+    Width = 198
+    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -61,12 +61,13 @@ object AndroidModule1: TAndroidModule1
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton2: jButton
-    Left = 60
-    Top = 82
-    Width = 199
-    Height = 40
+    Left = 53
+    Top = 105
+    Width = 213
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
@@ -84,13 +85,14 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
   end
   object jButton3: jButton
-    Left = 60
-    Top = 130
-    Width = 199
-    Height = 40
+    Left = 53
+    Top = 170
+    Width = 213
+    Height = 57
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
@@ -108,6 +110,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton3Click
   end
   object jModalDialog1: jModalDialog

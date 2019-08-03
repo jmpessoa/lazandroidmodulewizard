@@ -1,7 +1,6 @@
 package org.lamw.appmodaldialogdemo1;
 
 import java.lang.reflect.Field;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,6 +15,7 @@ import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -74,13 +74,14 @@ public class jButton extends Button {
 			     }, 150);
 			  	 
 			   }  		
+			   
 			   if (mEnable) {
 			      controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
 			   }
 												 				 
 			}
 		};		
-		setOnClickListener(onClickListener);
+		setOnClickListener(onClickListener);		
 	}
 	 
 	//Free object except Self, Pascal Code Free the class.
@@ -207,6 +208,8 @@ public class jButton extends Button {
 	}
 
 	private Drawable GetDrawableResourceById(int _resID) {
+		if( _resID == 0 ) return null; // by tr3e
+		
 		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
 	}
 	
@@ -222,12 +225,17 @@ public class jButton extends Button {
 		  }
 	}
 
-	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));			
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource( GetDrawableResourceId(_imgResIdentifier) );			
 	}	
 	
-	public  void SetBackgroundByImage(Bitmap _image) {	
+	public  void SetBackgroundByImage(Bitmap _image) {
+	  if(_image == null) return;
+	  
 	  Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+	  
+	  if( d == null ) return;
+	  
       //[ifdef_api16up]
 	  if(Build.VERSION.SDK_INT >= 16) 
           this.setBackground(d);
@@ -240,7 +248,9 @@ public class jButton extends Button {
 		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
 	    super.dispatchDraw(canvas);	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side
+	    
+	    if (!mEnable) this.setEnabled(false);
 	}
 	
 	//http://www.android--tutorials.com/2016/03/android-set-button-drawableleft.html
@@ -260,7 +270,13 @@ public class jButton extends Button {
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
 		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		if( id == 0 ) return; // by tr3e
+		
+		Drawable d = GetDrawableResourceById(id);
+		
+		if( d == null ) return; // by tr3e
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -332,6 +348,7 @@ public class jButton extends Button {
 		if  (this != null) {
 		   //mBackgroundColor = _color;
 	  	   this.setBackgroundColor(_color);
+	  	   //this.setAlpha(0.5f);
 		}   
 	}
 	
@@ -341,7 +358,8 @@ public class jButton extends Button {
     this.getBackground().setColorFilter(_color, android.graphics.PorterDuff.Mode.MULTIPLY);  
     //Set the color of the text displayed inside the button  
     //this.setTextColor(0xFF0000FF);  
-    //Render this Button again  
+    //Render this Button again 
+    //this.setAlpha(0.5f);
     this.invalidate();  
 	}
 	
@@ -385,8 +403,29 @@ public class jButton extends Button {
         this.setTypeface(customfont);
     }
 	
-	public void SetEnable(boolean _value) {
+	public void SetEnabled(boolean _value) {
 		mEnable = _value;
-		this.setEnabled(_value);
+		this.setEnabled(_value);		
 	}
+
+  /* Pascal:
+     TFrameGravity = (fgNone,
+                   fgTopLeft, fgTopCenter, fgTopRight,
+                   fgBottomLeft, fgBottomCenter, fgBottomRight,
+                   fgCenter,
+                   fgCenterVerticalLeft, fgCenterVerticalRight
+                   );     
+   */
+   public void SetFrameGravity(int _value) {	   
+      LAMWCommon.setLGravity(_value);
+   }
+   
+   public void SetAllCaps(boolean allCaps)
+   {
+	   this.setAllCaps(allCaps);
+   }
+
+   public void SetFocus() {
+   	  this.requestFocus();
+   }
 }
