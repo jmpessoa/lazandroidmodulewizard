@@ -220,6 +220,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     array[3] => y}
     function DrawTextAlignedEx(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
 
+    procedure DrawCroppedBitmap(_bitmap: jObject; _x: single; _y: single; _cropOffsetLeft: integer; _cropOffsetTop: integer; _cropWidth: integer; _cropHeight: integer);
 
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
@@ -353,6 +354,7 @@ function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: st
 function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle; overload;
 function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;  overload;
 function jDrawingView_DrawTextAlignedEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
+procedure jDrawingView_DrawCroppedBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _x: single; _y: single; _cropOffsetLeft: integer; _cropOffsetTop: integer; _cropWidth: integer; _cropHeight: integer);
 
 
 implementation
@@ -1211,15 +1213,6 @@ begin
    Result:= jDrawingView_DrawTextAlignedEx(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom ,_alignHorizontal ,_alignVertical);
 end;
 
-(*
-procedure jDrawingView.DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jDrawingView_DrawRect(FjEnv, FjObject, _P0x ,_P0y ,_P1x ,_P1y ,_P2x ,_P2y ,_P3x ,_P3y);
-end;
-*)
-
 procedure jDrawingView.SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);
 begin
     FMinWorldX:= minX;
@@ -1282,6 +1275,13 @@ begin
      escY:= -(_viewportHeight-10)/(_maxWorldY-_minWorldY);
      Result:= 10+round(escY*(_worldY - _maxWorldY));
   end;
+end;
+
+procedure jDrawingView.DrawCroppedBitmap(_bitmap: jObject; _x: single; _y: single; _cropOffsetLeft: integer; _cropOffsetTop: integer; _cropWidth: integer; _cropHeight: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jDrawingView_DrawCroppedBitmap(FjEnv, FjObject, _bitmap ,_x ,_y ,_cropOffsetLeft ,_cropOffsetTop ,_cropWidth ,_cropHeight);
 end;
 
 {-------- jDrawingView_JNI_Bridge ----------}
@@ -2685,6 +2685,25 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'DrawRect', '([F)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawCroppedBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _x: single; _y: single; _cropOffsetLeft: integer; _cropOffsetTop: integer; _cropWidth: integer; _cropHeight: integer);
+var
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].i:= _cropOffsetLeft;
+  jParams[4].i:= _cropOffsetTop;
+  jParams[5].i:= _cropWidth;
+  jParams[6].i:= _cropHeight;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawCroppedBitmap', '(Landroid/graphics/Bitmap;FFIIII)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

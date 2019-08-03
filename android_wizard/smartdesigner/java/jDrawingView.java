@@ -535,6 +535,16 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         mCanvas.restore();
     }
 
+    public void DrawCroppedBitmap(Bitmap _bitmap, float _x, float _y, int _cropOffsetLeft, int _cropOffsetTop, int _cropWidth, int _cropHeight) {
+        Bitmap croppedBitmap = Bitmap.createBitmap(_bitmap,_cropOffsetLeft , _cropOffsetTop, _cropWidth, _cropHeight);
+        int w = croppedBitmap.getWidth();
+        int h = croppedBitmap.getHeight();
+        Bitmap bmp = GetResizedBitmap(croppedBitmap, w, h);
+        mCanvas.save();
+        mCanvas.drawBitmap(bmp, (int)_x, (int)_y, null);
+        mCanvas.restore();
+    }
+
     public void DrawBitmap(Bitmap _bitmap, int _left, int _top, int _right, int _bottom) {
         /* Figure out which way needs to be reduced less */
 			/*
@@ -549,6 +559,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
             Bitmap scaled = Bitmap.createScaledBitmap(_bitmap, 512, nh, true);
             mCanvas.save();
             mCanvas.drawBitmap(scaled, null, rect, mDrawPaint);
+            mCanvas.restore();   //???
         } else {
             mCanvas.save();
             mCanvas.drawBitmap(_bitmap, null, rect, mDrawPaint);
