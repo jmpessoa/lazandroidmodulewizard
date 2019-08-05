@@ -48,7 +48,6 @@ jMediaPlayer = class(jControl)
     procedure Reset();
     procedure SetDataSource(_path: string); overload;
     procedure SetDataSource(_path: string; _filename: string); overload;
-    procedure Prepare();
     procedure Start();
     procedure Stop();
     procedure Pause();
@@ -67,11 +66,10 @@ jMediaPlayer = class(jControl)
     procedure SetScreenOnWhilePlaying(_value: boolean);
     procedure SetAudioStreamType(_audioStreamType: TAudioStreamType);
     procedure SetSurfaceTexture(_surfaceTexture: jObject);
-    procedure PrepareAsync();
     procedure LoadFromAssets(_fileName: string);
     procedure LoadFromURL(_url: string);
     procedure LoadFromFile(_path: string; _filename: string);
-
+    procedure SetPrepareAsync(_isPrepareAsync: boolean); // by TR3E
 
     procedure GenEvent_OnPrepared(Obj: TObject; videoWidth: integer; videoHeigh: integer);
     procedure GenEvent_OnVideoSizeChanged(Obj: TObject; videoWidth: integer; videoHeight: integer);
@@ -92,7 +90,6 @@ procedure jMediaPlayer_Reset(env: PJNIEnv; _jmediaplayer: JObject);
 procedure jMediaPlayer_SetDataSource(env: PJNIEnv; _jmediaplayer: JObject; _path: string); overload;
 procedure jMediaPlayer_SetDataSource(env: PJNIEnv; _jmediaplayer: JObject; _path: string; _filename: string); overload;
 
-procedure jMediaPlayer_Prepare(env: PJNIEnv; _jmediaplayer: JObject);
 procedure jMediaPlayer_Start(env: PJNIEnv; _jmediaplayer: JObject);
 procedure jMediaPlayer_Stop(env: PJNIEnv; _jmediaplayer: JObject);
 procedure jMediaPlayer_Pause(env: PJNIEnv; _jmediaplayer: JObject);
@@ -104,6 +101,7 @@ procedure jMediaPlayer_SelectTrack(env: PJNIEnv; _jmediaplayer: JObject; _index:
 function jMediaPlayer_GetCurrentPosition(env: PJNIEnv; _jmediaplayer: JObject): integer;
 function jMediaPlayer_GetDuration(env: PJNIEnv; _jmediaplayer: JObject): integer;
 procedure jMediaPlayer_SetVolume(env: PJNIEnv; _jmediaplayer: JObject; _leftVolume: single; _rightVolume: single);
+procedure jMediaPlayer_SetPrepareAsync(env: PJNIEnv; _jmediaplayer: JObject; _isPrepareAsync: boolean); // by TR3E
 
 //procedure jMediaPlayer_SetDisplay(env: PJNIEnv; _jmediaplayer: JObject; _surfaceView: jObject);
 procedure jMediaPlayer_SetDisplay(env: PJNIEnv; _jmediaplayer: JObject; _surfaceHolder: jObject);
@@ -113,7 +111,6 @@ function jMediaPlayer_GetVideoHeight(env: PJNIEnv; _jmediaplayer: JObject): inte
 procedure jMediaPlayer_SetScreenOnWhilePlaying(env: PJNIEnv; _jmediaplayer: JObject; _value: boolean);
 procedure jMediaPlayer_SetAudioStreamType(env: PJNIEnv; _jmediaplayer: JObject; _audioStreamType: integer);
 procedure jMediaPlayer_SetSurfaceTexture(env: PJNIEnv; _jmediaplayer: JObject; _surfaceTexture: jObject);
-procedure jMediaPlayer_PrepareAsync(env: PJNIEnv; _jmediaplayer: JObject);
 procedure jMediaPlayer_LoadFromAssets(env: PJNIEnv; _jmediaplayer: JObject; _fileName: string);
 procedure jMediaPlayer_LoadFromURL(env: PJNIEnv; _jmediaplayer: JObject; _url: string);
 procedure jMediaPlayer_LoadFromFile(env: PJNIEnv; _jmediaplayer: JObject; _path: string; _filename: string);
@@ -197,13 +194,6 @@ begin
      jMediaPlayer_SetDataSource(FjEnv, FjObject, _path);
 end;
 
-procedure jMediaPlayer.Prepare();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jMediaPlayer_Prepare(FjEnv, FjObject);
-end;
-
 procedure jMediaPlayer.Start();
 begin
   //in designing component state: set value here...
@@ -252,6 +242,14 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jMediaPlayer_SetLooping(FjEnv, FjObject, _looping);
+end;
+
+// by tr3e
+procedure jMediaPlayer.SetPrepareAsync(_isPrepareAsync: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMediaPlayer_SetPrepareAsync(FjEnv, FjObject, _isPrepareAsync);
 end;
 
 function jMediaPlayer.IsLooping(): boolean;
@@ -336,13 +334,6 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jMediaPlayer_SetSurfaceTexture(FjEnv, FjObject, _surfaceTexture);
-end;
-
-procedure jMediaPlayer.PrepareAsync();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jMediaPlayer_PrepareAsync(FjEnv, FjObject);
 end;
 
 procedure jMediaPlayer.LoadFromAssets(_fileName: string);
@@ -471,17 +462,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jMediaPlayer_Prepare(env: PJNIEnv; _jmediaplayer: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmediaplayer);
-  jMethod:= env^.GetMethodID(env, jCls, 'Prepare', '()V');
-  env^.CallVoidMethod(env, _jmediaplayer, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 procedure jMediaPlayer_Start(env: PJNIEnv; _jmediaplayer: JObject);
 var
   jMethod: jMethodID=nil;
@@ -550,6 +530,20 @@ begin
   jParams[0].z:= JBool(_looping);
   jCls:= env^.GetObjectClass(env, _jmediaplayer);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLooping', '(Z)V');
+  env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// by TR3E
+procedure jMediaPlayer_SetPrepareAsync(env: PJNIEnv; _jmediaplayer: JObject; _isPrepareAsync: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_isPrepareAsync);
+  jCls:= env^.GetObjectClass(env, _jmediaplayer);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetPrepareAsync', '(Z)V');
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -706,18 +700,6 @@ begin
   env^.CallVoidMethodA(env, _jmediaplayer, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-procedure jMediaPlayer_PrepareAsync(env: PJNIEnv; _jmediaplayer: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmediaplayer);
-  jMethod:= env^.GetMethodID(env, jCls, 'PrepareAsync', '()V');
-  env^.CallVoidMethod(env, _jmediaplayer, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 
 procedure jMediaPlayer_LoadFromAssets(env: PJNIEnv; _jmediaplayer: JObject; _fileName: string);
 var
