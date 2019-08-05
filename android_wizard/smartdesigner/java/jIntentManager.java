@@ -1,4 +1,4 @@
-package org.lamw.apptelephonymanagerdemo1;
+package org.lamw.appintentdemolaunchapp;
 
 import java.util.Iterator;
 import java.util.List;
@@ -385,12 +385,25 @@ Sending Data: Extras vs. URI Parameters
    public String GetActionCallButtonAsString() { 
       return "android.intent.action.CALL_BUTTON";
    }	   
-   
-   public String GetActionMainAsString() {  
-	     return "android.intent.action.MAIN";
-   }
-   
-   public void SetAction(int  _intentAction) {	 
+
+    public String GetActionMainAsString() {
+        return "android.intent.action.MAIN";
+    }
+
+    public String GetActionInstallPackageAsString() {
+        return "android.intent.ACTION_INSTALL_PACKAGE";
+    }
+
+    public String GetActionDeleteAsString() {
+        return "android.intent.action.DELETE";
+    }
+
+    //TODO Pascal
+    public String GetActionManagerUnknownAppSourcesAsString() {
+        return "Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES";
+    }
+
+    public void SetAction(int  _intentAction) {
 	  switch(_intentAction) { 
 	    case 0: mIntent.setAction("android.intent.action.VIEW"); break;
 	    case 1: mIntent.setAction("android.intent.action.PICK"); break; 
@@ -415,6 +428,9 @@ Sending Data: Extras vs. URI Parameters
 	    case 20: mIntent.setAction(android.content.Intent.ACTION_WEB_SEARCH); break; 	    
 	    case 21: mIntent.setAction("android.intent.action.Main");break;
 	    case 22: mIntent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+          case 23: mIntent.setAction("android.intent.ACTION_INSTALL_PACKAGE"); //
+          case 24: mIntent.setAction("android.intent.action.DELETE");  //
+          case 25: mIntent.setAction("Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES");
 	  }
 	  
    }
@@ -594,6 +610,8 @@ Sending Data: Extras vs. URI Parameters
 	   	 case 2: mIntent.setFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
 	   	 case 3: mIntent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 	  	 case 4: mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+           case 5: mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+           case 6: mIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 	  }
    }
    

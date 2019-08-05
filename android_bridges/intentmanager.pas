@@ -12,14 +12,16 @@ type
 TIntentAction = (iaView, iaPick, iaSendto, idDial, iaCallbutton, iaCall, iaImageCapture,
                  iaDataRoaming,iaQuickLaunch, iaDate,iaSystem, iaWireless, iaDeviceInfo,
                  iaSend, iaSendMultiple, iaPickActivity, iaEdit, iaGetContent,
-                 iaTimePick, iaVoiceCommand, iaWebSearch, iaMain, iaAppWidgetUpdate, iaNone);
+                 iaTimePick, iaVoiceCommand, iaWebSearch, iaMain, iaAppWidgetUpdate,
+                 iaInstalPackage, iaDelete, iaManagerUnknownAppSources,  iaNone);
 
 TIntentCategory = (icDefault, icLauncher, icHome, icInfo, icPreference, icAppBrowser,
                    icAppCalculator, icAppCalendar, icAppContacts, icAppEmail,
                    icAppGallery, icAppMaps, icAppMessaging, icAppMusic);
 
 TIntentFlag = (ifActivityNewTask, ifActivityBroughtToFront, ifActivityTaskOnHome,
-               ifActivityForwardResult, ifActivityClearWhenTaskReset);
+               ifActivityForwardResult, ifActivityClearWhenTaskReset,
+               ifActivityClearTop, ifGrantReadUriPermission);
 
 {Draft Component code by "Lazarus Android Module Wizard" [1/27/2015 0:43:07]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -126,7 +128,8 @@ jIntentManager = class(jControl)
     procedure SetDataAndType(_uriAsString: string; _mimeType: string); overload;
     function HasLaunchIntentForPackage(_packageName: string): boolean;
     function GetExtraSMS(_intent: jObject; _addressBodyDelimiter: string): string;
-
+    function GetActionInstallPackageAsString(): string;
+    function GetActionDeleteAsString(): string;
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetAction;
@@ -225,7 +228,8 @@ procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; 
 procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriAsString: string; _mimeType: string); overload;
 function jIntentManager_HasLaunchIntentForPackage(env: PJNIEnv; _jintentmanager: JObject; _packageName: string): boolean;
 function jIntentManager_GetExtraSMS(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _addressBodyDelimiter: string): string;
-
+function jIntentManager_GetActionInstallPackageAsString(env: PJNIEnv; _jintentmanager: JObject): string;
+function jIntentManager_GetActionDeleteAsString(env: PJNIEnv; _jintentmanager: JObject): string;
 
 implementation
 
@@ -871,6 +875,20 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraSMS(FjEnv, FjObject, _intent ,_addressBodyDelimiter);
+end;
+
+function jIntentManager.GetActionInstallPackageAsString(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetActionInstallPackageAsString(FjEnv, FjObject);
+end;
+
+function jIntentManager.GetActionDeleteAsString(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetActionDeleteAsString(FjEnv, FjObject);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2406,6 +2424,46 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jIntentManager_GetActionInstallPackageAsString(env: PJNIEnv; _jintentmanager: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetActionInstallPackageAsString', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jIntentManager_GetActionDeleteAsString(env: PJNIEnv; _jintentmanager: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetActionDeleteAsString', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
   env^.DeleteLocalRef(env, jCls);
 end;
 
