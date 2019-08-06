@@ -10362,8 +10362,9 @@ end;
 
 Procedure jDialogYN.Show;
 begin
+  //Fixed to show text if it is changed, when "Show" is called
   if FInitialized then
-     jDialogYN_Show(FjEnv, FjObject );
+     jDialogYN_Show(FjEnv, FjObject, FTitle, FMsg, FYes, FNo );
 end;
 
 Procedure jDialogYN.Show(titleText: string; msgText: string; yesText: string; noText: string);
@@ -10374,8 +10375,9 @@ end;
 
 Procedure jDialogYN.Show(titleText: string; msgText: string);
 begin
+  //Fixed to show text if it is changed, when "Show" is called
   if FInitialized then
-     jDialogYN_Show(FjEnv, FjObject, titleText, msgText);
+     jDialogYN_Show(FjEnv, FjObject, titleText, msgText, FYes, FNo);
 end;
 
 procedure jDialogYN.ShowOK(titleText: string; msgText: string; _OkText: string);
