@@ -39,6 +39,7 @@ begin
    if AndroidModule4 = nil then begin
      gApp.CreateForm(TAndroidModule4, AndroidModule4);
      AndroidModule4.Init(gApp);
+     AndroidModule4.Show;
    end
    else
    begin

@@ -232,6 +232,9 @@ public class jCustomDialog extends RelativeLayout {
 		mIconIdentifier = _iconIdentifier;
 		
 		if (mDialog != null) {
+			// Update icon if I change [to TR3E]
+			mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+						
 			mDialog.setTitle(mTitle);			
 			mDialog.show();
 						

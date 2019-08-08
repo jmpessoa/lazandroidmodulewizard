@@ -16,11 +16,12 @@ object AndroidModule2: TAndroidModule2
   OnCloseQuery = AndroidModule2CloseQuery
   OnBackButton = AndroidModule2BackButton
   OnClose = AndroidModule2Close
+  OnActivityCreate = AndroidModule2ActivityCreate
   object jTextView1: jTextView
-    Left = 12
+    Left = 16
     Top = 10
-    Width = 275
-    Height = 20
+    Width = 267
+    Height = 19
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -39,12 +40,13 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
     Left = 5
-    Top = 75
-    Width = 136
-    Height = 50
+    Top = 73
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -62,13 +64,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jButton2: jButton
-    Left = 151
-    Top = 75
-    Width = 136
-    Height = 50
+    Left = 165
+    Top = 73
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -86,13 +89,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
   end
   object jTextView2: jTextView
-    Left = 60
-    Top = 40
-    Width = 180
-    Height = 20
+    Left = 62
+    Top = 39
+    Width = 176
+    Height = 19
     MarginLeft = 10
     MarginTop = 0
     MarginRight = 10
@@ -112,12 +116,13 @@ object AndroidModule2: TAndroidModule2
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton3: jButton
     Left = 5
-    Top = 135
-    Width = 136
-    Height = 50
+    Top = 131
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -135,13 +140,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton3Click
   end
   object jButton4: jButton
-    Left = 151
-    Top = 135
-    Width = 136
-    Height = 50
+    Left = 165
+    Top = 131
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -159,13 +165,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton4Click
   end
   object jButton5: jButton
     Left = 5
-    Top = 195
-    Width = 136
-    Height = 50
+    Top = 189
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -183,13 +190,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton5Click
   end
   object jButton6: jButton
-    Left = 151
-    Top = 195
-    Width = 136
-    Height = 50
+    Left = 165
+    Top = 189
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -207,13 +215,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton6Click
   end
   object jButton7: jButton
     Left = 5
-    Top = 255
-    Width = 136
-    Height = 50
+    Top = 247
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -231,13 +240,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton7Click
   end
   object jButton8: jButton
-    Left = 151
-    Top = 255
-    Width = 136
-    Height = 50
+    Left = 165
+    Top = 247
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -255,13 +265,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton8Click
   end
   object jButton9: jButton
     Left = 5
-    Top = 315
-    Width = 136
-    Height = 50
+    Top = 305
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -279,13 +290,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton9Click
   end
   object jButton10: jButton
-    Left = 151
-    Top = 315
-    Width = 136
-    Height = 50
+    Left = 165
+    Top = 305
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -303,13 +315,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton10Click
   end
   object jButton11: jButton
     Left = 5
-    Top = 375
-    Width = 136
-    Height = 50
+    Top = 363
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -327,13 +340,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton11Click
   end
   object jButton12: jButton
-    Left = 151
-    Top = 375
-    Width = 136
-    Height = 50
+    Left = 165
+    Top = 363
+    Width = 150
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -351,13 +365,14 @@ object AndroidModule2: TAndroidModule2
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton12Click
   end
   object jImageView1: jImageView
     Left = 5
-    Top = 462
+    Top = 463
     Width = 290
-    Height = 133
+    Height = 132
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -373,6 +388,8 @@ object AndroidModule2: TAndroidModule2
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleFitCenter
+    GravityInParent = lgNone
+    RoundedShape = False
   end
   object jImageList1: jImageList
     Images.Strings = (

@@ -60,6 +60,7 @@ begin
     if AndroidModule2 = nil then begin
      gApp.CreateForm(TAndroidModule2, AndroidModule2);
      AndroidModule2.Init(gApp);
+     AndroidModule2.Show;
    end
    else
    begin
@@ -72,6 +73,7 @@ begin
   if AndroidModule3 = nil then begin
      gApp.CreateForm(TAndroidModule3, AndroidModule3);
      AndroidModule3.Init(gApp);
+     AndroidModule3.Show;
   end
   else
   begin
@@ -84,6 +86,7 @@ begin
    if AndroidModule5 = nil then begin
      gApp.CreateForm(TAndroidModule5, AndroidModule5);
      AndroidModule5.Init(gApp);
+     AndroidModule5.Show;
    end
    else
    begin

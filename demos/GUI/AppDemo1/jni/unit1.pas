@@ -54,6 +54,7 @@ begin
   jTimer1.Enabled:= False;
   gApp.CreateForm(TAndroidModule2, AndroidModule2);
   AndroidModule2.Init(gApp);
+  AndroidModule2.Show();
 end;
 
 procedure TAndroidModule1.AndroidModule1CloseQuery(Sender: TObject;

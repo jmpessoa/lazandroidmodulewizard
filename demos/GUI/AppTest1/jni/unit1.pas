@@ -76,6 +76,7 @@ begin
     AndroidModule2.SetCloseCallBack(CallBackData, Self);
     AndroidModule2.PromptOnBackKey:= False;
     AndroidModule2.Init(gApp);
+    AndroidModule2.Show;
   end
   else
   begin
@@ -89,6 +90,7 @@ begin
   begin
      gApp.CreateForm(TAndroidModule5, AndroidModule5);
      AndroidModule5.Init(gApp);
+     AndroidModule5.Show;
   end
   else
   begin

@@ -32,6 +32,8 @@ type
       jTextView1: jTextView;
       jTextView2: jTextView;
 
+      procedure AndroidModule2ActivityCreate(Sender: TObject;
+        intentData: jObject);
       procedure AndroidModule2BackButton(Sender: TObject);
       procedure AndroidModule2Close(Sender: TObject);
       procedure AndroidModule2CloseQuery(Sender: TObject; var CanClose: boolean);
@@ -70,6 +72,46 @@ begin
   ShowMessage('back pressed!');
 end;
 
+procedure TAndroidModule2.AndroidModule2ActivityCreate(Sender: TObject;
+  intentData: jObject);
+begin
+  gApp.CreateForm(TAndroidModule3, AndroidModule3);
+  AndroidModule3.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule4, AndroidModule4);
+  AndroidModule4.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule5, AndroidModule5);
+  AndroidModule5.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule6, AndroidModule6);
+  AndroidModule6.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule7, AndroidModule7);
+  AndroidModule7.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule8, AndroidModule8);
+  AndroidModule8.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule9, AndroidModule9);
+  AndroidModule9.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule10, AndroidModule10);
+  AndroidModule10.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule11, AndroidModule11);
+  AndroidModule11.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule12, AndroidModule12);
+  AndroidModule12.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule13, AndroidModule13);
+  AndroidModule13.Init(gApp);
+
+  gApp.CreateForm(TAndroidModule14, AndroidModule14);
+  AndroidModule14.Init(gApp);
+end;
+
 procedure TAndroidModule2.AndroidModule2Close(Sender: TObject);
 begin
    ShowMessage('Close....');
@@ -90,145 +132,66 @@ end;
 
 procedure TAndroidModule2.jButton1Click(Sender: TObject);  //DEMO: Base Controls
 begin
-  if AndroidModule3 = nil then
-  begin
-    gApp.CreateForm(TAndroidModule3, AndroidModule3);
-    AndroidModule3.Init(gApp);
-  end
-  else
-  begin
-    AndroidModule3.Show; //actRecyclable
-  end;
+  AndroidModule3.Show; //actRecyclable
 end;
 
 procedure TAndroidModule2.jButton2Click(Sender: TObject); //Demo: Memo and ScrollView
 begin
-  if AndroidModule4 = nil then
-  begin
-    gApp.CreateForm(TAndroidModule4, AndroidModule4);
-    AndroidModule4.Init(gApp);
-  end
-  else AndroidModule4.Show;   //actRecyclable
+  AndroidModule4.Show;   //actRecyclable
 end;
 
 procedure TAndroidModule2.jButton3Click(Sender: TObject); //Demo: jWebView1
 begin
-  if AndroidModule5 = nil then
-  begin
-    gApp.CreateForm(TAndroidModule5, AndroidModule5);
-    AndroidModule5.Init(gApp);
-  end
-  else AndroidModule5.Show; //actRecyclable
+  AndroidModule5.Show; //actRecyclable
 end;
 
 procedure TAndroidModule2.jButton4Click(Sender: TObject);  //Demo: List View
 begin
-  if AndroidModule6 = nil then
-  begin
-    gApp.CreateForm(TAndroidModule6, AndroidModule6);
-    AndroidModule6.Init(gApp);
-  end
-  else AndroidModule6.Show;  //actRecyclable
+  AndroidModule6.Show;  //actRecyclable
 end;
 
 procedure TAndroidModule2.jButton5Click(Sender: TObject);
 begin
-  if AndroidModule7 = nil then  //DEMO: jImageView , jScrollView , jImageBtn1
-  begin
-    gApp.CreateForm(TAndroidModule7, AndroidModule7);
-    AndroidModule7.Init(gApp);
-  end
-  else AndroidModule7.Show; //actRecyclable
+  AndroidModule7.Show; //DEMO: jImageView , jScrollView , jImageBtn1
 end;
 
 procedure TAndroidModule2.jButton6Click(Sender: TObject);
 begin
-  if AndroidModule8 = nil then    //DEMO: jView1, jCanvas, jBitmap1
-  begin
-    gApp.CreateForm(TAndroidModule8, AndroidModule8);
-    AndroidModule8.Init(gApp);
-  end
-  else AndroidModule8.Show;
+  AndroidModule8.Show; //DEMO: jView1, jCanvas, jBitmap1
 end;
 
 procedure TAndroidModule2.jButton7Click(Sender: TObject);
 begin
-  if AndroidModule9 = nil then    //DEMO: jBitmap1  - pixels access...
-  begin
-    gApp.CreateForm(TAndroidModule9, AndroidModule9);
-    AndroidModule9.Init(gApp);
-  end
-  else AndroidModule9.Show;
+  AndroidModule9.Show; //DEMO: jBitmap1  - pixels access...
 end;
 
 procedure TAndroidModule2.jButton8Click(Sender: TObject);  //gl_1 2D
 begin
-  if AndroidModule10 = nil then
-  begin
-    gApp.CreateForm(TAndroidModule10, AndroidModule10);
-    //AndroidModule10:= TAndroidModule10.Create(Self);
-    AndroidModule10.Init(gApp);
-  end
-  else
-  begin
-  //AndroidModule10.Show;
-    AndroidModule10.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES1" component
-  end
+  AndroidModule10.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES1" component
+  AndroidModule10.Show;
 end;
 
 procedure TAndroidModule2.jButton9Click(Sender: TObject); //gl_2 2D
 begin
-
- if AndroidModule11 = nil then
- begin
-   gApp.CreateForm(TAndroidModule11, AndroidModule11);
-    //AndroidModule11:= TAndroidModule11.Create(Self);
-   AndroidModule11.Init(gApp);
- end
- else
- begin
-    AndroidModule11.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES2" component
- end;
+ AndroidModule11.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES2" component
+ AndroidModule11.Show();
 end;
 
 procedure TAndroidModule2.jButton10Click(Sender: TObject);  //gl_1 3D
 begin
-  if AndroidModule12 = nil then
-  begin
-    gApp.CreateForm(TAndroidModule12, AndroidModule12);
-    //AndroidModule12:= TAndroidModule12.Create(Self);
-    AndroidModule12.Init(gApp);
-  end
-  else
-  begin
-    //AndroidModule12.show;
-      AndroidModule12.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES1" component
-  end;
+  AndroidModule12.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES1" component
+  AndroidModule12.show;
 end;
 
 procedure TAndroidModule2.jButton11Click(Sender: TObject); //gl_2 3D
 begin
-  if AndroidModule13 = nil then
-  begin
-    gApp.CreateForm(TAndroidModule13, AndroidModule13);
-    //AndroidModule13:= TAndroidModule13.Create(Self);
-    AndroidModule13.Init(gApp);
-  end
-  else
-  begin
-    //AndroidModule13.Show;
-      AndroidModule13.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES2" component
-  end;
+  AndroidModule13.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES2" component
+  AndroidModule13.Show;
 end;
 
 procedure TAndroidModule2.jButton12Click(Sender: TObject);
 begin
-  if AndroidModule14 = nil then     //jAsyncTask1 / jHttpClient1
-  begin
-    gApp.CreateForm(TAndroidModule14, AndroidModule14);
-    AndroidModule14.Init(gApp);
-  end
-  else AndroidModule14.Show;
+  AndroidModule14.Show; //jAsyncTask1 / jHttpClient1
 end;
 
 end.

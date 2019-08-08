@@ -47,12 +47,14 @@ begin
    if AndroidModule2 = nil then
    begin
        gApp.CreateForm(TAndroidModule2, AndroidModule2);
-       AndroidModule2.Init(gApp);  //NOTE: form "ActiveMode = actEasel" dont show!
+       AndroidModule2.Init(gApp);
+       AndroidModule2.Show;        //NOTE: form "ActiveMode = actEasel" dont show!
    end;
    if AndroidModule3 = nil then
    begin
       gApp.CreateForm(TAndroidModule3, AndroidModule3);
-      AndroidModule3.Init(gApp);   //NOTE: form "ActiveMode = actEasel" dont show!
+      AndroidModule3.Init(gApp);
+      AndroidModule3.Show;         //NOTE: form "ActiveMode = actEasel" dont show!
    end;
 
   jsCoordinatorLayout1.SetFitsSystemWindows(True);
