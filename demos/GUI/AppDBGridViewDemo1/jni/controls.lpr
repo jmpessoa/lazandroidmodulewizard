@@ -5,7 +5,7 @@ library controls;  //[by Lamw: Lazarus Android Module Wizard: 2/17/2018 1:04:07]
   
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
-  Laz_And_Controls_Events, unitAbout;
+  Laz_And_Controls_Events, unitAbout, unitMain;
   
 {%region /fold 'LAMW generated code'}
 
@@ -16,7 +16,7 @@ procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
   layout: JObject; intent: JObject); cdecl;
 begin
   Java_Event_pAppOnCreate(PEnv, this, context, layout, intent);
-    AndroidModuleAbout.Init(gApp);
+    AndroidModuleMain.Init(gApp);
 end;
 
 { Class:     ml_smartware_appdbgridviewdemo1_Controls
@@ -212,6 +212,15 @@ begin
 end;
 
 { Class:     ml_smartware_appdbgridviewdemo1_Controls
+  Method:    pOnDown
+  Signature: (JI)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
+  cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     ml_smartware_appdbgridviewdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
@@ -227,6 +236,15 @@ procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
   ); cdecl;
 begin
   Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     ml_smartware_appdbgridviewdemo1_Controls
+  Method:    pOnDoubleClick
+  Signature: (JI)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  value: JInt); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     ml_smartware_appdbgridviewdemo1_Controls
@@ -253,6 +271,14 @@ end;
 procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnEnter(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     ml_smartware_appdbgridviewdemo1_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     ml_smartware_appdbgridviewdemo1_Controls
@@ -337,6 +363,16 @@ begin
 end;
 
 { Class:     ml_smartware_appdbgridviewdemo1_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     ml_smartware_appdbgridviewdemo1_Controls
   Method:    pOnActionBarTabSelected
   Signature: (JLandroid/view/View;Ljava/lang/String;)V }
 procedure pOnActionBarTabSelected(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -375,6 +411,26 @@ begin
 end;
 
 { Class:     ml_smartware_appdbgridviewdemo1_Controls
+  Method:    pOnImageViewPopupItemSelected
+  Signature: (JLjava/lang/String;)V }
+procedure pOnImageViewPopupItemSelected(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; caption: JString); cdecl;
+begin
+  Java_Event_pOnImageViewPopupItemSelected(PEnv, this, TObject(pasobj), caption
+    );
+end;
+
+{ Class:     ml_smartware_appdbgridviewdemo1_Controls
+  Method:    pOnSqliteDataAccessAsyncPostExecute
+  Signature: (JILjava/lang/String;)V }
+procedure pOnSqliteDataAccessAsyncPostExecute(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; count: JInt; msgResult: JString); cdecl;
+begin
+  Java_Event_pOnSqliteDataAccessAsyncPostExecute(PEnv, this, TObject(pasobj),
+    count, msgResult);
+end;
+
+{ Class:     ml_smartware_appdbgridviewdemo1_Controls
   Method:    pOnTimer
   Signature: (J)V }
 procedure pOnTimer(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -382,7 +438,7 @@ begin
   Java_Event_pOnTimer(PEnv, this, TObject(pasobj));
 end;
 
-const NativeMethods: array[0..41] of JNINativeMethod = (
+const NativeMethods: array[0..47] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -453,12 +509,18 @@ const NativeMethods: array[0..41] of JNINativeMethod = (
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(JI)V';
+    fnPtr: @pOnDown; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
    (name: 'pOnLongClick';
     signature: '(JI)V';
     fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(JI)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -468,6 +530,9 @@ const NativeMethods: array[0..41] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -495,6 +560,9 @@ const NativeMethods: array[0..41] of JNINativeMethod = (
    (name: 'pOnLayouting';
     signature: '(JZ)V';
     fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
    (name: 'pOnActionBarTabSelected';
     signature: '(JLandroid/view/View;Ljava/lang/String;)V';
     fnPtr: @pOnActionBarTabSelected; ),
@@ -507,6 +575,12 @@ const NativeMethods: array[0..41] of JNINativeMethod = (
    (name: 'pOnLongClickDBListItem';
     signature: '(JILjava/lang/String;)V';
     fnPtr: @pOnLongClickDBListItem; ),
+   (name: 'pOnImageViewPopupItemSelected';
+    signature: '(JLjava/lang/String;)V';
+    fnPtr: @pOnImageViewPopupItemSelected; ),
+   (name: 'pOnSqliteDataAccessAsyncPostExecute';
+    signature: '(JILjava/lang/String;)V';
+    fnPtr: @pOnSqliteDataAccessAsyncPostExecute; ),
    (name: 'pOnTimer';
     signature: '(J)V';
     fnPtr: @pOnTimer; )
@@ -610,12 +684,17 @@ exports
     +'pOnClickGeneric',
   pAppOnSpecialKeyDown name 'Java_ml_smartware_appdbgridviewdemo1_Controls_'
     +'pAppOnSpecialKeyDown',
+  pOnDown name 'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnDown',
   pOnClick name 'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnClick',
   pOnLongClick name
     'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnLongClick',
+  pOnDoubleClick name 'Java_ml_smartware_appdbgridviewdemo1_Controls_'
+    +'pOnDoubleClick',
   pOnChange name 'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnChange',
   pOnChanged name 'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnEnter',
+  pOnBackPressed name 'Java_ml_smartware_appdbgridviewdemo1_Controls_'
+    +'pOnBackPressed',
   pOnClose name 'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnClose',
   pAppOnViewClick name 'Java_ml_smartware_appdbgridviewdemo1_Controls_'
     +'pAppOnViewClick',
@@ -633,6 +712,8 @@ exports
     +'pOnAfterDispatchDraw',
   pOnLayouting name
     'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_ml_smartware_appdbgridviewdemo1_'
+    +'Controls_pAppOnRequestPermissionResult',
   pOnActionBarTabSelected name 'Java_ml_smartware_appdbgridviewdemo1_Controls_'
     +'pOnActionBarTabSelected',
   pOnActionBarTabUnSelected name 'Java_ml_smartware_appdbgridviewdemo1_'
@@ -641,6 +722,10 @@ exports
     +'pOnClickDBListItem',
   pOnLongClickDBListItem name 'Java_ml_smartware_appdbgridviewdemo1_Controls_'
     +'pOnLongClickDBListItem',
+  pOnImageViewPopupItemSelected name 'Java_ml_smartware_appdbgridviewdemo1_'
+    +'Controls_pOnImageViewPopupItemSelected',
+  pOnSqliteDataAccessAsyncPostExecute name 'Java_ml_smartware_'
+    +'appdbgridviewdemo1_Controls_pOnSqliteDataAccessAsyncPostExecute',
   pOnTimer name 'Java_ml_smartware_appdbgridviewdemo1_Controls_pOnTimer';
 
 {%endregion}
@@ -653,5 +738,5 @@ begin
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;
-  gApp.CreateForm(TAndroidModuleAbout, AndroidModuleAbout);
+  gApp.CreateForm(TAndroidModuleMain, AndroidModuleMain);
 end.

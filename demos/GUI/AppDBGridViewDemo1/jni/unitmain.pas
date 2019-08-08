@@ -7,47 +7,43 @@ interface
 
 uses
   Classes, AndroidWidget, Laz_And_Controls, actionbartab,
-  And_jni, fileprovider;
+  fileprovider;
 
   
 type
+
+  { TAndroidModuleMain }
+
   TAndroidModuleMain = class(jForm)
     ActionBarTab: jActionBarTab;
     btnAddTripData: jButton;
     btnNewTrip: jImageBtn;
-    fpData: jFileProvider;
     dbgTrips: jDBListView;
+    jFileProvider1: jFileProvider;
     jPanel6: jPanel;
     jTextView1: jTextView;
 
     jImageList1: jImageList;
-    tmUpdateDelay: jTimer;
     pTrips: jPanel;
     sqlCursor: jSqliteCursor;
     sdaFDR: jSqliteDataAccess;
 
+    procedure AndroidModuleMainRequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure btnNewTripClick(Sender: TObject);
-    procedure tmUpdateDelayTimer(Sender: TObject);
-    procedure Mod_MainActivityCreate(Sender: TObject; {%H-}intentData: jObject);
-    procedure Mod_MainCreate(Sender: TObject);
+
     procedure Mod_MainJNIPrompt(Sender: TObject);
-    procedure ActionBarTabTabSelected(Sender: TObject; {%H-}view: jObject; title: string);
     procedure btnAddTripDataClick(Sender: TObject);
+    procedure CopyDataFromAssetsToDatabase();
   private
     {private declarations}
-    FDatabaseName: string;
-    AutoUpdate: boolean;
-    CurrentTable: string;
-    CurrentFields: string;
-    CurrentFilter: string;
-    CurrentOrder: string;
-    CurrentView: jDBListView;
-    procedure CreateDatabase;
-    procedure OpenDatabase;
+
+    function  CreateOrOpenDatabase(dataBaseName: string): boolean;
   public
     {public declarations}
     function QueryDatabase(TableName, Fields, Filter, OrderBy: string): boolean;
-    procedure UpdateView;
+    procedure TryUpdateView;
   end;
 
 
@@ -61,40 +57,34 @@ uses
   
 {$R *.lfm}
 
-procedure TAndroidModuleMain.CreateDatabase;
+function TAndroidModuleMain.CreateOrOpenDatabase(dataBaseName: string): boolean;
 begin
-  sdaFDR.OpenOrCreate(FDatabaseName);
-  sdaFDR.CreateTable(gApp.GetStringResourceByName('create_trips_table'));
-  sdaFDR.CreateTable(gApp.GetStringResourceByName('create_sites_table'));
-  sdaFDR.CreateTable(gApp.GetStringResourceByName('create_plants_table'));
-  sdaFDR.ExecSQL(gApp.GetStringResourceByName('create_plants_view'));
-  sdaFDR.ExecSQL(gApp.GetStringResourceByName('create_taxon_index'));
-  sdaFDR.ExecSQL(gApp.GetStringResourceByName('create_habitat_index'));
-end;
 
-procedure TAndroidModuleMain.OpenDatabase;
-begin
-  sdaFDR.OpenOrCreate(FDatabaseName);
-  sdaFDR.SetForeignKeyConstraintsEnabled(True);
+  //intern dabase dont need read/write permission....
+  sdaFDR.OpenOrCreate(dataBaseName);
+
+  //CREATE TABLE IF NOT EXISTS
+  sdaFDR.CreateTable(gApp.GetStringResourceByName('create_trips_table')); //from AppDBGridViewDemo1\res\values
+
+  Result:= True;
 end;
 
 function TAndroidModuleMain.QueryDatabase(TableName, Fields, Filter, OrderBy: string): boolean;
 var
   stmt: string;
 begin
+
   stmt := 'SELECT ' + Fields + ' FROM ' + TableName;
   if Filter <> '' then
     stmt := stmt + ' WHERE ' + Filter;
   if OrderBy <> '' then
     stmt := stmt + ' ORDER BY ' + OrderBy;
 
-  //LogDebug('FDR  ', stmt);
-  //OpenDatabase;
   with sdaFDR do
   begin
-    // Make sure the results go to the correct jDBGridView.
+    // Make sure the results go to the correct jDBListView.
 
-    //Cursor := CurrentView.DataSource;          // There is only one in this App so no need here
+    //Cursor := CurrentView.DataSource; // There is only one in this App so no need here
 
     // On sucessful query completion jSQLiteDataAccess grabs
     // an SQLiteCursor from Java and passes it back to a
@@ -103,29 +93,35 @@ begin
     // to be updated. No need for huge amounts of data to be
     // imported from java into Native code and then re-exported.
 
-    // The new jDBGridView component uses a subclassed Java CursorAdapter rather than an ArrayAdapter
+    // The jDBListView component uses a subclassed Java CursorAdapter rather than an ArrayAdapter
     // so will automatically renew the grid's view (actually it's a list of lists) when a new
     // SQLiteCursor is passed in. The newView and bindView implementations use the ViewHolder pattern
     // so are relatively fast and efficient.
 
-    Result := Select(stmt, False);
+    Result := Select(stmt, False);  //auto update grid view  !!!!
+
     Close;
   end;
 
 end;
 
-procedure TAndroidModuleMain.UpdateView;
+procedure TAndroidModuleMain.TryUpdateView;
 var
-  valid: boolean;
+  CurrentFields: string;
+  CurrentFilter: string;
+  CurrentOrder: string;
+  Currenttable: string;
 begin
+  Currenttable:= 'Trips';
 
-  valid := QueryDatabase(CurrentTable, CurrentFields, CurrentFilter, CurrentOrder);
-  if valid then
-  begin
-    //if CurrentView = gvTrips then
-    //  FillVisitBox;                 // Special case 1
-  end;
+  CurrentFields :=
+      '_id, VisitNo, Destination, strftime("%d-%m-%Y", StartDate), strftime("%d-%m-%Y", EndDate), Members';
+  CurrentFilter := '';
+  CurrentOrder := '1';
+
+  QueryDatabase(Currenttable, CurrentFields, CurrentFilter, CurrentOrder);
 end;
+
 {
 function TMod_Main.InsertData(TableName, Fields, Values: string): boolean;
 var
@@ -145,115 +141,114 @@ begin
   finally
     sdaFDR.Close;
   end;
-  if AutoUpdate and Result then
-    UpdateView;
+
+  TryUpdateView;
 end;
 }
 
-procedure TAndroidModuleMain.Mod_MainCreate(Sender: TObject);
-begin
-  FDatabaseName := sdaFDR.DataBaseName;
-  AutoUpdate := False;
-end;
-
-procedure TAndroidModuleMain.Mod_MainActivityCreate(Sender: TObject; intentData: jObject);
-begin
- // LogDebug('FDR  ', 'Main Activity Created');
-end;
 
 procedure TAndroidModuleMain.btnNewTripClick(Sender: TObject);
 begin
-  //
+  //InsertData
+  ShowMessage('Sorry ... Not implemented yet...')
 end;
 
-procedure TAndroidModuleMain.tmUpdateDelayTimer(Sender: TObject);
+procedure TAndroidModuleMain.AndroidModuleMainRequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
 begin
-  tmUpdateDelay.Enabled:=False;
-  UpdateView;
+  (*
+  case requestCode of
+     1811:begin
+              if grantResult = PERMISSION_GRANTED  then
+                ShowMessage('Success! ['+manifestPermission+'] Permission grant!!! ' )
+              else  //PERMISSION_DENIED
+                ShowMessage('Sorry... ['+manifestPermission+'] Permission not grant... ' );
+          end;
+  end;
+  *)
 end;
 
 procedure TAndroidModuleMain.Mod_MainJNIPrompt(Sender: TObject);
 begin
-  // Checks for existence of the file only
-  // Does NOT confirm it's a valid DB
 
-  if not sdaFDR.DataBaseExists(FDatabaseName) then
+  ActionBarTab.Add('Trips', pTrips.View);
+  CreateOrOpenDatabase(sdaFDR.DataBaseName);   //sdaFDR.DataBaseName:= mydata1.db  ...set in design time....
+  TryUpdateView;  //in the first app launch table is empty....
+
+
+  (*  for "assets"  and "internal"  app files we dont need run time permission,,,,
+  if IsRuntimePermissionNeed() then   // that is, target API >= 23  - Android 6
   begin
-    CreateDatabase;
+     //hint: if you  get "write" permission then you have "read", too!
+     Self.RequestRuntimePermission('android.permission.WRITE_EXTERNAL_STORAGE', 1811);
   end
-  else
-  begin
-    //FillVisitBox;;
-  end;
+  *)
 
-   ActionBarTab.Add('Trips', pTrips.View);
-   Self.SetTabNavigationModeActionBar;  //this is needed!!!     Automatically selects tab at index 0
 
-  //UpdateView;
-  //ShowMessage('Ready!');
 end;
 
-procedure TAndroidModuleMain.ActionBarTabTabSelected(Sender: TObject; view: jObject;
-  title: string);
-begin
-  if title = 'Trips' then
-  begin
-    CurrentView := dbgTrips;
-    CurrentTable := title;
-    CurrentFields :=
-      '_id, VisitNo, Destination, strftime("%d-%m-%Y", StartDate), strftime("%d-%m-%Y", EndDate), Members';
-    CurrentFilter := '';
-    CurrentOrder := '1';
-  end;
-  //if CurrentView.RowCount = 0 then
-     //  UpdateView;
-  tmUpdateDelay.Enabled := True;
-end;
-
-procedure TAndroidModuleMain.btnAddTripDataClick(Sender: TObject);
+procedure TAndroidModuleMain.CopyDataFromAssetsToDatabase();
 var
-  Data, row, TableValues: string;
+  row, TableValues, dataText: string;
   i, p: integer;
-  TableName: string = 'Trips';
+  TableName: string;
   stmtArray: TDynArrayOfString;
 begin
 
-  with fpData do
-    try
-      Init(gApp);
-      SetAuthorities(gjAppName);
-      Data := GetTextContent('trips.dat');
-    finally
-      jFree;
-    end;
+  jFileProvider1.SetAuthorities(Self.PackageName);
+
+  //load from assets don't need runtime permission...
+  jFileProvider1.FileSource:= srcAssets;
+  dataText:= jFileProvider1.GetTextContent('trips.dat');
+
+  TableName:= 'Trips';
 
   with TStringList.Create do
   begin
     try
-      //SkipLastLineBreak := True;
-      Text := Data;
-      Data := '';
+
+      Text:= dataText;
+
       SetLength(stmtArray, Count);
-      for i := 0 to Count - 1 do
+
+      if Count > 0 then
       begin
-        row := Strings[i];
-        TableValues := 'null,';
-        p := pos('|', row);
-        while p > 0 do
+        for i := 0 to Count - 1 do
         begin
-          TableValues := TableValues + QuotedStr(copy(row, 1, p - 1)) + ',';
-          system.Delete(row, 1, p);
+          row := Strings[i];
+          TableValues := 'null,';
           p := pos('|', row);
+          while p > 0 do
+          begin
+            TableValues := TableValues + QuotedStr(copy(row, 1, p - 1)) + ',';
+            system.Delete(row, 1, p);
+            p := pos('|', row);
+          end;
+          TableValues := TableValues + QuotedStr(row);
+          stmtArray[i] := 'INSERT INTO ' + TableName + ' VALUES (' + TableValues + ')';
         end;
-        TableValues := TableValues + QuotedStr(row);
-        stmtArray[i] := 'INSERT INTO ' + TableName + ' VALUES (' + TableValues + ')';
-      end;
+
+        sdaFDR.InsertIntoTableBatch(stmtArray);
+
+        TryUpdateView; //Refresh grid view....
+
+      end
+      else ShowMessage('Sorry .. Data content empty...');
+
     finally
+      SetLength(stmtArray, 0);
       Free;
     end;
+
   end;
-  sdaFDR.InsertIntoTableBatch(stmtArray);
-  SetLength(stmtArray, 0);
+
+end;
+
+procedure TAndroidModuleMain.btnAddTripDataClick(Sender: TObject);
+begin
+   ShowMessage('Add  Data....');
+   CopyDataFromAssetsToDatabase();
 end;
 
 end.

@@ -1,6 +1,6 @@
 package ml.smartware.appdbgridviewdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8  - 25 February  - 2018 
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.5  - 04 July - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -13,7 +13,7 @@ package ml.smartware.appdbgridviewdemo1;
 //                       simonsayz@naver.com
 //                       http://blog.naver.com/simonsayz
 //
-//          LoadMan    / Jang,Yang-Ho
+//         LoadMan    / Jang,Yang-Ho
 //                       wkddidgh@naver.com
 //                       http://blog.naver.com/wkddidgh
 //
@@ -70,7 +70,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.os.Build;
 import android.os.Bundle;
@@ -82,6 +84,7 @@ import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.net.ConnectivityManager;
@@ -104,6 +107,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RelativeLayout.LayoutParams;
@@ -133,6 +137,8 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 
 //-------------------------------------------------------------------------
 //Constants
@@ -160,48 +166,61 @@ private OnItemClickListener onListItemClickListener;
 private Boolean         enabled  = true;   //
 private Intent intent;
 private int mCountTab = 0;
+private ImageView mImageBackground = null;
 
 private boolean mRemovedFromParent = false;
 
 // Constructor
 public  jForm(Controls ctrls, long pasobj) {
-PasObj   = pasobj;
-controls = ctrls;
-parent = controls.appLayout;
+ PasObj   = pasobj;
+ controls = ctrls;
+ parent = controls.appLayout;
 
-layout   = new RelativeLayout(controls.activity);
-layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+ layout   = new RelativeLayout(controls.activity);
+ layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT);
-layout.setLayoutParams(layparam);
+ layout.setLayoutParams(layparam);
 
-// Init Event
-onClickListener = new OnClickListener() {
+ // Init Event
+ onClickListener = new OnClickListener() {
   public  void onClick(View view) {
     if (enabled) {
       controls.pOnClick(PasObj,Const.Click_Default);
     }
   }; 
-};
+ };
 
-//geric list item click Event - experimental component model!
-onListItemClickListener = new OnItemClickListener() {
-@Override
-public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
+ //geric list item click Event - experimental component model!
+ onListItemClickListener = new OnItemClickListener() {
+ @Override
+ public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
      controls.jAppOnListItemClick(parent, v, position, v.getId()); 
-}
-};
+  }
+ };
 
-//Init Event
-onViewClickListener = new OnClickListener() {
-public  void onClick(View view) {
- if (enabled) {
+ //Init Event
+ onViewClickListener = new OnClickListener() {
+  public  void onClick(View view) {
+   if (enabled) {
    controls.jAppOnViewClick(view, view.getId());
- }
-};
-};
+   }
+  };
+ };
 
-layout.setOnClickListener(onClickListener);
+ layout.setOnClickListener(onClickListener);
 
+ // To ensure that the image is always in the background by TR3E
+ mImageBackground = new ImageView(controls.activity);
+
+ mImageBackground.setScaleType(ImageView.ScaleType.FIT_XY);
+	
+ LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+ mImageBackground.setLayoutParams(param);
+ mImageBackground.setImageResource(android.R.color.transparent);
+
+ //mImageBackground.invalidate();
+ layout.addView(mImageBackground);
 }
 
 public  RelativeLayout GetLayout() {
@@ -284,42 +303,60 @@ public  void Close2() {
   controls.pOnClose(PasObj);
 }
 
-public boolean IsConnected(){ // by renabor
-   boolean r = false;	
+public boolean IsConnected(){ //by TR3E
+
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-   if (cm == null) return r;   
-   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-   if (activeNetwork == null) return r;   
-   return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+   if (cm != null) {
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+    if (activeNetwork != null)
+     return (activeNetwork.isAvailable() && activeNetwork.isConnected());
+   }
+
+   return false;
 }
 
-public boolean IsConnectedWifi(){ // by renabor
-   boolean r = false;
+public boolean IsConnectedWifi(){ // by TR3E
+
    ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-   if (cm == null) return r;   
-   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-   if (activeNetwork == null) return r;   
-   return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+
+   if (cm != null)
+   {
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+    if (activeNetwork != null)
+     return (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI);
+   }
+
+   return false;
 }
 
-public boolean IsConnectedTo(int _connectionType) {	   
-	   int r = -1;
-	   if (!IsConnected()) return false;	   
-	   ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);	   
-	   NetworkInfo activeNetwork = cm.getActiveNetworkInfo();	   
-	   if (activeNetwork != null) {   	   
-		  switch (activeNetwork.getType()){
-		  case ConnectivityManager.TYPE_MOBILE: r = 0; break;  //0
-		  case ConnectivityManager.TYPE_WIFI: r = 1; break;  //1
- 		  case ConnectivityManager.TYPE_BLUETOOTH: r = 2; break; //7
-		  case ConnectivityManager.TYPE_ETHERNET: r = 3; break; //9		  
-		  }	      
-	   }	   
-	   if (r == _connectionType)  
-		   return true;
-	   else 
-		  return false;
-	   
+public boolean IsConnectedTo(int _connectionType) { // by TR3E
+
+           ConnectivityManager cm =  (ConnectivityManager)controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+           if( cm != null )
+           {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            int result = -1;
+
+            if (activeNetwork != null)
+             if (activeNetwork.isAvailable() && activeNetwork.isConnected());
+             {
+                  switch (activeNetwork.getType()){
+                   case ConnectivityManager.TYPE_MOBILE:    result = 0; break; //0
+                   case ConnectivityManager.TYPE_WIFI:      result = 1; break; //1
+                   case ConnectivityManager.TYPE_BLUETOOTH: result = 2; break; //7
+                   case ConnectivityManager.TYPE_ETHERNET:  result = 3; break; //9
+                  }
+             }
+
+            return (result == _connectionType);
+           }
+
+           return false;
 }
 
 public void ShowMessage(String msg){
@@ -390,13 +427,17 @@ public int getSystemVersion()
 }
 
  public boolean SetWifiEnabled(boolean _status) {
-    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);             
-    return wifiManager.setWifiEnabled(_status);
+    //WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
+	 WifiManager wifiManager = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	 return wifiManager.setWifiEnabled(_status);
  }
 
  public boolean IsWifiEnabled() {
-    WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
-    return  wifiManager.isWifiEnabled();	
+    //WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
+    WifiManager wifiManager = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	 return  wifiManager.isWifiEnabled();
  }
          
  public boolean IsMobileDataEnabled() {
@@ -436,8 +477,11 @@ public String GetEnvironmentDirectoryPath(int _directory) {
 	    case 10: absPath = this.controls.activity.getFilesDir().getPath();
 	             absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases"; break;
 	    case 11: absPath = this.controls.activity.getFilesDir().getPath();
-                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;	             
-	           
+                 absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/shared_prefs"; break;
+
+		  case 12: absPath = this.controls.activity.getFilesDir().getPath();
+			  absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/cache"; break;
+
 	  }
 	  	  
 	  //Make sure the directory exists.
@@ -644,20 +688,66 @@ public int GetDrawableResourceId(String _resName) {
 }
 
 public Drawable GetDrawableResourceById(int _resID) {
-	    
-	        Drawable res = null;	    
-		if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21		
+	    if( _resID == 0 ) return null; // by tr3e
+	    		
+        Drawable res = null;
+
+        if (Build.VERSION.SDK_INT < 21 ) { 	//for old device < 21
  			res = this.controls.activity.getResources().getDrawable(_resID);
  		}
- 	
-                //[ifdef_api21up]	 		
+
+ 		//[ifdef_api21up]
  		if(Build.VERSION.SDK_INT >= 21) {  			
  		   res = this.controls.activity.getResources().getDrawable(_resID, null);
- 		} 
-                //[endif_api21up]			
+ 		}//[endif_api21up]
 
  		return res;
 }
+
+	//BY TR3E
+	public void SetBackgroundImage(String _imageIdentifier, int _scaleType) {
+	
+	 if( mImageBackground == null ) return;	
+		
+	 Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+	 
+	 switch(_scaleType) {
+		case 0: mImageBackground.setScaleType(ImageView.ScaleType.CENTER); break;
+		case 1: mImageBackground.setScaleType(ImageView.ScaleType.CENTER_CROP); break;
+		case 2: mImageBackground.setScaleType(ImageView.ScaleType.CENTER_INSIDE); break;
+		case 3: mImageBackground.setScaleType(ImageView.ScaleType.FIT_CENTER); break;
+		case 4: mImageBackground.setScaleType(ImageView.ScaleType.FIT_END); break;
+		case 5: mImageBackground.setScaleType(ImageView.ScaleType.FIT_START); break;
+		case 6: mImageBackground.setScaleType(ImageView.ScaleType.FIT_XY); break;
+		case 7: mImageBackground.setScaleType(ImageView.ScaleType.MATRIX); break;
+	 }
+	 	 
+	 mImageBackground.setImageDrawable(d);	 
+   }
+	
+   //BY TR3E
+   public void SetBackgroundImageMatrix(float _scaleX, float _scaleY, float _degress, float _dx, float _dy, float _centerX, float _centerY ) {
+   	
+   	if (mImageBackground == null) return;
+		
+		if ( mImageBackground.getScaleType() != ImageView.ScaleType.MATRIX)  
+			mImageBackground.setScaleType(ImageView.ScaleType.MATRIX);
+		
+   	Matrix matrix = new Matrix();
+   	
+   	matrix.setRotate( _degress, _centerX, _centerY);
+   	matrix.postScale(_scaleX, _scaleY, _centerX*_scaleX, _centerY*_scaleY);
+   	matrix.postTranslate(_dx, _dy);
+		
+		mImageBackground.setImageMatrix(matrix);		
+		//mImageBackground.invalidate();
+   }
+
+   // BY TR3E
+   public void SetBackgroundImage(String _imageIdentifier) {
+		SetBackgroundImage(_imageIdentifier, 6); // FIT_XY for default
+   }
+
 
 //by  thierrydijoux
 public String GetQuantityStringByName(String _resName, int _quantity) {
@@ -673,8 +763,10 @@ public String GetStringResourceByName(String _resName) {
 	return value;
 }   
 
-public ActionBar GetActionBar() { 
-    return this.controls.activity.getActionBar();
+public ActionBar GetActionBar() {
+    if (! jCommons.IsAppCompatProject() ) {
+		return (controls.activity).getActionBar();
+	} else return null;
 }
 
 /*
@@ -684,82 +776,72 @@ public ActionBar GetActionBar() {
  */
 
 public void HideActionBar() {
- ActionBar actionBar = this.controls.activity.getActionBar(); 
- actionBar.hide();          
+	jCommons.ActionBarHide(controls);
 }
 
-public void ShowActionBar() {	         
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.show();
+public void ShowActionBar() {
+	jCommons.ActionBarShow(controls);
 }
 
 //Hide the title label
 public void ShowTitleActionBar(boolean _value) {
-	ActionBar actionBar = this.controls.activity.getActionBar();
-    actionBar.setDisplayShowTitleEnabled(_value);
+	jCommons.ActionBarShowTitle(controls, _value);
 }
 
 //Hide the logo = false
-public void ShowLogoActionBar(boolean _value) { 
-   ActionBar actionBar = this.controls.activity.getActionBar();	    
-   actionBar.setDisplayShowHomeEnabled(_value);
+public void ShowLogoActionBar(boolean _value) {
+	jCommons.ActionBarShowLogo(controls, _value);
 }
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetTitleActionBar(String _title) {
-	ActionBar actionBar = this.controls.activity.getActionBar();   	
-    actionBar.setTitle(_title);    
+	jCommons.SetActionBarTitle(controls, _title);
 }
 
 //set a title and subtitle to the Action bar as shown in the code snippet.
 public void SetSubTitleActionBar(String _subtitle) {
-   ActionBar actionBar = this.controls.activity.getActionBar();    
-   actionBar.setSubtitle(_subtitle);
-   //actionBar.setDisplayHomeAsUpEnabled(true);  
+   jCommons.SetActionBarSubTitle(controls, _subtitle);
 }
 
 //forward [<] activity! // If your minSdkVersion is 11 or higher!
 /*.*/public void SetDisplayHomeAsUpEnabledActionBar(boolean _value) {
-   ActionBar actionBar = this.controls.activity.getActionBar();    
-   actionBar.setDisplayHomeAsUpEnabled(_value);
+	jCommons.ActionBarDisplayHomeAsUpEnabled(controls, _value);
 }	
 
 public void SetIconActionBar(String _iconIdentifier) {
 //[ifdef_api14up]
-  ActionBar actionBar = this.controls.activity.getActionBar();   	
-  actionBar.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
+	
+	if( d != null ) // by tr3e
+	 jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
 }
 
 public void SetTabNavigationModeActionBar(){
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);	//API 11
-	actionBar.setSelectedNavigationItem(0);
+	jCommons.ActionBarSetTabNavigationMode(controls);
 }
 
 //This method remove all tabs from the action bar and deselect the current tab
 public void RemoveAllTabsActionBar() {
-	ActionBar actionBar = this.controls.activity.getActionBar();
-	actionBar.removeAllTabs();
-    this.controls.activity.invalidateOptionsMenu(); // by renabor
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
+	jCommons.ActionBarRemoveAllTabs(controls);
 }
 
 //Calculate ActionBar height
 //ref http://stackoverflow.com/questions/12301510/how-to-get-the-actionbar-height
 public int GetActionBarHeight() {
-int actionBarHeight = 0;
-TypedValue tv = new TypedValue();
-if (controls.activity.getActionBar().isShowing()) {  
-   if (controls.activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-      actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,controls.activity.getResources().getDisplayMetrics());
-   }
-}
-return actionBarHeight;
+  return jCommons.ActionGetBarBarHeight(controls);
 }
 
 public boolean ActionBarIsShowing() {
-  return controls.activity.getActionBar().isShowing();
+	return jCommons.ActionBarIsShowing(controls);
+}
+
+public boolean HasActionBar() {
+	return jCommons.HasActionBar(controls);
+}
+
+public boolean IsAppCompatProject () {
+	return jCommons.IsAppCompatProject();
 }
 
 public boolean IsPackageInstalled(String _packagename) {
@@ -781,7 +863,7 @@ public void ShowCustomMessage(View _layout,  int _gravity) {
 	if (par != null) {
 	    par.removeView(_layout);        	    
 	}    
-    _layout.setVisibility(0);
+    _layout.setVisibility(View.VISIBLE);
     toast.setView(_layout);
     toast.show();
 }
@@ -812,7 +894,7 @@ public void ShowCustomMessage(View _layout,  int _gravity,  int _lenghTimeSecond
 	if (par != null) {
 	    par.removeView(_layout);        	    
 	}    
-    _layout.setVisibility(0);
+    _layout.setVisibility(View.VISIBLE);//0
     toast.setView(_layout);    				
     //it will show the toast for 20 seconds: 
     //(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
@@ -1109,8 +1191,10 @@ return r;
 
 //ref. http://www.devlper.com/2010/07/getting-ip-address-of-the-device-in-android/
 public String GetDeviceWifiIPAddress() {
-    WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);  
-    //String ip = Formatter.formatIpAddress(    		
+    //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
+	WifiManager mWifi = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+	//String ip = Formatter.formatIpAddress(
     int  ipAddress = mWifi.getConnectionInfo().getIpAddress();
     String sIP =String.format("%d.%d.%d.%d",
     		(ipAddress & 0xff),
@@ -1126,7 +1210,8 @@ public String GetDeviceWifiIPAddress() {
   */
   public String GetWifiBroadcastIPAddress() throws IOException {
 	String r = null;
-    WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);  
+    //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
+	  WifiManager mWifi = (WifiManager)this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 	// DhcpInfo  is a simple object for retrieving the results of a DHCP request
     DhcpInfo dhcp = mWifi.getDhcpInfo(); 
     if (dhcp == null) {     
@@ -1292,6 +1377,98 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	   return (char)valLong+"" ;
 }
 
+//https://developer.android.com/reference/android/provider/Settings.System
+
+	public int GetSettingsSystemInt(String _strKey) {
+		try {
+			return android.provider.Settings.System.getInt(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return -1;
+		}
+	}
+
+	//https://developer.android.com/reference/android/provider/Settings.System
+	public String GetSettingsSystemString(String _strKey) {
+	  String r = android.provider.Settings.System.getString(controls.activity.getContentResolver(), _strKey);
+  	  if (r == null) r = "";
+  	  return r;
+	}
+
+	public float GetSettingsSystemFloat(String _strKey) {
+		try {
+			return android.provider.Settings.System.getFloat(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return  -1;
+		}
+	}
+
+	public long GetSettingsSystemLong(String _strKey) {
+		try {
+			return android.provider.Settings.System.getLong(controls.activity.getContentResolver(), _strKey);
+		} catch(android.provider.Settings.SettingNotFoundException e) {
+			return  -1;
+		}
+	}
+
+	public boolean PutSettingsSystemInt (String _strKey, int _value) {
+			return android.provider.Settings.System.putInt(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemLong (String _strKey, long _value) {
+			return android.provider.Settings.System.putLong(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemFloat(String _strKey, float _value) {
+			return android.provider.Settings.System.putFloat(controls.activity.getContentResolver(), _strKey, _value);
+	}
+
+	public boolean PutSettingsSystemString(String _strKey, String _strValue) {
+		return android.provider.Settings.System.putString(controls.activity.getContentResolver(), _strKey, _strValue);
+	}
+
+	public boolean IsRuntimePermissionNeed() {
+		return Build.VERSION.SDK_INT >= 23;  //Build.VERSION_CODES.M
+	}
+
+	public boolean IsRuntimePermissionGranted(String _androidPermission) {  //"android.permission.CAMERA"
+		return jCommons.IsRuntimePermissionGranted(controls, _androidPermission);
+	}
+
+	public void RequestRuntimePermission(String _androidPermission, int _requestCode) {  //"android.permission.CAMERA"
+		jCommons.RequestRuntimePermission(controls, _androidPermission, _requestCode);
+	}
+
+	public void RequestRuntimePermission(String[] _androidPermissions, int _requestCode) {  //"android.permission.CAMERA"
+		jCommons.RequestRuntimePermission(controls, _androidPermissions, _requestCode);
+	}
+
+	//by TR3E
+	public int getScreenWidth( ){
+		return this.controls.activity.getResources().getDisplayMetrics().widthPixels;
+	}
+	//by TR3E
+	public int getScreenHeight( ){
+		return this.controls.activity.getResources().getDisplayMetrics().heightPixels;
+	}
+	//by TR3E
+	public String getSystemVersionString(){
+		return android.os.Build.VERSION.RELEASE;
+	}
+
+	public ByteBuffer GetJByteBuffer(int _width, int _height) {
+		ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);
+		return graphicBuffer;
+	}
+
+        public ByteBuffer GetByteBufferFromImage(Bitmap _bitmap) {
+           if (_bitmap == null) return null;
+           int w =  _bitmap.getWidth();
+           int h =_bitmap.getHeight();
+           ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);
+           _bitmap.copyPixelsToBuffer(graphicBuffer);
+           graphicBuffer.rewind();  //reset position
+           return graphicBuffer;
+        }
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1327,11 +1504,14 @@ public native void pOnDraw(long pasobj);
 public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, float x2, float y2);
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
+public native void pOnDown(long pasobj, int value);
 public native void pOnClick(long pasobj, int value);
 public native void pOnLongClick(long pasobj, int value);
+public native void pOnDoubleClick(long pasobj, int value);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
+public native void pOnBackPressed(long pasobj);
 public native void pOnClose(long pasobj);
 public native void pAppOnViewClick(View view, int id);
 public native void pAppOnListItemClick(AdapterView adapter, View view, int position, int id);
@@ -1341,7 +1521,7 @@ public native void pOnLostFocus(long pasobj, String text);
 public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
-
+public native void pAppOnRequestPermissionResult(int requestCode, String permission, int grantResult);
 // -------------------------------------------------------------------------------------------
 //Load Pascal Library - Please, do not edit the static content commented in the template file
 // -------------------------------------------------------------------------------------------
@@ -1392,6 +1572,10 @@ public void jAppOnListItemClick(AdapterView<?> adapter, View view, int position,
 //public  void jAppOnHomePressed()          { pAppOnHomePressed();           }
 public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {return pAppOnSpecialKeyDown(keyChar, keyCode, keyCodeString);};
 
+public  void jAppOnRequestPermissionResult(int requestCode, String permission, int grantResult) {
+	pAppOnRequestPermissionResult(requestCode, permission ,grantResult);
+}
+
 //// -------------------------------------------------------------------------
 //  System, Class
 // -------------------------------------------------------------------------
@@ -1418,6 +1602,10 @@ public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
 }
 
+public int getAPILevel() {
+  return android.os.Build.VERSION.SDK_INT;  
+}
+
 //by jmpessoa
 public  int  systemGetOrientation() {  
    return (this.activity.getResources().getConfiguration().orientation); 
@@ -1434,6 +1622,27 @@ public  void classChkNull (Class<?> object) {
 
 public Context GetContext() {   
    return this.activity; 
+}
+
+//by TR3E Software
+public int getContextTop(){
+ ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
+ 
+ if( view != null)
+ 	return view.getTop();
+ else
+ 	return 0;
+	
+}
+
+//by  TR3E Software
+public int getStatusBarHeight() {
+	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+	
+	if ( resourceId > 0 )
+		return this.activity.getResources().getDimensionPixelSize(resourceId);
+	else
+		return 0;
 }
 
 //by  thierrydijoux
@@ -1453,9 +1662,13 @@ public String getStringResourceByName(String _resName) {
 //  App Related
 // -------------------------------------------------------------------------
 //
-public  void appFinish () {
+public  void appFinish() {
 	   activity.finish();
 	   System.exit(0); //<< ------- fix by jmpessoa
+}
+
+public void appRecreate() {
+	activity.recreate();
 }
 
 public  void appKillProcess() {
@@ -1716,15 +1929,32 @@ public String getLocale(int localeType) {
 // -------------------------------------------------------------------------
 // Result: Phone Number - LORDMAN
 public  String getDevPhoneNumber() {
+	String f = "";
+
   TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-  return ( telephony.getLine1Number() );
+  if (telephony!=null) {
+	  try {
+		  f = telephony.getLine1Number();
+	  } catch (SecurityException ex) {
+		  Log.e("getDevPhoneNumber", ex.getMessage());
+	  }
+  }
+  return f;
 }
 
 // Result: Device ID - LORDMAN
 // Remarks : Nexus7 (no moblie device) -> Crash : fixed code - Simon
 public  String getDevDeviceID() {
+	String f = "";
   TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-  return ( telephony.getDeviceId()    );
+	if (telephony!=null) {
+		try {
+			f = telephony.getDeviceId();
+		} catch (SecurityException ex) {
+			Log.e("getDevDeviceID", ex.getMessage());
+		}
+	}
+  return f;
 }
 // -------------------------------------------------------------------------
 //  Bitmap
@@ -1815,7 +2045,8 @@ public void jSend_Email(
 //http://codetheory.in/android-sms/
 //http://www.developerfeed.com/java/tutorial/sending-sms-using-android
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
-public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
+
+	public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 	SmsManager sms = SmsManager.getDefault();	
 	try {
 		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
@@ -1835,32 +2066,39 @@ public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
 		return 0; //fail
 	}
 }
-
-public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {	
-	String SMS_DELIVERED = packageDeliveredAction;
-	PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
-	SmsManager sms = SmsManager.getDefault();
-	try {
-		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, deliveredPendingIntent);
-		if (multipartMessage) {
-			ArrayList<String> messages = sms.divideMessage(msg);    
-			ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
-			for (int i = 0; i < messages.size(); i++) {
-				deliveredPendingIntents.add(i, deliveredPendingIntent);
-			}			
-			sms.sendMultipartTextMessage(phoneNumber, null, messages, null, deliveredPendingIntents);			  
-		} else {
-			List<String> messages = sms.divideMessage(msg);    
-			for (String message : messages) {
-				sms.sendTextMessage(phoneNumber, null, message, null, deliveredPendingIntent);
-			}			    
-		}	
-		//Log.i("Send_SMS",phoneNumber+": "+ msg);    
-		return 1; //ok	      
-	} catch (Exception e) {
-		return 0; //fail
+        //improved by CC
+        //http://forum.lazarus-ide.org/index.php/topic,44775.msg315109/topicseen.html
+	public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {
+		String SMS_DELIVERED = packageDeliveredAction;
+		PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+		SmsManager sms = SmsManager.getDefault();
+		int partsCount = 1;
+		try {
+			if (multipartMessage)
+			{
+				ArrayList<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				ArrayList<PendingIntent> deliveredPendingIntents = new ArrayList<PendingIntent>();
+				for (int i = 0; i < messages.size(); i++)
+				{
+					deliveredPendingIntents.add(i, deliveredPendingIntent);
+				}
+				sms.sendMultipartTextMessage(phoneNumber, null, messages, deliveredPendingIntents, null  );
+			}
+			else
+			{
+				List<String> messages = sms.divideMessage(msg);
+				partsCount = messages.size();
+				for (String message : messages)
+				{
+					sms.sendTextMessage(phoneNumber, null, message, deliveredPendingIntent, null );
+				}
+			}
+			return partsCount;
+		} catch (Exception e) {
+			return 0; //fail
+		}
 	}
-}
 
 public String jRead_SMS(Intent intent, String addressBodyDelimiter)  {
   //---get the SMS message passed in---	
@@ -2016,6 +2254,7 @@ public java.lang.Object jImageList_jCreate(long _Self) {
 public  java.lang.Object jImageView_Create(long pasobj ) {
   return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
 }
+public native void pOnImageViewPopupItemSelected(long pasobj, String caption);
 
 public  java.lang.Object jPanel_Create(long pasobj ) {
   return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
@@ -2028,6 +2267,7 @@ public  java.lang.Object jSqliteCursor_Create( long pasobj ) {
 public java.lang.Object jSqliteDataAccess_Create(long pasobj, String databaseName, char colDelim, char rowDelim) {
    return (java.lang.Object)( new jSqliteDataAccess(this,pasobj,databaseName,colDelim,rowDelim) );
 }
+public native void pOnSqliteDataAccessAsyncPostExecute(long pasobj, int count, String msgResult);
 
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));

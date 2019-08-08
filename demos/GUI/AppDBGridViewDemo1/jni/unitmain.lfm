@@ -2,24 +2,24 @@ object AndroidModuleMain: TAndroidModuleMain
   Left = 366
   Top = 103
   Width = 816
-  Height = 518
+  Height = 482
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
   AutoAssignIDs = True
-  OnCreate = Mod_MainCreate
   Text = 'Field Data Main'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtTextAsTitle
   OnJNIPrompt = Mod_MainJNIPrompt
+  OnRequestPermissionResult = AndroidModuleMainRequestPermissionResult
   object pTrips: jPanel
     Left = 4
     Top = 4
     Width = 808
-    Height = 510
+    Height = 474
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
@@ -38,7 +38,7 @@ object AndroidModuleMain: TAndroidModuleMain
       Left = 0
       Top = 0
       Width = 808
-      Height = 77
+      Height = 81
       MarginLeft = 0
       MarginTop = 0
       MarginRight = 0
@@ -54,10 +54,10 @@ object AndroidModuleMain: TAndroidModuleMain
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
       object btnNewTrip: jImageBtn
-        Left = 736
-        Top = 5
-        Width = 67
-        Height = 67
+        Left = 731
+        Top = 4
+        Width = 72
+        Height = 72
         MarginLeft = 5
         MarginTop = 5
         MarginRight = 5
@@ -73,13 +73,15 @@ object AndroidModuleMain: TAndroidModuleMain
         Images = jImageList1
         IndexImageUp = 0
         IndexImageDown = 1
+        SleepDown = 0
         GravityInParent = lgNone
+        OnClick = btnNewTripClick
       end
       object jTextView1: jTextView
         Left = 5
         Top = 1
-        Width = 117
-        Height = 32
+        Width = 145
+        Height = 39
         MarginLeft = 5
         MarginTop = 1
         MarginRight = 5
@@ -101,10 +103,10 @@ object AndroidModuleMain: TAndroidModuleMain
         GravityInParent = lgNone
       end
       object btnAddTripData: jButton
-        Left = 627
-        Top = 13
-        Width = 99
-        Height = 50
+        Left = 604
+        Top = 12
+        Width = 117
+        Height = 57
         MarginLeft = 5
         MarginTop = 5
         MarginRight = 5
@@ -128,9 +130,9 @@ object AndroidModuleMain: TAndroidModuleMain
     end
     object dbgTrips: jDBListView
       Left = 5
-      Top = 82
+      Top = 86
       Width = 798
-      Height = 368
+      Height = 355
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
@@ -158,7 +160,6 @@ object AndroidModuleMain: TAndroidModuleMain
     end
   end
   object ActionBarTab: jActionBarTab
-    OnTabSelected = ActionBarTabTabSelected
     left = 66
     top = 24
   end
@@ -174,7 +175,7 @@ object AndroidModuleMain: TAndroidModuleMain
     Cursor = sqlCursor
     ColDelimiter = '|'
     RowDelimiter = '#'
-    DataBaseName = 'lm.fdr.db3'
+    DataBaseName = 'mydata1.db'
     ReturnHeaderOnSelect = False
     left = 288
     top = 24
@@ -183,16 +184,9 @@ object AndroidModuleMain: TAndroidModuleMain
     left = 392
     top = 24
   end
-  object fpData: jFileProvider
+  object jFileProvider1: jFileProvider
     FileSource = srcAssets
-    left = 584
-    top = 24
-  end
-  object tmUpdateDelay: jTimer
-    Enabled = False
-    Interval = 500
-    OnTimer = tmUpdateDelayTimer
-    left = 496
+    left = 504
     top = 24
   end
 end

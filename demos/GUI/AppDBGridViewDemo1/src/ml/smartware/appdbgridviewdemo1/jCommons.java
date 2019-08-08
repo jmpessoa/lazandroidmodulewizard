@@ -1,8 +1,13 @@
 package ml.smartware.appdbgridviewdemo1;
 
+import android.app.ActionBar;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.View.MeasureSpec;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -15,11 +20,10 @@ public class jCommons {
 
     //owner of this instance
 	private View aOwnerView = null;
-
 	//Java-Pascal Interface
 	private long PasObj = 0; // Pascal Obj
 
-	private ViewGroup parent = null;                     // parent view	
+	private ViewGroup parent = null;                     // parent view
 	private ViewGroup.MarginLayoutParams lparams = null; // layout XYWH
 	
 	private int lparamsAnchorRule[] = new int[30];
@@ -38,18 +42,21 @@ public class jCommons {
  /* //[endif_api14up]
  private int lgravity = Gravity.TOP | Gravity.LEFT;
  //[ifdef_api14up] */
-	private float lweight = 0;
+	private float lweight = 1.0f;
 	private boolean mRemovedFromParent = false;
 	private int algravity;
-        private int algravityAnchorId;
+	private int algravityAnchorId;
+	
+	private android.content.Context context;
 
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
 		aOwnerView = _view;       // set owner
 		PasObj   = _pasobj; 	//Connect Pascal I/F						
-		
 		lgravity = Gravity.NO_GRAVITY;
 		algravity = Gravity.NO_GRAVITY;
-                algravityAnchorId = -1;
+        algravityAnchorId = -1;
+                
+        context = _context;
 
 		if (aOwnerView != null) {
 			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
@@ -159,18 +166,34 @@ public class jCommons {
 	}
 		
 	public int getLParamHeight() {
-		int r = lparamH;		
+		int r = lparamH;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getHeight();
-		}		
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;				
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		    			
+			r = aOwnerView.getMeasuredHeight();
+		}
+		
 		return r;
 	}
 
 	public int getLParamWidth() {				
-		int r = lparamW;		
+		int r = lparamW;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getWidth();		
-		}				
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		   			
+			r = aOwnerView.getMeasuredWidth();		
+		}
+		
 		return r;		
 	}	
 	
@@ -183,7 +206,7 @@ public class jCommons {
 	      //[endif_api14up]
 	       /* //[endif_api14up]
 	       LEFT =  Gravity.LEFT;          
-	       RIGHT =  Gravity.RIGHT 
+	       RIGHT =  Gravity.RIGHT;
 	       //[ifdef_api14up] */	   	   
 		   switch(_g) {	   
 		   case 0: lgravity = Gravity.NO_GRAVITY; break;
@@ -218,7 +241,7 @@ public class jCommons {
 	      //[endif_api14up]
 	       /* //[endif_api14up]
 	       LEFT =  Gravity.LEFT;          
-	       RIGHT =  Gravity.RIGHT 
+	       RIGHT =  Gravity.RIGHT;
 	       //[ifdef_api14up] */	   	 
   
                    algravityAnchorId = _anchorId;
@@ -276,11 +299,12 @@ public class jCommons {
 			}			
 		}        
  		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
+          		((FrameLayout.LayoutParams)lparams).gravity = lgravity;
 		}
  		
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
+		if (lparams instanceof LinearLayout.LayoutParams) { //.weight
+                        ((LinearLayout.LayoutParams)lparams).weight = lweight; //lweight = 1 <-- the trick!!
+			((LinearLayout.LayoutParams)lparams).gravity = lgravity; //lweight;
 		}
 		
 		if (aOwnerView != null) { aOwnerView.setLayoutParams(lparams); }
@@ -343,7 +367,6 @@ public class jCommons {
 		}
 	}
 
-
 	public void setCollapseMode(int _mode) {  //called on JNIPrompt
 		
 	}
@@ -371,11 +394,131 @@ public class jCommons {
     public int getColorPrimaryLightId() {
     	return  R.color.primary_light;
     }
-    
-    
+
     public int getColorAccentId() {
     	return  R.color.accent;
     }
-    
 
+	public static void RequestRuntimePermission(Controls controls, String androidPermission, int requestCode) {  //"android.permission.CAMERA"
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			controls.activity.requestPermissions(new String[]{androidPermission}, requestCode);
+		} //[endif_api23up]
+	}
+
+	public static void RequestRuntimePermission(Controls controls, String[] androidPermissions, int requestCode) {  //"android.permission.CAMERA"
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			controls.activity.requestPermissions(androidPermissions, requestCode);
+		} //[endif_api23up]
+	}
+
+	public static boolean IsRuntimePermissionGranted(Controls controls, String _androidPermission) {  //"android.permission.CAMERA"
+		boolean r = true;
+		int IsGranted = PackageManager.PERMISSION_GRANTED; //0    PERMISSION_DENIED = -1
+		//[ifdef_api23up]
+		if (Build.VERSION.SDK_INT >= 23) {
+			IsGranted =  controls.activity.checkSelfPermission(_androidPermission);
+		} //[endif_api23up]
+		if (IsGranted != PackageManager.PERMISSION_GRANTED) r = false;
+
+		return r;
+	}
+
+	public static boolean HasActionBar(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null) return true;
+		else return false;
+	}
+
+	public static void SetActionBarSubTitle(Controls controls, String subtitle) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().setSubtitle(subtitle);
+	}
+
+	public static void SetActionBarTitle(Controls controls, String title) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().setTitle(title);
+	}
+
+	public static void ActionBarHide(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().hide();
+	}
+
+	public static void ActionBarShow(Controls controls) {
+		ActionBar actionBar = ( controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().show();
+	}
+
+	public static void ActionBarShowTitle(Controls controls, boolean value) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			(controls.activity).getActionBar().setDisplayShowTitleEnabled(value);
+	}
+
+	public static void ActionBarShowLogo(Controls controls, boolean value) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			( controls.activity).getActionBar().setDisplayUseLogoEnabled(value);
+	}
+
+	public static void ActionBarDisplayHomeAsUpEnabled(Controls controls, boolean value) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			( controls.activity).getActionBar().setDisplayHomeAsUpEnabled(value);
+	}
+
+	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			( controls.activity).getActionBar().setIcon(icon);;
+
+	}
+
+	public static void ActionBarSetTabNavigationMode(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null) {
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);    //API 11
+			actionBar.setSelectedNavigationItem(0);
+		}
+	}
+
+	public static void ActionBarRemoveAllTabs(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null) {
+			actionBar.removeAllTabs();
+			controls.activity.invalidateOptionsMenu(); // by renabor
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD); //API 11 renabor
+		}
+	}
+
+	public static int ActionGetBarBarHeight(Controls controls) {
+		ActionBar actionBar = (controls.activity).getActionBar();
+		int actionBarHeight = 0;
+		TypedValue tv = new TypedValue();
+		if (actionBar != null) {
+				if (actionBar.isShowing()) {
+					if (controls.activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+						actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, controls.activity.getResources().getDisplayMetrics());
+					}
+				}
+		}
+		return actionBarHeight;
+	}
+
+	public static boolean ActionBarIsShowing(Controls controls) {
+		 ActionBar actionBar = (controls.activity).getActionBar();
+		if (actionBar != null)
+			return actionBar.isShowing();
+		else return false;
+	}
+
+	public static boolean IsAppCompatProject() {
+		return false;
+	}
 }

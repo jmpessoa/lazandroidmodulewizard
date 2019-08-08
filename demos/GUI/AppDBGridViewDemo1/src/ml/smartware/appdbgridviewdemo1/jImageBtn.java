@@ -5,13 +5,17 @@ import java.lang.reflect.Field;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Gravity;
 
 //-------------------------------------------------------------------------
 //jImageBtn
@@ -27,6 +31,8 @@ public class jImageBtn extends View {
 	private Rect            rect;
 	private int             btnState = 0;      // Normal/Up = 0 , Pressed = 1
 	private Boolean         enabled  = true;   //
+	private int             sleep = 150;
+	private int savedBackColor = Color.TRANSPARENT;
 
 	//Constructor
 	public jImageBtn(android.content.Context context,
@@ -46,55 +52,111 @@ public class jImageBtn extends View {
 	public void setButtonUp( String fileup) {
 		// /data/data/com.example.appimagebtndemo1/files/btn_red.jpg
 	    BitmapFactory.Options bo = new BitmapFactory.Options();
-	    bo.inScaled = false; 		
-		bmpUp = BitmapFactory.decodeFile(fileup,bo);
-		rect = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
-		LAMWCommon.setLParamWidth(bmpUp.getWidth());
-		LAMWCommon.setLParamHeight(bmpUp.getHeight());								
-		invalidate();		
+	    
+	    if( bo != null ){
+	     bo.inScaled = false;
+	     
+		 bmpUp = BitmapFactory.decodeFile(fileup,bo);
+		 
+		 if( bmpUp != null ){
+		  rect = new Rect(0, 0, bmpUp.getWidth(), bmpUp.getHeight());
+		  LAMWCommon.setLParamWidth(bmpUp.getWidth());
+		  LAMWCommon.setLParamHeight(bmpUp.getHeight());
+		  invalidate();
+		 }
+	    }
 	}
 
 	public void setButtonDown( String filedn ) {  
 		// /data/data/com.example.appimagebtndemo1/files/btn_blue.jpg
 	    BitmapFactory.Options bo = new BitmapFactory.Options();
-	    bo.inScaled = false; 		
-		bmpDn = BitmapFactory.decodeFile(filedn, bo);
-		rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());
-		invalidate();		
+	    
+	    if( bo != null ){
+	     bo.inScaled = false;
+	     
+	     bmpDn = BitmapFactory.decodeFile(filedn, bo);
+	     
+	     if( bmpDn != null ){		 
+		  rect = new Rect(0, 0, bmpDn.getWidth(), bmpDn.getHeight());
+		  invalidate();
+	     }
+	    }
 	}
 
     private int GetDrawableResourceId(String _resName) {
 		  try {
 		     Class<?> res = R.drawable.class;
 		     Field field = res.getField(_resName);  //"drawableName"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
+		     
+		     if( field != null ){
+		    	int drawableId = field.getInt(null);
+		      	return drawableId;
+		     } else
+		    	 return 0;
 		  }
 		  catch (Exception e) {
-		     Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
+		     //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
 		     return 0;
 		  }
      }
     
-    public Bitmap GetBitmapResource(String _resourceDrawableIdentifier, boolean _inScaled) {
+     public Drawable GetDrawableResourceById(int _resID) {
+				
+		if( _resID == 0 ) return null;
+		
+		Drawable res = null;
+		
+		if (android.os.Build.VERSION.SDK_INT < 21 ) {
+			res = this.controls.activity.getResources().getDrawable(_resID);
+		}
+		
+		//[ifdef_api21up]
+		if(android.os.Build.VERSION.SDK_INT >= 21)
+			res = this.controls.activity.getResources().getDrawable(_resID, null);
+        //[endif_api21up]
+						
+		return res;
+	}
+    
+    /*
+     *** It does not load the images correctly according to the resolution ***
+     * 
+     * public Bitmap GetBitmapResource(String _resourceDrawableIdentifier, boolean _inScaled) {
        int id =	GetDrawableResourceId(_resourceDrawableIdentifier);	
        BitmapFactory.Options bo = new BitmapFactory.Options();
        bo.inScaled = _inScaled; //false; 
        return  BitmapFactory.decodeResource(this.controls.activity.getResources(), id, bo);
-    }    
+    }*/    
 
 	public  void setButtonUpByRes(String resup) {   // ..res/drawable
-		bmpUp = GetBitmapResource(resup, false); 
-		rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
-		LAMWCommon.setLParamWidth(bmpUp.getWidth());
-		LAMWCommon.setLParamHeight(bmpUp.getHeight());										
-		invalidate();
+		//bmpUp = GetBitmapResource(resup, false);
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
+		
+		if( d != null ){
+		 bmpUp  = ((BitmapDrawable)d).getBitmap();
+		 
+		 if( bmpUp != null ){
+		  rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
+		  LAMWCommon.setLParamWidth(bmpUp.getWidth());
+		  LAMWCommon.setLParamHeight(bmpUp.getHeight());
+		  invalidate();
+		 }
+		}				
 	}
 
 	public  void setButtonDownByRes(String resdn) {   // ..res/drawable
-		bmpDn = bmpUp = GetBitmapResource(resdn, false);
-		rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());		
-		invalidate();
+		//bmpDn = bmpUp = GetBitmapResource(resdn, false);
+		Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
+		
+		if( d != null ){
+		 bmpDn  = ((BitmapDrawable)d).getBitmap();
+		 
+		 if(bmpDn != null){
+		  rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());		  
+		  invalidate();
+		 }
+		}
+				
 	}
 
 	//
@@ -105,13 +167,27 @@ public class jImageBtn extends View {
 		int actType = event.getAction()&MotionEvent.ACTION_MASK;
 		switch(actType) {
 			case MotionEvent.ACTION_DOWN: {  btnState = 1;
+				//savedBackColor = GetBackgroundColor();
+				//SetBackgroundColor(Color.YELLOW);
 				invalidate();
+				final Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						// Do something after: 1s = 1000ms
+					}
+				}, sleep);  //1s = 1000ms
+
 				break;
 			}
-			case MotionEvent.ACTION_MOVE: { break; }
-			case MotionEvent.ACTION_UP  : {  btnState = 0;
-				invalidate();
-				controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+			case MotionEvent.ACTION_MOVE: // { break; } Fixed the bug: The button stays down after clicking and moving
+			case MotionEvent.ACTION_UP  : {
+				if ( btnState == 1 ){   //try fix twice event!
+					btnState = 0;
+					controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
+					//SetBackgroundColor(Color.GREEN);
+					invalidate();
+				}
 				break;
 			}
 		}
@@ -131,8 +207,33 @@ public class jImageBtn extends View {
 			if (bmpDn != null) {
 				LAMWCommon.setLParamWidth(bmpDn.getWidth());
 				LAMWCommon.setLParamHeight(bmpDn.getHeight());
-				canvas.drawBitmap(bmpDn,null,rect,null); 
+				canvas.drawBitmap(bmpDn,null,rect,null);
 			}
+		}
+	}
+
+	public void SetSleepDown(int _sleepMiliSeconds) {
+        sleep = _sleepMiliSeconds;
+	}
+
+	public int GetBackgroundColor() {
+
+		int c = Color.TRANSPARENT;
+		Drawable background = this.getBackground();
+		if (background instanceof ColorDrawable) {
+			c = ((ColorDrawable)this.getBackground()).getColor();
+		} else {
+			//if (mIsRounded = true) c = mBackgroundColor;
+		}
+
+		return c;
+	}
+
+	public void SetBackgroundColor(int _color) {
+		if  (this != null) {
+			//mBackgroundColor = _color;
+			this.setBackgroundColor(_color);
+			//this.setAlpha(0.5f);
 		}
 	}
 
@@ -186,7 +287,7 @@ public class jImageBtn extends View {
 		return LAMWCommon.getLParamWidth();					
 	}  
 
-	public void SetLGravity(int _g) {
+	public void setLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
@@ -209,6 +310,5 @@ public class jImageBtn extends View {
 	public void ClearLayoutAll() {		
 		LAMWCommon.clearLayoutAll();
 	}
-
 }
 

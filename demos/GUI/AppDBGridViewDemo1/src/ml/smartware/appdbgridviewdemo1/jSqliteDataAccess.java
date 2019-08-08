@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
@@ -63,6 +64,8 @@ import java.util.zip.ZipInputStream;
  * is no concept of a database downgrade; installing a new version of
  * your app which uses a lower version number than a
  * previously-installed version will result in undefined behavior.</p>
+ * 
+ * Review by TR3E 2019/03/28
  */
 class SQLiteAssetHelper extends SQLiteOpenHelper {
 
@@ -355,7 +358,6 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
 
         if (paths.isEmpty()) {
             Log.e(TAG, "no upgrade script path from " + oldVersion + " to " + newVersion);
-		
             throw new SQLiteAssetException("no upgrade script path from " + oldVersion + " to " + newVersion);
         }
 
@@ -641,6 +643,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
  char selectRowDelimiter;
 
  boolean mReturnHeaderOnSelect = true;
+ int mBatchTaskAsyncType = 0;  //**
  
  public void SetSelectDelimiters(char coldelim, char rowdelim) {
   selectColDelimiter = coldelim;
@@ -660,6 +663,9 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
  public void CreateAllTables() {
   SQLiteDatabase mydb = getWritableDatabase();
+  
+  if( mydb == null ) return;
+  
   for (int i = 0; i < countTableQuery - 1; i++) {
    mydb.execSQL(storeTableCreateQuery[i]);
   }
@@ -667,6 +673,9 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
  public void DropAllTables(boolean recreate) {
   SQLiteDatabase mydb = getWritableDatabase();
+  
+  if( mydb == null ) return;
+  
   //drop All tables
   for (int i = 0; i < countTableName - 1; i++) {
    mydb.execSQL("DROP TABLE IF EXISTS " + storeTableName[i]);
@@ -675,7 +684,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   if (recreate = true) {
    CreateAllTables();
   }
-  if (mydb != null) mydb.close();
+  
+  mydb.close();
  }
 
  //constructor ...
@@ -707,39 +717,17 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
  
  public int GetVersion() {
   SQLiteDatabase mydb = getWritableDatabase();
+  
   if (mydb != null) {
    return mydb.getVersion();
-  }
-  return 0;
+  }else
+   return 0;
  }
  
  public int GetRowCount() {
   return rowCount;
  }
- 
- public void ExecSQL(String execQuery) {
-   SQLiteDatabase mydb = getWritableDatabase();
-   //Log.i("Showmessage execsql", execQuery);
-  try {
-   mydb.beginTransaction();
-   try {
-    mydb.execSQL(execQuery); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
-    //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
-   } catch (Exception e) {
-    e.printStackTrace();
-   } finally {
-    // transaction over
-    mydb.setTransactionSuccessful();
-    mydb.endTransaction();
-    mydb.close();
-   }
-  } catch (SQLiteException e) {
-   Log.e(getClass().getSimpleName(), "Could not execute: " + execQuery);
 
-  }
- }
-
- //by jmpessoa
  private int GetDrawableResourceId(String _resName) {
   try {
    Class < ? > res = R.drawable.class;
@@ -752,59 +740,82 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   }
  }
 
- //by jmpessoa
  private Drawable GetDrawableResourceById(int _resID) {
+  if( _resID == 0 ) return null; // by tr3e
+  
   return this.controls.activity.getResources().getDrawable(_resID);
  }
 
- public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, Bitmap imageValue, int keyValue) {
+ public boolean UpdateImage(String tabName, String imageFieldName, String keyFieldName, Bitmap imageValue, int keyValue) {
   SQLiteDatabase mydb = getWritableDatabase();
+  
+  if( mydb == null ) return false;
+  
+  boolean result = false;
+  
   ByteArrayOutputStream stream = new ByteArrayOutputStream();
   bufBmp = imageValue;
   bufBmp.compress(CompressFormat.PNG, 0, stream);
   byte[] image_byte = stream.toByteArray();
   //Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
 
-  mydb.beginTransaction();
   try {
+   mydb.beginTransaction();
+	  
    mydb.execSQL("UPDATE " + tabName + " SET " + imageFieldName + " = ? WHERE " + keyFieldName + " = ?", new Object[] {
     image_byte,
     keyValue
    });
    //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
    mydb.setTransactionSuccessful();
+   result = true;
   } catch (Exception e) {
-   e.printStackTrace();
+   e.printStackTrace();  
   } finally {
    // transaction over
    mydb.endTransaction();
-   if (mydb != null) mydb.close();
+   mydb.close();
   }
   bufBmp = null;
+  
+  return result;
  }
 
- public void UpdateImage(String tabName, String imageFieldName, String keyFieldName, byte[] imageValue, int keyValue) {
+ public boolean UpdateImage(String tabName, String imageFieldName, String keyFieldName, byte[] imageValue, int keyValue) {
   SQLiteDatabase mydb = getWritableDatabase();
-  mydb.beginTransaction();
+  
+  if( mydb == null ) return false;
+  
+  boolean result = false;
+  
   try {
+   mydb.beginTransaction();
+	  
    mydb.execSQL("UPDATE " + tabName + " SET " + imageFieldName + " = ? WHERE " + keyFieldName + " = ?", new Object[] {
     imageValue,
     keyValue
    });
    //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
    mydb.setTransactionSuccessful();
+   result = true;
   } catch (Exception e) {
    e.printStackTrace();
   } finally {
    // transaction over
    mydb.endTransaction();
-   if (mydb != null) mydb.close();
+   mydb.close();
   }
+  
+  return result;
+  
  }
 
  public String Select(String selectQuery) { //return String
   //Log.i("0. sqlitehelper banche", "FUNCTION " + selectQuery);
   SQLiteDatabase mydb = getReadableDatabase();
+  
+  if( mydb == null ) return "";
+  
   String row = "";
   String rows = "";
   String colValue;
@@ -812,6 +823,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   int colCount;
   int i;
   String allRows = "";
+  
   try {
    cursor = mydb.rawQuery(selectQuery, null);
    rowCount = cursor.getCount();
@@ -893,24 +905,29 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
  public boolean Select(String selectQuery, boolean moveToLast) { //just set the cursor! return void..
   SQLiteDatabase mydb = getReadableDatabase();
-  boolean result = true;
+  
+  if( mydb == null ) return false;
+  
   try {
    this.cursor = mydb.rawQuery(selectQuery, null);
    rowCount = this.cursor.getCount();
    
-   if (rowCount == 0) return false;
-   
-   if (!moveToLast)
+   if (rowCount > 0)
+   {
+    if (!moveToLast)
       this.cursor.moveToFirst();
-   else
-	   this.cursor.moveToLast();
+    else
+	  this.cursor.moveToLast();
+   }
    
-   if (mydb != null) mydb.close();
-  } catch (SQLiteException se) {
-   result = false;
+   mydb.close();
+   
+   return (rowCount > 0);
+  } catch (SQLiteException se) {   
    Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
+   return false;
   }
-  return result;
+ 
  }
 
  public Cursor GetCursor() {
@@ -918,190 +935,267 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   return null;
  }
 
- public void CreateTable(String execQuery) {
-  SQLiteDatabase mydb = getWritableDatabase();
-  try {
-   mydb.beginTransaction();
-   try {
-    mydb.execSQL(execQuery); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
-    //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
-   } catch (Exception e) {
-    e.printStackTrace();
-   } finally {
-    // transaction over
-    mydb.setTransactionSuccessful();
-    mydb.endTransaction();
-   }
-  } catch (SQLiteException se) {
-   Log.e(getClass().getSimpleName(), "Could not execute: " + execQuery);
-
-  }	      
+ public boolean CreateTable(String execQuery) {
+	 return this.ExecSQL(execQuery);      
  }
 
  //ex: "INSERT INTO TABLE1 (NAME, PLACE) VALUES('CODERZHEAVEN','GREAT INDIA')"
- public void InsertIntoTable(String query) {
-  SQLiteDatabase mydb = getWritableDatabase();
-  mydb.execSQL(query);  
-  if (mydb != null) mydb.close();
+ public boolean InsertIntoTable(String query) {
+	return this.ExecSQL(query);
  }
 
  //ex: "UPDATE TABLE1 SET NAME = 'MAX' WHERE PLACE = 'USA'"
- public void UpdateTable(String query) {
-  SQLiteDatabase mydb = getWritableDatabase();
-  mydb.execSQL(query);
-  if (mydb != null) mydb.close();
+ public boolean UpdateTable(String query) {
+	 return this.ExecSQL(query);
  }
 
  //ex: "DELETE FROM TABLE1  WHERE PLACE = 'USA'";
- public void DeleteFromTable(String query) {
-  SQLiteDatabase mydb = getWritableDatabase();
-  mydb.execSQL(query);
-  if (mydb != null) mydb.close();
+ public boolean DeleteFromTable(String query) {
+	return this.ExecSQL(query);
  }
 
  //ex:  "TABLE1" 
- public void DropTable(String tbName) {
-  SQLiteDatabase mydb = getWritableDatabase();
-  mydb.execSQL("DROP TABLE " + tbName);
-  if (mydb != null) mydb.close();
+ public boolean DropTable(String tbName) {
+  return this.ExecSQL("DROP TABLE IF EXISTS " + tbName);
  }
 
  //Check if the database exist... 
  public boolean CheckDataBaseExists(String dbPath) {
   SQLiteDatabase checkDB = null;
+  
   try {
    String myPath = dbPath; //"data/data/com.example.appsqlitedemo1/databases/" + dbName;
    checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
   } catch (SQLiteException e) {
    Log.e("SQLiteDatabase", "database does't exist yet.");
+   return false;
   }
+  
   if (checkDB != null) {
-   checkDB.close();
-  }
-  return checkDB != null;
+      checkDB.close();
+      return true;
+  }else
+	  return false;
  }
 
  public void Close() {
   SQLiteDatabase mydb = getWritableDatabase();
-  if (mydb != null) {
-   if (mydb.isOpen()) {
-    mydb.close();
-   }
-  }
+  
+  if (mydb != null)
+   if (mydb.isOpen())
+    mydb.close();  
  }
 
  public void Free() {
   SQLiteDatabase mydb = getWritableDatabase();
+  
   if (mydb != null) {
-   if (mydb.isOpen()) {
+   if (mydb.isOpen())
     mydb.close();
-   }
+   
    mydb = null;
   }
+  
   if (this.cursor != null) {
    this.cursor.close(); // = null;
   }
+  
  }
 
  //news! version 06 rev. 08 15 december 2014.........................
  public void SetForeignKeyConstraintsEnabled(boolean _value) {
   SQLiteDatabase mydb = getWritableDatabase();
+  
   if (mydb != null) {	  
 	  //[ifdef_api16up]
 	   if(Build.VERSION.SDK_INT >= 16) 
 	        mydb.setForeignKeyConstraintsEnabled(_value);
-	 //[endif_api16up]	  
-  }      
-  if (mydb != null) mydb.close();
+	 //[endif_api16up]
+	 mydb.close();  
+  }        
  }
  
  public void SetDefaultLocale() {
   SQLiteDatabase mydb = getWritableDatabase();
-  if (mydb != null)
+  
+  if (mydb != null){
    mydb.setLocale(Locale.getDefault());
-  if (mydb != null) mydb.close();
+   mydb.close();
+  }
  }
 
  public void DeleteDatabase(String _dbName) {
   SQLiteDatabase mydb = getWritableDatabase();
-  if (this.cursor != null) this.cursor.close();
-  mydb.close();
-  //Log.i("sqlitehelper DeleteDb", "delete " + _dbName);
-  controls.activity.deleteDatabase(_dbName);
+  
+  if (this.cursor != null) this.cursor.close();  
   if (mydb != null) mydb.close();
+  
+  //Log.i("sqlitehelper DeleteDb", "delete " + _dbName);
+  controls.activity.deleteDatabase(_dbName);  
  }
+
+
+    public boolean ExecSQL(String execQuery) {
+        SQLiteDatabase mydb = getWritableDatabase();
+
+        if( mydb == null ) return false;
+
+        boolean result = false;
+
+        try {
+            mydb.beginTransaction();
+
+            try {
+                mydb.execSQL(execQuery); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();
+                result = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // transaction over
+                mydb.endTransaction();
+                mydb.close();
+            }
+
+        } catch (SQLiteException e) {
+            Log.e(getClass().getSimpleName(), "Could not execute: " + execQuery);
+        }
+
+        return result;
+
+    }
 
  /*
   * ref, http://www.informit.com/articles/article.aspx?p=1928230
        Because SQLite is a single file, it makes little sense to try to store binary data in the database. 
        Instead store the location of data, as a file path or a URI in the database, and access it appropriately.           
  */
- 
- public void UpdateImage(String _tabName, String _imageFieldName, String _keyFieldName, String _imageResIdentifier, int _keyValue) {
+
+ public boolean UpdateImage(String _tabName, String _imageFieldName, String _keyFieldName, String _imageResIdentifier, int _keyValue) {
+  SQLiteDatabase mydb = getWritableDatabase();
+	  
+  if( mydb == null ) return false;
+  
+  boolean result = false;
+	  
   ByteArrayOutputStream stream = new ByteArrayOutputStream();
   Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+  
+  if( d == null ) return false;
+  
   bufBmp = ((BitmapDrawable)d).getBitmap();
   bufBmp.compress(CompressFormat.PNG, 0, stream);        	
   byte[] image_byte = stream.toByteArray();
-  SQLiteDatabase mydb = getWritableDatabase();
-  mydb.beginTransaction();
+  
   try {
+   mydb.beginTransaction();
+	  
    mydb.execSQL("UPDATE " + _tabName + " SET " + _imageFieldName + " = ? WHERE " + _keyFieldName + " = ?", new Object[] {
     image_byte,
     _keyValue
    });
    //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
    mydb.setTransactionSuccessful();
+   result = true;
   } catch (Exception e) {
    e.printStackTrace();
   } finally {
    // transaction over
    mydb.endTransaction();
-   if (mydb != null) mydb.close();
+   mydb.close();
   }
   //Log.i("UpdateImage", "Ok. Image Updated!");
   bufBmp = null;
+  
+  return result;
  }
 
- public void InsertIntoTableBatch(String[] _insertQueries) {
-  SQLiteDatabase mydb = getWritableDatabase();
-  int i;
-  int len = _insertQueries.length;
-  for (i = 0; i < len; i++) {
-   mydb.execSQL(_insertQueries[i]);
-  }
-  if (mydb != null) mydb.close();
+
+ public boolean InsertIntoTableBatch(String[] _insertQueries) {
+     SQLiteDatabase mydb = getWritableDatabase();
+     boolean r = false;
+     if( mydb == null ) return false;
+     try {
+         mydb.beginTransaction();
+         int i;
+         int len = _insertQueries.length;
+         for (i = 0; i < len; i++) {
+             mydb.execSQL(_insertQueries[i]);
+         }
+         //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+         mydb.setTransactionSuccessful();
+         r = true;
+     } catch (Exception e) {
+         r = false;
+         e.printStackTrace();
+     } finally {
+         //transaction over
+         if (r)
+             mydb.endTransaction();
+         else
+             r = false;
+         mydb.close();
+     }
+     return r;
  }
 
- public void UpdateTableBatch(String[] _updateQueries) {
-  SQLiteDatabase mydb = getWritableDatabase();
-  int i;
-  int len = _updateQueries.length;
-  for (i = 0; i < len; i++) {
-   mydb.execSQL(_updateQueries[i]);
-  }
-  if (mydb != null) mydb.close();
+ public boolean UpdateTableBatch(String[] _updateQueries) {
+     SQLiteDatabase mydb = getWritableDatabase();
+
+     boolean r = false;
+     int i;
+     int len = _updateQueries.length;
+
+     if(mydb == null) return false;
+
+     try {
+         mydb.beginTransaction();
+         for (i = 0; i < len; i++) {
+             mydb.execSQL(_updateQueries[i]);
+         }
+        //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+         mydb.setTransactionSuccessful();
+         r = true;
+     } catch (Exception e) {
+         r = false;
+         e.printStackTrace();
+     } finally {
+         // transaction over
+         if (r)
+             mydb.endTransaction();
+         else
+             r = false;
+
+         mydb.close();
+     }
+     return r;
  }
 
 	//Check if the database exist... 
 	public boolean CheckDataBaseExistsByName(String _dbName) {   
-	      SQLiteDatabase checkDB = null; 
+	      SQLiteDatabase checkDB = null;
+	      
 	      try {
 	    	  String absPath = this.controls.activity.getFilesDir().getPath();
               absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases/"+_dbName;		         
 	          checkDB = SQLiteDatabase.openDatabase(absPath, null, SQLiteDatabase.OPEN_READONLY);
 	      } catch (SQLiteException e) {
 	    	  Log.e("jSqliteDataAccess","database does't exist yet!");
+	    	  return false;
 	      } 
+	      
 	      if (checkDB != null) {
-             checkDB.close();
-	      }      	         
-	      return checkDB != null ? true : false;
+              checkDB.close();
+              return true;
+	      }else
+	    	  return false;
+	      
 	}
 	
 	//ex. 'tablebook|FIGURE|_ID|ic_t1|1'
     private void SplitUpdateImageData(String _imageResIdentifierData, String _delimiter) {
-    	String[] tokens = _imageResIdentifierData.split("\\"+_delimiter);  //ex. "|"        	        
+    	String[] tokens = _imageResIdentifierData.split("\\"+_delimiter);  //ex. "|"
     	String _tabName = tokens[0];
     	String _imageFieldName = tokens[1]; 
     	String _keyFieldName = tokens[2];
@@ -1143,7 +1237,77 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
     public void SetReturnHeaderOnSelect (boolean _returnHeader) {
     	mReturnHeaderOnSelect = _returnHeader;
     }
-      
+
+    public void SetBatchAsyncTaskType(int _batchAsyncTaskType) {
+        mBatchTaskAsyncType = _batchAsyncTaskType;
+    }
+
+    public void ExecSQLBatchAsync(String[] _execSql) {
+        SQLiteDatabase mydb = getWritableDatabase();
+        if (mydb == null) return;
+        new BatchTask(mydb, mBatchTaskAsyncType).execute(_execSql);
+    }
+
+    /*
+    Params : The type of the parameters sent to the task upon execution  //ex. "my message"
+    Progress : The type of the progress units published during the background computation
+    Result : The type of the result of the background computation
+     */
+    class BatchTask extends AsyncTask<String, Void, String> {
+
+        public String[] data;
+        SQLiteDatabase mydb;
+        int taskType = 0;
+        String msgResult = "Fail to Execute Batch SQL Query...";
+        int count = 0;
+
+        public BatchTask(SQLiteDatabase _mydb, int _task) {
+            mydb = _mydb;
+            switch (taskType) {
+                case 0: msgResult = "[Async Unknown Task] Fail to Execute SQL..."; break;
+                case 1: msgResult = "[Async Update Task] Fail to Execute  SQL..."; break;
+                case 2: msgResult = "[Async Insert Task] Fail to Execute SQL..."; break;
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+                data = args;
+                int i;
+                int len = data.length;
+                try {
+                    mydb.beginTransaction();
+                    for (i = 0; i < len; i++) {
+                        mydb.execSQL(data[i]);
+                        count++;
+                    }
+                    //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                    mydb.setTransactionSuccessful();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    // transaction over
+                    mydb.endTransaction();
+                    mydb.close();
+                }
+                switch (taskType) {
+                 case 0: msgResult = "[Async Unknown Task]Success!! SQL Queries Executed!"; break;
+                 case 1: msgResult = "[Async Update Task] Success!! SQL Queries Executed!"; break;
+                 case 2: msgResult = "[Async Insert Task] Success!! SQL Queries Executed!"; break;
+                }
+
+                return null;
+        }
+
+        @Override
+        protected void onPostExecute(String msg) {
+            //Log.i("onPostBatchExecute", msgResult);
+            controls.pOnSqliteDataAccessAsyncPostExecute(PasObj, count, msgResult);
+        }
+
+    }
+
+
 }
 
 /**[by renabor]
@@ -1179,11 +1343,12 @@ class VersionComparator implements Comparator<String> {
      *         they are equal (though that shouldn't happen), and > 0 if
      *         file0 should be applied after file1.
      *
-     * @exception SQLiteAssetException
+     * @exception //SQLiteAssetException
      *                thrown if the strings are not in the correct upgrade
      *                script format of:
      *                <code>databasename_fromVersionInteger_toVersionInteger</code>
      */
+
     @Override
     public int compare(String file0, String file1) {
         Matcher m0 = pattern.matcher(file0);
@@ -1253,7 +1418,7 @@ class Utils {
     public static void writeExtractedFileToDisk(InputStream in, OutputStream outs) throws IOException {
         byte[] buffer = new byte[1024];
         int length;
-        while ((length = in.read(buffer))>0){
+        while ((length = in.read(buffer)) > 0) {
             outs.write(buffer, 0, length);
         }
         outs.flush();
@@ -1274,5 +1439,5 @@ class Utils {
     public static String convertStreamToString(InputStream is) {
         return new Scanner(is).useDelimiter("\\A").next();
     }
-    
+
 }
