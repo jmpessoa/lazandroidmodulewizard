@@ -46,11 +46,13 @@ begin
       AndroidModule2.HasPermission:= HasPermission;
       AndroidModule2.SetCloseCallBack(CloseCallBackNotify, Self);
       AndroidModule2.Init(gApp); //call OnJNIPrompt in form2
+      AndroidModule2.Show;
    end
    else
    begin
       AndroidModule2.HasPermission:= HasPermission;
       AndroidModule2.ReInit(gApp);  //not AndroidModule2.Show();
+      AndroidModule2.Show;
    end;
 end;
 

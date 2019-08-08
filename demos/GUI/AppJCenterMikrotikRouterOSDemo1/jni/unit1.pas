@@ -61,6 +61,7 @@ begin
      gApp.CreateForm(TAndroidModule2, AndroidModule2);
      AndroidModule2.Visible:= False;
      AndroidModule2.Init(gApp);
+     AndroidModule2.Show;
    end;
 end;
 

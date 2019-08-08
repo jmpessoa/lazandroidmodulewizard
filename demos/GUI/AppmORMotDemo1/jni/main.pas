@@ -56,6 +56,7 @@ begin
   begin
     gApp.CreateForm(TAndroidModule2, AndroidModule2);
     AndroidModule2.Init(gApp);
+    AndroidModule2.Show;
   end
   else
   begin

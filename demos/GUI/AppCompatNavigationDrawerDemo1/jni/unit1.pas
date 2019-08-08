@@ -122,6 +122,7 @@ begin
        AndroidModule2.Init(gApp);   //fire OnJNIPrompt ...
        AndroidModule2.jPanel1.Parent:= Self.jPanel2;   // <<-------- need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
        AndroidModule2.jPanel1.SetViewParent(Self.jPanel2.View); //add scene 2  to Self.jPanel2
+       AndroidModule2.Show;
     end;
 
     ActiveScene:= 102;
@@ -139,6 +140,7 @@ begin
       AndroidModule3.Init(gApp); //fire OnJNIPrompt ...
       AndroidModule3.jPanel1.Parent:= Self.jPanel2;  // <<-------- need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
       AndroidModule3.jPanel1.SetViewParent(Self.jPanel2.View); //add scene 3 to Self.jPanel2
+      AndroidModule3.Show;
     end;
 
     ActiveScene:= 103;
@@ -156,6 +158,7 @@ begin
       AndroidModule4.Init(gApp); //fire OnJNIPrompt ...
       AndroidModule4.jPanel1.Parent:= Self.jPanel2; // <<-------- need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
       AndroidModule4.jPanel1.SetViewParent(Self.jPanel2.View); //add scene 4 to Self.jPanel2
+      AndroidModule4.Show;
     end;
 
     ActiveScene:= 104;

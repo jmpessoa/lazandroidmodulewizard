@@ -251,6 +251,7 @@ begin
       AndroidModule2.SetCloseCallBack(CallBackNotify_Form2Closed, Self);
       //AndroidModule2.SetCloseCallBack(CallBackData, Self);
       AndroidModule2.Init(gApp);
+      AndroidModule2.Show;
   end
   else
   begin

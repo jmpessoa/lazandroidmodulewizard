@@ -61,6 +61,7 @@ begin
     gApp.CreateForm(TAndroidModule3, AndroidModule3);
     AndroidModule3.TryBacktrackOnClose:= True;
     AndroidModule3.Init(gApp);
+    AndroidModule3.Show;
   end
   else
   begin

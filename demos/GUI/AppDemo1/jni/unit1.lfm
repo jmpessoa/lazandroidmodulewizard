@@ -18,10 +18,10 @@ object AndroidModule1: TAndroidModule1
   OnClose = DataModuleClose
   OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 31
+    Left = 59
     Top = 376
-    Width = 238
-    Height = 26
+    Width = 181
+    Height = 19
     MarginLeft = 40
     MarginTop = 40
     MarginRight = 5
@@ -68,9 +68,9 @@ object AndroidModule1: TAndroidModule1
   end
   object jImageView2: jImageView
     Left = 114
-    Top = 412
+    Top = 405
     Width = 72
-    Height = 72
+    Height = 92
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5

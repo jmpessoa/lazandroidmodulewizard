@@ -2932,15 +2932,18 @@ begin
       end;
     end;
 
+    if (FActivityMode = actMain) or (FActivityMode = actSplash) then
+     FVisible := True;
+
     //Show ...
-    if not FVisible then
+    if FVisible then
     begin
-       FVisible:= True;
        gApp.TopIndex:= FormIndex;
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
-       if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
-       if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
     end;
+
+    if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
+    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 
   end
   else    //actEasel ...
