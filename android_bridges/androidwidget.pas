@@ -1123,7 +1123,10 @@ end;
 
     procedure Init(refApp: jApp); override;
     procedure Finish;
+
     Procedure Show; overload;
+    Procedure Show(jniPrompt: boolean);
+
     procedure Show(refApp: jApp); overload; //call ReInit to force the form to recreate the layout...
     Procedure DoJNIPrompt;
 
@@ -3008,7 +3011,7 @@ end;
 procedure jForm.Show(refApp: jApp);
 begin
    ReInit(refApp);
-   Show;
+   Show(False);
 end;
 
 function jForm.GetFormByIndex(index: integer): jForm;
@@ -3093,6 +3096,22 @@ begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
 end;
+
+Procedure jForm.Show(jniPrompt: boolean);
+begin
+  if FActivityMode = actEasel then Exit;
+  if FVisible then Exit;
+  FormState := fsFormWork;
+  FVisible:= True;
+  FormBaseIndex:= gApp.TopIndex;
+  gApp.TopIndex:= Self.FormIndex;
+  jForm_Show2(FjEnv,FjObject,FAnimation.In_);
+  if jniPrompt then
+  begin
+    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+  end;
+end;
+
 
 procedure jForm.DoJNIPrompt;
 begin
