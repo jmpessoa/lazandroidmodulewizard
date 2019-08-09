@@ -300,18 +300,18 @@ public class jCustomDialog extends RelativeLayout {
 	}
 
 	public void SetTitle(String _title) {
-		if (mDialog == null) return;
 		
 		mTitle = _title;
-		mDialog.setTitle(mTitle);
+		
+		if (mDialog != null)		
+		 mDialog.setTitle(mTitle);
 	}
 
 	public void SetIconIdentifier(String _iconIdentifier) {   // ../res/drawable
-		if (mDialog == null) return;
-		
 		mIconIdentifier = _iconIdentifier;
-		mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);		
-		mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+		
+		if (mDialog != null)		
+		 mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
 	}
 
 	public void Close() {
