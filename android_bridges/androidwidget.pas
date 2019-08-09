@@ -1125,7 +1125,7 @@ end;
     procedure Finish;
 
     Procedure Show; overload;
-    Procedure Show(jniPrompt: boolean);
+    Procedure Show(jniPrompt: boolean); overload;
 
     procedure Show(refApp: jApp); overload; //call ReInit to force the form to recreate the layout...
     Procedure DoJNIPrompt;
