@@ -2949,10 +2949,7 @@ begin
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
     end;
 
-    if FActivityMode = actMain then
-    begin
-       if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
-    end;
+    if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
 
     if DoJNIPromptOnInit then
     begin
