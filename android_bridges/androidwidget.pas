@@ -1112,6 +1112,7 @@ end;
     PromptOnBackKey: boolean;
     TryBacktrackOnClose: boolean;
     DoJNIPromptOnShow: boolean;
+    DoJNIPromptOnInit: boolean;
     Standby: boolean;
 
     constructor CreateNew(AOwner: TComponent);
@@ -2823,6 +2824,7 @@ begin
   TryBacktrackOnClose:= False;
 
   DoJNIPromptOnShow:= True;
+  DoJNIPromptOnInit:= True;
 
   //now load the stream
   InitInheritedComponent(Self, TAndroidWidget {TAndroidForm}); {thanks to  x2nie !!}
@@ -2933,7 +2935,9 @@ begin
     end;
 
     if (FActivityMode = actMain) or (FActivityMode = actSplash) then
-     FVisible := True;
+    begin
+      FVisible := True;
+    end;
 
     //Show ...
     if FVisible then
@@ -2942,8 +2946,15 @@ begin
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
     end;
 
-    if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
-    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+    if FActivityMode = actMain then
+    begin
+       if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
+    end;
+
+    if DoJNIPromptOnInit then
+    begin
+      if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+    end;
 
   end
   else    //actEasel ...
@@ -2967,7 +2978,11 @@ begin
          (Self.Components[i] as jControl).Init(refApp);
       end;
     end;
-    if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+
+    if DoJNIPromptOnInit then
+    begin
+      if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+    end;
 
   end;
 
