@@ -3008,6 +3008,7 @@ end;
 procedure jForm.Show(refApp: jApp);
 begin
    ReInit(refApp);
+   Show;
 end;
 
 function jForm.GetFormByIndex(index: integer): jForm;
