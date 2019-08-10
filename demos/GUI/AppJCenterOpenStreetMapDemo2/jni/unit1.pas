@@ -45,19 +45,14 @@ begin
       gApp.CreateForm(TAndroidModule2, AndroidModule2);
       AndroidModule2.HasPermission:= HasPermission;
       AndroidModule2.SetCloseCallBack(CloseCallBackNotify, Self);
-      AndroidModule2.Init(gApp); //call OnJNIPrompt in form2
-      AndroidModule2.Show(False); //false -> dont call OnJNIPrompt in form2, again
+      AndroidModule2.InitShowing(gApp); //call OnJNIPrompt in form2
    end
    else
    begin
-      AndroidModule2.HasPermission:= HasPermission;
-      
+      AndroidModule2.HasPermission:= HasPermission;    
       AndroidModule2.Show(gApp); //special Show need to re-init engine map ... //combo: ReInit(gApp) + Show(False)
-
       //or
-      //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt in form2
-      //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
-
+      //ReInitShowing(gApp);  //call OnJNIPrompt in form2
    end;
 end;
 

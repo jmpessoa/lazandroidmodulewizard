@@ -76,7 +76,7 @@ procedure TAndroidModule2.AndroidModule2ActivityCreate(Sender: TObject;
   intentData: jObject);
 begin
   gApp.CreateForm(TAndroidModule3, AndroidModule3);
-  AndroidModule3.Init(gApp);
+  AndroidModule3.Init(gApp);  //fire OnJNIPrompt but dont Show the form ...
 
   gApp.CreateForm(TAndroidModule4, AndroidModule4);
   AndroidModule4.Init(gApp);
@@ -169,32 +169,28 @@ procedure TAndroidModule2.jButton8Click(Sender: TObject);  //gl_1 2D
 begin
   AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
   //or
-  //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt
-  //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
+  //ReInitShowing(gApp);  //call OnJNIPrompt
 end;
 
 procedure TAndroidModule2.jButton9Click(Sender: TObject); //gl_2 2D
 begin
   AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
   //or
-  //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt
-  //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
+  //ReInitShowing(gApp);  //call OnJNIPrompt  
 end;
 
 procedure TAndroidModule2.jButton10Click(Sender: TObject);  //gl_1 3D
 begin
   AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
   //or
-  //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt
-  //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
+  //ReInitShowing(gApp);  //call OnJNIPrompt  
 end;
 
 procedure TAndroidModule2.jButton11Click(Sender: TObject); //gl_2 3D
 begin
   AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
   //or
-  //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt
-  //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
+  //ReInitShowing(gApp);  //call OnJNIPrompt  
 end;
 
 procedure TAndroidModule2.jButton12Click(Sender: TObject);

@@ -1094,6 +1094,7 @@ end;
     FLayoutVisibility: boolean;
     FBackgroundImageIdentifier: string;
 
+    function GetActionBarHeight: integer;
     Procedure SetColor   (Value : TARGBColorBridge);
 
   protected
@@ -1122,6 +1123,9 @@ end;
     Procedure GenEvent_OnClick(Obj: TObject);
 
     procedure Init(refApp: jApp); override;
+    procedure InitShowing(refApp: jApp);
+    procedure ReInitShowing(refApp: jApp);
+
     procedure Finish;
 
     Procedure Show; overload;
@@ -1221,7 +1225,6 @@ end;
 
     function DumpExceptionCallStack(E: Exception): string; //Thanks to Euller and Oswaldo
 
-    function GetActionBarHeight(): integer;
     function ActionBarIsShowing(): boolean;
     procedure ToggleSoftInput();
     function GetDeviceModel(): string;
@@ -2988,6 +2991,12 @@ begin
 
 end;
 
+procedure jForm.InitShowing(refApp: jApp);
+begin
+   Init(refApp);
+   Show(False);
+end;
+
 procedure jForm.ReInit(refApp: jApp);
 var
   i: integer;
@@ -3009,6 +3018,12 @@ procedure jForm.Show(refApp: jApp);
 begin
    ReInit(refApp);
    Show(False);
+end;
+
+procedure jForm.ReInitShowing(refApp: jApp);
+begin
+  ReInit(refApp);
+  Show(False);
 end;
 
 function jForm.GetFormByIndex(index: integer): jForm;
@@ -3094,7 +3109,7 @@ begin
   end;
 end;
 
-Procedure jForm.Show(jniPrompt: boolean);
+procedure jForm.Show(jniPrompt: boolean);
 begin
   if FActivityMode = actEasel then Exit;
   if FVisible then Exit;
@@ -3472,7 +3487,7 @@ begin
   end;
 end;
 
-procedure jForm.SetTabNavigationModeActionBar();
+procedure jForm.SetTabNavigationModeActionBar;
 begin
   if FInitialized then
   begin
@@ -4129,7 +4144,7 @@ begin
    Result:= jForm_IsAppCompatProject(FjEnv, FjObject);
 end;
 
-function jForm.getScreenWidth(): integer;
+function jForm.GetScreenWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then

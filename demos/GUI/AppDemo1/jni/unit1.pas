@@ -53,8 +53,7 @@ procedure TAndroidModule1.DataModuleClose(Sender: TObject);
 begin
   jTimer1.Enabled:= False;
   gApp.CreateForm(TAndroidModule2, AndroidModule2);
-  AndroidModule2.Init(gApp);  //fire JNIOnPrompt
-  AndroidModule2.Show(False); //False -> dont fire JNIOnPrompt
+  AndroidModule2.InitShowing(gApp);//fire JNIOnPrompt
 end;
 
 procedure TAndroidModule1.AndroidModule1CloseQuery(Sender: TObject;

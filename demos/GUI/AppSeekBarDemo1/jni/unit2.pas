@@ -37,10 +37,10 @@ uses Unit4;
 
 procedure TAndroidModule2.jButton1Click(Sender: TObject);
 begin
-   if AndroidModule4 = nil then begin
+   if AndroidModule4 = nil then 
+   begin
      gApp.CreateForm(TAndroidModule4, AndroidModule4);
-     AndroidModule4.Init(gApp); //fire OnJNIPrompt
-     AndroidModule4.Show(False); //False -> dont fire OnJNIPrompt,  again...
+     AndroidModule4.InitShowing(gApp); // call/fire OnJNIPrompt in form
    end
    else
    begin

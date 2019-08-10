@@ -75,8 +75,7 @@ begin
     AndroidModule2.SetCloseCallBack(CallBackNotify, Self);
     AndroidModule2.SetCloseCallBack(CallBackData, Self);
     AndroidModule2.PromptOnBackKey:= False;
-    AndroidModule2.Init(gApp); //fire OnJNIPrompt
-    AndroidModule2.Show(False); //False  -> dont fire OnJNIPrompt again...
+    AndroidModule2.InitShowing(gApp); // call/fire OnJNIPrompt in form2
   end
   else
   begin
@@ -89,8 +88,7 @@ begin
   if AndroidModule5 = nil then
   begin
      gApp.CreateForm(TAndroidModule5, AndroidModule5);
-     AndroidModule5.Init(gApp);   //fire OnJNIPrompt
-     AndroidModule5.Show(False); //False  -> dont fire OnJNIPrompt again...
+     AndroidModule5.InitShowing(gApp); // call/fire OnJNIPrompt in form5
   end
   else
   begin

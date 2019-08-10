@@ -38,8 +38,7 @@ procedure TAndroidModule4.jButton1Click(Sender: TObject);
 begin
    if AndroidModule5 = nil then begin
      gApp.CreateForm(TAndroidModule5, AndroidModule5);
-     AndroidModule5.Init(gApp);  //fire OnJNIPrompt
-     AndroidModule5.Show(False); //False -> dont fire OnJNIPrompt, again
+     AndroidModule5.InitShowing(gApp); // call/fire OnJNIPrompt in form
    end
    else
    begin
