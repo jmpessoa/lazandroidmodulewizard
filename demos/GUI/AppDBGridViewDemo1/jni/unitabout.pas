@@ -64,8 +64,8 @@ end;
 procedure TAndroidModuleAbout.Mod_AboutClose(Sender: TObject);
 begin
   gApp.CreateForm(TAndroidModuleMain, AndroidModuleMain);
-  AndroidModuleMain.Init(gApp);
-  AndroidModuleMain.Show;
+  AndroidModuleMain.Init(gApp);  //fire OnJNIPrompt
+  AndroidModuleMain.Show(False); //False -> dont fire OnJNIPrompt, again!
 end;
 
 procedure TAndroidModuleAbout.Mod_AboutCreate(Sender: TObject);

@@ -52,7 +52,6 @@ begin
   begin
     gApp.CreateForm(TAndroidModule2, AndroidModule2);
     AndroidModule2.Init(gApp);  //dispatch "OnJNIPrompt" in  AndroidModule2
-    AndroidModule2.Show;
   end;
 
   jsCoordinatorLayout1.SetFitsSystemWindows(True);

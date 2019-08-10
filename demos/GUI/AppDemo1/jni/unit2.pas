@@ -167,26 +167,34 @@ end;
 
 procedure TAndroidModule2.jButton8Click(Sender: TObject);  //gl_1 2D
 begin
-  AndroidModule10.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES1" component
-  AndroidModule10.Show;
+  AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
+  //or
+  //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt
+  //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
 end;
 
 procedure TAndroidModule2.jButton9Click(Sender: TObject); //gl_2 2D
 begin
- AndroidModule11.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES2" component
- AndroidModule11.Show();
+  AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
+  //or
+  //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt
+  //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
 end;
 
 procedure TAndroidModule2.jButton10Click(Sender: TObject);  //gl_1 3D
 begin
-  AndroidModule12.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES1" component
-  AndroidModule12.show;
+  AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
+  //or
+  //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt
+  //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
 end;
 
 procedure TAndroidModule2.jButton11Click(Sender: TObject); //gl_2 3D
 begin
-  AndroidModule13.ReInit(gApp);  //ReInit is a "must have" for "jCanvasES2" component
-  AndroidModule13.Show;
+  AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
+  //or
+  //AndroidModule2.ReInit(gApp);  //call OnJNIPrompt
+  //AndroidModule2.Show(False);   //False -> dont call OnJNIPrompt in form2, again
 end;
 
 procedure TAndroidModule2.jButton12Click(Sender: TObject);

@@ -59,9 +59,7 @@ begin
    if AndroidModule2 = nil then  //prepare form 2
    begin
      gApp.CreateForm(TAndroidModule2, AndroidModule2);
-     AndroidModule2.Visible:= False;
-     AndroidModule2.Init(gApp);
-     AndroidModule2.Show;
+     AndroidModule2.Init(gApp); //fire OnJniPrompt
    end;
 end;
 

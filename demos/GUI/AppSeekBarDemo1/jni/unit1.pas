@@ -59,8 +59,8 @@ procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
     if AndroidModule2 = nil then begin
      gApp.CreateForm(TAndroidModule2, AndroidModule2);
-     AndroidModule2.Init(gApp);
-     AndroidModule2.Show;
+     AndroidModule2.Init(gApp);  //fire OnJNIPrompt
+     AndroidModule2.Show(False); //False -> dont fire OnJNIPrompt, again..
    end
    else
    begin
@@ -72,8 +72,8 @@ procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
   if AndroidModule3 = nil then begin
      gApp.CreateForm(TAndroidModule3, AndroidModule3);
-     AndroidModule3.Init(gApp);
-     AndroidModule3.Show;
+     AndroidModule3.Init(gApp); //fire OnJNIPrompt
+     AndroidModule3.Show(False); //False -> dont fire OnJNIPrompt, again..
   end
   else
   begin
@@ -85,8 +85,8 @@ procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
    if AndroidModule5 = nil then begin
      gApp.CreateForm(TAndroidModule5, AndroidModule5);
-     AndroidModule5.Init(gApp);
-     AndroidModule5.Show;
+     AndroidModule5.Init(gApp); //fire OnJNIPrompt
+     AndroidModule5.Show(False); //False -> dont fire OnJNIPrompt, again..
    end
    else
    begin

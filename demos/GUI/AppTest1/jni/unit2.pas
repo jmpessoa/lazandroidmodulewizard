@@ -60,8 +60,8 @@ begin
   begin
     gApp.CreateForm(TAndroidModule3, AndroidModule3);
     AndroidModule3.TryBacktrackOnClose:= True;
-    AndroidModule3.Init(gApp);
-    AndroidModule3.Show;
+    AndroidModule3.Init(gApp); //fire OnJNIPrompt...
+    AndroidModule3.Show(False);  //False -> dont fire OnJNIPrompt,  again
   end
   else
   begin
