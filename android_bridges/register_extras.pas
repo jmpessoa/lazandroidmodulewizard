@@ -6,8 +6,9 @@ interface
 
 //please, do not change this code format/layout!
 
-uses 
+uses
   Classes,
+  soundpool,
   wifimanager,
   midimanager,
   expression,
@@ -64,6 +65,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jsoundpool_icon.lrs}
   {$I jwifimanager_icon.lrs}
   {$I jexpression_icon.lrs}
   {$I jxlswriter_icon.lrs}
@@ -121,6 +123,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jSoundPool,
       jWifiManager,
       jExpression,
       jXLSWriter,
