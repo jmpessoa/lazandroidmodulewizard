@@ -1,0 +1,3 @@
+public java.lang.Object jSoundPool_jCreate(long _Self) {
+  return (java.lang.Object)(new jSoundPool(this,_Self));
+}

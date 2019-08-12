@@ -80,6 +80,8 @@ uses
    Procedure Java_Event_pOnMediaPlayerPrepared(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeigh: integer);
    Procedure Java_Event_pOnMediaPlayerTimedText(env: PJNIEnv; this: jobject; Obj: TObject; timedText: JString);
 
+   Procedure Java_Event_pOnSoundPoolLoadComplete(env: PJNIEnv; this: jobject; Obj: TObject; soundId : integer; status: integer);
+
    Procedure Java_Event_pOnSurfaceViewCreated(env: PJNIEnv; this: jobject; Obj: TObject;
                                   surfaceHolder: jObject);
 
@@ -214,7 +216,7 @@ uses
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
    customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
-   midimanager, copenmapview, csignaturepad;
+   midimanager, copenmapview, csignaturepad, soundpool;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -1293,6 +1295,17 @@ begin
       pastimedText:= string( env^.GetStringUTFChars(Env,timedText,@jBoo) );
     end;
     jMediaPlayer(Obj).GenEvent_pOnMediaPlayerTimedText(Obj, pastimedText);
+  end;
+end;
+
+Procedure Java_Event_pOnSoundPoolLoadComplete(env: PJNIEnv; this: jobject; Obj: TObject; soundId : integer; status: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jSoundPool then
+  begin
+    jForm(jSoundPool(Obj).Owner).UpdateJNI(gApp);
+    jSoundPool(Obj).GenEvent_OnLoadComplete(Obj, soundId, status);
   end;
 end;
 
