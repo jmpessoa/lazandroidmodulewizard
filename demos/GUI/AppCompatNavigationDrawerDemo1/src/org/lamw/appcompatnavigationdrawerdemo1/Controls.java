@@ -1,6 +1,6 @@
 package org.lamw.appcompatnavigationdrawerdemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.4.4  - 30 May - 2019
+//LAMW: Lazarus Android Module Wizard  - version 0.8.4.5  - 13 August - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -50,6 +50,10 @@ package org.lamw.appcompatnavigationdrawerdemo1;
 //                              rename example Name
 //			12.2013 LAMW Started by jmpessoa
 
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -72,6 +76,7 @@ import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.os.Build;
 import android.os.Bundle;
@@ -102,6 +107,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -165,48 +172,65 @@ private OnItemClickListener onListItemClickListener;
 private Boolean         enabled  = true;   //
 private Intent intent;
 private int mCountTab = 0;
+private ImageView mImageBackground = null;
 
 private boolean mRemovedFromParent = false;
 
+private int animationDurationIn = 1500;
+private int animationDurationOut = 1500;
+private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
+
 // Constructor
 public  jForm(Controls ctrls, long pasobj) {
-PasObj   = pasobj;
-controls = ctrls;
-parent = controls.appLayout;
+ PasObj   = pasobj;
+ controls = ctrls;
+ parent = controls.appLayout;
 
-layout   = new RelativeLayout(controls.activity);
-layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+ layout   = new RelativeLayout(controls.activity);
+ layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT);
-layout.setLayoutParams(layparam);
+ layout.setLayoutParams(layparam);
 
-// Init Event
-onClickListener = new OnClickListener() {
+ // Init Event
+ onClickListener = new OnClickListener() {
   public  void onClick(View view) {
     if (enabled) {
       controls.pOnClick(PasObj,Const.Click_Default);
     }
   }; 
-};
+ };
 
-//geric list item click Event - experimental component model!
-onListItemClickListener = new OnItemClickListener() {
-@Override
-public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
+ //geric list item click Event - experimental component model!
+ onListItemClickListener = new OnItemClickListener() {
+ @Override
+ public  void onItemClick(AdapterView<?> parent, View v, int position, long id) {	   
      controls.jAppOnListItemClick(parent, v, position, v.getId()); 
-}
-};
+  }
+ };
 
-//Init Event
-onViewClickListener = new OnClickListener() {
-public  void onClick(View view) {
- if (enabled) {
+ //Init Event
+ onViewClickListener = new OnClickListener() {
+  public  void onClick(View view) {
+   if (enabled) {
    controls.jAppOnViewClick(view, view.getId());
- }
-};
-};
+   }
+  };
+ };
 
-layout.setOnClickListener(onClickListener);
+ layout.setOnClickListener(onClickListener);
 
+ // To ensure that the image is always in the background by TR3E
+ mImageBackground = new ImageView(controls.activity);
+
+ mImageBackground.setScaleType(ImageView.ScaleType.FIT_XY);
+	
+ LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+ mImageBackground.setLayoutParams(param);
+ mImageBackground.setImageResource(android.R.color.transparent);
+
+ //mImageBackground.invalidate();
+ layout.addView(mImageBackground);
 }
 
 public  RelativeLayout GetLayout() {
@@ -270,11 +294,154 @@ public void SetViewParent( android.view.ViewGroup _viewgroup) {
 	mRemovedFromParent = false;
 }
 
-public  void Show(int effect) {			
-   controls.appLayout.addView(layout);
-   parent = controls.appLayout;
+
+   public void SetAnimationDurationIn(int _animationDurationIn) {
+	   animationDurationIn = _animationDurationIn;
+   }
+
+	public void SetAnimationDurationOut(int _animationDurationOut) {
+		animationDurationOut = _animationDurationOut;
+	}
+
+	public void SetAnimationMode(int _animationMode) {
+		animationMode = _animationMode;
+	}
+
+	/// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
+	private void fadeInAnimation(final View view, int duration) {
+		Animation fadeIn = new AlphaAnimation(0, 1);
+		fadeIn.setInterpolator(new DecelerateInterpolator());
+		fadeIn.setDuration(duration);
+		fadeIn.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				view.setVisibility(View.VISIBLE);
+			}
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+
+		view.startAnimation(fadeIn);
+	}
+
+	private void fadeOutAnimation(final View view, int duration) {
+		Animation fadeOut = new AlphaAnimation(1, 0);
+		fadeOut.setInterpolator(new AccelerateInterpolator());
+		fadeOut.setStartOffset(duration);
+		fadeOut.setDuration(duration);
+		fadeOut.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				view.setVisibility(View.INVISIBLE);
+			}
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+		view.startAnimation(fadeOut);
+	}
+
+	//https://stackoverflow.com/questions/20696801/how-to-make-a-right-to-left-animation-in-a-layout/20696822
+	private void slidefromRightToLeft(View view, long duration) {
+		TranslateAnimation animate;
+		if (view.getHeight() == 0) {
+			//controls.appLayout.getHeight(); // parent layout
+			animate = new TranslateAnimation(controls.appLayout.getWidth(),
+					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		} else {
+			animate = new TranslateAnimation(view.getWidth(),0, 0, 0); // View for animation
+		}
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	private void slidefromLeftToRight(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		if (view.getHeight() == 0) {
+			//controls.appLayout.getHeight(); // parent layout
+			animate = new TranslateAnimation(0,
+					controls.appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		} else {
+			animate = new TranslateAnimation(0,view.getWidth(), 0, 0); // View for animation
+		}
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+
+private void slidefromRightToLeft3(View view, long duration) {
+	TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+	if (view.getHeight() == 0) {
+		//controls.appLayout.getHeight(); // parent layout
+		animate = new TranslateAnimation(0, -controls.appLayout.getWidth(),
+				                         0, 0); //(xFrom,xTo, yFrom,yTo)
+	} else {
+		animate = new TranslateAnimation(0,-controls.appLayout.getWidth(),
+				                         0, 0); // View for animation
+	}
+
+	animate.setDuration(duration);
+	animate.setFillAfter(true);
+	view.startAnimation(animate);
+	view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
 }
 
+	private void slidefromLeftToRight3(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		if (view.getHeight() == 0) {
+			//controls.appLayout.getHeight(); // parent layout
+			animate = new TranslateAnimation(-controls.appLayout.getWidth(),
+					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		} else {
+			animate = new TranslateAnimation(-controls.appLayout.getWidth(),0, 0, 0); // View for animation
+		}
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+
+public void Show(int effect) {
+
+ 	//fadeOutAnimation(layout, 2000);
+	//fadeInAnimation(layout, 2000);
+
+  if (animationDurationIn > 0) {
+		switch (animationMode) {
+			case 1: {
+				fadeInAnimation(layout, animationDurationIn);
+				break;
+			}
+			case 2: {  //RightToLeft
+				slidefromRightToLeft(layout, animationDurationIn);
+				break;
+			}
+			case 3: {  //RightToLeft
+				slidefromLeftToRight3(layout, animationDurationIn);
+				break;
+			}
+		}
+	}
+
+	controls.appLayout.addView(layout);
+    parent = controls.appLayout;
+}
 
 public ViewGroup GetParent() {	
   return controls.appLayout; //parent;
@@ -284,8 +451,26 @@ public  void Close(int effect ) {
     controls.pOnClose(PasObj);
 }
 
-public  void Close2() {  	
-  controls.appLayout.removeView(layout);
+public  void Close2() {
+    //fadeOutAnimation(layout, 2000);
+	// slidefromLeftToRight(layout, 2000);
+	if (animationDurationOut > 0) {
+		switch (animationMode) {
+			case 1: {
+				fadeOutAnimation(layout, animationDurationOut);
+				break;
+			}
+			case 2: {
+				slidefromLeftToRight(layout, animationDurationOut);
+				break;
+			}
+			case 3: {
+				slidefromRightToLeft3(layout, animationDurationOut);
+				break;
+			}
+		}
+	}
+	controls.appLayout.removeView(layout);
   controls.pOnClose(PasObj);
 }
 
@@ -690,20 +875,49 @@ public Drawable GetDrawableResourceById(int _resID) {
  		return res;
 }
 
-	public void SetBackgroundImage(String _imageIdentifier) {
-		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+	//BY TR3E
+	public void SetBackgroundImage(String _imageIdentifier, int _scaleType) {
+	
+	 if( mImageBackground == null ) return;	
 		
-		if( d == null ) return; // by tr3e
+	 Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+	 
+	 switch(_scaleType) {
+		case 0: mImageBackground.setScaleType(ImageView.ScaleType.CENTER); break;
+		case 1: mImageBackground.setScaleType(ImageView.ScaleType.CENTER_CROP); break;
+		case 2: mImageBackground.setScaleType(ImageView.ScaleType.CENTER_INSIDE); break;
+		case 3: mImageBackground.setScaleType(ImageView.ScaleType.FIT_CENTER); break;
+		case 4: mImageBackground.setScaleType(ImageView.ScaleType.FIT_END); break;
+		case 5: mImageBackground.setScaleType(ImageView.ScaleType.FIT_START); break;
+		case 6: mImageBackground.setScaleType(ImageView.ScaleType.FIT_XY); break;
+		case 7: mImageBackground.setScaleType(ImageView.ScaleType.MATRIX); break;
+	 }
+	 	 
+	 mImageBackground.setImageDrawable(d);	 
+   }
+	
+   //BY TR3E
+   public void SetBackgroundImageMatrix(float _scaleX, float _scaleY, float _degress, float _dx, float _dy, float _centerX, float _centerY ) {
+   	
+   	if (mImageBackground == null) return;
 		
-		//Bitmap bmp = ((BitmapDrawable)d).getBitmap();
-		ImageView image = new ImageView(controls.activity);
-        LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        image.setLayoutParams(param);
-		image.setImageResource(android.R.color.transparent);
-		image.setImageDrawable(d);
-		//image.invalidate();
-		layout.addView(image);
-	}
+		if ( mImageBackground.getScaleType() != ImageView.ScaleType.MATRIX)  
+			mImageBackground.setScaleType(ImageView.ScaleType.MATRIX);
+		
+   	Matrix matrix = new Matrix();
+   	
+   	matrix.setRotate( _degress, _centerX, _centerY);
+   	matrix.postScale(_scaleX, _scaleY, _centerX*_scaleX, _centerY*_scaleY);
+   	matrix.postTranslate(_dx, _dy);
+		
+		mImageBackground.setImageMatrix(matrix);		
+		//mImageBackground.invalidate();
+   }
+
+   // BY TR3E
+   public void SetBackgroundImage(String _imageIdentifier) {
+		SetBackgroundImage(_imageIdentifier, 6); // FIT_XY for default
+   }
 
 
 //by  thierrydijoux

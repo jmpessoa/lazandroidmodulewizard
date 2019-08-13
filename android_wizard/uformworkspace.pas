@@ -381,10 +381,10 @@ begin
        FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
     if not IsAllCharNumber(PChar(FTargetApi))  then
-      FTargetApi:= '26';
+      FTargetApi:= '28';
 
-    if StrToInt(FTargetApi) < 26 then
-       ShowMessage('Warning: remember that "google play" store NOW equires Target Api >= 26 !');
+    if StrToInt(FTargetApi) < 28 then
+       ShowMessage('Warning: remember that "google play" store NOW equires Target Api >= 28 !');
   end;
 end;
 
@@ -550,7 +550,7 @@ begin
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
   if not IsAllCharNumber(PChar(FMinApi))  then FMinApi:= '14';
-  if not IsAllCharNumber(PChar(FTargetApi)) then FTargetApi:= '26';
+  if not IsAllCharNumber(PChar(FTargetApi)) then FTargetApi:= '28';
 
   apiTarg:= StrToInt(FTargetApi);
   if StrToInt(FMinApi) > apiTarg then FMinApi:= IntToStr(apiTarg);
@@ -791,7 +791,7 @@ var
 begin
 
   strTApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 26
+  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 28
   else tApi:= StrToInt(strTApi);
 
   strMApi:= ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex];
@@ -1100,14 +1100,14 @@ var
 begin
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then
   begin
-    if (FMaxSdkPlatform < 26) or (FPathToGradle = '')   then
+    if (FMaxSdkPlatform < 28) or (FPathToGradle = '')   then
     begin
       ShowMessage('Warning/Recomendation:'+
                sLineBreak+
-               sLineBreak+'[LAMW 0.8.4] "AppCompat" [material] theme need:'+
+               sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
                sLineBreak+' 1. Java JDK 1.8'+
                sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
-               sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
+               sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
                sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
                sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
                sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1207,10 +1207,10 @@ procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.4] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
+           sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1266,10 +1266,10 @@ procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.4] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2'+
+           sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+

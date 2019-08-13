@@ -92,6 +92,7 @@ object FormSettingsPaths: TFormSettingsPaths
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
+  LCLVersion = '2.0.0.4'
   object BitBtnOK: TBitBtn
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Side = asrBottom

@@ -470,6 +470,9 @@ function jImageView_GetView(env: PJNIEnv; _jimageview: JObject): jObject;
 procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; var _items: TDynArrayOfString); overload;
 procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: array of string); overload;
 
+procedure jImageView_SetAnimationDurationIn(env: PJNIEnv; _jimageview: JObject; _animationDurationIn: integer);
+procedure jImageView_SetAnimationMode(env: PJNIEnv; _jimageview: JObject; _animationMode: integer);
+
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
@@ -682,6 +685,8 @@ function jPanel_GetChildCount(env: PJNIEnv; _jpanel: JObject): integer;
 procedure jPanel_BringChildToFront(env: PJNIEnv; _jpanel: JObject; _view: jObject);
 procedure jPanel_BringToFront(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetVisibilityGone(env: PJNIEnv; _jpanel: JObject);
+procedure jPanel_SetAnimationDurationIn(env: PJNIEnv; _jpanel: JObject; _animationDurationIn: integer);
+procedure jPanel_SetAnimationMode(env: PJNIEnv; _jpanel: JObject; _animationMode: integer);
 
 
 //-----------------
@@ -4990,6 +4995,34 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jImageView_SetAnimationDurationIn(env: PJNIEnv; _jimageview: JObject; _animationDurationIn: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _animationDurationIn;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAnimationDurationIn', '(I)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jImageView_SetAnimationMode(env: PJNIEnv; _jimageview: JObject; _animationMode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _animationMode;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAnimationMode', '(I)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 //------------------------------------------------------------------------------
 // ListView
 //------------------------------------------------------------------------------
@@ -7361,6 +7394,31 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jPanel_SetAnimationDurationIn(env: PJNIEnv; _jpanel: JObject; _animationDurationIn: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _animationDurationIn;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAnimationDurationIn', '(I)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jPanel_SetAnimationMode(env: PJNIEnv; _jpanel: JObject; _animationMode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _animationMode;
+  jCls:= env^.GetObjectClass(env, _jpanel);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAnimationMode', '(I)V');
+  env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //------------------------------------------------------------------------------
 // HorizontalScrollView

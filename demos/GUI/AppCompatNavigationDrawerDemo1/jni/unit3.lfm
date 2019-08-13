@@ -12,6 +12,9 @@ object AndroidModule3: TAndroidModule3
   ActivityMode = actEasel
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnRotate = AndroidModule3Rotate
   OnJNIPrompt = AndroidModule3JNIPrompt
   object jPanel1: jPanel
@@ -33,6 +36,8 @@ object AndroidModule3: TAndroidModule3
     BackgroundColor = colbrWhite
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
+    AnimationDurationIn = 1500
+    AnimationMode = animRightToLeft
     object jImageView1: jImageView
       Left = 120
       Top = 195
@@ -54,6 +59,8 @@ object AndroidModule3: TAndroidModule3
       ImageScaleType = scaleCenter
       GravityInParent = lgNone
       RoundedShape = False
+      AnimationDurationIn = 1500
+      AnimationMode = animNone
       OnClick = jImageView1Click
     end
     object jTextView1: jTextView

@@ -57,7 +57,7 @@ I. Infrastructure
 				"Google Repository"
 				"Google Play Services"		
 
-.Android SDK  [updated/modern version] --- only "gradle" build  supported...
+.Android SDK  [updated/modern version] --- warning: Only "gradle" build  supported...
 
 	[Windows]	https://dl.google.com/android/repository/sdk-tools-windows-3859397.zip
 	[Linux]		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip

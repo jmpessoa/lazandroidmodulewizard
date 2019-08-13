@@ -905,7 +905,7 @@ begin
       //Result:= '3.4.0';
       //gradleVer:= 'Gradle Gradle 5.1.1'
 
-      Result:= '3.1.0'; //just to support minSdk/targetSdk from AndroidManifest!!
+      Result:= '3.1.0'; //just to support minSdk/targetSdk in AndroidManifest!!
   end;
 
 end;

@@ -1354,19 +1354,19 @@ begin
 
       if IsAllCharNumber(PChar(sdkManifestTargetApi))  then
           manifestTargetApi:= StrToInt(sdkManifestTargetApi)
-      else manifestTargetApi:= 26;
+      else manifestTargetApi:= 28;
 
       buildTool:=  GetBuildTool(manifestTargetApi);
-      if manifestTargetApi < 26 then
+      if manifestTargetApi < 28 then
       begin
-         queryValue:= '26';
+         queryValue:= '28';
 
-         if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 26',
-                       '[Suggestion] Change Target API to 26'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
+         if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 28',
+                       '[Suggestion] Change Target API to 28'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
          begin
-           manifestTargetApi:= 26;
-           buildTool:= GetBuildTool(26);
-           if queryValue <> '26' then
+           manifestTargetApi:= 28;
+           buildTool:= GetBuildTool(28);
+           if queryValue <> '28' then
            begin
               if IsAllCharNumber(PChar(queryValue)) then
               begin
@@ -1377,7 +1377,7 @@ begin
          end; //if input...
 
       end
-      else //target >= 26
+      else //target >= 28
       begin
         outMaxBuildTool:= FCandidateSdkBuild;
         if not LamwGlobalSettings.KeepManifestTargetApi  then

@@ -1887,6 +1887,16 @@ public class jListView extends ListView {
 			aadapter.notifyDataSetChanged();
 		}
 	}
+	
+	// by TR3E
+	public void setTextSizeAll(int textsize) {
+		if (textsize != 0) {
+			for( int i = 0; i < alist.size(); i++ )
+			 alist.get(i).textSize = textsize;
+			
+			aadapter.notifyDataSetChanged();
+		}
+	}
 
 	public  void setImageItem(Bitmap bm, int index) {
 		alist.get(index).bmp = bm;

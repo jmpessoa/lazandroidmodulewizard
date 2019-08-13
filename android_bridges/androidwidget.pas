@@ -1047,6 +1047,8 @@ end;
 
   { jForm }
 
+  TAnimationMode = (animNone, animFade, animRightToLeft, animLeftToRight);
+
   jForm = class(TAndroidForm)
   private
     FCBDataString: string;
@@ -1093,6 +1095,10 @@ end;
     //FOnNewIntent: TOnNewIntent;
     FLayoutVisibility: boolean;
     FBackgroundImageIdentifier: string;
+
+    FAnimationDurationIn: integer;
+    FAnimationDurationOut: integer;
+    FAnimationMode: TAnimationMode;
 
     function GetActionBarHeight: integer;
     Procedure SetColor   (Value : TARGBColorBridge);
@@ -1311,6 +1317,12 @@ end;
     function GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
     function GetJGlobalRef(jObj: jObject): jObject;
 
+    procedure SetAnimationDurationIn(_animationDurationIn: integer);
+    procedure SetAnimationDurationOut(_animationDurationOut: integer);
+
+    procedure SetAnimationMode(_animationMode: TAnimationMode);
+
+
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
@@ -1344,6 +1356,9 @@ end;
     property BackgroundColor: TARGBColorBridge  read FColor write SetColor;
     property BackgroundImageIdentifier: string read FBackgroundImageIdentifier write SetBackgroundImageIdentifier;
     property ActionBarTitle: TActionBarTitle read FActionBarTitle write FActionBarTitle;
+    property AnimationDurationIn: integer read FAnimationDurationIn write SetAnimationDurationIn;
+    property AnimationDurationOut: integer read FAnimationDurationOut write SetAnimationDurationOut;
+    property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
 
     // Event
     property OnCloseQuery : TOnCloseQuery  read FOnCloseQuery  write FOnCloseQuery;
@@ -1752,6 +1767,10 @@ procedure jForm_SetBackgroundImageMatrix(env: PJNIEnv; _jform: JObject;
 
 function jForm_GetJByteBuffer(env: PJNIEnv; _jform: JObject; _width: integer; _height: integer): jObject;
 function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jObject): jObject;
+
+procedure jForm_SetAnimationDurationIn(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
+procedure jForm_SetAnimationDurationOut(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
+procedure jForm_SetAnimationMode(env: PJNIEnv; _jform: JObject; _animationMode: integer);
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -2832,6 +2851,11 @@ begin
   DoJNIPromptOnShow:= True;
   DoJNIPromptOnInit:= True;
 
+  FAnimationDurationIn:=  1500;
+  FAnimationDurationOut:=  1500;
+
+  FAnimationMode:= animNone;
+
   //now load the stream
   InitInheritedComponent(Self, TAndroidWidget {TAndroidForm}); {thanks to  x2nie !!}
 end;
@@ -2895,7 +2919,16 @@ begin
        View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
 
     if FBackgroundImageIdentifier <> '' then
-        jForm_SetBackgroundImage(FjEnv, FjObject, FBackgroundImageIdentifier);
+      jForm_SetBackgroundImage(FjEnv, FjObject, FBackgroundImageIdentifier);
+
+    if FAnimationDurationIn <> 1500 then  //default
+       jForm_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
+
+    if FAnimationDurationOut <> 1500 then  //default
+       jForm_SetAnimationDurationOut(FjEnv, FjObject, FAnimationDurationOut);
+
+    if FAnimationMode <> animNone then  //default
+       jForm_SetAnimationMode(FjEnv, FjObject, Ord(FAnimationMode));
 
     FInitialized:= True;
 
@@ -2971,6 +3004,15 @@ begin
     FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout} //GetView
     FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin
     FjPRLayout:= FjPRLayoutHome;  //base appLayout
+
+    if FAnimationDurationIn <> 1500 then  //default
+       jForm_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
+
+    if FAnimationDurationOut <> 1500 then  //default
+       jForm_SetAnimationDurationOut(FjEnv, FjObject, FAnimationDurationOut);
+
+    if FAnimationMode <> animNone then  //default
+       jForm_SetAnimationMode(FjEnv, FjObject, Ord(FAnimationMode));
 
     FInitialized:= True;
 
@@ -4237,6 +4279,30 @@ end;
 function jForm.GetJGlobalRef(jObj: jObject): jObject;
 begin
   Result := FjEnv^.NewGlobalRef(FjEnv,jObj);
+end;
+
+procedure jForm.SetAnimationDurationIn(_animationDurationIn: integer);
+begin
+  //in designing component state: set value here...
+  FAnimationDurationIn:= _animationDurationIn;
+  if FInitialized then
+     jForm_SetAnimationDurationIn(FjEnv, FjObject, _animationDurationIn);
+end;
+
+procedure jForm.SetAnimationDurationOut(_animationDurationOut: integer);
+begin
+  //in designing component state: set value here...
+  FAnimationDurationOut:= _animationDurationOut;
+  if FInitialized then
+     jForm_SetAnimationDurationOut(FjEnv, FjObject, _animationDurationOut);
+end;
+
+procedure jForm.SetAnimationMode(_animationMode: TAnimationMode);
+begin
+  //in designing component state: set value here...
+  FAnimationMode:= _animationMode;
+  if FInitialized then
+     jForm_SetAnimationMode(FjEnv, FjObject, Ord(_animationMode));
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -6045,6 +6111,46 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetByteBufferFromImage', '(Landroid/graphics/Bitmap;)Ljava/nio/ByteBuffer;');
   Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jForm_SetAnimationDurationIn(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _animationDuration;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAnimationDurationIn', '(I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_SetAnimationDurationOut(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _animationDuration;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAnimationDurationOut', '(I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_SetAnimationMode(env: PJNIEnv; _jform: JObject; _animationMode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _animationMode;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAnimationMode', '(I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

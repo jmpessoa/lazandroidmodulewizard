@@ -2,7 +2,7 @@ object AndroidModule1: TAndroidModule1
   Left = 465
   Top = 284
   Width = 320
-  Height = 457
+  Height = 523
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -12,6 +12,9 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnRotate = AndroidModule1Rotate
   OnJNIPrompt = AndroidModule1JNIPrompt
   OnSpecialKeyDown = AndroidModule1SpecialKeyDown
@@ -19,7 +22,7 @@ object AndroidModule1: TAndroidModule1
     Left = 0
     Top = 0
     Width = 320
-    Height = 457
+    Height = 523
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
@@ -37,7 +40,7 @@ object AndroidModule1: TAndroidModule1
       Left = 0
       Top = 0
       Width = 320
-      Height = 457
+      Height = 523
       MarginLeft = 0
       MarginTop = 0
       MarginRight = 0
@@ -58,7 +61,7 @@ object AndroidModule1: TAndroidModule1
       Left = 0
       Top = 0
       Width = 320
-      Height = 457
+      Height = 523
       MarginLeft = 0
       MarginTop = 0
       MarginRight = 0
@@ -73,6 +76,8 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       MinPinchZoomFactor = 0.25
       MaxPinchZoomFactor = 4
+      AnimationDurationIn = 1500
+      AnimationMode = animNone
       object jsToolbar1: jsToolbar
         Left = 0
         Top = 0
@@ -101,7 +106,7 @@ object AndroidModule1: TAndroidModule1
         Left = 0
         Top = 40
         Width = 320
-        Height = 417
+        Height = 483
         MarginLeft = 0
         MarginTop = 0
         MarginRight = 0
@@ -117,11 +122,13 @@ object AndroidModule1: TAndroidModule1
         BackgroundColor = colbrDefault
         MinPinchZoomFactor = 0.25
         MaxPinchZoomFactor = 4
+        AnimationDurationIn = 1500
+        AnimationMode = animNone
         object jPanel3: jPanel
           Left = 0
           Top = 0
           Width = 320
-          Height = 417
+          Height = 483
           MarginLeft = 0
           MarginTop = 0
           MarginRight = 0
@@ -136,6 +143,8 @@ object AndroidModule1: TAndroidModule1
           BackgroundColor = colbrWhite
           MinPinchZoomFactor = 0.25
           MaxPinchZoomFactor = 4
+          AnimationDurationIn = 1500
+          AnimationMode = animNone
           object jImageView1: jImageView
             Left = 124
             Top = 0
@@ -157,6 +166,8 @@ object AndroidModule1: TAndroidModule1
             ImageScaleType = scaleCenter
             GravityInParent = lgNone
             RoundedShape = False
+            AnimationDurationIn = 1500
+            AnimationMode = animNone
             OnClick = jImageView1Click
           end
           object jTextView1: jTextView
@@ -179,7 +190,7 @@ object AndroidModule1: TAndroidModule1
             Text = 'Don Quixote by Miguel de Cervantes'
             Alignment = taLeft
             BackgroundColor = colbrDefault
-            FontColor = colbrDefault
+            FontColor = colbrBlue
             FontSize = 0
             TextTypeFace = tfNormal
             FontSizeUnit = unitDefault

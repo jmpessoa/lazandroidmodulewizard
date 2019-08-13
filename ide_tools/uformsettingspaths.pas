@@ -463,10 +463,10 @@ procedure TFormSettingsPaths.SpeedButtonHelpClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.4] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
-           sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 [or up]'+
+           sLineBreak+' 2. Gradle 4.4.1 [or up] [https://gradle.org/next-steps/?version=4.1&format=bin]' +
+           sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3 [or up]'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+

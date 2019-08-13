@@ -1,7 +1,6 @@
 package org.lamw.appcompatnavigationdrawerdemo1;
 
 import java.lang.reflect.Field;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;

@@ -85,15 +85,84 @@
 		-Frederico Marques - Tutorial in Portuguese
 			https://www.linkedin.com/pulse/lazarus-android-module-wizard-lamw-gere-seu-apk-usando-marques/	
 			
+		-Rogelio Fernandez Arraez - many, many contributions!!!!
+			tr3esoftware dot gmail com
+
 		-Lazarus forum community!
 		
 
 	***************************************************************************************************
 	* How To Start:				
 	*	
-	*  "LAMW Getting Started.txt"				
+	*  "LAMW_Getting_Started.txt"				
 	*					
 	***************************************************************************************************
+
+Version 0.8 - rev 05 - 13 - August - 2019
+	
+	NEW! jForm/jPanel/jImageView [effect]  Animation Trasition!!!
+		Add properties:
+			Animation {Fade, RightToLeft, LeftToRight)
+			AnimationDuration
+
+			how it works: 
+				jForm {InitShowing, Show}
+				jPanel/jImageView {BringToFront}
+		
+	NEW!  demo "AppAnimationDemo1"  -> jForm/jPanel/jImageView  Animation        
+	MEW!  demo  "AppImageViewListDemo1"   --> jImageView  Animation 
+	UPDATED! demo "AppCompatNavigationDrawerDemo1" -> jPanel   Animation
+
+
+        NEW! Compoments!
+		jSoundPool componet and "AppSoundPoolDemo"   [thanks to @TR3E!]
+		jMidiManager componet and "AppMidiManagerDemo1" [thanks to Marco Bramardi]
+		jWifiManager componet and "AppWifiManagerDemo1"
+
+		jExpression componet and "AppExpressionDemo1"     [link to a local "jar" file...]
+		jZBarcodeScannerView componet and "AppZBarcodeScannerViewDemo1"
+
+		jsContinuousScrollableImageView component and "AppCompatContinuousScrollableImageViewDemo1"
+
+	NEW! Palette "JCenter" <-- Link to external java libraries,  need "Gradle" 
+
+		jcSignaturePad componet and "AppJCenterSignaturePadDemo1"
+		jcOpenStreetMap componet and "AppJCenterOpenStreetMapDemo2"
+		jcMikrotikRouterOS componet and "AppJCenterMikrotikRouterOSDemo1"
+		jcLantern componet and "AppJCenterLanternDemo1"
+		jcScreenShot componet and "AppJCenterScreenShotDemo1"
+
+
+	CHANGED!
+		ref. https://forum.lazarus.freepascal.org/index.php/topic,46340.0.html
+
+		"Init"  no longer show the form....Some old code can be easily fixed:
+
+		example:
+
+		procedure TAndroidModule1.jButton1Click(Sender: TObject);
+		begin
+  			if AndroidModule2 = nil then
+  			begin
+    				gApp.CreateForm(TAndroidModule2, AndroidModule2);
+    				AndroidModule2.InitShowing(gApp);                             // <-- Fixed!!!
+  			end
+  			else
+  			begin
+    				AndroidModule2.Show();
+  			end;
+		end;
+
+
+	REQUIREMENTS:
+
+		1. Java JDK 1.8  
+		2. Gradle 4.4.1 [or up] + Internet Connection!
+		3. Android SDK "plataforms" 28 + "build-tools" 28.0.3   [Min "target" need by Google Play Store]
+		4. Android SDK/Extra  "Support Repository"
+		5. Android SDK/Extra  "Support Library"
+		6. Android SDK/Extra  "Google Repository"
+		7. Android SDK/Extra  "Google Play Services"
 
 Version 0.8 - rev 04 - 12 - March - 2019
 

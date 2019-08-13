@@ -12,6 +12,9 @@ object AndroidModule4: TAndroidModule4
   ActivityMode = actEasel
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnRotate = AndroidModule4Rotate
   OnJNIPrompt = AndroidModule4JNIPrompt
   object jPanel1: jPanel
@@ -33,6 +36,8 @@ object AndroidModule4: TAndroidModule4
     BackgroundColor = colbrPaleGreen
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
+    AnimationDurationIn = 1500
+    AnimationMode = animRightToLeft
     object jScrollView1: jScrollView
       Left = 0
       Top = 0

@@ -166,6 +166,9 @@ type
      FMinZoomFactor: single;
      FMaxZoomFactor: single;
 
+     FAnimationDurationIn: integer;
+     FAnimationMode: TAnimationMode;
+
      Procedure SetColor(Value : TARGBColorBridge); //background
      
    protected
@@ -213,11 +216,15 @@ type
      procedure BringChildToFront(_view: jObject);
      procedure BringToFront();
      procedure SetVisibilityGone();
+     procedure SetAnimationDurationIn(_animationDurationIn: integer);
+     procedure SetAnimationMode(_animationMode: TAnimationMode);
 
    published
-     property BackgroundColor     : TARGBColorBridge read FColor write SetColor;
+     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
      property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
      property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
+     property AnimationDurationIn: integer read FAnimationDurationIn write SetAnimationDurationIn;
+     property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
 
      property OnDown : TOnNotify read FOnDown write FOnDown;
      property OnClick : TOnNotify read FOnClick write FOnClick;
@@ -1343,6 +1350,9 @@ type
     FRoundedShape: boolean;
     FOnPopupItemSelected: TOnImageViewPopupItemSelected;
 
+    FAnimationDurationIn: integer;
+    FAnimationMode: TAnimationMode;
+
     Procedure SetColor    (Value : TARGBColorBridge);
 
     procedure SetImages(Value: jImageList);
@@ -1425,6 +1435,9 @@ type
     function GetView(): jObject; override;
     procedure ShowPopupMenu(var _items: TDynArrayOfString); overload;
     procedure ShowPopupMenu(_items: array of string);   overload;
+    procedure SetAnimationDurationIn(_animationDurationIn: integer);
+    procedure SetAnimationMode(_animationMode: TAnimationMode);
+
     procedure GenEvent_OnImageViewPopupItemSelected(Sender:TObject; caption:string);
 
     property Count: integer read GetCount;
@@ -1437,6 +1450,10 @@ type
     property ImageScaleType: TImageScaleType read FImageScaleType write SetScaleType;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     property RoundedShape: boolean read FRoundedShape write SetRoundedShape;
+
+    property AnimationDurationIn: integer read FAnimationDurationIn write SetAnimationDurationIn;
+    property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
+
     // Events
     property OnPopupItemSelected: TOnImageViewPopupItemSelected read FOnPopupItemSelected write FOnPopupItemSelected;
      property OnClick: TOnNotify read FOnClick write FOnClick;
@@ -5966,6 +5983,9 @@ begin
   FFilePath:= fpathData;
   FImageScaleType:= scaleCenter;
   FRoundedShape:= False;
+  FAnimationMode:= animNone;
+  FAnimationDurationIn:= 1500;
+
 end;
 
 destructor jImageView.Destroy;
@@ -6035,6 +6055,12 @@ begin
 
   if (FImageName <> '') and (FImageIndex < 0) then
      jImageView_SetImageByResIdentifier(FjEnv, FjObject , FImageName);
+
+  if FAnimationDurationIn <> 1500 then
+     jImageView_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
+
+  if FAnimationMode <> animNone then
+    jImageView_SetAnimationMode(FjEnv, FjObject, Ord(FAnimationMode) );
 
   if FImageList <> nil then
   begin
@@ -6525,6 +6551,22 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jImageView_ShowPopupMenu(FjEnv, FjObject, _items);
+end;
+
+procedure jImageView.SetAnimationDurationIn(_animationDurationIn: integer);
+begin
+  //in designing component state: set value here...
+  FAnimationDurationIn:= _animationDurationIn;
+  if FInitialized then
+     jImageView_SetAnimationDurationIn(FjEnv, FjObject, _animationDurationIn);
+end;
+
+procedure jImageView.SetAnimationMode(_animationMode: TAnimationMode);
+begin
+  //in designing component state: set value here...
+  FAnimationMode:= _animationMode;
+  if FInitialized then
+     jImageView_SetAnimationMode(FjEnv, FjObject, Ord(_animationMode) );
 end;
 
 procedure jImageView.GenEvent_OnImageViewPopupItemSelected(Sender:TObject;caption:string);
@@ -7794,7 +7836,7 @@ Procedure jListView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
-   jListView_setTextSizeAll(FjEnv, FjObject, FFontSize);
+    jListView_setTextSizeAll(FjEnv, FjObject, FFontSize);
 end;
 
 Procedure jListView.SetFontSizeByIndex(Value: DWord; index: integer);
@@ -11646,7 +11688,9 @@ begin
   FMinZoomFactor:= 1/4;
   FMaxZoomFactor:= 8/2;
   FHeight:= 48;
-  FWidth:= 96;
+  FWidth:= 300;
+  FAnimationDurationIn:= 1500;
+  FAnimationMode:= animNone;
 end;
 
 destructor jPanel.Destroy;
@@ -11669,18 +11713,15 @@ var
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+    inherited Init(refApp);
+    FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
+    if FParent <> nil then
+     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-   FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
+    FjPRLayoutHome:= FjPRLayout;
+    jPanel_setParent(FjEnv, FjObject , FjPRLayout);
+    jPanel_setId(FjEnv, FjObject , Self.Id);
 
-   if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-   FjPRLayoutHome:= FjPRLayout;
-
-   jPanel_setParent(FjEnv, FjObject , FjPRLayout);
-
-   jPanel_setId(FjEnv, FjObject , Self.Id);
   end;
 
   jPanel_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -11717,11 +11758,18 @@ begin
 
   if not FInitialized then
   begin
+
+   if FAnimationMode <> animNone then //default
+     jPanel_SetAnimationMode(FjEnv, FjObject, Ord(FAnimationMode));
+
+   if FAnimationDurationIn <> 1500 then //default
+     jPanel_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
+
    FInitialized:= True;
    if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{!}, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
+    View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
   end;
   
 end;
@@ -11869,6 +11917,22 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jPanel_SetVisibilityGone(FjEnv, FjObject);
+end;
+
+procedure jPanel.SetAnimationDurationIn(_animationDurationIn: integer);
+begin
+  //in designing component state: set value here...
+  FAnimationDurationIn:= _animationDurationIn;
+  if FInitialized then
+     jPanel_SetAnimationDurationIn(FjEnv, FjObject, _animationDurationIn);
+end;
+
+procedure jPanel.SetAnimationMode(_animationMode: TAnimationMode);
+begin
+  //in designing component state: set value here...
+  FAnimationMode:= _animationMode;
+  if FInitialized then
+     jPanel_SetAnimationMode(FjEnv, FjObject, Ord(_animationMode));
 end;
 
 // Event : Java -> Pascal
