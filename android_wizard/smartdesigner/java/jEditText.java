@@ -293,7 +293,9 @@ public class jEditText extends EditText {
 
 	public  void InputMethodShow() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+		//Repaired forever show the "softInput" by TR3E
+		this.requestFocus();
+		imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
 	}
 
 

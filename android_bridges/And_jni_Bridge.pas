@@ -597,6 +597,7 @@ procedure jListView_SaveToFile(env: PJNIEnv; _jlistview: JObject; _appInternalFi
 //procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
 function jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
 procedure jListView_Refresh(env:PJNIEnv;  ListView : jObject); // by tr3e
+procedure jListView_setTextSizeAll(env:PJNIEnv; ListView : jObject; size  : DWord); // by tr3e
 
 procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string); overload;
 procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string; _filterMode: integer);  overload;
@@ -5872,6 +5873,21 @@ begin
   cls:= env^.GetObjectClass(env, ListView);
  _jMethod:= env^.GetMethodID(env, cls, 'Refresh', '()V');
  env^.CallVoidMethod(env,ListView,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+// by tr3e
+procedure jListView_setTextSizeAll  (env:PJNIEnv;
+                                  ListView : jObject; size  : DWord);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].i := size;
+   cls := env^.GetObjectClass(env, ListView);
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextSizeAll', '(I)V');
+ env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
 

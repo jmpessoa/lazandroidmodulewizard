@@ -7793,8 +7793,8 @@ end;
 Procedure jListView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
-  //if FInitialized and (FFontSize > 0) then
-   //  jListView_setTextSize2(FjEnv, FjObject , FFontSize, index);
+  if FInitialized and (FFontSize > 0) then
+   jListView_setTextSizeAll(FjEnv, FjObject, FFontSize);
 end;
 
 Procedure jListView.SetFontSizeByIndex(Value: DWord; index: integer);
