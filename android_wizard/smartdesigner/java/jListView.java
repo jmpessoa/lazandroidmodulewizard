@@ -1891,6 +1891,8 @@ public class jListView extends ListView {
 	// by TR3E
 	public void setTextSizeAll(int textsize) {
 		if (textsize != 0) {
+			this.textSize = textsize;
+			
 			for( int i = 0; i < alist.size(); i++ )
 			 alist.get(i).textSize = textsize;
 			
