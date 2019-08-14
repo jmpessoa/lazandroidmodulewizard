@@ -47,6 +47,8 @@ public class jCustomDialog extends RelativeLayout {
  private int lgravity = Gravity.TOP | Gravity.LEFT;
  //[ifdef_api14up] */
  
+    private boolean mShowTitle; 
+ 
 	Dialog mDialog = null;
 	private String mIconIdentifier = "ic_launcher";   //default icon  ../res/drawable
 	private String mTitle = "Information";
@@ -58,11 +60,13 @@ public class jCustomDialog extends RelativeLayout {
 	boolean FCancelable = true;
 
 	//GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-	public jCustomDialog(Controls _ctrls, long _Self) { //Add more others news "_xxx"p arams if needed!
+	public jCustomDialog(Controls _ctrls, long _Self, boolean _showTitle) { //Add more others news "_xxx"p arams if needed!
 		super(_ctrls.activity);
 		context   = _ctrls.activity;
 		pascalObj = _Self;
 		controls  = _ctrls;
+		
+		mShowTitle = _showTitle;
 
 		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
 		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
@@ -232,10 +236,14 @@ public class jCustomDialog extends RelativeLayout {
 		mIconIdentifier = _iconIdentifier;
 		
 		if (mDialog != null) {
+			
 			// Update icon if I change [to TR3E]
-			mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
-						
-			mDialog.setTitle(mTitle);			
+			if( mShowTitle ){			
+			 mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+			
+			 mDialog.setTitle(mTitle);
+			}
+			
 			mDialog.show();
 						
 			controls.pOnCustomDialogShow(pascalObj, mDialog, _title);
@@ -251,13 +259,21 @@ public class jCustomDialog extends RelativeLayout {
 			}
 						
 			mDialog = new Dialog(this.controls.activity);
-			
-			mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
-			mDialog.setContentView(this);			
-			
-			mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
-			
-			mDialog.setTitle(mTitle);			
+						
+			if( !mShowTitle ){
+				mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			 
+				mDialog.setContentView(this);
+			}else{
+				mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
+				mDialog.setContentView(this);			
+				
+				mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+				
+				mDialog.setTitle(mTitle);
+			 //mDialog.getWindow().setTitleColor(0xFF0000FF); 
+			}
+		
 			//mDialog.setCanceledOnTouchOutside(mCanceledOnTouchOutside);
 			mDialog.setCancelable(FCancelable);
 			
@@ -281,7 +297,7 @@ public class jCustomDialog extends RelativeLayout {
 			});
 			this.setVisibility(android.view.View.VISIBLE);  // //0: vis; 4: inv; 8: gone						
 						
-			mDialog.show();
+			mDialog.show();					
 						
 			controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
 		}
@@ -300,17 +316,17 @@ public class jCustomDialog extends RelativeLayout {
 	}
 
 	public void SetTitle(String _title) {
-		
+				
 		mTitle = _title;
 		
-		if (mDialog != null)		
+		if ((mDialog != null) && mShowTitle)		
 		 mDialog.setTitle(mTitle);
 	}
 
 	public void SetIconIdentifier(String _iconIdentifier) {   // ../res/drawable
 		mIconIdentifier = _iconIdentifier;
 		
-		if (mDialog != null)		
+		if ((mDialog != null) && mShowTitle)		
 		 mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
 	}
 

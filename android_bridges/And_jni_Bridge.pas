@@ -898,10 +898,9 @@ Procedure jTimer_SetEnabled            (env:PJNIEnv; Timer  : jObject; Active   
 Function  jDialogYN_Create             (env:PJNIEnv; this:jobject; SelfObj : TObject;
                                         title,msg,y,n : string ): jObject;
 Procedure jDialogYN_Free               (env:PJNIEnv; DialogYN: jObject);
-Procedure jDialogYN_Show               (env:PJNIEnv; DialogYN: jObject);  overload;
-Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string; yesText: string; noText:string);  overload;
-Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string); overload;
+Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string; yesText: string; noText:string);
 procedure jDialogYN_ShowOK(env: PJNIEnv; _jdialogyn: JObject; titleText: string; msgText: string; _OkText: string);
+procedure jDialogYN_SetFontSize(env: PJNIEnv; _jdialogyn: JObject; fontSize: integer); // by tr3e
 
 // Dialog Progress
 Function  jDialogProgress_Create       (env:PJNIEnv; this:jobject; SelfObj : TObject;
@@ -9525,18 +9524,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject);
-var
- _jMethod: jMethodID = nil;
- _jParam: jValue;
- cls: jClass;
-begin
- cls:= env^.GetObjectClass(env, DialogYN);
- _jMethod:= env^.GetMethodID(env, cls, 'show', '()V');
- env^.CallVoidMethodA(env,DialogYN,_jMethod,@_jParam);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string; yesText: string; noText:string);
 var
  _jMethod: jMethodID = nil;
@@ -9560,26 +9547,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-
-Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string);
-var
- _jMethod: jMethodID = nil;
- _jParams:  Array[0..1] of jValue;
- cls: jClass;
-begin
- _jParams[0].l := env^.NewStringUTF(env, pchar(titleText) );
- _jParams[1].l := env^.NewStringUTF(env, pchar(msgText) );
-
- cls:= env^.GetObjectClass(env, DialogYN);
- _jMethod:= env^.GetMethodID(env, cls, 'show', '(Ljava/lang/String;Ljava/lang/String;)V');
- env^.CallVoidMethodA(env,DialogYN,_jMethod,@_jParams);
-
- env^.DeleteLocalRef(env,_jParams[0].l);
- env^.DeleteLocalRef(env,_jParams[1].l);
-
- env^.DeleteLocalRef(env, cls);
-end;
-
 procedure jDialogYN_ShowOK(env: PJNIEnv; _jdialogyn: JObject; titleText: string; msgText: string; _OkText: string);
 var
   jParams: array[0..2] of jValue;
@@ -9596,6 +9563,20 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDialogYN_SetFontSize(env: PJNIEnv; _jdialogyn: JObject; fontSize: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  _jParams[0].i := fontSize;
+
+ cls := env^.GetObjectClass(env, _jdialogyn);
+_jMethod:= env^.GetMethodID(env, cls, 'SetFontSize', '(I)V');
+ env^.CallVoidMethodA(env,_jdialogyn,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
 end;
 
 //------------------------------------------------------------------------------

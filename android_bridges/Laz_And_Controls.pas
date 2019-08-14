@@ -605,6 +605,7 @@ type
     Procedure Show(titleText: string; msgText: string; yesText: string; noText: string); overload;
     Procedure Show(titleText: string; msgText: string); overload;
     procedure ShowOK(titleText: string; msgText: string; _OkText: string);
+    Procedure SetFontSize( fontSize : integer ); // by tr3e
 
     property Parent   : jForm     read FParent   write FParent;
   published
@@ -10427,6 +10428,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jDialogYN_ShowOK(FjEnv, FjObject, titleText ,msgText ,_OkText);
+end;
+
+// by tr3e
+Procedure jDialogYN.SetFontSize( fontSize : integer );
+begin
+  if FInitialized then
+     jDialogYN_SetFontSize( FjEnv, FjObject, fontSize );
 end;
 
 // Event : Java -> Pascal

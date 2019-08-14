@@ -24,12 +24,13 @@ type
     //FCloseOnBackKeyPressed: boolean;
     //FCanceledOnTouchOutside: boolean;
     FCancelable: boolean;
+    FShowTitle : boolean;
 
     procedure SetColor(Value: TARGBColorBridge); //background
     procedure SetIconIdentifier(_iconIdentifier: string);
-
   protected
     procedure SetText(_title: string); override;   //****
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -70,11 +71,12 @@ type
     //property CloseOnBackKeyPressed: boolean  read FCloseOnBackKeyPressed write SetCloseOnBackKeyPressed;
     //property CanceledOnTouchOutside: boolean   read FCanceledOnTouchOutside write SetCanceledOnTouchOutside;
     property Cancelable: boolean read FCancelable write SetCancelable;
+    property ShowTitle: boolean read FShowTitle write FShowTitle;
     property OnShow: TCustomDialogShow read FOnShow write FOnShow;
     property OnBackKeyPressed: TCustomDialogBackKeyPressed read FOnBackKeyPressed write FOnBackKeyPressed;
   end;
 
-function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
+function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _showTitle : boolean): jObject;
 procedure jCustomDialog_jFree(env: PJNIEnv; _jcustomdialog: JObject);
 procedure jCustomDialog_SetViewParent(env: PJNIEnv; _jcustomdialog: JObject; _viewgroup: jObject);
 procedure jCustomDialog_RemoveFromViewParent(env: PJNIEnv; _jcustomdialog: JObject);
@@ -122,8 +124,10 @@ begin
   //FCloseOnBackKeyPressed:= True;
   //FCanceledOnTouchOutside:= True;
   FCancelable:= True;
+  FShowTitle := True;
     //your code here....
   FVisible:= False;
+  FIconIdentifier := '';
 end;
 
 destructor jCustomDialog.Destroy;
@@ -256,7 +260,7 @@ end;
 
 function jCustomDialog.jCreate(): jObject;
 begin
-   Result:= jCustomDialog_jCreate(FjEnv, FjThis , int64(Self));
+   Result:= jCustomDialog_jCreate(FjEnv, FjThis , int64(Self), FShowTitle);
 end;
 
 procedure jCustomDialog.jFree();
@@ -452,15 +456,16 @@ end;
 
 {-------- jCustomDialog_JNI_Bridge ----------}
 
-function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
+function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _showTitle : boolean): jObject;
 var
-  jParams: array[0..0] of jValue;
+  jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+  jParams[1].z:= JBool(_showTitle);
   jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jCustomDialog_jCreate', '(J)Ljava/lang/Object;');
+  jMethod:= env^.GetMethodID(env, jCls, 'jCustomDialog_jCreate', '(JZ)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
