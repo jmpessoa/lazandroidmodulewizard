@@ -3,7 +3,7 @@ object FormWorkspace: TFormWorkspace
   Height = 716
   Top = 101
   Width = 487
-  Caption = '[LAMW 0.8.4]  New Project'
+  Caption = '[LAMW 0.8.5]  New Project'
   ClientHeight = 716
   ClientWidth = 487
   Color = clGradientInactiveCaption
@@ -95,7 +95,6 @@ object FormWorkspace: TFormWorkspace
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.0.4'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29

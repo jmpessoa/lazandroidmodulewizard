@@ -3,7 +3,7 @@ object FormSettingsPaths: TFormSettingsPaths
   Height = 631
   Top = 101
   Width = 543
-  Caption = '[LAMW 0.8.4] Paths/Settings'
+  Caption = '[LAMW 0.8.5] Paths/Settings'
   ClientHeight = 631
   ClientWidth = 543
   Color = clGradientInactiveCaption
@@ -92,7 +92,6 @@ object FormSettingsPaths: TFormSettingsPaths
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
-  LCLVersion = '2.0.0.4'
   object BitBtnOK: TBitBtn
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Side = asrBottom

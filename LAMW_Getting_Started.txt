@@ -80,10 +80,10 @@ I. Infrastructure
 	.Option 3) Lazarus + FPC 3.2.0 [canonical/windows] "Do It Yourself"			
 
 		win64:  [need FPC 3.2.0 to support android-64 bits]
-		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2064/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793-win64.exe/download
+		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2064/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593-win64.exe/download
 		
 		win32: [need FPC 3.2.0 to support android-64 bits]
-		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2032/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793-win32.exe/download
+		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2032/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593-win32.exe/download
 
 			After install the LAMW packages [section II] go to:
 			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
