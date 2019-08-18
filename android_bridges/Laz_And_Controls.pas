@@ -533,7 +533,7 @@ type
     procedure Init(refApp: jApp) override;
 
     Procedure LoadFromFile(fullFileName : String);
-    Procedure LoadFromRes( imgResIdenfier: String);  // ..res/drawable
+    Procedure LoadFromRes( imgResIdentifier: String);  // ..res/drawable
 
     Procedure CreateJavaBitmap(w,h : Integer);
     Function  GetJavaBitmap: jObject;  //deprecated ..
@@ -575,6 +575,12 @@ type
     function GetImageFromFile(_fullFilename: string): jObject;
     function GetRoundedShape(_bitmapImage: jObject): jObject;   overload;
     function GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject; overload;
+    function DrawText(_bitmapImage: jObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;overload;
+    function DrawText(_text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;overload;
+    function DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
+    procedure SaveToFileJPG(_fullPathFileName: string);
+    procedure SetImage(_bitmapImage: jObject);
+
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -9418,11 +9424,11 @@ begin
   end;
 end;
 
-Procedure jBitmap.LoadFromRes(imgResIdenfier: String);  // ..res/drawable
+Procedure jBitmap.LoadFromRes(imgResIdentifier: String);  // ..res/drawable
 begin
    if FInitialized then
    begin
-       jBitmap_loadRes(FjEnv, FjObject , imgResIdenfier);
+       jBitmap_loadRes(FjEnv, FjObject , imgResIdentifier);
        FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
        FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
    end;
@@ -9819,6 +9825,46 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetRoundedShape(FjEnv, FjObject, _bitmapImage ,_diameter);
+end;
+
+function jBitmap.DrawText(_bitmapImage: jObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_DrawText(FjEnv, FjObject, _bitmapImage ,_text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
+end;
+
+procedure jBitmap.SaveToFileJPG(_fullPathFileName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jBitmap_SaveToFileJPG(FjEnv, FjObject, _fullPathFileName);
+end;
+
+
+procedure jBitmap.SetImage(_bitmapImage: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+  begin
+     jBitmap_SetImage(FjEnv, FjObject, _bitmapImage);
+     FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
+     FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+  end;
+end;
+
+function jBitmap.DrawText(_text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_DrawText(FjEnv, FjObject, _text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
+end;
+
+function jBitmap.DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_DrawBitmap(FjEnv, FjObject, _bitmapImageIn ,_left ,_top);
 end;
 
 //------------------------------------------------------------------------------
