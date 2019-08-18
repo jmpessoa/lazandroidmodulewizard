@@ -374,6 +374,8 @@ begin
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPIChange(Sender: TObject);
+var
+  intTarqetApi: integer;
 begin
   if ListBoxTargetAPI.ItemIndex >=0 then
   begin
@@ -383,8 +385,15 @@ begin
     if not IsAllCharNumber(PChar(FTargetApi))  then
       FTargetApi:= '28';
 
-    if StrToInt(FTargetApi) < 28 then
+    intTarqetApi:= StrToInt(FTargetApi);
+    if intTarqetApi  < 28 then
        ShowMessage('Warning: remember that "google play" store NOW equires Target Api >= 28 !');
+
+    if (intTarqetApi> 28) and ( Pos('AppCompat', FAndroidTheme) > 0) then
+    begin
+       FTargetApi:= '28'; //LAMW dont support AndroidX, yet!
+    end;
+
   end;
 end;
 
@@ -546,13 +555,21 @@ begin
   if ModalResult = mrCancel  then Exit;
 
   FMainActivity:= 'App'; //TODO: flexibility here...
+
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
+
+  apiTarg:= StrToInt(FTargetApi);
+
+  if (apiTarg> 28) and ( Pos('AppCompat', FAndroidTheme) > 0) then
+  begin
+     FTargetApi:= '28'; //LAMW dont support AndroidX, yet!
+  end;
+
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
   if not IsAllCharNumber(PChar(FMinApi))  then FMinApi:= '14';
   if not IsAllCharNumber(PChar(FTargetApi)) then FTargetApi:= '28';
 
-  apiTarg:= StrToInt(FTargetApi);
   if StrToInt(FMinApi) > apiTarg then FMinApi:= IntToStr(apiTarg);
 
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then

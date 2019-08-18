@@ -1977,61 +1977,42 @@ begin
 
                if Pos('AppCompat', FAndroidTheme) > 0 then
                begin
-                  if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/appcompat-v7/26.1.0') then
+
+                  if compileSdkVersion = '28'  then
                   begin
-                     compileSdkVersion:= '26';
+                     compatVer:= '28.0.0';
+                     designVer:= '28.0.0';
+                     cardVer:= '28.0.0';
+                     recyclerVer:= '28.0.0';
+                  end
+                  else if compileSdkVersion = '27'  then
+                  begin
+                     compatVer:= '27.1.0';
+                     designVer:= '27.1.0';
+                     cardVer:= '27.1.0';
+                     recyclerVer:= '27.1.0';
+                  end
+                  else if compileSdkVersion = '26'  then
+                  begin
                      compatVer:= '26.1.0';
+                     designVer:= '26.1.0';
+                     cardVer:= '26.1.0';
+                     recyclerVer:= '26.1.0';
                   end
-                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/appcompat-v7/26.0.0-beta1')  then
+                  else if compileSdkVersion = '25'  then
                   begin
-                     compileSdkVersion:= '26';
-                     compatVer:= '26.0.0-beta1';
-                  end
-                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/appcompat-v7/26.0.0-alpha1')  then
-                  begin
-                     compileSdkVersion:= '26';
-                     compatVer:= '26.0.0-alpha1';
-                  end
-                  else
-                  begin
-                     compileSdkVersion:= '25';
                      compatVer:= '25.3.1';
+                     designVer:= '25.3.1';
+                     cardVer:= '25.3.1';
+                     recyclerVer:= '25.3.1';
                   end;
-
-                  //designVer
-                  if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/design/26.1.0') then
-                    designVer:= '26.1.0'
-                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/design/26.0.0-beta1')  then
-                    designVer:= '26.0.0-beta1'
-                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/design/26.0.0-alpha1')  then
-                    designVer:= '26.0.0-alpha1'
-                  else
-                    designVer:= '25.3.1';
-
-                  //cardVer
-                  if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.1.0') then
-                    cardVer:= '26.1.0'
-                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.0.0-beta1')  then
-                    cardVer:= '26.0.0-beta1'
-                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.0.0-alpha1')  then
-                    cardVer:= '26.0.0-alpha1'
-                  else
-                    cardVer:= '25.3.1';
-
-                  //recyclerVer
-                  if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.1.0') then
-                    recyclerVer:= '26.1.0'
-                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.0.0-beta1')  then
-                    recyclerVer:= '26.0.0-beta1'
-                  else if DirectoryExists(FPathToAndroidSDK+'extras/android/m2repository/com/android/support/cardview-v7/26.0.0-alpha1')  then
-                    recyclerVer:= '26.0.0-alpha1'
-                  else
-                    recyclerVer:= '25.3.1';
 
                   strList.Add('    compileSdkVersion '+compileSdkVersion);
 
                   if androidPluginNumber < 300 then
-                    strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
+                  begin
+                     strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
+                  end
                   //else: each version of the Android Gradle Plugin now has a default version of the build tools
 
                end

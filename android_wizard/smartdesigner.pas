@@ -811,8 +811,8 @@ begin
        end
        else
        begin
-         buildToolApi:= '26';
-         pluginVersion:= '3.0.1';  //gradle 4.1
+         buildToolApi:= '28';
+         pluginVersion:= '3.1.0';  //gradle 4.4.1
        end;
 
        if pluginVersion <> '' then
@@ -877,57 +877,35 @@ begin
 
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin
-           pathToSdk:= GetPathToSDKFromBuildXML(FPathToAndroidProject+'build.xml');
-           if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/appcompat-v7/26.1.0') then
+
+           if buildToolApi = '28'  then
            begin
-             buildToolApi:= '26';
-             compatVer:= '26.1.0';
+              compatVer:= '28.0.0';
+              designVer:= '28.0.0';
+              cardVer:= '28.0.0';
+              recyclerVer:= '28.0.0';
            end
-           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/appcompat-v7/26.0.0-beta1')  then
+           else if buildToolApi = '27'  then
            begin
-             buildToolApi:= '26';
-             compatVer:= '26.0.0-beta1';
+              compatVer:= '27.1.0';
+              designVer:= '27.1.0';
+              cardVer:= '27.1.0';
+              recyclerVer:= '27.1.0';
            end
-           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/appcompat-v7/26.0.0-alpha1')  then
+           else if buildToolApi = '26'  then
            begin
-             buildToolApi:= '26';
-             compatVer:= '26.0.0-alpha1';
+              compatVer:= '26.1.0';
+              designVer:= '26.1.0';
+              cardVer:= '26.1.0';
+              recyclerVer:= '26.1.0';
            end
-           else
+           else if buildToolApi = '25'  then
            begin
-             buildToolApi:= '25';
-             compatVer:= '25.3.1';
+              compatVer:= '25.3.1';
+              designVer:= '25.3.1';
+              cardVer:= '25.3.1';
+              recyclerVer:= '25.3.1';
            end;
-
-           //designVer
-           if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/design/26.1.0') then
-             designVer:= '26.1.0'
-           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/design/26.0.0-beta1')  then
-             designVer:= '26.0.0-beta1'
-           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/design/26.0.0-alpha1')  then
-             designVer:= '26.0.0-alpha1'
-           else
-             designVer:= '25.3.1';
-
-           //cardVer
-           if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.1.0') then
-             cardVer:= '26.1.0'
-           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.0.0-beta1')  then
-             cardVer:= '26.0.0-beta1'
-           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.0.0-alpha1')  then
-             cardVer:= '26.0.0-alpha1'
-           else
-             cardVer:= '25.3.1';
-
-           //recyclerVer
-           if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.1.0') then
-             recyclerVer:= '26.1.0'
-           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.0.0-beta1')  then
-             recyclerVer:= '26.0.0-beta1'
-           else if DirectoryExists(pathToSdk+'/extras/android/m2repository/com/android/support/cardview-v7/26.0.0-alpha1')  then
-             recyclerVer:= '26.0.0-alpha1'
-           else
-             recyclerVer:= '25.3.1';
 
            strList.Add('    compileSdkVersion '+ buildToolApi);
 
