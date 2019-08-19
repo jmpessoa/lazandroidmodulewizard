@@ -12,6 +12,9 @@ object AndroidModule1: TAndroidModule1
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   object jTextView1: jTextView
     Left = 21
     Top = 5

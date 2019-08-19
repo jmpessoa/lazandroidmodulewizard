@@ -274,6 +274,14 @@ begin
 end;
 
 { Class:     org_lamw_apporaclejdbcconnectiondemo1_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_apporaclejdbcconnectiondemo1_Controls
   Method:    pOnClose
   Signature: (J)V }
 procedure pOnClose(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -364,7 +372,7 @@ begin
     grantResult);
 end;
 
-const NativeMethods: array[0..39] of JNINativeMethod = (
+const NativeMethods: array[0..40] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -456,6 +464,9 @@ const NativeMethods: array[0..39] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -601,6 +612,8 @@ exports
   pOnChanged name 'Java_org_lamw_apporaclejdbcconnectiondemo1_Controls_'
     +'pOnChanged',
   pOnEnter name 'Java_org_lamw_apporaclejdbcconnectiondemo1_Controls_pOnEnter',
+  pOnBackPressed name 'Java_org_lamw_apporaclejdbcconnectiondemo1_Controls_'
+    +'pOnBackPressed',
   pOnClose name 'Java_org_lamw_apporaclejdbcconnectiondemo1_Controls_pOnClose',
   pAppOnViewClick name 'Java_org_lamw_apporaclejdbcconnectiondemo1_Controls_'
     +'pAppOnViewClick',

@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import java.util.Locale;
 //import static oracle.net.aso.C12.e;
 
 /*
@@ -51,6 +51,7 @@ public class jOracleJDBCConnection /*extends ...*/ {
 
     //java.sql.Connection
     private Connection connection = null;
+    private Locale locale = Locale.ENGLISH;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jOracleJDBCConnection(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -73,8 +74,9 @@ public class jOracleJDBCConnection /*extends ...*/ {
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
-    public static Connection createConnection(String driver, String url, String username, String password) throws ClassNotFoundException, SQLException {
+    public Connection createConnection(String driver, String url, String username, String password) throws ClassNotFoundException, SQLException {
         Class.forName(driver);
+        Locale.setDefault(locale);
         return DriverManager.getConnection(url, username, password);
     }
 
@@ -191,8 +193,8 @@ public class jOracleJDBCConnection /*extends ...*/ {
        }
     }
 
-    public  void SetDrive(String _drive) {
-        DEFAULT_DRIVER = _drive; //"oracle.jdbc.driver.OracleDriver";
+    public  void SetDriver(String _driver) {
+        DEFAULT_DRIVER = _driver; //"oracle.jdbc.driver.OracleDriver";
     }
     public  void SetUrl(String _url) {
         DEFAULT_URL = _url; //"jdbc:oracle:thin:@192.168.43.47:1521:XE";
@@ -204,6 +206,57 @@ public class jOracleJDBCConnection /*extends ...*/ {
 
     public  void SetPassword(String _password) {
         DEFAULT_PASSWORD = _password;
+    }
+
+    public void SetLanguage(int _language) {
+
+        switch (_language) {
+            case 0:
+                locale = Locale.getDefault();
+                break;
+            case 1:
+                locale = Locale.CANADA;
+                break;
+            case 2:
+                locale = Locale.CANADA_FRENCH;
+                break;
+            case 3:
+                locale = Locale.CHINESE;
+                break;
+            case 4:
+                locale = Locale.ENGLISH;
+                break;
+            case 5:
+                locale = Locale.FRENCH;
+                break;
+            case 6:
+                locale = Locale.GERMAN;
+                break;
+            case 7:
+                locale = Locale.ITALIAN;
+                break;
+            case 8:
+                locale = Locale.JAPANESE;
+                break;
+            case 9:
+                locale = Locale.KOREAN;
+                break;
+            case 10:
+                locale = Locale.SIMPLIFIED_CHINESE;
+                break;
+            case 11:
+                locale = Locale.TAIWAN;
+                break;
+            case 12:
+                locale = Locale.TRADITIONAL_CHINESE;
+                break;
+            case 13:
+                locale = Locale.UK;
+                break;
+            case 14:
+                locale = Locale.US;
+                break;
+        }
     }
 
 }

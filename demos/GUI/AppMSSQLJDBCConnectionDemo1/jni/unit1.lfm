@@ -1,0 +1,73 @@
+object AndroidModule1: TAndroidModule1
+  Left = 489
+  Top = 32
+  Width = 320
+  Height = 524
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  object jTextView1: jTextView
+    Left = 14
+    Top = 5
+    Width = 292
+    Height = 26
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App MS SQL JDBC Connection Demo1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jButton1: jButton
+    Left = 53
+    Top = 41
+    Width = 213
+    Height = 57
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Visible = True
+    Anchor = jTextView1
+    Id = 2
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Connect!'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton1Click
+  end
+  object jMsSqlJDBCConnection1: jMsSqlJDBCConnection
+    Language = slEnglish
+    left = 125
+    top = 215
+  end
+end

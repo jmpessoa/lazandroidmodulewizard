@@ -40,13 +40,14 @@ begin
 
    ShowMessage('warning: fix information and uncomment the code!!');
 
-(*
-   //warning: just dummy information....
-   jOracleJDBCConnection1.Drive:= 'oracle.jdbc.driver.OracleDriver';
-   jOracleJDBCConnection1.Url:= 'jdbc:oracle:thin:@192.168.43.47:1521:XE';  //jdbc:oracle:thin:@localhost:1521:MKYONG
-   jOracleJDBCConnection1.UserName:= 'root';
-   jOracleJDBCConnection1.Password:= '123456';
+   jOracleJDBCConnection1.Driver:= 'oracle.jdbc.driver.OracleDriver'; //OK !!!
+   jOracleJDBCConnection1.Language:= slEnglish; //OK!!!
 
+   //warning: just dummy information....
+   (*
+   jOracleJDBCConnection1.Url:= 'jdbc:oracle:thin:@192.168.43.47:1521:XE'; //change here!
+   jOracleJDBCConnection1.UserName:= 'root';    //change here!
+   jOracleJDBCConnection1.Password:= '123456';  // change here!
 
    if jOracleJDBCConnection1.Open() then
    begin
@@ -63,7 +64,7 @@ begin
        jOracleJDBCConnection1.Close();
 
    end;
-*)
+   *)
 
 end;
 

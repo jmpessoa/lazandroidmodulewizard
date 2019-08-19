@@ -5,7 +5,7 @@ unit oraclejdbcconnection;
 interface
 
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget;
+  Classes, SysUtils, And_jni, AndroidWidget;
 
 type
 
@@ -16,10 +16,11 @@ type
 
 jOracleJDBCConnection = class(jControl)
  private
-    FDrive: string;
+    FDriver: string;
     FUrl: string;
     FUserName: string;
     FPassword: string;
+    FLanguage: TSpeechLanguage;
 
  public
     constructor Create(AOwner: TComponent); override;
@@ -32,15 +33,17 @@ jOracleJDBCConnection = class(jControl)
     function ExecuteQuery(_sqlQuery: string): string;
     function ExecuteUpdate(_sqlExecute: string): boolean;
     procedure Close();
-    procedure SetDrive(_drive: string);
+    procedure SetDriver(_driver: string);
     procedure SetUrl(_url: string);
     procedure SetUserName(_username: string);
     procedure SetPassword(_password: string);
+    procedure SetLanguage(_language: TSpeechLanguage);
 
-    property Drive: string read FDrive write SetDrive;
+    property Driver: string read FDriver write SetDriver;
     property Url: string read FUrl write SetUrl;
     property UserName: string read FUserName write SetUserName;
     property Password: string read FPassword write SetPassword;
+    property Language: TSpeechLanguage read FLanguage write SetLanguage;
 
  published
 
@@ -52,11 +55,11 @@ function jOracleJDBCConnection_Open(env: PJNIEnv; _joraclejdbcconnection: JObjec
 function jOracleJDBCConnection_ExecuteQuery(env: PJNIEnv; _joraclejdbcconnection: JObject; _sqlQuery: string): string;
 function jOracleJDBCConnection_ExecuteUpdate(env: PJNIEnv; _joraclejdbcconnection: JObject; _sqlExecute: string): boolean;
 procedure jOracleJDBCConnection_Close(env: PJNIEnv; _joraclejdbcconnection: JObject);
-procedure jOracleJDBCConnection_SetDrive(env: PJNIEnv; _joraclejdbcconnection: JObject; _drive: string);
+procedure jOracleJDBCConnection_SetDriver(env: PJNIEnv; _joraclejdbcconnection: JObject; _driver: string);
 procedure jOracleJDBCConnection_SetUrl(env: PJNIEnv; _joraclejdbcconnection: JObject; _url: string);
 procedure jOracleJDBCConnection_SetUserName(env: PJNIEnv; _joraclejdbcconnection: JObject; _username: string);
 procedure jOracleJDBCConnection_SetPassword(env: PJNIEnv; _joraclejdbcconnection: JObject; _password: string);
-
+procedure jOracleJDBCConnection_SetLanguage(env: PJNIEnv; _jmssqljdbcconnection: JObject; _language: integer);
 
 implementation
 
@@ -65,7 +68,8 @@ implementation
 constructor jOracleJDBCConnection.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-//your code here....
+  //your code here....
+  FLanguage:= slEnglish;
 end;
 
 destructor jOracleJDBCConnection.Destroy;
@@ -133,11 +137,11 @@ begin
      jOracleJDBCConnection_Close(FjEnv, FjObject);
 end;
 
-procedure jOracleJDBCConnection.SetDrive(_drive: string);
+procedure jOracleJDBCConnection.SetDriver(_driver: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOracleJDBCConnection_SetDrive(FjEnv, FjObject, _drive);
+     jOracleJDBCConnection_SetDriver(FjEnv, FjObject, _driver);
 end;
 
 procedure jOracleJDBCConnection.SetUrl(_url: string);
@@ -161,6 +165,13 @@ begin
      jOracleJDBCConnection_SetPassword(FjEnv, FjObject, _password);
 end;
 
+procedure jOracleJDBCConnection.SetLanguage(_language: TSpeechLanguage);
+begin
+  //in designing component state: set value here...
+  FLanguage:= _language;
+  if FInitialized then
+    jOracleJDBCConnection_SetLanguage(FjEnv, FjObject, Ord(_language));
+end;
 
 {-------- jOracleJDBCConnection_JNI_Bridge ----------}
 
@@ -256,15 +267,15 @@ begin
 end;
 
 
-procedure jOracleJDBCConnection_SetDrive(env: PJNIEnv; _joraclejdbcconnection: JObject; _drive: string);
+procedure jOracleJDBCConnection_SetDriver(env: PJNIEnv; _joraclejdbcconnection: JObject; _driver: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_drive));
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_driver));
   jCls:= env^.GetObjectClass(env, _joraclejdbcconnection);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetDrive', '(Ljava/lang/String;)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDriver', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _joraclejdbcconnection, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -315,5 +326,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jOracleJDBCConnection_SetLanguage(env: PJNIEnv; _jmssqljdbcconnection: JObject; _language: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _language;
+  jCls:= env^.GetObjectClass(env, _jmssqljdbcconnection);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLanguage', '(I)V');
+  env^.CallVoidMethodA(env, _jmssqljdbcconnection, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.
