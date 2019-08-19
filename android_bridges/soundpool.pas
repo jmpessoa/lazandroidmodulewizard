@@ -19,6 +19,7 @@ type
 jSoundPool = class(jControl)
  private
     FOnLoadComplete: TOnLoadComplete;
+    FMaxStreams : integer;
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -41,10 +42,11 @@ jSoundPool = class(jControl)
 
     procedure GenEvent_OnLoadComplete(Obj: jObject; soundId: integer; status: integer);
  published
+   property MaxStreams : integer read FMaxStreams write FMaxStreams;
    property OnLoadComplete: TOnLoadComplete read FOnLoadComplete write FOnLoadComplete;
 end;
 
-function  jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function  jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject; _maxStreams : integer): jObject;
 function  jSoundPool_SoundLoad(env: PJNIEnv; _jsoundpool: JObject; _path: string; _filename: string): integer; overload;
 function  jSoundPool_SoundLoad(env: PJNIEnv; _jsoundpool: JObject; _path: string): integer; overload;
 procedure jSoundPool_SoundUnload(env: PJNIEnv; _jsoundpool: JObject; soundId: integer);
@@ -67,8 +69,10 @@ implementation
 
 constructor jSoundPool.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-//your code here....
+ FMaxStreams := 5;
+
+ inherited Create(AOwner);
+ //your code here....
 end;
 
 destructor jSoundPool.Destroy;
@@ -97,7 +101,7 @@ end;
 
 function jSoundPool.jCreate(): jObject;
 begin
-   Result:= jSoundPool_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jSoundPool_jCreate(FjEnv, int64(Self), FjThis, FMaxStreams);
 end;
 
 
@@ -225,15 +229,16 @@ end;
 
 {-------- jSoundPool_JNI_Bridge ----------}
 
-function jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject; _maxStreams : integer): jObject;
 var
-  jParams: array[0..0] of jValue;
+  jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+  jParams[1].i:= _maxStreams;
   jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jSoundPool_jCreate', '(J)Ljava/lang/Object;');
+  jMethod:= env^.GetMethodID(env, jCls, 'jSoundPool_jCreate', '(JI)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;

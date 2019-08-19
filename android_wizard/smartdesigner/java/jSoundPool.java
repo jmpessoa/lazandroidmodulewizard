@@ -27,9 +27,8 @@ public class jSoundPool implements SoundPool.OnLoadCompleteListener {
 	private Context  context   = null;
 	
     private SoundPool soundPool;
-    private final int maxStreams = 5;    
-
-    public jSoundPool(Controls _ctrls, long _Self) {
+    
+    public jSoundPool(Controls _ctrls, long _Self, int maxStreams) {
     	//super(_ctrls.activity);
 	    pascalObj = _Self ;
 		controls  = _ctrls;
