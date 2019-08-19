@@ -906,7 +906,9 @@ Function  jDialogYN_Create             (env:PJNIEnv; this:jobject; SelfObj : TOb
 Procedure jDialogYN_Free               (env:PJNIEnv; DialogYN: jObject);
 Procedure jDialogYN_Show(env:PJNIEnv; DialogYN: jObject; titleText: string; msgText: string; yesText: string; noText:string);
 procedure jDialogYN_ShowOK(env: PJNIEnv; _jdialogyn: JObject; titleText: string; msgText: string; _OkText: string);
+
 procedure jDialogYN_SetFontSize(env: PJNIEnv; _jdialogyn: JObject; fontSize: integer); // by tr3e
+procedure jDialogYN_SetTitleAlign(env: PJNIEnv; _jdialogyn: JObject; titleAlign: integer); // by tr3e
 
 // Dialog Progress
 Function  jDialogProgress_Create       (env:PJNIEnv; this:jobject; SelfObj : TObject;
@@ -9662,6 +9664,20 @@ begin
 
  cls := env^.GetObjectClass(env, _jdialogyn);
 _jMethod:= env^.GetMethodID(env, cls, 'SetFontSize', '(I)V');
+ env^.CallVoidMethodA(env,_jdialogyn,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+procedure jDialogYN_SetTitleAlign(env: PJNIEnv; _jdialogyn: JObject; titleAlign: integer);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+  _jParams[0].i := titleAlign;
+
+ cls := env^.GetObjectClass(env, _jdialogyn);
+_jMethod:= env^.GetMethodID(env, cls, 'SetTitleAlign', '(I)V');
  env^.CallVoidMethodA(env,_jdialogyn,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;

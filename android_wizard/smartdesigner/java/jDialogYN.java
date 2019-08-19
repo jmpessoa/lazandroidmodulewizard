@@ -11,7 +11,7 @@ class YNConst {
   public static final int Click_No  = -2;
 }
 
-//Revised 08/14/2019 [by TR3E]
+//Revised 08/19/2019 [by TR3E]
 
 public class jDialogYN {
  //Java-Pascal Interface
@@ -23,7 +23,8 @@ public class jDialogYN {
  private String          dlgY;
  private String          dlgN;
  
- private int 			 mFontSize; 
+ private int 			 mFontSize;   // by tr3e
+ private int			 mTitleAlign; // by tr3e
  //
  private DialogInterface.OnClickListener onClickListener = null;
  private AlertDialog dialog = null;
@@ -68,12 +69,19 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 	
 	TextView title = new TextView(controls.activity);
     title.setText(dlgTitle);
-    title.setPadding(5, 5, 5, 5);
+    title.setPadding(10, 10, 10, 10);
+    
     //title.setBackgroundResource(R.drawable.gradient);
-    //title.setGravity(Gravity.CENTER);
     //title.setTextColor(0xFF0000FF);
+    
+    switch( mTitleAlign ){ 
+     case 0 : title.setGravity(Gravity.LEFT); break;
+     case 1 : title.setGravity(Gravity.RIGHT); break;
+     case 2 : title.setGravity(Gravity.CENTER); break;
+    }
+    
     if( mFontSize != 0)
-    	  title.setTextSize(mFontSize);
+      title.setTextSize(mFontSize);
     
     builder.setCustomTitle(title);
 	
@@ -108,7 +116,13 @@ public void ShowOK(String titleText, String msgText, String _OkText) {
 	
 	TextView title = new TextView(controls.activity);
     title.setText(dlgTitle);
-    title.setPadding(5, 5, 5, 5);
+    title.setPadding(10, 10, 10, 10);
+    
+    switch( mTitleAlign ){ 
+    case 0 : title.setGravity(Gravity.LEFT); break;
+    case 1 : title.setGravity(Gravity.RIGHT); break;
+    case 2 : title.setGravity(Gravity.CENTER); break;
+    }
     
     if( mFontSize != 0)
     	  title.setTextSize(mFontSize);
@@ -137,6 +151,11 @@ public void ShowOK(String titleText, String msgText, String _OkText) {
 // by tr3e
 public void SetFontSize( int _fontSize ){
 	mFontSize = _fontSize;
+}
+
+// by tr3e
+public void SetTitleAlign( int _titleAlign ){
+	mTitleAlign = _titleAlign;
 }
 
 public  void Free() {

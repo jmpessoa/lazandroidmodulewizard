@@ -600,6 +600,7 @@ type
     FNo: string;
     FParent     : jForm;
     FOnDialogYN : TOnClickYN;
+    FTitleAlign : TTextAlign; // by tr3e
   protected
     Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
   public
@@ -611,7 +612,9 @@ type
     Procedure Show(titleText: string; msgText: string; yesText: string; noText: string); overload;
     Procedure Show(titleText: string; msgText: string); overload;
     procedure ShowOK(titleText: string; msgText: string; _OkText: string);
+
     Procedure SetFontSize( fontSize : integer ); // by tr3e
+    procedure SetTitleAlign( _titleAlign : TTextAlign ); // by tr3e
 
     property Parent   : jForm     read FParent   write FParent;
   published
@@ -619,6 +622,7 @@ type
     property Msg: string read FMsg write FMsg;
     property Yes: string read FYes write FYes;
     property No: string  read FNo write FNo;
+    property TitleAlign: TTextAlign read FTitleAlign write SetTitleAlign;
     //event
     property OnClickYN: TOnClickYN read FOnDialogYN write FOnDialogYN;
   end;
@@ -10445,7 +10449,12 @@ procedure jDialogYN.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
+
   FjObject := jDialogYN_Create(FjEnv, FjThis, Self, FTitle, FMsg, FYes, FNo);
+
+  if FTitleAlign <> alLeft then
+   jDialogYN_SetTitleAlign( FjEnv, FjObject, ord(FTitleAlign) );
+
   FInitialized:= True;
 end;
 
@@ -10481,6 +10490,14 @@ Procedure jDialogYN.SetFontSize( fontSize : integer );
 begin
   if FInitialized then
      jDialogYN_SetFontSize( FjEnv, FjObject, fontSize );
+end;
+
+Procedure jDialogYN.SetTitleAlign( _titleAlign : TTextAlign );
+begin
+  FTitleAlign := _titleAlign;
+
+  if FInitialized then
+     jDialogYN_SetTitleAlign( FjEnv, FjObject, ord(FTitleAlign) );
 end;
 
 // Event : Java -> Pascal
