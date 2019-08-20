@@ -1,6 +1,7 @@
 package org.lamw.appviewflipperdemo2;
 
 import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -34,6 +35,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
 import android.view.Gravity;
+
+//Reviewed by TR3E on 08/20/2019
 
 public class jEditText extends EditText {
 	//Pascal Interface
@@ -94,10 +97,33 @@ public class jEditText extends EditText {
 			};
 		};
 		setOnClickListener(onClickListener);
-
+		
+		// Fixed "Go / Next / Done / Ok" command capture [by TR3E]
+		setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			        @Override
+			        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+			            if (actionId != 0) {
+			            	final EditText caption = (EditText)v;
+						    
+			            	if (mCloseSoftInputOnEnter) {
+								InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+								imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							}
+						    
+							if (!caption.getText().toString().equals("")){  //try fix program logic...
+								controls.pOnEnter(LAMWCommon.getPasObj());							
+							}
+											    
+			                return true;
+			            } else {
+			                return false;
+			            }
+			        }
+	     });
+		
 		onKeyListener = new OnKeyListener() {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
-				//if (event.getAction() == KeyEvent.ACTION_UP) {
+				
 				    final EditText caption = (EditText)v;
 				    
 				    // by tr3e fix back_key close app
@@ -108,24 +134,24 @@ public class jEditText extends EditText {
 						controls.pOnBackPressed(LAMWCommon.getPasObj());
 						return true;
 			        }
-				    
-					//if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok
-				    if((event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+				    					
+				    if( (event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
 						if (mCloseSoftInputOnEnter) {
 							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 						}
 						if (! caption.getText().toString().equals("")){  //try fix program logic...
-							controls.pOnEnter(LAMWCommon.getPasObj());
+						 controls.pOnEnter(LAMWCommon.getPasObj());
 						}
 						return mCloseSoftInputOnEnter;
 					}
-				//}
+				
 				return false;
 			}
 		};
 
 		setOnKeyListener(onKeyListener);
+		
 		//Event
 		textwatcher = new TextWatcher() {
 			@Override
