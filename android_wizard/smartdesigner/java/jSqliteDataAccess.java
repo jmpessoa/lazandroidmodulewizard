@@ -65,7 +65,7 @@ import java.util.zip.ZipInputStream;
  * your app which uses a lower version number than a
  * previously-installed version will result in undefined behavior.</p>
  * 
- * Review by TR3E 2019/03/28
+ * Review by TR3E 2019/08/21
  */
 class SQLiteAssetHelper extends SQLiteOpenHelper {
 
@@ -192,12 +192,13 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
     @Override
     public synchronized SQLiteDatabase getWritableDatabase() {
         
-        if (mDatabase != null && mDatabase.isOpen() && !mDatabase.isReadOnly()) {
-            return mDatabase;  // The database is already open for business
-        }
+        if (mDatabase != null)
+        	if (mDatabase.isOpen() && !mDatabase.isReadOnly())
+        		return mDatabase;  // The database is already open for business        
 
         if (mIsInitializing) {
-            throw new IllegalStateException("getWritableDatabase called recursively");
+            //throw new IllegalStateException("getWritableDatabase called recursively");
+        	return null;
         }
 
         // If we have a read-only database open, someone could be using it
@@ -206,17 +207,26 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
         // fail waiting for the file lock.  To prevent that, we acquire the
         // lock on the read-only database, which shuts out other users.
 
+        mIsInitializing = true;
         boolean success = false;
         SQLiteDatabase db = null;
         //if (mDatabase != null) mDatabase.lock();
-        try {
-            mIsInitializing = true;
+        try {        	
             //if (mName == null) {
             //    db = SQLiteDatabase.create(null);
             //} else {
             //    db = mContext.openOrCreateDatabase(mName, 0, mFactory);
             //}
+        	if (mDatabase != null) {
+                try { mDatabase.close(); } catch (Exception e) { }                
+            }
+        	
             db = createOrOpenDatabase(false);
+            
+            if( db == null ){
+            	 mIsInitializing = false;
+            	 return null;
+            }
 
             int version = db.getVersion();
 
@@ -229,6 +239,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
 
             if (version != mNewVersion) {
                 db.beginTransaction();
+                
                 try {
                     if (version == 0) {
                         onCreate(db);
@@ -236,7 +247,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
                         if (version > mNewVersion) {
                             Log.w(TAG, "downgrade database from version " +
                                     version + " to " + mNewVersion + ": " + db.getPath());
-				db.setVersion(mNewVersion);
+                            db.setVersion(mNewVersion);
 				
                         }
                         onUpgrade(db, version, mNewVersion);
@@ -249,20 +260,20 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
             }
 
             onOpen(db);
-            success = true;
-            return db;
+            success = true;                        
         } finally {
-            mIsInitializing = false;
-            if (success) {
-                if (mDatabase != null) {
-                    try { mDatabase.close(); } catch (Exception e) { }
-                    //mDatabase.unlock();
-                }
+                       
+            if (success) {                
                 mDatabase = db;
-            } else {
-                //if (mDatabase != null) mDatabase.unlock();
+                
+                mIsInitializing = false;
+                return db;
+            } else {                
                 if (db != null) db.close();
             }
+            
+            mIsInitializing = false;
+            return null;
         }
 
     }
@@ -287,38 +298,54 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
      */
     @Override
     public synchronized SQLiteDatabase getReadableDatabase() {
-        if (mDatabase != null && mDatabase.isOpen()) {        	
-            return mDatabase;  // The database is already open for business
-        }
-
+        if( mDatabase != null )
+          if( mDatabase.isOpen() )         	
+             return mDatabase;  // The database is already open for business
+        
         if (mIsInitializing) {
-            throw new IllegalStateException("getReadableDatabase called recursively");
+            //throw new IllegalStateException("getReadableDatabase called recursively");
+        	return null;
         }
 
         try {
             return getWritableDatabase();
         } catch (SQLiteException e) {
-            if (mName == null) throw e;  // Can't open a temp database read-only!
-            Log.e(TAG, "Couldn't open " + mName + " for writing (will try read-only):", e);
+            //if (mName == null) throw e;  // Can't open a temp database read-only!
+            if (mName == null) return null;  // Can't open a temp database read-only!
+            //Log.e(TAG, "Couldn't open " + mName + " for writing (will try read-only):", e);
         }
 
+        mIsInitializing = true;
         SQLiteDatabase db = null;
-        try {
-            mIsInitializing = true;
+        
+        try {            
             String path = mContext.getDatabasePath(mName).getPath();
+            
+            if (mDatabase != null) {
+                try { mDatabase.close(); } catch (Exception e) { }                
+            }
+            
             db = SQLiteDatabase.openDatabase(path, mFactory, (SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS));
+            
+            if( db == null){
+             mIsInitializing = false;
+             return null;
+            }
+            
             if (db.getVersion() != mNewVersion) {
                 throw new SQLiteException("Can't upgrade read-only database from version " +
                         db.getVersion() + " to " + mNewVersion + ": " + path);
             }
 
             onOpen(db);// borsa.db_upgrade_1-2.sql
-            Log.w(TAG, "Opened " + mName + " in read-only mode");
-            mDatabase = db;
-            return mDatabase;
+            //Log.w(TAG, "Opened " + mName + " in read-only mode");
+            mDatabase = db;            
         } finally {
+        	
+            if ((db != null) && (db != mDatabase)) db.close();
+                        
             mIsInitializing = false;
-            if (db != null && db != mDatabase) db.close();
+            return mDatabase;
         }
         
     }
@@ -826,6 +853,12 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   
   try {
    cursor = mydb.rawQuery(selectQuery, null);
+   
+   if(cursor == null){
+	   mydb.close();
+	   return "";
+   }
+   
    rowCount = cursor.getCount();
    colCount = cursor.getColumnCount();
    headerRow = "";
@@ -834,11 +867,13 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
       headerRow = headerRow + cursor.getColumnName(i) + selectColDelimiter;
    }
    
-   if (rowCount == 0) {	   
+   if (rowCount == 0) {
+	 mydb.close();
+	 
 	 if (mReturnHeaderOnSelect)
 	    return  headerRow;
 	 else
-		 return  "";
+	    return  "";
    }
       
    headerRow = headerRow.substring(0, headerRow.length() - 1);
@@ -891,39 +926,48 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
    else
 	  allRows = rows; 
    
-  } catch (SQLiteException se) {
-	   if (mydb != null) mydb.close();
+  } catch (SQLiteException se) {	   
 	   allRows = "";
        Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
   }
   
   cursor.moveToFirst();  //reset cursor ...
-  if (mydb != null) mydb.close();
+  mydb.close();
 
   return allRows;
  }
 
  public boolean Select(String selectQuery, boolean moveToLast) { //just set the cursor! return void..
+	 
   SQLiteDatabase mydb = getReadableDatabase();
   
   if( mydb == null ) return false;
   
+  rowCount = 0;
+  
   try {
    this.cursor = mydb.rawQuery(selectQuery, null);
-   rowCount = this.cursor.getCount();
    
-   if (rowCount > 0)
-   {
-    if (!moveToLast)
+   if( this.cursor != null ){
+    rowCount = this.cursor.getCount();
+   
+    if (rowCount > 0)
+    {
+     if (!moveToLast)
       this.cursor.moveToFirst();
-    else
+     else
 	  this.cursor.moveToLast();
+    }
    }
    
    mydb.close();
    
    return (rowCount > 0);
-  } catch (SQLiteException se) {   
+   
+  } catch (SQLiteException se) {
+	  
+   mydb.close();
+   
    Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
    return false;
   }
@@ -1036,6 +1080,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
 
     public boolean ExecSQL(String execQuery) {
+    	
         SQLiteDatabase mydb = getWritableDatabase();
 
         if( mydb == null ) return false;
@@ -1142,12 +1187,12 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
  public boolean UpdateTableBatch(String[] _updateQueries) {
      SQLiteDatabase mydb = getWritableDatabase();
+     
+     if(mydb == null) return false;
 
      boolean r = false;
      int i;
      int len = _updateQueries.length;
-
-     if(mydb == null) return false;
 
      try {
          mydb.beginTransaction();
