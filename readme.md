@@ -85,7 +85,7 @@
 		-Frederico Marques - Tutorial in Portuguese
 			https://www.linkedin.com/pulse/lazarus-android-module-wizard-lamw-gere-seu-apk-usando-marques/	
 			
-		-Rogelio Fernandez Arraez - many, many contributions!!!!
+		-TR3E - many, many contributions!!!!
 			tr3esoftware dot gmail com
 
 		-Lazarus forum community!
