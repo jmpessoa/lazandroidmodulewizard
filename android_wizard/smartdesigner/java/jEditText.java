@@ -1,4 +1,4 @@
-package org.lamw.appviewflipperdemo2;
+package org.lamw.appcompatnavigationdrawerdemo1;
 
 import java.io.BufferedReader;
 
@@ -35,6 +35,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
 import android.view.Gravity;
+import android.widget.TextView;
 
 //Reviewed by TR3E on 08/20/2019
 
