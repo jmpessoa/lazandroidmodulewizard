@@ -2009,6 +2009,9 @@ type
     procedure SetImageDownByIndex(Value: integer);
     procedure SetImageUpByIndex(Value: integer);
 
+    procedure SetImageUpIndex(Value: TImageListIndex); // by TR3E
+    procedure SetImageDownIndex(Value: TImageListIndex); // by TR3E
+
     procedure SetImageDownByRes(imgResIdentifief: string); //  ../res/drawable
     procedure SetImageUpByRes(imgResIdentifief: string);   //  ../res/drawable
 
@@ -2035,8 +2038,8 @@ type
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
     property Images    : jImageList read FImageList write SetImages;
-    property IndexImageUp: TImageListIndex read FImageUpIndex write FImageUpIndex default -1;
-    property IndexImageDown: TImageListIndex read FImageDownIndex write FImageDownIndex default -1;
+    property IndexImageUp: TImageListIndex read FImageUpIndex write SetImageUpIndex; // Fix by TR3E
+    property IndexImageDown: TImageListIndex read FImageDownIndex write SetImageDownIndex; // Fix by TR3E
 
     property ImageUpIdentifier: string read FImageUpName write SetImageUpByRes;
     property ImageDownIdentifier: string read FImageDownName write SetImageDownByRes;
@@ -10802,6 +10805,40 @@ begin
   FImageUpName:=  imgResIdentifief;
   if FInitialized then
     jImageBtn_setButtonUpByRes(FjEnv, FjObject , imgResIdentifief);
+end;
+
+// by TR3E
+procedure jImageBtn.SetImageUpIndex(Value: TImageListIndex);
+begin
+
+  FImageUpIndex:= Value;
+
+  if FImageList = nil then exit;
+
+  if FInitialized then
+  begin
+      if Value > FImageList.Images.Count then FImageUpIndex:= FImageList.Images.Count;
+      if Value < 0 then FImageUpIndex:= 0;
+      SetImageUpByIndex(Value);
+  end;
+
+end;
+
+// by TR3E
+procedure jImageBtn.SetImageDownIndex(Value: TImageListIndex);
+begin
+
+  FImageDownIndex:= Value;
+
+  if FImageList = nil then exit;
+
+  if FInitialized then
+  begin
+      if Value > FImageList.Images.Count then FImageDownIndex:= FImageList.Images.Count;
+      if Value < 0 then FImageDownIndex:= 0;
+      SetImageDownByIndex(Value);
+  end;
+
 end;
 
 procedure jImageBtn.ClearLayout();
