@@ -70,7 +70,7 @@ class jListItemRow {
 	int textDecorated;
 	int textSizeDecorated;
 	int itemLayout;
-	int textAlign;
+	int textAlign = 0;
 	int textPosition=1; //posCenter
 	String tagString="";
 
@@ -618,8 +618,9 @@ class jArrayAdapter extends ArrayAdapter {
 		    paddingLeft  = 0;
 		else return; // layText
 				
-		if (mDispatchOnDrawItemBitmap)  {
+		if (mDispatchOnDrawItemBitmap){  
 			Bitmap  imageBmp = (Bitmap)controls.pOnListViewDrawItemBitmap(PasObj, (int)position , items.get(position).label);
+			
 			if (imageBmp != null) {
 				itemImage = new ImageView(ctx);
 				itemImage.setId(position+4444);
@@ -628,30 +629,22 @@ class jArrayAdapter extends ArrayAdapter {
 				itemImage.setFocusable(false);
 				itemImage.setFocusableInTouchMode(false);					
 				itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
+				return;
 			}
-			else {
-				if (items.get(position).bmp !=  null) {
+		}
+			
+	    if (items.get(position).bmp !=  null) {
 					itemImage = new ImageView(ctx);
 					itemImage.setId(position+4444);
 					itemImage.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
 					itemImage.setImageBitmap(items.get(position).bmp);
 					itemImage.setFocusable(false);
 					itemImage.setFocusableInTouchMode(false);						
-					itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
-				}
-			}
+					itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e					
 		}
-		else {
-			if (items.get(position).bmp !=  null) {
-				itemImage = new ImageView(ctx);
-				itemImage.setId(position+5555);
-				itemImage.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-				itemImage.setImageBitmap(items.get(position).bmp);
-				itemImage.setFocusable(false);
-				itemImage.setFocusableInTouchMode(false);
-				itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
-			}
-		}
+			
+		
+		
 	}
 	
 	// tr3e Code optimization
@@ -763,7 +756,7 @@ class jArrayAdapter extends ArrayAdapter {
 				   itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);
 				
 				if (items.get(position).textAlign == 1)   //right  ***
-				   itemText[i].setGravity(Gravity.RIGHT);
+				   itemText[i].setGravity(Gravity.RIGHT);							
 				
 				if( mEnableOnClickTextCenter )
 				    itemText[i].setOnClickListener( getOnClickTextCenter( itemText[i], position) );
@@ -1441,7 +1434,7 @@ public class jListView extends ListView {
 	int textDecorated;
 	int itemLayout;
 	int textSizeDecorated;
-	int textAlign;
+	int textAlign = 0;
 	int textPosition = 1; //posCenter
 	
 	String delimiter = "|";
@@ -1888,7 +1881,6 @@ public class jListView extends ListView {
 		}
 	}
 	
-	// by TR3E
 	public void setTextSizeAll(int textsize) {
 		if (textsize != 0) {
 			this.textSize = textsize;

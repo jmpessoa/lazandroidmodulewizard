@@ -5047,7 +5047,7 @@ begin
  _jParams[5].i := itemLay;
  _jParams[6].i := txtSizeDec;
  _jParams[7].i := txtAlign;
- _jParams[7].i := txtPosition;
+ _jParams[8].i := txtPosition;
   cls:= Get_gjClass(env); {global}
   {jmpessoa/warning: a jmethodID is not an object. So don't need to convert it to a GlobalRef!}
  _jMethod:= env^.GetMethodID(env, cls, 'jListView_Create2',
