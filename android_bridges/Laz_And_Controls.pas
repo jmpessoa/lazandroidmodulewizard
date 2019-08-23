@@ -715,7 +715,8 @@ type
      function GetColumName(columnIndex: integer): string;
      function GetColType(columnIndex: integer): TSqliteFieldType;
 
-     function GetValueAsString(position: integer; columnName: string): string; overload;
+     function GetValueToString(columnIndex: integer): string; overload;
+     function GetValueToString(colName: string): string; overload;
      function GetValueAsString(columnIndex: integer): string;   overload;
      function GetValueAsString(colName: string): string; overload;
      function GetValueAsBitmap(columnIndex: integer): jObject; overload;
@@ -11268,7 +11269,7 @@ function jSqliteCursor.GetValueAsString(colName: string): string;
 begin
 
  if FInitialized  then
-  result := jSqliteCursor_GetValueAsString(FjEnv, FjObject , colName)
+  result := GetValueAsString(GetColumnIndex(colName))
  else
   result := '';
 end;
@@ -11286,7 +11287,7 @@ function jSqliteCursor.GetValueAsBitmap(colName: string): jObject;
 begin
 
   if FInitialized  then
-   result := jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , colName)
+   result := GetValueAsBitmap(GetColumnIndex(colName))
   else
    result := nil;
 end;
@@ -11304,7 +11305,7 @@ function jSqliteCursor.GetValueAsInteger(colName: string): integer;
 begin
 
   if FInitialized  then
-   result :=  jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , colName)
+   result :=  GetValueAsInteger(GetColumnIndex(colName))
   else
    result := -1;
 end;
@@ -11322,7 +11323,7 @@ function jSqliteCursor.GetValueAsDouble(colName: string): double;
 begin
 
   if FInitialized  then
-   Result :=  jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , colName)
+   Result :=  GetValueAsDouble(GetColumnIndex(colName))
   else
    result := -1;
 end;
@@ -11340,16 +11341,25 @@ function jSqliteCursor.GetValueAsFloat(colName: string): real;
 begin
 
   if FInitialized  then
-   result := jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , colName)
+   result := GetValueAsFloat(GetColumnIndex(colName))
   else
    result := -1;
 end;
 
-function jSqliteCursor.GetValueAsString(position: integer; columnName: string): string;
+function jSqliteCursor.GetValueToString(columnIndex: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   result := jSqliteCursor_GetValueAsString(FjEnv, FjObject, position ,columnName)
+   result := jSqliteCursor_GetValueToString(FjEnv, FjObject, columnIndex)
+  else
+   result := '';
+end;
+
+function jSqliteCursor.GetValueToString(colName: string): string;
+begin
+
+  if FInitialized  then
+   Result :=  GetValueToString(GetColumnIndex(colName))
   else
    result := '';
 end;

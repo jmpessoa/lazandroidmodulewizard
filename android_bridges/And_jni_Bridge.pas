@@ -977,17 +977,12 @@ Function jSqliteCursor_GetColumnIndex(env:PJNIEnv;  SqliteCursor: jObject; colNa
 Function jSqliteCursor_GetColumName(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
 Function jSqliteCursor_GetColType(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): integer;
 
-Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string; overload;
-function jSqliteCursor_GetValueAsString(env: PJNIEnv; SqliteCursor: JObject; colName: string): string; overload;
+function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string; overload;
 function jSqliteCursor_GetValueAsBitmap(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): jObject; overload;
-function jSqliteCursor_GetValueAsBitmap(env: PJNIEnv; SqliteCursor: JObject; colName: string): jObject; overload;
 function jSqliteCursor_GetValueAsDouble (env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): double; overload;
-function jSqliteCursor_GetValueAsDouble(env: PJNIEnv; SqliteCursor: JObject; colName: string): double; overload;
 function jSqliteCursor_GetValueAsFloat (env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): real; overload;
-function jSqliteCursor_GetValueAsFloat(env: PJNIEnv; SqliteCursor: JObject; colName: string): real; overload;
 function jSqliteCursor_GetValueAsInteger(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): integer; overload;
-function jSqliteCursor_GetValueAsInteger(env: PJNIEnv; SqliteCursor: JObject; colName: string): integer; overload;
-function jSqliteCursor_GetValueAsString(env: PJNIEnv; SqliteCursor: JObject; position: integer; columnName: string): string; overload;
+function jSqliteCursor_GetValueToString(env: PJNIEnv; SqliteCursor: JObject; columnIndex: integer): string;
 function jSqliteCursor_GetPosition(env: PJNIEnv; SqliteCursor: JObject): integer;
 
 {jSqliteDataAccess: by jmpessoa}
@@ -10330,30 +10325,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-{
-Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
- _jParam: array[0..0] of jValue;
-  _jString  : jString;
- _jBoolean : jBoolean;
-begin
-  _jParam[0].i := columnIndex;
-  cls := env^.GetObjectClass(env, SqliteCursor);
-  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsString', '(I)Ljava/lang/String;');
-  _jString   := env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
-  case _jString = nil of
-    True : Result    := '';
-    False: begin
-            _jBoolean := JNI_False;
-            Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
-  env^.DeleteLocalRef(env, cls);
-end;
-}
-
 //fixed by Martin Lowry
 
 Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
@@ -10382,32 +10353,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-function jSqliteCursor_GetValueAsString(env: PJNIEnv; SqliteCursor: JObject; colName: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(colName));
-  jCls:= env^.GetObjectClass(env, SqliteCursor);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetValueAsString', '(Ljava/lang/String;)Ljava/lang/String;');
-
-  jStr:= env^.CallObjectMethodA(env, SqliteCursor, jMethod, @jParams);
-
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 
 function jSqliteCursor_GetValueAsBitmap(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): jObject;
 var
@@ -10420,20 +10365,6 @@ begin
   _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsBitmap', '(I)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
   env^.DeleteLocalRef(env, cls);
-end;
-
-function jSqliteCursor_GetValueAsBitmap(env: PJNIEnv; SqliteCursor: JObject; colName: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(colName));
-  jCls:= env^.GetObjectClass(env, SqliteCursor);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetValueAsBitmap', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, SqliteCursor, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jSqliteCursor_GetValueAsInteger(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): integer;
@@ -10449,20 +10380,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-function jSqliteCursor_GetValueAsInteger(env: PJNIEnv; SqliteCursor: JObject; colName: string): integer;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(colName));
-  jCls:= env^.GetObjectClass(env, SqliteCursor);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetValueAsInteger', '(Ljava/lang/String;)I');
-  Result:= env^.CallIntMethodA(env, SqliteCursor, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 function jSqliteCursor_GetValueAsDouble(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): double;
 var
  _jMethod : jMethodID = nil;
@@ -10474,20 +10391,6 @@ begin
   _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsDouble', '(I)D');
   Result:= env^.CallDoubleMethodA(env,SqliteCursor,_jMethod,@_jParam);
   env^.DeleteLocalRef(env, cls);
-end;
-
-function jSqliteCursor_GetValueAsDouble(env: PJNIEnv; SqliteCursor: JObject; colName: string): double;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(colName));
-  jCls:= env^.GetObjectClass(env, SqliteCursor);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetValueAsDouble', '(Ljava/lang/String;)D');
-  Result:= env^.CallDoubleMethodA(env, SqliteCursor, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jSqliteCursor_GetValueAsFloat(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): real;
@@ -10503,42 +10406,30 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-function jSqliteCursor_GetValueAsFloat(env: PJNIEnv; SqliteCursor: JObject; colName: string): real;
+Function jSqliteCursor_GetValueToString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
 var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+  _jString  : jString;
+ _jBoolean : jBoolean;
+ tmp:pchar;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(colName));
-  jCls:= env^.GetObjectClass(env, SqliteCursor);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetValueAsFloat', '(Ljava/lang/String;)F');
-  Result:= env^.CallFloatMethodA(env, SqliteCursor, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jSqliteCursor_GetValueAsString(env: PJNIEnv; SqliteCursor: JObject; position: integer; columnName: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= position;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(columnName));
-  jCls:= env^.GetObjectClass(env, SqliteCursor);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetValueAsString', '(ILjava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, SqliteCursor, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
+  _jParam[0].i := columnIndex;
+  cls := env^.GetObjectClass(env, SqliteCursor);
+  _jMethod:= env^.GetMethodID(env, cls, 'GetValueToString', '(I)Ljava/lang/String;');
+  _jString   := env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
+  case _jString = nil of
+    True : Result    := '';
+    False: begin
+            _jBoolean := JNI_False;
+            tmp    := env^.GetStringUTFChars(Env, _jString, @_jBoolean);
+            Result := AnsiString( tmp );
+            env^.ReleaseStringUTFChars(env, _jString, tmp);
+            env^.DeleteLocalRef(env, _jString);
+          end;
   end;
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 function jSqliteCursor_GetPosition(env: PJNIEnv; SqliteCursor: JObject): integer;
