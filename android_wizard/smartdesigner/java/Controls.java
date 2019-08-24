@@ -146,6 +146,9 @@ import javax.microedition.khronos.egl.EGLSurface;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 
+import android.app.KeyguardManager;
+import android.os.PowerManager;
+
 //-------------------------------------------------------------------------
 //Constants
 //-------------------------------------------------------------------------
@@ -472,6 +475,26 @@ public  void Close2() {
 	}
 	controls.appLayout.removeView(layout);
   controls.pOnClose(PasObj);
+}
+
+//by TR3E
+public boolean IsScreenLocked(){
+	KeyguardManager myKM = (KeyguardManager) controls.activity.getSystemService(Context.KEYGUARD_SERVICE);
+	
+	if( myKM == null ) return false;
+	
+	return myKM.inKeyguardRestrictedInputMode();	
+}
+
+//by TR3E
+public boolean IsSleepMode(){
+PowerManager powerManager = (PowerManager)controls.activity.getSystemService(Context.POWER_SERVICE);
+
+if( powerManager == null ) return false;
+
+boolean isScreenAwake = (Build.VERSION.SDK_INT < 20? powerManager.isScreenOn():powerManager.isInteractive());
+
+return !isScreenAwake;
 }
 
 public boolean IsConnected(){ //by TR3E
