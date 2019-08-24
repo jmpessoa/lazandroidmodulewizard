@@ -21,6 +21,8 @@ TIntentActionFiter = (afTimeTick,  //Intent.ACTION_TIME_TICK
                    afDownloadComplete,  //android.intent.action.DOWNLOAD_COMPLETE  or DownloadManager.ACTION_DOWNLOAD_COMPLETE
                    afPhoneState,        //android.intent.action.PHONE_STATE
                    afNewOutgoingCall,   //android.intent.action.NEW_OUTGOING_CALL
+                   afScreenOn,          //Intent.ACTION_SCREEN_ON
+                   afScreenOff,         //Intent.ACTION_SCREEN_OFF
                    afNone);
 
 
