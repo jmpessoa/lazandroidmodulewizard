@@ -11877,11 +11877,17 @@ begin
   if not FInitialized then
   begin
 
-   if FAnimationMode <> animNone then //default
-     jPanel_SetAnimationMode(FjEnv, FjObject, Ord(FAnimationMode));
+   if jForm(Self.Owner).ActivityMode <> actEasel then
+   begin
+    if FAnimationMode <> animNone then //default
+      jPanel_SetAnimationMode(FjEnv, FjObject, Ord(FAnimationMode));
 
-   if FAnimationDurationIn <> 1500 then //default
-     jPanel_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
+    if FAnimationDurationIn <> 1500 then //default
+      jPanel_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
+    {
+        AnimationMode in actEasel looks problematic in Android 8.0.0
+    }
+   end; 
 
    FInitialized:= True;
    if FColor <> colbrDefault then
