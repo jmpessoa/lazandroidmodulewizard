@@ -128,8 +128,9 @@ public class jEditText extends EditText {
 				    final EditText caption = (EditText)v;
 				    
 				    // by tr3e fix back_key close app
-				    if( mFlagCaptureBackPressed && (KeyEvent.KEYCODE_BACK == keyCode) )
-			        {			            
+				    if( mFlagCaptureBackPressed && (event.getAction() == KeyEvent.ACTION_DOWN) &&
+					   	(KeyEvent.KEYCODE_BACK == keyCode) )
+				    {			            
 				    	InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 						controls.pOnBackPressed(LAMWCommon.getPasObj());
