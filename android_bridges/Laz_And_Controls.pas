@@ -715,7 +715,8 @@ type
      function GetColumName(columnIndex: integer): string;
      function GetColType(columnIndex: integer): TSqliteFieldType;
 
-     function GetValueAsString(position: integer; columnName: string): string; overload;
+     function GetValueToString(columnIndex: integer): string; overload;
+     function GetValueToString(colName: string): string; overload;
      function GetValueAsString(columnIndex: integer): string;   overload;
      function GetValueAsString(colName: string): string; overload;
      function GetValueAsBitmap(columnIndex: integer): jObject; overload;
@@ -2008,6 +2009,9 @@ type
     procedure SetImageDownByIndex(Value: integer);
     procedure SetImageUpByIndex(Value: integer);
 
+    procedure SetImageUpIndex(Value: TImageListIndex); // by TR3E
+    procedure SetImageDownIndex(Value: TImageListIndex); // by TR3E
+
     procedure SetImageDownByRes(imgResIdentifief: string); //  ../res/drawable
     procedure SetImageUpByRes(imgResIdentifief: string);   //  ../res/drawable
 
@@ -2034,8 +2038,8 @@ type
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
     property Images    : jImageList read FImageList write SetImages;
-    property IndexImageUp: TImageListIndex read FImageUpIndex write FImageUpIndex default -1;
-    property IndexImageDown: TImageListIndex read FImageDownIndex write FImageDownIndex default -1;
+    property IndexImageUp: TImageListIndex read FImageUpIndex write SetImageUpIndex; // Fix by TR3E
+    property IndexImageDown: TImageListIndex read FImageDownIndex write SetImageDownIndex; // Fix by TR3E
 
     property ImageUpIdentifier: string read FImageUpName write SetImageUpByRes;
     property ImageDownIdentifier: string read FImageDownName write SetImageDownByRes;
@@ -10803,6 +10807,40 @@ begin
     jImageBtn_setButtonUpByRes(FjEnv, FjObject , imgResIdentifief);
 end;
 
+// by TR3E
+procedure jImageBtn.SetImageUpIndex(Value: TImageListIndex);
+begin
+
+  FImageUpIndex:= Value;
+
+  if FImageList = nil then exit;
+
+  if FInitialized then
+  begin
+      if Value > FImageList.Images.Count then FImageUpIndex:= FImageList.Images.Count;
+      if Value < 0 then FImageUpIndex:= 0;
+      SetImageUpByIndex(Value);
+  end;
+
+end;
+
+// by TR3E
+procedure jImageBtn.SetImageDownIndex(Value: TImageListIndex);
+begin
+
+  FImageDownIndex:= Value;
+
+  if FImageList = nil then exit;
+
+  if FInitialized then
+  begin
+      if Value > FImageList.Images.Count then FImageDownIndex:= FImageList.Images.Count;
+      if Value < 0 then FImageDownIndex:= 0;
+      SetImageDownByIndex(Value);
+  end;
+
+end;
+
 procedure jImageBtn.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
@@ -11268,7 +11306,7 @@ function jSqliteCursor.GetValueAsString(colName: string): string;
 begin
 
  if FInitialized  then
-  result := jSqliteCursor_GetValueAsString(FjEnv, FjObject , colName)
+  result := GetValueAsString(GetColumnIndex(colName))
  else
   result := '';
 end;
@@ -11286,7 +11324,7 @@ function jSqliteCursor.GetValueAsBitmap(colName: string): jObject;
 begin
 
   if FInitialized  then
-   result := jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , colName)
+   result := GetValueAsBitmap(GetColumnIndex(colName))
   else
    result := nil;
 end;
@@ -11304,7 +11342,7 @@ function jSqliteCursor.GetValueAsInteger(colName: string): integer;
 begin
 
   if FInitialized  then
-   result :=  jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , colName)
+   result :=  GetValueAsInteger(GetColumnIndex(colName))
   else
    result := -1;
 end;
@@ -11322,7 +11360,7 @@ function jSqliteCursor.GetValueAsDouble(colName: string): double;
 begin
 
   if FInitialized  then
-   Result :=  jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , colName)
+   Result :=  GetValueAsDouble(GetColumnIndex(colName))
   else
    result := -1;
 end;
@@ -11340,16 +11378,25 @@ function jSqliteCursor.GetValueAsFloat(colName: string): real;
 begin
 
   if FInitialized  then
-   result := jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , colName)
+   result := GetValueAsFloat(GetColumnIndex(colName))
   else
    result := -1;
 end;
 
-function jSqliteCursor.GetValueAsString(position: integer; columnName: string): string;
+function jSqliteCursor.GetValueToString(columnIndex: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   result := jSqliteCursor_GetValueAsString(FjEnv, FjObject, position ,columnName)
+   result := jSqliteCursor_GetValueToString(FjEnv, FjObject, columnIndex)
+  else
+   result := '';
+end;
+
+function jSqliteCursor.GetValueToString(colName: string): string;
+begin
+
+  if FInitialized  then
+   Result :=  GetValueToString(GetColumnIndex(colName))
   else
    result := '';
 end;
