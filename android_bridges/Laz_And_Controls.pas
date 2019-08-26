@@ -1671,6 +1671,7 @@ type
     procedure SetFilterQuery(_query: string; _filterMode: integer);  overload;
     procedure SetFilterMode(_filterMode: TFilterMode);
     procedure ClearFilterQuery();
+    procedure SetDrawItemBackColorAlpha(_alpha: integer);
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -4171,8 +4172,8 @@ end;
 constructor jEditText.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FText      :='';
-  //FColor     := colbrDefault; //colbrWhite;
+  FText:='';
+  //FColor:= colbrDefault; //colbrWhite;
   FOnLostFocus:= nil;
   FOnEnter   := nil;
   FOnChange  := nil;
@@ -4305,7 +4306,7 @@ begin
    jEditText_setSingleLine(FjEnv, FjObject , True);
 
    if FText <> '' then
-    jEditText_setText(FjEnv, FjObject , FText);
+     jEditText_setText(FjEnv, FjObject , FText);
 
    if FEditable = False then
      jEditText_SetEditable(FjEnv, FjObject, FEditable);
@@ -8600,6 +8601,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_ClearFilterQuery(FjEnv, FjObject);
+end;
+
+procedure jListView.SetDrawItemBackColorAlpha(_alpha: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_SetDrawItemBackColorAlpha(FjEnv, FjObject, _alpha);
 end;
 
 //------------------------------------------------------------------------------
