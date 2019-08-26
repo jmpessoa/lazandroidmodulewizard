@@ -554,15 +554,31 @@ public boolean IsConnectedTo(int _connectionType) { // by TR3E
 }
 
 public void ShowMessage(String msg){
-  Log.i("ShowMessage", msg);
-  Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT).show();	
-}
+	  Log.i("ShowMessage", msg);
+	  Toast toast = Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT);
+	  
+	  if( toast != null ){
+	   toast.setGravity(Gravity.BOTTOM, 0, 0);
+	   toast.show();	
+	  }
+	}
 
 public void ShowMessage(String _msg, int _gravity, int _timeLength) {
-	  Log.i("ShowMessage", _msg);
-	  Toast toast = Toast.makeText(controls.activity, _msg, _timeLength);
-	  toast.setGravity(Gravity.CENTER, 0, 0);
-	  toast.show();
+		  Log.i("ShowMessage", _msg);
+		  
+		  Toast toast = Toast.makeText(controls.activity, _msg, _timeLength);
+		  
+		  int posGravity = Gravity.BOTTOM;
+		  
+		  switch( _gravity ){
+		   case 1: posGravity = Gravity.CENTER; break;
+		   case 8: posGravity = Gravity.TOP; break;
+		  }
+		  
+		  if( toast != null){
+		   toast.setGravity(posGravity, 0, 0);
+		   toast.show();
+		  }
 }
 
 public String GetDateTime() {
