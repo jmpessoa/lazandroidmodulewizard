@@ -606,6 +606,7 @@ procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: st
 procedure jListView_SetFilterQuery(env: PJNIEnv; _jlistview: JObject; _query: string; _filterMode: integer);  overload;
 procedure jListView_SetFilterMode(env: PJNIEnv; _jlistview: JObject; _filterMode: integer);
 procedure jListView_ClearFilterQuery(env: PJNIEnv; _jlistview: JObject);
+procedure jListView_SetDrawItemBackColorAlpha(env: PJNIEnv; _jlistview: JObject; _alpha: integer);
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -6622,6 +6623,19 @@ begin
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearFilterQuery', '()V');
   env^.CallVoidMethod(env, _jlistview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jListView_SetDrawItemBackColorAlpha(env: PJNIEnv; _jlistview: JObject; _alpha: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _alpha;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDrawItemBackColorAlpha', '(I)V');
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

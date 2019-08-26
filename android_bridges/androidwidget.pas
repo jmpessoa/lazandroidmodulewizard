@@ -1879,6 +1879,7 @@ var
 
 implementation
 
+
 function GetPString(env: PJNIEnv; jstr: JString): string;
 var
  _jBoolean: JBoolean;
@@ -2319,10 +2320,11 @@ begin
   //see TAndroidForm ...
 end;
 
+
 procedure TAndroidWidget.SetName(const NewName: TComponentName);
 begin
   if (csDesigning in ComponentState) then
-     if Name = FText then FText:= NewName;
+    if Name = FText then FText:= NewName;
 
   inherited SetName(NewName);
 end;
