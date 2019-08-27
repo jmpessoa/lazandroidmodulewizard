@@ -94,6 +94,7 @@ end;
 procedure TAndroidModule1.jCustomDialog1Show(Sender: TObject; dialog: jObject; title: string);
 begin
    ShowMessage('Hint: jPanel4.LayoutParamWidth = lpNineTenthsOfParent');
+   self.UpdateLayout;
 end;
 
 procedure TAndroidModule1.jTimer1Timer(Sender: TObject);

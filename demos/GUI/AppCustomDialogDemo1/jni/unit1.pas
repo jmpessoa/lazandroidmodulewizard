@@ -76,6 +76,7 @@ procedure TAndroidModule1.jCustomDialog1Show(Sender: TObject; dialog: jObject; t
 begin
    jEditText1.Text:= 'Lazarus';
    jEditText2.Text:= '66-4441-5555';
+   self.UpdateLayout;
 end;
 
 end.

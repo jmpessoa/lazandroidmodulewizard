@@ -226,8 +226,7 @@ begin
 
   inherited UpdateLayout;
 
-  if getDialogWidth()  > 0 then FWidth  := getDialogWidth()-FMarginLeft-FMarginRight-4;
-  //if getDialogHeight() > 0 then FHeight := getDialogHeight()-FMarginTop-FMarginBottom-10;
+  if getDialogWidth()  > 0 then FWidth := getDialogWidth();
 
   //init(gApp);
 end;
