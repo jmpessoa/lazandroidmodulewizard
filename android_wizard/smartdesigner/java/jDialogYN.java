@@ -5,13 +5,15 @@ import android.content.DialogInterface;
 import android.widget.TextView;
 import android.widget.Button;
 import android.view.Gravity;
+import android.graphics.Typeface;
+import android.graphics.Color;
 
 class YNConst {
   public static final int Click_Yes = -1;
   public static final int Click_No  = -2;
 }
 
-//Revised 08/19/2019 [by TR3E]
+//Revised 08/27/2019 [by TR3E]
 
 public class jDialogYN {
  //Java-Pascal Interface
@@ -65,26 +67,31 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 	if (dlgN.equals("")) dlgN ="No";
 	
 	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
-	
-	
+		
 	TextView title = new TextView(controls.activity);
-    title.setText(dlgTitle);
-    title.setPadding(10, 10, 10, 10);
-    
-    //title.setBackgroundResource(R.drawable.gradient);
-    //title.setTextColor(0xFF0000FF);
-    
-    switch( mTitleAlign ){ 
-     case 0 : title.setGravity(Gravity.LEFT); break;
-     case 1 : title.setGravity(Gravity.RIGHT); break;
-     case 2 : title.setGravity(Gravity.CENTER); break;
-    }
-    
-    if( mFontSize != 0)
-      title.setTextSize(mFontSize);
-    
-    builder.setCustomTitle(title);
 	
+	if( title != null ){
+     title.setText(dlgTitle);
+     title.setPadding(30, 10, 30, 10);
+     title.setTextColor(Color.BLACK);
+     title.setTypeface(null, Typeface.BOLD);
+    
+     //title.setBackgroundResource(R.drawable.gradient);
+     //title.setTextColor(0xFF0000FF);
+    
+     switch( mTitleAlign ){ 
+      case 0 : title.setGravity(Gravity.LEFT); break;
+      case 1 : title.setGravity(Gravity.RIGHT); break;
+      case 2 : title.setGravity(Gravity.CENTER); break;
+     }
+    
+     if( mFontSize != 0)
+      title.setTextSize(mFontSize);
+     
+     builder.setCustomTitle(title);
+	} else
+     builder.setTitle(dlgTitle);
+    	
 	builder.setMessage       (dlgMsg  )
 	       .setCancelable    (false)
 	       .setPositiveButton(dlgY,onClickListener)
@@ -94,16 +101,24 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 	dialog.show();
 	
 	if( mFontSize != 0){
-		  dialog.getWindow().getAttributes();
+		  dialog.getWindow().getAttributes();		  
 			 
 		  TextView tvMessage = (TextView) dialog.findViewById(android.R.id.message);
-		  tvMessage.setTextSize(mFontSize);
+		  
+		  if( tvMessage != null ){
+		   tvMessage.setPadding(30, 10, 30, 10);
+		   tvMessage.setTextSize(mFontSize);
+		  }
 		 
 		  Button btNegative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-		  btNegative.setTextSize(mFontSize);
+		  
+		  if( btNegative != null )
+		   btNegative.setTextSize(mFontSize);
 		 
 		  Button btPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-		  btPositive.setTextSize(mFontSize);
+		  
+		  if( btPositive != null )
+		   btPositive.setTextSize(mFontSize);
 		 }
 }
 
@@ -115,19 +130,25 @@ public void ShowOK(String titleText, String msgText, String _OkText) {
 	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
 	
 	TextView title = new TextView(controls.activity);
-    title.setText(dlgTitle);
-    title.setPadding(10, 10, 10, 10);
+	
+	if( title != null ){
+     title.setText(dlgTitle);
+     title.setPadding(30, 10, 30, 10);
+     title.setTextColor(Color.BLACK);
+     title.setTypeface(null, Typeface.BOLD);
     
-    switch( mTitleAlign ){ 
-    case 0 : title.setGravity(Gravity.LEFT); break;
-    case 1 : title.setGravity(Gravity.RIGHT); break;
-    case 2 : title.setGravity(Gravity.CENTER); break;
-    }
+     switch( mTitleAlign ){ 
+      case 0 : title.setGravity(Gravity.LEFT); break;
+      case 1 : title.setGravity(Gravity.RIGHT); break;
+      case 2 : title.setGravity(Gravity.CENTER); break;
+     }
     
-    if( mFontSize != 0)
+     if( mFontSize != 0)
     	  title.setTextSize(mFontSize);
-    
-    builder.setCustomTitle(title);
+     
+     builder.setCustomTitle(title);
+	} else
+     builder.setTitle(dlgTitle);
 	
 	builder.setMessage       (dlgMsg  )
 	       .setCancelable    (false)	       
@@ -139,12 +160,18 @@ public void ShowOK(String titleText, String msgText, String _OkText) {
 	
 	if( mFontSize != 0){
 		  dialog.getWindow().getAttributes();
-			 
+		    		  			
 		  TextView tvMessage = (TextView) dialog.findViewById(android.R.id.message);
-		  tvMessage.setTextSize(mFontSize);
+		  
+		  if( tvMessage != null ){
+		   tvMessage.setPadding(30, 10, 30, 10);
+		   tvMessage.setTextSize(mFontSize);
+		  }
 		 
 		  Button btPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-		  btPositive.setTextSize(mFontSize);		 		 
+		  
+		  if( btPositive != null)
+		   btPositive.setTextSize(mFontSize);		 		 
 		 }
 }
 
