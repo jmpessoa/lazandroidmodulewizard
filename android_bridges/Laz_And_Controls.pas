@@ -6069,8 +6069,9 @@ begin
   if FRoundedShape <> False then
     jImageView_SetRoundedShape(FjEnv, FjObject , FRoundedShape);
 
-  if (FImageName <> '') and (FImageIndex < 0) then
-     jImageView_SetImageByResIdentifier(FjEnv, FjObject , FImageName);
+  if(FImageIndex < 0) or (FImagelist = nil) then
+   if (FImageName <> '') then
+     jImageView_SetImageByResIdentifier(FjEnv, FjObject, FImageName);
 
   if FAnimationDurationIn <> 1500 then
      jImageView_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
@@ -9395,7 +9396,9 @@ begin
   FjObject  := jBitmap_Create(FjEnv, FjThis, Self);
   FInitialized:= True;  //neded here....
 
-  if FImageName <> '' then LoadFromRes(FImageName);
+  if (FImageIndex < 0) or (FImageList = nil) then
+   if FImageName <> '' then
+    LoadFromRes(FImageName);
 
   if FImageList <> nil then
   begin
@@ -10707,13 +10710,15 @@ begin
   else Self.AnchorId:= -1;
 
   if not FInitialized then
-   jImageBtn_SetEnabled(FjEnv, FjObject ,FEnabled);
+   jImageBtn_SetEnabled(FjEnv, FjObject, FEnabled);
 
-  if (FImageDownName <> '') and (FImageDownIndex < 0) then
-     jImageBtn_setButtonDownByRes(FjEnv, FjObject , FImageDownName);
+  if (FImageDownIndex < 0) or (FImageList = nil) then
+   if (FImageDownName <> '') then
+     jImageBtn_setButtonDownByRes(FjEnv, FjObject, FImageDownName);
 
-  if (FImageUpName <> '') and (FImageUpIndex < 0) then
-    jImageBtn_setButtonUpByRes(FjEnv, FjObject , FImageUpName);
+  if (FImageUpIndex < 0) or (FImageList = nil) then
+    if (FImageUpName <> '') then
+     jImageBtn_setButtonUpByRes(FjEnv, FjObject, FImageUpName);
 
   if FImageList <> nil then
   begin

@@ -15,9 +15,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.view.Gravity;
 
+import android.graphics.Point;
+
 /*Draft java code by "Lazarus Android Module Wizard" [12/4/2014 23:21:31]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jVisualControl template*/
+
+// Reviewed by TR3E on 08/27/2019
 
 public class jCustomDialog extends RelativeLayout {
 
@@ -35,10 +39,10 @@ public class jCustomDialog extends RelativeLayout {
 
 	private int lparamH = 100;
 	private int lparamW = 100;
-	private int marginLeft = 0;
-	private int marginTop = 0;
-	private int marginRight = 0;
-	private int marginBottom = 0;
+	private int marginLeft   = 10;
+	private int marginTop    = 10;
+	private int marginRight  = 10;
+	private int marginBottom = 10;
 	private float lweight = 0;
  //[ifdef_api14up]
  private int lgravity = Gravity.TOP | Gravity.START;
@@ -244,9 +248,7 @@ public class jCustomDialog extends RelativeLayout {
 			 mDialog.setTitle(mTitle);
 			}
 			
-			mDialog.show();
-						
-			controls.pOnCustomDialogShow(pascalObj, mDialog, _title);
+			mDialog.show();						
 		}
 		else {
 			if (this.getVisibility()==0) { //visible
@@ -295,24 +297,33 @@ public class jCustomDialog extends RelativeLayout {
 					return false;
 				}
 			});
-			this.setVisibility(android.view.View.VISIBLE);  // //0: vis; 4: inv; 8: gone						
+			this.setVisibility(android.view.View.VISIBLE);  // //0: vis; 4: inv; 8: gone
+			
+			// To really run after displaying the Dialog [by TR3E]
+			mDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+		        @Override
+		        public void onShow(DialogInterface d) {
+		        			            
+		        	controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
+		        }
+		    });
 						
 			mDialog.show();					
 						
-			controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
+			
 		}
 	}
 	
 	public int GetDialogWidth(){
 		if (mDialog == null) return 0;
 	 
-		return mDialog.getWindow().getDecorView().getWidth();
+		return this.getWidth() + marginLeft + marginRight;
 	}
 	
 	public int GetDialogHeight(){
 		if (mDialog == null) return 0;
-		 
-	    return mDialog.getWindow().getDecorView().getHeight();
+		
+		return this.getHeight() + marginTop + marginBottom;
 	}
 
 	public void SetTitle(String _title) {
