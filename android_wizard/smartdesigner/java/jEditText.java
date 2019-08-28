@@ -489,6 +489,11 @@ public class jEditText extends EditText {
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
 	}
+	
+	//by TR3E
+	public void SetSelection(int _value){
+		this.setSelection(_value);
+	}
 
 	public void SetSelectAllOnFocus(boolean _value){
 		this.setSelectAllOnFocus(_value);

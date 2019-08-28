@@ -1090,6 +1090,7 @@ type
     procedure Clear;
 
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
+    procedure SetSelection(_value: integer);
     procedure SetSelectAllOnFocus(_value: boolean);
     procedure SelectAll();
     procedure SetBackgroundByResIdentifier(_imgResIdentifier: string);
@@ -4706,6 +4707,14 @@ begin
   FFontSizeUnit:= _unit;
   if FInitialized then
      jEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+end;
+
+// by TR3E
+procedure jEditText.SetSelection(_value: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetSelection(FjEnv, FjObject, _value);
 end;
 
 procedure jEditText.SetSelectAllOnFocus(_value: boolean);
