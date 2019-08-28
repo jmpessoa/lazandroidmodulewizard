@@ -265,6 +265,7 @@ procedure jEditText_SetAcceptSuggestion(env: PJNIEnv; _jedittext: JObject; _valu
 procedure jEditText_CopyToClipboard(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_PasteFromClipboard(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetFontSizeUnit(env: PJNIEnv; _jedittext: JObject; _unit: integer);
+procedure jEditText_SetSelection(env: PJNIEnv; _jedittext: JObject; _value: integer); // by TR3E
 procedure jEditText_SetSelectAllOnFocus(env: PJNIEnv; _jedittext: JObject; _value: boolean);
 procedure jEditText_SelectAll(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetBackgroundByResIdentifier(env: PJNIEnv; _jedittext: JObject; _imgResIdentifier: string);
@@ -2721,6 +2722,19 @@ begin
   jParams[0].i:= _unit;
   jCls:= env^.GetObjectClass(env, _jedittext);
   jMethod:= env^.GetMethodID(env, jCls, 'SetFontSizeUnit', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jEditText_SetSelection(env: PJNIEnv; _jedittext: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSelection', '(I)V');
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
