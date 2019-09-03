@@ -8,6 +8,8 @@ import android.preference.PreferenceManager;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl template*/
 
+//Reviewed by TR3E on 09/02/2019
+
 public class jPreferences /*extends ...*/ {
 
     private long     pascalObj = 0;      // Pascal Object
@@ -42,33 +44,64 @@ public class jPreferences /*extends ...*/ {
   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     
    public int GetIntData(String _key, int _defaultValue) {
-		return mPreferences.getInt(_key, _defaultValue);
+	   
+	   if( mPreferences != null )
+		   return mPreferences.getInt(_key, _defaultValue);
+	   else
+		   return _defaultValue;
+	   
 	}
 
 	public void SetIntData(String _key, int _value) {
+		if( mPreferences == null ) return;
+		
 		SharedPreferences.Editor edt = mPreferences.edit();
-		edt.putInt(_key, _value);
-		edt.commit();
+		
+		if( edt != null ){
+		 edt.putInt(_key, _value);
+		 edt.commit();
+		}
 	}
 
 	public String GetStringData(String _key, String _defaultValue) {
-		return mPreferences.getString(_key, _defaultValue);
+		
+		if( mPreferences != null )
+				return mPreferences.getString(_key, _defaultValue);
+		else
+			    return _defaultValue;
+		
 	}
 
 	public void SetStringData(String _key, String _value) {
+		
+		if( mPreferences == null ) return;
+		
 		SharedPreferences.Editor edt = mPreferences.edit();
-		edt.putString(_key, _value);
-		edt.commit();
+		
+		if( edt != null ){
+		 edt.putString(_key, _value);
+		 edt.commit();
+		}
 	}
 
 	public boolean GetBoolData(String _key, boolean _defaultValue) {
-		return mPreferences.getBoolean(_key, _defaultValue);
+		
+		if( mPreferences != null )
+				return mPreferences.getBoolean(_key, _defaultValue);
+		else
+			   	return _defaultValue;
 	}
 
 	public void SetBoolData(String _key, boolean _value) {
+		
+		if( mPreferences == null ) return;
+		
 		SharedPreferences.Editor edt = mPreferences.edit();
-		edt.putBoolean(_key, _value);
-		edt.commit();
+		
+		if( edt != null ){
+		 edt.putBoolean(_key, _value);
+		 edt.commit();
+		}
 	}
 }
 
