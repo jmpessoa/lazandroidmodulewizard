@@ -1259,6 +1259,7 @@ end;
     function LoadFromAssetsTextContent(_filename: string): string;
 
     function RGBA(color: string): TSimpleRGBAColor;
+    function GetStripAccents(_str: string): string;
     function GetPathFromAssetsFile(_assetsFileName: string): string;
     function GetImageFromAssetsFile(_assetsImageFileName: string): jObject;
 
@@ -1722,6 +1723,7 @@ function jForm_CopyFile(env: PJNIEnv;  _jform: JObject; _srcFullName: string; _d
 function jForm_LoadFromAssets(env: PJNIEnv;  _jform: JObject; _fileName: string): string;
 function jForm_IsSdCardMounted(env: PJNIEnv;  _jform: JObject): boolean;
 function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
+function jForm_GetStripAccents(env: PJNIEnv; _jform: JObject; _str: string): string;
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
 function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
 
@@ -3970,6 +3972,13 @@ begin
 
 end;
 
+function jForm.GetStripAccents(_str: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetStripAccents(FjEnv, FjObject, _str);
+end;
+
 function jForm.GetPathFromAssetsFile(_assetsFileName: string): string;
 begin
   //in designing component state: result value here...
@@ -4326,6 +4335,29 @@ begin
 end;
 
 {-------- jForm_JNI_Bridge ----------}
+
+function jForm_GetStripAccents(env: PJNIEnv; _jform: JObject; _str: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetStripAccents', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
 var
