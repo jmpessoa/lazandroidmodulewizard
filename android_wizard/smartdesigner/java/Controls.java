@@ -149,6 +149,8 @@ import android.provider.Settings.SettingNotFoundException;
 import android.app.KeyguardManager;
 import android.os.PowerManager;
 
+import java.text.Normalizer;
+
 //-------------------------------------------------------------------------
 //Constants
 //-------------------------------------------------------------------------
@@ -1259,7 +1261,14 @@ public String CopyFromAssetsToInternalAppStorage(String _filename) {
 		     e.printStackTrace();			     
 		}
 		return PathDat+"/"+_filename;
-}	
+}
+
+//by TR3E
+public String GetStripAccents( String _str ){
+	_str = Normalizer.normalize(_str, Normalizer.Form.NFD);
+	_str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+	return _str;
+}
 
 public String GetPathFromAssetsFile(String _assetsFileName) {  
    return LoadFromAssets(_assetsFileName);
