@@ -40,6 +40,8 @@ jImageFileManager = class(jControl)
     function SaveToFile(_image: jObject;_path: string; _filename: string) : boolean; overload;
     function LoadFromUri(_imageUri: jObject): jObject;   overload;
 
+    function GetBitmapToGrayscale( _bitmap : jObject ): jObject;
+
     function LoadFromFile(_filename: string; _scale: integer): jObject; overload;
     function CreateBitmap(_width: integer; _height: integer): jObject;
     function GetBitmapWidth(_bitmap: jObject): integer;
@@ -62,36 +64,6 @@ jImageFileManager = class(jControl)
 end;
 
 function jImageFileManager_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jImageFileManager_jFree(env: PJNIEnv; _jimagefilemanager: JObject);
-function jImageFileManager_SaveToSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string) : boolean;
-procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; _jimagefilemanager: JObject);
-function jImageFileManager_LoadFromSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject;
-function jImageFileManager_LoadFromURL(env: PJNIEnv; _jimagefilemanager: JObject; _imageURL: string): jObject;
-function jImageFileManager_LoadFromAssets(env: PJNIEnv; _jimagefilemanager: JObject; strName: string): jObject;
-function jImageFileManager_LoadFromRawFolder(env: PJNIEnv; _jimagefilemanager: JObject;
-  FileName: string): jObject;
-function jImageFileManager_LoadFromResources(env: PJNIEnv; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
-function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject; overload;
-function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _path: string; _filename: string): jObject; overload;
-function jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string) : boolean; overload;
-function jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject;_path:string; _filename: string) : boolean; overload;
-function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _imageUri: jObject): jObject;  overload;
-
-function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string; _scale: integer): jObject;  overload;
-function jImageFileManager_CreateBitmap(env: PJNIEnv; _jimagefilemanager: JObject; _width: integer; _height: integer): jObject;
-function jImageFileManager_GetBitmapWidth(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject): integer;
-function jImageFileManager_GetBitmapHeight(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject): integer;
-function jImageFileManager_GetByteArrayFromBitmap(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _compressFormat: string): TDynArrayOfJByte;
-function jImageFileManager_SetByteArrayToBitmap(env: PJNIEnv; _jimagefilemanager: JObject; var _imageArray: TDynArrayOfJByte): jObject;
-function jImageFileManager_Clockwise(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _imageView: jObject): jObject;
-function jImageFileManager_AntiClockWise(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _imageView: jObject): jObject;
-function jImageFileManager_SetScale(env: PJNIEnv; _jimagefilemanager: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
-
-function jImageFileManager_GetBitmapFromDecodedFile(env: PJNIEnv; _jimagefilemanager: JObject; _imagePath: string): jObject;
-function jImageFileManager_GetBitmapFromIntentResult(env: PJNIEnv; _jimagefilemanager: JObject; _intentData: jObject): jObject;
-function jImageFileManager_GetBitmapThumbnailFromCamera(env: PJNIEnv; _jimagefilemanager: JObject; _intentData: jObject): jObject;
-
-function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _uriAsString: string): jObject; overload;
 
 implementation
 
@@ -136,7 +108,7 @@ procedure jImageFileManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 function jImageFileManager.SaveToSdCard(_image: jObject; _filename: string) : boolean;
@@ -145,49 +117,56 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-   result := jImageFileManager_SaveToSdCard(FjEnv, FjObject, _image ,_filename);
+   result := jni_func_mt_out_z(FjEnv, FjObject, 'SaveToSdCard', _image ,_filename);
 end;
 
 procedure jImageFileManager.ShowImagesFromGallery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageFileManager_ShowImagesFromGallery(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ShowImagesFromGallery');
 end;
 
 function jImageFileManager.LoadFromSdCard(_filename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromSdCard(FjEnv, FjObject, _filename);
+   Result:= jni_func_t_out_m(FjEnv, FjObject, 'LoadFromSdCard', _filename);
 end;
 
 function jImageFileManager.LoadFromURL(_imageURL: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromURL(FjEnv, FjObject, _imageURL);
+   Result:= jni_func_t_out_m(FjEnv, FjObject, 'LoadFromURL', _imageURL);
+end;
+
+function jImageFileManager.GetBitmapToGrayscale( _bitmap : jObject ): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_m_out_m(FjEnv, FjObject, 'GetBitmapToGrayscale', _bitmap);
 end;
 
 function jImageFileManager.LoadFromAssets(filename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromAssets(FjEnv, FjObject, filename);
+   Result:= jni_func_t_out_m(FjEnv, FjObject, 'LoadFromAssets', filename);
 end;
 
 function jImageFileManager.LoadFromRawFolder(FileName: string): jObject;
 begin
 
   if(FInitialized) then
-    Result:= jImageFileManager_LoadFromRawFolder(FjEnv, FjObject, FileName);
+    Result:= jni_func_t_out_m(FjEnv, FjObject, 'LoadFromRawFolder', FileName);
 end;
 
 function jImageFileManager.LoadFromResources(_imageResIdentifier: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromResources(FjEnv, FjObject, _imageResIdentifier);
+   Result:= jni_func_t_out_m(FjEnv, FjObject, 'LoadFromResources', _imageResIdentifier);
 end;
 
 
@@ -195,14 +174,14 @@ function jImageFileManager.LoadFromFile(_filenameInternalAppStorage: string): jO
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject, _filenameInternalAppStorage);
+   Result:= jni_func_t_out_m(FjEnv, FjObject, 'LoadFromFile', _filenameInternalAppStorage);
 end;
 
 function jImageFileManager.LoadFromFile(_pathEnvironment: string; _filename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject,_pathEnvironment, _filename);
+    Result:= jni_func_tt_out_m(FjEnv, FjObject, 'LoadFromFile', _pathEnvironment, _filename);
 end;
 
 function jImageFileManager.SaveToFile(_image: jObject; _filename: string) : boolean;
@@ -211,7 +190,7 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-   result := jImageFileManager_SaveToFile(FjEnv, FjObject, _image ,_filename);
+   result := jni_func_mt_out_z(FjEnv, FjObject, 'SaveToFile', _image ,_filename);
 end;
 
 function jImageFileManager.SaveToFile(_image: jObject; _path:string;  _filename: string) : boolean;
@@ -220,77 +199,77 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-   result := jImageFileManager_SaveToFile(FjEnv, FjObject, _image ,_path, _filename);
+   result := jni_func_mtt_out_z(FjEnv, FjObject, 'SaveToFile', _image ,_path, _filename);
 end;
 
 function jImageFileManager.LoadFromUri(_imageUri: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromUri(FjEnv, FjObject, _imageUri);
+   Result:= jni_func_u_out_m(FjEnv, FjObject, 'LoadFromUri', _imageUri);
 end;
 
 function jImageFileManager.LoadFromFile(_filename: string; _scale: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromFile(FjEnv, FjObject, _filename ,_scale);
+   Result:= jni_func_ti_out_m(FjEnv, FjObject, 'LoadFromFile', _filename ,_scale);
 end;
 
 function jImageFileManager.CreateBitmap(_width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_CreateBitmap(FjEnv, FjObject, _width ,_height);
+   Result:= jni_func_ii_out_m(FjEnv, FjObject, 'CreateBitmap', _width ,_height);
 end;
 
 function jImageFileManager.GetBitmapWidth(_bitmap: jObject): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_GetBitmapWidth(FjEnv, FjObject, _bitmap);
+   Result:= jni_func_m_out_i(FjEnv, FjObject, 'GetBitmapWidth', _bitmap);
 end;
 
 function jImageFileManager.GetBitmapHeight(_bitmap: jObject): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_GetBitmapHeight(FjEnv, FjObject, _bitmap);
+   Result:= jni_func_m_out_i(FjEnv, FjObject, 'GetBitmapHeight', _bitmap);
 end;
 
 function jImageFileManager.GetByteArrayFromBitmap(_bitmap: jObject; _compressFormat: string): TDynArrayOfJByte;
 begin
   //in designing component state: result value here...
   if FInitialized then
-     Result:= jImageFileManager_GetByteArrayFromBitmap(FjEnv, FjObject, _bitmap ,_compressFormat);
+     Result:= jni_func_mt_out_y(FjEnv, FjObject, 'GetByteArrayFromBitmap', _bitmap ,_compressFormat);
 end;
 
 function jImageFileManager.SetByteArrayToBitmap(var _imageArray: TDynArrayOfJByte): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_SetByteArrayToBitmap(FjEnv, FjObject, _imageArray);
+   Result:= jni_func_y_out_m(FjEnv, FjObject, 'SetByteArrayToBitmap', _imageArray);
 end;
 
 function jImageFileManager.ClockWise(_bitmap: jObject; _imageView: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_ClockWise(FjEnv, FjObject, _bitmap ,_imageView);
+   Result:= jni_func_ma_out_m(FjEnv, FjObject, 'ClockWise', _bitmap ,_imageView);
 end;
 
 function jImageFileManager.AntiClockWise(_bitmap: jObject; _imageView: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_AntiClockWise(FjEnv, FjObject, _bitmap ,_imageView);
+   Result:= jni_func_ma_out_m(FjEnv, FjObject, 'AntiClockWise', _bitmap ,_imageView);
 end;
 
 function jImageFileManager.SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_SetScale(FjEnv, FjObject, _bmp ,_imageView ,_scaleX ,_scaleY);
+   Result:= jni_func_maff_out_m(FjEnv, FjObject, 'SetScale', _bmp ,_imageView ,_scaleX ,_scaleY);
 end;
 
 
@@ -298,14 +277,14 @@ function jImageFileManager.GetBitmapFromDecodedFile(_imagePath: string): jObject
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_GetBitmapFromDecodedFile(FjEnv, FjObject, _imagePath);
+   Result:= jni_func_t_out_m(FjEnv, FjObject, 'GetBitmapFromDecodedFile', _imagePath);
 end;
 
 function jImageFileManager.GetBitmapFromIntentResult(_intentData: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_GetBitmapFromIntentResult(FjEnv, FjObject, _intentData);
+   Result:= jni_func_n_out_m(FjEnv, FjObject, 'GetBitmapFromIntentData', _intentData);
 end;
 
 
@@ -313,14 +292,14 @@ function jImageFileManager.GetBitmapThumbnailFromCamera(_intentData: jObject): j
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_GetBitmapThumbnailFromCamera(FjEnv, FjObject, _intentData);
+   Result:= jni_func_n_out_m(FjEnv, FjObject, 'GetBitmapThumbnailFromCamera', _intentData);
 end;
 
 function jImageFileManager.LoadFromUri(_uriAsString: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageFileManager_LoadFromUri(FjEnv, FjObject, _uriAsString);
+   Result:= jni_func_t_out_m(FjEnv, FjObject, 'LoadFromUri', _uriAsString);
 end;
 
 {-------- jImageFileManager_JNI_Bridge ----------}
@@ -347,410 +326,6 @@ end;
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-
-procedure jImageFileManager_jFree(env: PJNIEnv; _jimagefilemanager: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jimagefilemanager, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_SaveToSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string) : boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _image;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
-
-  jCls    := env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod := env^.GetMethodID(env, jCls, 'SaveToSdCard', '(Landroid/graphics/Bitmap;Ljava/lang/String;)Z');
-  jBoo    := env^.CallBooleanMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  Result  := boolean(jBoo);
-
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jImageFileManager_ShowImagesFromGallery(env: PJNIEnv; _jimagefilemanager: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'ShowImagesFromGallery', '()V');
-  env^.CallVoidMethod(env, _jimagefilemanager, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_LoadFromSdCard(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromSdCard', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_LoadFromURL(env: PJNIEnv; _jimagefilemanager: JObject; _imageURL: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageURL));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromURL', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_LoadFromAssets(env: PJNIEnv; _jimagefilemanager: JObject; strName: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(strName));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssets', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_LoadFromRawFolder(env: PJNIEnv; _jimagefilemanager: JObject;
-  FileName: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(FileName));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromRawFolder', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_LoadFromResources(env: PJNIEnv; _jimagefilemanager: JObject; _imageResIdentifier: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageResIdentifier));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromResources', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject;_path: string; _filename: string): jObject;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _filename: string) : boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _image;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
-
-  jCls    := env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod := env^.GetMethodID(env, jCls, 'SaveToFile', '(Landroid/graphics/Bitmap;Ljava/lang/String;)Z');
-  jBoo    := env^.CallBooleanMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  Result  := boolean(jBoo);
-
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_SaveToFile(env: PJNIEnv; _jimagefilemanager: JObject; _image: jObject; _path: string; _filename: string) : boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _image;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_path));
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_filename));
-
-  jCls    := env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod := env^.GetMethodID(env, jCls, 'SaveToFile', '(Landroid/graphics/Bitmap;Ljava/lang/String;Ljava/lang/String;)Z');
-  jBoo    := env^.CallBooleanMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  Result  := boolean(jBoo);
-
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env,jParams[2].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _imageUri: jObject): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _imageUri;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromUri', '(Landroid/net/Uri;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_LoadFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _filename: string; _scale: integer): jObject;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jParams[1].i:= _scale;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;I)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_CreateBitmap(env: PJNIEnv; _jimagefilemanager: JObject; _width: integer; _height: integer): jObject;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _width;
-  jParams[1].i:= _height;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'CreateBitmap', '(II)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_GetBitmapWidth(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject): integer;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bitmap;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapWidth', '(Landroid/graphics/Bitmap;)I');
-  Result:= env^.CallIntMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_GetBitmapHeight(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject): integer;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bitmap;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapHeight', '(Landroid/graphics/Bitmap;)I');
-  Result:= env^.CallIntMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_GetByteArrayFromBitmap(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _compressFormat: string): TDynArrayOfJByte;
-var
-  resultSize: integer;
-  jResultArray: jObject;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bitmap;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_compressFormat));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetByteArrayFromBitmap', '(Landroid/graphics/Bitmap;Ljava/lang/String;)[B');
-  jResultArray:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod,  @jParams);
-  if jResultArray <> nil then
-  begin
-    resultSize:= env^.GetArrayLength(env, jResultArray);
-    SetLength(Result, resultSize);
-    env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
-  end;
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_SetByteArrayToBitmap(env: PJNIEnv; _jimagefilemanager: JObject; var _imageArray: TDynArrayOfJByte): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-  newSize0: integer;
-  jNewArray0: jObject=nil;
-begin
-  newSize0:= Length(_imageArray);
-  jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
-  env^.SetByteArrayRegion(env, jNewArray0, 0 , newSize0, @_imageArray[0] {source});
-  jParams[0].l:= jNewArray0;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetByteArrayToBitmap', '([B)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_ClockWise(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _imageView: jObject): jObject;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bitmap;
-  jParams[1].l:= _imageView;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_AntiClockWise(env: PJNIEnv; _jimagefilemanager: JObject; _bitmap: jObject; _imageView: jObject): jObject;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bitmap;
-  jParams[1].l:= _imageView;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'AntiClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_SetScale(env: PJNIEnv; _jimagefilemanager: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
-var
-  jParams: array[0..3] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bmp;
-  jParams[1].l:= _imageView;
-  jParams[2].f:= _scaleX;
-  jParams[3].f:= _scaleY;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetScale', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;FF)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_GetBitmapFromDecodedFile(env: PJNIEnv; _jimagefilemanager: JObject; _imagePath: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_imagePath));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromDecodedFile', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jImageFileManager_GetBitmapFromIntentResult(env: PJNIEnv; _jimagefilemanager: JObject; _intentData: jObject): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _intentData;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromIntentData', '(Landroid/content/Intent;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_GetBitmapThumbnailFromCamera(env: PJNIEnv; _jimagefilemanager: JObject; _intentData: jObject): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _intentData;
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapThumbnailFromCamera', '(Landroid/content/Intent;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageFileManager_LoadFromUri(env: PJNIEnv; _jimagefilemanager: JObject; _uriAsString: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
-  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromUri', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 
 end.

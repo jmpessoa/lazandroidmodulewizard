@@ -29,6 +29,11 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ImageView;
 
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.Paint;
+import android.graphics.Canvas;
+
 /*Draft java code by "Lazarus Android Module Wizard" [8/13/2014 1:43:12]*/    //********
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl template*/
@@ -191,6 +196,35 @@ public class jImageFileManager /*extends ...*/ {
 	
     return ((BitmapDrawable)d).getBitmap();
  }
+ 
+ // by TR3E
+ public Bitmap GetBitmapToGrayscale(Bitmap _bitmapImage)
+ {   
+		
+	 if( _bitmapImage == null ) return null;
+     
+     int height = _bitmapImage.getHeight();
+     int width  = _bitmapImage.getWidth();    
+
+     Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+     
+     if(bmpGrayscale == null) return null;
+     
+     Canvas c = new Canvas(bmpGrayscale);
+     Paint paint = new Paint();
+     ColorMatrix cm = new ColorMatrix();
+     
+     if( (c == null) || (paint == null) || (cm == null) ) return null;
+     
+     cm.setSaturation(0);
+     ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+     paint.setColorFilter(f);
+     
+     c.drawBitmap(_bitmapImage, 0, 0, paint);
+     
+     return bmpGrayscale;
+ }
+
  
  public Bitmap LoadFromFile(String _filename) {  //InternalAppStorage  !!!	   
 	   Bitmap bmap=null;
