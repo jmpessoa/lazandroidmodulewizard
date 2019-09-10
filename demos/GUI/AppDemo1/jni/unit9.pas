@@ -111,7 +111,7 @@ begin
      //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width-20,Round( (jView1.Width-20)*(1/Ratio) ) );
      //jView1.Canvas.drawBitmap(jBitmap1,10,10, jView1.Width, Ratio);
 
-     jView1.Canvas.drawBitmap(jBitmap1.GetImage,jView1.Width, jView1.Height);
+     jView1.Canvas.drawBitmap(jBitmap1.GetImage, jView1.Width, jView1.Height);
 
      jView1.Canvas.drawText('P(x,y)= (' + IntToStr(P.X) + ',' + IntToStr(P.Y)+')',60,60);
 
