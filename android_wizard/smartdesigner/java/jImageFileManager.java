@@ -371,7 +371,7 @@ public class jImageFileManager /*extends ...*/ {
 			
 		 matrix.postRotate(-90);
 		 
-	     return Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, false);    
+	     return Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);    
 	} 
 
 	public Bitmap AntiClockWise(Bitmap _bitmap){
@@ -381,7 +381,7 @@ public class jImageFileManager /*extends ...*/ {
 		
 		matrix.postRotate(-90);
 	    
-		return Bitmap.createBitmap(_bitmap, 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, false);    
+		return Bitmap.createBitmap(_bitmap, 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);    
 	}
 	
 	public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {      
@@ -392,7 +392,7 @@ public class jImageFileManager /*extends ...*/ {
 		// RESIZE THE BIT MAP
 		matrix.postScale(_scaleX, _scaleY);
 		// RECREATE THE NEW BITMAP
-		return Bitmap.createBitmap(_bmp, 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, false);		
+		return Bitmap.createBitmap(_bmp, 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);		
 	}
 
 	public Bitmap GetBitmapFromDecodedFile(String _imagePath) {

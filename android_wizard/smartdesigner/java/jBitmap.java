@@ -183,7 +183,7 @@ public Bitmap ClockWise(Bitmap _bmp){
 		
 	  matrix.postRotate(90);
 	  
-	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, false);    
+	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);    
 } 
 
 public Bitmap AntiClockWise(Bitmap _bmp){
@@ -194,7 +194,7 @@ public Bitmap AntiClockWise(Bitmap _bmp){
 		
 	  matrix.postRotate(-90);
 	  
-	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, false);    
+	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);    
 }
 
 public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {
@@ -207,7 +207,7 @@ public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {
 	  matrix.postScale(_scaleX, _scaleY);
 	  // RECREATE THE NEW BITMAP 
 		
-	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, false);	   
+	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);	   
 }
 
 public Bitmap SetScale(float _scaleX, float _scaleY ) {      
@@ -218,7 +218,7 @@ public Bitmap SetScale(float _scaleX, float _scaleY ) {
 		// RESIZE THE BIT MAP
 		matrix.postScale(_scaleX, _scaleY);
 		// RECREATE THE NEW BITMAP 
-		return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, false);
+		return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
 }
 
 public Bitmap LoadFromAssets(String strName)
