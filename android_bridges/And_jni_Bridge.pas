@@ -819,10 +819,6 @@ Procedure jBitmap_getWH                (env:PJNIEnv;
 function jBitmap_GetWidth(env: PJNIEnv; bmap: JObject): integer;
 function jBitmap_GetHeight(env: PJNIEnv; bmap: JObject): integer;
 Function  jBitmap_jInstance(env:PJNIEnv;  bmap: jObject): jObject;
-function jBitmap_ClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
-function jBitmap_AntiClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
-function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
-function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
 function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;
                                                    var bufferImage: TDynArrayOfJByte): integer;
@@ -8638,65 +8634,6 @@ begin
   _jMethod:= env^.GetMethodID(env, cls,'jInstance', '()Landroid/graphics/Bitmap;');
   Result := env^.CallObjectMethod(env,bmap,_jMethod);
   env^.DeleteLocalRef(env, cls);
-end;
-
-function jBitmap_ClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bmp;
-  jParams[1].l:= _imageView;
-  jCls:= env^.GetObjectClass(env, _jbitmap);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jBitmap_AntiClockWise(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject): jObject;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bmp;
-  jParams[1].l:= _imageView;
-  jCls:= env^.GetObjectClass(env, _jbitmap);
-  jMethod:= env^.GetMethodID(env, jCls, 'AntiClockWise', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
-var
-  jParams: array[0..3] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bmp;
-  jParams[1].l:= _imageView;
-  jParams[2].f:= _scaleX;
-  jParams[3].f:= _scaleY;
-  jCls:= env^.GetObjectClass(env, _jbitmap);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetScale', '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;FF)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jBitmap_SetScale(env: PJNIEnv; _jbitmap: JObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _imageView;
-  jParams[1].f:= _scaleX;
-  jParams[2].f:= _scaleY;
-  jCls:= env^.GetObjectClass(env, _jbitmap);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetScale', '(Landroid/widget/ImageView;FF)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
 end;
 
 function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;

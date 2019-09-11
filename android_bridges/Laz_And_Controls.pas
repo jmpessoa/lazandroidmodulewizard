@@ -556,10 +556,10 @@ type
     function GetInfo: boolean;
     function GetRatio: Single;
 
-    function ClockWise(_bmp: jObject; _imageView: jObject): jObject;
-    function AntiClockWise(_bmp: jObject; _imageView: jObject): jObject;
-    function SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
-    function SetScale(_imageView: jObject; _scaleX: single; _scaleY: single): jObject; overload;
+    function ClockWise(_bmp: jObject): jObject;
+    function AntiClockWise(_bmp: jObject): jObject;
+    function SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject; overload;
+    function SetScale(_scaleX: single; _scaleY: single): jObject; overload;
     function LoadFromAssets(strName: string): jObject;
     function GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject; overload;
     function GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject; overload;
@@ -9738,32 +9738,32 @@ begin
     Self.UnlockPixels;
 end;
 
-function jBitmap.ClockWise(_bmp: jObject; _imageView: jObject): jObject;
+function jBitmap.ClockWise(_bmp: jObject ): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_ClockWise(FjEnv, FjObject, _bmp ,_imageView);
+   Result:= jni_func_m_out_m(FjEnv, FjObject, 'ClockWise', _bmp);
 end;
 
-function jBitmap.AntiClockWise(_bmp: jObject; _imageView: jObject): jObject;
+function jBitmap.AntiClockWise(_bmp: jObject ): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_AntiClockWise(FjEnv, FjObject, _bmp ,_imageView);
+   Result:= jni_func_m_out_m(FjEnv, FjObject, 'AntiClockWise', _bmp);
 end;
 
-function jBitmap.SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+function jBitmap.SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_SetScale(FjEnv, FjObject, _bmp ,_imageView ,_scaleX ,_scaleY);
+   Result:= jni_func_mff_out_m(FjEnv, FjObject, 'SetScale', _bmp ,_scaleX ,_scaleY);
 end;
 
-function jBitmap.SetScale(_imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+function jBitmap.SetScale(_scaleX: single; _scaleY: single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_SetScale(FjEnv, FjObject, _imageView ,_scaleX ,_scaleY);
+   Result:= jni_func_ff_out_m(FjEnv, FjObject, 'SetScale' ,_scaleX ,_scaleY);
 end;
 
 function jBitmap.LoadFromAssets(strName: string): jObject;

@@ -24,7 +24,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.Log;
-import android.widget.ImageView;
 
 //------------------------------------------------------------------------------
 //Graphic API
@@ -176,52 +175,50 @@ public void SetByteArrayToBitmap(byte[] image) {
 	//Log.i("SetByteArrayToBitmap","size="+ image.length);
 }
 
-//http://androidtrainningcenter.blogspot.com.br/2012/05/bitmap-operations-like-re-sizing.html
-public Bitmap ClockWise(Bitmap _bmp, ImageView _imageView){
-  if(_bmp == null) return null;
+public Bitmap ClockWise(Bitmap _bmp){
 	
-  Matrix mMatrix = new Matrix();
-  Matrix mat= _imageView.getImageMatrix();    
-  mMatrix.set(mat);
-  mMatrix.setRotate(90);
-  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);    
+	  if(_bmp == null) return null;
+		
+	  Matrix matrix = new Matrix();
+		
+	  matrix.postRotate(90);
+	  
+	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, false);    
 } 
 
-public Bitmap AntiClockWise(Bitmap _bmp, ImageView _imageView){
-  if(_bmp == null) return null;
+public Bitmap AntiClockWise(Bitmap _bmp){
 	
-  Matrix mMatrix = new Matrix();
-  Matrix mat= _imageView.getImageMatrix();    
-  mMatrix.set(mat);
-  mMatrix.setRotate(-90);
-  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);    
+	  if(_bmp == null) return null;
+		
+	  Matrix matrix = new Matrix();
+		
+	  matrix.postRotate(-90);
+	  
+	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, false);    
 }
 
-public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {
-  if(_bmp == null) return null;
+public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {
 	
-  Matrix mMatrix = new Matrix();
-  Matrix mat= _imageView.getImageMatrix();    
-  mMatrix.set(mat);        
-	mMatrix.setScale(_scaleX, _scaleY);
-	return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);	   
+	  if(_bmp == null) return null;
+		
+	  //CREATE A MATRIX FOR THE MANIPULATION	 
+	  Matrix matrix = new Matrix();
+	  // RESIZE THE BIT MAP
+	  matrix.postScale(_scaleX, _scaleY);
+	  // RECREATE THE NEW BITMAP 
+		
+	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, false);	   
 }
 
-public Bitmap SetScale(ImageView _imageView, float _scaleX, float _scaleY ) {      
-	/*Matrix mMatrix = new Matrix();
-  Matrix mat= _imageView.getImageMatrix();    
-  mMatrix.set(mat);        
-	mMatrix.setScale(_scaleX, _scaleY);		
-	bmp = Bitmap.createBitmap(bmp , 0, 0, bmp.getWidth(), bmp.getHeight(), mMatrix, false);
-	return bmp;*/
-	if(_imageView == null) return null;
-	// CREATE A MATRIX FOR THE MANIPULATION	 
-	Matrix matrix = new Matrix();
-	// RESIZE THE BIT MAP
-	matrix.postScale(_scaleX, _scaleY);
-	// RECREATE THE NEW BITMAP
-	Bitmap resizedBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, false);
-	return resizedBitmap;
+public Bitmap SetScale(float _scaleX, float _scaleY ) {      
+		
+		if(bmp == null) return null;
+		// CREATE A MATRIX FOR THE MANIPULATION	 
+		Matrix matrix = new Matrix();
+		// RESIZE THE BIT MAP
+		matrix.postScale(_scaleX, _scaleY);
+		// RECREATE THE NEW BITMAP 
+		return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, false);
 }
 
 public Bitmap LoadFromAssets(String strName)
