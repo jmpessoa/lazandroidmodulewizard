@@ -51,9 +51,9 @@ jImageFileManager = class(jControl)
     function GetByteArrayFromBitmap(_bitmap: jObject; _compressFormat: string): TDynArrayOfJByte;
 
     function SetByteArrayToBitmap(var _imageArray: TDynArrayOfJByte): jObject;
-    function ClockWise(_bitmap: jObject; _imageView: jObject): jObject;
-    function AntiClockWise(_bitmap: jObject; _imageView: jObject): jObject;
-    function SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+    function ClockWise(_bitmap: jObject ): jObject;
+    function AntiClockWise(_bitmap: jObject ): jObject;
+    function SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
     function GetBitmapFromDecodedFile(_imagePath: string): jObject;
     function GetBitmapFromIntentResult(_intentData: jObject): jObject;
     function GetBitmapThumbnailFromCamera(_intentData: jObject): jObject;
@@ -251,27 +251,26 @@ begin
    Result:= jni_func_y_out_m(FjEnv, FjObject, 'SetByteArrayToBitmap', _imageArray);
 end;
 
-function jImageFileManager.ClockWise(_bitmap: jObject; _imageView: jObject): jObject;
+function jImageFileManager.ClockWise(_bitmap: jObject ): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ma_out_m(FjEnv, FjObject, 'ClockWise', _bitmap ,_imageView);
+   Result:= jni_func_m_out_m(FjEnv, FjObject, 'ClockWise', _bitmap);
 end;
 
-function jImageFileManager.AntiClockWise(_bitmap: jObject; _imageView: jObject): jObject;
+function jImageFileManager.AntiClockWise(_bitmap: jObject ): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ma_out_m(FjEnv, FjObject, 'AntiClockWise', _bitmap ,_imageView);
+   Result:= jni_func_m_out_m(FjEnv, FjObject, 'AntiClockWise', _bitmap );
 end;
 
-function jImageFileManager.SetScale(_bmp: jObject; _imageView: jObject; _scaleX: single; _scaleY: single): jObject;
+function jImageFileManager.SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_maff_out_m(FjEnv, FjObject, 'SetScale', _bmp ,_imageView ,_scaleX ,_scaleY);
+   Result:= jni_func_mff_out_m(FjEnv, FjObject, 'SetScale', _bmp,_scaleX ,_scaleY);
 end;
-
 
 function jImageFileManager.GetBitmapFromDecodedFile(_imagePath: string): jObject;
 begin

@@ -575,8 +575,8 @@ function jni_func_u_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
 function jni_func_y_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte): jObject;
 
 function jni_func_ii_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2: integer): jObject;
-function jni_func_ma_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _imageView: jObject): jObject;
-function jni_func_maff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _imageView: jObject; _float1, _float2: single): jObject;
+function jni_func_ff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single): jObject;
+function jni_func_mff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
 function jni_func_mt_out_y(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string): TDynArrayOfJByte;
 function jni_func_mt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string) : boolean;
 function jni_func_mtt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str1, _str2: string) : boolean;
@@ -776,22 +776,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_ma_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                           _bitmap: jObject; _imageView: jObject): jObject;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bitmap;
-  jParams[1].l:= _imageView;
-
-  jCls:= env^.GetObjectClass(env, _jobject);
-  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;)Landroid/graphics/Bitmap;');
-  Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 function jni_func_mt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                            _bitmap: jObject; _str: string) : boolean;
 var
@@ -834,20 +818,35 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_maff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                             _bitmap: jObject; _imageView: jObject; _float1, _float2: single): jObject;
+function jni_func_ff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                             _float1, _float2: single): jObject;
 var
-  jParams: array[0..3] of jValue;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _float1;
+  jParams[1].f:= _float2;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FF)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_mff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                             _bitmap: jObject; _float1, _float2: single): jObject;
+var
+  jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jParams[0].l:= _bitmap;
-  jParams[1].l:= _imageView;
-  jParams[2].f:= _float1;
-  jParams[3].f:= _float2;
+  jParams[1].f:= _float1;
+  jParams[2].f:= _float2;
 
   jCls:= env^.GetObjectClass(env, _jobject);
-  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;Landroid/widget/ImageView;FF)Landroid/graphics/Bitmap;');
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;FF)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

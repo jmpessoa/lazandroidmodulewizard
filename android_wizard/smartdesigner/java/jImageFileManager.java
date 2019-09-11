@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.ImageView;
 
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.ColorMatrix;
@@ -365,35 +364,35 @@ public class jImageFileManager /*extends ...*/ {
 	    return BitmapFactory.decodeByteArray(_imageArray, 0, _imageArray.length);
 	}
 
-	 //http://androidtrainningcenter.blogspot.com.br/2012/05/bitmap-operations-like-re-sizing.html
-	public Bitmap ClockWise(Bitmap _bitmap, ImageView _imageView){
-		 if( (_bitmap == null) || (_imageView == null) ) return null; // by tr3e
+	public Bitmap ClockWise(Bitmap _bitmap){
+		 if(_bitmap == null) return null; // by tr3e
 		 
-	     Matrix mMatrix = new Matrix();
-	     Matrix mat= _imageView.getImageMatrix();    
-	     mMatrix.set(mat);
-	     mMatrix.setRotate(90);
-	     return Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), mMatrix, false);    
+		 Matrix matrix = new Matrix();
+			
+		 matrix.postRotate(-90);
+		 
+	     return Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);    
 	} 
 
-	public Bitmap AntiClockWise(Bitmap _bitmap, ImageView _imageView){
-		if( (_bitmap == null) || (_imageView == null) ) return null; // by tr3e
+	public Bitmap AntiClockWise(Bitmap _bitmap){
+		if(_bitmap == null) return null; // by tr3e
 		
-	     Matrix mMatrix = new Matrix();
-	     Matrix mat= _imageView.getImageMatrix();    
-	     mMatrix.set(mat);
-	     mMatrix.setRotate(-90);
-	     return Bitmap.createBitmap(_bitmap, 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), mMatrix, false);    
+		Matrix matrix = new Matrix();
+		
+		matrix.postRotate(-90);
+	    
+		return Bitmap.createBitmap(_bitmap, 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);    
 	}
 	
-	public Bitmap SetScale(Bitmap _bmp, ImageView _imageView, float _scaleX, float _scaleY ) {
-		if( (_bmp == null) || (_imageView == null) ) return null; // by tr3e
+	public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {      
 		
-	    Matrix mMatrix = new Matrix();
-	    Matrix mat= _imageView.getImageMatrix();    
-	    mMatrix.set(mat);        
-		mMatrix.setScale(_scaleX, _scaleY);
-		return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), mMatrix, false);	   
+		if(_bmp == null) return null;
+		// CREATE A MATRIX FOR THE MANIPULATION	 
+		Matrix matrix = new Matrix();
+		// RESIZE THE BIT MAP
+		matrix.postScale(_scaleX, _scaleY);
+		// RECREATE THE NEW BITMAP
+		return Bitmap.createBitmap(_bmp, 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);		
 	}
 
 	public Bitmap GetBitmapFromDecodedFile(String _imagePath) {
