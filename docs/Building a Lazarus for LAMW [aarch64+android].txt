@@ -80,6 +80,7 @@ TUTORIAL II  -  "Do It Yourself"
 		tfpandroidbridge_pack.lpk	[..../android_bridges]
 		lazandroidwizardpack.lpk	[..../android_wizard]
 		amw_ide_tools.lpk		[..../ide_tools]
+
 3) Get FPC Source [Trunk]
 IDE "Tools" --> "[LAMW] Android Module Wizard" --> "Get FPC Source [Trunk]"	
 
