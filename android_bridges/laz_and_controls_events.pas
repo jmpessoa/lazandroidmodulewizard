@@ -202,11 +202,17 @@ uses
    procedure Java_Event_pOnSignaturePadSigned(env:PJNIEnv;this:JObject;Sender:TObject);
    procedure Java_Event_pOnSignaturePadClear(env:PJNIEnv;this:JObject;Sender:TObject);
 
+   //procedure Java_Event_pOnGDXScreenShow(env:PJNIEnv;this:JObject;Sender:TObject);
+   //procedure Java_Event_pOnGDXScreenResize(env:PJNIEnv;this:JObject;Sender:TObject;width:integer;height:integer);
+   //procedure Java_Event_pOnGDXScreenRender(env:PJNIEnv;this:JObject;Sender:TObject;deltaTime:single);
+
+   procedure Java_Event_pOnMailMessagesCount(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
+
+   procedure Java_Event_pOnMailMessageRead(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;Header:jString;Date:jString;Subject:jString;ContentType:jString;ContentText:jString;Attachments:jString);
 
 implementation
 
 uses
-
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
@@ -216,7 +222,7 @@ uses
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
    customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
-   midimanager, copenmapview, csignaturepad, soundpool;
+   midimanager, copenmapview, csignaturepad, soundpool, {gdxscreen,} cmail;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -330,7 +336,7 @@ begin
   Result:= nil;
   newSize0:= Length(dataContent);
   Result:= env^.NewIntArray(env, newSize0);  // allocate
-    env^.SetIntArrayRegion(env, Result, 0 , newSize0, @dataContent[0] {source});
+  env^.SetIntArrayRegion(env, Result, 0 , newSize0, @dataContent[0] {source});
 end;
 
 function GetJObjectOfDynArrayOfString(env: PJNIEnv; var dataContent: TDynArrayOfString): jstringArray;  // jObject;
@@ -2400,6 +2406,65 @@ begin
     jcSignaturePad(Sender).GenEvent_OnSignaturePadClear(Sender);
   end;
 end;
+
+(*
+procedure Java_Event_pOnGDXScreenRender(env:PJNIEnv;this:JObject;Sender:TObject;deltaTime:single);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxScreen then
+  begin
+    jForm(jGdxScreen(Sender).Owner).UpdateJNI(gApp);
+    jGdxScreen(Sender).GenEvent_OnGDXScreenRender(Sender,deltaTime);
+  end;
+end;
+
+procedure Java_Event_pOnGDXScreenShow(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxScreen then
+  begin
+    jForm(jGdxScreen(Sender).Owner).UpdateJNI(gApp);
+    jGdxScreen(Sender).GenEvent_OnGDXScreenShow(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnGDXScreenResize(env:PJNIEnv;this:JObject;Sender:TObject;width:integer;height:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxScreen then
+  begin
+    jForm(jGdxScreen(Sender).Owner).UpdateJNI(gApp);
+    jGdxScreen(Sender).GenEvent_OnGDXScreenResize(Sender,width,height);
+  end;
+end;
+*)
+
+procedure Java_Event_pOnMailMessageRead(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;Header:jString;Date:jString;Subject:jString;ContentType:jString;ContentText:jString;Attachments:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcMail then
+  begin
+    jForm(jcMail(Sender).Owner).UpdateJNI(gApp);
+    jcMail(Sender).GenEvent_OnMailMessageRead(Sender,position,GetString(env,Header),GetString(env,Date),GetString(env,Subject),GetString(env,ContentType),GetString(env,ContentText),GetString(env,Attachments));
+  end;
+end;
+
+
+procedure Java_Event_pOnMailMessagesCount(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcMail then
+  begin
+    jForm(jcMail(Sender).Owner).UpdateJNI(gApp);
+    jcMail(Sender).GenEvent_OnMailMessagesCount(Sender,count);
+  end;
+end;
+
 
 end.
 

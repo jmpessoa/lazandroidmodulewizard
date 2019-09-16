@@ -6,6 +6,7 @@ interface
   
 uses
   Classes,
+  cmail,
   csignaturepad,
   copenmapview,
   clantern,
@@ -20,6 +21,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jcmail_icon.lrs}
   {$I jcsignaturepad_icon.lrs}
   {$I jcopenmapview_icon.lrs}
   {$I jclantern_icon.lrs}
@@ -27,6 +29,7 @@ begin
   {$I jcmikrotikrouteros_icon.lrs}
   RegisterComponents('Android Bridges jCenter',
     [
+      jcMail,
       jcSignaturePad,
       jcOpenMapView,
       jcLantern,

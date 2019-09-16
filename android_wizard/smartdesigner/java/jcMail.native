@@ -1,0 +1,2 @@
+public native void pOnMailMessageRead(long pasobj, int position, String Header, String Date, String Subject, String ContentType, String ContentText, String Attachments);
+public native void pOnMailMessagesCount(long pasobj, int count);
