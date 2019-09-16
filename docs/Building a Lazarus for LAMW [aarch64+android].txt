@@ -1,0 +1,115 @@
+How to: building a Lazarus for LAMW [aarch64+android]
+by jmpessoa
+
+TUTORIAL I -  using  ”Fpcupdeluxe”  tool
+
+1) Get fpcupdeluxe 
+
+ ref. https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases
+ [example: win64]
+ https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/download/1.6.2x/fpcupdeluxe-x86_64-win64.exe
+
+2) Task 1: Install Fpc + Lazarus
+
+  2.1) Run/execute "fpcupdeluxe" 
+
+  2.2) Select FPC version [fixes3.2]
+
+  2.3) Select Lazarus version [fixes2.xx]
+
+  2.4) Click  "Install/Update FPC+Laz" button
+   wait...  wait... wait... wait... wait... wait... wait... wait...
+   Success!!!!
+
+3) Task 2: Build/Install Cross compiles 
+ 
+  3.1) Select Cross: CPU  [ex. "aarch64"]
+
+  3.2) Select Cross: OS     [android]
+
+  3.3) Click  "Install cross-compile" button
+   wait...  wait... wait... wait... wait... wait... wait... wait...
+   Success!!!!
+   NOTE: If desirable/wanted repeat 3.1/3.2/3.3 for other CPUs [ex. "arm"]
+
+4) Run/Execute "Lazarus_fpcupdeluxe" from desktop shortcut [mandatory!!!] 
+
+5) Install/configure LAMW packages
+
+  ref. https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip
+	.Download	
+	.Unzip
+	.Packages Instalation order.
+		tfpandroidbridge_pack.lpk	[..../android_bridges]
+		lazandroidwizardpack.lpk	[..../android_wizard]
+		amw_ide_tools.lpk		[..../ide_tools]
+
+  5.1) Configure LAMW
+	Lazarus IDE menu "Tools" ---> "[LAMW] Android Module Wizard" -->  "Path Settings ..."
+
+6) Create/Open a LAMW project
+
+7) How to get more/others ".so" chipset builds:
+  	 .warning 1: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds! 
+   	 .warning 2: Laz4Android2.0.0 [out-of-box] support only 32 Bits chipset: "armV6", "armV7a+Soft", "x86"!
+
+  7.1. From LazarusIDE menu:
+     > Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]
+
+  7.2. From LazarusIDE  menu:
+     > Run -> Clean up and Build...
+
+  7.3. From LazarusIDE menu:
+     > [LAMW] Build Android Apk and Run
+
+  NOTE: If desirable/wanted repeat 7.1/7.2/7.3 for other CPUs...
+
+
+TUTORIAL II  -  "Do It Yourself" 
+
+1)  Get Lazarus [canonical] + FPC 3.2.0		
+		win64:  [need FPC 3.2.0 to support cross-android-64 bits]
+	https://sourceforge.net/projects/lazarus-snapshots/files/Window%2064/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793-win64.exe/download
+
+		win32: [need FPC 3.2.0 to support cross- android-64 bits]
+	https://sourceforge.net/projects/lazarus-snapshots/files/Window%2032/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793/lazarus-2.0.2-60960-fpc-3.2.0-beta-41793-win32.exe/download
+
+2) Install the LAMW packages
+	.ref. https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip
+	.Packages Installations  order.
+		tfpandroidbridge_pack.lpk	[..../android_bridges]
+		lazandroidwizardpack.lpk	[..../android_wizard]
+		amw_ide_tools.lpk		[..../ide_tools]
+3) Get FPC Source [Trunk]
+IDE "Tools" --> "[LAMW] Android Module Wizard" --> "Get FPC Source [Trunk]"	
+
+4) Build/Install android cross-compilers
+IDE "Tools" --> "[ LAMW] Android Module Wizard" --> "Build FPC Cross Android"
+				[ex. Armv7a + Soft]	<<---- tested!
+				.Build  
+				.Install
+				[ex. aarch64]	  	<<---- tested!
+				.Build  
+				.Install
+
+5) After "build" and "install" the cross-compilers and before to create your first LAMW project
+		[How to fix "Fatal: Cannot find unit system used by fcllaz of package FCL."]
+
+		5.1) Go to "fpc.cfg"  [ex. "lazarus\fpc\3.2.0\bin"]
+					Change:
+					# searchpath for units and other system dependent things
+					-FuC:\lazarus1864\fpc\$FPCVERSION/units/$fpctarget
+					-FuC:\lazarus1864\fpc\$FPCVERSION/units/$fpctarget/*
+					-FuC:\lazarus1864\fpc\$FPCVERSION/units/$fpctarget/rtl
+					To:
+					# searchpath for units and other system dependent things
+					-FuC:\lazarus1864\fpc\3.2.0/units/$fpctarget
+					-FuC:\lazarus1864\fpc\3.2.0/units/$fpctarget/*
+					-FuC:\lazarus1864\fpc\3.2.0/units/$fpctarget/rtl
+
+		5.2) Go to Lazarus IDE menu "Tools" --> "Options" --> "Environment"  
+					[FPC Source]
+					Change:
+						$(LazarusDir)fpc\$(FPCVer)\source
+					To: 
+						$(LazarusDir)fpc\3.2.0\source
