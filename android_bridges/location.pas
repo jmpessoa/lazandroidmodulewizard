@@ -112,6 +112,7 @@ jLocation = class(jControl)
     function GetSatelliteInfo(_index: integer): string;
     function GetTimeToFirstFix(): single;
     procedure SetGoogleMapsApiKey(_key: string);
+    function GetAccuracy(): single; //by zebu1er
    // procedure Listen();
 
     procedure GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
@@ -180,6 +181,7 @@ function jLocation_GetSatelliteInfo(env: PJNIEnv; _jlocation: JObject; _index: i
 function jLocation_GetTimeToFirstFix(env: PJNIEnv; _jlocation: JObject): single;
 procedure jLocation_SetGoogleMapsApiKey(env: PJNIEnv; _jlocation: JObject; _key: string);
 //procedure jLocation_Listen(env: PJNIEnv; _jlocation: JObject);
+function jLocation_GetAccuracy(env: PJNIEnv; _jlocation: JObject): single;
 
 function GeoPoint2D(latitute: double; longitude: double): TGeoPoint2D;
 
@@ -593,6 +595,13 @@ begin
      jLocation_SetGoogleMapsApiKey(FjEnv, FjObject, _key);
 end;
 
+function jLocation.GetAccuracy(): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jLocation_GetAccuracy(FjEnv, FjObject);
+end;
+
 procedure jLocation.GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);
 begin
    if Assigned(FOnLocationChanged) then FOnLocationChanged(Obj, latitude, longitude, altitude, address);
@@ -637,16 +646,6 @@ begin
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
-
-(*
-//Please, you need insert:
-
-   public java.lang.Object jLocation_jCreate(long _Self, long _TimeForUpdates, long _DistanceForUpdates, int _CriteriaAccuracy, int _MapType) {
-      return (java.lang.Object)(new jLocation(this,_Self,_TimeForUpdates,_DistanceForUpdates,_CriteriaAccuracy,_MapType));
-   }
-
-//to end of "public class Controls" in "Controls.java"
-*)
 
 procedure jLocation_jFree(env: PJNIEnv; _jlocation: JObject);
 var
@@ -1253,6 +1252,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetGoogleMapsApiKey', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jlocation, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jLocation_GetAccuracy(env: PJNIEnv; _jlocation: JObject): single;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jlocation);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetAccuracy', '()F');
+  Result:= env^.CallFloatMethod(env, _jlocation, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

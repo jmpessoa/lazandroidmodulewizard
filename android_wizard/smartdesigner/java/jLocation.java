@@ -57,6 +57,7 @@ public class jLocation /*extends ...*/ {
     private double mLat;
     private double mLng;
     private double mAlt;
+    private float mAcc;
 
     private int mCriteriaAccuracy;
 
@@ -128,6 +129,7 @@ public class jLocation /*extends ...*/ {
 
         mLat = 0.0;
         mLng = 0.0;
+        mAcc = 0.0f;
         mTimeForUpdates = _TimeForUpdates;           //(long) (1000 * 60 * 1)/4; // 1 minute
         mDistanceForUpdates = _DistanceForUpdates;  //1; //meters
 
@@ -400,7 +402,11 @@ public class jLocation /*extends ...*/ {
     public double GetAltitude() {
       return mAlt;
     }   
-        
+
+    public float GetAccuracy() { //by zebu1er
+        return mAcc;
+    }
+
     public boolean IsWifiEnabled() {
        WifiManager wifiManager = (WifiManager)this.context.getSystemService(Context.WIFI_SERVICE);
        return  wifiManager.isWifiEnabled();	
@@ -617,7 +623,8 @@ public class jLocation /*extends ...*/ {
                                            	 
              mLat = _location.getLatitude();
              mLng = _location.getLongitude();
-             mAlt = _location.getAltitude();                                   
+             mAlt = _location.getAltitude();
+             mAcc = _location.getAccuracy();
              mAddress = GetAddress(mLat, mLng);
              
             // mLastLocationMillis = SystemClock.elapsedRealtime();
