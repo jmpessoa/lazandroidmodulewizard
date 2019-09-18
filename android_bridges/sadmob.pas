@@ -92,10 +92,10 @@ implementation
 constructor jsAdMob.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FMarginLeft   := 10;
-  FMarginTop    := 10;
-  FMarginBottom := 10;
-  FMarginRight  := 10;
+  FMarginLeft   := 0;
+  FMarginTop    := 0;
+  FMarginBottom := 0;
+  FMarginRight  := 0;
   FHeight       := 96; //??
   FWidth        := 192; //??
   FLParamWidth  := lpWrapContent;  //lpWrapContent
