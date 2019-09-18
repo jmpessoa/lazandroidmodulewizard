@@ -553,18 +553,28 @@ procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer);{$ifdef mswindows}stdcall;{$
  d:jdouble);
  l:jobject);
 
- a: jImageView
- m: jBitmap
- n: jIntent
- o: jObject
- t: jString
- u: jUri
- y: jDynArrayOfJByte
+ g: ViewGroup -> Landroid/view/ViewGroup;
+ m: Bitmap    -> Landroid/graphics/Bitmap;
+ n: Intent    -> Landroid/content/Intent;
+ t: String    -> Ljava/lang/String;
+ u: Uri       -> Landroid/net/Uri;
+ v: View      -> Landroid/view/View;
+ y: jDynArrayOfJByte -> [B
 *)
 
-procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string );
+procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string);
+procedure jni_proc_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float: single);
+procedure jni_proc_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _viewgroup: jObject);
+procedure jni_proc_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer);
+procedure jni_proc_iiiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2, _int3, _int4, _int5, _int6: integer);
+procedure jni_proc_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string);
 
-function jni_func_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string ): string;
+function jni_func_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string): single;
+function jni_func_out_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
+function jni_func_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string): integer;
+function jni_func_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string): string;
+function jni_func_out_v(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
+function jni_func_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string): boolean;
 
 function jni_func_m_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject): jObject;
 function jni_func_m_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject): integer;
@@ -608,6 +618,117 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jni_proc_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                     _float: single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _float;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(F)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jni_proc_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                     _viewgroup: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _viewgroup;
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/view/ViewGroup;)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jni_proc_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                     _int: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _int;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jni_proc_iiiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _int1, _int2, _int3, _int4, _int5, _int6: integer);
+var
+  jParams: array[0..5] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _int1;
+  jParams[1].i:= _int2;
+  jParams[2].i:= _int3;
+  jParams[3].i:= _int4;
+  jParams[4].i:= _int5;
+  jParams[5].i:= _int6;
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IIIIII)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jni_proc_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                     _str: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): single;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()F');
+  Result:= env^.CallFloatMethod(env, _jobject, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_out_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Landroid/view/ViewGroup;');
+  Result:= env^.CallObjectMethod(env, _jobject, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()I');
+  Result:= env^.CallIntMethod(env, _jobject, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jni_func_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): string;
 var
   jStr: JString;
@@ -625,6 +746,30 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_out_v(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Landroid/view/View;');
+  Result:= env^.CallObjectMethod(env, _jobject, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jobject, jMethod);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
 
