@@ -134,8 +134,8 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jni_proc_g(FjEnv, FjObject, 'SetViewParent', FjPRLayout);
-   jni_proc_i(FjEnv, FjObject, 'SetId', Self.Id);
+   SetViewParent( FjPRLayout );
+   SetId(Self.Id);
   end;
 
   jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
@@ -144,28 +144,22 @@ begin
                     sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
+      AddLParamsAnchorRule( GetPositionRelativeToAnchor(rToA) );
+
   for rToP := rpBottom to rpCenterVertical do
-  begin
     if rToP in FPositionRelativeToParent then
-    begin
-      jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', GetPositionRelativeToParent(rToP));
-    end;
-  end;
+      AddLParamsParentRule( GetPositionRelativeToParent(rToP) );
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', Self.AnchorId);
+  SetLayoutAll( Self.AnchorId );
 
   if not FInitialized then
   begin
    FInitialized:= True;
+
    if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
@@ -249,7 +243,7 @@ end;
 procedure jsAdMob.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
-  if FInitialized then
+  if FjObject <> nil then
      jni_proc_g(FjEnv, FjObject, 'SetViewParent', _viewgroup);
 end;
 
@@ -361,21 +355,21 @@ end;
 procedure jsAdMob.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
+  if FjObject <> nil then
      jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
 end;
 
 procedure jsAdMob.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
+  if FjObject <> nil then
      jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
 end;
 
 procedure jsAdMob.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
+  if FjObject <> nil then
      jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
 end;
 
@@ -391,18 +385,18 @@ begin
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', GetPositionRelativeToParent(rToP));
+         self.AddLParamsParentRule(GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', GetPositionRelativeToAnchor(rToA));
+        self.AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
 procedure jsAdMob.SetId(_id: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
+  if FjObject <> nil then
      jni_proc_i(FjEnv, FjObject, 'SetId', _id);
 end;
 
