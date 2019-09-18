@@ -1,0 +1,3 @@
+public native void pOnSeekBarProgressChanged(long pasobj,  int progress, boolean fromUser);
+public native void pOnSeekBarStartTrackingTouch(long pasobj, int progress);
+public native void pOnSeekBarStopTrackingTouch(long pasobj, int progress);

@@ -84,31 +84,6 @@ jsAdMob = class(jVisualControl)
 end;
 
 function jsAdMob_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jsAdMob_jFree(env: PJNIEnv; _jadmob: JObject);
-procedure jsAdMob_SetViewParent(env: PJNIEnv; _jadmob: JObject; _viewgroup: jObject);
-function jsAdMob_GetParent(env: PJNIEnv; _jadmob: JObject): jObject;
-procedure jsAdMob_RemoveFromViewParent(env: PJNIEnv; _jadmob: JObject);
-
-procedure jsAdMob_AdMobSetId(env: PJNIEnv; _jadmob: JObject; _admobid: string);
-function jsAdMob_AdMobGetId(env: PJNIEnv; _jadmob: JObject): string;
-procedure jsAdMob_AdMobInit(env: PJNIEnv; _jadmob: JObject);
-procedure jsAdMob_AdMobFree(env: PJNIEnv; _jadmob: JObject);
-procedure jsAdMob_AdMobRun(env: PJNIEnv; _jadmob: JObject);
-
-function jsAdMob_GetView(env: PJNIEnv; _jadmob: JObject): jObject;
-procedure jsAdMob_SetLParamWidth(env: PJNIEnv; _jadmob: JObject; _w: integer);
-procedure jsAdMob_SetLParamHeight(env: PJNIEnv; _jadmob: JObject; _h: integer);
-function jsAdMob_GetLParamWidth(env: PJNIEnv; _jadmob: JObject): integer;
-function jsAdMob_GetLParamHeight(env: PJNIEnv; _jadmob: JObject): integer;
-procedure jsAdMob_SetLGravity(env: PJNIEnv; _jadmob: JObject; _g: integer);
-procedure jsAdMob_SetLWeight(env: PJNIEnv; _jadmob: JObject; _w: single);
-procedure jsAdMob_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jadmob: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jsAdMob_AddLParamsAnchorRule(env: PJNIEnv; _jadmob: JObject; _rule: integer);
-procedure jsAdMob_AddLParamsParentRule(env: PJNIEnv; _jadmob: JObject; _rule: integer);
-procedure jsAdMob_SetLayoutAll(env: PJNIEnv; _jadmob: JObject; _idAnchor: integer);
-procedure jsAdMob_ClearLayoutAll(env: PJNIEnv; _jadmob: JObject);
-procedure jsAdMob_SetId(env: PJNIEnv; _jadmob: JObject; _id: integer);
-
 
 implementation
 
@@ -159,38 +134,32 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jsAdMob_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsAdMob_SetId(FjEnv, FjObject, Self.Id);
+   SetViewParent( FjPRLayout );
+   SetId(Self.Id);
   end;
 
-  jsAdMob_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+  jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
+                    FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                    sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
+                    sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-      jsAdMob_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
+      AddLParamsAnchorRule( GetPositionRelativeToAnchor(rToA) );
+
   for rToP := rpBottom to rpCenterVertical do
-  begin
     if rToP in FPositionRelativeToParent then
-    begin
-      jsAdMob_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
-    end;
-  end;
+      AddLParamsParentRule( GetPositionRelativeToParent(rToP) );
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsAdMob_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  SetLayoutAll( Self.AnchorId );
 
   if not FInitialized then
   begin
    FInitialized:= True;
+
    if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
@@ -268,140 +237,140 @@ procedure jsAdMob.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jsAdMob.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsAdMob_SetViewParent(FjEnv, FjObject, _viewgroup);
+  if FjObject <> nil then
+     jni_proc_g(FjEnv, FjObject, 'SetViewParent', _viewgroup);
 end;
 
 function jsAdMob.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsAdMob_GetParent(FjEnv, FjObject);
+   Result:= jni_func_out_g(FjEnv, FjObject, 'GetParent');
 end;
 
 procedure jsAdMob.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_RemoveFromViewParent(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
 end;
 
 procedure jsAdMob.AdMobSetId(_admobid: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_AdMobSetId(FjEnv, FjObject, _admobid);
+     jni_proc_t(FjEnv, FjObject, 'AdMobSetId', _admobid);
 end;
 
 function jsAdMob.AdMobGetId(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsAdMob_AdMobGetId(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'AdMobGetId');
 end;
 
 procedure jsAdMob.AdMobInit();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_AdMobInit(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'AdMobInit');
 end;
 
 procedure jsAdMob.AdMobFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_AdMobFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'AdMobFree');
 end;
 
 procedure jsAdMob.AdMobRun();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_AdMobRun(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'AdMobRun');
 end;  
 
 function jsAdMob.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsAdMob_GetView(FjEnv, FjObject);
+   Result:= jni_func_out_v(FjEnv, FjObject, 'GetView');
 end;
 
 procedure jsAdMob.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_SetLParamWidth(FjEnv, FjObject, _w);
+     jni_proc_i(FjEnv, FjObject, 'SetLParamWidth', _w);
 end;
 
 procedure jsAdMob.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_SetLParamHeight(FjEnv, FjObject, _h);
+     jni_proc_i(FjEnv, FjObject, 'SetLParamHeight', _h);
 end;
 
 function jsAdMob.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsAdMob_GetLParamWidth(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamWidth');
 end;
 
 function jsAdMob.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsAdMob_GetLParamHeight(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamHeight');
 end;
 
 procedure jsAdMob.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_SetLGravity(FjEnv, FjObject, _g);
+     jni_proc_i(FjEnv, FjObject, 'SetLGravity', _g);
 end;
 
 procedure jsAdMob.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_SetLWeight(FjEnv, FjObject, _w);
+     jni_proc_f(FjEnv, FjObject, 'SetLWeight', _w);
 end;
 
 procedure jsAdMob.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAdMob_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight', _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsAdMob.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsAdMob_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
 end;
 
 procedure jsAdMob.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsAdMob_AddLParamsParentRule(FjEnv, FjObject, _rule);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
 end;
 
 procedure jsAdMob.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsAdMob_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
 end;
 
 procedure jsAdMob.ClearLayout();
@@ -412,23 +381,23 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsAdMob_clearLayoutAll(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ClearLayoutAll');
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsAdMob_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+         self.AddLParamsParentRule(GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsAdMob_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+        self.AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
 procedure jsAdMob.SetId(_id: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsAdMob_SetId(FjEnv, FjObject, _id);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'SetId', _id);
 end;
 
 {-------- jsAdMob_JNI_Bridge ----------}
@@ -455,303 +424,6 @@ public java.lang.Object jsAdMob_jCreate(long _Self) {
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-
-procedure jsAdMob_jFree(env: PJNIEnv; _jadmob: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_SetViewParent(env: PJNIEnv; _jadmob: JObject; _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsAdMob_GetParent(env: PJNIEnv; _jadmob: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-  Result:= env^.CallObjectMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_RemoveFromViewParent(env: PJNIEnv; _jadmob: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsAdMob_AdMobSetId(env: PJNIEnv; _jadmob: JObject; _admobid: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_admobid));
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'AdMobSetId', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsAdMob_AdMobGetId(env: PJNIEnv; _jadmob: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'AdMobGetId', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jadmob, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsAdMob_AdMobInit(env: PJNIEnv; _jadmob: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'AdMobInit', '()V');
-  env^.CallVoidMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsAdMob_AdMobFree(env: PJNIEnv; _jadmob: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'AdMobFree', '()V');
-  env^.CallVoidMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsAdMob_AdMobRun(env: PJNIEnv; _jadmob: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'AdMobRun', '()V');
-  env^.CallVoidMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsAdMob_GetView(env: PJNIEnv; _jadmob: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_SetLParamWidth(env: PJNIEnv; _jadmob: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_SetLParamHeight(env: PJNIEnv; _jadmob: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsAdMob_GetLParamWidth(env: PJNIEnv; _jadmob: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsAdMob_GetLParamHeight(env: PJNIEnv; _jadmob: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_SetLGravity(env: PJNIEnv; _jadmob: JObject; _g: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _g;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_SetLWeight(env: PJNIEnv; _jadmob: JObject; _w: single);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _w;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLWeight', '(F)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jadmob: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_AddLParamsAnchorRule(env: PJNIEnv; _jadmob: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_AddLParamsParentRule(env: PJNIEnv; _jadmob: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_SetLayoutAll(env: PJNIEnv; _jadmob: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_ClearLayoutAll(env: PJNIEnv; _jadmob: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jadmob, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsAdMob_SetId(env: PJNIEnv; _jadmob: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jadmob);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
-  env^.CallVoidMethodA(env, _jadmob, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 
 

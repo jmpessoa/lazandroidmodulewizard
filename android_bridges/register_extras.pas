@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  brightness,
   soundpool,
   wifimanager,
   midimanager,
@@ -66,6 +67,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jbrightness_icon.lrs}
   {$I jsoundpool_icon.lrs}
   {$I jwifimanager_icon.lrs}
   {$I jexpression_icon.lrs}
@@ -125,6 +127,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jBrightness,
       jSoundPool,
       jWifiManager,
       jExpression,

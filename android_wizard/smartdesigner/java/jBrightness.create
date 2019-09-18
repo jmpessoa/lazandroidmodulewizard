@@ -1,0 +1,3 @@
+public java.lang.Object jBrightness_jCreate(long _Self) {
+  return (java.lang.Object)(new jBrightness(this,_Self));
+}

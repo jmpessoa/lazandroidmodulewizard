@@ -158,7 +158,7 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
         });
 
         admobView.setLayoutParams(bannerLParams);
-        admobView.setAdSize(AdSize.BANNER);
+        admobView.setAdSize(AdSize.SMART_BANNER);
         admobView.setAdUnitId(admobId);
 
         this.addView(admobView);
