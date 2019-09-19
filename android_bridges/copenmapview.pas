@@ -134,6 +134,9 @@ jcOpenMapView = class(jVisualControl)
     procedure SetStrokeWidth(_strokeWidth: single);
     procedure SetFillColor(_fillColor: integer);
 
+    procedure SetMarkerRotation(_marker: jObject; _angleDeg: integer);
+    function AddMarker(_latitude: double; _longitude: double; _iconIdentifier: string; _rotationAngleDeg: integer): integer; overload;
+    function AddMarker(_latitude: double; _longitude: double; _title: string; _iconIdentifier: string; _rotationAngleDeg: integer): integer; overload;
 
     procedure GenEvent_OnOpenMapViewRoadDraw(Sender:TObject; roadCode:integer;roadStatus:integer;roadDuration:double; roadDistance:double; out color: dword; out width: integer);
     procedure GenEvent_OnOpenMapViewClick(Sender:TObject;latitude:double;longitude:double);
@@ -240,6 +243,10 @@ function jcOpenMapView_GetLinesCount(env: PJNIEnv; _jcopenmapview: JObject): int
 procedure jcOpenMapView_SetStrokeColor(env: PJNIEnv; _jcopenmapview: JObject; _strokeColor: integer);
 procedure jcOpenMapView_SetStrokeWidth(env: PJNIEnv; _jcopenmapview: JObject; _strokeWidth: single);
 procedure jcOpenMapView_SetFillColor(env: PJNIEnv; _jcopenmapview: JObject; _fillColor: integer);
+
+procedure jcOpenMapView_SetMarkerRotation(env: PJNIEnv; _jcopenmapview: JObject; _marker: jObject; _angleDeg: integer);
+function jcOpenMapView_AddMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _iconIdentifier: string; _rotationAngleDeg: integer): integer;overload;
+function jcOpenMapView_AddMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _title: string; _iconIdentifier: string; _rotationAngleDeg: integer): integer;overload;
 
 
 implementation
@@ -925,6 +932,27 @@ begin
      jcOpenMapView_SetFillColor(FjEnv, FjObject, _fillColor);
 end;
 
+procedure jcOpenMapView.SetMarkerRotation(_marker: jObject; _angleDeg: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jcOpenMapView_SetMarkerRotation(FjEnv, FjObject, _marker ,_angleDeg);
+end;
+
+function jcOpenMapView.AddMarker(_latitude: double; _longitude: double; _iconIdentifier: string; _rotationAngleDeg: integer): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_iconIdentifier ,_rotationAngleDeg);
+end;
+
+function jcOpenMapView.AddMarker(_latitude: double; _longitude: double; _title: string; _iconIdentifier: string; _rotationAngleDeg: integer): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_title ,_iconIdentifier ,_rotationAngleDeg);
+end;
+
 procedure jcOpenMapView.GenEvent_OnOpenMapViewClick(Sender:TObject;latitude:double;longitude:double);
 begin
   if Assigned(FOnOpenMapViewClick) then FOnOpenMapViewClick(Sender,latitude,longitude);
@@ -1510,8 +1538,6 @@ env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env,jParams[5].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-
 
 procedure jcOpenMapView_ClearMarker(env: PJNIEnv; _jcopenmapview: JObject; _index: integer);
 var
@@ -2113,5 +2139,56 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jcOpenMapView_SetMarkerRotation(env: PJNIEnv; _jcopenmapview: JObject; _marker: jObject; _angleDeg: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _marker;
+  jParams[1].i:= _angleDeg;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMarkerRotation', '(Lorg/osmdroid/views/overlay/Marker;I)V');
+  env^.CallVoidMethodA(env, _jcopenmapview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jcOpenMapView_AddMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _iconIdentifier: string; _rotationAngleDeg: integer): integer;
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].d:= _latitude;
+  jParams[1].d:= _longitude;
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
+  jParams[3].i:= _rotationAngleDeg;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddMarker', '(DDLjava/lang/String;I)I');
+  Result:= env^.CallIntMethodA(env, _jcopenmapview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jcOpenMapView_AddMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _title: string; _iconIdentifier: string; _rotationAngleDeg: integer): integer;
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].d:= _latitude;
+  jParams[1].d:= _longitude;
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_title));
+  jParams[3].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
+  jParams[4].i:= _rotationAngleDeg;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddMarker', '(DDLjava/lang/String;Ljava/lang/String;I)I');
+  Result:= env^.CallIntMethodA(env, _jcopenmapview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env,jParams[3].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

@@ -416,6 +416,33 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         new MyAsyncTask(0).execute(pointsList);
     }
 
+
+    public int AddMarker(double _latitude, double _longitude, String _iconIdentifier, int _rotationAngleDeg) {
+        Marker marker = new Marker(this);
+        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
+        marker.setPosition(geoPoint);
+        marker.setTitle(_iconIdentifier);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setRotation(_rotationAngleDeg);
+        //marker.setInfoWindow(null);
+        marker.setDraggable(true);
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                marker.showInfoWindow();
+                mapView.getController().animateTo(marker.getPosition());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(),  marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                return false;
+            }
+        });
+
+        this.getOverlays().add(marker);
+        this.invalidate();
+        mMarkerList.add(marker);
+        return mMarkerList.size();
+    }
+
     public int AddMarker(double _latitude, double _longitude, String _iconIdentifier) {
         Marker marker = new Marker(this);
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
@@ -431,6 +458,35 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
                 controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(),  marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                return false;
+            }
+        });
+
+        this.getOverlays().add(marker);
+        this.invalidate();
+        mMarkerList.add(marker);
+        return mMarkerList.size();
+    }
+
+    public int AddMarker(double _latitude, double _longitude, String _title, String _iconIdentifier,  int _rotationAngleDeg) {
+        Marker marker = new Marker(this);
+        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
+        marker.setPosition(geoPoint);
+        marker.setTitle(_title);
+        //marker.setSnippet("Département INFO, IUT de Lannion");
+        //marker.setAlpha(0.75f);
+        //nodeMarker.setSubDescription(Road.getLengthDurationText(controls.activity, _node.mLength, _node.mDuration));
+        //nodeMarker.setImage(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setRotation(_rotationAngleDeg);
+        marker.setDraggable(IsMarkerDraggable);
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                marker.showInfoWindow();
+                mapView.getController().animateTo(marker.getPosition());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
                 return false;
             }
         });
@@ -693,6 +749,10 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
 
     public Marker GetMarker(int _index) {
         return  (Marker)mMarkerList.get(_index);
+    }
+
+    public void SetMarkerRotation(Marker _marker, int _angleDeg) {
+        _marker.setRotation(_angleDeg);
     }
 
     public double[] GetMarkerPosition(Marker _marker) {
