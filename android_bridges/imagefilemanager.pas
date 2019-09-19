@@ -283,7 +283,7 @@ function jImageFileManager.GetBitmapFromIntentResult(_intentData: jObject): jObj
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_n_out_m(FjEnv, FjObject, 'GetBitmapFromIntentData', _intentData);
+   Result:= jni_func_n_out_m(FjEnv, FjObject, 'GetBitmapFromIntentResult', _intentData);
 end;
 
 

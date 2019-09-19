@@ -345,6 +345,14 @@ Sending Data: Extras vs. URI Parameters
       return android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
    }
    
+   public Uri GetFilesExternContentUri(){
+      return android.provider.MediaStore.Files.getContentUri("external");
+   }
+
+   public Uri GetImagesExternContentUri(){
+      return android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+   }
+
    public Uri GetVideoExternContentUri(){
 	  return android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
    }
