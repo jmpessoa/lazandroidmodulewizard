@@ -83,6 +83,8 @@ jIntentManager = class(jControl)
     function GetContactsContentUri(): jObject;
     function GetContactsPhoneUri(): jObject;
     function GetAudioExternContentUri(): jObject;
+    function GetFilesExternContentUri(): jObject;
+    function GetImagesExternContentUri(): jObject;
     function GetVideoExternContentUri(): jObject;
     function ParseUri(_uriAsString: string): jObject;
     function GetActionViewAsString(): string;
@@ -181,6 +183,8 @@ procedure jIntentManager_PutExtraPhoneNumbers(env: PJNIEnv; _jintentmanager: JOb
 function jIntentManager_GetContactsContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
 function jIntentManager_GetContactsPhoneUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
 function jIntentManager_GetAudioExternContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
+function jIntentManager_GetFilesExternContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
+function jIntentManager_GetImagesExternContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
 function jIntentManager_GetVideoExternContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
 function jIntentManager_ParseUri(env: PJNIEnv; _jintentmanager: JObject; _uriAsString: string): jObject;
 function jIntentManager_GetActionViewAsString(env: PJNIEnv; _jintentmanager: JObject): string;
@@ -588,6 +592,20 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetAudioExternContentUri(FjEnv, FjObject);
+end;
+
+function jIntentManager.GetFilesExternContentUri(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetFilesExternContentUri(FjEnv, FjObject);
+end;
+
+function jIntentManager.GetImagesExternContentUri(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetImagesExternContentUri(FjEnv, FjObject);
 end;
 
 function jIntentManager.GetVideoExternContentUri(): jObject;
@@ -1699,6 +1717,28 @@ var
 begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetAudioExternContentUri', '()Landroid/net/Uri;');
+  Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jIntentManager_GetFilesExternContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetFilesExternContentUri', '()Landroid/net/Uri;');
+  Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jIntentManager_GetImagesExternContentUri(env: PJNIEnv; _jintentmanager: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetImagesExternContentUri', '()Landroid/net/Uri;');
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
