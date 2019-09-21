@@ -68,6 +68,9 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
     private float mStrokeWidth = 2;
     private int mFillColor = 0x12121212;
 
+    float mX = Marker.ANCHOR_CENTER;
+    float mY = Marker.ANCHOR_BOTTOM;
+
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jcOpenMapView(Controls _ctrls, long _Self, boolean _showScale, int _tileSource, int _zoom) { //Add more others news "_xxx" params if needed!
         super(_ctrls.activity);
@@ -422,7 +425,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
         marker.setPosition(geoPoint);
         marker.setTitle(_iconIdentifier);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(mX, mY);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
         marker.setRotation(_rotationAngleDeg);
         //marker.setInfoWindow(null);
@@ -448,7 +451,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
         marker.setPosition(geoPoint);
         marker.setTitle(_iconIdentifier);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(mX, mY);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
         //marker.setInfoWindow(null);
         marker.setDraggable(true);
@@ -477,7 +480,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         //marker.setAlpha(0.75f);
         //nodeMarker.setSubDescription(Road.getLengthDurationText(controls.activity, _node.mLength, _node.mDuration));
         //nodeMarker.setImage(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(mX, mY);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
         marker.setRotation(_rotationAngleDeg);
         marker.setDraggable(IsMarkerDraggable);
@@ -506,7 +509,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         //marker.setAlpha(0.75f);
         //nodeMarker.setSubDescription(Road.getLengthDurationText(controls.activity, _node.mLength, _node.mDuration));
         //nodeMarker.setImage(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(mX, mY);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
         marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -532,7 +535,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         marker.setTitle(_title);
         marker.setSnippet(_snippetInfo);
         //marker.setAlpha(0.75f);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(mX, mY);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
         marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -562,7 +565,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             marker.setTitle(_title);
             marker.setSnippet(_snippetInfo);
             //marker.setAlpha(0.75f);
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setAnchor(mX, mY);
             marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
             marker.setDraggable(IsMarkerDraggable);
             marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -592,7 +595,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             //marker.setTitle(_title);
             //marker.setSnippet(_snippetInfo);
             //marker.setAlpha(0.75f);
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setAnchor(mX, mY);
             marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
             marker.setDraggable(IsMarkerDraggable);
             marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -620,7 +623,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         marker.setSnippet(_snippetInfo);
         //marker.setAlpha(0.75f);
         marker.setImage(GetDrawableResourceById(GetDrawableResourceId(_snippetImageIdentifier)));
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(mX, mY);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_markerIconIdentifier)));
         marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -643,7 +646,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         GeoPoint geoPoint = new GeoPoint(_latitude,_longitude);
         Marker marker = new Marker(this);
         marker.setPosition(geoPoint);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(mX, mY);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
         marker.setTitle(_title);
         marker.setDraggable(IsMarkerDraggable);
@@ -665,7 +668,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         GeoPoint geoPoint = new GeoPoint(_latitude,_longitude);
         Marker marker = new Marker(this);
         marker.setPosition(geoPoint);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(mX, mY);
         marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
         marker.setTitle(_title);
         marker.setSnippet(_snippetInfo);
@@ -1133,6 +1136,17 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             dist = dist * 0.8684;
         }
         return (dist);
+    }
+
+    public void SetMarkerXY(float _x, float _y){
+        mX = _x;
+        mY = _y;
+
+        if (mY < 0) mY = 0;
+        if (mX < 0) mX = 0;
+
+        if (mY > 1) mY = 1;
+        if (mX > 1) mX = 1;
     }
 
 }

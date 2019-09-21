@@ -137,6 +137,7 @@ jcOpenMapView = class(jVisualControl)
     procedure SetMarkerRotation(_marker: jObject; _angleDeg: integer);
     function AddMarker(_latitude: double; _longitude: double; _iconIdentifier: string; _rotationAngleDeg: integer): integer; overload;
     function AddMarker(_latitude: double; _longitude: double; _title: string; _iconIdentifier: string; _rotationAngleDeg: integer): integer; overload;
+    procedure SetMarkerXY(_x: single; _y: single);
 
     procedure GenEvent_OnOpenMapViewRoadDraw(Sender:TObject; roadCode:integer;roadStatus:integer;roadDuration:double; roadDistance:double; out color: dword; out width: integer);
     procedure GenEvent_OnOpenMapViewClick(Sender:TObject;latitude:double;longitude:double);
@@ -247,7 +248,7 @@ procedure jcOpenMapView_SetFillColor(env: PJNIEnv; _jcopenmapview: JObject; _fil
 procedure jcOpenMapView_SetMarkerRotation(env: PJNIEnv; _jcopenmapview: JObject; _marker: jObject; _angleDeg: integer);
 function jcOpenMapView_AddMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _iconIdentifier: string; _rotationAngleDeg: integer): integer;overload;
 function jcOpenMapView_AddMarker(env: PJNIEnv; _jcopenmapview: JObject; _latitude: double; _longitude: double; _title: string; _iconIdentifier: string; _rotationAngleDeg: integer): integer;overload;
-
+procedure jcOpenMapView_SetMarkerXY(env: PJNIEnv; _jcopenmapview: JObject; _x: single; _y: single);
 
 implementation
 
@@ -951,6 +952,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_title ,_iconIdentifier ,_rotationAngleDeg);
+end;
+
+procedure jcOpenMapView.SetMarkerXY(_x: single; _y: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jcOpenMapView_SetMarkerXY(FjEnv, FjObject, _x ,_y);
 end;
 
 procedure jcOpenMapView.GenEvent_OnOpenMapViewClick(Sender:TObject;latitude:double;longitude:double);
@@ -2188,6 +2196,20 @@ begin
   Result:= env^.CallIntMethodA(env, _jcopenmapview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env,jParams[3].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jcOpenMapView_SetMarkerXY(env: PJNIEnv; _jcopenmapview: JObject; _x: single; _y: single);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _x;
+  jParams[1].f:= _y;
+  jCls:= env^.GetObjectClass(env, _jcopenmapview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMarkerXY', '(FF)V');
+  env^.CallVoidMethodA(env, _jcopenmapview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
