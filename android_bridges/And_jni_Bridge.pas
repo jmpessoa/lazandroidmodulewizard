@@ -437,7 +437,6 @@ function jImageView_getLParamWidth(env:PJNIEnv; ImageView : jObject): integer;
 function jImageView_GetBitmapHeight(env:PJNIEnv; ImageView : jObject ): integer;
 function jImageView_GetBitmapWidth(env:PJNIEnv; ImageView : jObject): integer;
 Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
-procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _scaleX: single; _scaleY: single); overload;
 procedure jImageView_SetScaleType(env: PJNIEnv; _jimageview: JObject; _scaleType: integer);
 function jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
 procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
@@ -454,7 +453,6 @@ procedure jImageView_SetScrollFlag(env: PJNIEnv; _jimageview: JObject; _collapsi
 procedure jImageView_RemoveFromViewParent(env: PJNIEnv; _jimageview: JObject);
 procedure jImageView_BringToFront(env: PJNIEnv; _jimageview: JObject);
 procedure jImageView_SetVisibilityGone(env: PJNIEnv; _jimageview: JObject);
-procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _scaleX: single; _scaleY: single; _centerX: single; _centerY: single); overload;
 procedure jImageView_ClearLayoutAll(env: PJNIEnv; _jimageview: JObject);
 
 procedure jImageView_SetRotation(env: PJNIEnv; _jimageview: JObject; angle: integer);
@@ -4619,20 +4617,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _scaleX: single; _scaleY: single);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _scaleX;
-  jParams[1].f:= _scaleY;
-  jCls:= env^.GetObjectClass(env, _jimageview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetImageMatrixScale', '(FF)V');
-  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 procedure jImageView_SetScaleType(env: PJNIEnv; _jimageview: JObject; _scaleType: integer);
 var
   jParams: array[0..0] of jValue;
@@ -4836,22 +4820,6 @@ begin
   jCls:= env^.GetObjectClass(env, _jimageview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetVisibilityGone', '()V');
   env^.CallVoidMethod(env, _jimageview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jImageView_SetImageMatrixScale(env: PJNIEnv; _jimageview: JObject; _scaleX: single; _scaleY: single; _centerX: single; _centerY: single);
-var
-  jParams: array[0..3] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _scaleX;
-  jParams[1].f:= _scaleY;
-  jParams[2].f:= _centerX;
-  jParams[3].f:= _centerY;
-  jCls:= env^.GetObjectClass(env, _jimageview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetImageMatrixScale', '(FFFF)V');
-  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 

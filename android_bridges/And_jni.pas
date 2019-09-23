@@ -564,6 +564,8 @@ procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer);{$ifdef mswindows}stdcall;{$
 
 procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string);
 procedure jni_proc_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float: single);
+procedure jni_proc_ff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single);
+procedure jni_proc_fffffff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2, _float3, _float4, _float5, _float6, _float7 : single);
 procedure jni_proc_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _viewgroup: jObject);
 procedure jni_proc_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer);
 procedure jni_proc_iiiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2, _int3, _int4, _int5, _int6: integer);
@@ -629,6 +631,43 @@ begin
 
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(F)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jni_proc_ff(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                     _float1, _float2: single);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _float1;
+  jParams[1].f:= _float2;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FF)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jni_proc_fffffff(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                     _float1, _float2, _float3, _float4, _float5, _float6, _float7 : single);
+var
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _float1;
+  jParams[1].f:= _float2;
+  jParams[2].f:= _float3;
+  jParams[3].f:= _float4;
+  jParams[4].f:= _float5;
+  jParams[5].f:= _float6;
+  jParams[6].f:= _float7;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FFFFFFF)V');
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

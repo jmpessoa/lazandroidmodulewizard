@@ -1359,6 +1359,8 @@ type
     FOnTouchDown : TOnTouchEvent;
     FOnTouchMove : TOnTouchEvent;
     FOnTouchUp   : TOnTouchEvent;
+
+    FAlpha       : integer;
     //end tr3e
     FRoundedShape: boolean;
     FOnPopupItemSelected: TOnImageViewPopupItemSelected;
@@ -1391,8 +1393,7 @@ type
     function GetHeight: integer;   override;
     function GetWidth: integer;     override;
 
-    //by tre3
-    procedure ClearLayout;
+    procedure ClearLayout; //by TR3E
 
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
@@ -1407,9 +1408,11 @@ type
     function GetBitmapHeight: integer;
     function GetBitmapWidth: integer;
 
-    procedure SetImageMatrixScale(_scaleX: single; _scaleY: single); overload;
-    //by tre3
-    procedure SetImageMatrixScale(_scaleX: single; _scaleY: single; _centerX : single; _centerY: single); overload;
+    procedure SetAlpha( value: integer ); //by TR3E
+
+    procedure SetScale(_scaleX: single; _scaleY: single); //by TR3E
+    procedure SetMatrix(_scaleX, _scaleY, _angle, _dx, _dy, _px, _py : single); //by TR3E
+    procedure SetMatrixScaleCenter( _scaleX, _scaleY : single ); //by TR3E
 
     procedure SetScaleType(_scaleType: TImageScaleType);
 
@@ -6015,6 +6018,7 @@ begin
   FAnimationMode:= animNone;
   FAnimationDurationIn:= 1500;
 
+  FAlpha := 255;
 end;
 
 destructor jImageView.Destroy;
@@ -6111,6 +6115,9 @@ begin
    FInitialized:= True;
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   end;
+
+  if FAlpha <> 255 then
+   SetAlpha(FAlpha);
 
 end;
 
@@ -6384,18 +6391,44 @@ begin
    Result:= jImageView_GetBitmapWidth(FjEnv, FjObject );
 end;
 
-procedure jImageView.SetImageMatrixScale(_scaleX: single; _scaleY: single);
+procedure jImageView.SetScale(_scaleX: single; _scaleY: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetImageMatrixScale(FjEnv, FjObject, _scaleX ,_scaleY);
+     jni_proc_ff(FjEnv, FjObject, 'SetScale', _scaleX ,_scaleY);
 end;
 
-procedure jImageView.SetImageMatrixScale(_scaleX: single; _scaleY: single; _centerX : single; _centerY: single); overload;
+procedure jImageView.SetAlpha( value: integer );
+begin
+ FAlpha := value;
+
+ if FInitialized then
+ begin
+  jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
+ end;
+end;
+
+procedure jImageView.SetMatrixScaleCenter( _scaleX, _scaleY : single );
+begin
+ if FInitialized then
+ begin
+  if ImageScaleType <> scaleMatrix then
+   SetScaleType( scaleMatrix );
+
+  jni_proc_ff(FjEnv, FjObject, 'SetMatrixScaleCenter', _scaleX,_scaleY);
+ end;
+end;
+
+procedure jImageView.SetMatrix(_scaleX, _scaleY, _angle, _dx, _dy, _px, _py : single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetImageMatrixScale(FjEnv, FjObject, _scaleX ,_scaleY, _centerX, _centerY);
+  begin
+   if ImageScaleType <> scaleMatrix then
+    SetScaleType( scaleMatrix );
+
+   jni_proc_fffffff(FjEnv, FjObject, 'SetMatrix', _scaleX,_scaleY, _angle, _dx, _dy, _px, _py);
+  end;
 end;
 
 
