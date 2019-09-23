@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Path;
@@ -53,6 +54,7 @@ public class jImageView extends ImageView {
 	//
 	private OnClickListener onClickListener;   //
 	public  Bitmap          bmp      = null;   //
+	public  Bitmap			bmpAlpha = null;
 	public  int             mAngle   = 0;
 	
 	Matrix mMatrix;
@@ -403,20 +405,75 @@ public class jImageView extends ImageView {
 		}
 	}	
 	
-	public void SetImageMatrixScale(float _scaleX, float _scaleY, float _centerX, float _centerY ) {
-		
-		if ( this.getScaleType() != ImageView.ScaleType.MATRIX)  
+    public void SetMatrixScaleCenter(float _scaleX, float _scaleY) {
+    	
+    	if( (_scaleX <= 0) || (_scaleY <= 0) ) return;
+    	
+    	if(this.getScaleType() != ImageView.ScaleType.MATRIX)  
 			this.setScaleType(ImageView.ScaleType.MATRIX);
-		
-		mMatrix.setScale(_scaleX, _scaleY, _centerX, _centerY);
-		
-		this.setImageMatrix(mMatrix);		
-		this.invalidate();
+    	
+    	SetMatrix( _scaleX, _scaleY, 0,
+    			   (this.getWidth()/2) - (bmp.getWidth()*_scaleX)/2,
+    			   (this.getHeight()/2) - (bmp.getHeight()*_scaleY)/2, 0, 0);
+    	
 	}
 
-	public void SetImageMatrixScale(float _scaleX, float _scaleY ) {
+	public void SetMatrix(float _scaleX, float _scaleY, float _angle, float _dx, float _dy, float _px, float _py ) {
 		
-		SetImageMatrixScale( _scaleX, _scaleY, 0, 0 );
+		if( (_scaleX <= 0) || (_scaleY <= 0) ) return;
+		
+		if(this.getScaleType() != ImageView.ScaleType.MATRIX)  
+			this.setScaleType(ImageView.ScaleType.MATRIX);
+		
+		mMatrix.setScale(_scaleX, _scaleY);
+		mMatrix.postRotate( _angle, _px, _py );		
+		mMatrix.postTranslate( _dx, _dy );				      				
+		
+		this.setImageMatrix(mMatrix);
+		
+	}
+
+	public void SetScale(float _scaleX, float _scaleY ) {
+		if( bmp == null ) return;
+		
+		int newWidth = (int)(bmp.getWidth()*_scaleX);
+		int newHeight = (int)(bmp.getHeight()*_scaleY);
+		
+		if( newWidth <= 0 ) newWidth = 1;
+		if( newHeight <= 0 ) newHeight = 1;
+		
+		this.setImageBitmap(Bitmap.createScaledBitmap( bmp, newWidth, newHeight, true ));		
+	}
+	
+    public void SetAlpha( int value ) {
+		
+		if( bmp == null ) return;
+		
+		if( value < 0 ) value = 0;
+		if( value > 255) value = 255;
+		
+		if( bmpAlpha == null )
+		 bmpAlpha = bmp;
+		
+	    int width  = bmp.getWidth();
+	    int height = bmp.getHeight();
+	    
+	    bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	    
+	    if( bmp == null ) return;
+	    
+	    Canvas canvas = new Canvas(bmp);
+	    
+	    if( canvas != null ){
+	     canvas.drawARGB(0, 0, 0, 0);
+	    
+	     // config paint
+	     final Paint paint = new Paint();
+	     paint.setAlpha(value);
+	     canvas.drawBitmap(bmpAlpha, 0, 0, paint);
+	    	     
+	     this.setImageBitmap( bmp );
+	    }
 	}
 
 	public Bitmap GetBitmapImage() {
