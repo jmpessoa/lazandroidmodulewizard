@@ -178,6 +178,12 @@ public class jCommons {
 			r = aOwnerView.getMeasuredHeight();
 		}
 		
+		//Fix the "match_parent" error with an "anchor" and 
+		// within the component a "half_parent" is set
+		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {
+			if( aOwnerView.getHeight() > 0 ) r = aOwnerView.getHeight();			
+		}
+		
 		return r;
 	}
 
@@ -192,6 +198,12 @@ public class jCommons {
 		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
 		   			
 			r = aOwnerView.getMeasuredWidth();		
+		}
+		
+		//Fix the "match_parent" error with an "anchor" and 
+		// within the component a "half_parent" is set
+		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {  
+			if( aOwnerView.getWidth() > 0 ) r = aOwnerView.getWidth(); 
 		}
 		
 		return r;		

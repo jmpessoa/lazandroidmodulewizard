@@ -2004,6 +2004,7 @@ type
     FImageList : jImageList;
     FFilePath: TFilePath;
     FSleepDown: integer;
+    FAlpha : integer;
 
     procedure SetImages(Value: jImageList);
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -2034,6 +2035,9 @@ type
     procedure SetViewParent(Value: jObject); override;
     procedure RemoveFromViewParent;  override;
     procedure SetSleepDown(_sleepMiliSeconds: integer);
+
+    procedure SetImageDownScale(Value: single); // by TR3E
+    procedure SetAlpha( Value : integer );
 
   published
 
@@ -10657,7 +10661,8 @@ begin
   FMarginRight  := 5;
   FWidth        := 72;
   FHeight       := 72;
-  FSleepDown:= 0;
+  FSleepDown    := 0;
+  FAlpha        := 255;
 end;
 
 Destructor jImageBtn.Destroy;
@@ -10753,6 +10758,9 @@ begin
 
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   end;
+
+  if FAlpha <> 255 then
+     SetAlpha(FAlpha);
 end;
 
 procedure jImageBtn.SetViewParent(Value: jObject);
@@ -10766,6 +10774,15 @@ procedure jImageBtn.RemoveFromViewParent;
 begin
  if FInitialized then
    jImageBtn_RemoveFromViewParent(FjEnv, FjObject);
+end;
+
+procedure jImageBtn.SetAlpha(Value: integer);
+begin
+  FAlpha := value;
+
+  if not FInitialized then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
 end;
 
 Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
@@ -10787,6 +10804,20 @@ procedure jImageBtn.Refresh;
 begin
   if FInitialized then
      View_Invalidate(FjEnv, FjObject );
+end;
+
+Procedure jImageBtn.SetImageDownScale(Value: single);
+begin
+
+   if not FInitialized then exit;
+
+   if (Value > 0) then
+   begin
+    if value > 1 then value := 1;
+
+    jni_proc_f(FjEnv, FjObject, 'SetImageDownScale', value);
+   end;
+
 end;
 
 Procedure jImageBtn.SetImageDownByIndex(Value: integer);
