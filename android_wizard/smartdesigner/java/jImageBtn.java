@@ -28,6 +28,8 @@ public class jImageBtn extends View {
 	private Paint           mPaint   = null;
 	private Bitmap          bmpUp    = null;
 	private Bitmap          bmpDn    = null;
+	private Bitmap          bmpUpAlpha = null;
+	private Bitmap          bmpDnAlpha = null;
 	private Rect            rect;
 	private int             btnState = 0;      // Normal/Up = 0 , Pressed = 1
 	private Boolean         enabled  = true;   //
@@ -158,6 +160,102 @@ public class jImageBtn extends View {
 		}
 				
 	}
+	
+	public void SetImageDownScale( float _scale ) {
+		
+		if(bmpUp == null) return;
+		
+		int newWidth = (int)(bmpUp.getWidth()*_scale);
+		int newHeight = (int)(bmpUp.getHeight()*_scale);
+		
+		Bitmap bmpScale = Bitmap.createScaledBitmap( bmpUp, newWidth, newHeight, true );
+		
+		if( bmpScale == null ) return;
+		
+		int posLeft = (bmpUp.getWidth() - bmpScale.getWidth()) / 2;
+		int posTop  = (bmpUp.getHeight() - bmpScale.getHeight()) / 2;				
+					
+		bmpDn = Bitmap.createBitmap(bmpUp.getWidth(), bmpUp.getHeight(), Bitmap.Config.ARGB_8888);
+						
+		if( bmpDn != null ){			
+			Canvas canvas = new Canvas(bmpDn);
+			canvas.drawBitmap(bmpScale, posLeft, posTop, null);
+			
+			rect = new Rect(0, 0, bmpDn.getWidth(), bmpDn.getHeight());			
+									
+			invalidate();
+		}
+		
+	}
+	
+	public void SetImageUpAlpha( int value ) {
+		
+		if( bmpUp == null ) return;
+		
+		if( value < 0 ) value = 0;
+		if( value > 255) value = 255;
+		
+		if( bmpUpAlpha == null )
+		 bmpUpAlpha = bmpUp;
+		
+	    int width  = bmpUp.getWidth();
+	    int height = bmpUp.getHeight();
+	    
+	    bmpUp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	    
+	    if( bmpUp == null ) return;
+	    
+	    Canvas canvas = new Canvas(bmpUp);
+	    
+	    if( canvas != null ){
+	     canvas.drawARGB(0, 0, 0, 0);
+	    
+	     // config paint
+	     final Paint paint = new Paint();
+	     paint.setAlpha(value);
+	     canvas.drawBitmap(bmpUpAlpha, 0, 0, paint);
+	    	     
+	     rect = new Rect(0, 0, bmpUp.getWidth(), bmpUp.getHeight());		 
+		 invalidate();
+	    }
+	}
+	
+    public void SetImageDnAlpha( int value ) {
+		
+		if( bmpDn == null ) return;
+		
+		if( value < 0 ) value = 0;
+		if( value > 255) value = 255;
+		
+		if( bmpDnAlpha == null )
+		 bmpDnAlpha = bmpDn;
+		
+	    int width  = bmpDn.getWidth();
+	    int height = bmpDn.getHeight();
+	    
+	    bmpDn = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	    
+	    if( bmpDn == null ) return;
+	    
+	    Canvas canvas = new Canvas(bmpDn);
+	    
+	    if( canvas != null ){
+	     canvas.drawARGB(0, 0, 0, 0);
+	    
+	     // config paint
+	     final Paint paint = new Paint();
+	     paint.setAlpha(value);
+	     canvas.drawBitmap(bmpDnAlpha, 0, 0, paint);
+	    	     
+	     rect = new Rect(0, 0, bmpDn.getWidth(), bmpDn.getHeight());		 
+		 invalidate();
+	    }
+	}
+    
+    public void SetAlpha( int value ){
+    	SetImageUpAlpha(value);
+    	SetImageDnAlpha(value);
+    }
 
 	//
 	@Override
