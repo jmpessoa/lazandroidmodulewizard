@@ -9779,28 +9779,28 @@ function jBitmap.ClockWise(_bmp: jObject ): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_m_out_m(FjEnv, FjObject, 'ClockWise', _bmp);
+   Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'ClockWise', _bmp);
 end;
 
 function jBitmap.AntiClockWise(_bmp: jObject ): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_m_out_m(FjEnv, FjObject, 'AntiClockWise', _bmp);
+   Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'AntiClockWise', _bmp);
 end;
 
 function jBitmap.SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_mff_out_m(FjEnv, FjObject, 'SetScale', _bmp ,_scaleX ,_scaleY);
+   Result:= jni_func_bmp_ff_out_bmp(FjEnv, FjObject, 'SetScale', _bmp ,_scaleX ,_scaleY);
 end;
 
 function jBitmap.SetScale(_scaleX: single; _scaleY: single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ff_out_m(FjEnv, FjObject, 'SetScale' ,_scaleX ,_scaleY);
+   Result:= jni_func_ff_out_bmp(FjEnv, FjObject, 'SetScale' ,_scaleX ,_scaleY);
 end;
 
 function jBitmap.LoadFromAssets(strName: string): jObject;

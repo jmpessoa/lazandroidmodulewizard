@@ -244,14 +244,14 @@ procedure jsAdMob.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_g(FjEnv, FjObject, 'SetViewParent', _viewgroup);
+     jni_proc_vig(FjEnv, FjObject, 'SetViewParent', _viewgroup);
 end;
 
 function jsAdMob.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_g(FjEnv, FjObject, 'GetParent');
+   Result:= jni_func_out_vig(FjEnv, FjObject, 'GetParent');
 end;
 
 procedure jsAdMob.RemoveFromViewParent();
@@ -300,7 +300,7 @@ function jsAdMob.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_v(FjEnv, FjObject, 'GetView');
+   Result:= jni_func_out_viw(FjEnv, FjObject, 'GetView');
 end;
 
 procedure jsAdMob.SetLParamWidth(_w: integer);
