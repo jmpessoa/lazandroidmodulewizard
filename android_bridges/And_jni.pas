@@ -552,48 +552,48 @@ procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer);{$ifdef mswindows}stdcall;{$
  f:jfloat);
  d:jdouble);
  l:jobject);
-
- g: ViewGroup -> Landroid/view/ViewGroup;
- m: Bitmap    -> Landroid/graphics/Bitmap;
- n: Intent    -> Landroid/content/Intent;
  t: String    -> Ljava/lang/String;
- u: Uri       -> Landroid/net/Uri;
- v: View      -> Landroid/view/View;
- y: jDynArrayOfJByte -> [B
+
+ vig: ViewGroup -> Landroid/view/ViewGroup;
+ bmp: Bitmap    -> Landroid/graphics/Bitmap;
+ int: Intent    -> Landroid/content/Intent;
+ uri: Uri       -> Landroid/net/Uri;
+ viw: View      -> Landroid/view/View;
+ dab: jDynArrayOfJByte -> [B
 *)
 
 procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string);
 procedure jni_proc_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float: single);
 procedure jni_proc_ff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single);
 procedure jni_proc_fffffff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2, _float3, _float4, _float5, _float6, _float7 : single);
-procedure jni_proc_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _viewgroup: jObject);
 procedure jni_proc_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer);
 procedure jni_proc_iiiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2, _int3, _int4, _int5, _int6: integer);
 procedure jni_proc_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string);
+procedure jni_proc_vig(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _viewgroup: jObject);
 
 function jni_func_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string): single;
-function jni_func_out_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
 function jni_func_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string): integer;
 function jni_func_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string): string;
-function jni_func_out_v(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
+function jni_func_out_viw(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
 function jni_func_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string): boolean;
+function jni_func_out_vig(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
 
-function jni_func_m_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject): jObject;
-function jni_func_m_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject): integer;
-function jni_func_n_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _intent: jObject): jObject;
-function jni_func_t_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): jObject;
+function jni_func_bmp_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject): jObject;
+function jni_func_bmp_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject): integer;
+function jni_func_n_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _intent: jObject): jObject;
+function jni_func_t_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): jObject;
 function jni_func_t_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): string;
-function jni_func_u_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): jObject;
-function jni_func_y_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte): jObject;
+function jni_func_uri_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): jObject;
+function jni_func_dab_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte): jObject;
 
-function jni_func_ii_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2: integer): jObject;
-function jni_func_ff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single): jObject;
-function jni_func_mff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
-function jni_func_mt_out_y(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string): TDynArrayOfJByte;
-function jni_func_mt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string) : boolean;
-function jni_func_mtt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str1, _str2: string) : boolean;
-function jni_func_tt_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string): jObject;
-function jni_func_ti_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
+function jni_func_ii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2: integer): jObject;
+function jni_func_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single): jObject;
+function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
+function jni_func_bmp_t_out_dab(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string): TDynArrayOfJByte;
+function jni_func_bmp_t_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string) : boolean;
+function jni_func_bmp_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str1, _str2: string) : boolean;
+function jni_func_tt_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string): jObject;
+function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
 
 implementation
 
@@ -672,8 +672,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jni_proc_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                     _viewgroup: jObject);
+procedure jni_proc_vig(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                       _viewgroup: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -746,7 +746,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_out_g(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): jObject;
+function jni_func_out_vig(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): jObject;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -788,7 +788,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_out_v(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
+function jni_func_out_viw(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -812,7 +812,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_m_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+function jni_func_bmp_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                           _bitmap: jObject): integer;
 var
   jParams: array[0..0] of jValue;
@@ -827,7 +827,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_y_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+function jni_func_dab_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                           var _byteArray: TDynArrayOfJByte): jObject;
 var
   jParams: array[0..0] of jValue;
@@ -848,7 +848,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_m_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+function jni_func_bmp_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                           _bitmap: JObject): jObject;
 var
   jParams: array[0..0] of jValue;
@@ -864,8 +864,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_t_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                          _str: string): jObject;
+function jni_func_t_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -880,8 +880,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_u_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                          _uri: jObject): jObject;
+function jni_func_uri_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                              _uri: jObject): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -895,8 +895,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_n_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                          _intent: jObject): jObject;
+function jni_func_n_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _intent: jObject): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
@@ -910,8 +910,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_ii_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                          _int1, _int2: integer): jObject;
+function jni_func_ii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                             _int1, _int2: integer): jObject;
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -926,7 +926,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_tt_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+function jni_func_tt_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                            _str1, _str2: string): jObject;
 var
   jParams: array[0..1] of jValue;
@@ -944,8 +944,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_ti_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                           _str: string; _int: integer): jObject;
+function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                             _str: string; _int: integer): jObject;
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
@@ -960,7 +960,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_mt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+function jni_func_bmp_t_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                            _bitmap: jObject; _str: string) : boolean;
 var
   jBoo: JBoolean;
@@ -980,7 +980,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_mtt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+function jni_func_bmp_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                            _bitmap: jObject; _str1, _str2: string) : boolean;
 var
   jBoo: JBoolean;
@@ -1002,7 +1002,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_ff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+function jni_func_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                              _float1, _float2: single): jObject;
 var
   jParams: array[0..1] of jValue;
@@ -1018,8 +1018,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_mff_out_m(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                             _bitmap: jObject; _float1, _float2: single): jObject;
+function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                                 _bitmap: jObject; _float1, _float2: single): jObject;
 var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
@@ -1060,8 +1060,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_mt_out_y(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                           _bitmap: jObject; _str: string): TDynArrayOfJByte;
+function jni_func_bmp_t_out_dab(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                                _bitmap: jObject; _str: string): TDynArrayOfJByte;
 var
   resultSize: integer;
   jResultArray: jObject;

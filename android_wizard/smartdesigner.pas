@@ -1642,12 +1642,15 @@ var
   i: integer;
   fileName: string;
 begin
-  ForceDirectory(FPathToJavaSource+'bak');
+  // By TR3E, disable backup of .java for not incrementase .apk file
+  // of gradle and not showing source code of program
+
+  //ForceDirectory(FPathToJavaSource+'bak');
   contentList:= FindAllFiles(FPathToJavaSource, '*.java', False);
   for i:= 0 to contentList.Count-1 do
   begin         //do backup
-    CopyFile(contentList.Strings[i],
-          FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
+    //CopyFile(contentList.Strings[i],
+    //      FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
 
     fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher]
     if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
