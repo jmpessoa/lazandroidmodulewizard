@@ -158,6 +158,8 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure SetBufferedDraw(_value: boolean);
     function GetTextHeight(_text: string): single;
     function GetTextWidth(_text: string): single;
+    function GetTextLeft(_text: string): single; //LMB
+    function GetTextBottom(_text: string): single; //LMB
 
     procedure SetFontFace(AValue: TFontFace);
     procedure SetTextTypeFace(AValue: TTextTypeFace);
@@ -342,6 +344,8 @@ procedure jDrawingView_SetBufferedDraw(env: PJNIEnv; _jdrawingview: JObject; _va
 
 function jDrawingView_GetTextHeight(env: PJNIEnv; _jdrawingview: JObject; _text: string): single;
 function jDrawingView_GetTextWidth(env: PJNIEnv; _jdrawingview: JObject; _text: string): single;
+function jDrawingView_GetTextLeft(env: PJNIEnv; _jdrawingview: JObject; _text: string): single; //LMB
+function jDrawingView_GetTextBottom(env: PJNIEnv; _jdrawingview: JObject; _text: string): single; //LMB
 procedure jDrawingView_SetFontAndTextTypeFace(env: PJNIEnv; _jdrawingview: JObject; _fontFace: integer; _fontStyle: integer);
 
 procedure jDrawingView_SetFontFromAssets(env: PJNIEnv; _jdrawingview: JObject; _fontName: string);
@@ -1141,6 +1145,21 @@ begin
   if FInitialized then
    Result:= jDrawingView_GetTextWidth(FjEnv, FjObject, _text);
 end;
+
+function jDrawingView.GetTextLeft(_text: string): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetTextLeft(FjEnv, FjObject, _text);
+end;
+
+function jDrawingView.GetTextBottom(_text: string): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDrawingView_GetTextBottom(FjEnv, FjObject, _text);
+end;
+
 
 
 procedure jDrawingView.SetFontFace(AValue: TFontFace);
@@ -2410,6 +2429,37 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+//LMB
+function jDrawingView_GetTextLeft(env: PJNIEnv; _jdrawingview: JObject; _text: string): single;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextLeft', '(Ljava/lang/String;)F');
+  Result:= env^.CallFloatMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//LMB
+function jDrawingView_GetTextBottom(env: PJNIEnv; _jdrawingview: JObject; _text: string): single;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextBottom', '(Ljava/lang/String;)F');
+  Result:= env^.CallFloatMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 procedure jDrawingView_SetFontAndTextTypeFace(env: PJNIEnv; _jdrawingview: JObject; _fontFace: integer; _fontStyle: integer);
 var

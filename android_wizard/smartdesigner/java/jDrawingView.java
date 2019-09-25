@@ -1,4 +1,4 @@
-package com.example.appdrawingviewdemo1;
+package net.micrologus.paet;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1134,6 +1134,19 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         Rect rect = new Rect();
         mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
         return rect.width();
+    }
+
+    //LMB
+    public float GetTextLeft(String _text) {
+        Rect rect = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+        return rect.left;
+    }
+    //LMB
+    public float GetTextBottom(String _text) {
+        Rect rect = new Rect();
+        mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+        return rect.bottom;
     }
 
     public int GetViewportX(float _worldX, float _minWorldX, float _maxWorldX, int _viewPortWidth) {
