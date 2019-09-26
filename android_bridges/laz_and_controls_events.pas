@@ -207,8 +207,13 @@ uses
    //procedure Java_Event_pOnGDXScreenRender(env:PJNIEnv;this:JObject;Sender:TObject;deltaTime:single);
 
    procedure Java_Event_pOnMailMessagesCount(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
-
    procedure Java_Event_pOnMailMessageRead(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;Header:jString;Date:jString;Subject:jString;ContentType:jString;ContentText:jString;Attachments:jString);
+
+   procedure Java_Event_pOnSFTPClientTryConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean);
+   procedure Java_Event_pOnSFTPClientDownloadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
+   procedure Java_Event_pOnSFTPClientUploadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
+   procedure Java_Event_pOnSFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
+   procedure Java_Event_pOnSFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
 
 implementation
 
@@ -222,7 +227,7 @@ uses
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
    customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
-   midimanager, copenmapview, csignaturepad, soundpool, {gdxscreen,} cmail;
+   midimanager, copenmapview, csignaturepad, soundpool{, gdxscreen}, cmail, sftpclient;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2465,6 +2470,60 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnSFTPClientTryConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jSFTPClient then
+  begin
+    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jSFTPClient(Sender).GenEvent_OnSFTPClientTryConnect(Sender,boolean(success));
+  end;
+end;
+
+procedure Java_Event_pOnSFTPClientDownloadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jSFTPClient then
+  begin
+    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jSFTPClient(Sender).GenEvent_OnSFTPClientDownloadFinished(Sender,GetString(env,destination),boolean(success));
+  end;
+end;
+
+procedure Java_Event_pOnSFTPClientUploadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jSFTPClient then
+  begin
+    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jSFTPClient(Sender).GenEvent_OnSFTPClientUploadFinished(Sender,GetString(env,destination),boolean(success));
+  end;
+end;
+
+procedure Java_Event_pOnSFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jSFTPClient then
+  begin
+    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jSFTPClient(Sender).GenEvent_OnSFTPClientListing(Sender,GetString(env,remotePath),GetString(env,fileName),fileSize);
+  end;
+end;
+
+procedure Java_Event_pOnSFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jSFTPClient then
+  begin
+    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jSFTPClient(Sender).GenEvent_OnSFTPClientListed(Sender,count);
+  end;
+end;
 
 end.
 

@@ -1,0 +1,3 @@
+public java.lang.Object jSFTPClient_jCreate(long _Self) {
+  return (java.lang.Object)(new jSFTPClient(this,_Self));
+}

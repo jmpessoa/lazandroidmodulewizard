@@ -1,0 +1,5 @@
+public native void pOnSFTPClientTryConnect(long pasobj, boolean success);
+public native void pOnSFTPClientDownloadFinished(long pasobj, String destination,  boolean success);
+public native void pOnSFTPClientUploadFinished(long pasobj, String destination,  boolean success);
+public native void pOnSFTPClientListing(long pasobj, String url, String fileName, int fileSize);
+public native void pOnSFTPClientListed(long pasobj, int count);

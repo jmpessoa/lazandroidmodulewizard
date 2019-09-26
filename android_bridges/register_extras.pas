@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  sftpclient,
   brightness,
   soundpool,
   wifimanager,
@@ -67,6 +68,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jsftpclient_icon.lrs}
   {$I jbrightness_icon.lrs}
   {$I jsoundpool_icon.lrs}
   {$I jwifimanager_icon.lrs}
@@ -127,6 +129,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jSFTPClient,
       jBrightness,
       jSoundPool,
       jWifiManager,
