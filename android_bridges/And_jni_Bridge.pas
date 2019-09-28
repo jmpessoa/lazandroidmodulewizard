@@ -774,7 +774,7 @@ Procedure jCanvas_setTextSize          (env:PJNIEnv;
 Procedure jCanvas_SetTypeface          (env:PJNIEnv;
                                         Canv : jObject; _typeface: integer);
 Procedure jCanvas_drawText             (env:PJNIEnv;
-                                        Canv : jObject; const text : string; x, y : single);
+                                        Canv : jObject; const text : string; x, y : single); overload;
 Procedure jCanvas_drawLine(env:PJNIEnv; Canv : jObject; x1,y1,x2,y2 : single); overload;
 procedure jCanvas_drawLine(env: PJNIEnv; _jcanvas: JObject; var _points: TDynArrayOfSingle);  overload;
 // LORDMAN 2013-08-13
@@ -785,7 +785,7 @@ Procedure jCanvas_drawCircle           (env:PJNIEnv;
 Procedure jCanvas_drawOval             (env:PJNIEnv;
                                         Canv : jObject; _left, _top, _right, _bottom : single);
 Procedure jCanvas_drawRect             (env:PJNIEnv;
-                                        Canv : jObject; _left, _top, _right, _bottom : single);
+                                        Canv : jObject; _left, _top, _right, _bottom : single);overload;
 Procedure jCanvas_drawRoundRect        (env:PJNIEnv;
                                         Canv : jObject; _left, _top, _right, _bottom, _rx, _ry : single);
 Procedure jCanvas_drawBitmap           (env:PJNIEnv;
@@ -801,6 +801,27 @@ procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _points: array of si
 procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _path: jObject);  overload;
 procedure jCanvas_DrawArc(env: PJNIEnv; _jcanvas: JObject; _leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
 
+function jCanvas_CreateBitmap(env: PJNIEnv; _jcanvas: JObject; _width: integer; _height: integer; _backgroundColor: integer): jObject;
+function jCanvas_GetBitmap(env: PJNIEnv; _jcanvas: JObject): jObject;
+procedure jCanvas_DrawBitmap(env: PJNIEnv; _jcanvas: JObject; _left: single; _top: single; _bitmap: jObject);overload;
+
+procedure jCanvas_SetDensityScale(env: PJNIEnv; _jcanvas: JObject; _scale: boolean);
+
+procedure jCanvas_SetBitmap(env: PJNIEnv; _jcanvas: JObject; _bitmap: jObject); overload;
+procedure jCanvas_SetBitmap(env: PJNIEnv; _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer); overload;
+
+procedure jCanvas_DrawText(env: PJNIEnv; _jcanvas: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);overload;
+procedure jCanvas_DrawText(env: PJNIEnv; _jcanvas: JObject; _text: string; _x: single; _y: single; _angleDegree: single);overload;
+procedure jCanvas_DrawRect(env: PJNIEnv; _jcanvas: JObject; _P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single);overload;
+procedure jCanvas_DrawRect(env: PJNIEnv; _jcanvas: JObject; var _box: TDynArrayOfSingle);overload;
+procedure jCanvas_DrawTextMultiLine(env: PJNIEnv; _jcanvas: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single);
+procedure jCanvas_Clear(env: PJNIEnv; _jcanvas: JObject; _color: integer);
+function jCanvas_GetInstance(env: PJNIEnv; _jcanvas: JObject): jObject;
+
+//by Kordal
+procedure jCanvas_DrawBitmap(env: PJNIEnv; Canv: JObject; bmp: jObject; srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB: Integer); overload;
+procedure jCanvas_DrawFrame(env: PJNIEnv; _jcanvas: JObject; _bitMap: jObject; _srcX: integer; _srcY: integer; _srcW: integer; _srcH: integer; _X: integer; _Y: integer; _Wh: integer; _Ht: integer; _rotateDegree: single); overload;
+procedure jCanvas_DrawFrame(env: PJNIEnv; _jcanvas: JObject; _bitMap: jObject; _X: integer; _Y: integer; _Index: integer; _Size: integer; _scaleFactor: single; _rotateDegree: single);  overload;
 
 // Bitmap
 Function  jBitmap_Create               (env:PJNIEnv;
@@ -811,13 +832,14 @@ Procedure jBitmap_loadRes             (env:PJNIEnv;
 Procedure jBitmap_loadFile             (env:PJNIEnv;
                                         bmap : jObject; filename : String);
 Procedure jBitmap_createBitmap         (env:PJNIEnv;
-                                        bmap : jObject; w,h : integer);
+                                        bmap : jObject; w,h : integer); overload;
 Procedure jBitmap_getWH                (env:PJNIEnv;
                                         bmap : jObject; var w,h : integer);
 function jBitmap_GetWidth(env: PJNIEnv; bmap: JObject): integer;
 function jBitmap_GetHeight(env: PJNIEnv; bmap: JObject): integer;
 Function  jBitmap_jInstance(env:PJNIEnv;  bmap: jObject): jObject;
 function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
+procedure jBitmap_LoadFromBuffer(env: PJNIEnv; _jbitmap: JObject; buffer: PJByte; size: Integer);//by Kordal
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;
                                                    var bufferImage: TDynArrayOfJByte): integer;
 procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TDynArrayOfJByte; size: integer);
@@ -837,7 +859,7 @@ procedure jBitmap_SetImage(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObjec
 function jBitmap_DrawText(env: PJNIEnv; _jbitmap: JObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: integer): jObject;overload;
 function jBitmap_DrawBitmap(env: PJNIEnv; _jbitmap: JObject; _bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
 procedure jBitmap_SaveToFileJPG(env: PJNIEnv; _jbitmap: JObject; _fullPathFileName: string);
-
+function jBitmap_CreateBitmap(env: PJNIEnv; _jbitmap: JObject; _width: integer; _height: integer; _backgroundColor: integer): jObject; overload;
 
 //GLSurfaceView
 Function  jGLSurfaceView_Create1       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
@@ -5447,7 +5469,6 @@ var
  _jMethod : jMethodID = nil;
  _jParams : array[0..0] of jValue;
  cls: jClass;
- _jBool: jBoolean;
 begin
  _jParams[0].i:= index;
  cls := env^.GetObjectClass(env, ListView);
@@ -8330,7 +8351,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jCanvas_setCanvas(env: PJNIEnv; _jcanvas: JObject; _canvas: jObject);
 var
   jParams: array[0..0] of jValue;
@@ -8438,10 +8458,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jcanvas);
   jMethod:= env^.GetMethodID(env, jCls, 'DrawPath', '([F)V');
   env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jCanvas_DrawPath(env: PJNIEnv; _jcanvas: JObject; _path: jObject);
 var
@@ -8471,6 +8490,276 @@ begin
   jParams[6].z:= JBool(_useCenter);
   jCls:= env^.GetObjectClass(env, _jcanvas);
   jMethod:= env^.GetMethodID(env, jCls, 'DrawArc', '(FFFFFFZ)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jCanvas_CreateBitmap(env: PJNIEnv; _jcanvas: JObject; _width: integer; _height: integer; _backgroundColor: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _width;
+  jParams[1].i:= _height;
+  jParams[2].i:= _backgroundColor;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'CreateBitmap', '(III)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jCanvas_GetBitmap(env: PJNIEnv; _jcanvas: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmap', '()Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethod(env, _jcanvas, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_DrawBitmap(env: PJNIEnv; _jcanvas: JObject; _left: single; _top: single; _bitmap: jObject);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _left;
+  jParams[1].f:= _top;
+  jParams[2].l:= _bitmap;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawBitmap', '(FFLandroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_SetDensityScale(env: PJNIEnv; _jcanvas: JObject; _scale: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_scale);
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDensityScale', '(Z)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_SetBitmap(env: PJNIEnv; _jcanvas: JObject; _bitmap: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBitmap', '(Landroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_SetBitmap(env: PJNIEnv; _jcanvas: JObject; _bitmap: jObject; _width: integer; _height: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBitmap', '(Landroid/graphics/Bitmap;II)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jCanvas_DrawText(env: PJNIEnv; _jcanvas: JObject; _text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _angleDegree;
+  jParams[4].z:= JBool(_rotateCenter);
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawText', '(Ljava/lang/String;FFFZ)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jCanvas_DrawText(env: PJNIEnv; _jcanvas: JObject; _text: string; _x: single; _y: single; _angleDegree: single);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _x;
+  jParams[2].f:= _y;
+  jParams[3].f:= _angleDegree;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawText', '(Ljava/lang/String;FFF)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jCanvas_DrawRect(env: PJNIEnv; _jcanvas: JObject; _P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single);
+var
+  jParams: array[0..7] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _P0x;
+  jParams[1].f:= _P0y;
+  jParams[2].f:= _P1x;
+  jParams[3].f:= _P1y;
+  jParams[4].f:= _P2x;
+  jParams[5].f:= _P2y;
+  jParams[6].f:= _P3x;
+  jParams[7].f:= _P3y;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawRect', '(FFFFFFFF)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jCanvas_DrawRect(env: PJNIEnv; _jcanvas: JObject; var _box: TDynArrayOfSingle);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_box);
+  jNewArray0:= env^.NewFloatArray(env, newSize0);  // allocate
+  env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_box[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawRect', '([F)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jCanvas_DrawTextMultiLine(env: PJNIEnv; _jcanvas: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].f:= _left;
+  jParams[2].f:= _top;
+  jParams[3].f:= _right;
+  jParams[4].f:= _bottom;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawTextMultiLine', '(Ljava/lang/String;FFFF)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jCanvas_Clear(env: PJNIEnv; _jcanvas: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '(I)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jCanvas_GetInstance(env: PJNIEnv; _jcanvas: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetInstance', '()Landroid/graphics/Canvas;');
+  Result:= env^.CallObjectMethod(env, _jcanvas, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//by Kordal
+procedure jCanvas_DrawBitmap(env: PJNIEnv; Canv: JObject; bmp: jObject; srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB: Integer);
+var
+  jParams: array [0..8] of jValue;
+  jMethod: jMethodID = nil;
+  jCls: jClass = nil;
+begin
+  jParams[0].l:= bmp;
+  jParams[1].i:= srcL;
+  jParams[2].i:= srcT;
+  jParams[3].i:= srcR;
+  jParams[4].i:= srcB;
+  jParams[5].i:= dstL;
+  jParams[6].i:= dstT;
+  jParams[7].i:= dstR;
+  jParams[8].i:= dstB;
+
+  jCls:= env^.GetObjectClass(env, Canv);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawBitmap', '(Landroid/graphics/Bitmap;IIIIIIII)V');
+  env^.CallVoidMethodA(env, Canv, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//by Kordal
+procedure jCanvas_DrawFrame(env: PJNIEnv; _jcanvas: JObject; _bitMap: jObject; _srcX: integer; _srcY: integer; _srcW: integer; _srcH: integer; _X: integer; _Y: integer; _Wh: integer; _Ht: integer; _rotateDegree: single);
+var
+  jParams: array[0..9] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitMap;
+  jParams[1].i:= _srcX;
+  jParams[2].i:= _srcY;
+  jParams[3].i:= _srcW;
+  jParams[4].i:= _srcH;
+  jParams[5].i:= _X;
+  jParams[6].i:= _Y;
+  jParams[7].i:= _Wh;
+  jParams[8].i:= _Ht;
+  jParams[9].f:= _rotateDegree;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawFrame', '(Landroid/graphics/Bitmap;IIIIIIIIF)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//by Kordal
+procedure jCanvas_DrawFrame(env: PJNIEnv; _jcanvas: JObject; _bitMap: jObject; _X: integer; _Y: integer; _Index: integer; _Size: integer; _scaleFactor: single; _rotateDegree: single);
+var
+  jParams: array[0..6] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitMap;
+  jParams[1].i:= _X;
+  jParams[2].i:= _Y;
+  jParams[3].i:= _Index;
+  jParams[4].i:= _Size;
+  jParams[5].f:= _scaleFactor;
+  jParams[6].f:= _rotateDegree;
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawFrame', '(Landroid/graphics/Bitmap;IIIIFF)V');
   env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -8615,6 +8904,24 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssets', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jBitmap_LoadFromBuffer(env: PJNIEnv; _jbitmap: JObject; buffer: PJByte; size: Integer); //by Kordal
+var
+  jMethod: jMethodID = nil;
+  jCls: jClass;
+  jParam: array[0..0] of jValue;
+  byteArray: jByteArray;
+begin
+   //Convert the Pascal's Native array[] of jbyte to JNI jbytearray
+  byteArray:= env^.NewByteArray(env, size);  // allocate
+  env^.SetByteArrayRegion(env, byteArray, 0, size, buffer);
+  jParam[0].l := byteArray;
+  jCls := env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromBuffer', '([B)V');
+  env^.CallVoidMethodA(env, _jbitmap, jMethod, @jParam);
+  env^.DeleteLocalRef(env, jParam[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -8824,7 +9131,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbitmap);
   jMethod:= env^.GetMethodID(env, jCls, 'DrawText', '(Landroid/graphics/Bitmap;Ljava/lang/String;IIII)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -8885,6 +9192,21 @@ begin
   jParams[2].i:= _top;
   jCls:= env^.GetObjectClass(env, _jbitmap);
   jMethod:= env^.GetMethodID(env, jCls, 'DrawBitmap', '(Landroid/graphics/Bitmap;II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_CreateBitmap(env: PJNIEnv; _jbitmap: JObject; _width: integer; _height: integer; _backgroundColor: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _width;
+  jParams[1].i:= _height;
+  jParams[2].i:= _backgroundColor;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'CreateBitmap', '(III)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

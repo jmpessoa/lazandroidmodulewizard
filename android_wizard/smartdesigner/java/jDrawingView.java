@@ -1,4 +1,4 @@
-package net.micrologus.paet;
+package org.lamw.appdrawinginbitmap;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1239,6 +1239,37 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         this.setBackgroundColor(mBackgroundColor);
         //mCanvas.drawColor(mBackgroundColor);
     }
+
+
+    // by Kordal
+    public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, int _dstLeft, int _dstTop, int _dstRight, int _dstBottom) {
+        Rect srcRect = new Rect(_srcLeft, _srcTop, _srcRight, _srcBottom);
+        Rect dstRect = new Rect(_dstLeft, _dstTop, _dstRight, _dstBottom);
+
+        mCanvas.drawBitmap(_bitMap, srcRect, dstRect, mDrawPaint);
+    }
+
+    // by Kordal
+    public void DrawFrame(Bitmap _bitMap, int _srcX, int _srcY, int _srcW, int _srcH, int _X, int _Y, int _Wh, int _Ht, float _rotateDegree) {
+        Rect srcRect = new Rect(_srcX, _srcY, _srcX + _srcW, _srcY + _srcH);
+        Rect dstRect = new Rect(_X, _Y, _X + _Wh, _Y + _Ht);
+
+        if (_rotateDegree != 0) {
+            mCanvas.save();
+            mCanvas.rotate(_rotateDegree, _X + _Wh / 2, _Y + _Ht / 2);
+            mCanvas.drawBitmap(_bitMap, srcRect, dstRect, mDrawPaint);
+            mCanvas.restore();
+        } else {
+            mCanvas.drawBitmap(_bitMap, srcRect, dstRect, mDrawPaint);
+        }
+    }
+
+    // by Kordal
+    public void DrawFrame(Bitmap _bitMap, int _X, int _Y, int _Index, int _Size, float _scaleFactor, float _rotateDegree) {
+        int sf = (int) (_Size * _scaleFactor);
+        DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
+    }
+
 
 } //end class
 

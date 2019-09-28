@@ -169,7 +169,7 @@ type
      FAnimationDurationIn: integer;
      FAnimationMode: TAnimationMode;
 
-     Procedure SetColor(Value : TARGBColorBridge); //background
+     Procedure SetColor(Value: TARGBColorBridge); //background
      
    protected
 
@@ -501,28 +501,24 @@ type
 
   jBitmap = class(jControl)
   private
-    FWidth  : integer;
-    FHeight : integer;
-    FStride : Cardinal;
-    FFormat : Integer;
-    FFlags  : Cardinal;
+    FWidth: integer;
+    FHeight: integer;
+    FStride: Cardinal;
+    FFormat: Integer;
+    FFlags: Cardinal;
 
     FImageName: string;
     FImageIndex: TImageListIndex;
-    FImageList : jImageList;  //by jmpessoa
+    FImageList: jImageList;  //by jmpessoa
 
     { TFilePath = (fpathApp, fpathData, fpathExt, fpathDCIM); }
     FFilePath: TFilePath;
-
     FBitmapInfo : AndroidBitmapInfo;
-    procedure SetImages(Value: jImageList);   //by jmpessoa
 
+    procedure SetImages(Value: jImageList);
     procedure SetImageIndex(Value: TImageListIndex);
-
     procedure SetImageByIndex(Value: integer);
-
     procedure SetImageIdentifier(Value: string);  // ...res/drawable
-
     function TryPath(path: string; fileName: string): boolean;
 
   protected
@@ -532,8 +528,10 @@ type
     Destructor  Destroy; override;
     procedure Init(refApp: jApp) override;
 
+    procedure LoadFromBuffer(buffer: Pointer; size: Integer); // by Kordal
     Procedure LoadFromFile(fullFileName : String);
     Procedure LoadFromRes( imgResIdentifier: String);  // ..res/drawable
+
 
     Procedure CreateJavaBitmap(w,h : Integer);
     Function  GetJavaBitmap: jObject;  //deprecated ..
@@ -580,16 +578,16 @@ type
     function DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
     procedure SaveToFileJPG(_fullPathFileName: string);
     procedure SetImage(_bitmapImage: jObject);
-
+    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
     property ImageIndex: TImageListIndex read FImageIndex write SetImageIndex default -1;
-    property Images    : jImageList read FImageList write SetImages;     //by jmpessoa
+    property Images: jImageList read FImageList write SetImages;
     property ImageIdentifier: string read FImageName write SetImageIdentifier;
     //property ImageName: string read FImageName write SetImageName;
-    property  Width   : integer           read FWidth      write FWidth;
-    property  Height  : integer           read FHeight     write FHeight;
+    property Width: integer read FWidth write FWidth;
+    property Height: integer read FHeight write FHeight;
   end;
 
   jDialogYN = class(jControl)
@@ -632,7 +630,7 @@ type
     FTitle: string;
     FMsg: string;
     // Java
-    FjObject    : jObject; //Self
+    //FjObject    : jObject; //Self
     FParent     : jForm;
   protected
   public
@@ -1885,7 +1883,7 @@ type
   private
     FInitialized : boolean;
 
-    FjObject     : jObject; // Java side
+    //FjObject: jObject; //Java side  // jSelf !
 
     FPaintStrokeWidth: single;
     FPaintStyle: TPaintStyle;
@@ -1911,13 +1909,13 @@ type
     procedure DrawLine(var _points: TDynArrayOfSingle);  overload;
 
     // LORDMAN 2013-08-13
-    Procedure DrawPoint            (x1,y1 : single);
-    Procedure DrawText             (Text : String; x,y : single);
+    Procedure DrawPoint(x1,y1 : single);
+    Procedure DrawText(Text : String; x,y : single); overload;
 
     procedure DrawCircle(_cx: single; _cy: single; _radius: single);
     procedure DrawOval(_left, _top, _right, _bottom: single);
     procedure DrawBackground(_color: integer);
-    procedure DrawRect(_left, _top, _right, _bottom: single);
+    procedure DrawRect(_left, _top, _right, _bottom: single);overload;
     procedure DrawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
 
     Procedure DrawBitmap(bmp: jObject; b,l,r,t: integer); overload;
@@ -1925,6 +1923,9 @@ type
     Procedure DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single); overload;
     Procedure DrawBitmap(bmp: jBitmap; b,l,r,t: integer); overload;
     procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
+    procedure DrawBitmap(_left: single; _top: single; _bitmap: jObject); overload;
+
+    procedure SetDensityScale(_scale: boolean);
 
     function GetNewPath(var _points: TDynArrayOfSingle): jObject; overload;
     function GetNewPath(_points: array of single): jObject;  overload;
@@ -1936,8 +1937,27 @@ type
     procedure SetCanvas(_canvas: jObject);
     procedure DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
-    // Property
-    property  JavaObj : jObject read FjObject;
+    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
+    function GetBitmap(): jObject;
+
+    procedure SetBitmap(_bitmap: jObject); overload;
+    procedure SetBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
+
+    procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean); overload;
+    procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single); overload;
+    procedure DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
+    procedure DrawRect(var _box: TDynArrayOfSingle); overload;
+    procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
+    procedure Clear(_color: integer);
+    function GetInstance(): jObject;
+
+    //by Kordal
+    procedure DrawBitmap(bitMap: jBitmap; srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB: Integer); overload;
+    procedure DrawFrame(_bitMap: jObject; _srcX: integer; _srcY: integer; _srcW: integer; _srcH: integer; _X: integer; _Y: integer; _Wh: integer; _Ht: integer; _rotateDegree: single); overload;
+    procedure DrawFrame(_bitMap: jObject; _X: integer; _Y: integer; _Index: integer; _Size: integer; _scaleFactor: single; _rotateDegree: single); overload;
+
+    //Property
+    //property  jSelf {JavaObj} : jObject read FjObject;
 
   published
     property PaintStrokeWidth: single read FPaintStrokeWidth write setStrokeWidth;
@@ -3126,7 +3146,6 @@ end;
 //by tr3e
 function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt;
 var
-  _jBoolean: JBoolean;
   outColor: dword;
 begin
   gApp.Jni.jEnv:= env;
@@ -3135,7 +3154,6 @@ begin
   if Obj is jListVIew then
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
-
     jListVIew(Obj).GenEvent_OnDrawItemBackgroundColor(Obj, index, outColor);
   end;
   Result:= outColor;
@@ -9810,6 +9828,12 @@ begin
    Result:= jBitmap_LoadFromAssets(FjEnv, FjObject, strName);
 end;
 
+procedure jBitmap.LoadFromBuffer(buffer: Pointer; size: Integer);
+begin
+  if FInitialized then
+    jBitmap_LoadFromBuffer(FjEnv, FjObject, buffer, size);
+end;
+
 function jBitmap.GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject;
 begin
   //in designing component state: result value here...
@@ -9906,7 +9930,6 @@ begin
      jBitmap_SaveToFileJPG(FjEnv, FjObject, _fullPathFileName);
 end;
 
-
 procedure jBitmap.SetImage(_bitmapImage: jObject);
 begin
   //in designing component state: set value here...
@@ -9922,14 +9945,21 @@ function jBitmap.DrawText(_text: string; _left: integer; _top: integer; _fontSiz
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_DrawText(FjEnv, FjObject, _text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
+    Result:= jBitmap_DrawText(FjEnv, FjObject, _text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
 end;
 
 function jBitmap.DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_DrawBitmap(FjEnv, FjObject, _bitmapImageIn ,_left ,_top);
+    Result:= jBitmap_DrawBitmap(FjEnv, FjObject, _bitmapImageIn ,_left ,_top);
+end;
+
+function jBitmap.CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_CreateBitmap(FjEnv, FjObject, _width ,_height, GetARGB(FCustomColor, _backgroundColor));
 end;
 
 //------------------------------------------------------------------------------
@@ -9941,7 +9971,7 @@ begin
   FjObject  := nil;
   FPaintStrokeWidth:= 1;
   FPaintStyle:= psStroke;
-  FPaintTextSize:= 20;
+  FPaintTextSize:= 12;
   FPaintColor:= colbrBlue;
   FInitialized:= False;
 end;
@@ -9963,7 +9993,7 @@ Procedure jCanvas.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
-  FjObject := jCanvas_Create(FjEnv, FjThis, Self);
+  FjObject := jCanvas_Create(FjEnv, FjThis, Self); // jSelf !
   jCanvas_setStrokeWidth(FjEnv, FjObject ,FPaintStrokeWidth);
   jCanvas_setStyle(FjEnv, FjObject ,ord(FPaintStyle));
   jCanvas_setColor(FjEnv, FjObject ,GetARGB(FCustomColor, FPaintColor));
@@ -10101,6 +10131,26 @@ begin
      jCanvas_drawBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
+procedure jCanvas.DrawBitmap(bitMap: jBitmap; srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB: Integer);
+begin
+  if FInitialized then
+    jCanvas_DrawBitmap(FjEnv, FjObject, bitMap.GetImage, srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB);
+end;
+
+procedure jCanvas.DrawFrame(_bitMap: jObject; _srcX: integer; _srcY: integer; _srcW: integer; _srcH: integer; _X: integer; _Y: integer; _Wh: integer; _Ht: integer; _rotateDegree: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawFrame(FjEnv, FjObject, _bitMap ,_srcX ,_srcY ,_srcW ,_srcH ,_X ,_Y ,_Wh ,_Ht ,_rotateDegree);
+end;
+
+procedure jCanvas.DrawFrame(_bitMap: jObject; _X: integer; _Y: integer; _Index: integer; _Size: integer; _scaleFactor: single; _rotateDegree: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawFrame(FjEnv, FjObject, _bitMap ,_X ,_Y ,_Index ,_Size ,_scaleFactor ,_rotateDegree);
+end;
+
 procedure jCanvas.SetCanvas(_canvas: jObject);
 begin
   //in designing component state: set value here...
@@ -10170,7 +10220,98 @@ procedure jCanvas.DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: si
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawArc(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF ,_startAngle ,_sweepAngle ,_useCenter);
+     jCanvas_DrawArc(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF,_bottomRectF,_startAngle,_sweepAngle ,_useCenter);
+end;
+
+function jCanvas.CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_CreateBitmap(FjEnv, FjObject, _width,_height, GetARGB(FCustomColor, _backgroundColor));
+end;
+
+function jCanvas.GetBitmap(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_GetBitmap(FjEnv, FjObject);
+end;
+
+procedure jCanvas.DrawBitmap(_left: single; _top: single; _bitmap: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawBitmap(FjEnv, FjObject, _left ,_top ,_bitmap);
+end;
+
+procedure jCanvas.SetDensityScale(_scale: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_SetDensityScale(FjEnv, FjObject, _scale);
+end;
+
+procedure jCanvas.SetBitmap(_bitmap: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_SetBitmap(FjEnv, FjObject, _bitmap);
+end;
+
+procedure jCanvas.SetBitmap(_bitmap: jObject; _width: integer; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_SetBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
+end;
+
+procedure jCanvas.DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawText(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
+end;
+
+procedure jCanvas.DrawText(_text: string; _x: single; _y: single; _angleDegree: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawText(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree);
+end;
+
+procedure jCanvas.DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawRect(FjEnv, FjObject, _P0x ,_P0y ,_P1x ,_P1y ,_P2x ,_P2y ,_P3x ,_P3y);
+end;
+
+procedure jCanvas.DrawRect(var _box: TDynArrayOfSingle);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawRect(FjEnv, FjObject, _box);
+end;
+
+procedure jCanvas.DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_DrawTextMultiLine(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
+end;
+
+procedure jCanvas.Clear(_color: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_Clear(FjEnv, FjObject, _color);
+end;
+
+function jCanvas.GetInstance(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_GetInstance(FjEnv, FjObject);
 end;
 
 //------------------------------------------------------------------------------
@@ -10219,7 +10360,7 @@ begin
    if  FjCanvas <> nil then
    begin
     FjCanvas.Init(refApp);
-    jView_setjCanvas(FjEnv,FjObject ,FjCanvas.JavaObj);
+    jView_setjCanvas(FjEnv,FjObject ,FjCanvas.jSelf); //JavaObj
    end;
 
    if FParent <> nil then

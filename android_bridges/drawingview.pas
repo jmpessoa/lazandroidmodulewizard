@@ -128,6 +128,10 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure SetImageByResourceIdentifier(_imageResIdentifier: string);    // ../res/drawable
     procedure DrawBitmap(_bitmap: jObject);  overload;
 
+    procedure DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom: Integer); overload; // by Kordal
+    procedure DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH, X, Y, W, H: Integer; rotateDegree: Single=0); overload; // by Kordal
+    procedure DrawFrame(bitMap: jObject; X, Y, Index, Size: Integer; scaleFactor: Single=1; rotateDegree: Single=0); overload;
+
     procedure SaveToFile(_filename: string); overload;
     procedure SaveToFile(_path: string; _filename: string);  overload;
 
@@ -359,6 +363,10 @@ function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: st
 function jDrawingView_DrawTextEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;  overload;
 function jDrawingView_DrawTextAlignedEx(env: PJNIEnv; _jdrawingview: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
 procedure jDrawingView_DrawCroppedBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _x: single; _y: single; _cropOffsetLeft: integer; _cropOffsetTop: integer; _cropWidth: integer; _cropHeight: integer);
+
+procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _sl, _st, _sr, _sb, _dl, _dt, _dr, _db: Integer); overload; // by Kordal
+procedure jDrawingView_DrawFrame(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _srcX, _srcY, _srcW, _srcH, _X, _Y, _Wh, _Ht: Integer; _rotateDegree: Single); overload;
+procedure jDrawingView_DrawFrame(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _X, _Y, _Index, _Size: Integer; _scaleFactor, _rotateDegree: Single); overload;
 
 
 implementation
@@ -671,6 +679,24 @@ begin
    Result := sysGetHeightOfParent(FParent);
 end;
 
+procedure jDrawingView.DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom: Integer);
+begin
+  if FInitialized then
+    jDrawingView_DrawBitmap(FjEnv, FjObject, bitMap, srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom);
+end;
+
+procedure jDrawingView.DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH, X, Y, W, H: Integer; rotateDegree: Single);
+begin
+  if FInitialized then
+    jDrawingView_DrawFrame(FjEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, W, H, rotateDegree);
+end;
+
+procedure jDrawingView.DrawFrame(bitMap: jObject; X, Y, Index, Size: LongInt; scaleFactor: Single; rotateDegree: Single);
+begin
+  if FInitialized then
+    jDrawingView_DrawFrame(FjEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
+end;
+
 procedure jDrawingView.DrawBitmap(_bitmap: jObject; _width: integer; _height: integer);
 begin
   //in designing component state: set value here...
@@ -855,6 +881,68 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jDrawingView_DrawBitmap(FjEnv, FjObject, _bitmap);
+end;
+
+procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _sl, _st, _sr, _sb, _dl, _dt, _dr, _db: Integer);
+var
+  jParams: array [0..8] of jValue;
+  jMethod: jMethodID=nil;
+  jCls   : jClass=nil;
+begin
+  jParams[0].l := _bitmap;
+  jParams[1].i := _sl;
+  jParams[2].i := _st;
+  jParams[3].i := _sr;
+  jParams[4].i := _sb;
+  jParams[5].i := _dl;
+  jParams[6].i := _dt;
+  jParams[7].i := _dr;
+  jParams[8].i := _db;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawBitmap', '(Landroid/graphics/Bitmap;IIIIIIII)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawFrame(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _srcX, _srcY, _srcW, _srcH, _X, _Y, _Wh, _Ht: Integer; _rotateDegree: Single);
+var
+  jParams: array [0..9] of jValue;
+  jMethod: jMethodID = nil;
+  jCls   : jClass = nil;
+begin
+  jParams[0].l := _bitmap;
+  jParams[1].i := _srcX;
+  jParams[2].i := _srcY;
+  jParams[3].i := _srcW;
+  jParams[4].i := _srcH;
+  jParams[5].i := _X;
+  jParams[6].i := _Y;
+  jParams[7].i := _Wh;
+  jParams[8].i := _Ht;
+  jParams[9].f := _rotateDegree;
+  jCls := env^.GetObjectClass(env, _jdrawingview);
+  jMethod := env^.GetMethodID(env, jCls, 'DrawFrame', '(Landroid/graphics/Bitmap;IIIIIIIIF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawFrame(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _X, _Y, _Index, _Size: Integer; _scaleFactor, _rotateDegree: Single);
+var
+  jParams: array [0..6] of jValue;
+  jMethod: jMethodID = nil;
+  jCls   : jClass = nil;
+begin
+  jParams[0].l := _bitmap;
+  jParams[1].i := _X;
+  jParams[2].i := _Y;
+  jParams[3].i := _Index;
+  jParams[4].i := _Size;
+  jParams[5].f := _scaleFactor;
+  jParams[6].f := _rotateDegree;
+  jCls := env^.GetObjectClass(env, _jdrawingview);
+  jMethod := env^.GetMethodID(env, jCls, 'DrawFrame', '(Landroid/graphics/Bitmap;IIIIFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jDrawingView.SaveToFile(_filename: string);

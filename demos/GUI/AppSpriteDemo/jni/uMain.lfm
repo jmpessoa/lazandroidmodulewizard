@@ -1,0 +1,64 @@
+object AndroidModule1: TAndroidModule1
+  Left = 461
+  Top = 127
+  Width = 320
+  Height = 413
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
+  object jDrawingView1: jDrawingView
+    Left = 10
+    Top = 10
+    Width = 300
+    Height = 280
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Enabled = True
+    Visible = True
+    Id = 1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpLeft, rpRight]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrLavenderBlush
+    FontSize = 0
+    FontFace = ffNormal
+    TextTypeFace = tfNormal
+    PaintStrokeWidth = 1
+    PaintStyle = psDefault
+    PaintColor = colbrRed
+    PaintStrokeJoin = sjDefault
+    PaintStrokeCap = scDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    BufferedDraw = True
+    OnDraw = jDrawingView1Draw
+  end
+  object jTimer1: jTimer
+    Enabled = False
+    Interval = 200
+    OnTimer = jTimer1Timer
+    Left = 176
+    Top = 315
+  end
+  object jBitmap1: jBitmap
+    FilePath = fpathData
+    Width = 0
+    Height = 0
+    Left = 112
+    Top = 315
+  end
+end
