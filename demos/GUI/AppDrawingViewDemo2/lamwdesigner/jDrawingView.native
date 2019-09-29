@@ -1,0 +1,3 @@
+public native void pOnDrawingViewTouch(long pasobj, int action, int countPoints, float[] arrayX, float[] arrayY, int flingGesture, int pinchZoomGestureState, float zoomScaleFactor);
+public native void pOnDrawingViewDraw(long pasobj, int action, int countPoints, float[] arrayX, float[] arrayY, int flingGesture, int pinchZoomGestureState, float zoomScaleFactor);
+public native void pOnDrawingViewSizeChanged(long pasobj, int width, int height, int oldWidth, int oldHeight);
