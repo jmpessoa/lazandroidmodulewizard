@@ -816,7 +816,8 @@ procedure jCanvas_DrawRect(env: PJNIEnv; _jcanvas: JObject; _P0x: single; _P0y: 
 procedure jCanvas_DrawRect(env: PJNIEnv; _jcanvas: JObject; var _box: TDynArrayOfSingle);overload;
 procedure jCanvas_DrawTextMultiLine(env: PJNIEnv; _jcanvas: JObject; _text: string; _left: single; _top: single; _right: single; _bottom: single);
 procedure jCanvas_Clear(env: PJNIEnv; _jcanvas: JObject; _color: integer);
-function jCanvas_GetInstance(env: PJNIEnv; _jcanvas: JObject): jObject;
+function jCanvas_GetJInstance(env: PJNIEnv; _jcanvas: JObject): jObject;
+procedure jCanvas_SaveBitmapJPG(env: PJNIEnv; _jcanvas: JObject; _fullPathFileName: string);
 
 //by Kordal
 procedure jCanvas_DrawBitmap(env: PJNIEnv; Canv: JObject; bmp: jObject; srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB: Integer); overload;
@@ -8687,13 +8688,13 @@ begin
 end;
 
 
-function jCanvas_GetInstance(env: PJNIEnv; _jcanvas: JObject): jObject;
+function jCanvas_GetJInstance(env: PJNIEnv; _jcanvas: JObject): jObject;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jCls:= env^.GetObjectClass(env, _jcanvas);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetInstance', '()Landroid/graphics/Canvas;');
+  jMethod:= env^.GetMethodID(env, jCls, 'GetJInstance', '()Landroid/graphics/Canvas;');
   Result:= env^.CallObjectMethod(env, _jcanvas, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -8764,6 +8765,19 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jCanvas_SaveBitmapJPG(env: PJNIEnv; _jcanvas: JObject; _fullPathFileName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPathFileName));
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveBitmapJPG', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //------------------------------------------------------------------------------
 // Bitmap

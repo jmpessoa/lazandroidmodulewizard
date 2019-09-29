@@ -15,6 +15,9 @@ import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 public class jCanvas {
 	//Java-Pascal Interface
 	private long             PasObj   = 0;      // Pascal Obj
@@ -169,6 +172,7 @@ public class jCanvas {
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		paint = null;
+		mCanvas = null;
 	}
 	
 	//by CC
@@ -330,10 +334,6 @@ public class jCanvas {
 			mCanvas.drawColor(Color.WHITE);
 	}
 
-	public Canvas GetInstance() {
-		return mCanvas;
-	}
-
 	// by Kordal
 	public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, int _dstLeft, int _dstTop, int _dstRight, int _dstBottom) {
 		Rect srcRect = new Rect(_srcLeft, _srcTop, _srcRight, _srcBottom);
@@ -361,6 +361,33 @@ public class jCanvas {
 	public void DrawFrame(Bitmap _bitMap, int _X, int _Y, int _Index, int _Size, float _scaleFactor, float _rotateDegree) {
 		int sf = (int) (_Size * _scaleFactor);
 		DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
+	}
+
+	public void SaveBitmapJPG(String _fullPathFileName) {
+		if (innerBitmap == null) return;
+
+		File file;
+
+		String f = _fullPathFileName.toLowerCase();
+		if (f.contains(".jpg"))
+		    file = new File(_fullPathFileName);
+		else
+			file = new File(_fullPathFileName+".jpg");
+
+		if (file.exists ()) file.delete();
+		try {
+			FileOutputStream out = new FileOutputStream(file);
+			innerBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public Canvas GetJInstance() {
+		if (mCanvas ==null) mCanvas = new Canvas();
+		return mCanvas;
 	}
 
 }

@@ -155,8 +155,12 @@ public  void Free() {
 bmp = null;
 }
 
-public  Bitmap jInstance() {
-	  return this.bmp;
+public Bitmap jInstance() {
+    return this.bmp;
+}
+
+public Bitmap GetJInstance() {
+     return this.bmp;
 }
 
 public byte[] GetByteArrayFromBitmap() {
@@ -423,20 +427,28 @@ public Bitmap DrawText(Bitmap _bitmapImage, String _text, int _left, int _top, i
     }
 
 
-public void SaveToFileJPG(String _fullPathFileName) {
-       if (bmp == null) return;
-        File file = new File(_fullPathFileName);
-        if (file.exists ()) file.delete();
-        try {
+    public void SaveToFileJPG(String _fullPathFileName) {
+      if (bmp == null) return;
+      File file;
+
+      String f = _fullPathFileName.toLowerCase();
+      if (f.contains(".jpg"))
+        file = new File(_fullPathFileName);
+      else
+        file = new File(_fullPathFileName+".jpg");
+
+      if (file.exists ()) file.delete();
+
+      try {
             FileOutputStream out = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+      }
 
-}
+    }
 
     public void SetImage(Bitmap _bitmapImage) {
         bmp = _bitmapImage;

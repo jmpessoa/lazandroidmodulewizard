@@ -1891,7 +1891,7 @@ type
     FPaintColor: TARGBColorBridge;
     FTypeface: TFontFace;
 
-    Procedure SetStrokeWidth       (Value : single );
+    Procedure SetStrokeWidth  (Value : single );
     Procedure SetStyle             (Value : TPaintStyle);
     Procedure SetColor             (Value : TARGBColorBridge);
     Procedure SetTextSize          (Value : single );
@@ -1949,7 +1949,8 @@ type
     procedure DrawRect(var _box: TDynArrayOfSingle); overload;
     procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
     procedure Clear(_color: integer);
-    function GetInstance(): jObject;
+    function GetJInstance(): jObject;
+    procedure SaveBitmapJPG(_fullPathFileName: string);
 
     //by Kordal
     procedure DrawBitmap(bitMap: jBitmap; srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB: Integer); overload;
@@ -1960,7 +1961,7 @@ type
     //property  jSelf {JavaObj} : jObject read FjObject;
 
   published
-    property PaintStrokeWidth: single read FPaintStrokeWidth write setStrokeWidth;
+    property PaintStrokeWidth: single read FPaintStrokeWidth write SetStrokeWidth;
     property PaintStyle: TPaintStyle read FPaintStyle write setStyle;
     property PaintTextSize: single read FPaintTextSize write setTextSize;
     property PaintColor: TARGBColorBridge read FPaintColor write setColor;
@@ -10307,11 +10308,18 @@ begin
      jCanvas_Clear(FjEnv, FjObject, _color);
 end;
 
-function jCanvas.GetInstance(): jObject;
+function jCanvas.GetJInstance(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_GetInstance(FjEnv, FjObject);
+   Result:= jCanvas_GetJInstance(FjEnv, FjObject);
+end;
+
+procedure jCanvas.SaveBitmapJPG(_fullPathFileName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_SaveBitmapJPG(FjEnv, FjObject, _fullPathFileName);
 end;
 
 //------------------------------------------------------------------------------
