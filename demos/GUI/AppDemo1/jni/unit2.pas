@@ -167,28 +167,28 @@ end;
 
 procedure TAndroidModule2.jButton8Click(Sender: TObject);  //gl_1 2D
 begin
-  AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
+  AndroidModule10.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
   //or
   //ReInitShowing(gApp);  //call OnJNIPrompt
 end;
 
 procedure TAndroidModule2.jButton9Click(Sender: TObject); //gl_2 2D
 begin
-  AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
+  AndroidModule11.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
   //or
   //ReInitShowing(gApp);  //call OnJNIPrompt  
 end;
 
 procedure TAndroidModule2.jButton10Click(Sender: TObject);  //gl_1 3D
 begin
-  AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
+  AndroidModule12.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
   //or
   //ReInitShowing(gApp);  //call OnJNIPrompt  
 end;
 
 procedure TAndroidModule2.jButton11Click(Sender: TObject); //gl_2 3D
 begin
-  AndroidModule2.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
+  AndroidModule13.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
   //or
   //ReInitShowing(gApp);  //call OnJNIPrompt  
 end;
