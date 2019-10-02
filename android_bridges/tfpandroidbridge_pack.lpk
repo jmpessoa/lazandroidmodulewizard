@@ -14,7 +14,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="15">
+    <Files Count="14">
       <Item1>
         <Filename Value="regandroidbridge.pas"/>
         <HasRegisterProc Value="True"/>
@@ -54,31 +54,27 @@
         <UnitName Value="AndroidWidget"/>
       </Item9>
       <Item10>
-        <Filename Value="laz_and_jni_controls.pas"/>
-        <UnitName Value="Laz_And_jni_Controls"/>
-      </Item10>
-      <Item11>
         <Filename Value="register_support.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="register_support"/>
-      </Item11>
-      <Item12>
+      </Item10>
+      <Item11>
         <Filename Value="commonparent.pas"/>
         <UnitName Value="commonparent"/>
-      </Item12>
-      <Item13>
+      </Item11>
+      <Item12>
         <Filename Value="supportparent.pas"/>
         <UnitName Value="supportparent"/>
-      </Item13>
-      <Item14>
+      </Item12>
+      <Item13>
         <Filename Value="systryparent.pas"/>
         <UnitName Value="systryparent"/>
-      </Item14>
-      <Item15>
+      </Item13>
+      <Item14>
         <Filename Value="register_jcenter.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="register_jcenter"/>
-      </Item15>
+      </Item14>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
