@@ -87,8 +87,8 @@ begin
   p:= jsViewPager1.GetPosition();
   case p of
       0: jListView1.Add('New Client '  + IntToStr(jListView1.Count+1));
-      1: jListView2.Add('New Company ' + IntToStr(jListView1.Count+1));
-      2: jListView3.Add('New Employe ' + IntToStr(jListView1.Count+1));
+      1: jListView2.Add('New Company ' + IntToStr(jListView2.Count+1));
+      2: jListView3.Add('New Employe ' + IntToStr(jListView3.Count+1));
       3: ShowMessage(jsViewPager1.GetPageTitle(p));
   end;
 end;
