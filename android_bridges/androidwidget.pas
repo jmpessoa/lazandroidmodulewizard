@@ -737,6 +737,8 @@ type
 
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;
                                  URL : String; Var CanNavi : Boolean) of object;
+  //LMB:
+  TOnWebViewFindResult = Procedure(Sender: TObject; findIndex, findCount: integer) of object;
 
   TAsyncTaskState = (atsBefore, atsProgress, atsPost, atsInBackground);
   TOnAsyncEvent = Procedure(Sender: TObject; eventType, progress: integer) of object;
@@ -1030,6 +1032,8 @@ type
     // tk
     property OnAutoAssignIDs: TNotifyEvent read FOnAutoAssignIDs write FOnAutoAssignIDs;
     // end tk
+
+
   published
     // tk
     property AutoAssignIDs: Boolean read FAutoAssignIDs write SetAutoAssignIDs default False;
@@ -1122,6 +1126,7 @@ end;
     DoJNIPromptOnShow: boolean;
     DoJNIPromptOnInit: boolean;
     Standby: boolean;
+
 
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
@@ -1894,6 +1899,7 @@ begin
     end;
 end;
 
+
 function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
 begin
 
@@ -2453,6 +2459,7 @@ begin
   InvalidateRect(Rect(0,0,Width,Height),False);
 end;
 
+
 {jVisualControl}
 
 constructor jVisualControl.Create(AOwner: TComponent);
@@ -2717,6 +2724,7 @@ begin
     View_SetId(FjEnv, FjObject, FId);
 end;
 
+
 // needed by jForm process logic ...
 procedure jVisualControl.UpdateLayout();
 begin
@@ -2779,6 +2787,7 @@ begin
   if not (csDesigning in ComponentState) then
      if Assigned(FOnDestroy) then FOnDestroy(Self);
 end;
+
 
 procedure TAndroidForm.SetAutoAssignIDs(AValue: Boolean);
 begin
@@ -8033,6 +8042,19 @@ begin
  _jParams[0].i := color;
  cls:= env^.GetObjectClass(env, view);
  _jMethod:= env^.GetMethodID(env, cls, 'setBackgroundColor', '(I)V');
+ env^.CallVoidMethodA(env,view,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure View_SetTextColor(env:PJNIEnv; view : jObject; color : DWord);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..0] of jValue;
+  cls: jClass;
+begin
+ _jParams[0].i := color;
+ cls:= env^.GetObjectClass(env, view);
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V');
  env^.CallVoidMethodA(env,view,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;

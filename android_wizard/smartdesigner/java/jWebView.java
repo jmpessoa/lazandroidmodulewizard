@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
+import android.webkit.WebView.FindListener; //LMB
 import android.webkit.WebViewClient;
 
 //-------------------------------------------------------------------------
@@ -133,6 +134,11 @@ public class jWebView extends WebView {
     
     private OnLongClickListener onClickListener;   
     private Boolean         enabled  = true;    
+
+	//LMB:
+  	private FindListener findListener;
+    private int findIndex = 0;
+  	private int findCount = 0;
     
     //Constructor
     public  jWebView(android.content.Context context,
@@ -162,6 +168,22 @@ public class jWebView extends WebView {
 		};
         };                       
         setOnLongClickListener(onClickListener);
+
+        //LMB:
+        findListener = new FindListener() {
+        @Override
+        public void onFindResultReceived(int activeMatchOrdinal, 
+            int numberOfMatches, boolean isDoneCounting) {
+            if (isDoneCounting) {
+                findIndex = activeMatchOrdinal;
+                findCount = numberOfMatches;
+                controls.pOnWebViewFindResultReceived(PasObj,activeMatchOrdinal,numberOfMatches);
+            }
+            return;
+        };
+        };
+        setFindListener(findListener);
+
     }
 
 
@@ -176,7 +198,8 @@ public class jWebView extends WebView {
 
     //Free object except Self, Pascal Code Free the class.
     public  void Free() {
-    	this.setOnLongClickListener(null);    	
+    	this.setOnLongClickListener(null);
+        this.setFindListener(null); //LMB
         setWebViewClient(null);
         webclient = null;
     	LAMWCommon.free();
@@ -259,4 +282,35 @@ public class jWebView extends WebView {
     public void	GoForward(){
     	this.goForward();
     }
+
+	//LMB:
+	public void FindAllAsync(String _s) {
+		this.findAllAsync(_s);
+	} 
+	
+	//LMB 
+	public int getFindIndex() {
+		return findIndex;
+	}
+
+	//LMB
+	public int getFindCount() {
+		return findCount;
+	}
+
+	//LMB
+	public void FindNext(boolean _forward) {
+		this.findNext(_forward);
+	} // smartdesigner
+	
+	public void ClearMatches() {
+		this.clearMatches();
+		findCount = 0;
+		findIndex = 0;
+	}
+
+	//LMB
+	public void callLoadDataWithBaseURL(String s1, String s2, String s3, String s4, String s5) {  //thanks to Anton!
+		loadDataWithBaseURL(s1,s2,s3,s4,s5); // experimental...
+	}
 }

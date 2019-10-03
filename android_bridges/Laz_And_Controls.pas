@@ -1828,6 +1828,8 @@ type
 
   //------------------------------------------------------------------
 
+  { jWebView }
+
   jWebView = class(jVisualControl)
   private
     FJavaScript : Boolean;
@@ -1836,6 +1838,9 @@ type
 
     // Fatih - ZoomControl
     FZoomControl : Boolean;
+
+    //LMB
+    fOnFindResult: TOnWebViewFindResult;
 
     Procedure SetColor     (Value : TARGBColorBridge);
     Procedure SetZoomControl(Value : Boolean);
@@ -1868,6 +1873,18 @@ type
     procedure GoBackOrForward(steps: integer);
     procedure GoForward();
     procedure ScrollTo(_x, _y: integer);//by MB:
+
+	//LMB
+    function  ScrollY: integer;//LMB
+    procedure LoadDataWithBaseURL(s1,s2,s3,s4,s5: string);//LMB
+    procedure FindAll(_s: string); //LMB:
+    procedure FindNext(_forward: boolean); //LMB
+    procedure ClearMatches();//LMB
+    function GetFindIndex: integer;//LMB
+    function GetFindCount: integer;//LMB
+    property OnFindResult: TOnWebViewFindResult read FOnFindResult write FOnFindResult;
+    function GetWidth: integer;  override;//LMB
+    function GetHeight: integer; override;//LMB
 
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
@@ -2213,6 +2230,9 @@ type
 
   // WebView Event
   Function  Java_Event_pOnWebViewStatus          (env: PJNIEnv; this: jobject; WebView : TObject; EventType : integer; URL : jString) : Integer;
+  //LMB:
+  Procedure Java_Event_pOnWebViewFindResultReceived(env: PJNIEnv; this: jobject;
+             webview: TObject; findIndex, findCount: integer);
 
   // AsyncTask Event & Task
  // procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject; Obj : TObject; EventType,Progress: integer);
@@ -3460,6 +3480,21 @@ begin
   if not(pasCanNavi) then Result := cjWebView_Act_Break;
 
 end;
+
+//LMB:
+procedure Java_Event_pOnWebViewFindResultReceived(env: PJNIEnv; this: jobject;
+        webview: TObject; findIndex, findCount: integer);
+var
+  pasWebView : jWebView;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  pasWebView := jWebView(webview);
+  if not Assigned(pasWebView) then Exit;
+  if not Assigned(pasWebView.OnFindResult) then Exit;
+  pasWebView.OnFindResult(pasWebView,findIndex,findCount);
+end;
+
 
 {
 procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject;
@@ -8350,7 +8385,7 @@ begin
   Result:= jListView_getLParamHeight(FjEnv, FjObject );
 
   if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+    Result := sysGetHeightOfParent(FParent);
 end;
 
 function jListView.GetTotalHeight: integer;
@@ -9228,10 +9263,10 @@ begin
   end;
 
   jWebView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
-                  
+    FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+    sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
+    sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+
   jWebView_SetZoomControl(FjEnv, FjObject, FZoomControl);
 
   for rToA := raAbove to raAlignRight do
@@ -9280,20 +9315,20 @@ begin
   // jWebView_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
-Procedure jWebView.SetColor(Value: TARGBColorBridge);
+procedure jWebView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
      View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
-Procedure jWebView.Refresh;
+procedure jWebView.Refresh;
  begin
   if not FInitialized then Exit;
   View_Invalidate(FjEnv, FjObject );
  end;
 
-Procedure jWebView.SetJavaScript(Value : Boolean);
+procedure jWebView.SetJavaScript(Value: Boolean);
 begin
   FJavaScript:= Value;
   if FInitialized then
@@ -9309,13 +9344,14 @@ begin
   end;
 end;
 
-Procedure jWebView.Navigate(url: string);
+procedure jWebView.Navigate(url: string);
 begin
   if not FInitialized then Exit;
   jWebView_loadURL(FjEnv, FjObject , url);
 end;
 
-Procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
+procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string;
+  htmlFileName: string);
 begin;
    Navigate('file://'+environmentDirectoryPath+'/'+htmlFileName);
 end;
@@ -9369,7 +9405,7 @@ begin
      jWebView_GoForward(FjEnv, FjObject);
 end;
 
-procedure jWebView.ClearLayout();
+procedure jWebView.ClearLayout;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -9421,6 +9457,81 @@ procedure jWebView.ScrollTo(_x, _y: integer);
 begin
   if FInitialized then
      jWebView_ScrollTo(FjEnv, FjObject, _x, _y);
+end;
+
+
+//LMB
+function jWebView.ScrollY: integer;
+begin
+  if FInitialized then
+     result := jWebView_GetScrollY(FjEnv, FjObject)
+  else
+    result := 0
+end;
+
+//LMB
+procedure jWebView.LoadDataWithBaseURL(s1,s2,s3,s4,s5: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_LoadDataWithBaseURL(FjEnv, FjObject, s1,s2,s3,s4,s5);
+end;
+
+//LMB
+procedure jWebView.FindAll(_s: string);
+begin
+  if FInitialized then
+     jWebView_FindAll(FjEnv, FjObject, _s);
+end;
+
+//LMB
+procedure jWebView.FindNext(_forward: boolean);
+begin
+  if FInitialized then
+     jWebView_FindNext(FjEnv, FjObject, _forward);
+end;
+
+//LMB
+procedure jWebView.ClearMatches();
+begin
+  if FInitialized then
+     jWebView_ClearMatches(FjEnv, FjObject);
+end;
+
+//LMB
+function jWebView.GetFindIndex: integer;
+begin
+  if FInitialized then
+     result := jWebView_GetFindIndex(FjEnv, FjObject)
+  else
+    result := 0;
+end;
+
+//LMB
+function jWebView.GetFindCount: integer;
+begin
+  if FInitialized then
+     result := jWebView_GetFindCount(FjEnv, FjObject)
+  else
+    result := 0;
+end;
+
+function jWebView.GetWidth: integer;
+begin
+  Result:= fWidth;
+  if not FInitialized then exit;
+  Result:= jWebView_getWidth(FjEnv, FjObject );
+  if Result = -1 then //lpMatchParent
+    Result := sysGetWidthOfParent(FParent);
+end;
+
+function jWebView.GetHeight: integer;
+begin
+  Result:= fHeight;
+  if not FInitialized then exit;
+  Result:= jWebView_getHeight(FjEnv, FjObject );
+  if Result = -1 then //lpMatchParent
+    Result := sysGetHeightOfParent(FParent);
 end;
 
 //------------------------------------------------------------------------------

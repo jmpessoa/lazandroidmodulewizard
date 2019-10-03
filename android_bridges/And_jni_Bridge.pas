@@ -757,6 +757,17 @@ procedure jWebView_GoBackOrForward(env: PJNIEnv; _jwebview: JObject; steps: inte
 procedure jWebView_GoForward(env: PJNIEnv; _jwebview: JObject);
 procedure jWebView_ScrollTo(env: PJNIEnv; _jwebview: JObject; _x, _y: integer);
 
+function  jWebView_GetScrollY(env: PJNIEnv; _jwebview: JObject): integer;//LMB
+procedure jWebView_FindAll(env: PJNIEnv; _jwebview: JObject; _s: string);//LMB
+procedure jWebView_FindNext(env: PJNIEnv; _jwebview: JObject; _forward: boolean);//LMB
+procedure jWebView_ClearMatches(env: PJNIEnv; _jwebview: JObject);//LMB
+function  jWebView_GetFindIndex(env: PJNIEnv; _jwebview: JObject): integer;//LMB
+function  jWebView_GetFindCount(env: PJNIEnv; _jwebview: JObject): integer;//LMB
+procedure jWebView_LoadDataWithBaseURL(env: PJNIEnv; _jwebview: JObject; _s1,_s2,_s3,_s4,_s5: string);//LMB
+function  jWebView_getWidth(env:PJNIEnv; _jwebview : jObject): integer; //LMB
+function  jWebView_getHeight(env:PJNIEnv; _jwebview : jObject ): integer; //LMB
+
+
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
                                         this:jobject; SelfObj : TObject) : jObject;
@@ -8073,6 +8084,129 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'scrollTo', '(II)V');
   env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+//LMB
+procedure jWebView_LoadDataWithBaseURL(env: PJNIEnv; _jwebview: JObject; _s1,_s2,_s3,_s4,_s5: string);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID;
+  jCls: jClass;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_s1));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_s2));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_s3));
+  jParams[3].l:= env^.NewStringUTF(env, PChar(_s4));
+  jParams[4].l:= env^.NewStringUTF(env, PChar(_s5));
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'callLoadDataWithBaseURL',
+    '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jParams[1].l);
+  env^.DeleteLocalRef(env, jParams[2].l);
+  env^.DeleteLocalRef(env, jParams[3].l);
+  env^.DeleteLocalRef(env, jParams[4].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//LMB
+procedure jWebView_FindAll(env: PJNIEnv; _jwebview: JObject; _s: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID;
+  jCls: jClass;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_s));
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'findAllAsync', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//LMB
+procedure jWebView_FindNext(env: PJNIEnv; _jwebview: JObject; _forward: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID;
+  jCls: jClass;
+begin
+  jParams[0].z:= JBool(_forward);
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'findNext', '(Z)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//LMB
+procedure jWebView_ClearMatches(env: PJNIEnv; _jwebview: JObject);
+var
+  jMethod: jMethodID;
+  jCls: jClass;
+begin
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'clearMatches', '()V');
+  env^.CallVoidMethod(env, _jwebview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//LMB - returns index of currently focused match. This changes when user manually scrolls WebView
+function  jWebView_GetFindIndex(env: PJNIEnv; _jwebview: JObject): integer;
+var
+  jMethod: jMethodID;
+  jCls: jClass;
+begin
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'getFindIndex', '()I');
+  result := env^.CallIntMethod(env, _jwebview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//LMB - returns number of matches
+function  jWebView_GetFindCount(env: PJNIEnv; _jwebview: JObject): integer;
+var
+  jMethod: jMethodID;
+  jCls: jClass;
+begin
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'getFindCount', '()I');
+  result := env^.CallIntMethod(env, _jwebview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+// LMB - returns Y coordinate of current scroll position
+function  jWebView_GetScrollY(env: PJNIEnv; _jwebview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'getScrollY', '()I');
+  result := env^.CallIntMethod(env, _jwebview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function  jWebView_getWidth(env:PJNIEnv; _jwebview : jObject): integer; //LMB
+var
+ _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, _jwebview);
+  _jMethod:= env^.GetMethodID(env, cls, 'getWidth', '()I');
+  Result:= env^.CallIntMethod(env,_jwebview,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+function  jWebView_getHeight(env:PJNIEnv; _jwebview : jObject ): integer; //LMB
+var
+ _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, _jwebview);
+  _jMethod:= env^.GetMethodID(env, cls, 'getHeight', '()I');
+  Result:= env^.CallIntMethod(env,_jwebview,_jMethod);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 //------------------------------------------------------------------------------
