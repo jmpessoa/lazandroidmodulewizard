@@ -218,9 +218,6 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
 	 LAMWCommon.clearLayoutAll();
    }
 
-   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...   
 
 }

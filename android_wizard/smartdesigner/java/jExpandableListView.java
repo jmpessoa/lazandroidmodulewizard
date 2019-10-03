@@ -56,7 +56,8 @@ class ChildInfo {
 //http://techlovejump.com/android-expandable-listview-tutorial/
 
 class ExpandableListAdapter extends BaseExpandableListAdapter {
-	 
+	
+	private Controls controls  = null;
     private Context _context;
     
     private List<HeaderInfo> _listDataHeader; // header titles
@@ -64,9 +65,11 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
     // child data in format of header info, child info
     private HashMap<HeaderInfo, List<ChildInfo>> _listDataChild;
  
-    public ExpandableListAdapter(Context context, List<HeaderInfo> listDataHeader,
+    public ExpandableListAdapter(Controls _ctrls, List<HeaderInfo> listDataHeader,
             HashMap<HeaderInfo, List<ChildInfo>> listChildData) {
-        this._context = context;
+    	
+    	controls = _ctrls;
+        this._context = _ctrls.activity;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
     }
@@ -119,14 +122,14 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
 		TextView textView = new TextView(_context); 
 		
 		textView.setText(childText);
-		textView.setId(groupPosition+childPosition+46742);
+		textView.setId(controls.getJavaNewId());
 	
 		ImageView itemImage = null;
 		RelativeLayout.LayoutParams imgParam = null; 
 		if (iconResId != 0) {
 		  imgParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h		  
 		  itemImage = new ImageView(_context);
-		  itemImage.setId(groupPosition+childPosition+16742);
+		  itemImage.setId(controls.getJavaNewId());
 		  itemImage.setImageResource(iconResId);
 		  itemImage.setFocusable(false);
 		  itemImage.setFocusableInTouchMode(false);		
@@ -286,14 +289,14 @@ class ExpandableListAdapter extends BaseExpandableListAdapter {
 		LayoutParams txtParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h  //layText							
 		TextView textView = new TextView(_context); 		
 		textView.setText(headerTitle);
-		textView.setId(groupPosition+36742);		
+		textView.setId(controls.getJavaNewId());
 		
 		ImageView itemImage = null;
 		RelativeLayout.LayoutParams imgParam = null;
 		if (iconResId != 0) {
 		  imgParam = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); //w,h		
 		  itemImage = new ImageView(_context);
-		  itemImage.setId(groupPosition+26742);		  
+		  itemImage.setId(controls.getJavaNewId());
 		  itemImage.setImageResource(iconResId);
 		  itemImage.setFocusable(false);
 		  itemImage.setFocusableInTouchMode(false);
@@ -455,7 +458,7 @@ public class jExpandableListView extends ExpandableListView /*dummy*/ { //please
       // preparing list data
       listDataHeader = new ArrayList<HeaderInfo>();
       listDataChild = new HashMap<HeaderInfo, List<ChildInfo>>();
-      listAdapter = new ExpandableListAdapter(controls.activity, listDataHeader, listDataChild);
+      listAdapter = new ExpandableListAdapter(controls, listDataHeader, listDataChild);
       
       // setting list adapter      
       this.setAdapter(listAdapter);
@@ -592,9 +595,6 @@ public class jExpandableListView extends ExpandableListView /*dummy*/ { //please
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
 
    public void SetItemHeaderDelimiter(String _itemHeaderDelimiter) {
 	   headerDelimiter = _itemHeaderDelimiter;

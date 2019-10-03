@@ -207,10 +207,6 @@ public class jCustomDialog extends RelativeLayout {
 		countParentRule = 0;
 	}
 
-	public void SetId(int _id) { //wrapper method pattern ...
-		this.setId(_id);
-	}
-
 	//write others [public] methods code here......
 	//GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 	private int GetDrawableResourceId(String _resName) {   //    ../res/drawable

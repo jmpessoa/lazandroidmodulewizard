@@ -47,7 +47,6 @@ jViewFlipper = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure SetAutoStart(_value: boolean);
     procedure SetFlipInterval(_milliseconds: integer);
     procedure StartFlipping();
@@ -102,6 +101,9 @@ implementation
 constructor jViewFlipper.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -356,13 +358,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jViewFlipper_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jViewFlipper.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jViewFlipper_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jViewFlipper.SetAutoStart(_value: boolean);
@@ -689,7 +684,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jviewflipper);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jviewflipper, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

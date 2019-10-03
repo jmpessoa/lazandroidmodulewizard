@@ -115,10 +115,7 @@ public class jCalendarView extends CalendarView /*dummy*/ { //please, fix what G
     }
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
-    }
-
+    
     private String getDateString(long currentDateTime){
         //creating Date from millisecond
         Date currentDate = new Date(currentDateTime);  //Examples of patterns are dd/MM/yyyy, dd-MM-yyyy, MM/dd/yyyy, yyyy-MM-dd.

@@ -377,10 +377,7 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     }
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
-    }
-
+    
     private Bitmap decodeSampleImage(File f, int width, int height) {
         try {
             System.gc(); // First of all free some memory //Decode image size

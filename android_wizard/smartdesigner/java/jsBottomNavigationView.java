@@ -141,9 +141,6 @@ public class jsBottomNavigationView extends BottomNavigationView /*dummy*/ { //p
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
    
    public Menu GetMenu() {
 	      //this.getMenu().add(Menu.NONE, 1, Menu.NONE, "Home").setIcon(R.drawable.ic_home_black_24dp);	      

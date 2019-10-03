@@ -62,7 +62,6 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure SetId(_id: integer);
     function GetSelectedItemPosition(): integer;
     function GetSelectedItem(): string;
     procedure Add(_item: string); overload;
@@ -172,6 +171,9 @@ implementation
 constructor jSpinner.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 5;
   FMarginTop    := 5;
   FMarginBottom := 5;
@@ -434,13 +436,6 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jSpinner_SetLayoutAll(FjEnv, FjObject , _idAnchor);
-end;
-
-procedure jSpinner.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jSpinner_SetId(FjEnv, FjObject , _id);
 end;
 
 function jSpinner.GetSelectedItemPosition(): integer;
@@ -869,7 +864,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

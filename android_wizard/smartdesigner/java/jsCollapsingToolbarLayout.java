@@ -118,9 +118,6 @@ public class jsCollapsingToolbarLayout extends CollapsingToolbarLayout /*dummy*/
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
    
    public void SetScrollFlag(int _collapsingScrollFlag) {   //called in OnJNIPrompt
        

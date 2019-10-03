@@ -89,10 +89,6 @@ public class jCheckBox extends CheckBox {
 	public void ClearLayoutAll() {		//TODO Pascal
 		LAMWCommon.clearLayoutAll();
 	}
-	
-	public void setIdEx(int id) {
-		setId(id);
-	}
 
 	public void setTextColor2(int value) {
 		this.setTextColor(value);

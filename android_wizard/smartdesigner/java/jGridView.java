@@ -328,10 +328,6 @@ public class jGridView extends GridView /*dummy*/ { //please, fix what GUI objec
 		LAMWCommon.clearLayoutAll();
     }
 
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
-    }
-
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 

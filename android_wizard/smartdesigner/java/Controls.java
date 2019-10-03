@@ -1699,6 +1699,8 @@ public RelativeLayout  appLayout; // Base Layout
 public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
 public int systemVersion;
 
+private int javaNewId = 100000;   // To assign java id to 100000 ... native 0..100000
+
 //Jave -> Pascal Function ( Pascal Side = Event )
 public native void pAppOnCreate(Context context, RelativeLayout layout, Intent intent);
 public native int  pAppOnScreenStyle();
@@ -1793,6 +1795,13 @@ public boolean jAppOnKeyDown(char keyChar , int keyCode, String keyCodeString) {
 
 public  void jAppOnRequestPermissionResult(int requestCode, String permission, int grantResult) {
 	pAppOnRequestPermissionResult(requestCode, permission ,grantResult);
+}
+
+// For internal id of componente 100000 or higher
+
+public int getJavaNewId(){
+	javaNewId = javaNewId + 1;
+	return javaNewId;
 }
 
 //// -------------------------------------------------------------------------

@@ -131,10 +131,6 @@ public class jRatingBar extends RatingBar { //please, fix what GUI object will b
     	LAMWCommon.clearLayoutAll();
     }
 
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
-    }
-
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 

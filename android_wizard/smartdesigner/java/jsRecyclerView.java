@@ -366,7 +366,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     public View getlayoutView(Context ctx, String holderItemFormat) {
     	
        RelativeLayout layout = new RelativeLayout(ctx);       
-       layout.setId(1234567);
+       layout.setId(controls.getJavaNewId());
               
        RelativeLayout drafPanel = null;
               
@@ -404,7 +404,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				TextView drafTextView = (TextView)mDraftLayoutView.findViewById(idText);
 				
 				label[indexText] = new TextView(context);				
-				label[indexText].setId(idText);
+				label[indexText].setId(idText);				
 				
 				ViewGroup.LayoutParams lp = (ViewGroup.LayoutParams) drafTextView.getLayoutParams();
 								
@@ -443,6 +443,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				
 				image[indexImage] = new ImageView(context);				
 				image[indexImage].setId(idImage);
+								
 				image[indexImage].setLayoutParams(drafImageView.getLayoutParams());
 			
 				String pad = (String) drafImageView.getTag(); //seted in "jImageView.java"
@@ -463,6 +464,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 
 			   check[indexCheck] = new CheckBox(context);
 			   check[indexCheck].setId(idCheck);
+			   
 			   check[indexCheck].setLayoutParams(draftCheckBox.getLayoutParams());
 
 			   String pad = (String) draftCheckBox.getTag(); //seted in "jCheckBox.java"
@@ -495,6 +497,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				   rating[indexRating] = new RatingBar(context, null, android.R.attr.ratingBarStyle);
 
 			   rating[indexRating].setId(idRat);
+			   
 			   rating[indexRating].setStepSize(draftRatingBar.getStepSize());
      	       rating[indexRating].setIsIndicator(draftRatingBar.isIndicator());
 
@@ -524,6 +527,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 
 			   switchbtn[indexSwitchbtn] = new Switch(context);
 			   switchbtn[indexSwitchbtn].setId(idSwitch);
+			   
 			   switchbtn[indexSwitchbtn].setLayoutParams(draftSwitch.getLayoutParams());
 
 			   String pad = (String) draftSwitch.getTag(); //seted in "jSwitchButton.java"
@@ -562,7 +566,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 	       cardView.setUseCompatPadding(true);	       
 	       cardView.setContentPadding(10, 10,10, 10);
 	       cardView.setPadding(30, 40, 30, 40);	       
-	       cardView.setId(12345678);                    
+	       cardView.setId(controls.getJavaNewId()); 
 	       cardView.addView(layout);                                  
 	       return cardView; 
 	   }	   
@@ -1130,9 +1134,6 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
    
    public void SetItemContentDictionary(String _delimitedContentDictionary, String _delimiter) {
 	   rcAdapter.setItemContentDictionary(_delimitedContentDictionary, _delimiter);

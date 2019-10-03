@@ -1,3 +1,4 @@
+private int javaNewId = 100000;   // To assign java id to 100000 ... native 0..100000
 public native void pAppOnCreate(Context context, RelativeLayout layout, Intent intent);
 public native int  pAppOnScreenStyle();
 public native void pAppOnNewIntent(Intent intent);

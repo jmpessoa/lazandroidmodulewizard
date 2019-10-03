@@ -142,10 +142,6 @@ public class jsTextInput extends TextInputLayout /*dummy*/ { //please, fix what 
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-
    public void SetHint(String _hint) {	   
 	   this.setHint(_hint);
    }

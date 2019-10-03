@@ -143,7 +143,7 @@ public class jModalDialog extends Activity {
     	
         TextView title = new TextView(this);
         int id1111 = 1111;
-        title.setId(id1111);
+        title.setId(id1111); // Being a new activity you don't need "getJavaNewId ()"
         title.setPadding(20, 40, 20, 40);
         title.setText(mMessage);
         
@@ -167,7 +167,7 @@ public class jModalDialog extends Activity {
             if (mRequestInfoCount > 0) {
      		   
      	     mEditInput[0] = new EditText(this);
-     	     mEditInput[0].setId(id2222);
+     	     mEditInput[0].setId(id2222); // Being a new activity you don't need "getJavaNewId ()"
      	     mEditInput[0].setPadding(20, 30, 20, 30);
      	     mEditInput[0].setHint(mRequestHint[0]);
 
@@ -185,7 +185,7 @@ public class jModalDialog extends Activity {
            for (int j = 1;  j < mRequestInfoCount; j++) { //others inputs...
         	           	  
         	  mEditInput[j] = new EditText(this);        	  
-        	  mEditInput[j].setId(id2222+j);
+        	  mEditInput[j].setId(id2222+j); // Being a new activity you don't need "getJavaNewId ()"
         	  mEditInput[j].setPadding(20, 30, 20, 30);      
         	  //mEditInput[j].setText(mRequestInfo[j]);
         	  mEditInput[j].setHint(mRequestHint[j]);// +" "+ mRequestInfo[j].toLowerCase());
@@ -217,7 +217,7 @@ public class jModalDialog extends Activity {
         Button buttonOk = new Button(this);
 
         int id3333 = 3333;
-        buttonOk.setId(id3333);
+        buttonOk.setId(id3333); // Being a new activity you don't need "getJavaNewId ()"
         buttonOk.setPadding(20, 40, 20, 40);
         buttonOk.setText(mBtnOK);
 
@@ -283,7 +283,7 @@ public class jModalDialog extends Activity {
         if ( (mDlgType == 0)  || ((mDlgType == 2)) ){  //  == dlgInputBox,  dlgShowQuestion
         	
           Button buttonCancel = new Button(this);
-          buttonCancel.setId(id3334);
+          buttonCancel.setId(id3334); // Being a new activity you don't need "getJavaNewId ()"
           buttonCancel.setPadding(20, 40, 20, 40);
           buttonCancel.setText(mBtnCancel);
         

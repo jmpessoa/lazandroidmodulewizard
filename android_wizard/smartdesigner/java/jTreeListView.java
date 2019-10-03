@@ -1514,10 +1514,7 @@ public class jTreeListView extends TreeViewList {
     }
  
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public void SetId(int _id) { //wrapper method pattern ...
-       this.setId(_id);
-    }
-
+    
 	public int RootNode() {
 		return ROOT.intValue();
 	}

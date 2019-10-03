@@ -71,7 +71,6 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     function GetDrawingCache(): jObject;
     function GetImage(): jObject;
 
@@ -377,6 +376,8 @@ constructor jDrawingView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -634,13 +635,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jDrawingView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jDrawingView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jDrawingView_SetId(FjEnv, FjObject, _id);
 end;
 
 function jDrawingView.GetDrawingCache(): jObject;
@@ -1579,7 +1573,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jdrawingview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

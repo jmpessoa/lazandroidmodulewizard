@@ -111,9 +111,6 @@ public class jsCardView extends CardView /*dummy*/ { //please, fix what GUI obje
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
    
    /*
     * cardView.setCardBackgroundColor(...);

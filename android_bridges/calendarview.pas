@@ -56,7 +56,6 @@ jCalendarView = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure SetFirstDayOfWeek(_firstDayOfWeek: integer);
     function GetFirstDayOfWeek(): integer;
 
@@ -131,6 +130,9 @@ implementation
 constructor jCalendarView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -382,26 +384,6 @@ begin
 end;
 
 procedure jCalendarView.ClearLayout();
-var
-  rToP: TPositionRelativeToParent;
-  rToA: TPositionRelativeToAnchorID;
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-  begin
-     jCalendarView_clearLayoutAll(FjEnv, FjObject);
-
-     for rToP := rpBottom to rpCenterVertical do
-        if rToP in FPositionRelativeToParent then
-          jCalendarView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
-
-     for rToA := raAbove to raAlignRight do
-       if rToA in FPositionRelativeToAnchor then
-         jCalendarView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
-  end;
-end;
-
-procedure jCalendarView.SetId(_id: integer);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -774,7 +756,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jcalendarview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jcalendarview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -45,7 +45,6 @@ jsCollapsingToolbarLayout = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure SetScrollFlag(_collapsingScrollFlag: TCollapsingScrollflag);
     procedure SetExpandedTitleColorTransparent();
     procedure SetExpandedTitleColor(_color: TARGBColorBridge);
@@ -97,7 +96,10 @@ implementation
 
 constructor jsCollapsingToolbarLayout.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);                                                                              
+  inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+                                                                                
   FMarginLeft   := 0;
   FMarginTop    := 0;
   FMarginBottom := 0;
@@ -355,13 +357,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jsCollapsingToolbarLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jsCollapsingToolbarLayout.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsCollapsingToolbarLayout_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jsCollapsingToolbarLayout.SetScrollFlag(_collapsingScrollFlag: TCollapsingScrollflag);
@@ -667,7 +662,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jscollapsingtoolbarlayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jscollapsingtoolbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

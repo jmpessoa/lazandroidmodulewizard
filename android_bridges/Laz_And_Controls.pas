@@ -878,7 +878,6 @@ type
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
 
-    procedure SetId(_id: integer);
     function GetItemIndex(): integer;
     function GetItemCaption(): string;
     procedure SetSelection(_index: integer);
@@ -1874,7 +1873,7 @@ type
     procedure GoForward();
     procedure ScrollTo(_x, _y: integer);//by MB:
 
-	//LMB
+    //LMB
     function  ScrollY: integer;//LMB
     procedure LoadDataWithBaseURL(s1,s2,s3,s4,s5: string);//LMB
     procedure FindAll(_s: string); //LMB:
@@ -1882,7 +1881,6 @@ type
     procedure ClearMatches();//LMB
     function GetFindIndex: integer;//LMB
     function GetFindCount: integer;//LMB
-    property OnFindResult: TOnWebViewFindResult read FOnFindResult write FOnFindResult;
     function GetWidth: integer;  override;//LMB
     function GetHeight: integer; override;//LMB
 
@@ -1894,6 +1892,8 @@ type
     // Event
     property OnStatus  : TOnWebViewStatus read FOnStatus   write FOnStatus;
     property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
+    property OnFindResult: TOnWebViewFindResult read FOnFindResult write FOnFindResult;
+
   end;
 
   jCanvas = class(jControl)
@@ -3495,7 +3495,6 @@ begin
   pasWebView.OnFindResult(pasWebView,findIndex,findCount);
 end;
 
-
 {
 procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject;
                                       Obj: TObject; EventType,Progress : integer);
@@ -3764,6 +3763,9 @@ constructor jTextView.Create(AOwner: TComponent);
 begin
 
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FTextAlignment:= taLeft;
   FText:= '';
 
@@ -4234,6 +4236,9 @@ end;
 constructor jEditText.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FText:='';
   //FColor:= colbrDefault; //colbrWhite;
   FOnLostFocus:= nil;
@@ -4971,6 +4976,9 @@ end;
 constructor jButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FText:= '';
   FMarginLeft   := 5;
   FMarginTop    := 5;
@@ -5319,6 +5327,9 @@ end;
 constructor jCheckBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FText      := '';
   FChecked   := False;
   FMarginLeft   := 5;
@@ -5566,6 +5577,9 @@ end;
 constructor jRadioButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FText      := '';
   FChecked   := False;
   FMarginLeft   := 5;
@@ -5625,12 +5639,6 @@ begin
    begin
     jRadioButton_setParent2(FjEnv, FjObject , FjPRLayout);
    end;
-
-   // tk
-   if (Self.Id = 0) or Self.IDExistsInParent then
-    Self.AssignNewId;
-   //if  Self.Id = 0 then Self.Id:= Random(10000000);
-   // end tk
 
    jRadioButton_setId(FjEnv, FjObject , Self.Id);
   end;
@@ -5836,6 +5844,9 @@ end;
 constructor jProgressBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FProgress  := 0;
   FMax       := 100;  //default...
   FStyle     := cjProgressBarStyleHorizontal;
@@ -6058,6 +6069,9 @@ end;
 constructor jImageView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   // Init
   FImageName:= '';
   FImageIndex:= -1;
@@ -7582,6 +7596,8 @@ constructor jListView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FWidgetItem:= wgNone;
   FDelimiter:= '|';
   FTextDecorated:= txtNormal;
@@ -8385,7 +8401,7 @@ begin
   Result:= jListView_getLParamHeight(FjEnv, FjObject );
 
   if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+   Result := sysGetHeightOfParent(FParent);
 end;
 
 function jListView.GetTotalHeight: integer;
@@ -8718,6 +8734,9 @@ end;
 constructor jScrollView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FScrollSize := 800; //to scrolling images this number could be higher....
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
@@ -8988,6 +9007,9 @@ end;
 Constructor jHorizontalScrollView.Create(AOwner: TComponent);
  begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FScrollSize := 800; //to scrolling images this number could be higher....
 
   FLParamWidth:= lpMatchParent;
@@ -9221,6 +9243,9 @@ end;
 constructor jWebView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FJavaScript:= True;
   FZoomControl:= True;
   FOnStatus:= nil;
@@ -9263,10 +9288,10 @@ begin
   end;
 
   jWebView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-    FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-    sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-    sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
-
+                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
+                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+                  
   jWebView_SetZoomControl(FjEnv, FjObject, FZoomControl);
 
   for rToA := raAbove to raAlignRight do
@@ -9315,20 +9340,20 @@ begin
   // jWebView_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
-procedure jWebView.SetColor(Value: TARGBColorBridge);
+Procedure jWebView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
      View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
-procedure jWebView.Refresh;
+Procedure jWebView.Refresh;
  begin
   if not FInitialized then Exit;
   View_Invalidate(FjEnv, FjObject );
  end;
 
-procedure jWebView.SetJavaScript(Value: Boolean);
+Procedure jWebView.SetJavaScript(Value : Boolean);
 begin
   FJavaScript:= Value;
   if FInitialized then
@@ -9344,14 +9369,13 @@ begin
   end;
 end;
 
-procedure jWebView.Navigate(url: string);
+Procedure jWebView.Navigate(url: string);
 begin
   if not FInitialized then Exit;
   jWebView_loadURL(FjEnv, FjObject , url);
 end;
 
-procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string;
-  htmlFileName: string);
+Procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
 begin;
    Navigate('file://'+environmentDirectoryPath+'/'+htmlFileName);
 end;
@@ -9405,7 +9429,7 @@ begin
      jWebView_GoForward(FjEnv, FjObject);
 end;
 
-procedure jWebView.ClearLayout;
+procedure jWebView.ClearLayout();
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -9458,7 +9482,6 @@ begin
   if FInitialized then
      jWebView_ScrollTo(FjEnv, FjObject, _x, _y);
 end;
-
 
 //LMB
 function jWebView.ScrollY: integer;
@@ -10440,6 +10463,9 @@ end;
 constructor jView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FMouches.Mouch.Active := False;
   FMouches.Mouch.Start  := False;
   FMouches.Mouch.Zoom   := 1.0;
@@ -10939,6 +10965,9 @@ end;
 Constructor jImageBtn.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FImageUpName:='';
   FImageDownName:='';
   FImageUpIndex:= -1;
@@ -11351,6 +11380,9 @@ end;
 constructor jGLViewEvent.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FOnGLCreate  := nil;
   FOnGLChange  := nil;
   FOnGLDraw    := nil;
@@ -12142,6 +12174,9 @@ end;
 constructor jPanel.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FLParamWidth:= lpMatchParent;
   FLParamHeight:=lpWrapContent;
   FAcceptChildrenAtDesignTime:= True;
@@ -12564,6 +12599,9 @@ constructor jDBListView.Create(AOwner: TComponent);
 
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FMarginLeft := 10;
   FMarginTop := 10;
   FMarginBottom := 10;
@@ -12642,7 +12680,7 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jDBListView_SetId(FjEnv, FjObject, Self.Id);
+   jDBListView_setId(FjEnv, FjObject, Self.Id);
   end;
 
   jDBListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -12928,12 +12966,6 @@ begin
   end;
 end;
 
-procedure jDBListView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-    jDBListView_SetId(FjEnv, FjObject, _id);
-end;
 {
 procedure jDBListView.UpdateView();
 begin

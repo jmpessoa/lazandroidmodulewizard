@@ -140,9 +140,6 @@ public class jToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object 
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
    
    private int GetDrawableResourceId(String _resName) {
 		  try {

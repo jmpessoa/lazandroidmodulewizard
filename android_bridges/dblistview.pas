@@ -64,7 +64,6 @@ type
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure UpdateView;
     //procedure SetItemsLayout(_value: integer);
     function GetItemIndex(): integer;
@@ -139,6 +138,9 @@ constructor jDBListView.Create(AOwner: TComponent);
 
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft := 10;
   FMarginTop := 10;
   FMarginBottom := 10;
@@ -465,13 +467,6 @@ begin
   end;
 end;
 
-procedure jDBListView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-    jDBListView_SetId(FjEnv, FjObject, _id);
-end;
-
 procedure jDBListView.UpdateView();
 begin
   //in designing component state: set value here...
@@ -781,7 +776,7 @@ var
 begin
   jParams[0].i := _id;
   jCls := env^.GetObjectClass(env, _jdblistview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod := env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

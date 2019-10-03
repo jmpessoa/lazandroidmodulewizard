@@ -146,10 +146,7 @@ public class jcSignaturePad extends SignaturePad /*dummy*/ { //please, fix what 
     }
  
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public void SetId(int _id) { //wrapper method pattern ...
-       this.setId(_id);
-    }
-
+    
     public File getAlbumStorageDir(String albumName) {
         // Get the directory for the user's public pictures directory.
         File file = new File(Environment.getExternalStoragePublicDirectory(
