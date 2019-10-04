@@ -514,6 +514,9 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawBitmap(Bitmap _bitmap, int _width, int _height) {
+
+        if (mCanvas == null) return;
+
         Bitmap bmp = GetResizedBitmap(_bitmap, _width, _height);
         Rect rect = new Rect(0, 0, _width, _height);
         mCanvas.save();
@@ -522,6 +525,9 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawBitmap(Bitmap _bitmap, float _x, float _y, float _angleDegree) {
+
+        if (mCanvas == null) return;
+
         int x = (int) _x;
         int y = (int) _y;
         Bitmap bmp = GetResizedBitmap(_bitmap, _bitmap.getWidth(), _bitmap.getHeight());
@@ -532,6 +538,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawCroppedBitmap(Bitmap _bitmap, float _x, float _y, int _cropOffsetLeft, int _cropOffsetTop, int _cropWidth, int _cropHeight) {
+        if (mCanvas == null) return;
         Bitmap croppedBitmap = Bitmap.createBitmap(_bitmap,_cropOffsetLeft , _cropOffsetTop, _cropWidth, _cropHeight);
         int w = croppedBitmap.getWidth();
         int h = croppedBitmap.getHeight();
@@ -549,6 +556,8 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 		        scaleFactor = Math.min(bitmap.getWidth()/(right-left), bitmap.getHeight()/(bottom-top));
 		    }
 			*/
+        if (mCanvas == null) return;
+
         Rect rect = new Rect(_left, _top, _right, _bottom);
         if ((_bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (_bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {
             int nh = (int) (_bitmap.getHeight() * (512.0 / _bitmap.getWidth()));
@@ -645,6 +654,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawLine(float _x1, float _y1, float _x2, float _y2) {
+        if (mCanvas == null) return;
         mCanvas.drawLine(_x1, _y1, _x2, _y2, mDrawPaint);
     }
 
@@ -689,6 +699,9 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public float[] GetTextBox(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
+
+        if (mCanvas == null) return null;
+
         //draw bounding rect before rotating text
         Pointf[] box = GetTextBoxEx(_text, _x, _y);
         Pointf c;  //center
@@ -727,6 +740,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawText(String _text, float _x, float _y) {
+        if (mCanvas == null) return;
         mCanvas.drawText(_text, _x, _y, mTextPaint);
         //float[] r = GetTextBox(_text, _x, _y);
         //DrawRect(r[0],r[1],r[2], r[3]);
@@ -802,6 +816,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawText(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
+        if (mCanvas == null) return;
         Rect rect = new Rect();
         mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
         mCanvas.save();
@@ -817,6 +832,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public float[] DrawTextEx(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
+        if (mCanvas == null) return null;
         //draw bounding rect before rotating text
         Pointf[] box = GetTextBoxEx(_text, _x, _y);
         Pointf c;  //center
@@ -896,15 +912,18 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawCircle(float _cx, float _cy, float _radius) {
+        if (mCanvas == null) return;
         mCanvas.drawCircle(_cx, _cy, _radius, mDrawPaint);
     }
 
     public void DrawBackground(int _color) {
         //mBackgroundColor = _color;
+        if (mCanvas == null) return;
         mCanvas.drawColor(_color);
     }
 
     public void DrawRect(float _left, float _top, float _right, float _bottom) {
+        if (mCanvas == null) return;
         mCanvas.drawRect(_left, _top, _right, _bottom, mDrawPaint);
     }
 
@@ -919,7 +938,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawRect(float[] _box) {
-
+        if (mCanvas == null) return;
         if (_box.length != 8) return;
 
         DrawLine(_box[0], _box[1], _box[2], _box[3]); //PO - P1
@@ -930,11 +949,13 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     //https://thoughtbot.com/blog/android-canvas-drawarc-method-a-visual-guide
     public void DrawArc(float _leftRectF, float _topRectF, float _rightRectF, float _bottomRectF, float _startAngle, float _sweepAngle, boolean _useCenter) {
+        if (mCanvas == null) return;
         RectF oval = new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF);
         mCanvas.drawArc(oval, _startAngle, _sweepAngle, _useCenter, mDrawPaint);
     }
 
     public void DrawOval(float _leftRectF, float _topRectF, float _rightRectF, float _bottomRectF) {
+        if (mCanvas == null) return;
         mCanvas.drawOval(new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF), mDrawPaint);
     }
 
@@ -967,6 +988,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawBitmap(Bitmap _bitmap) {
+        if (mCanvas == null) return;
         int w = _bitmap.getWidth();
         int h = _bitmap.getHeight();
         Rect rect = new Rect(0, 0, w, h);
@@ -1166,6 +1188,9 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void Clear(int _color) {
+
+        if (mCanvas == null) return;
+
         if (_color != 0)
             mCanvas.drawColor(_color);
         else
@@ -1173,6 +1198,9 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void Clear() {
+
+        if (mCanvas == null) return;
+
         if (mBackgroundColor != 0)
             mCanvas.drawColor(mBackgroundColor);
         else
@@ -1220,6 +1248,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawTextFromAssetsFont(String _text, float _x, float _y, String _assetsFontName, int _size, int _color) {
+        if (mCanvas == null) return;
         TextPaint textPaint = new TextPaint();
         textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(_color);
@@ -1247,6 +1276,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     // by Kordal
     public void DrawFrame(Bitmap _bitMap, int _srcX, int _srcY, int _srcW, int _srcH, int _X, int _Y, int _Wh, int _Ht, float _rotateDegree) {
+        if (mCanvas == null) return;
         Rect srcRect = new Rect(_srcX, _srcY, _srcX + _srcW, _srcY + _srcH);
         Rect dstRect = new Rect(_X, _Y, _X + _Wh, _Y + _Ht);
 
