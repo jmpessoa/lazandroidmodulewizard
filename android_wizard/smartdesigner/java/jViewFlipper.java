@@ -190,10 +190,7 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
    }  
       
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-
+   
    public void SetAutoStart(boolean _value) {
       this.setAutoStart(_value);  //true
    }

@@ -61,7 +61,7 @@ public class jNumberPickerDialog /*extends ...*/ {
 	   int halfParentW = width/2-42;
 	   	   
 	   NumberPicker np = new NumberPicker(controls.activity);	   
-	   np.setId(1);
+	   np.setId(controls.getJavaNewId());
 	   	   	   
        android.widget.RelativeLayout.LayoutParams lparams1 = new android.widget.RelativeLayout.LayoutParams(
        		RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);     // W,H
@@ -74,7 +74,7 @@ public class jNumberPickerDialog /*extends ...*/ {
 	   	   
 	   Button cancel = new Button(controls.activity);
 	   cancel.setText("Cancel");
-	   cancel.setId(2);
+	   cancel.setId(controls.getJavaNewId());
 	   cancel.setBackgroundColor(Color.TRANSPARENT);
 	   	   
        android.widget.RelativeLayout.LayoutParams lparams2 = new android.widget.RelativeLayout.LayoutParams(halfParentW,

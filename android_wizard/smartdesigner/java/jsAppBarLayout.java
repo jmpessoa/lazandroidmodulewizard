@@ -117,9 +117,6 @@ public class jsAppBarLayout extends AppBarLayout /*dummy*/ { //please, fix what 
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
    
    public void	SetFitsSystemWindows(boolean _value) { //TODO Pascal
 		LAMWCommon.setFitsSystemWindows(_value);

@@ -210,10 +210,7 @@ public class jsViewPager extends ViewPager /*dummy*/ { //please, fix what GUI ob
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-      
+     
    public void AddPage(View _view, String _title) {	   
 	  ViewGroup parent = (ViewGroup) _view.getParent();
 	  if (parent != null) parent.removeView(_view);	   

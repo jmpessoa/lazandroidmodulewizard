@@ -110,10 +110,6 @@ public class jsFloatingActionButton extends FloatingActionButton /*dummy*/ { //p
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-
    public void SetVisibility(int _value) {  //	   
 	  this.setVisibility(_value);   //View.GONE=8   View.VISIBLE=0  View.INVISIBLE=4
    }

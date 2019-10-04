@@ -222,10 +222,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
     }
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
-    }
-
+    
     //Faz zoom no mapa
     public void SetZoom(int _zoom) {
         mapController.setZoom((double)_zoom);

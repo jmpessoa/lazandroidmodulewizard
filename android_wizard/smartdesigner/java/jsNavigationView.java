@@ -182,9 +182,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
       
    public Menu GetMenu() {
       return this.getMenu();
@@ -393,16 +390,14 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	      headerLayout.setBackgroundColor(headerColor);
 	      headerImageView = new ImageView(context);
 
-	      int id1 = 111111111;
 	      if (bmp != null) { 	    	  
 	    	  headerImageView.setImageBitmap(bmp);	      
 	          headerImageView.setPadding(10, 10, 10, 10);
-	          headerImageView.setId(id1);
+	          headerImageView.setId(controls.getJavaNewId());
           }
-
-	      int id2 = 111111110;
+	      
 		  headerTextView = new TextView(context);
-		  headerTextView.setId(id2);
+		  headerTextView.setId(controls.getJavaNewId());
 		  headerTextView.setText(headerText);      
 		  headerTextView.setPadding(10, 30, 10, 10);	      		  
 		  headerTextView.setTextColor(textColor);
@@ -415,7 +410,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 
 		  RelativeLayout.LayoutParams paramText = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		  paramText.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		  paramText.addRule(RelativeLayout.BELOW, id1);
+		  paramText.addRule(RelativeLayout.BELOW, headerImageView.getId());
 		  headerLayout.addView(headerTextView, paramText);	    	  
 
 		  if (countText >= 2) {
@@ -425,7 +420,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
      	      headerSubTextView.setTextColor(subTextColor);        	  
     		  RelativeLayout.LayoutParams paramText2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     		  paramText2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-    		  paramText2.addRule(RelativeLayout.BELOW, id2);
+    		  paramText2.addRule(RelativeLayout.BELOW, headerTextView.getId());
     	      headerLayout.addView(headerSubTextView, paramText2);	    	  
 	      }
 
@@ -456,16 +451,14 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 		headerLayout.setLayoutParams(paramLayout);
 		headerImageView = new ImageView(context);
 
-		int id1 = 111111111;
 		if (bmp != null) {
 			headerImageView.setImageBitmap(bmp);
 			headerImageView.setPadding(10, 10, 10, 10);
-			headerImageView.setId(id1);
+			headerImageView.setId(controls.getJavaNewId());
 		}
-
-		int id2 = 111111110;
+		
 		headerTextView = new TextView(context);
-		headerTextView.setId(id2);
+		headerTextView.setId(controls.getJavaNewId());
 		headerTextView.setText(headerText);
 		headerTextView.setPadding(10, 30, 10, 10);
 		headerTextView.setTextColor(textColor);
@@ -478,7 +471,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 
 		RelativeLayout.LayoutParams paramText = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		paramText.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		paramText.addRule(RelativeLayout.BELOW, id1);
+		paramText.addRule(RelativeLayout.BELOW, headerImageView.getId());
 		headerLayout.addView(headerTextView, paramText);
 
 		if (countText >= 2) {
@@ -488,7 +481,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 			headerSubTextView.setTextColor(subTextColor);
 			RelativeLayout.LayoutParams paramText2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 			paramText2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-			paramText2.addRule(RelativeLayout.BELOW, id2);
+			paramText2.addRule(RelativeLayout.BELOW, headerTextView.getId());
 			headerLayout.addView(headerSubTextView, paramText2);
 		}
 

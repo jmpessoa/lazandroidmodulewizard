@@ -75,7 +75,6 @@ jsRecyclerView = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure SetItemContentFormat(_delimitedContentFormat: string; _delimiter: string); overload;
     procedure SetItemContentFormat(_contentFormat: string); overload;
     procedure SetItemContentFormat(); overload;
@@ -145,6 +144,9 @@ implementation
 constructor jsRecyclerView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -418,13 +420,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jsRecyclerView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jsRecyclerView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsRecyclerView_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jsRecyclerView.SetItemContentFormat(_delimitedContentFormat: string; _delimiter: string);
@@ -771,7 +766,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

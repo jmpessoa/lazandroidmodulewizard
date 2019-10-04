@@ -102,10 +102,6 @@ public class jToggleButton extends ToggleButton /*dummy*/ { //please, fix what G
 	   LAMWCommon.clearLayoutAll();
    }
 
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-
    //write others [public] methods code here......
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 

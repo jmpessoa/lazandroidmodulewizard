@@ -139,10 +139,6 @@ public class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what G
     	LAMWCommon.clearLayoutAll();
     }
 
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         if (mDrawing)  controls.pOnSurfaceViewDraw(pascalObj, canvas);

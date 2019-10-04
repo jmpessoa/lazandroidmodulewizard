@@ -50,7 +50,6 @@ jRatingBar = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     function GetRating(): single;
     procedure SetRating(_rating: single);
     procedure SetNumStars(_numStars: integer);
@@ -105,6 +104,9 @@ implementation
 constructor jRatingBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -338,14 +340,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jRatingBar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jRatingBar.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  FId:= _id;
-  if FInitialized then
-     jRatingBar_SetId(FjEnv, FjObject, _id);
 end;
 
 function jRatingBar.GetRating(): single;
@@ -605,7 +599,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jratingbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jratingbar, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

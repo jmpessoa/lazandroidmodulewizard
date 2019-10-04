@@ -639,11 +639,6 @@ begin
      strList.Add('	 LAMWCommon.clearLayoutAll();');
      strList.Add('    }');
      strList.Add(' ');
-     strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
-     strList.Add('    public void SetId(int _id) { //wrapper method pattern ...');
-     strList.Add('       this.setId(_id);');
-     strList.Add('    }');
-     strList.Add(' ');
      strList.Add('}');
 
      SynMemo1.Clear;
@@ -814,6 +809,9 @@ begin
 
     if Pos('jVisualControl', FProjectModel) > 0  then
     begin
+      listPascal.Add(' ');
+      listPascal.Add('  if gapp <> nil then FId := gapp.GetNewId();');
+      listPascal.Add(' ');
       listPascal.Add('  FMarginLeft   := 10;');
       listPascal.Add('  FMarginTop    := 10;');
       listPascal.Add('  FMarginBottom := 10;');
@@ -1886,14 +1884,8 @@ begin
          strList.Add('    }');
       end;
       strList.Add(' ');
-      strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
+      strList.Add('  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
       strList.Add('  //write others [public] methods code here......');
-      if codeFrom = 1 then
-      begin
-        strList.Add('    public void SetId(int _id) { //wrapper method pattern ...');
-        strList.Add('       this.setId(_id);');
-        strList.Add('    }');
-      end;
       strList.Add(' ');
 
       //add test here:

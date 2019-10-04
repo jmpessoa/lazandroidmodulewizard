@@ -45,8 +45,7 @@ jFrameLayout = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure SetId(_id: integer);
-
+    
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property OnClick: TOnNotify read FOnClick write FOnClick;
@@ -80,6 +79,9 @@ implementation
 constructor jFrameLayout.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -336,13 +338,6 @@ begin
   end;
 end;
 
-procedure jFrameLayout.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jFrameLayout_SetId(FjEnv, FjObject, _id);
-end;
-
 {-------- jFrameLayout_JNI_Bridge ----------}
 
 function jFrameLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -592,7 +587,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jframelayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jframelayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

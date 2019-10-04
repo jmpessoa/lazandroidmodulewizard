@@ -67,7 +67,6 @@ jGL2SurfaceView = class(jVisualControl)
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
-    procedure SetId(_id: integer);
     procedure Pause();
     procedure Resume();
     function GetByteBufferFromByteArray(var _values: TDynArrayOfJByte): jObject;
@@ -174,6 +173,9 @@ implementation
 constructor jGL2SurfaceView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FHeight       := 96; //??
   FWidth        := 100; //??
   FLParamWidth  := lpMatchParent;  //lpWrapContent
@@ -418,13 +420,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jGL2SurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jGL2SurfaceView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jGL2SurfaceView_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jGL2SurfaceView.Pause();
@@ -886,7 +881,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jgl2surfaceview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jgl2surfaceview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

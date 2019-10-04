@@ -58,8 +58,7 @@ jSurfaceView = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
-
+    
     procedure SetHolderFixedSize(_width: integer; _height: integer);
     procedure DrawLine(_canvas: jObject; _x1: single; _y1: single; _x2: single; _y2: single);  overload;
     procedure DrawPoint(_canvas: jObject; _x1: single; _y1: single);
@@ -175,6 +174,9 @@ implementation
 constructor jSurfaceView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -395,13 +397,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jSurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jSurfaceView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jSurfaceView_SetId(FjEnv, FjObject, _id);
 end;
 
 
@@ -816,7 +811,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jsurfaceview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jsurfaceview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

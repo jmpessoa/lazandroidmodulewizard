@@ -68,8 +68,7 @@ jsAdMob = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
-
+    
  published
 
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -92,6 +91,9 @@ implementation
 constructor jsAdMob.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 0;
   FMarginTop    := 0;
   FMarginBottom := 0;
@@ -135,7 +137,8 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    SetViewParent( FjPRLayout );
-   SetId(Self.Id);
+   
+   jni_proc_i(FjEnv, FjObject, 'setId', FId);
   end;
 
   jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
@@ -391,13 +394,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
         self.AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jsAdMob.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'SetId', _id);
 end;
 
 {-------- jsAdMob_JNI_Bridge ----------}

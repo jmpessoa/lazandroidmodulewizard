@@ -77,8 +77,7 @@ jExpandableListView = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
-
+    
     procedure Add(_header: string; _delimitedChildItems: string); overload;
     procedure Add(_delimitedItem: string; _headerDelimiter: string; _childInnerDelimiter: string); overload;
 
@@ -186,6 +185,8 @@ implementation
 constructor jExpandableListView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
 
   FHeight       := 96; //??
   FWidth        := 200; //??
@@ -489,14 +490,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jExpandableListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jExpandableListView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  Fid := _id;
-  if FInitialized then
-     jExpandableListView_SetId(FjEnv, FjObject, _id);
 end;
 
 Procedure jExpandableListView.SetFontColor(_color: TARGBColorBridge);
@@ -957,7 +950,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jexpandablelistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jexpandablelistview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

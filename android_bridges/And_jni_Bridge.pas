@@ -767,7 +767,6 @@ procedure jWebView_LoadDataWithBaseURL(env: PJNIEnv; _jwebview: JObject; _s1,_s2
 function  jWebView_getWidth(env:PJNIEnv; _jwebview : jObject): integer; //LMB
 function  jWebView_getHeight(env:PJNIEnv; _jwebview : jObject ): integer; //LMB
 
-
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
                                         this:jobject; SelfObj : TObject) : jObject;
@@ -1083,7 +1082,7 @@ procedure jDBListView_AddLParamsParentRule(env: PJNIEnv; _jdblistview: JObject;
  _rule: integer);
 procedure jDBListView_SetLayoutAll(env: PJNIEnv; _jdblistview: JObject; _idAnchor: integer);
 procedure jDBListView_ClearLayoutAll(env: PJNIEnv; _jdblistview: JObject);
-procedure jDBListView_SetId(env: PJNIEnv; _jdblistview: JObject; _id: integer);
+procedure jDBListView_setId(env: PJNIEnv; _jdblistview: JObject; _id: integer);
 function jDBListView_GetItemIndex(env: PJNIEnv; _jdblistview: JObject): integer;
 function jDBListView_GetItemCaption(env: PJNIEnv; _jdblistview: JObject): string;
 procedure jDBListView_SetSelection(env: PJNIEnv; _jdblistview: JObject; _index: integer);
@@ -11746,7 +11745,7 @@ end;
    end;
 
 
-   procedure jDBListView_SetId(env: PJNIEnv; _jdblistview: JObject; _id: integer);
+   procedure jDBListView_setId(env: PJNIEnv; _jdblistview: JObject; _id: integer);
    var
      jParams: array[0..0] of jValue;
      jMethod: jMethodID = nil;
@@ -11754,7 +11753,7 @@ end;
    begin
      jParams[0].i := _id;
      jCls := env^.GetObjectClass(env, _jdblistview);
-     jMethod := env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+     jMethod := env^.GetMethodID(env, jCls, 'setId', '(I)V');
      env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
      env^.DeleteLocalRef(env, jCls);
    end;

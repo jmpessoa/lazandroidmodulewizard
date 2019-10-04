@@ -44,7 +44,6 @@ jsCardView = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure SetCardElevation(_elevation: single);
     procedure SetContentPadding(_left: integer; _top: integer; _right: integer; _bottom: integer);
     procedure SetFitsSystemWindows(_value: boolean);
@@ -88,6 +87,9 @@ implementation
 constructor jsCardView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 4;
   FMarginTop    := 4;
   FMarginBottom := 4;
@@ -349,13 +351,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jsCardView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jsCardView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsCardView_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jsCardView.SetCardElevation(_elevation: single);
@@ -626,7 +621,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

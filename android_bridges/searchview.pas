@@ -55,7 +55,6 @@ jSearchView = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     function GetQuery(): string;
     function GetQueryHint(): string;
     function IsIconfiedByDefault(): boolean;
@@ -123,6 +122,9 @@ implementation
 constructor jSearchView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -372,13 +374,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jSearchView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jSearchView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jSearchView_SetId(FjEnv, FjObject, _id);
 end;
 
 function jSearchView.GetQuery(): string;
@@ -709,7 +704,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jsearchview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

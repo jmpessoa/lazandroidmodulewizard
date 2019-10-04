@@ -48,7 +48,6 @@ jsViewPager = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure AddPage(_view: jObject; _title: string);
     function GetPageTitle(_position: integer): string;
     function GetPosition(): integer;
@@ -103,6 +102,9 @@ implementation
 constructor jsViewPager.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 0;
   FMarginTop    := 0;
   FMarginBottom := 0;
@@ -358,13 +360,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jsViewPager_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jsViewPager.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsViewPager_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jsViewPager.AddPage(_view: jObject; _title: string);
@@ -670,7 +665,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jsviewpager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jsviewpager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

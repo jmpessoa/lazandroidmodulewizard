@@ -46,7 +46,6 @@ type
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure SetTextOff(_caption: string);
     procedure SetTextOn(_caption: string);
     procedure SetChecked(_state: boolean);
@@ -98,6 +97,9 @@ implementation
 constructor jSwitchButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 7;
   FMarginTop    := 7;
   FMarginBottom := 7;
@@ -327,13 +329,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jSwitchButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jSwitchButton.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jSwitchButton_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jSwitchButton.SetTextOff(_caption: string);
@@ -605,7 +600,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

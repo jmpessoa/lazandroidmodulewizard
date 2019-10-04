@@ -532,7 +532,7 @@ class jArrayAdapter extends ArrayAdapter {
 				     
 				     if ( txt1.length() > 0) {
 				       itemTextLeft = new TextView(ctx);  
-				       itemTextLeft.setId(position + 1111);
+				       itemTextLeft.setId(controls.getJavaNewId());
 				       //itemTextLeft.setPadding(20, 40, 20, 40);
 				       itemTextLeft.setPadding(mItemPaddingLeft, mItemPaddingTop, 0, mItemPaddingBottom);
 				       
@@ -580,7 +580,7 @@ class jArrayAdapter extends ArrayAdapter {
 				   
 				   if (txt2.length() > 0) { 
 				     itemTextRight = new TextView(ctx);
-				     itemTextRight.setId(position + 2222);
+				     itemTextRight.setId(controls.getJavaNewId());
 				     //itemTextRight.setPadding(20, 40, 20, 40);
 				     itemTextRight.setPadding(0, mItemPaddingTop, mItemPaddingRight, mItemPaddingBottom);
 				     itemTextRight.setText(txt2);
@@ -623,7 +623,7 @@ class jArrayAdapter extends ArrayAdapter {
 			
 			if (imageBmp != null) {
 				itemImage = new ImageView(ctx);
-				itemImage.setId(position+4444);
+				itemImage.setId(controls.getJavaNewId());
 				itemImage.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
 				itemImage.setImageBitmap(imageBmp);
 				itemImage.setFocusable(false);
@@ -635,7 +635,7 @@ class jArrayAdapter extends ArrayAdapter {
 			
 	    if (items.get(position).bmp !=  null) {
 					itemImage = new ImageView(ctx);
-					itemImage.setId(position+4444);
+					itemImage.setId(controls.getJavaNewId());
 					itemImage.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
 					itemImage.setImageBitmap(items.get(position).bmp);
 					itemImage.setFocusable(false);
@@ -771,7 +771,7 @@ class jArrayAdapter extends ArrayAdapter {
 
 			switch(items.get(position).widget) {   //0 == there is not a widget!
 				case 1:  itemWidget = new CheckBox(ctx);
-					((CheckBox)itemWidget).setId(position+6666); //dummy
+					((CheckBox)itemWidget).setId(controls.getJavaNewId());
 
 					((CheckBox)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 					
@@ -811,7 +811,7 @@ class jArrayAdapter extends ArrayAdapter {
 					break;
 					
 				case 2:  itemWidget = new RadioButton(ctx);
-					((RadioButton)itemWidget).setId(position+6666);
+					((RadioButton)itemWidget).setId(controls.getJavaNewId());
 					((RadioButton)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 					
 					((RadioButton)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
@@ -850,7 +850,7 @@ class jArrayAdapter extends ArrayAdapter {
 					break;
 					
 				case 3:  itemWidget = new Button(ctx);
-					((Button)itemWidget).setId(position+6666);
+					((Button)itemWidget).setId(controls.getJavaNewId());
 					((Button)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 					
 					((Button)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
@@ -887,7 +887,7 @@ class jArrayAdapter extends ArrayAdapter {
 					break;
 					
 				case 4:  itemWidget = new TextView(ctx);
-					((TextView)itemWidget).setId(position+6666);
+					((TextView)itemWidget).setId(controls.getJavaNewId());
 					((TextView)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 					
 					((TextView)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
@@ -924,7 +924,7 @@ class jArrayAdapter extends ArrayAdapter {
 					break;
 
 				case 5:  itemWidget = new EditText(ctx);
-					((EditText)itemWidget).setId(position+6666);
+					((EditText)itemWidget).setId(controls.getJavaNewId());
 					((EditText)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 
 					if (items.get(position).widgetTextColor != 0) {
@@ -970,15 +970,23 @@ class jArrayAdapter extends ArrayAdapter {
 
 					((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {
 						public void onFocusChange(View v, boolean hasFocus) {
-							int temp = v.getId();
-							final int index = temp - 6666; //dummy
+							int tempId = v.getId();
+							int index = -1; // = temp - 6666; //dummy
 							final EditText caption = (EditText)v;
+							
 							if (!hasFocus){
-								if (index >= 0) {
-									items.get(index).widgetText = caption.getText().toString();
+								
+								for( int i = 0; i < items.size(); i++)
+								 if( items.get(i).jWidget.getId() == tempId ){
+									 index = i;
+									 break;
+								 }
+																								
+								if (index >= 0){
+									items.get(index).widgetText = caption.getText().toString();								
 									items.get(index).jWidget.setFocusable(false);
 									items.get(index).jWidget.setFocusableInTouchMode(false);
-									controls.pOnWidgeItemLostFocus(PasObj, index, caption.getText().toString());
+								    controls.pOnWidgeItemLostFocus(PasObj, index, caption.getText().toString());
 								}
 							}
 						}

@@ -737,6 +737,7 @@ type
 
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;
                                  URL : String; Var CanNavi : Boolean) of object;
+
   //LMB:
   TOnWebViewFindResult = Procedure(Sender: TObject; findIndex, findCount: integer) of object;
 
@@ -835,6 +836,8 @@ type
 
     FjClassName   : string;
     FForm        : jForm;       // Main/Initial Form
+
+    FNewId       : integer;
     //
     Procedure SetAppName  (Value : String);
     Procedure SetjClassName(Value : String);
@@ -857,6 +860,9 @@ type
     destructor Destroy; override;
     procedure CreateForm(InstanceClass: TComponentClass; out Reference);
     procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject; intent: jobject);
+
+    function GetNewId() : integer;
+    function GetLastId() : integer;
 
     procedure Finish();
     Procedure Recreate();
@@ -976,10 +982,6 @@ type
     procedure InvalidateRect(ARect: TRect; Erase: boolean);
     procedure Invalidate;
 
-    // tk
-    procedure ReassignIDs; virtual;
-    // end tk
-
     property AcceptChildrenAtDesignTime:boolean read FAcceptChildrenAtDesignTime;
     property Parent: TAndroidWidget read FParent write SetParent;
     property Visible: boolean read FVisible write FVisible;
@@ -1032,8 +1034,6 @@ type
     // tk
     property OnAutoAssignIDs: TNotifyEvent read FOnAutoAssignIDs write FOnAutoAssignIDs;
     // end tk
-
-
   published
     // tk
     property AutoAssignIDs: Boolean read FAutoAssignIDs write SetAutoAssignIDs default False;
@@ -1126,7 +1126,6 @@ end;
     DoJNIPromptOnShow: boolean;
     DoJNIPromptOnInit: boolean;
     Standby: boolean;
-
 
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
@@ -1404,8 +1403,6 @@ end;
 
   jVisualControl = class(TAndroidWidget)
   private
-    procedure ReadIntId(Reader: TReader);
-    procedure WriteIntId(Writer: TWriter);
 
     {
     procedure ReadIntOrdLParamWidth(Reader: TReader);
@@ -1413,6 +1410,8 @@ end;
     procedure ReadIntOrdLParamHeight(Reader: TReader);
     procedure WriteIntOrdLParamHeight(Writer: TWriter);
     }
+
+    procedure NotSetId(_id: DWord);
 
   protected
     FId: DWord;
@@ -1472,18 +1471,12 @@ end;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetParentComponent(Value: TComponent); override;  //+++
-    // tk
-    procedure AssignNewId; virtual;
-    function IDExistsInParent: Boolean; virtual;
-    // end tk
 
     procedure Init(refApp: jApp); override;
     procedure UpdateLayout(); virtual;
 
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
-
-    procedure SetId(_id: DWord);
 
     property AnchorId: integer read FAnchorId write FAnchorId;
     property ScreenStyle   : TScreenStyle read FScreenStyle  write FScreenStyle   ;
@@ -1493,7 +1486,7 @@ end;
   published
     property Visible: boolean read GetVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
-    property Id: DWord read FId write SetId; //FId; // quickfix #25
+    property Id: DWord read FId write NotSetId; //FId; // quickfix #25
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
                                                                        write FPositionRelativeToAnchor;
     property PosRelativeToParent: TPositionRelativeToParentSet read FPositionRelativeToParent
@@ -1898,7 +1891,6 @@ begin
       Result:= string(env^.GetStringUTFChars(env,jstr,@_jBoolean) );
     end;
 end;
-
 
 function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
 begin
@@ -2397,26 +2389,6 @@ begin
         Proc(Components[i]);
 end;
 
-procedure TAndroidWidget.ReassignIDs;
-var
-  I: Integer;
-  Widget: TAndroidWidget;
-  NewID: DWord;
-begin
-  // Reassign IDs when holes found, this makes 'nice' IDs from those assigned by older LAMW versions
-  NewID := 1;
-  for I := 0 to ChildCount - 1 do
-  begin
-    Widget := Children[I];
-    if Widget is jVisualControl then
-    begin
-      jVisualControl(Widget).FId := NewId; // directly set property value
-      Inc(NewId);
-    end;
-    Widget.ReassignIDs; // reassign IDs for all children
-  end;
-end;
-
 function TAndroidWidget.ChildCount: integer;
 begin
   Result:=FChilds.Count;
@@ -2459,7 +2431,6 @@ begin
   InvalidateRect(Rect(0,0,Width,Height),False);
 end;
 
-
 {jVisualControl}
 
 constructor jVisualControl.Create(AOwner: TComponent);
@@ -2497,17 +2468,6 @@ destructor jVisualControl.Destroy;
 begin
   inherited Destroy;
 end;
-
-procedure jVisualControl.AssignNewId;
-begin
-  ID := InternalNewIDFromParent;
-end;
-
-function jVisualControl.IDExistsInParent: Boolean;
-begin
-  Result := InternalIDExistsInParent(ID);
-end;
-
 
 procedure jVisualControl.Init(refApp: jApp);
 begin
@@ -2554,30 +2514,6 @@ begin
      if Value <> nil then  //re- add free notification...
      begin
         Value.FreeNotification(Self);
-
-        // tk
-(*
-        if Value.Initialized then  //added to run time component create!
-        begin
-          if Value.Id = 0 then
-          begin
-            //Randomize;
-            //Value.Id:= Random(10000000);
-            Value.SetId(Random(10000000){Value.Id}); //JNI call
-          end;
-        end;
-
-        if not (csDesigning in ComponentState) then Exit;
-        if (csLoading in ComponentState) then Exit;
-
-        if Value.Id = 0 then   //Id must be published for data persistence!
-        begin
-          //Randomize;
-          Value.Id:= Random(10000000);  //warning: remember the law of Murphi...
-        end;
-*)
-        // end tk
-
      end;
   end;
 end;
@@ -2585,8 +2521,6 @@ end;
 procedure jVisualControl.SetParent(const AValue: TAndroidWidget);
 begin
   inherited SetParent(AValue);
-  if (ID = 0) or IDExistsInParent then
-    AssignNewId;
 end;
 
 procedure jVisualControl.SetParentComponent(Value: TComponent);
@@ -2702,28 +2636,10 @@ begin
  inherited DefineProperties(Filer);
 end;
 
-procedure jVisualControl.ReadIntId(Reader: TReader);
+procedure jVisualControl.NotSetId(_id: DWord);
 begin
-  FId:= Reader.ReadInteger;
+  // Not delete, for not setId
 end;
-
-procedure jVisualControl.WriteIntId(Writer: TWriter);
-begin
-  Writer.WriteInteger(FId);
-end;
-
-procedure jVisualControl.SetId(_id: DWord);
-begin
-  // tk
-  if InternalIDExistsInParent(_id) then
-    FId := InternalNewIDFromParent // silently assign a new ID
-  else
-    FId:= _id;
-  // end tk
-  if FInitialized then
-    View_SetId(FjEnv, FjObject, FId);
-end;
-
 
 // needed by jForm process logic ...
 procedure jVisualControl.UpdateLayout();
@@ -2759,7 +2675,7 @@ begin
   CreateNew(AOwner); //no stream loaded yet.
   FAcceptChildrenAtDesignTime:= True;
   // tk
-  FAutoAssignIDs := False;
+  FAutoAssignIDs := True;
   // end tk
 end;
 
@@ -2788,13 +2704,12 @@ begin
      if Assigned(FOnDestroy) then FOnDestroy(Self);
 end;
 
-
 procedure TAndroidForm.SetAutoAssignIDs(AValue: Boolean);
 begin
-  if FAutoAssignIDs=AValue then Exit;
+  (*if FAutoAssignIDs=AValue then Exit;
   FAutoAssignIDs:=AValue;
   if Assigned(FOnAutoAssignIDs) then
-    FOnAutoAssignIDs(Self);
+    FOnAutoAssignIDs(Self);*)
 end;
 
 procedure TAndroidForm.InternalInvalidateRect(ARect: TRect; Erase: boolean);
@@ -2806,8 +2721,6 @@ end;
 procedure TAndroidForm.Loaded;
 begin
   inherited Loaded;
-  if AutoAssignIDs and (csDesigning in ComponentState) then
-    ReassignIDs;
 end;
 
 { jForm }
@@ -6249,11 +6162,24 @@ begin
   //Device.ID          := '';
   FInitialized     := False;
   TopIndex:= -1;
+
+  FNewId := 0;
 end;
 
 destructor jApp.Destroy;
 begin
   inherited Destroy;
+end;
+
+function jApp.GetNewId() : integer;
+begin
+ FNewId := FNewId + 1;
+ result := FNewId;
+end;
+
+function jApp.GetLastId() : integer;
+begin
+ result := FNewId;
 end;
 
 procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject;
@@ -8046,19 +7972,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure View_SetTextColor(env:PJNIEnv; view : jObject; color : DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : Array[0..0] of jValue;
-  cls: jClass;
-begin
- _jParams[0].i := color;
- cls:= env^.GetObjectClass(env, view);
- _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V');
- env^.CallVoidMethodA(env,view,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure View_Invalidate(env:PJNIEnv; this:jobject; view : jObject);
 var
  _jMethod : jMethodID = nil;
@@ -8079,6 +7992,19 @@ begin
   cls:= env^.GetObjectClass(env, view);
  _jMethod:= env^.GetMethodID(env, cls, 'invalidate', '()V');
  env^.CallVoidMethod(env,view,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure View_SetTextColor(env:PJNIEnv; view : jObject; color : DWord);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..0] of jValue;
+  cls: jClass;
+begin
+ _jParams[0].i := color;
+ cls:= env^.GetObjectClass(env, view);
+ _jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V');
+ env^.CallVoidMethodA(env,view,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
 

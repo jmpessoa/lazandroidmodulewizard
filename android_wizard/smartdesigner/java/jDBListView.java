@@ -79,10 +79,11 @@ class jDBRecordView extends ListView {
 	
     private jDBCursorAdapter mCustomAdapter;
 	
-	public jDBRecordView(Context context, long _Self) { //Add more others news "_xxx" params if needed!
-        super(context);
+	public jDBRecordView(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
+        super(_ctrls.activity);
 		
-        mContext  = context;
+        controls  = _ctrls;
+        mContext  = _ctrls.activity;
         pascalObj = _Self;
         LAMWCommon = new jCommons(this, mContext, pascalObj);
         LAMWCommon.setMarginLeftTopRightBottom(0, 0, 0, 0);
@@ -91,7 +92,7 @@ class jDBRecordView extends ListView {
 		ColorDrawable dvdr = new ColorDrawable(0xFF000000);
 		setDivider(dvdr);
 		setDividerHeight(1);
-		setId(0xBABE);
+		setId(controls.getJavaNewId());
 		
 		mColumnWeight = new float[]{1f};
 
@@ -160,10 +161,6 @@ class jDBRecordView extends ListView {
 
     public void ClearLayoutAll() {   //TODO Pascal
 		LAMWCommon.clearLayoutAll();
-    }
-
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
     }
 
     public void SetFontSize(int _size) {
@@ -295,7 +292,7 @@ class jDBRecordView extends ListView {
 		// Log.i("jDBRecordView", "newHeader ...");
 		final int len = mColumnNames.length;
 		LinearLayout header = new LinearLayout(mContext);
-		header.setId(0x0D01);
+		header.setId(controls.getJavaNewId());
 		header.setOrientation(LinearLayout.HORIZONTAL);
 		header.setGravity(Gravity.CENTER);
 		header.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
@@ -392,12 +389,13 @@ public class jDBListView extends LinearLayout {
         super(_ctrls.activity);
 		
         controls  = _ctrls;
-        context   = controls.activity;
+        context   = _ctrls.activity;
         pascalObj = _Self;
         LAMWCommon = new jCommons(this, context, pascalObj);
         
 		setOrientation(LinearLayout.VERTICAL);
-		mItemList = new jDBRecordView(context, pascalObj);
+		mItemList = new jDBRecordView(controls, pascalObj);
+		mItemList.setId(controls.getJavaNewId());
 		mItemList.SetViewParent(this);
 		mItemList.SetLParamWidth(android.view.ViewGroup.LayoutParams.MATCH_PARENT);
 		
@@ -485,10 +483,6 @@ public class jDBListView extends LinearLayout {
 
     public void ClearLayoutAll() {   //TODO Pascal
 		LAMWCommon.clearLayoutAll();
-    }
-
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
     }
 
     public View GetView() {

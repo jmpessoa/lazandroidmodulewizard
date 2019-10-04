@@ -546,13 +546,7 @@ private long pascalObj = 0;        // Pascal Object
 
    public void ClearLayoutAll() {
 	 LAMWCommon.clearLayoutAll();
-   }
-
-   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-    
+   }    
 
     @Override
 	public void surfaceDestroyed(SurfaceHolder holder) {

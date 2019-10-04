@@ -103,10 +103,7 @@ public class jsNestedScrollView extends NestedScrollView /*dummy*/ { //please, f
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-
+   
    public void SetAppBarLayoutScrollingViewBehavior() { //This attribute will trigger event in the Toolbar.
      CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)this.getLayoutParams();
      params.setBehavior(new AppBarLayout.ScrollingViewBehavior(context, null));

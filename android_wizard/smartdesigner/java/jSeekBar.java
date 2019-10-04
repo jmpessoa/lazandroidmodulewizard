@@ -143,10 +143,6 @@ public class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object 
     	LAMWCommon.clearLayoutAll();
     }
 
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
-    }
-
     public void SetMax(int _maxProgress) {
         this.setMax(_maxProgress);
     }

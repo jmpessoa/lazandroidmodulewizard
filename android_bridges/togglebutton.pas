@@ -41,7 +41,6 @@ type
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure SetChecked(_value: boolean);
     procedure DispatchOnToggleEvent(_value: boolean);
     procedure SetTextOn(_caption: string);
@@ -91,6 +90,9 @@ implementation
 constructor jToggleButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -319,13 +321,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jToggleButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jToggleButton.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jToggleButton_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jToggleButton.SetChecked(_value: boolean);
@@ -588,7 +583,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

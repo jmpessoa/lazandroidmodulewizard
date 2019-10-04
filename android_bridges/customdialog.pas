@@ -51,7 +51,6 @@ type
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure Show(); overload;
     procedure Show(_title: string); overload;
     procedure Show(_title: string; _iconIdentifier: string); overload;
@@ -112,6 +111,9 @@ implementation
 constructor jCustomDialog.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 10;
   FMarginTop    := 10;
   FMarginBottom := 10;
@@ -345,13 +347,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jCustomDialog_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jCustomDialog.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jCustomDialog_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jCustomDialog.Show();
@@ -626,7 +621,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -44,7 +44,6 @@ jsNavigationView = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
-    procedure SetId(_id: integer);
     procedure SetItemBackground(_imageIdentifier: string);
     procedure SetItemBackgroundResource(_imageIdentifier: string);
     function GetMenu(): jObject;
@@ -121,6 +120,9 @@ implementation
 constructor jsNavigationView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  if gapp <> nil then FId := gapp.GetNewId();
+  
   FMarginLeft   := 0;
   FMarginTop    := 0;
   FMarginBottom := 0;
@@ -368,13 +370,6 @@ begin
        if rToA in FPositionRelativeToAnchor then
          jsNavigationView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
-end;
-
-procedure jsNavigationView.SetId(_id: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsNavigationView_SetId(FjEnv, FjObject, _id);
 end;
 
 procedure jsNavigationView.SetItemBackground(_imageIdentifier: string);
@@ -755,7 +750,7 @@ var
 begin
   jParams[0].i:= _id;
   jCls:= env^.GetObjectClass(env, _jsnavigationview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetId', '(I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
   env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

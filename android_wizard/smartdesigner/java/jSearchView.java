@@ -164,10 +164,6 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
     }
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
-    }
-
     public String GetQuery() {
         //CharSequence
         return (String) this.getQuery();

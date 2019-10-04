@@ -50,7 +50,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
                  if (c >= 0) {
                 	 	
 	                RadioButton rb = (RadioButton) findViewById(checkedId);
-	                
+	                	               
 	                if (rb != null) {
 		                String checkedCaption = (String) rb.getText();
 		
@@ -151,10 +151,6 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
 
     public void ClearLayoutAll() {   //TODO Pascal
     	LAMWCommon.clearLayoutAll();
-    }
-
-    public void SetId(int _id) { //wrapper method pattern ...
-        this.setId(_id);
     }
 
     //write others [public] methods code here......
@@ -278,7 +274,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
 	public void Add(String _radioTitle) {
         // Create a Radio Button for RadioGroup
         RadioButton rb = new RadioButton(controls.activity);
-        rb.setId(this.getId() + mSeedId);
+        rb.setId(controls.getJavaNewId());
         mSeedId = mSeedId +1;
         rb.setText(_radioTitle);
         //rb.setTextColor(Color.BLACK);
@@ -288,7 +284,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
     public void Add(String _radioTitle, int _color) {
         // Create a Radio Button for RadioGroup
         RadioButton rb = new RadioButton(controls.activity);
-        rb.setId(this.getId() + mSeedId);
+        rb.setId(controls.getJavaNewId());
         mSeedId = mSeedId +1;
         rb.setText(_radioTitle);
         rb.setTextColor(_color);
