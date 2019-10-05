@@ -75,17 +75,21 @@ end;
 procedure TAndroidModule1.jBroadcastReceiver1Receiver(Sender: TObject; intent: jObject);
 begin
 
-  ShowMessage(jDownloadManager1.GetExtras(intent, '|'));  //must call first!
+  (*
+  ShowMessage(jDownloadManager1.GetExtras(intent, '|'));  //MUST! be call first!
 
   ShowMessage(jDownloadManager1.GetLocalFileName());
   ShowMessage('Size(bytes): ' + IntToStr(jDownloadManager1.GetFileSizeBytes()) );
   ShowMessage(jDownloadManager1.GetMediaType());
   ShowMessage(jDownloadManager1.GetLocalUriAsString());
 
-  jBroadcastReceiver1.Unregister();  //unregister BroadcastReceiver ...
-
                                //or Self.ParseUri(jDownloadManager1.GetLocalUriAsString())
   jImageView1.SetImageFromURI( jDownloadManager1.GetFileUri() );
+  *)
+
+  //or
+
+  jImageView1.SetImageFromURI( jDownloadManager1.GetFileUri(intent) );
 
 end;
 

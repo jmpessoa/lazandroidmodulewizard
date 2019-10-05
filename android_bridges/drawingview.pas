@@ -81,7 +81,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView
 
     procedure SetPaintStrokeWidth(_width: single);
     procedure SetPaintStyle(_style: TPaintStyle);  //TPaintStyle
-    procedure SetPaintColor( _color: TARGBColorBridge); //
+    procedure SetPaintColor( _color: TARGBColorBridge); overload;
     procedure SetTextSize(_textsize: DWord);
 
     procedure DrawLine(_x1: single; _y1: single; _x2: single; _y2: single); overload;
@@ -227,6 +227,10 @@ jDrawingView = class(jVisualControl)    //jDrawingView
 
     procedure DrawCroppedBitmap(_bitmap: jObject; _x: single; _y: single; _cropOffsetLeft: integer; _cropOffsetTop: integer; _cropWidth: integer; _cropHeight: integer);
 
+    //by Kordal
+    procedure SetPaintColor( _color: TColor); overload;
+    procedure DrawRoundRect(Left, Top, Right, Bottom, radiusX, radiusY: Single);
+
     Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 
@@ -367,6 +371,7 @@ procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap:
 procedure jDrawingView_DrawFrame(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _srcX, _srcY, _srcW, _srcH, _X, _Y, _Wh, _Ht: Integer; _rotateDegree: Single); overload;
 procedure jDrawingView_DrawFrame(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _X, _Y, _Index, _Size: Integer; _scaleFactor, _rotateDegree: Single); overload;
 
+procedure jDrawingView_DrawRoundRect(env: PJNIEnv; _jdrawingview: JObject; _left, _top, _right, _bottom, _rx, _ry: Single);
 
 implementation
 
@@ -1385,6 +1390,18 @@ begin
      jDrawingView_DrawCroppedBitmap(FjEnv, FjObject, _bitmap ,_x ,_y ,_cropOffsetLeft ,_cropOffsetTop ,_cropWidth ,_cropHeight);
 end;
 
+procedure jDrawingView.SetPaintColor(_color: TColor);
+begin
+  if FInitialized then
+     jDrawingView_SetPaintColor(FjEnv, FjObject, _color);
+end;
+
+procedure jDrawingView.DrawRoundRect(Left, Top, Right, Bottom, radiusX, radiusY: Single);
+begin
+  if FInitialized then
+     jDrawingView_DrawRoundRect(FjEnv, FjObject, Left, Top, Right, Bottom, radiusX, radiusY);
+end;
+
 {-------- jDrawingView_JNI_Bridge ----------}
 
 function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean; _backgroundColor: integer; this: jObject): jObject;
@@ -1402,18 +1419,6 @@ begin
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
-
-(*
-//Please, you need insert:
-
-   public java.lang.Object jDrawingView_jCreate(long _Self) {
-      return (java.lang.Object)(new jDrawingView(this,_Self));
-   }
-
-//to end of "public class Controls" in "Controls.java"
-*)
-
-
 procedure jDrawingView_jFree(env: PJNIEnv; _jdrawingview: JObject);
 var
   jMethod: jMethodID=nil;
@@ -1424,7 +1429,6 @@ begin
   env^.CallVoidMethod(env, _jdrawingview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jDrawingView_SetViewParent(env: PJNIEnv; _jdrawingview: JObject; _viewgroup: jObject);
 var
@@ -1741,7 +1745,8 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  //jParams[0].l:= env^.NewStringUTF(env, PChar(_text)); //problem while displaying Cyrillic
+  jParams[0].l:= env^.NewString(env, PjChar(UTF8Decode(_text)), Length(_text)); // fix by Kordal!!
   jParams[1].f:= _x;
   jParams[2].f:= _y;
   jCls:= env^.GetObjectClass(env, _jdrawingview);
@@ -2835,6 +2840,24 @@ begin
   jParams[6].i:= _cropHeight;
   jCls:= env^.GetObjectClass(env, _jdrawingview);
   jMethod:= env^.GetMethodID(env, jCls, 'DrawCroppedBitmap', '(Landroid/graphics/Bitmap;FFIIII)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_DrawRoundRect(env: PJNIEnv; _jdrawingview: JObject; _left, _top, _right, _bottom, _rx, _ry: Single);
+var
+  jParams: array[0..5] of jValue;
+  jMethod: jMethodID = nil;
+  jCls   : jClass = nil;
+begin
+  jParams[0].f:= _left;
+  jParams[1].f:= _top;
+  jParams[2].f:= _right;
+  jParams[3].f:= _bottom;
+  jParams[4].f:= _rx;
+  jParams[5].f:= _ry;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'DrawRoundRect', '(FFFFFF)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

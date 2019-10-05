@@ -885,6 +885,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
         //by CC
     public void DrawTextAligned(String _text, float _left, float _top, float _right, float _bottom, float _alignHorizontal, float _alignVertical) {
+        if (mCanvas == null) return;
         Rect bounds = new Rect();
         mTextPaint.getTextBounds(_text, 0, _text.length(), bounds);
         float x = _left + (_right - _left - bounds.width()) * _alignHorizontal;
@@ -893,6 +894,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public float[] DrawTextAlignedEx(String _text, float _left, float _top, float _right, float _bottom, float _alignHorizontal, float _alignVertical) {
+        if (mCanvas == null) return null;
         Rect bounds = new Rect();
         mTextPaint.getTextBounds(_text, 0, _text.length(), bounds);
         float x = _left + (_right - _left - bounds.width()) * _alignHorizontal;
@@ -904,10 +906,12 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawLine(float[] _points) {
+        if (mCanvas == null) return;
         mCanvas.drawLines(_points, mDrawPaint);
     }
 
     public void DrawPoint(float _x1, float _y1) {
+        if (mCanvas == null) return;
         mCanvas.drawPoint(_x1, _y1, mDrawPaint);
     }
 
@@ -1088,22 +1092,26 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void DrawPath(Path _path) {
+        if (mCanvas == null) return;
         //mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
         mCanvas.drawPath(_path, mDrawPaint);
     }
 
     public void DrawPath(float[] _points) {
+        if (mCanvas == null) return;
         //mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
         mCanvas.drawPath(GetPath(_points), mDrawPaint);
     }
 
     public void DrawTextOnPath(Path _path, String _text, float _xOffset, float _yOffset) {
+        if (mCanvas == null) return;
         //setLayerType(View.LAYER_TYPE_SOFTWARE, mPaint); // Required for API level 11 or higher.
         mCanvas.drawTextOnPath(_text, _path, _xOffset, _yOffset, mTextPaint);
         //setLayerType(View.LAYER_TYPE_SOFTWARE, mPaint); // Required for API level 11 or higher.
     }
 
     public void DrawTextOnPath(String _text, float _xOffset, float _yOffset) {
+        if (mCanvas == null) return;
         if (!mPath.isEmpty()) {
             //setLayerType(View.LAYER_TYPE_SOFTWARE, mPaint); // Required for API level 11 or higher.
             mCanvas.drawTextOnPath(_text, mPath, _xOffset, _yOffset, mTextPaint);
@@ -1113,6 +1121,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     //https://blog.danlew.net/2013/10/03/centering_single_line_text_in_a_canvas/   TODO
     //https://ivankocijan.xyz/android-drawing-multiline-text-on-canvas/
     public void DrawTextMultiLine(String _text, float _left, float _top, float _right, float _bottom) {
+        if (mCanvas == null) return;
         Rect bounds = new Rect((int) _left, (int) _top, (int) _right, (int) _bottom);
         //Static layout which will be drawn on canvas
         //bounds.width - width of the layout
@@ -1262,12 +1271,11 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     public void SetBackgroundColor(int _backgroundColor) {
         mBackgroundColor = _backgroundColor;
         this.setBackgroundColor(mBackgroundColor);
-        //mCanvas.drawColor(mBackgroundColor);
     }
-
 
     // by Kordal
     public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, int _dstLeft, int _dstTop, int _dstRight, int _dstBottom) {
+        if (mCanvas == null) return;
         Rect srcRect = new Rect(_srcLeft, _srcTop, _srcRight, _srcBottom);
         Rect dstRect = new Rect(_dstLeft, _dstTop, _dstRight, _dstBottom);
 
@@ -1296,6 +1304,16 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
     }
 
+    // by Kordal
+    public void DrawRoundRect(float _left, float _top, float _right, float _bottom, float _rx, float _ry) {
+        if (mCanvas == null) return;
+
+        //[ifdef_api21up]
+        if (Build.VERSION.SDK_INT >= 21) {
+            mCanvas.drawRoundRect(_left, _top, _right, _bottom, _rx, _ry, mDrawPaint);
+        }//[endif_api21up]
+
+    }
 
 } //end class
 

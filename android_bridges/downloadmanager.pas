@@ -29,13 +29,20 @@ jDownloadManager = class(jControl)
     function GetActionDownloadComplete(): string;
     function GetExtras(_intent: jObject; _delimiter: string): string;
 
-    function GetLocalUriAsString(): string;
-    function GetLocalFileName(): string;
-    function GetMediaType(): string;
-    function GetFileSizeBytes(): integer;
-    procedure SaveToFile(_filname: string); overload;
+    procedure SaveToFile(_filename: string); overload;
     function GetElapsedTimeInSeconds(): integer;
-    function GetFileUri(): jObject;
+
+    function GetLocalUriAsString(): string; overload;
+    function GetLocalFileName(): string; overload;
+    function GetMediaType(): string; overload;
+    function GetFileSizeBytes(): integer; overload;
+    function GetFileUri(): jObject; overload;
+
+    function GetLocalUriAsString(_intent: jObject): string; overload;
+    function GetLocalFileName(_intent: jObject): string; overload;
+    function GetMediaType(_intent: jObject): string; overload;
+    function GetFileSizeBytes(_intent: jObject): integer; overload;
+    function GetFileUri(_intent: jObject): jObject; overload;
 
  published
 
@@ -49,13 +56,21 @@ function jDownloadManager_Start(env: PJNIEnv; _jdownloadmanager: JObject; _urlSt
 function jDownloadManager_GetActionDownloadComplete(env: PJNIEnv; _jdownloadmanager: JObject): string;
 function jDownloadManager_GetExtras(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject; _delimiter: string): string;
 
-function jDownloadManager_GetLocalUriAsString(env: PJNIEnv; _jdownloadmanager: JObject): string;
-function jDownloadManager_GetLocalFileName(env: PJNIEnv; _jdownloadmanager: JObject): string;
-function jDownloadManager_GetMediaType(env: PJNIEnv; _jdownloadmanager: JObject): string;
-function jDownloadManager_GetFileSizeBytes(env: PJNIEnv; _jdownloadmanager: JObject): integer;
 procedure jDownloadManager_SaveToFile(env: PJNIEnv; _jdownloadmanager: JObject; _filname: string); overload;
 function jDownloadManager_GetElapsedTimeInSeconds(env: PJNIEnv; _jdownloadmanager: JObject): integer;
-function jDownloadManager_GetFileUri(env: PJNIEnv; _jdownloadmanager: JObject): jObject;
+
+function jDownloadManager_GetLocalUriAsString(env: PJNIEnv; _jdownloadmanager: JObject): string; overload;
+function jDownloadManager_GetLocalFileName(env: PJNIEnv; _jdownloadmanager: JObject): string; overload;
+function jDownloadManager_GetMediaType(env: PJNIEnv; _jdownloadmanager: JObject): string; overload;
+function jDownloadManager_GetFileSizeBytes(env: PJNIEnv; _jdownloadmanager: JObject): integer; overload;
+function jDownloadManager_GetFileUri(env: PJNIEnv; _jdownloadmanager: JObject): jObject; overload;
+
+function jDownloadManager_GetLocalUriAsString(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): string; overload;
+function jDownloadManager_GetLocalFileName(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): string; overload;
+function jDownloadManager_GetMediaType(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): string; overload;
+function jDownloadManager_GetFileSizeBytes(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): integer; overload;
+function jDownloadManager_GetFileUri(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): jObject; overload;
+
 
 implementation
 
@@ -167,11 +182,11 @@ begin
    Result:= jDownloadManager_GetFileSizeBytes(FjEnv, FjObject);
 end;
 
-procedure jDownloadManager.SaveToFile(_filname: string);
+procedure jDownloadManager.SaveToFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadManager_SaveToFile(FjEnv, FjObject, _filname);
+     jDownloadManager_SaveToFile(FjEnv, FjObject, _filename);
 end;
 
 function jDownloadManager.GetElapsedTimeInSeconds(): integer;
@@ -186,6 +201,137 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jDownloadManager_GetFileUri(FjEnv, FjObject);
+end;
+
+function jDownloadManager.GetLocalUriAsString(_intent: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDownloadManager_GetLocalUriAsString(FjEnv, FjObject, _intent);
+end;
+
+function jDownloadManager.GetLocalFileName(_intent: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDownloadManager_GetLocalFileName(FjEnv, FjObject, _intent);
+end;
+
+function jDownloadManager.GetMediaType(_intent: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDownloadManager_GetMediaType(FjEnv, FjObject, _intent);
+end;
+
+function jDownloadManager.GetFileSizeBytes(_intent: jObject): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDownloadManager_GetFileSizeBytes(FjEnv, FjObject, _intent);
+end;
+
+function jDownloadManager.GetFileUri(_intent: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jDownloadManager_GetFileUri(FjEnv, FjObject, _intent);
+end;
+
+function jDownloadManager_GetLocalUriAsString(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intent;
+  jCls:= env^.GetObjectClass(env, _jdownloadmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLocalUriAsString', '(Landroid/content/Intent;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jdownloadmanager, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDownloadManager_GetLocalFileName(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intent;
+  jCls:= env^.GetObjectClass(env, _jdownloadmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLocalFileName', '(Landroid/content/Intent;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jdownloadmanager, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDownloadManager_GetMediaType(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intent;
+  jCls:= env^.GetObjectClass(env, _jdownloadmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetMediaType', '(Landroid/content/Intent;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jdownloadmanager, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDownloadManager_GetFileSizeBytes(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intent;
+  jCls:= env^.GetObjectClass(env, _jdownloadmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetFileSizeBytes', '(Landroid/content/Intent;)I');
+  Result:= env^.CallIntMethodA(env, _jdownloadmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDownloadManager_GetFileUri(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _intent;
+  jCls:= env^.GetObjectClass(env, _jdownloadmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetFileUri', '(Landroid/content/Intent;)Landroid/net/Uri;');
+  Result:= env^.CallObjectMethodA(env, _jdownloadmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 {-------- jDownloadManager_JNI_Bridge ----------}

@@ -1,4 +1,4 @@
-package org.lamw.appimageviewlistdemo1;
+package com.example.appdownloadmanagerdemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -511,8 +511,10 @@ public class jImageView extends ImageView {
 		this.invalidate();
 	}
 
-	//TODO Pascal
 	public void SetImageFromURI(Uri _uri) {
+
+		if (_uri == null) return;
+
 		InputStream imageStream = null;
 		try {
 			imageStream = controls.activity.getContentResolver().openInputStream(_uri);

@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 
 //ref. http://www.vogella.com/tutorials/AndroidServices/article.html  
 //http://www.tutorialspoint.com/android/android_services.htm
@@ -152,9 +153,13 @@ public class jDownloadManager /*extends ...*/ {
  public String GetActionDownloadComplete() {  //DownloadManager.ACTION_DOWNLOAD_COMPLETE
    return "android.intent.action.DOWNLOAD_COMPLETE";
  }
- 
- public String GetExtras(Intent _intent,  String _delimiter) {
-	  
+
+ public int GetElapsedTimeInSeconds() {
+        return (int)(System.currentTimeMillis() - mStartTime)/1000;
+ }
+
+    public String GetExtras(Intent _intent,  String _delimiter) {
+       mExtrasExists = false;
 	   Bundle extras = _intent.getExtras();
 	   DownloadManager.Query q = new DownloadManager.Query();
 	   q.setFilterById(extras.getLong(DownloadManager.EXTRA_DOWNLOAD_ID));
@@ -163,40 +168,85 @@ public class jDownloadManager /*extends ...*/ {
 	       int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
 	       if (status == DownloadManager.STATUS_SUCCESSFUL) {
 	           // process download
-	    	  // mTitle = c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE));	           
-	    	   mLocalFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
+	    	  // mTitle = c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE));
+
+               mLocalFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+               mLocalFileName = mLocalFileName.replace("file://","");
+
 	    	   mMediaType = c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE ));
 	    	   mSizeBytes = c.getString(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES ));
-	    	   mLocalUriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI ));	    	   
-	    	   mFileUri =  Uri.parse(mLocalUriString);
-	    	   mExtrasExists = true;
+	    	   mLocalUriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI ));
+               mFileUri =  Uri.parse(mLocalUriString);
+               mExtrasExists = true;
 	       }
 	       return mLocalFileName + _delimiter + mMediaType + _delimiter+ mSizeBytes + _delimiter + mLocalUriString;
 	   } else return "";	   
  }
  
  public String GetLocalUriAsString() {
+    if (mExtrasExists)
 	  return mLocalUriString;
+    else return "";
+
  }
  
  public String GetLocalFileName() {
+     if (mExtrasExists)
 	  return mLocalFileName;
+     else
+         return "";
  }
  
  public String GetMediaType() {
+     if (mExtrasExists)
 	  return mMediaType;
+     else return "";
  }
  
  public int GetFileSizeBytes() {
+     if (mExtrasExists)
 	  return Integer.parseInt(mSizeBytes);
+     else return 0;
  }
-                  
- public int GetElapsedTimeInSeconds() {
-   return (int)(System.currentTimeMillis() - mStartTime)/1000;
- }
- 
-public Uri GetFileUri() {	 
-	return mFileUri;
+
+public Uri GetFileUri() {
+     if (mExtrasExists)
+  	   return mFileUri;
+     else return null;
 }
- 
+
+    public String GetLocalUriAsString(Intent _intent) {
+        if (!mExtrasExists) {
+            GetExtras(_intent, "|");
+        }
+        return mLocalUriString;
+    }
+
+    public String GetLocalFileName(Intent _intent) {
+        if (!mExtrasExists) {
+            GetExtras(_intent, "|");
+        }
+        return mLocalFileName;
+    }
+
+    public String GetMediaType(Intent _intent) {
+        if (!mExtrasExists) {
+            GetExtras(_intent, "|");
+        }
+        return mMediaType;
+    }
+
+    public int GetFileSizeBytes(Intent _intent) {
+        if (!mExtrasExists) {
+            GetExtras(_intent, "|");
+        }
+        return Integer.parseInt(mSizeBytes);
+    }
+
+    public Uri GetFileUri(Intent _intent) {
+        if (!mExtrasExists) {
+            GetExtras(_intent, "|");
+        }
+        return mFileUri;
+    }
 }
