@@ -63,7 +63,7 @@ type
     procedure OnPersistentDeleting(APersistent: TPersistent);
     procedure OnSetSelection(const ASelection: TPersistentSelectionList);
     // tk
-    procedure OnAutoAssignIDs(Sender: TObject);
+    //procedure OnAutoAssignIDs(Sender: TObject);
     procedure SetRoot(const AValue: TComponent); override;
     // end tk
   public
@@ -1857,18 +1857,20 @@ begin
     FSelection.Add(ASelection[i]);
 end;
 
+(*
 procedure TAndroidWidgetMediator.OnAutoAssignIDs(Sender: TObject);
 begin
-  (*if (Sender is TAndroidForm) and TAndroidForm(Sender).AutoAssignIDs then
+  if (Sender is TAndroidForm) and TAndroidForm(Sender).AutoAssignIDs then
     if QuestionDlg('LAMW', 'Reassign Id properties now (otherwise they will be reassigned on next form open)?', mtConfirmation, [mrYes, mrNo], 0) = mrYes then
-      TAndroidForm(Sender).ReassignIds;*)
+      TAndroidForm(Sender).ReassignIds;
 end;
+*)
 
 procedure TAndroidWidgetMediator.SetRoot(const AValue: TComponent);
 begin
   inherited SetRoot(AValue);
-  if AValue is jForm then
-    jForm(AValue).OnAutoAssignIDs := @OnAutoAssignIDs;
+  (*if AValue is jForm then
+    jForm(AValue).OnAutoAssignIDs := @OnAutoAssignIDs;*)
 end;
 
 function TAndroidWidgetMediator.GetAndroidForm: jForm;

@@ -37,6 +37,9 @@ uses
 
 type
 
+  PColor = ^TColor;   //by Kordal
+  TColor = -$7FFFFFFF-1..$7FFFFFFF; // by Kordal
+
   TStrokeCap = (scDefault, scRound);
   TStrokeJoin = (sjDefault, sjRound);
 
@@ -807,10 +810,12 @@ type
                 end;
 
 
-  jForm      = class; // Forward Declaration
+  jForm         = class; // Forward Declaration
+  jGdxForm      = class; // Forward Declaration
+  TAndroidForm  = class; // Forward Declaration
 
   TjFormStack=  record
-                 Form        : jForm;
+                 Form        : TAndroidForm; //jForm;  gdx change
                  CloseCB     : TjCallBack; //Close Call Back Event
                 end;
 
@@ -822,6 +827,14 @@ type
   TjFormState = (fsFormCreate,  // Initializing
                  fsFormWork,    // Working
                  fsFormClose);  // Closing
+
+  TSimpleRGBAColor = record
+    r: single;    //red
+    g: single;   //green
+    b: single;  //blue
+    a: single; //alfa
+  end;
+
 
   { jApp }
 
@@ -835,7 +848,7 @@ type
     FAPILevel      : Integer;
 
     FjClassName   : string;
-    FForm        : jForm;       // Main/Initial Form
+    FForm        : TAndroidForm; //jForm; gdx change      // Main/Initial Form
 
     FNewId       : integer;
     //
@@ -895,7 +908,7 @@ type
 
     //properties
     property Initialized : boolean read FInitialized;
-    property Form: jForm read FForm write FForm; // Main Form
+    property Form: {jForm} TAndroidForm read FForm write FForm; // Main Form  gdx change
     property AppName    : string read FAppName write SetAppName;
     property ClassName  : string read FjClassName write SetjClassName;
     property MainActivityName: string read GetMainActivityName;
@@ -1012,16 +1025,38 @@ type
   private
     FAutoAssignIDs: Boolean;
     FDesigner: IAndroidWidgetDesigner;
+    //FOnAutoAssignIDs: TNotifyEvent;
     FOnCreate: TNotifyEvent;
     FOnDestroy: TNotifyEvent;
-    FOnAutoAssignIDs: TNotifyEvent;
-    procedure SetAutoAssignIDs(AValue: Boolean);
+    //FOnAutoAssignIDs: TNotifyEvent;
+
+    FOnActivityPause: TOnActivityPause;  //gdx change
+    FOnActivityResume: TOnActivityResume; //gdx
+    FScreenWH: TWH; //gdx
+    FScreenStyle  : TScreenStyle; //gdx
+    FOnRotate      : TOnRotate; //gdx
+    FOnActivityRst: TOnActivityRst; //gdx
+
+    procedure ReadBoolAutoAssignIDs(Reader: TReader);   //hide "AutoAssignIDs"  in ".lfm"
+    procedure WriteBoolAutoAssignIDs(Writer: TWriter);  //hide "AutoAssignIDs"  in ".lfm"
+
+    //procedure SetAutoAssignIDs(AValue: Boolean);
   protected
     procedure InternalInvalidateRect(ARect: TRect; Erase: boolean); override;
     // tk
     procedure Loaded; override;
     // end tk
+    procedure DefineProperties(Filer: TFiler); override;  //hide "AutoAssignIDs"  in ".lfm"
   public
+
+    //begin gdx
+    ScreenStyleAtStart: TScreenStyle;    //device direction [vertical=1 and vertical=2]
+    FormState     : TjFormState;
+    FormIndex: integer;
+    FormBaseIndex: integer;
+    Finished: boolean;
+    //end gdx
+
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1032,23 +1067,26 @@ type
     procedure BeforeDestruction; override;
     property Designer: IAndroidWidgetDesigner read FDesigner write FDesigner;
     // tk
-    property OnAutoAssignIDs: TNotifyEvent read FOnAutoAssignIDs write FOnAutoAssignIDs;
+    //property OnAutoAssignIDs: TNotifyEvent read FOnAutoAssignIDs write FOnAutoAssignIDs;
     // end tk
+
+    property OnActivityPause: TOnActivityPause read FOnActivityPause write FOnActivityPause; //gdx
+    property OnActivityResume: TOnActivityResume read FOnActivityResume write FOnActivityResume;  //gdx
+
+     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle; //gdx
+     property ScreenWH      : TWH read FScreenWH write FScreenWH; //gdx
+
+     property OnRotate     : TOnRotate      read FOnRotate      write FOnRotate;  //gdx
+     property OnActivityResult: TOnActivityRst read FOnActivityRst write FOnActivityRst; //gdx
+
+     // tk
+     property AutoAssignIDs: Boolean read FAutoAssignIDs; //write SetAutoAssignIDs default False;
+     // end tk
+
   published
-    // tk
-    property AutoAssignIDs: Boolean read FAutoAssignIDs write SetAutoAssignIDs default False;
-    // end tk
     property OnCreate: TNotifyEvent read FOnCreate write FOnCreate;
     property OnDestroy: TNotifyEvent read FOnDestroy write FOnDestroy;
   end;
-
-
-TSimpleRGBAColor = record
-  r: single;    //red
-  g: single;   //green
-  b: single;  //blue
-  a: single; //alfa
-end;
 
   { jForm }
 
@@ -1066,12 +1104,13 @@ end;
 
     FjPRLayoutHome: jObject;  //save origin
 
-    FOnViewClick      : TViewClick;
-    FOnListItemClick  : TListItemClick;
+    FOnViewClick      : TViewClick; //gdx
+    FOnListItemClick  : TListItemClick;  //gdx
 
-    FScreenWH      : TWH;
+    //FScreenWH      : TWH;  //gdx
+    //FScreenStyle   : TScreenStyle; //gdx
     FPackageName: string;
-    FScreenStyle   : TScreenStyle;
+
     FAnimation     : TAnimation;
     FActivityMode  : TActivityMode;
     FActionBarTitle: TActionBarTitle;
@@ -1079,9 +1118,10 @@ end;
     FOnClick      : TOnNotify;
     FOnClose      :   TOnNotify;
     FOnCloseQuery  : TOnCloseQuery;
-    FOnRotate      : TOnRotate;
 
-    FOnActivityRst : TOnActivityRst;
+    //FOnRotate      : TOnRotate; //gdx
+    //FOnActivityRst : TOnActivityRst;  //gdx
+
     FOnJNIPrompt   : TOnNotify;
     FOnBackButton  : TOnNotify;
     FOnSpecialKeyDown      : TOnKeyDown;
@@ -1094,8 +1134,8 @@ end;
     FOnPrepareOptionsMenu: TOnPrepareOptionsMenu;
     FOnPrepareOptionsMenuItem: TOnPrepareOptionsMenuItem;
     FOnActivityCreate: TOnActivityCreate;
-    FOnActivityPause: TOnActivityPause;
-    FOnActivityResume: TOnActivityResume;
+    //FOnActivityPause: TOnActivityPause;  //gdx change
+    //FOnActivityResume: TOnActivityResume; //gdx change
     FOnRequestPermissionResult: TOnRequestPermissionResult;
     //FOnNewIntent: TOnNewIntent;
     FLayoutVisibility: boolean;
@@ -1116,11 +1156,11 @@ end;
     function  GetOnListItemClickListener(jObjForm: jObject): jObject;
 
   public
-    ScreenStyleAtStart: TScreenStyle;    //device direction [vertical=1 and vertical=2]
+   (* ScreenStyleAtStart: TScreenStyle;    //device direction [vertical=1 and vertical=2]
     FormState     : TjFormState;
     FormIndex: integer;
     FormBaseIndex: integer;
-    Finished: boolean;
+    Finished: boolean; *)
     PromptOnBackKey: boolean;
     TryBacktrackOnClose: boolean;
     DoJNIPromptOnShow: boolean;
@@ -1159,8 +1199,8 @@ end;
     Procedure SetCloseCallBack(Func : TOnCallBackData; Sender : TObject); overload;
     Procedure SetCloseCallBack(Func : TOnCallBackPointer; Sender : TObject); overload;
 
-    Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
-    Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
+    //Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
+    //Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
 
     procedure UpdateJNI(refApp: jApp); override;
     Procedure UpdateLayout;
@@ -1330,14 +1370,16 @@ end;
 
     procedure SetAnimationMode(_animationMode: TAnimationMode);
 
+    Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
+    Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
 
-    property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle;
     property Animation    : TAnimation     read FAnimation      write FAnimation;
-    property ScreenWH      : TWH read FScreenWH write FScreenWH;
+    //property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle; //gdx
+    //property ScreenWH      : TWH read FScreenWH write FScreenWH; //gdx
 
     property CallBackDataString: string read FCBDataString write FCBDataString;
     property CallBackDataInteger: integer read FCBDataInteger write FCBDataInteger;
@@ -1397,6 +1439,15 @@ end;
     //property OnNewIntent: TOnNewIntent read FOnNewIntent write FOnNewIntent;
   end;
 
+  { jGdxForm }
+
+  jGdxForm = class(TAndroidForm)
+  private
+      //
+  public
+      //
+  end;
+
   {jVisualControl}
 
   TFontSizeUnit =(unitDefault, unitPixel, unitDIP, {unitInch,} unitMillimeter, unitPoint, unitScaledPixel);
@@ -1404,14 +1455,10 @@ end;
   jVisualControl = class(TAndroidWidget)
   private
 
-    {
-    procedure ReadIntOrdLParamWidth(Reader: TReader);
-    procedure WriteIntOrdLParamWidth(Writer: TWriter);
-    procedure ReadIntOrdLParamHeight(Reader: TReader);
-    procedure WriteIntOrdLParamHeight(Writer: TWriter);
-    }
+    procedure ReadIntId(Reader: TReader);   //hide "id"  in ".lfm"
+    procedure WriteIntId(Writer: TWriter);  //hide "id"  in ".lfm"
 
-    procedure NotSetId(_id: DWord);
+    //procedure NotSetId(_id: DWord);
 
   protected
     FId: DWord;
@@ -1422,7 +1469,6 @@ end;
     FFontSize     : DWord;
     FFontSizeUnit: TFontSizeUnit;
 
-    //FFontColor     : TARGBColorBridge;
     FFontFace: TFontFace;
     FTextTypeFace: TTextTypeFace;
     FHintTextColor: TARGBColorBridge;
@@ -1446,7 +1492,7 @@ end;
     FMyClassParentName: string;
 
     procedure SetAnchor(Value: jVisualControl);
-    procedure DefineProperties(Filer: TFiler); override;
+    procedure DefineProperties(Filer: TFiler); override;  //hide "id"  in ".lfm"
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
     procedure SetViewParent(Value: jObject);  virtual;
@@ -1470,7 +1516,7 @@ end;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure SetParentComponent(Value: TComponent); override;  //+++
+    procedure SetParentComponent(Value: TComponent); override;
 
     procedure Init(refApp: jApp); override;
     procedure UpdateLayout(); virtual;
@@ -1483,10 +1529,13 @@ end;
     property ViewParent {ViewParent}: jObject  read  GetViewParent write SetViewParent; // Java : Parent Relative Layout
     property View: jObject read GetView;     //FjObject; //View/Layout
     property MyClassParentName: string read FMyClassParentName write FMyClassParentName;
+
+    //hide "id"  in ".lfm"
+    property Id: DWord read FId; // Id must be read only, NOT published anymore...!
+
   published
     property Visible: boolean read GetVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
-    property Id: DWord read FId write NotSetId; //FId; // quickfix #25
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
                                                                        write FPositionRelativeToAnchor;
     property PosRelativeToParent: TPositionRelativeToParentSet read FPositionRelativeToParent
@@ -2631,14 +2680,20 @@ begin
      Result:= View_GetVisible(FjEnv, FjObject);
 end;
 
-procedure jVisualControl.DefineProperties(Filer: TFiler);
+procedure jVisualControl.DefineProperties(Filer: TFiler); //hide "id"  in ".lfm"
 begin
  inherited DefineProperties(Filer);
+ Filer.DefineProperty('Id', ReadIntId, WriteIntId, False); // Id<>0
 end;
 
-procedure jVisualControl.NotSetId(_id: DWord);
+procedure jVisualControl.ReadIntId(Reader: TReader);  //hide "id"  in ".lfm"
 begin
-  // Not delete, for not setId
+  Reader.ReadInteger;  // Not load the id
+end;
+
+procedure jVisualControl.WriteIntId(Writer: TWriter); //hide "id"  in ".lfm"
+begin
+   Writer.WriteInteger(0); // id write to 0
 end;
 
 // needed by jForm process logic ...
@@ -2675,7 +2730,7 @@ begin
   CreateNew(AOwner); //no stream loaded yet.
   FAcceptChildrenAtDesignTime:= True;
   // tk
-  FAutoAssignIDs := True;
+  //FAutoAssignIDs := True;
   // end tk
 end;
 
@@ -2704,14 +2759,32 @@ begin
      if Assigned(FOnDestroy) then FOnDestroy(Self);
 end;
 
-procedure TAndroidForm.SetAutoAssignIDs(AValue: Boolean);
+procedure TAndroidForm.DefineProperties(Filer: TFiler);
 begin
-  (*if FAutoAssignIDs=AValue then Exit;
-  FAutoAssignIDs:=AValue;
-  if Assigned(FOnAutoAssignIDs) then
-    FOnAutoAssignIDs(Self);*)
+  inherited DefineProperties(Filer);
+  Filer.DefineProperty('AutoAssignIDs', ReadBoolAutoAssignIDs, WriteBoolAutoAssignIDs, False);
 end;
 
+
+procedure TAndroidForm.ReadBoolAutoAssignIDs(Reader: TReader);
+begin
+  Reader.ReadBoolean; // Not load the AutoAssignIDs
+end;
+
+procedure TAndroidForm.WriteBoolAutoAssignIDs(Writer: TWriter);
+begin
+  Writer.WriteBoolean(False); // id write to False
+end;
+
+(*
+procedure TAndroidForm.SetAutoAssignIDs(AValue: Boolean);
+begin
+  if FAutoAssignIDs=AValue then Exit;
+  FAutoAssignIDs:=AValue;
+  if Assigned(FOnAutoAssignIDs) then
+    FOnAutoAssignIDs(Self);
+end;
+*)
 procedure TAndroidForm.InternalInvalidateRect(ARect: TRect; Erase: boolean);
 begin
  if (Parent=nil) and (Designer<>nil) then
@@ -3241,14 +3314,14 @@ begin
     Result:= jForm_GetOnListItemClickListener(FjEnv, jObjForm);
 end;
 
-procedure jForm.GenEvent_OnListItemClick(jObjAdapterView: jObject;
+procedure jForm.GenEvent_OnListItemClick(jObjAdapterView: jObject; //gdx
   jObjView: jObject; position: integer; Id: integer);
 begin
   if FInitialized then
     if Assigned(FOnListItemClick) then FOnListItemClick(jObjAdapterView, jObjView,position,Id);
 end;
 
-procedure jForm.GenEvent_OnViewClick(jObjView: jObject; Id: integer);
+procedure jForm.GenEvent_OnViewClick(jObjView: jObject; Id: integer);  //gdx
 begin
    if not FInitialized then Exit;
 

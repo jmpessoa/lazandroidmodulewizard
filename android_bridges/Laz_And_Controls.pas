@@ -2377,7 +2377,7 @@ but can be killed by the system in extremely low memory situations.
 // Another activity is taking focus (this activity is about to be "paused").
 Procedure Java_Event_pAppOnPause(env: PJNIEnv; this: jobject);
 var
-  Form: jForm;
+  Form: TAndroidForm; //jForm;  gdx change
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -2400,7 +2400,7 @@ Resume: The activity is in the foreground of the screen and has user focus.
 }
 Procedure Java_Event_pAppOnResume(env: PJNIEnv; this: jobject);
 var
-  Form: jForm;
+  Form: TAndroidForm; //jForm; //gdx change
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -2462,7 +2462,7 @@ end;
 // Event : OnRotate -> Form OnRotate
 Function Java_Event_pAppOnRotate(env: PJNIEnv; this: jobject; rotate : integer) : Integer;
 var                   {rotate=1 --> device vertical/default position ; 2: device horizontal position}
-  Form      : jForm;
+  Form: TAndroidForm; //jForm;  //gdx change
   rotOrientation: TScreenStyle;
 begin
 
@@ -2505,7 +2505,7 @@ Procedure Java_Event_pAppOnActivityResult(env: PJNIEnv; this: jobject;
                                                 requestCode, resultCode : Integer;
                                                intentData : jObject);
 var
-  Form: jForm;
+  Form: TAndroidForm; //jForm; //gdx
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -2522,7 +2522,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnViewClick) then Form.GenEvent_OnViewClick(jObjView, id);
@@ -2534,7 +2534,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnListItemClick) then Form.GenEvent_OnListItemClick(jObjAdapterView, jObjView, position, id);
@@ -2547,7 +2547,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnCreateOptionMenu) then Form.OnCreateOptionMenu(Form, jObjMenu);
@@ -2563,7 +2563,7 @@ begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form); //gdx
 
   if not Assigned(Form) then Exit;
 
@@ -2582,7 +2582,7 @@ begin
   prepareMoreItems:= True;
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnPrepareOptionsMenuItem) then Form.OnPrepareOptionsMenuItem(Form, jObjMenu, jObjMenuItem, itemIndex, prepareMoreItems);
@@ -2599,7 +2599,7 @@ begin
   mute:= False;
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -2633,7 +2633,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
 
@@ -2655,7 +2655,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnCreateContextMenu) then Form.OnCreateContextMenu(Form, jObjMenu);
@@ -2678,7 +2678,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
 
@@ -2701,7 +2701,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
 
