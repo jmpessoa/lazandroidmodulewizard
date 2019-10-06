@@ -18,7 +18,7 @@
 	About MacOs Install:  [adapted from ".../docs/linux/tutorial_by_waynesherman]
 		.Install [I] Infrastructure
 		.Install FPCUpdeluxe
-			https://github.com/newpascal/fpcupdeluxe/releases/download/v1.6.0q/fpcupdeluxe-powerpc-darwin-carbon.app.zip
+                        https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/download/1.6.2y2/fpcupdeluxe-x86_64-darwin-cocoa.zip
 		.Use FPCUpdeluxe to Install FPC+Laz   [trunk or  stable or ...]
 		.Use FPCUpdeluxe to Install arm/android cross-compile		
 					  
