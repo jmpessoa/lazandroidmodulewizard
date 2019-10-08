@@ -6244,6 +6244,8 @@ begin
   inherited Destroy;
 end;
 
+// To automatically enter id from 1 to the limit set by "Controls.java" [by TR3E]
+
 function jApp.GetNewId() : integer;
 begin
  FNewId := FNewId + 1;
