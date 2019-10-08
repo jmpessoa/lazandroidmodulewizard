@@ -1699,7 +1699,7 @@ public RelativeLayout  appLayout; // Base Layout
 public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
 public int systemVersion;
 
-private int javaNewId = 100000;   // To assign java id to 0..100000
+private int javaNewId = 100000;   // To assign java id from 100001 onwards [by TR3E]
 
 //Jave -> Pascal Function ( Pascal Side = Event )
 public native void pAppOnCreate(Context context, RelativeLayout layout, Intent intent);
