@@ -6,6 +6,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+//-------------------------------------------------------------------------
+// jImageList
+// Reviewed by TR3E on 10/10/2019
+//-------------------------------------------------------------------------
+
 public class jImageList /*extends ...*/ {
   
     private long     pascalObj = 0;      // Pascal Object
@@ -30,8 +35,13 @@ public class jImageList /*extends ...*/ {
 
   public Bitmap LoadFromFile(String _fullFilename) {
 	 //if (bmp != null) { bmp.recycle(); }
-	  BitmapFactory.Options bo = new BitmapFactory.Options();
-	  bo.inScaled = false;
+	  BitmapFactory.Options bo = new BitmapFactory.Options();		
+		
+	  if( bo == null ) return null;
+	    
+	  if( controls.GetDensityAssets() > 0 )
+	     bo.inDensity = controls.GetDensityAssets();
+	    
 	  return BitmapFactory.decodeFile(_fullFilename, bo);
  }
 

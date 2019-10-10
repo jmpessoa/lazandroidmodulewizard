@@ -1,4 +1,4 @@
-package com.example.appdownloadmanagerdemo1;
+package org.lamw.appimageviewlistdemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -46,6 +46,11 @@ import android.widget.PopupMenu;
 import java.io.FileOutputStream;
 import java.io.File;
 
+//-------------------------------------------------------------------------
+// jImageView
+// Reviewed by TR3E on 10/10/2019
+//-------------------------------------------------------------------------
+
 public class jImageView extends ImageView {
 	//Pascal Interface
 	private long           PasObj   = 0;      // Pascal Obj
@@ -54,7 +59,6 @@ public class jImageView extends ImageView {
 	//
 	private OnClickListener onClickListener;   //
 	public  Bitmap          bmp      = null;   //
-	public  Bitmap			bmpAlpha = null;
 	public  int             mAngle   = 0;
 	
 	Matrix mMatrix;
@@ -168,59 +172,29 @@ public class jImageView extends ImageView {
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
-		if (bmp    != null) { bmp.recycle(); }
+		if (bmp    != null) bmp.recycle();
+		
 		bmp     = null;
+		
 		setImageBitmap(null);
 		setImageResource(0); //android.R.color.transparent;
+		
 		onClickListener = null;
 		setOnClickListener(null);
+		
 		mMatrix = null;
 		LAMWCommon.free();		
 	}
-	
-	// Bitmap scaling with smoothing
-	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){		
-		
-		 // Get current dimensions
-		 int width  = _bmp.getWidth();
-		 int height = _bmp.getHeight();
-
-		 // Determine how much to scale
-		 float xScale = ((float) _newWidth) / width;
-		 float yScale = ((float) _newHeight) / height;
-		 
-		// Create a matrix for the scaling and add the scaling data
-		 Matrix matrix = new Matrix();
-		 matrix.postScale(xScale, yScale);
-
-		 // Create a new bitmap and convert it to a format understood by the ImageView
-		 Bitmap scaledBitmap = Bitmap.createBitmap(_bmp, 0, 0, width, height, matrix, true);
-		 BitmapDrawable result = new BitmapDrawable(scaledBitmap);
-		 width  = scaledBitmap.getWidth();
-		 height = scaledBitmap.getHeight();
-
-		 // Apply the scaled bitmap
-		 this.setImageDrawable(result);
-		 this.invalidate();
-		 
-		 Drawable drawing = this.getDrawable();
-		 Bitmap bitmap = ((BitmapDrawable)drawing).getBitmap();
-		 return bitmap;
-		}
-
-	/*private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
-		float factorH = _newHeight / (float)_bmp.getHeight();
-		float factorW = _newWidth / (float)_bmp.getWidth();
-		float factorToUse = (factorH > factorW) ? factorW : factorH;
-		Bitmap bm = Bitmap.createScaledBitmap(_bmp,
-				(int) (_bmp.getWidth() * factorToUse),
-				(int) (_bmp.getHeight() * factorToUse),false);
-		return bm;
-	}*/
 
 	public void SetBitmapImage(Bitmap _bitmap, int _width, int _height) {
+		
 		this.setImageResource(android.R.color.transparent);
-		bmp = GetResizedBitmap(_bitmap, _width, _height);
+		
+		bmp = Bitmap.createScaledBitmap(_bitmap, _width, _height, true);
+		
+		if( bmp == null ) return;
+		
+		bmp.setDensity( _bitmap.getDensity() );
 
 		if (!mRounded)
 		    this.setImageBitmap(bmp);
@@ -238,14 +212,17 @@ public class jImageView extends ImageView {
 		if ( (bm.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bm.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {
 			//is is the case when the bitmap fails to load
 			int nh = (int) ( bm.getHeight() * (1024.0 / bm.getWidth()) );
-			Bitmap scaled = Bitmap.createScaledBitmap(bm,1024, nh, true);
+			
+			bmp = Bitmap.createScaledBitmap(bm,1024, nh, true);
+			
+			if( bmp == null ) return;
+			
+			bmp.setDensity( bm.getDensity() );
 
 			if (!mRounded)
-				this.setImageBitmap(scaled);
+				this.setImageBitmap(bmp);
 			else
-				this.setImageBitmap(GetRoundedShape(scaled, 0));
-
-			bmp = scaled;
+				this.setImageBitmap(GetRoundedShape(bmp, 0));			
 		}
 		else{
 			// for bitmaps with dimensions that lie within the limits, load the image normally
@@ -273,49 +250,28 @@ public class jImageView extends ImageView {
 	public  void setImage(String fullPath) {
 		//if (bmp != null)        { bmp.recycle(); }
 		this.setImageResource(android.R.color.transparent);
+		
 		if (fullPath.equals("null")) { this.setImageBitmap(null); return; };
-		bmp = BitmapFactory.decodeFile(fullPath);
+		
+		BitmapFactory.Options bo = new BitmapFactory.Options();
+		
+		if( bo != null ){
+		 if( controls.GetDensityAssets() > 0 )
+		  bo.inDensity = controls.GetDensityAssets();
+		
+		 bmp = BitmapFactory.decodeFile(fullPath, bo);
 
-		if (!mRounded)
+		 if (!mRounded)
 			this.setImageBitmap(bmp);
-		else
+		 else
 			this.setImageBitmap(GetRoundedShape(bmp, 0));
 
-		this.invalidate();
-	}
-
-	public int GetDrawableResourceId(String _resName) {
-		try {
-			Class<?> res = R.drawable.class;
-			Field field = res.getField(_resName);  //"drawableName"
-			int drawableId = field.getInt(null);
-			return drawableId;
+		 this.invalidate();
 		}
-		catch (Exception e) {
-			//Log.e("jImageView", "Failure to get drawable id.", e);
-			return 0;
-		}
-	}
-
-	public Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null; // by tr3e
-		
-		Drawable res = null;
-		
-		if (Build.VERSION.SDK_INT < 21 ) {
-			res = this.controls.activity.getResources().getDrawable(_resID);
-		}
-		
-		//[ifdef_api21up]
-		if(Build.VERSION.SDK_INT >= 21)
-			res = this.controls.activity.getResources().getDrawable(_resID, null);
-        //[endif_api21up]
-						
-		return res;
 	}
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
-		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
 		if( d == null ) return;
 		
@@ -323,13 +279,15 @@ public class jImageView extends ImageView {
 		
 		if( b == null ) return;
 		
-		bmp = GetResizedBitmap(b, b.getWidth(), b.getHeight());
+		bmp = Bitmap.createScaledBitmap(b, b.getWidth(), b.getHeight(), true);
+		
 		this.setImageResource(android.R.color.transparent);
+		
 		if (!mRounded)
 			this.setImageBitmap(bmp);
 		else
 			this.setImageBitmap(GetRoundedShape(bmp, 0));
-		//this.setImageDrawable(d);
+		
 		this.invalidate();
 	}
 
@@ -442,7 +400,10 @@ public class jImageView extends ImageView {
 		if( newWidth <= 0 ) newWidth = 1;
 		if( newHeight <= 0 ) newHeight = 1;
 		
-		this.setImageBitmap(Bitmap.createScaledBitmap( bmp, newWidth, newHeight, true ));		
+		Bitmap bmpScale = Bitmap.createScaledBitmap( bmp, newWidth, newHeight, true );
+		bmpScale.setDensity( bmp.getDensity() );
+		
+		this.setImageBitmap( bmpScale );		
 	}
 	
     public void SetAlpha( int value ) {
@@ -452,28 +413,7 @@ public class jImageView extends ImageView {
 		if( value < 0 ) value = 0;
 		if( value > 255) value = 255;
 		
-		if( bmpAlpha == null )
-		 bmpAlpha = bmp;
-		
-	    int width  = bmp.getWidth();
-	    int height = bmp.getHeight();
-	    
-	    bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-	    
-	    if( bmp == null ) return;
-	    
-	    Canvas canvas = new Canvas(bmp);
-	    
-	    if( canvas != null ){
-	     canvas.drawARGB(0, 0, 0, 0);
-	    
-	     // config paint
-	     final Paint paint = new Paint();
-	     paint.setAlpha(value);
-	     canvas.drawBitmap(bmpAlpha, 0, 0, paint);
-	    	     
-	     this.setImageBitmap( bmp );
-	    }
+		setImageAlpha(value);	    
 	}
 
 	public Bitmap GetBitmapImage() {
@@ -483,13 +423,27 @@ public class jImageView extends ImageView {
 
 	public void SetImageFromIntentResult(Intent _intentData) {
 		Uri selectedImage = _intentData.getData();
+		
 		String[] filePathColumn = { MediaStore.Images.Media.DATA };
+		
 		Cursor cursor = controls.activity.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+		
 		cursor.moveToFirst();
+		
 		int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+		
 		String picturePath = cursor.getString(columnIndex);
+		
 		cursor.close();
-		bmp = BitmapFactory.decodeFile(picturePath);
+		
+		BitmapFactory.Options bo = new BitmapFactory.Options();		
+		
+	    if( bo == null ) return;
+	    
+	    if( controls.GetDensityAssets() > 0 )
+	     bo.inDensity = controls.GetDensityAssets();
+		
+		bmp = BitmapFactory.decodeFile(picturePath, bo);
 
 		if (!mRounded)
 			this.setImageBitmap(bmp);
@@ -501,7 +455,11 @@ public class jImageView extends ImageView {
 
 	public void SetImageThumbnailFromCamera(Intent _intentData) {
 		Bundle extras = _intentData.getExtras();
-		bmp = (Bitmap) extras.get("data");
+		
+		bmp = (Bitmap)extras.get("data");
+		
+		if( (bmp != null) && (controls.GetDensityAssets() > 0) )
+			bmp.setDensity(controls.GetDensityAssets());
 
 		if (!mRounded)
 			this.setImageBitmap(bmp);
@@ -511,10 +469,8 @@ public class jImageView extends ImageView {
 		this.invalidate();
 	}
 
+	//TODO Pascal
 	public void SetImageFromURI(Uri _uri) {
-
-		if (_uri == null) return;
-
 		InputStream imageStream = null;
 		try {
 			imageStream = controls.activity.getContentResolver().openInputStream(_uri);
@@ -522,18 +478,34 @@ public class jImageView extends ImageView {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		bmp = BitmapFactory.decodeStream(imageStream);
+		
+        BitmapFactory.Options bo = new BitmapFactory.Options();		
+		
+	    if( bo != null ){
+	     if( controls.GetDensityAssets() > 0 )
+	      bo.inDensity = controls.GetDensityAssets();
+	     
+		 bmp = BitmapFactory.decodeStream(imageStream, null, bo);
 
-		if (!mRounded)
+		 if (!mRounded)
 			this.setImageBitmap(bmp);
-		else
+		 else
 			this.setImageBitmap(GetRoundedShape(bmp, 0));
 
-		this.invalidate();
+		 this.invalidate();
+	    }
 	}
 
 	public void SetImageFromByteArray(byte[] _image) {
-		bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+		
+        BitmapFactory.Options bo = new BitmapFactory.Options();		
+		
+	    if( bo == null ) return;
+	    
+	    if( controls.GetDensityAssets() > 0 )
+	     bo.inDensity = controls.GetDensityAssets();
+	     
+		bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length, bo);
 
 		if (!mRounded)
 			this.setImageBitmap(bmp);
@@ -544,20 +516,28 @@ public class jImageView extends ImageView {
 	}
 
 	public Bitmap GetDrawingCache() {
+		
 		this.setDrawingCacheEnabled(true);
+		
 		Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
+		
 		this.setDrawingCacheEnabled(false);
+		
 		return b;
 	}
 	
 	public void SetRoundCorner() {
 		   if (this != null) {  		
 			        PaintDrawable  shape =  new PaintDrawable();
-			        shape.setCornerRadius(mRadius);                
+			        
+			        shape.setCornerRadius(mRadius);
+			        
 			        int color = Color.TRANSPARENT;
-			        Drawable background = this.getBackground();        
+			        
+			        Drawable background = this.getBackground();
+			        
 			        if (background instanceof ColorDrawable) {
-			          color = ((ColorDrawable)this.getBackground()).getColor();
+			            color = ((ColorDrawable)this.getBackground()).getColor();
 				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
 				        //[ifdef_api16up]
 				  	    if(Build.VERSION.SDK_INT >= 16) 
@@ -683,17 +663,21 @@ public class jImageView extends ImageView {
 		LAMWCommon.setVisibilityGone();
 	}
 
-        public ByteBuffer GetByteBuffer(int _width, int _height) {	  
+    public ByteBuffer GetByteBuffer(int _width, int _height) {	  
 	    ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(_width*_height*4);    
-            return graphicBuffer;    
-        }
+        return graphicBuffer;    
+    }
 
-        public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	 
-	       _byteBuffer.rewind();  //reset position
-	       bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);
-          bmp.copyPixelsFromBuffer(_byteBuffer); 	
+    public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _height) {	 
+	      _byteBuffer.rewind();  //reset position
+	      bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);
+          bmp.copyPixelsFromBuffer(_byteBuffer);
+          
+          if( controls.GetDensityAssets() > 0 )
+           bmp.setDensity( controls.GetDensityAssets() );
+          
           return bmp;
-        }
+    }
 
 	public void SetImageFromByteBuffer(ByteBuffer _jbyteBuffer, int _width, int _height) {
 		bmp = GetBitmapFromByteBuffer(_jbyteBuffer,_width,_height);
@@ -738,6 +722,10 @@ public class jImageView extends ImageView {
 
 		Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
 				targetHeight,Bitmap.Config.ARGB_8888);
+		
+		if( targetBitmap == null ) return null;
+		
+		targetBitmap.setDensity( _bitmapImage.getDensity() );
 
 		Canvas canvas = new Canvas(targetBitmap);
 
@@ -785,8 +773,15 @@ public class jImageView extends ImageView {
 
 		@Override
 		protected Bitmap doInBackground(String... args) {
+			BitmapFactory.Options bo = new BitmapFactory.Options();		
+			
+		    if( bo == null ) return null;
+		    
+		    if( controls.GetDensityAssets() > 0 )
+		     bo.inDensity = controls.GetDensityAssets();
+		     
 			try {
-				return BitmapFactory.decodeStream((InputStream)new URL(args[0]).getContent());
+				return BitmapFactory.decodeStream((InputStream)new URL(args[0]).getContent(), null, bo);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -810,11 +805,17 @@ public class jImageView extends ImageView {
 	}
 
 	public void SaveToFile(String _filename) {
+		
 		if (bmp == null) return;
+		
 		Bitmap image = bmp.copy(Bitmap.Config.ARGB_8888, true);
+		
 		Canvas c = new Canvas(image);
+		
 		draw(c);
+		
 		FileOutputStream fos = null;
+		
 		try {
 			fos = new FileOutputStream(_filename);
 			if (fos != null) {
