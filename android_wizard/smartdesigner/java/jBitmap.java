@@ -23,14 +23,14 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.text.TextPaint;
 import android.util.Log;
 
-//------------------------------------------------------------------------------
-//Graphic API
-//------------------------------------------------------------------------------
-//http://forum.lazarus.freepascal.org/index.php?topic=21568.0
-//https://github.com/alrieckert/lazarus/blob/master/lcl/interfaces/customdrawn/android/bitmap.pas
+//-------------------------------------------------------------------------
+// jBitmap
+// Reviewed by TR3E on 10/10/2019
+//-------------------------------------------------------------------------
 
 public class jBitmap {
 //Java-Pascal Interface
@@ -46,45 +46,29 @@ controls = ctrls;
 
 }
 
-public  void loadFile(String fullFilename) {  //full file name!
-//if (bmp != null) { bmp.recycle(); }
-//Log.i("loadFile", filename);	
-bmp = BitmapFactory.decodeFile(fullFilename);
-}
-
-
-//by jmpessoa
-private int GetDrawableResourceId(String _resName) {
-	  try {
-	     Class<?> res = R.drawable.class;
-	     Field field = res.getField(_resName);  //"drawableName"
-	     int drawableId = field.getInt(null);
-	     return drawableId;
-	  }
-	  catch (Exception e) {
-	     Log.e("jBitmap", "Failure to get drawable id.", e);
-	     return 0;
-	  }
-}
-
-//by jmpessoa
-private Drawable GetDrawableResourceById(int _resID) {
-	if( _resID == 0 ) return null; // by tr3e
+public void loadFile(String fullFilename) {  //full file name!
+	  BitmapFactory.Options bo = new BitmapFactory.Options();		
 	
-	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
+	  if( bo == null ) return;
+	    
+	  if( controls.GetDensityAssets() > 0 )
+	     bo.inDensity = controls.GetDensityAssets();
+	    
+	  bmp = BitmapFactory.decodeFile(fullFilename, bo);
 }
 
 //by jmpessoa
-public  void loadRes(String imgResIdentifier) {
-	    bmp = null;
-	    
-	    int id =	GetDrawableResourceId(imgResIdentifier);
-	    
-	    if( id == 0 ) return; // by tr3e
-	    
-	    BitmapFactory.Options bo = new BitmapFactory.Options();
-	    bo.inScaled = false; 
-	    bmp =  BitmapFactory.decodeResource(this.controls.activity.getResources(), id, bo);	
+public  void loadRes(String _imgResIdentifier) {
+	Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imgResIdentifier));
+	
+	if( d == null ) return;
+	
+	Bitmap b = ((BitmapDrawable)d).getBitmap();
+	
+	if( b == null ) return;
+	
+	bmp = Bitmap.createScaledBitmap(b, b.getWidth(), b.getHeight(), true);
+	// Drawable not need set density
 }
 
 //by jmpessoa
@@ -92,30 +76,47 @@ public  void loadRes(String imgResIdentifier) {
 //options.inSampleSize = 4;
 
 public  void loadFileEx(String fullFilename) {
-//if (bmp != null) { bmp.recycle(); }
-BitmapFactory.Options options = new BitmapFactory.Options();
-options.inSampleSize = 4; // --> 1/4
-bmp = BitmapFactory.decodeFile(fullFilename, options);
+	BitmapFactory.Options bo = new BitmapFactory.Options();
+	
+	if( bo != null ){
+	 if( controls.GetDensityAssets() > 0 )
+	  bo.inDensity = controls.GetDensityAssets();
+	 
+	 bo.inSampleSize = 4; // --> 1/4
+	 bmp = BitmapFactory.decodeFile(fullFilename, bo);
+	}
 }
 
 public  void LoadFile(String _fullFilename, int _shrinkFactor) {
-	 //if (bmp != null) { bmp.recycle(); }
-	  BitmapFactory.Options options = new BitmapFactory.Options();
-	  options.inSampleSize = _shrinkFactor; // 4 --> 1/4
-	  bmp = BitmapFactory.decodeFile(_fullFilename, options);	  
+	
+    BitmapFactory.Options bo = new BitmapFactory.Options();
+	
+	if( bo != null ){
+	 if( controls.GetDensityAssets() > 0 )
+	  bo.inDensity = controls.GetDensityAssets();
+	 
+	 bo.inSampleSize = _shrinkFactor; // 4 --> 1/4
+	 bmp = BitmapFactory.decodeFile(_fullFilename, bo);
+	}	  
 }
 
 public  void createBitmap(int w, int h) {
- //if (bmp != null) { bmp.recycle(); }
  bmp = Bitmap.createBitmap( w,h, Bitmap.Config.ARGB_8888 );
+ 
+ if( (bmp != null) &&  (controls.GetDensityAssets() > 0) )
+	 bmp.setDensity( controls.GetDensityAssets() );
 }
 
 public Bitmap LoadFromFile(String _fullFilename) {  //pascal  "GetImageFromFile"
-	 //if (bmp != null) { bmp.recycle(); }
-	  BitmapFactory.Options bo = new BitmapFactory.Options();
-	  bo.inScaled = false; 	   
-          bmp = BitmapFactory.decodeFile(_fullFilename, bo);	  
-          return bmp;
+    BitmapFactory.Options bo = new BitmapFactory.Options();
+	
+	if( bo != null ){
+	 if( controls.GetDensityAssets() > 0 )
+	  bo.inDensity = controls.GetDensityAssets();
+	 
+	 return BitmapFactory.decodeFile(_fullFilename, bo);
+	}else
+		return null;
 }
 
 public  int[] getWH() {
@@ -167,6 +168,7 @@ public byte[] GetByteArrayFromBitmap() {
   if(bmp == null) return null;
   
   ByteArrayOutputStream stream = new ByteArrayOutputStream();
+  
   this.bmp.compress(CompressFormat.PNG, 0, stream); //O: PNG will ignore the quality setting...
   //Log.i("GetByteArrayFromBitmap","size="+ stream.size());
   return stream.toByteArray();
@@ -175,7 +177,14 @@ public byte[] GetByteArrayFromBitmap() {
 public void SetByteArrayToBitmap(byte[] image) {
 	if(image == null) return;
 	
-	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+	BitmapFactory.Options bo = new BitmapFactory.Options();
+	
+	if( bo == null ) return;
+	  
+	if( controls.GetDensityAssets() > 0 )
+	 bo.inDensity = controls.GetDensityAssets();
+	
+	this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length, bo);
 	//Log.i("SetByteArrayToBitmap","size="+ image.length);
 }
 
@@ -187,7 +196,12 @@ public Bitmap ClockWise(Bitmap _bmp){
 		
 	  matrix.postRotate(90);
 	  
-	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);    
+	  Bitmap bmpRotate = Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);
+	  
+	  if( bmpRotate != null )
+	   bmpRotate.setDensity( _bmp.getDensity() );
+	  
+	  return bmpRotate;
 } 
 
 public Bitmap AntiClockWise(Bitmap _bmp){
@@ -198,7 +212,12 @@ public Bitmap AntiClockWise(Bitmap _bmp){
 		
 	  matrix.postRotate(-90);
 	  
-	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);    
+	  Bitmap bmpRotate = Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);
+	  
+	  if( bmpRotate != null )
+		   bmpRotate.setDensity( _bmp.getDensity() );
+		  
+	  return bmpRotate;
 }
 
 public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {
@@ -211,7 +230,12 @@ public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {
 	  matrix.postScale(_scaleX, _scaleY);
 	  // RECREATE THE NEW BITMAP 
 		
-	  return Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);	   
+	  Bitmap bmpScale = Bitmap.createBitmap(_bmp , 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);
+	  
+	  if( bmpScale != null )
+		  bmpScale.setDensity( _bmp.getDensity() );
+		  
+	  return bmpScale;
 }
 
 public Bitmap SetScale(float _scaleX, float _scaleY ) {      
@@ -222,7 +246,12 @@ public Bitmap SetScale(float _scaleX, float _scaleY ) {
 		// RESIZE THE BIT MAP
 		matrix.postScale(_scaleX, _scaleY);
 		// RECREATE THE NEW BITMAP 
-		return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+		Bitmap bmpScale =  Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+		
+		if( (bmpScale != null) && (controls.GetDensityAssets() > 0) )
+			bmpScale.setDensity( controls.GetDensityAssets() );
+			  
+		return bmpScale;
 }
 
 public Bitmap LoadFromAssets(String strName)
@@ -235,7 +264,15 @@ public Bitmap LoadFromAssets(String strName)
       e.printStackTrace();
       return null;
   }
-  bmp = BitmapFactory.decodeStream(istr);    
+  
+  BitmapFactory.Options bo = new BitmapFactory.Options();
+	
+  if( bo == null ) return null;
+	  
+  if( controls.GetDensityAssets() > 0 )
+	 bo.inDensity = controls.GetDensityAssets();
+	
+  bmp = BitmapFactory.decodeStream(istr, null, bo);    
   return bmp;
 }
 
@@ -245,10 +282,16 @@ public Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
 	
  float factorH = _newHeight / (float)_bmp.getHeight();
  float factorW = _newWidth / (float)_bmp.getWidth();
+ 
  float factorToUse = (factorH > factorW) ? factorW : factorH;
+ 
  Bitmap bm = Bitmap.createScaledBitmap(_bmp,
    (int) (_bmp.getWidth() * factorToUse),
-   (int) (_bmp.getHeight() * factorToUse),false);     
+   (int) (_bmp.getHeight() * factorToUse),true);
+ 
+ if( (bm != null) && (controls.GetDensityAssets() > 0) )
+	 bm.setDensity( _bmp.getDensity() );
+ 
  return bm;
 }
 
@@ -257,10 +300,16 @@ public Bitmap GetResizedBitmap(int _newWidth, int _newHeight){
 	
  float factorH = _newHeight / (float)bmp.getHeight();
  float factorW = _newWidth / (float)bmp.getWidth();
+ 
  float factorToUse = (factorH > factorW) ? factorW : factorH;
+ 
  Bitmap bm = Bitmap.createScaledBitmap(bmp,
    (int) (bmp.getWidth() * factorToUse),
-   (int) (bmp.getHeight() * factorToUse),false);     
+   (int) (bmp.getHeight() * factorToUse),true);
+ 
+ if( (bm != null) && (controls.GetDensityAssets() > 0) )
+	 bm.setDensity( bmp.getDensity() );
+ 
  return bm;
 }
 
@@ -268,9 +317,14 @@ public Bitmap GetResizedBitmap(float _factorScaleX, float _factorScaleY ){
  if(bmp == null) return null;
 	
  float factorToUse = (_factorScaleY > _factorScaleX) ? _factorScaleX : _factorScaleY;
+ 
  Bitmap bm = Bitmap.createScaledBitmap(bmp,
    (int) (bmp.getWidth() * factorToUse),
-   (int) (bmp.getHeight() * factorToUse),false);     
+   (int) (bmp.getHeight() * factorToUse),true);
+ 
+ if( (bm != null) && (controls.GetDensityAssets() > 0) )
+	 bm.setDensity( bmp.getDensity() );
+ 
  return bm;
 }
 
@@ -283,8 +337,8 @@ public ByteBuffer GetByteBuffer(int _width, int _height) {
 public ByteBuffer GetByteBufferFromBitmap(Bitmap _bmap) {
 	if( _bmap == null ) return null;
 	
-	int w =  _bmap.getWidth();
-	int h =_bmap.getHeight();
+	int w = _bmap.getWidth();
+	int h = _bmap.getHeight();
 	//Log.i("w="+w, "h="+h); ok
 	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);  	
 	_bmap.copyPixelsToBuffer(graphicBuffer);
@@ -296,8 +350,8 @@ public ByteBuffer GetByteBufferFromBitmap() {
 	
 	if (bmp == null) return null;
 	
-	int w =  bmp.getWidth();
-	int h =bmp.getHeight();
+	int w = bmp.getWidth();
+	int h = bmp.getHeight();
 	
 	ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w*h*4);  	
 	bmp.copyPixelsToBuffer(graphicBuffer);
@@ -312,14 +366,27 @@ public Bitmap GetBitmapFromByteBuffer(ByteBuffer _byteBuffer, int _width, int _h
 	
 	_byteBuffer.rewind();  //reset position
 	bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);					 
-    bmp.copyPixelsFromBuffer(_byteBuffer); 	
+    bmp.copyPixelsFromBuffer(_byteBuffer);
+    
+    if( (bmp != null) && (controls.GetDensityAssets() > 0) )
+    	bmp.setDensity( bmp.getDensity() );
+    
     return bmp;
 }
 
 public Bitmap GetBitmapFromByteArray(byte[] _image) {
 	if( _image == null ) return null;
+	
+	BitmapFactory.Options bo = new BitmapFactory.Options();
+	
+	if( bo == null ) return null;
+	
+	if( controls.GetDensityAssets() > 0 )
+	 bo.inDensity = controls.GetDensityAssets();
+	
  //this.bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
-	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length);
+	bmp = BitmapFactory.decodeByteArray(_image, 0, _image.length, bo);
+	
 	return bmp;	
 }
 
@@ -356,6 +423,10 @@ public Bitmap GetRoundedShape(Bitmap _bitmapImage, int _diameter) {
 
  Bitmap targetBitmap = Bitmap.createBitmap(targetWidth, 
          targetHeight,Bitmap.Config.ARGB_8888);
+ 
+ if( targetBitmap == null ) return null;
+ 
+ targetBitmap.setDensity(_bitmapImage.getDensity());
 
  Canvas canvas = new Canvas(targetBitmap);
 
@@ -398,6 +469,8 @@ public Bitmap DrawText(Bitmap _bitmapImage, String _text, int _left, int _top, i
         if (bmp == null) return null;
 
         Bitmap mutableBitmap = bmp.copy(Bitmap.Config.ARGB_8888, true);
+        mutableBitmap.setDensity( bmp.getDensity() );
+        
         Canvas canvas = new Canvas(mutableBitmap);
         TextPaint textPaint = new TextPaint();
         textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
@@ -415,6 +488,7 @@ public Bitmap DrawText(Bitmap _bitmapImage, String _text, int _left, int _top, i
         if (bmp == null) return null;
 
         Bitmap mutableBitmap = bmp.copy(Bitmap.Config.ARGB_8888, true);
+        mutableBitmap.setDensity( bmp.getDensity() );
 
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
@@ -456,18 +530,32 @@ public Bitmap DrawText(Bitmap _bitmapImage, String _text, int _left, int _top, i
 
     public Bitmap CreateBitmap(int _width, int _height, int _backgroundColor) {
         bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);
+        
+        if( (bmp != null) && (controls.GetDensityAssets() > 0) )
+        	bmp.setDensity( controls.GetDensityAssets() );
+        
         Canvas canvas = new Canvas(bmp);
         Paint paintBg = new Paint();
         paintBg.setColor(_backgroundColor); //Color.GRAY
         canvas.drawRect(0, 0, _width, _height, paintBg);
+        
         return bmp;
     }
 
-    // by Kordal
+    // by TR3E
     public void LoadFromBuffer(byte[] buffer) {
         if (buffer == null) return;
+        
         ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
-        this.bmp = BitmapFactory.decodeStream(stream);
+        
+        BitmapFactory.Options bo = new BitmapFactory.Options();		
+		
+  	    if( bo == null ) return;
+  	    
+  	    if( controls.GetDensityAssets() > 0 )
+  	     bo.inDensity = controls.GetDensityAssets();
+        
+        bmp = BitmapFactory.decodeStream(stream, null, bo);
     }
 
 }
