@@ -10999,7 +10999,7 @@ begin
   FMarginRight  := 5;
   FWidth        := 72;
   FHeight       := 72;
-  FSleepDown    := 0;
+  FSleepDown    := 150;
   FAlpha        := 255;
 end;
 
@@ -11311,8 +11311,11 @@ end;
 
 procedure jImageBtn.SetSleepDown(_sleepMiliSeconds: integer);
 begin
+  if _sleepMiliSeconds <= 0 then exit;
+
   //in designing component state: set value here...
   FSleepDown:= _sleepMiliSeconds;
+  
   if FInitialized then
      jImageBtn_SetSleepDown(FjEnv, FjObject, _sleepMiliSeconds);
 end;

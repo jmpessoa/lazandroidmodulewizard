@@ -36,7 +36,7 @@ public class jImageBtn extends ImageView {
 	
 	private int             btnState = 0;      // Normal/Up = 0 , Pressed = 1
 	private Boolean         enabled  = true;   //
-	private int             sleep = 150;
+	private int             mSleep   = 150;
 	
 	private ImageView       mImage = null;
 
@@ -84,7 +84,7 @@ public class jImageBtn extends ImageView {
 							 controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
 							}
 						}
-					}, sleep);  //1s = 1000ms
+					}, mSleep);  //1s = 1000ms
 
 					break;
 				}				
@@ -205,7 +205,7 @@ public class jImageBtn extends ImageView {
     }
 
 	public void SetSleepDown(int _sleepMiliSeconds) {
-        sleep = _sleepMiliSeconds;
+        mSleep = _sleepMiliSeconds;
 	}
 
 	public  void setEnabled(boolean value) {
