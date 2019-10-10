@@ -8,11 +8,16 @@ object AndroidModule1: TAndroidModule1
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
-  OnCreate = DataModuleCreate
+  AutoAssignIDs = True
+  OnInit = AndroidModule1Init
+  OnCreate = AndroidModule1Create
   Text = 'AndroidModule1'
   ActivityMode = actSplash
   BackgroundColor = colbrWhite
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnCloseQuery = AndroidModule1CloseQuery
   OnJNIPrompt = DataModuleJNIPrompt
   OnClose = DataModuleClose
@@ -29,7 +34,7 @@ object AndroidModule1: TAndroidModule1
     Enabled = True
     Visible = True
     Anchor = jImageView1
-    Id = 855478
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -54,7 +59,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 0
     Enabled = True
     Visible = True
-    Id = 11952
+    Id = 0
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterInParent]
     LayoutParamWidth = lpWrapContent
@@ -65,6 +70,8 @@ object AndroidModule1: TAndroidModule1
     ImageScaleType = scaleCenter
     GravityInParent = lgNone
     RoundedShape = False
+    AnimationDurationIn = 1500
+    AnimationMode = animNone
   end
   object jImageView2: jImageView
     Left = 114
@@ -89,6 +96,8 @@ object AndroidModule1: TAndroidModule1
     ImageScaleType = scaleFitCenter
     GravityInParent = lgNone
     RoundedShape = False
+    AnimationDurationIn = 1500
+    AnimationMode = animNone
   end
   object jTimer1: jTimer
     Enabled = False

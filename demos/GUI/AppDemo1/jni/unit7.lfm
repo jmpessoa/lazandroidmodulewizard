@@ -1,30 +1,34 @@
 object AndroidModule7: TAndroidModule7
   Left = 322
-  Top = 118
+  Top = 0
   Width = 300
-  Height = 745
+  Height = 718
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
+  AutoAssignIDs = True
   Text = 'AndroidModule7'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnCloseQuery = DataModuleCloseQuery
   object jTextView1: jTextView
-    Left = 60
+    Left = 84
     Top = 10
-    Width = 179
-    Height = 26
+    Width = 132
+    Height = 19
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Enabled = True
     Visible = True
-    Id = 69181
+    Id = 0
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -40,9 +44,9 @@ object AndroidModule7: TAndroidModule7
   end
   object jScrollView1: jScrollView
     Left = 10
-    Top = 102
+    Top = 88
     Width = 280
-    Height = 433
+    Height = 430
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -50,7 +54,7 @@ object AndroidModule7: TAndroidModule7
     Enabled = True
     Visible = True
     Anchor = jTextView2
-    Id = 23460
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
@@ -70,7 +74,7 @@ object AndroidModule7: TAndroidModule7
       MarginBottom = 5
       Enabled = True
       Visible = True
-      Id = 7100012
+      Id = 0
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -80,6 +84,9 @@ object AndroidModule7: TAndroidModule7
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
       GravityInParent = lgNone
+      RoundedShape = False
+      AnimationDurationIn = 1500
+      AnimationMode = animNone
     end
     object jImageView2: jImageView
       Left = 104
@@ -93,7 +100,7 @@ object AndroidModule7: TAndroidModule7
       Enabled = True
       Visible = True
       Anchor = jImageView1
-      Id = 3953947
+      Id = 0
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -103,6 +110,9 @@ object AndroidModule7: TAndroidModule7
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
       GravityInParent = lgNone
+      RoundedShape = False
+      AnimationDurationIn = 1500
+      AnimationMode = animNone
     end
     object jImageView3: jImageView
       Tag = 1
@@ -117,7 +127,7 @@ object AndroidModule7: TAndroidModule7
       Enabled = True
       Visible = True
       Anchor = jImageView2
-      Id = 7668691
+      Id = 0
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -127,6 +137,9 @@ object AndroidModule7: TAndroidModule7
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
       GravityInParent = lgNone
+      RoundedShape = False
+      AnimationDurationIn = 1500
+      AnimationMode = animNone
     end
     object jImageView4: jImageView
       Tag = 1
@@ -141,7 +154,7 @@ object AndroidModule7: TAndroidModule7
       Enabled = True
       Visible = True
       Anchor = jImageView3
-      Id = 3535108
+      Id = 0
       PosRelativeToAnchor = [raBelow]
       PosRelativeToParent = [rpCenterHorizontal]
       LayoutParamWidth = lpWrapContent
@@ -151,6 +164,9 @@ object AndroidModule7: TAndroidModule7
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
       GravityInParent = lgNone
+      RoundedShape = False
+      AnimationDurationIn = 1500
+      AnimationMode = animNone
     end
     object jImageView5: jImageView
       Tag = 1
@@ -175,13 +191,16 @@ object AndroidModule7: TAndroidModule7
       BackgroundColor = colbrDefault
       ImageScaleType = scaleCenter
       GravityInParent = lgNone
+      RoundedShape = False
+      AnimationDurationIn = 1500
+      AnimationMode = animNone
     end
   end
   object jTextView2: jTextView
-    Left = 30
-    Top = 56
-    Width = 240
-    Height = 26
+    Left = 58
+    Top = 49
+    Width = 184
+    Height = 19
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -189,7 +208,7 @@ object AndroidModule7: TAndroidModule7
     Enabled = True
     Visible = True
     Anchor = jTextView1
-    Id = 10102
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -204,10 +223,10 @@ object AndroidModule7: TAndroidModule7
     GravityInParent = lgNone
   end
   object jTextView3: jTextView
-    Left = 178
-    Top = 555
-    Width = 112
-    Height = 26
+    Left = 207
+    Top = 538
+    Width = 83
+    Height = 19
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
@@ -231,7 +250,7 @@ object AndroidModule7: TAndroidModule7
   end
   object jImageBtn1: jImageBtn
     Left = 113
-    Top = 550
+    Top = 533
     Width = 74
     Height = 74
     MarginLeft = 5
@@ -241,15 +260,16 @@ object AndroidModule7: TAndroidModule7
     Enabled = True
     Visible = True
     Anchor = jScrollView1
-    Id = 1575872
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
-    LayoutParamWidth = lp48px
-    LayoutParamHeight = lp48px
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
     Images = jImageList1
     IndexImageUp = 2
     IndexImageDown = 4
+    SleepDown = 0
     GravityInParent = lgNone
     OnClick = jImageBtn1Click
   end
