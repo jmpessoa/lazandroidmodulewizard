@@ -191,7 +191,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    public Menu AddMenu(String _headerTitle) {	    
 	    Menu menu = this.getMenu();	    
 	    Menu submenu = menu.addSubMenu(_headerTitle);	    
-	    //submenu.setHeaderIcon(GetDrawableResourceId(_headerIconIdentifier));
+	    //submenu.setHeaderIcon(controls.GetDrawableResourceId(_headerIconIdentifier));
 	    this.invalidate();
 	    return submenu;
    }	   
@@ -313,26 +313,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    public Bitmap GetRoundedShape(Bitmap _bitmapImage) {
    	return GetRoundedShape(_bitmapImage, 0);
    }
-
-   
-   public int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     Log.e("jForm", "Failure to get drawable id.", e);
-		     return 0;
-		  }
-	}
-
-   /*
-   public Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
-	}
-    */
       
    private Bitmap GetBitmapFromById(int _resID) {
 	    if( _resID == 0 ) return null; // by tr3e

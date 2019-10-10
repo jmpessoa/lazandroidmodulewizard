@@ -355,25 +355,6 @@ class jArrayAdapter extends ArrayAdapter {
 	    return (int)TypedValue.applyDimension(unit, size, metrics);
 	}
 
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null; // by tr3e
-		
-		return ctx.getResources().getDrawable(_resID);
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-
 	public void setFilter(ArrayList<jListItemRow> list, String query) {
         items = list;
         thisAdapter.getFilter().filter((CharSequence) query);
@@ -1906,27 +1887,8 @@ public class jListView extends ListView {
 		aadapter.notifyDataSetChanged();
 	}
 
-	private int GetDrawableResourceId(String _resName) {
-		try {
-			Class<?> res = R.drawable.class;
-			Field field = res.getField(_resName);  //"drawableName"
-			int drawableId = field.getInt(null);
-			return drawableId;
-		}
-		catch (Exception e) {
-			Log.e("ListView", "Failure to get drawable id.", e);
-			return 0;
-		}
-	}
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null;
-		
-		return this.controls.activity.getResources().getDrawable(_resID);
-	}
-
 	public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable		
-		Drawable d = GetDrawableResourceById(GetDrawableResourceId(imgResIdentifier));
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(imgResIdentifier));
 		
 		if( d != null ){
 		 alist.get(index).bmp = ((BitmapDrawable)d).getBitmap();		
@@ -1935,7 +1897,7 @@ public class jListView extends ListView {
 	}
 
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
-		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
 		if( d != null )
 		 genericBmp = ((BitmapDrawable)d).getBitmap();	

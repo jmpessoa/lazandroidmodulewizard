@@ -127,27 +127,8 @@ public class jToggleButton extends ToggleButton /*dummy*/ { //please, fix what G
       return this.IsChecked();
    }
 
-   private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
-      try {
-         Class<?> res = R.drawable.class;
-         Field field = res.getField(_resName);  //"drawableName"
-         int drawableId = field.getInt(null);
-         return drawableId;
-      }
-      catch (Exception e) {
-         Log.e("toglebutton", "Failure to get drawable id.", e);
-         return 0;
-      }
-   }
-
-   private Drawable GetDrawableResourceById(int _resID) {
-	  if( _resID == 0 ) return null; // by tr3e
-	   
-      return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-   }
-
    public void SetBackgroundDrawable(String _imageIdentifier) {
-      this.setBackgroundDrawable(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
+      this.setBackgroundDrawable(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageIdentifier)));
    }
 
    public void DispatchOnToggleEvent(boolean _value) {

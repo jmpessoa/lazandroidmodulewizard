@@ -277,8 +277,8 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
     }
 
     public void SetGroundImageOverlay(double _latitude, double _longitude, String _imageIdentifier, float _dimMetters) {
-        int resId = GetDrawableResourceId(_imageIdentifier);
-        Drawable d = GetDrawableResourceById(resId);
+        int resId = controls.GetDrawableResourceId(_imageIdentifier);
+        Drawable d = controls.GetDrawableResourceById(resId);
         GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
         GroundOverlay myGroundOverlay = new GroundOverlay();
         myGroundOverlay.setPosition(geoPoint);
@@ -297,19 +297,6 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             Log.e("jcOpenMapView", "Failure to get drawable id.", e);
             return 0;
         }
-    }
-
-    public Drawable GetDrawableResourceById(int _resID) {
-        if (_resID == 0) return null; // by tr3e
-        Drawable res = null;
-        if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
-            res = this.controls.activity.getResources().getDrawable(_resID);
-        }
-        //[ifdef_api21up]
-        if (Build.VERSION.SDK_INT >= 21) {
-            res = this.controls.activity.getResources().getDrawable(_resID, null);
-        }//[endif_api21up]
-        return res;
     }
 
     /**
@@ -423,7 +410,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         marker.setPosition(geoPoint);
         marker.setTitle(_iconIdentifier);
         marker.setAnchor(mX, mY);
-        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         marker.setRotation(_rotationAngleDeg);
         //marker.setInfoWindow(null);
         marker.setDraggable(true);
@@ -449,7 +436,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         marker.setPosition(geoPoint);
         marker.setTitle(_iconIdentifier);
         marker.setAnchor(mX, mY);
-        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         //marker.setInfoWindow(null);
         marker.setDraggable(true);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -476,9 +463,9 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         //marker.setSnippet("Département INFO, IUT de Lannion");
         //marker.setAlpha(0.75f);
         //nodeMarker.setSubDescription(Road.getLengthDurationText(controls.activity, _node.mLength, _node.mDuration));
-        //nodeMarker.setImage(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
+        //nodeMarker.setImage(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageIdentifier)));
         marker.setAnchor(mX, mY);
-        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         marker.setRotation(_rotationAngleDeg);
         marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -505,9 +492,9 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         //marker.setSnippet("Département INFO, IUT de Lannion");
         //marker.setAlpha(0.75f);
         //nodeMarker.setSubDescription(Road.getLengthDurationText(controls.activity, _node.mLength, _node.mDuration));
-        //nodeMarker.setImage(GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier)));
+        //nodeMarker.setImage(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageIdentifier)));
         marker.setAnchor(mX, mY);
-        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
@@ -533,7 +520,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         marker.setSnippet(_snippetInfo);
         //marker.setAlpha(0.75f);
         marker.setAnchor(mX, mY);
-        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
@@ -563,7 +550,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             marker.setSnippet(_snippetInfo);
             //marker.setAlpha(0.75f);
             marker.setAnchor(mX, mY);
-            marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+            marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
             marker.setDraggable(IsMarkerDraggable);
             marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
@@ -593,7 +580,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             //marker.setSnippet(_snippetInfo);
             //marker.setAlpha(0.75f);
             marker.setAnchor(mX, mY);
-            marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+            marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
             marker.setDraggable(IsMarkerDraggable);
             marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
@@ -619,9 +606,9 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         marker.setTitle(_title);
         marker.setSnippet(_snippetInfo);
         //marker.setAlpha(0.75f);
-        marker.setImage(GetDrawableResourceById(GetDrawableResourceId(_snippetImageIdentifier)));
+        marker.setImage(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_snippetImageIdentifier)));
         marker.setAnchor(mX, mY);
-        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_markerIconIdentifier)));
+        marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_markerIconIdentifier)));
         marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
@@ -644,7 +631,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         Marker marker = new Marker(this);
         marker.setPosition(geoPoint);
         marker.setAnchor(mX, mY);
-        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         marker.setTitle(_title);
         marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -666,7 +653,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         Marker marker = new Marker(this);
         marker.setPosition(geoPoint);
         marker.setAnchor(mX, mY);
-        marker.setIcon(GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier)));
+        marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         marker.setTitle(_title);
         marker.setSnippet(_snippetInfo);
         marker.setDraggable(IsMarkerDraggable);

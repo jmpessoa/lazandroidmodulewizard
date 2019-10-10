@@ -501,28 +501,10 @@ public class jEditText extends EditText {
 
 	public void SelectAll() {
 		this.selectAll();
-	}
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null; // by tr3e
-		
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
 	}	
 	
 	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));
+		this.setBackgroundResource(controls.GetDrawableResourceId(_imgResIdentifier));
 	}		
 
 	public void SetBackgroundByImage(Bitmap _image) {
@@ -561,11 +543,8 @@ public class jEditText extends EditText {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
 		
-		if( id == 0 ) return;
-		
-		Drawable d = GetDrawableResourceById(id);
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
 		if( d == null ) return;
 		
