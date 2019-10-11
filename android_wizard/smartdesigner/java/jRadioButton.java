@@ -128,27 +128,7 @@ public class jRadioButton extends RadioButton {
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
-	}
-	
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null; // by tr3e
-		
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-	
+	}	
 	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
@@ -166,11 +146,8 @@ public class jRadioButton extends RadioButton {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
 		
-		if( id == 0 ) return; // by tr3e
-		
-		Drawable d = GetDrawableResourceById(id);
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
 		if( d == null ) return;
 		

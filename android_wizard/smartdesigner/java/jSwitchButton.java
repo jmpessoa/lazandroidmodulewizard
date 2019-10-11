@@ -119,30 +119,11 @@ public class jSwitchButton extends Switch /*API 14*/ { //please, fix what GUI ob
    public boolean IsChecked(){
       return this.IsChecked();
    }
-   
-   /*
-   private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
-   }
-   */
-
-   private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
-      try {
-         Class<?> res = R.drawable.class;
-         Field field = res.getField(_resName);  //"drawableName"
-         int drawableId = field.getInt(null);
-         return drawableId;
-      }
-      catch (Exception e) {
-         Log.e("jSwitchButton", "Failure to get drawable id.", e);
-         return 0;
-      }
-   }
 
    public void SetThumbIcon(String _thumbIconIdentifier) {	   //Api  16
       //[ifdef_api16up]
       if (Build.VERSION.SDK_INT >= 16) {
-         this.setThumbResource(GetDrawableResourceId(_thumbIconIdentifier));
+         this.setThumbResource(controls.GetDrawableResourceId(_thumbIconIdentifier));
       }
       //[endif_api14up]
    }

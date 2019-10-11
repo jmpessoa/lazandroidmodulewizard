@@ -1701,6 +1701,10 @@ public int systemVersion;
 
 private int javaNewId = 100000;   // To assign java id from 100001 onwards [by TR3E]
 
+//Sets the density at which an asset image should be loaded.
+//This is done so that the same image looks the same on different devices with different densities.
+private int densityForAssets = 0;      // (0 Not set)
+
 //Jave -> Pascal Function ( Pascal Side = Event )
 public native void pAppOnCreate(Context context, RelativeLayout layout, Intent intent);
 public native int  pAppOnScreenStyle();
@@ -1802,6 +1806,57 @@ public  void jAppOnRequestPermissionResult(int requestCode, String permission, i
 public int getJavaNewId(){
 	javaNewId = javaNewId + 1;
 	return javaNewId;
+}
+
+public int GetJavaLastId(){
+	return javaNewId;
+}
+
+// We assign the density for the correct scaling of assets images
+
+public void SetDensityAssets( int _density ){
+	densityForAssets = _density;
+}
+
+public int GetDensityAssets( ){
+	return densityForAssets;
+}
+
+// For reuse and avoid repeating errors
+
+public int GetDrawableResourceId(String _resName) {
+	  try {
+	     Class<?> res = R.drawable.class;
+	     Field field = res.getField(_resName);  //"drawableName"
+	     
+	     if( field != null ){
+	    	int drawableId = field.getInt(null);
+	      	return drawableId;
+	     } else
+	    	 return 0;
+	  }
+	  catch (Exception e) {
+	     //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
+	     return 0;
+	  }
+}
+
+public Drawable GetDrawableResourceById(int _resID) {
+			
+	if( _resID == 0 ) return null;
+	
+	Drawable res = null;
+	
+	if (android.os.Build.VERSION.SDK_INT < 21 ) {
+		res = activity.getResources().getDrawable(_resID);
+	}
+	
+	//[ifdef_api21up]
+	if(android.os.Build.VERSION.SDK_INT >= 21)
+		res = activity.getResources().getDrawable(_resID, null);
+    //[endif_api21up]
+					
+	return res;
 }
 
 //// -------------------------------------------------------------------------

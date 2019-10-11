@@ -1,6 +1,6 @@
 object AndroidModule10: TAndroidModule10
-  Left = 332
-  Top = 59
+  Left = 844
+  Top = 156
   Width = 300
   Height = 600
   MarginLeft = 0
@@ -8,25 +8,29 @@ object AndroidModule10: TAndroidModule10
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
+  AutoAssignIDs = True
   OnCreate = DataModuleCreate
   Text = 'AndroidModule10'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnCloseQuery = AndroidModule10CloseQuery
   OnJNIPrompt = AndroidModule10JNIPrompt
   object jTextView1: jTextView
-    Left = 52
+    Left = 74
     Top = 10
-    Width = 195
-    Height = 26
+    Width = 151
+    Height = 19
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Enabled = True
     Visible = True
-    Id = 19240
+    Id = 0
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -43,7 +47,7 @@ object AndroidModule10: TAndroidModule10
   object jCanvasES1_1: jCanvasES1
     Tag = 1
     Left = 10
-    Top = 123
+    Top = 107
     Width = 280
     Height = 240
     MarginLeft = 10
@@ -53,7 +57,7 @@ object AndroidModule10: TAndroidModule10
     Enabled = True
     Visible = True
     Anchor = jButton1
-    Id = 31633
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
@@ -66,9 +70,9 @@ object AndroidModule10: TAndroidModule10
   end
   object jButton1: jButton
     Left = 5
-    Top = 51
+    Top = 44
     Width = 150
-    Height = 57
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -76,7 +80,7 @@ object AndroidModule10: TAndroidModule10
     Enabled = True
     Visible = True
     Anchor = jTextView1
-    Id = 72076
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpHalfOfParent
@@ -91,9 +95,9 @@ object AndroidModule10: TAndroidModule10
   end
   object jButton2: jButton
     Left = 165
-    Top = 51
+    Top = 44
     Width = 150
-    Height = 57
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -116,9 +120,9 @@ object AndroidModule10: TAndroidModule10
   end
   object jButton3: jButton
     Left = 5
-    Top = 378
+    Top = 362
     Width = 290
-    Height = 57
+    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -126,7 +130,7 @@ object AndroidModule10: TAndroidModule10
     Enabled = True
     Visible = True
     Anchor = jCanvasES1_1
-    Id = 34322
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent

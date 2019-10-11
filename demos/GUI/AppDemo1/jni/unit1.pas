@@ -19,11 +19,12 @@ type
       jTextView1: jTextView;
       jTimer1: jTimer;
       procedure AndroidModule1CloseQuery(Sender: TObject; var CanClose: boolean);
+      procedure AndroidModule1Create(Sender: TObject);
+      procedure AndroidModule1Init(Sender: TObject);
       procedure AndroidModule1RequestPermissionResult(Sender: TObject;
         requestCode: integer; manifestPermission: string;
         grantResult: TManifestPermissionResult);
       procedure DataModuleClose(Sender: TObject);
-      procedure DataModuleCreate(Sender: TObject);
       procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jTimer1Timer(Sender: TObject);
     private
@@ -43,12 +44,6 @@ implementation
 
 { TAndroidModule1 }
 
-procedure TAndroidModule1.DataModuleCreate(Sender: TObject);
-begin
-  cnt_Timer:= 0;
-  cnt_Image:= -1;
-end;
-
 procedure TAndroidModule1.DataModuleClose(Sender: TObject);
 begin
   jTimer1.Enabled:= False;
@@ -60,6 +55,17 @@ procedure TAndroidModule1.AndroidModule1CloseQuery(Sender: TObject;
   var CanClose: boolean);
 begin
   ShowMessage('form 1 can close....')
+end;
+
+procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
+begin
+  cnt_Timer:= 0;
+  cnt_Image:= -1;
+end;
+
+procedure TAndroidModule1.AndroidModule1Init(Sender: TObject);
+begin
+ gapp.SetDensityAssets(daHIGH);
 end;
 
 procedure TAndroidModule1.AndroidModule1RequestPermissionResult(

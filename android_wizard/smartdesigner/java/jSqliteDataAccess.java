@@ -752,24 +752,6 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
    return 0;
  }
 
- private int GetDrawableResourceId(String _resName) {
-  try {
-   Class < ? > res = R.drawable.class;
-   Field field = res.getField(_resName); //"drawableName"
-   int drawableId = field.getInt(null);
-   return drawableId;
-  } catch (Exception e) {
-   Log.e("jSqliteDataAccess", "Failure to get drawable id.", e);
-   return 0;
-  }
- }
-
- private Drawable GetDrawableResourceById(int _resID) {
-  if( _resID == 0 ) return null; // by tr3e
-  
-  return this.controls.activity.getResources().getDrawable(_resID);
- }
-
  public boolean UpdateImage(String tabName, String imageFieldName, String keyFieldName, Bitmap imageValue, int keyValue) {
   SQLiteDatabase mydb = getWritableDatabase();
   
@@ -1134,7 +1116,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   boolean result = false;
 	  
   ByteArrayOutputStream stream = new ByteArrayOutputStream();
-  Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+  Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
   
   if( d == null ) return false;
   

@@ -80,7 +80,7 @@ public class jMenu /*extends ...*/ {
     	  mMenu = _menu;
           String _resName = "ic_launcher"; //ok       
           MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);       
-          item.setIcon(GetDrawableResourceId(_resName));          
+          item.setIcon(controls.GetDrawableResourceId(_resName));          
        }
     }
     
@@ -191,27 +191,9 @@ public class jMenu /*extends ...*/ {
       controls.activity.unregisterForContextMenu(_view); 
     }  
     
-//http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
-   //Just note that in case you want to retrieve Views (Buttons, TextViews, etc.) 
+    //http://daniel-codes.blogspot.com.br/2009/12/dynamically-retrieving-resources-in.html
+    //Just note that in case you want to retrieve Views (Buttons, TextViews, etc.) 
     //you must implement R.id.class instead of R.drawable.
-    private int GetDrawableResourceId(String _resName) {
-    	  try {
-    	     Class<?> res = R.drawable.class;
-    	     Field field = res.getField(_resName);  //"drawableName"
-    	     int drawableId = field.getInt(null);
-    	     return drawableId;
-    	  }
-    	  catch (Exception e) {
-    	     Log.e("MyTag", "Failure to get drawable id.", e);
-    	     return 0;
-    	  }
-    }
-    
-    private Drawable GetDrawableResourceById(int _resID) {
-    	if( _resID == 0 ) return null; // by tr3e
-    	
-    	return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-    }
     
     //_itemType --> 0:Default, 1:Checkable
     public void AddItem(Menu _menu, int _itemID, String _caption, String _iconIdentifier, int _itemType, int _showAsAction){
@@ -222,7 +204,7 @@ public class jMenu /*extends ...*/ {
     	    case 1:  item.setCheckable(true); break;    	
     	 }    	
          if (!_iconIdentifier.equals("")) {
-           item.setIcon(GetDrawableResourceId(_iconIdentifier)); 
+           item.setIcon(controls.GetDrawableResourceId(_iconIdentifier)); 
          }                     
          switch (_showAsAction) {
            case 0: item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); break;
@@ -249,7 +231,7 @@ public class jMenu /*extends ...*/ {
     	if (_menu != null) {
     	   mMenu = _menu;	
      	   sm =_menu.addSubMenu((CharSequence)_title); //main title     	        	       	  
-     	   sm.setHeaderIcon(GetDrawableResourceId(_headerIconIdentifier));
+     	   sm.setHeaderIcon(controls.GetDrawableResourceId(_headerIconIdentifier));
     	   mSubMenus[mCountSubMenu] = sm;      	       	     	       	       	   
     	   mCountSubMenu++; 
     	}   

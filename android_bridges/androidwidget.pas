@@ -53,6 +53,9 @@ type
 
   TAppTheme = (actThemeOverlayAppCompatDarkActionBar);
 
+  TDensityAssets = (daNONE=0, daLOW=120, daMEDIUM=160, daTV=213,
+                    daHIGH=240, daXHIGH=320, daXXHIGH=480, daXXXHIGH=640);
+
   jObjectRef = Pointer;
 
 const
@@ -874,8 +877,11 @@ type
     procedure CreateForm(InstanceClass: TComponentClass; out Reference);
     procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject; intent: jobject);
 
-    function GetNewId() : integer;
-    function GetLastId() : integer;
+    function GetNewId() : integer;  // by TR3E
+    function GetLastId() : integer; // by TR3E
+
+    function  GetJavaLastId : integer; // by TR3E
+    procedure SetDensityAssets( _value : TDensityAssets ); // by TR3E
 
     procedure Finish();
     Procedure Recreate();
@@ -1027,6 +1033,7 @@ type
     FDesigner: IAndroidWidgetDesigner;
     //FOnAutoAssignIDs: TNotifyEvent;
     FOnCreate: TNotifyEvent;
+    FOnInit: TNotifyEvent; // by TR3E
     FOnDestroy: TNotifyEvent;
     //FOnAutoAssignIDs: TNotifyEvent;
 
@@ -1085,6 +1092,7 @@ type
 
   published
     property OnCreate: TNotifyEvent read FOnCreate write FOnCreate;
+    property OnInit: TNotifyEvent read FOnInit write FOnInit; // by TR3E
     property OnDestroy: TNotifyEvent read FOnDestroy write FOnDestroy;
   end;
 
@@ -2742,6 +2750,8 @@ end;
 procedure TAndroidForm.Init(refApp: jApp);
 begin
    Inherited Init(refApp);
+   if not (csDesigning in ComponentState) then
+     if Assigned(FOnInit) then FOnInit(Self);
 end;
 
 procedure TAndroidForm.AfterConstruction;
@@ -6252,9 +6262,22 @@ begin
  result := FNewId;
 end;
 
+//by TR3E
 function jApp.GetLastId() : integer;
 begin
  result := FNewId;
+end;
+
+//by TR3E
+function jApp.GetJavaLastId(): integer;
+begin
+   Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'GetJavaLastId');
+end;
+
+//by TR3E
+procedure jApp.SetDensityAssets( _value : TDensityAssets );
+begin
+  jni_proc_i(Self.Jni.jEnv, Self.Jni.jThis, 'SetDensityAssets', ord(_value));
 end;
 
 procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject;

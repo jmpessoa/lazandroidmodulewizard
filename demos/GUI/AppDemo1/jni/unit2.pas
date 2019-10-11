@@ -38,6 +38,7 @@ type
       procedure AndroidModule2Close(Sender: TObject);
       procedure AndroidModule2CloseQuery(Sender: TObject; var CanClose: boolean);
       procedure AndroidModule2Create(Sender: TObject);
+      procedure AndroidModule2Init(Sender: TObject);
 
       procedure jButton10Click(Sender: TObject);
       procedure jButton11Click(Sender: TObject);
@@ -128,6 +129,11 @@ end;
 procedure TAndroidModule2.AndroidModule2Create(Sender: TObject);
 begin
   //
+end;
+
+procedure TAndroidModule2.AndroidModule2Init(Sender: TObject);
+begin
+
 end;
 
 procedure TAndroidModule2.jButton1Click(Sender: TObject);  //DEMO: Base Controls

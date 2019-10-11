@@ -8,11 +8,16 @@ object AndroidModule2: TAndroidModule2
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
+  AutoAssignIDs = True
+  OnInit = AndroidModule2Init
   OnCreate = AndroidModule2Create
   Text = 'AndroidModule2'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnCloseQuery = AndroidModule2CloseQuery
   OnBackButton = AndroidModule2BackButton
   OnClose = AndroidModule2Close
@@ -28,7 +33,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 10
     Enabled = True
     Visible = True
-    Id = 41266
+    Id = 0
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -54,7 +59,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jTextView2
-    Id = 35128
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -104,7 +109,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jTextView1
-    Id = 93524
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -130,7 +135,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton1
-    Id = 2770
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -155,7 +160,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton3
-    Id = 93525
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -180,7 +185,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton3
-    Id = 51074
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -205,7 +210,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton5
-    Id = 93526
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -230,7 +235,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton5
-    Id = 71909
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -255,7 +260,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton7
-    Id = 93527
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -280,7 +285,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton7
-    Id = 34150
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -305,7 +310,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton9
-    Id = 93528
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -330,7 +335,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton9
-    Id = 59567
+    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -355,7 +360,7 @@ object AndroidModule2: TAndroidModule2
     Enabled = True
     Visible = True
     Anchor = jButton11
-    Id = 93529
+    Id = 0
     PosRelativeToAnchor = [raToRightOf, raAlignBaseline]
     PosRelativeToParent = []
     LayoutParamWidth = lpHalfOfParent
@@ -379,7 +384,7 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Enabled = True
     Visible = True
-    Id = 93530
+    Id = 0
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpBottom, rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
@@ -390,6 +395,8 @@ object AndroidModule2: TAndroidModule2
     ImageScaleType = scaleFitCenter
     GravityInParent = lgNone
     RoundedShape = False
+    AnimationDurationIn = 1500
+    AnimationMode = animNone
   end
   object jImageList1: jImageList
     Images.Strings = (

@@ -2037,6 +2037,7 @@ type
 
   jImageBtn = class(jVisualControl)
   private
+    FOnDown : TOnNotify; // by TR3E
     FImageUpName: string;
     FImageDownName: string;
     FImageUpIndex: TImageListIndex;
@@ -2070,6 +2071,8 @@ type
 
     procedure ClearLayout;
     Procedure UpdateLayout(); override;
+
+    procedure GenEvent_OnDown(Obj: TObject); // by TR3E
     
     procedure Init(refApp: jApp); override;
     procedure SetLGravity(_value: TLayoutGravity);
@@ -2081,6 +2084,7 @@ type
     procedure SetAlpha( Value : integer );
 
   published
+    property OnDown : TOnNotify read FOnDown write FOnDown; // by TR3E
 
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
@@ -2742,6 +2746,12 @@ begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
+  if Obj is jImageBtn then
+  begin
+    jForm(jImageBtn(Obj).Owner).UpdateJNI(gApp);
+    jImageBtn(Obj).GenEvent_OnDown(Obj);
+    exit;
+  end else
   if Obj is jPanel then
   begin
     jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
@@ -10962,6 +10972,12 @@ end;
 // jImageBtn
 //------------------------------------------------------------------------------
 
+// Event : Java -> Pascal by TR3E
+procedure jImageBtn.GenEvent_OnDown(Obj: TObject);
+begin
+  if Assigned(FOnDown) then FOnDown(Obj);
+end;
+
 Constructor jImageBtn.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -10983,7 +10999,7 @@ begin
   FMarginRight  := 5;
   FWidth        := 72;
   FHeight       := 72;
-  FSleepDown    := 0;
+  FSleepDown    := 150;
   FAlpha        := 255;
 end;
 
@@ -11098,6 +11114,7 @@ begin
    jImageBtn_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
+// by TR3E
 procedure jImageBtn.SetAlpha(Value: integer);
 begin
   FAlpha := value;
@@ -11294,8 +11311,11 @@ end;
 
 procedure jImageBtn.SetSleepDown(_sleepMiliSeconds: integer);
 begin
+  if _sleepMiliSeconds <= 0 then exit;
+
   //in designing component state: set value here...
   FSleepDown:= _sleepMiliSeconds;
+  
   if FInitialized then
      jImageBtn_SetSleepDown(FjEnv, FjObject, _sleepMiliSeconds);
 end;

@@ -33,9 +33,10 @@ import android.graphics.ColorMatrix;
 import android.graphics.Paint;
 import android.graphics.Canvas;
 
-/*Draft java code by "Lazarus Android Module Wizard" [8/13/2014 1:43:12]*/    //********
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jControl template*/
+//-------------------------------------------------------------------------
+// jImageFileManager
+// Reviewed by TR3E on 10/10/2019
+//-------------------------------------------------------------------------
 
 public class jImageFileManager /*extends ...*/ {
 
@@ -88,9 +89,16 @@ public class jImageFileManager /*extends ...*/ {
  }
  
  public Bitmap LoadFromSdCard(String _filename) {	   
-	      String imageInSD = Environment.getExternalStorageDirectory().getPath()+"/"+_filename;	      
-	      Bitmap bitmap = BitmapFactory.decodeFile(imageInSD);	      
-	      return bitmap; 
+	      String imageInSD = Environment.getExternalStorageDirectory().getPath()+"/"+_filename;
+	      
+	      BitmapFactory.Options bo = new BitmapFactory.Options();		
+			
+		  if( bo == null ) return null;
+		    
+		  if( controls.GetDensityAssets() > 0 )
+		   bo.inDensity = controls.GetDensityAssets();
+	      	      
+	      return BitmapFactory.decodeFile(imageInSD, bo); 
  }
     
  //http://android-er.blogspot.com.br/2010/07/save-file-to-sd-card.html
@@ -119,16 +127,21 @@ public class jImageFileManager /*extends ...*/ {
  
  public Bitmap LoadFromURL(String _imageURL) {
 	   
-  BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+  BitmapFactory.Options bo = new BitmapFactory.Options();
   
-  bmOptions.inSampleSize = 1;
+  if( bo == null ) return null;
+  
+  if( controls.GetDensityAssets() > 0 )
+   bo.inDensity = controls.GetDensityAssets();
+  
+  bo.inSampleSize = 1;
 	   
   Bitmap bitmap = null;
   InputStream in = null;
   
   try {
       in = OpenHttpConnection(_imageURL);
-      bitmap = BitmapFactory.decodeStream(in, null, bmOptions);
+      bitmap = BitmapFactory.decodeStream(in, null, bo);
       in.close();
   } catch (IOException e1) {
 	  return null;
@@ -150,46 +163,41 @@ public class jImageFileManager /*extends ...*/ {
          return null; // Fix by tr3e
      }
      
-     return BitmapFactory.decodeStream(istr);
+     BitmapFactory.Options bo = new BitmapFactory.Options();
+     
+     if( bo == null ) return null;
+     
+     if( controls.GetDensityAssets() > 0 )
+      bo.inDensity = controls.GetDensityAssets();
+     
+     return BitmapFactory.decodeStream(istr, null, bo);
  }
  
 	public Bitmap LoadFromRawFolder(String pictureName)
 	{
 		Bitmap bitmap = null;
+		
+		BitmapFactory.Options bo = new BitmapFactory.Options();
+	     
+	    if( bo == null ) return null;
+	     
+	    if( controls.GetDensityAssets() > 0 )
+	      bo.inDensity = controls.GetDensityAssets();
 
 		int rID = controls.activity.getResources().getIdentifier(pictureName, "raw", controls.activity.getPackageName());
 		
 		if(rID != 0) 
 		{
 		 InputStream is = controls.activity.getResources().openRawResource(rID);
-		 if (is != null) bitmap = BitmapFactory.decodeStream(is);
+		 if (is != null) bitmap = BitmapFactory.decodeStream(is, null, bo);
 		}
 		
 		return bitmap;
 	}
- 
- private int GetDrawableResourceId(String _resName) {
- 	  try {
- 	     Class<?> res = R.drawable.class;
- 	     Field field = res.getField(_resName);  //"drawableName"
- 	     int drawableId = field.getInt(null);
- 	     return drawableId;
- 	  }
- 	  catch (Exception e) {
- 	     Log.e("jImageFileManager", "Failure to get drawable id.", e);
- 	     return 0;
- 	  }
- }
-
- private Drawable GetDrawableResourceById(int _resID) {
-	 if( _resID == 0 ) return null; // Fix by tr3e
-	 
- 	 return this.controls.activity.getResources().getDrawable(_resID);	
- }
            
  public Bitmap LoadFromResources(String _imageResIdentifier)
  {
-	Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageResIdentifier));
+	Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 	
 	if( d == null ) return null; // fix by tr3e
 	
@@ -206,6 +214,7 @@ public class jImageFileManager /*extends ...*/ {
      int width  = _bitmapImage.getWidth();    
 
      Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+     bmpGrayscale.setDensity( _bitmapImage.getDensity() );
      
      if(bmpGrayscale == null) return null;
      
@@ -235,10 +244,15 @@ public class jImageFileManager /*extends ...*/ {
 	   
 	   try {
 		 fileInputStream = new FileInputStream(file);
-		 BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-		 bitmapOptions.inSampleSize = 1; //original image size :: 4 --> size 1/4!
-		 bitmapOptions.inJustDecodeBounds = false; //If set to true, the decoder will return null (no bitmap), 
-		 bmap = BitmapFactory.decodeStream(fileInputStream, null, bitmapOptions);		 
+		 BitmapFactory.Options bo = new BitmapFactory.Options();
+		 
+		 if( controls.GetDensityAssets() > 0 )
+		      bo.inDensity = controls.GetDensityAssets();
+		 
+		 bo.inSampleSize = 1; //original image size :: 4 --> size 1/4!
+		 bo.inJustDecodeBounds = false; //If set to true, the decoder will return null (no bitmap),
+		 
+		 bmap = BitmapFactory.decodeStream(fileInputStream, null, bo);		 
 	   } catch (FileNotFoundException e) {
 		// TODO Auto-generated catch block
 		 e.printStackTrace();
@@ -248,8 +262,16 @@ public class jImageFileManager /*extends ...*/ {
 	   return bmap;  	   
  }
  
- public Bitmap LoadFromFile(String _path, String _filename) { //EnvironmentDirectoryPath  !!	   	   	      	   	     
-	   return BitmapFactory.decodeFile(_path + "/" + _filename); 
+ public Bitmap LoadFromFile(String _path, String _filename) { //EnvironmentDirectoryPath  !!
+	 
+	    BitmapFactory.Options bo = new BitmapFactory.Options();
+     
+	    if( bo == null ) return null;
+	     
+	    if( controls.GetDensityAssets() > 0 )
+	      bo.inDensity = controls.GetDensityAssets();
+	  
+	   return BitmapFactory.decodeFile(_path + "/" + _filename, bo); 
  }
  
  public boolean SaveToFile(Bitmap _image, String _filename) {
@@ -303,9 +325,16 @@ public class jImageFileManager /*extends ...*/ {
       InputStream imageStream;
       Bitmap selectedImage= null;
       
+      BitmapFactory.Options bo = new BitmapFactory.Options();
+	     
+	  if( bo == null ) return null;
+	     
+	  if( controls.GetDensityAssets() > 0 )
+	      bo.inDensity = controls.GetDensityAssets();
+      
 	  try {
 			imageStream = controls.activity.getContentResolver().openInputStream(_imageUri);
-			selectedImage = BitmapFactory.decodeStream(imageStream);
+			selectedImage = BitmapFactory.decodeStream(imageStream, null, bo);
 	  } catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -316,16 +345,24 @@ public class jImageFileManager /*extends ...*/ {
  }
        
  public  Bitmap LoadFromFile(String _filename, int _scale) {
-	   BitmapFactory.Options options = new BitmapFactory.Options();
+	   BitmapFactory.Options bo = new BitmapFactory.Options();
+     
+	   if( bo == null ) return null;
+	     
+	   if( controls.GetDensityAssets() > 0 )
+	      bo.inDensity = controls.GetDensityAssets();
 	   
-	   if( options == null ) return null;
-	   
-	   options.inSampleSize = _scale; // --> 1/4
-	   return BitmapFactory.decodeFile(_filename, options);
+	   bo.inSampleSize = _scale; // --> 1/4
+	   return BitmapFactory.decodeFile(_filename, bo);
  }
 
  public Bitmap CreateBitmap(int _width, int _height) {
-	    return Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888 );
+	    Bitmap newbmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888 );
+	    
+	    if( (newbmp != null) && (controls.GetDensityAssets() > 0) )
+	    	newbmp.setDensity( controls.GetDensityAssets() );
+	    
+	    return newbmp;
  }
  
  public int GetBitmapWidth(Bitmap _bitmap) {	 	 
@@ -361,7 +398,14 @@ public class jImageFileManager /*extends ...*/ {
 	public Bitmap SetByteArrayToBitmap(byte[] _imageArray) {
 		if( _imageArray == null ) return null; // by tr3e
 		
-	    return BitmapFactory.decodeByteArray(_imageArray, 0, _imageArray.length);
+		BitmapFactory.Options bo = new BitmapFactory.Options();
+	     
+		if( bo == null ) return null;
+		     
+		if( controls.GetDensityAssets() > 0 )
+		    bo.inDensity = controls.GetDensityAssets();
+		
+	    return BitmapFactory.decodeByteArray(_imageArray, 0, _imageArray.length, bo);
 	}
 
 	public Bitmap ClockWise(Bitmap _bitmap){
@@ -369,9 +413,14 @@ public class jImageFileManager /*extends ...*/ {
 		 
 		 Matrix matrix = new Matrix();
 			
-		 matrix.postRotate(-90);
+		 matrix.postRotate(90);
 		 
-	     return Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);    
+	     Bitmap bmpRotate = Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);
+	     
+	     if(bmpRotate != null)
+	    	 bmpRotate.setDensity( _bitmap.getDensity() );
+	     
+	     return bmpRotate;
 	} 
 
 	public Bitmap AntiClockWise(Bitmap _bitmap){
@@ -381,7 +430,12 @@ public class jImageFileManager /*extends ...*/ {
 		
 		matrix.postRotate(-90);
 	    
-		return Bitmap.createBitmap(_bitmap, 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);    
+		Bitmap bmpRotate = Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);
+	     
+	    if(bmpRotate != null)
+	     bmpRotate.setDensity( _bitmap.getDensity() );
+	     
+	    return bmpRotate;    
 	}
 	
 	public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {      
@@ -392,11 +446,23 @@ public class jImageFileManager /*extends ...*/ {
 		// RESIZE THE BIT MAP
 		matrix.postScale(_scaleX, _scaleY);
 		// RECREATE THE NEW BITMAP
-		return Bitmap.createBitmap(_bmp, 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);		
+		Bitmap bmpScale = Bitmap.createBitmap(_bmp, 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);
+		
+		if(bmpScale != null)
+		   bmpScale.setDensity( _bmp.getDensity() );
+		     
+		return bmpScale; 
 	}
 
 	public Bitmap GetBitmapFromDecodedFile(String _imagePath) {
-	   return BitmapFactory.decodeFile(_imagePath);
+	   BitmapFactory.Options bo = new BitmapFactory.Options();
+	     
+	   if( bo == null ) return null;
+		     
+	   if( controls.GetDensityAssets() > 0 )
+		    bo.inDensity = controls.GetDensityAssets();
+		
+	   return BitmapFactory.decodeFile(_imagePath, bo);
 	}
 	
 	
@@ -415,7 +481,14 @@ public class jImageFileManager /*extends ...*/ {
 	    String picturePath = cursor.getString(columnIndex);
 	    cursor.close();
 	    
-	    return BitmapFactory.decodeFile(picturePath);    
+	    BitmapFactory.Options bo = new BitmapFactory.Options();
+	     
+		if( bo == null ) return null;
+			     
+		if( controls.GetDensityAssets() > 0 )
+		    bo.inDensity = controls.GetDensityAssets();
+	    
+	    return BitmapFactory.decodeFile(picturePath, bo);    
 	}
 	
 	
@@ -424,7 +497,12 @@ public class jImageFileManager /*extends ...*/ {
 		
 		if( extras == null ) return null; // Fix by tr3e
 		
-	    return (Bitmap) extras.get("data");    
+	    Bitmap bmpExtra = (Bitmap) extras.get("data");
+	    
+	    if( (bmpExtra != null) && (controls.GetDensityAssets() > 0) )
+	    	bmpExtra.setDensity(controls.GetDensityAssets());
+	    
+	    return bmpExtra;
 	}
 	
 	//TODO Pascal
@@ -447,12 +525,20 @@ public class jImageFileManager /*extends ...*/ {
 	}
 
 	public Bitmap LoadFromUri(String _uriAsString) {
-		   Uri imageUri =  Uri.parse(_uriAsString);
-	       InputStream imageStream;
-	       Bitmap selectedImage= null;
+		    Uri imageUri =  Uri.parse(_uriAsString);
+	        InputStream imageStream;
+	        Bitmap selectedImage= null;
+	       
+	        BitmapFactory.Options bo = new BitmapFactory.Options();
+		     
+			if( bo == null ) return null;
+				     
+			if( controls.GetDensityAssets() > 0 )
+			    bo.inDensity = controls.GetDensityAssets();
+			
 			try {
 				imageStream = controls.activity.getContentResolver().openInputStream(imageUri);
-				selectedImage = BitmapFactory.decodeStream(imageStream);
+				selectedImage = BitmapFactory.decodeStream(imageStream, null, bo);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
