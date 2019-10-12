@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "C:\\android\\workspace\\AppFTPClientDemo1\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v14\\values-v14.xml",
+            "map": [
+                {
+                    "source": "C:\\android\\workspace\\AppFTPClientDemo1\\res\\values-v14\\styles.xml",
+                    "from": {
+                        "startLines": "6",
+                        "startColumns": "4",
+                        "startOffsets": "225",
+                        "endLines": "8",
+                        "endColumns": "12",
+                        "endOffsets": "362"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "4",
+                        "endColumns": "12",
+                        "endOffsets": "190"
+                    }
+                }
+            ]
+        }
+    ]
+}

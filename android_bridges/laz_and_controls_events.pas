@@ -215,6 +215,13 @@ uses
    procedure Java_Event_pOnSFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
    procedure Java_Event_pOnSFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
 
+   procedure Java_Event_pOnFTPClientTryConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean);
+   procedure Java_Event_pOnFTPClientDownloadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
+   procedure Java_Event_pOnFTPClientUploadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
+   procedure Java_Event_pOnFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
+   procedure Java_Event_pOnFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
+
+
 implementation
 
 uses
@@ -227,7 +234,7 @@ uses
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
    customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
-   midimanager, copenmapview, csignaturepad, soundpool{, gdxscreen}, cmail, sftpclient;
+   midimanager, copenmapview, csignaturepad, soundpool{, gdxscreen}, cmail, sftpclient, ftpclient;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2522,6 +2529,61 @@ begin
   begin
     jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
     jSFTPClient(Sender).GenEvent_OnSFTPClientListed(Sender,count);
+  end;
+end;
+
+procedure Java_Event_pOnFTPClientTryConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jFTPClient then
+  begin
+    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jFTPClient(Sender).GenEvent_OnFTPClientTryConnect(Sender,boolean(success));
+  end;
+end;
+
+procedure Java_Event_pOnFTPClientDownloadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jFTPClient then
+  begin
+    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jFTPClient(Sender).GenEvent_OnFTPClientDownloadFinished(Sender,GetString(env,destination),boolean(success));
+  end;
+end;
+
+procedure Java_Event_pOnFTPClientUploadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jFTPClient then
+  begin
+    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jFTPClient(Sender).GenEvent_OnFTPClientUploadFinished(Sender,GetString(env,destination),boolean(success));
+  end;
+end;
+
+procedure Java_Event_pOnFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jFTPClient then
+  begin
+    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jFTPClient(Sender).GenEvent_OnFTPClientListing(Sender,GetString(env,remotePath),GetString(env,fileName),fileSize);
+  end;
+end;
+
+procedure Java_Event_pOnFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jFTPClient then
+  begin
+    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
+    jFTPClient(Sender).GenEvent_OnFTPClientListed(Sender,count);
   end;
 end;
 
