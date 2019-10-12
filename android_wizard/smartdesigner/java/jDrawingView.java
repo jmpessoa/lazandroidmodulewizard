@@ -32,6 +32,7 @@ import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
 import android.view.ViewGroup;
+import java.nio.charset.Charset;
 
 /*Draft java code by "Lazarus Android Module Wizard" [5/20/2016 3:18:58]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -76,6 +77,8 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     private int mWidth;
     private int mHeight;
     private Paint.Style mStyle;
+
+    private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jDrawingView(Controls _ctrls, long _Self, boolean _bufferedDraw, int _backgroundColor) { //Add more others news "_xxx"p arams if needed!
@@ -513,17 +516,32 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         return bm;
     }
 
+ // in drawing functions where the rotation, translation or scale matrix is ​​not used, the following function calls are not needed:
+  // mCanvas.save () ;
+  // mCanvas.restore ();
+  // example:
     public void DrawBitmap(Bitmap _bitmap, int _width, int _height) {
 
         if (mCanvas == null) return;
 
         Bitmap bmp = GetResizedBitmap(_bitmap, _width, _height);
         Rect rect = new Rect(0, 0, _width, _height);
-        mCanvas.save();
+        //mCanvas.save(); //  not needed! fixed by Kordal
         mCanvas.drawBitmap(bmp, null, rect, mDrawPaint);
-        mCanvas.restore();
+        //mCanvas.restore(); // not needed!
     }
 
+    // new by Kordal
+    private String decodeUTF8(byte[] bytes) {
+     return new String(bytes, UTF8_CHARSET);
+     //return new String(bytes);
+    }
+
+    // new by Kordal
+    public void DrawText(byte[] _text, float _x, float _y) {
+                mCanvas.drawText(decodeUTF8(_text), _x, _y, mTextPaint);
+    }
+ 
     public void DrawBitmap(Bitmap _bitmap, float _x, float _y, float _angleDegree) {
 
         if (mCanvas == null) return;
@@ -531,7 +549,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         int x = (int) _x;
         int y = (int) _y;
         Bitmap bmp = GetResizedBitmap(_bitmap, _bitmap.getWidth(), _bitmap.getHeight());
-        mCanvas.save();
+        mCanvas.save(); // needed, uses rotate matrix
         mCanvas.rotate(_angleDegree, x + _bitmap.getWidth() / 2, y + _bitmap.getHeight() / 2);
         mCanvas.drawBitmap(bmp, x, y, null);
         mCanvas.restore();
@@ -1180,9 +1198,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void Clear(int _color) {
-
         if (mCanvas == null) return;
-
         if (_color != 0)
             mCanvas.drawColor(_color);
         else
@@ -1190,9 +1206,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void Clear() {
-
         if (mCanvas == null) return;
-
         if (mBackgroundColor != 0)
             mCanvas.drawColor(mBackgroundColor);
         else
@@ -1256,46 +1270,66 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         this.setBackgroundColor(mBackgroundColor);
     }
 
-    // by Kordal
-    public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, int _dstLeft, int _dstTop, int _dstRight, int _dstBottom) {
+    //by Kordal
+    public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, float _dstLeft, float _dstTop, float _dstRight, float _dstBottom) {
         if (mCanvas == null) return;
         Rect srcRect = new Rect(_srcLeft, _srcTop, _srcRight, _srcBottom);
-        Rect dstRect = new Rect(_dstLeft, _dstTop, _dstRight, _dstBottom);
-
+        RectF dstRect = new RectF(_dstLeft, _dstTop, _dstRight, _dstBottom);
+               
         mCanvas.drawBitmap(_bitMap, srcRect, dstRect, mDrawPaint);
     }
-
-    // by Kordal
-    public void DrawFrame(Bitmap _bitMap, int _srcX, int _srcY, int _srcW, int _srcH, int _X, int _Y, int _Wh, int _Ht, float _rotateDegree) {
+       
+    public void DrawFrame(Bitmap _bitMap, int _srcX, int _srcY, int _srcW, int _srcH, float _X, float _Y, float _Wh, float _Ht, float _rotateDegree) {
         if (mCanvas == null) return;
         Rect srcRect = new Rect(_srcX, _srcY, _srcX + _srcW, _srcY + _srcH);
-        Rect dstRect = new Rect(_X, _Y, _X + _Wh, _Y + _Ht);
-
+        RectF dstRect = new RectF(_X, _Y, _X + _Wh, _Y + _Ht);
+               
         if (_rotateDegree != 0) {
             mCanvas.save();
             mCanvas.rotate(_rotateDegree, _X + _Wh / 2, _Y + _Ht / 2);
             mCanvas.drawBitmap(_bitMap, srcRect, dstRect, mDrawPaint);
             mCanvas.restore();
-        } else {
+         } else {
             mCanvas.drawBitmap(_bitMap, srcRect, dstRect, mDrawPaint);
-        }
+         }
+    }
+       
+    public void DrawFrame(Bitmap _bitMap, float _X, float _Y, int _Index, int _Size, float _scaleFactor, float _rotateDegree) {
+          float sf = _Size * _scaleFactor;
+          DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
     }
 
-    // by Kordal
-    public void DrawFrame(Bitmap _bitMap, int _X, int _Y, int _Index, int _Size, float _scaleFactor, float _rotateDegree) {
-        int sf = (int) (_Size * _scaleFactor);
-        DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
-    }
-
-    // by Kordal
+    //by Kordal
     public void DrawRoundRect(float _left, float _top, float _right, float _bottom, float _rx, float _ry) {
         if (mCanvas == null) return;
-
         //[ifdef_api21up]
         if (Build.VERSION.SDK_INT >= 21) {
             mCanvas.drawRoundRect(_left, _top, _right, _bottom, _rx, _ry, mDrawPaint);
         }//[endif_api21up]
 
+    }
+
+    //by Kordal
+    public float GetDensity() {
+        return controls.activity.getResources().getDisplayMetrics().density;
+    }      
+ 
+    public void ClipRect(float _left, float _top, float _right, float _bottom) {
+        if (mCanvas == null) return;
+        mCanvas.clipRect(_left, _top, _right, _bottom);
+    }
+ 
+    public void DrawGrid(float _left, float _top, float _width, float _height, int _cellsX, int _cellsY) {
+        if (mCanvas == null) return;
+
+        float cw = _width / _cellsX;
+        float ch = _height / _cellsY;
+        for (int i = 0; i < _cellsX + 1; i++) {
+            mCanvas.drawLine(_left + i * cw, _top, _left + i * cw, _top + _height, mDrawPaint); // draw Y lines
+        }
+        for (int i = 0; i < _cellsY + 1; i++) {
+            mCanvas.drawLine(_left, _top + i * ch, _left + _width, _top + i * ch, mDrawPaint); // draw X lines
+        }
     }
 
 } //end class
