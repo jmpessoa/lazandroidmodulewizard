@@ -1406,6 +1406,7 @@ type
     function GetBitmapWidth: integer;
 
     procedure SetAlpha( value: integer ); //by TR3E
+    procedure SetSaturation(Value: single); // by TR3E
 
     procedure SetScale(_scaleX: single; _scaleY: single); //by TR3E
     procedure SetMatrix(_scaleX, _scaleY, _angle, _dx, _dy, _px, _py : single); //by TR3E
@@ -2081,7 +2082,8 @@ type
     procedure SetSleepDown(_sleepMiliSeconds: integer);
 
     procedure SetImageDownScale(Value: single); // by TR3E
-    procedure SetAlpha( Value : integer );
+    procedure SetAlpha( Value : integer ); // by TR3E
+    procedure SetSaturation(Value: single); // by TR3E
 
   published
     property OnDown : TOnNotify read FOnDown write FOnDown; // by TR3E
@@ -6476,14 +6478,23 @@ begin
      jni_proc_ff(FjEnv, FjObject, 'SetScale', _scaleX ,_scaleY);
 end;
 
+// by TR3E
 procedure jImageView.SetAlpha( value: integer );
 begin
  FAlpha := value;
 
- if FInitialized then
- begin
-  jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
- end;
+ if not FInitialized then exit;
+
+ jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
+end;
+
+// by TR3E
+procedure jImageView.SetSaturation(Value: single);
+begin
+
+  if not FInitialized then exit;
+
+  jni_proc_f(FjEnv, FjObject, 'SetSaturation', Value);
 end;
 
 procedure jImageView.SetMatrixScaleCenter( _scaleX, _scaleY : single );
@@ -11122,6 +11133,15 @@ begin
   if not FInitialized then exit;
 
   jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
+end;
+
+// by TR3E
+procedure jImageBtn.SetSaturation(Value: single);
+begin
+
+  if not FInitialized then exit;
+
+  jni_proc_f(FjEnv, FjObject, 'SetSaturation', Value);
 end;
 
 Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
