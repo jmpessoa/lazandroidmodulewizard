@@ -1406,6 +1406,7 @@ type
     function GetBitmapWidth: integer;
 
     procedure SetAlpha( value: integer ); //by TR3E
+    procedure SetSaturation(Value: single); // by TR3E
 
     procedure SetScale(_scaleX: single; _scaleY: single); //by TR3E
     procedure SetMatrix(_scaleX, _scaleY, _angle, _dx, _dy, _px, _py : single); //by TR3E
@@ -2081,7 +2082,8 @@ type
     procedure SetSleepDown(_sleepMiliSeconds: integer);
 
     procedure SetImageDownScale(Value: single); // by TR3E
-    procedure SetAlpha( Value : integer );
+    procedure SetAlpha( Value : integer ); // by TR3E
+    procedure SetSaturation(Value: single); // by TR3E
 
   published
     property OnDown : TOnNotify read FOnDown write FOnDown; // by TR3E
@@ -6476,14 +6478,23 @@ begin
      jni_proc_ff(FjEnv, FjObject, 'SetScale', _scaleX ,_scaleY);
 end;
 
+// by TR3E
 procedure jImageView.SetAlpha( value: integer );
 begin
  FAlpha := value;
 
- if FInitialized then
- begin
-  jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
- end;
+ if not FInitialized then exit;
+
+ jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
+end;
+
+// by TR3E
+procedure jImageView.SetSaturation(Value: single);
+begin
+
+  if not FInitialized then exit;
+
+  jni_proc_f(FjEnv, FjObject, 'SetSaturation', Value);
 end;
 
 procedure jImageView.SetMatrixScaleCenter( _scaleX, _scaleY : single );
@@ -11124,6 +11135,15 @@ begin
   jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
 end;
 
+// by TR3E
+procedure jImageBtn.SetSaturation(Value: single);
+begin
+
+  if not FInitialized then exit;
+
+  jni_proc_f(FjEnv, FjObject, 'SetSaturation', Value);
+end;
+
 Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
@@ -11145,6 +11165,7 @@ begin
      View_Invalidate(FjEnv, FjObject );
 end;
 
+// by TR3E
 Procedure jImageBtn.SetImageDownScale(Value: single);
 begin
 
@@ -11154,6 +11175,9 @@ begin
    begin
     if value > 1 then value := 1;
 
+    self.SetImageDownByRes('');
+    self.SetImageDownByIndex(-1);
+
     jni_proc_f(FjEnv, FjObject, 'SetImageDownScale', value);
    end;
 
@@ -11161,6 +11185,8 @@ end;
 
 Procedure jImageBtn.SetImageDownByIndex(Value: integer);
 begin
+
+   FImageDownIndex:= Value;
 
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
@@ -11170,11 +11196,14 @@ begin
         jImageBtn_setButtonDown(FjEnv, FjObject , GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageDownName);
       end;
    end;
+
 end;
 
 Procedure jImageBtn.SetImageUpByIndex(Value: integer);
 begin
-   
+
+   FImageUpIndex:= Value;
+
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
       FImageUpName:= Trim(FImageList.Images.Strings[Value]);
@@ -11183,19 +11212,22 @@ begin
         jImageBtn_setButtonUp(FjEnv, FjObject ,GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageUpName);
       end;
    end;
+   
 end;
 
 procedure jImageBtn.SetImageDownByRes(imgResIdentifief: string);
 begin
    FImageDownName:= imgResIdentifief;
-   if FInitialized then
+
+   if FInitialized and (length(imgResIdentifief) > 0) then
      jImageBtn_setButtonDownByRes(FjEnv, FjObject , imgResIdentifief);
 end;
 
 procedure jImageBtn.SetImageUpByRes(imgResIdentifief: string);
 begin
   FImageUpName:=  imgResIdentifief;
-  if FInitialized then
+
+  if FInitialized and (length(imgResIdentifief) > 0) then
     jImageBtn_setButtonUpByRes(FjEnv, FjObject , imgResIdentifief);
 end;
 
@@ -11208,11 +11240,7 @@ begin
   if FImageList = nil then exit;
 
   if FInitialized then
-  begin
-      if Value > FImageList.Images.Count then FImageUpIndex:= FImageList.Images.Count;
-      if Value < 0 then FImageUpIndex:= 0;
-      SetImageUpByIndex(Value);
-  end;
+   SetImageUpByIndex(Value);
 
 end;
 
@@ -11225,11 +11253,7 @@ begin
   if FImageList = nil then exit;
 
   if FInitialized then
-  begin
-      if Value > FImageList.Images.Count then FImageDownIndex:= FImageList.Images.Count;
-      if Value < 0 then FImageDownIndex:= 0;
-      SetImageDownByIndex(Value);
-  end;
+   SetImageDownByIndex(Value);
 
 end;
 

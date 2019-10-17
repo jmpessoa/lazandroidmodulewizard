@@ -22,6 +22,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -48,7 +50,7 @@ import java.io.File;
 
 //-------------------------------------------------------------------------
 // jImageView
-// Reviewed by TR3E on 10/10/2019
+// Reviewed by TR3E on 17/10/2019
 //-------------------------------------------------------------------------
 
 public class jImageView extends ImageView {
@@ -415,6 +417,14 @@ public class jImageView extends ImageView {
 		
 		setImageAlpha(value);	    
 	}
+    
+    public void SetSaturation( float value ){
+        ColorMatrix matrix = new ColorMatrix();
+        
+        matrix.setSaturation(value); 
+        
+        setColorFilter(new ColorMatrixColorFilter(matrix));
+    }
 
 	public Bitmap GetBitmapImage() {
 		return bmp;

@@ -13,6 +13,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.os.Handler;
 import android.util.Log;
 import android.util.DisplayMetrics;
@@ -23,7 +25,7 @@ import android.view.ViewGroup;
 
 //-------------------------------------------------------------------------
 // jImageBtn
-// Reviewed by TR3E on 10/10/2019
+// Reviewed by TR3E on 17/10/2019
 //-------------------------------------------------------------------------
 
 public class jImageBtn extends ImageView {
@@ -202,6 +204,14 @@ public class jImageBtn extends ImageView {
 		if( value > 255) value = 255;
 		
 		setImageAlpha(value);
+    }
+    
+    public void SetSaturation( float value ){
+     ColorMatrix matrix = new ColorMatrix();
+     
+     matrix.setSaturation(value); 
+     
+     setColorFilter(new ColorMatrixColorFilter(matrix));
     }
 
 	public void SetSleepDown(int _sleepMiliSeconds) {
