@@ -60,6 +60,7 @@ var
 begin
 
    //LOW DENSITY
+   gapp.SetDensityAssets(daLOW);
    w:= 72;
    h:= 72;
 
