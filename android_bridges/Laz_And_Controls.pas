@@ -1955,7 +1955,9 @@ type
     procedure SetCanvas(_canvas: jObject);
     procedure DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
-    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
+    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject; overload;
+    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject; overload;
+
     function GetBitmap(): jObject;
 
     procedure SetBitmap(_bitmap: jObject); overload;
@@ -1966,7 +1968,8 @@ type
     procedure DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
     procedure DrawRect(var _box: TDynArrayOfSingle); overload;
     procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
-    procedure Clear(_color: integer);
+    procedure Clear( _color : TARGBColorBridge ); overload;
+    procedure Clear( _color : integer); overload;
     function GetJInstance(): jObject;
     procedure SaveBitmapJPG(_fullPathFileName: string);
 
@@ -1976,6 +1979,7 @@ type
     procedure DrawFrame(_bitMap: jObject; _X: integer; _Y: integer; _Index: integer; _Size: integer; _scaleFactor: single; _rotateDegree: single); overload;
 
     //Property
+    property CustomColor : DWord read FCustomColor write FCustomColor;
     //property  jSelf {JavaObj} : jObject read FjObject;
 
   published
@@ -2083,7 +2087,7 @@ type
 
     procedure SetImageDownScale(Value: single); // by TR3E
     procedure SetAlpha( Value : integer ); // by TR3E
-    procedure SetSaturation(Value: single); // by TR3E
+    procedure SetSaturation( value : single ); // by TR3E
 
   published
     property OnDown : TOnNotify read FOnDown write FOnDown; // by TR3E
@@ -10173,9 +10177,13 @@ end;
 
 Procedure jCanvas.SetColor(Value : TARGBColorBridge);
 begin
+
   FPaintColor:= Value;
-  if FInitialized then
-     jCanvas_setColor(FjEnv, FjObject ,GetARGB(FCustomColor, FPaintColor));
+
+  if not FInitialized then exit;
+
+  jCanvas_setColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor))
+
 end;
 
 Procedure jCanvas.SetTextSize(Value: single);
@@ -10386,6 +10394,13 @@ begin
    Result:= jCanvas_CreateBitmap(FjEnv, FjObject, _width,_height, GetARGB(FCustomColor, _backgroundColor));
 end;
 
+function jCanvas.CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_CreateBitmap(FjEnv, FjObject, _width,_height, _backgroundColor);
+end;
+
 function jCanvas.GetBitmap(): jObject;
 begin
   //in designing component state: result value here...
@@ -10454,6 +10469,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCanvas_DrawTextMultiLine(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
+end;
+
+procedure jCanvas.Clear( _color : TARGBColorBridge ); overload;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_Clear(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jCanvas.Clear(_color: integer);
@@ -11165,7 +11187,6 @@ begin
      View_Invalidate(FjEnv, FjObject );
 end;
 
-// by TR3E
 Procedure jImageBtn.SetImageDownScale(Value: single);
 begin
 
@@ -11196,14 +11217,13 @@ begin
         jImageBtn_setButtonDown(FjEnv, FjObject , GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageDownName);
       end;
    end;
-
 end;
 
 Procedure jImageBtn.SetImageUpByIndex(Value: integer);
 begin
 
    FImageUpIndex:= Value;
-
+   
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
       FImageUpName:= Trim(FImageList.Images.Strings[Value]);
@@ -11212,7 +11232,6 @@ begin
         jImageBtn_setButtonUp(FjEnv, FjObject ,GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageUpName);
       end;
    end;
-   
 end;
 
 procedure jImageBtn.SetImageDownByRes(imgResIdentifief: string);
