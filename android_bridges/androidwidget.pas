@@ -1124,8 +1124,10 @@ type
     FActionBarTitle: TActionBarTitle;
 
     FOnClick      : TOnNotify;
-    FOnClose      :   TOnNotify;
+    FOnClose      : TOnNotify;
     FOnCloseQuery  : TOnCloseQuery;
+
+    FOnShow      : TOnNotify; //by TR3E
 
     //FOnRotate      : TOnRotate; //gdx
     //FOnActivityRst : TOnActivityRst;  //gdx
@@ -1192,6 +1194,7 @@ type
 
     procedure Show(refApp: jApp); overload; //call ReInit to force the form to recreate the layout...
     Procedure DoJNIPrompt;
+    procedure DoOnShow; //by TR3E
 
     Procedure Close;
     Procedure Refresh;
@@ -1428,6 +1431,7 @@ type
 
     property OnBackButton : TOnNotify read FOnBackButton write FOnBackButton;
     property OnClose      : TOnNotify read FOnClose write FOnClose;
+    property OnShow       : TOnNotify read FOnShow write FOnShow; //by TR3E
 
     property OnSpecialKeyDown    :TOnKeyDown read FOnSpecialKeyDown write FOnSpecialKeyDown;
 
@@ -2998,6 +3002,7 @@ begin
     begin
        gApp.TopIndex:= FormIndex;
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
+       if Assigned(FOnShow) then FOnShow(Self); //by TR3E
     end;
 
     if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
@@ -3157,13 +3162,18 @@ begin
   if FVisible then Exit;
   FormState := fsFormWork;
   FVisible:= True;
+
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
+
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
+
   if DoJNIPromptOnShow then
   begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
+
+  if Assigned(FOnShow) then FOnShow(Self); //by TR3E
 end;
 
 procedure jForm.Show(jniPrompt: boolean);
@@ -3172,13 +3182,18 @@ begin
   if FVisible then Exit;
   FormState := fsFormWork;
   FVisible:= True;
+
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
+
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
+
   if jniPrompt then
   begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
+
+  if Assigned(FOnShow) then FOnShow(Self); //by TR3E
 end;
 
 
@@ -3186,6 +3201,12 @@ procedure jForm.DoJNIPrompt;
 begin
   //if FActivityMode = actEasel then Exit;
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
+end;
+
+//by TR3E
+procedure jForm.DoOnShow;
+begin
+  if Assigned(FOnShow) then FOnShow(Self);
 end;
 
 
@@ -3226,9 +3247,14 @@ begin
   if jForm(Form).ActivityMode = actEasel then Exit;
 
   Inx:= jForm(Form).FormIndex;
-  formBaseInx:= jForm(Form).FormBaseIndex;
 
-  gApp.TopIndex:= formBaseInx; //update topIndex...
+  // Prevents the error that is called close before it has been show [by TR3E]
+  if Inx = gapp.TopIndex then
+  begin
+   formBaseInx:= jForm(Form).FormBaseIndex;
+   gApp.TopIndex:= formBaseInx; //update topIndex...
+  end else
+   formBaseInx:= -1;
 
   if Assigned(jForm(Form).OnClose) then
   begin
@@ -3245,6 +3271,8 @@ begin
       begin
         if jForm(gApp.Forms.Stack[formBaseInx].Form).PromptOnBackKey then
             jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt; //<<--- thanks to @arenabor
+
+        jForm(gApp.Forms.Stack[formBaseInx].Form).DoOnShow; // by TR3E
       end;
 
       //LORDMAN - 2013-08-01 // Call Back event
@@ -3264,7 +3292,8 @@ begin
       //BacktrackOnClose
       if jForm(Form).TryBacktrackOnClose then
       begin
-        if formBaseInx <> 0 then
+        // Prevents the error that is called close before it has been show [by TR3E]
+        if formBaseInx > 0 then
            jForm(gApp.Forms.Stack[formBaseInx].Form).Close;
       end;
 
