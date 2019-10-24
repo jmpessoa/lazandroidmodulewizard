@@ -3162,8 +3162,10 @@ begin
   if FVisible then Exit;
   FormState := fsFormWork;
   FVisible:= True;
+
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
+
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
 
   if DoJNIPromptOnShow then
@@ -3180,8 +3182,10 @@ begin
   if FVisible then Exit;
   FormState := fsFormWork;
   FVisible:= True;
+
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
+
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
 
   if jniPrompt then
@@ -3243,9 +3247,14 @@ begin
   if jForm(Form).ActivityMode = actEasel then Exit;
 
   Inx:= jForm(Form).FormIndex;
-  formBaseInx:= jForm(Form).FormBaseIndex;
 
-  gApp.TopIndex:= formBaseInx; //update topIndex...
+  // Prevents the error that is called close before it has been show [by TR3E]
+  if Inx = gapp.TopIndex then
+  begin
+   formBaseInx:= jForm(Form).FormBaseIndex;
+   gApp.TopIndex:= formBaseInx; //update topIndex...
+  end else
+   formBaseInx:= -1;
 
   if Assigned(jForm(Form).OnClose) then
   begin
@@ -3283,7 +3292,8 @@ begin
       //BacktrackOnClose
       if jForm(Form).TryBacktrackOnClose then
       begin
-        if formBaseInx <> 0 then
+        // Prevents the error that is called close before it has been show [by TR3E]
+        if formBaseInx > 0 then
            jForm(gApp.Forms.Stack[formBaseInx].Form).Close;
       end;
 
