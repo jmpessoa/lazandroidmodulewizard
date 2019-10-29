@@ -14,11 +14,15 @@ type
 
   TAndroidModule1 = class(jForm)
     jButton1: jButton;
+    jButton2: jButton;
     jsAdMob1: jsAdMob;
     jsAdMob2: jsAdMob;
+    jTextView1: jTextView;
     procedure AndroidModule1ActivityCreate(Sender: TObject; intentData: jObject
       );
+    procedure AndroidModule1Rotate(Sender: TObject; rotate: TScreenStyle);
     procedure jButton1Click(Sender: TObject);
+    procedure jButton2Click(Sender: TObject);
   private
     {private declarations}
   public
@@ -46,6 +50,11 @@ begin
  jsAdMob2.AdMobRun();
 end;
 
+procedure TAndroidModule1.jButton2Click(Sender: TObject);
+begin
+  jsAdMob2.AdMobStop();
+end;
+
 procedure TAndroidModule1.AndroidModule1ActivityCreate(Sender: TObject;
   intentData: jObject);
 begin
@@ -54,6 +63,14 @@ begin
  // It is usually placed in the OnCreate event
  jsAdMob1.AdMobSetId('ca-app-pub-3940256099942544/6300978111');  //warning: just test key!!!!
  jsAdMob1.AdMobInit();
+end;
+
+procedure TAndroidModule1.AndroidModule1Rotate(Sender: TObject;
+  rotate: TScreenStyle);
+begin
+  updateLayout;
+  jsAdMob1.AdMobUpdate();
+  jsAdMob2.AdMobUpdate();
 end;
 
 end.

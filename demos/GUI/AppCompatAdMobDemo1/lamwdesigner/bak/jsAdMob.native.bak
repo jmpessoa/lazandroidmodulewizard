@@ -1,0 +1,5 @@
+public native void pOnAdMobLoaded(long pasobj);
+public native void pOnAdMobFailedToLoad(long pasobj, int errorCode);
+public native void pOnAdMobOpened(long pasobj);
+public native void pOnAdMobClosed(long pasobj);
+public native void pOnAdMobLeftApplication(long pasobj);
