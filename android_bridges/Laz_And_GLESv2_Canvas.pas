@@ -1390,6 +1390,8 @@ begin
 
    FjObject:= jGLSurfaceView_Create2(FjEnv, FjThis, Self,cjOpenGLESv2);
 
+   if FjObject = nil then exit;
+
    jGLSurfaceView_setParent(FjEnv, FjObject , FjPRLayout);
    jGLSurfaceView_setId(FjEnv, FjObject , Self.Id);
   end;

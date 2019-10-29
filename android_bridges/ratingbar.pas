@@ -150,6 +150,8 @@ begin
 
    FjObject:= jCreate(FnumStars, Ord(FStyle), FIsIndicator); //jSelf !
 
+   if FjObject = nil then exit;
+
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 

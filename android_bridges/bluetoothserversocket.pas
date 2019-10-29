@@ -156,7 +156,7 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject:= jCreate();
+  FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
 
   if FTimeout > 0 then

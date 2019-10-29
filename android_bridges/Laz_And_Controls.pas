@@ -6797,9 +6797,7 @@ var
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
-  FjObject:= jCreate(); //jSelf !
-
-  if FjObject = nil then exit;
+  FjObject := jCreate(); if FjObject = nil then exit;
 
   FInitialized:= True;
   for i:= 0 to FImages.Count - 1 do
@@ -6903,9 +6901,7 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
-
-  if FjObject = nil then exit;
+  FjObject := jCreate(); if FjObject = nil then exit;
 
   if FResponseTimeout <> 15000 then
      jHttpClient_SetResponseTimeout(FjEnv, FjObject, FResponseTimeout);
