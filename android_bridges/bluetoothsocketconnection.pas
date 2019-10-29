@@ -81,7 +81,7 @@ begin
   if FInitialized  then Exit;
   inherited Init;
   //your code here: set/initialize create params....
-  FjObject:= jCreate();
+  FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
 end;
 

@@ -90,6 +90,9 @@ begin
   //your code here: set/initialize create params....
   if  Fhello = '' then Fhello:= 'Hello Android World!';
   FjObject:= jCreate(Fflag ,Fhello);
+
+  if FjObject = nil then exit;
+  
   FInitialized:= True;
 end;
 

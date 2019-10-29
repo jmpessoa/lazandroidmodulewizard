@@ -3823,6 +3823,8 @@ begin
 
    FjObject := jTextView_Create(FjEnv, FjThis, Self);
 
+   if FjObject = nil then exit;
+
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
@@ -4310,6 +4312,8 @@ begin
    inherited Init(refApp);
 
    FjObject := jEditText_Create(FjEnv, FjThis, Self);
+
+   if FjObject = nil then exit;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -5032,6 +5036,8 @@ begin
 
    FjObject := jButton_Create(FjEnv,FjThis,Self);
 
+   if FjObject = nil then exit;
+
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
@@ -5382,6 +5388,8 @@ begin
 
    FjObject  := jCheckBox_Create(FjEnv, FjThis, self);
 
+   if FjObject = nil then exit;
+
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
@@ -5633,6 +5641,8 @@ begin
   begin
    inherited Init(refApp);
    FjObject := jRadioButton_Create(FjEnv, FjThis, Self);
+
+   if FjObject = nil then exit;
 
    if FParent <> nil then Self.MyClassParentName:= FParent.ClassName;
 
@@ -5903,6 +5913,8 @@ begin
    inherited Init(refApp);
    FjObject := jProgressBar_Create(FjEnv, FjThis, Self, GetProgressBarStyle(FStyle));
 
+   if FjObject = nil then exit;
+
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
@@ -6128,6 +6140,8 @@ begin
    inherited Init(refApp);
 
    FjObject := jImageView_Create(FjEnv, FjThis, Self);
+
+   if FjObject = nil then exit;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -6783,7 +6797,8 @@ var
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
-  FjObject:= jCreate(); //jSelf !
+  FjObject := jCreate(); if FjObject = nil then exit;
+
   FInitialized:= True;
   for i:= 0 to FImages.Count - 1 do
   begin
@@ -6886,7 +6901,7 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
+  FjObject := jCreate(); if FjObject = nil then exit;
 
   if FResponseTimeout <> 15000 then
      jHttpClient_SetResponseTimeout(FjEnv, FjObject, FResponseTimeout);
@@ -7691,6 +7706,8 @@ begin
                                Ord(FTextDecorated), Ord(FItemLayout), Ord(FTextSizeDecorated),
                                Ord(FTextAlign), Ord(FTextPosition));
 
+    if FjObject = nil then exit;
+
     if FWidgetTextColor <> colbrDefault then
         jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
 
@@ -7743,6 +7760,8 @@ begin
                                Ord(FWidgetItem), FWidgetText,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated),
                                Ord(FTextAlign), Ord(FTextPosition));
+
+    if FjObject = nil then exit;
 
     if FWidgetTextColor <> colbrDefault then
       jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
@@ -8795,6 +8814,9 @@ begin
    inherited Init(refApp);
 
    FjObject := jScrollView_Create(FjEnv,  FjThis, Self); //View  !!!
+
+   if FjObject = nil then exit;
+
    //FjRLayout:= jScrollView_getView(FjEnv, FjObject ); //Self.View
 
    if FParent <> nil then
@@ -9066,6 +9088,9 @@ begin
   begin
    inherited Init(refApp);                   //fix create
    FjObject  := jHorizontalScrollView_Create(FjEnv, FjThis, Self);
+
+   if FjObject = nil then exit;
+
    FInitialized:= True;
 
    if FParent <> nil then
@@ -9302,6 +9327,8 @@ begin
   begin
    inherited Init(refApp);
    FjObject := jWebView_Create(FjEnv, FjThis, Self);
+
+   if FjObject = nil then exit;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -9618,6 +9645,9 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   FjObject  := jBitmap_Create(FjEnv, FjThis, Self);
+
+  if FjObject = nil then exit;
+
   FInitialized:= True;  //neded here....
 
   if (FImageIndex < 0) or (FImageList = nil) then
@@ -10154,6 +10184,9 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   FjObject := jCanvas_Create(FjEnv, FjThis, Self); // jSelf !
+
+  if FjObject = nil then exit;
+
   jCanvas_setStrokeWidth(FjEnv, FjObject ,FPaintStrokeWidth);
   jCanvas_setStyle(FjEnv, FjObject ,ord(FPaintStyle));
   jCanvas_setColor(FjEnv, FjObject ,GetARGB(FCustomColor, FPaintColor));
@@ -10545,6 +10578,8 @@ begin
 
    FjObject  := jView_Create(FjEnv, FjThis, Self);
 
+   if FjObject = nil then exit;
+
    if  FjCanvas <> nil then
    begin
     FjCanvas.Init(refApp);
@@ -10787,6 +10822,9 @@ begin
   if FInitialized then Exit;
   inherited Init(refApp);
   FjObject := jTimer_Create(FjEnv, FjThis, Self);
+
+  if FjObject = nil then exit;
+
   jTimer_SetInterval(FjEnv, FjObject , FInterval);
   FInitialized:= True;
 end;
@@ -10841,6 +10879,8 @@ begin
   inherited Init(refApp);
 
   FjObject := jDialogYN_Create(FjEnv, FjThis, Self, FTitle, FMsg, FYes, FNo);
+
+  if FjObject = nil then exit;
 
   if FTitleAlign <> alLeft then
    jDialogYN_SetTitleAlign( FjEnv, FjObject, ord(FTitleAlign) );
@@ -10933,6 +10973,9 @@ begin
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jDialogProgress_Create(FjEnv, gApp.Jni.jThis, Self, FTitle, FMsg);
+
+  if FjObject = nil then exit;
+
   FInitialized:= True;
 end;
 
@@ -11058,6 +11101,8 @@ begin
   begin
    inherited Init(refApp);
    FjObject := jImageBtn_Create(FjEnv, FjThis, Self);
+
+   if FjObject = nil then exit;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -11394,8 +11439,12 @@ procedure jAsyncTask.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
-  FInitialized:= True;
+
   FjObject := jAsyncTask_Create(FjEnv, FjThis, Self);
+
+  if FjObject = nil then exit;
+
+  FInitialized:= True;
 end;
 
 procedure jAsyncTask.Done;
@@ -11545,6 +11594,9 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   FjObject := jSqliteCursor_Create(FjEnv, FjThis, Self);
+
+  if FjObject = nil then exit;
+
   FInitialized:= True;
 end;
 
@@ -11887,6 +11939,8 @@ begin
   if FInitialized then Exit;
   inherited Init(refApp);
   FjObject := jSqliteDataAccess_Create(FjEnv, FjThis, Self, FDataBaseName, FColDelimiter, FRowDelimiter);
+
+  if FjObject = nil then exit;
 
   FInitialized:= True;
 
@@ -12276,20 +12330,26 @@ begin
   if not FInitialized  then
   begin
     inherited Init(refApp);
+
     FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
+
+    if FjObject = nil then exit;
+
     if FParent <> nil then
      sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
     FjPRLayoutHome:= FjPRLayout;
     jPanel_setParent(FjEnv, FjObject , FjPRLayout);
-    jPanel_setId(FjEnv, FjObject , Self.Id);
+    jPanel_setId(FjEnv, FjObject, Self.Id);
 
   end;
 
+  FWidth  := sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight );
+  FHeight := sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom );
+
   jPanel_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+                                           FWidth, FHeight);
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -12711,6 +12771,8 @@ begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate();  //jSelf !
+
+   if FjObject = nil then exit;
 
    if FFontColor <> colbrDefault then
     jDBListView_setFontColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));

@@ -226,6 +226,8 @@ begin
   //your code here: set/initialize create params....
   FjObject := jCreate(FTimeForUpdates ,FDistanceForUpdates ,Ord(FCriteriaAccuracy) ,Ord(FMapType));
 
+  if FjObject = nil then exit;
+
   if FGoogleMapsApiKey <> '' then
      jLocation_SetGoogleMapsApiKey(FjEnv, FjObject, FGoogleMapsApiKey);
 

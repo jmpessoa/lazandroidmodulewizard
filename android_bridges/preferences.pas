@@ -79,6 +79,9 @@ begin
   inherited Init(refApp);
   //your code here: set/initialize create params....
   FjObject := jCreate(FIsShared);
+
+  if FjObject = nil then exit;
+  
   FInitialized:= True;
 end;
 

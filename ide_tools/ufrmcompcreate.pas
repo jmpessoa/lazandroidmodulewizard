@@ -882,7 +882,10 @@ begin
 
     if Pos('_', FHackCreateParam) > 0 then
     begin
-      listPascal.Add('  FjObject:= jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !');   //** add F
+      listPascal.Add('  FjObject := jCreate('+StringReplace(FHackCreateParam,'_','F',[rfReplaceAll])+'); //jSelf !');   //** add F
+      listPascal.Add('  ');
+      listPascal.Add('  if FjObject = nil then exit;');
+      listPascal.Add('  ');
 
       if Pos('jControl', FProjectModel) > 0  then
          listPascal.Add('  FInitialized:= True;');
@@ -897,7 +900,10 @@ begin
       begin
         listProperties.Strings[i]:= 'FP'+Trim(listProperties.Strings[i]); //ReplaceCharFirst(Trim(listProperties.Strings[i]),'F')+';'; //** Add F
       end;
-      listPascal.Add('  FjObject:= jCreate('+listProperties.DelimitedText+'); //jSelf !');   //** add F
+      listPascal.Add('  FjObject := jCreate('+listProperties.DelimitedText+'); //jSelf !');   //** add F
+      listPascal.Add('  ');
+      listPascal.Add('  if FjObject = nil then exit;');
+      listPascal.Add('  ');
 
       if Pos('jControl', FProjectModel) > 0  then
          listPascal.Add('  FInitialized:= True;');

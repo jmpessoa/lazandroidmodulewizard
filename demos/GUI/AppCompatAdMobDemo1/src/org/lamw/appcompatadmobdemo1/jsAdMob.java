@@ -14,6 +14,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdListener;
 
 /*Draft java code by "Lazarus Android Module Wizard" [12/13/2017 17:18:12]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -29,6 +30,8 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
 
    private OnClickListener onClickListener;   // click event
    private Boolean enabled  = true;           // click-touch enabled!
+   
+   private int admobWidth = 0; // Control change of width
 
    private AdView    admobView    = null;
    private AdRequest admobRequest = null;
@@ -74,30 +77,109 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
    }
 
    public void AdMobSetId( String _admobid ) {
-      admobId = _admobid;
+      admobId = _admobid;      
    }
 
    public String AdMobGetId(){
       return admobId;
    }
 
-   private void AdMobInit(){
+   public void AdMobInit(){	  
+       
     if( !admobInit ) {
        MobileAds.initialize(controls.activity, admobId);
        admobInit = true;
     }
+    
+   }
+   
+   public void AdMobFree(){
+	   admobView    = null;
+	   admobRequest = null;
+   }
+   
+   public void AdMobUpdate(){
+	   if( (admobView == null) || (admobWidth == this.getWidth()) ) return;
+	   
+	   AdMobStop();	   	     
+	   AdMobRun();
+	   
+	   admobWidth = this.getWidth();
+   }
+   
+   public void AdMobStop(){
+       if(admobView == null) return;
+	   
+	   this.removeView(admobView);
+	   admobView.destroy();
+	   admobView = null;
    }
 
    public void AdMobRun(){
-     if( admobView == null ){
-        AdMobInit();
+        
+	    if( admobView != null ) return;              
 
         RelativeLayout.LayoutParams bannerLParams = (RelativeLayout.LayoutParams)this.getLayoutParams();
 
         admobView = new AdView(controls.activity);
+        
+        if( admobView == null ) return;
+        
+        admobView.setAdListener(new AdListener() {
+        	
+            /*private void showToast(String message) {            	
+                Toast.makeText(controls.activity, message, Toast.LENGTH_SHORT).show();
+            }*/
+                        
+            
+            @Override
+            public void onAdLoaded() {
+            	            	
+                //showToast("Ad loaded.");
+                if (admobView.getVisibility() == View.GONE) {                	
+                	admobView.setVisibility(View.VISIBLE);                	
+                }
+                
+                controls.pOnAdMobLoaded(pascalObj);
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+            	                      
+            	controls.pOnAdMobFailedToLoad(pascalObj, errorCode);
+                /*showToast(String.format("Ad failed to load with error code %d.", errorCode));
+                
+                switch(errorCode){
+                 	case AdRequest.ERROR_CODE_INTERNAL_ERROR: showToast("INTERNAL ERROR"); break; 
+                 	case AdRequest.ERROR_CODE_INVALID_REQUEST: showToast("INVALID REQUEST"); break;
+                 	case AdRequest.ERROR_CODE_NETWORK_ERROR: showToast("NETWORK ERROR"); break;
+                 	case AdRequest.ERROR_CODE_NO_FILL: showToast("NO FILL"); break;
+                }*/
+            }
+            @Override
+            public void onAdOpened() {
+            	// Click in Ads
+                //showToast("Ad opened.");
+            	controls.pOnAdMobOpened(pascalObj);
+            }
+
+            @Override
+            public void onAdClosed() {
+            	// Return to Ads
+                //showToast("Ad closed.");
+            	controls.pOnAdMobClosed(pascalObj);
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+            	// After click in Ads
+                //showToast("Ad left application.");
+            	controls.pOnAdMobLeftApplication(pascalObj);
+            }
+        });
 
         admobView.setLayoutParams(bannerLParams);
-        admobView.setAdSize(AdSize.BANNER);
+        admobView.setAdSize(AdSize.SMART_BANNER);
         admobView.setAdUnitId(admobId);
 
         this.addView(admobView);
@@ -107,7 +189,8 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
 
         // Start loading the ad in the background.
         admobView.loadAd(admobRequest);
-       }
+        
+        admobWidth = this.getWidth();
    }
 
    public View GetView() {
@@ -158,9 +241,6 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
 	 LAMWCommon.clearLayoutAll();
    }
 
-   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
+   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...   
 
 }

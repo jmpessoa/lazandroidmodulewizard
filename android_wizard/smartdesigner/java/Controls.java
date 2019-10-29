@@ -190,10 +190,13 @@ public  jForm(Controls ctrls, long pasobj) {
  PasObj   = pasobj;
  controls = ctrls;
  parent = controls.appLayout;
-
+ 
  layout   = new RelativeLayout(controls.activity);
+ 
+ if( layout == null ) return;
+ 
  layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT);
+                             ViewGroup.LayoutParams.MATCH_PARENT);
  layout.setLayoutParams(layparam);
 
  // Init Event
@@ -227,15 +230,21 @@ public  jForm(Controls ctrls, long pasobj) {
  // To ensure that the image is always in the background by TR3E
  mImageBackground = new ImageView(controls.activity);
 
- mImageBackground.setScaleType(ImageView.ScaleType.FIT_XY);
+ if( mImageBackground != null){  
+  mImageBackground.setScaleType(ImageView.ScaleType.FIT_XY);
 	
- LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+  LayoutParams param = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
- mImageBackground.setLayoutParams(param);
- mImageBackground.setImageResource(android.R.color.transparent);
+  mImageBackground.setLayoutParams(param);
+  mImageBackground.setImageResource(android.R.color.transparent);
 
- //mImageBackground.invalidate();
- layout.addView(mImageBackground);
+  //mImageBackground.invalidate();
+  layout.addView(mImageBackground);
+ }
+}
+
+public void FormChangeSize(){
+	 controls.formChangeSize = true;
 }
 
 public  RelativeLayout GetLayout() {
@@ -1699,6 +1708,10 @@ public RelativeLayout  appLayout; // Base Layout
 public int screenStyle=0;         // Screen Style [Dev:0 , Portrait: 1, Landscape : 2]
 public int systemVersion;
 
+public int screenWidth = 0;
+public int screenHeight = 0;
+public boolean formChangeSize = false;
+
 private int javaNewId = 100000;   // To assign java id from 100001 onwards [by TR3E]
 
 //Sets the density at which an asset image should be loaded.
@@ -2014,18 +2027,7 @@ public  java.lang.Object jForm_Create(long pasobj ) {
 // -------------------------------------------------------------------------
 // Result : Width(16bit) : Height (16bit)
 public  int  getScreenWH(android.content.Context context) {
-  DisplayMetrics metrics = new DisplayMetrics();
-
-  int h = context.getResources().getDisplayMetrics().heightPixels;
-  int w = context.getResources().getDisplayMetrics().widthPixels;
-// proposed by renabor
-/* 
- float density  = context.getResources().getDisplayMetrics().density;
- int dpHeight = Math.round ( h / density );
- int dpWidth  = Math.round ( w / density );
- return ( dpWidth << 16 | dpHeight ); // dp screen size  
-*/
-  return ( (w << 16)| h );
+  return ( (screenWidth << 16)| screenHeight );
 }
 
 // LORDMAN - 2013-07-28

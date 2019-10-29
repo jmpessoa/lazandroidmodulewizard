@@ -455,6 +455,8 @@ begin
    //your code here: set/initialize create params....
    FjObject:= jCreate(FBufferedDraw, GetARGB(FCustomColor, FColor)); //jSelf !
 
+   if FjObject = nil then exit;
+
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 

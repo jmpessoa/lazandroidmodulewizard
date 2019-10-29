@@ -266,7 +266,7 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject:= jCreate(); //jSelf !
+  FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
   if FIntentAction <> iaNone then
       jIntentManager_SetAction(FjEnv, FjObject, Ord(FIntentAction));

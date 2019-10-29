@@ -113,6 +113,9 @@ begin
   if FfullJavaClassName = '' then FfullJavaClassName:= 'android.media.MediaPlayer';
 
   FjObject:= jCreate(FfullJavaClassName);
+
+  if FjObject = nil then exit;
+  
   FInitialized:= True;
 
   if FObjReferenceName <> '' then  //others initializations...

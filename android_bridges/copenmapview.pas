@@ -299,6 +299,9 @@ begin
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(FShowScale, Ord(FTileSource), FZoom); //jSelf !
+
+  if FjObject = nil then exit;
+
   if FParent <> nil then
    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 

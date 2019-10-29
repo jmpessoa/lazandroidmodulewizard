@@ -262,7 +262,7 @@ procedure jMidiManager.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
-  FjObject:= jCreate();
+  FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
 end;
 

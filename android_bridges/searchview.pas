@@ -163,6 +163,8 @@ begin
    //your code here: set/initialize create params....
    FjObject:= jCreate(FIconified); //jSelf !
 
+   if FjObject = nil then exit;
+
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 

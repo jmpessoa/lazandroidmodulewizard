@@ -55,6 +55,8 @@ jsAdMob = class(jVisualControl)
     procedure AdMobInit();
     procedure AdMobFree();
     procedure AdMobRun();
+    procedure AdMobStop();
+    procedure AdMobUpdate();
 
     function GetView(): jObject;  override;
     procedure SetLParamWidth(_w: integer);
@@ -129,8 +131,8 @@ begin
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject:= jCreate(); //jSelf !
-   
+   FjObject := jCreate(); if FjObject = nil then exit;
+
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
@@ -292,12 +294,26 @@ begin
      jni_proc(FjEnv, FjObject, 'AdMobFree');
 end;
 
+procedure jsAdMob.AdMobStop();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'AdMobStop');
+end;
+
 procedure jsAdMob.AdMobRun();
 begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'AdMobRun');
-end;  
+end;
+
+procedure jsAdMob.AdMobUpdate();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'AdMobUpdate');
+end;
 
 function jsAdMob.GetView(): jObject;
 begin
