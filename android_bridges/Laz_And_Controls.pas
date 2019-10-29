@@ -12276,20 +12276,26 @@ begin
   if not FInitialized  then
   begin
     inherited Init(refApp);
+
     FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
+
+    if FjObject = nil then exit;
+
     if FParent <> nil then
      sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
     FjPRLayoutHome:= FjPRLayout;
     jPanel_setParent(FjEnv, FjObject , FjPRLayout);
-    jPanel_setId(FjEnv, FjObject , Self.Id);
+    jPanel_setId(FjEnv, FjObject, Self.Id);
 
   end;
 
+  FWidth  := sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight );
+  FHeight := sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom );
+
   jPanel_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+                                           FWidth, FHeight);
 
   for rToA := raAbove to raAlignRight do
   begin

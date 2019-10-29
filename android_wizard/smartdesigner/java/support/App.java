@@ -36,9 +36,54 @@ import android.view.WindowManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.content.Context;
+import android.graphics.Canvas;
 
 public class App extends AppCompatActivity {
     private Controls       controls;
+    
+    private int screenOrientation = 0; //For udapte screen orientation. [by TR3E]
+    
+    //New "RelativeLayout" adapted to "Multiwindow" and automatic resizing. [by TR3E]
+    public class RLAppLayout extends RelativeLayout {
+    	
+    	public RLAppLayout(Context context) {
+            super(context);
+        }             
+
+        @Override
+        protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        	super.onSizeChanged(w, h, oldw, oldh);
+        	
+        	// We update the size before being drawn       
+            if ((controls.screenWidth != 0) && (controls.screenHeight != 0)){            	
+            	controls.screenWidth  = w;
+            	controls.screenHeight = h;
+            	controls.formChangeSize = true;
+            }
+                        
+        }
+        
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+                        
+            //If this is the first time it is drawn, change the size and call "jOnCreate"
+            //to start the application.  Allows a perfect fit of all components.
+            if ((controls.screenWidth == 0) || (controls.screenHeight == 0)){
+            	controls.screenWidth  = controls.appLayout.getWidth();
+            	controls.screenHeight = controls.appLayout.getHeight();
+            	controls.jAppOnCreate(controls.activity, controls.appLayout, controls.activity.getIntent());
+            	return;
+            }
+            
+            // If change size call "jAppOnRotate" for update screen. [by TR3E]
+            if(controls.formChangeSize){
+            	controls.formChangeSize = false;            	
+            	controls.jAppOnRotate(screenOrientation);
+            }
+        }
+    }
 	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,7 +99,8 @@ public class App extends AppCompatActivity {
       //Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();
       controls.activity    = this; 
-      controls.appLayout   = new RelativeLayout(this);
+    //New "RelativeLayout" adapted to "Multiwindows" and automatic resizing. [by TR3E]
+      controls.appLayout   = new RLAppLayout(this);
       controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);
       controls.screenStyle = controls.jAppOnScreenStyle();
       controls.systemVersion = systemVersion;
@@ -65,14 +111,9 @@ public class App extends AppCompatActivity {
       } 	
       this.setContentView(controls.appLayout);
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-               
-      // Event : Java -> Pascal
-      //Log.i("jApp","02.Controls.jAppOnCreate");
-      //Bundle extras = getIntent().getExtras();      
- 
-      controls.jAppOnCreate(this, controls.appLayout, getIntent());
       
-      //Log.i("jApp","03.Controls.jAppOnCreate");
+      // Force updating the screen would need for Android 8 or higher [by TR3E]
+      controls.appLayout.requestLayout();      
     }
 
     //[ifdef_api23up]
@@ -117,7 +158,8 @@ public class App extends AppCompatActivity {
     @Override
     public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
-    	controls.jAppOnRotate(newConfig.orientation);
+    	screenOrientation = newConfig.orientation;
+    	//controls.jAppOnRotate(newConfig.orientation);
     	//controls.jAppOnConfigurationChanged();
     }	   	
  

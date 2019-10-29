@@ -926,8 +926,6 @@ type
 
   jControl = class(TComponent)
   protected
-    FjClass: jObject;
-    FClassPath: string; //need by new pure jni model! -->> initialized by widget.Create
     FjObject     : jObject; //jSelf - java object
     FInitialized : boolean;
     FjEnv: PJNIEnv;
@@ -1195,6 +1193,7 @@ type
     procedure Show(refApp: jApp); overload; //call ReInit to force the form to recreate the layout...
     Procedure DoJNIPrompt;
     procedure DoOnShow; //by TR3E
+    procedure FormChangeSize;
 
     Procedure Close;
     Procedure Refresh;
@@ -1978,7 +1977,7 @@ end;
 function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
 begin
       if FParent is jForm then
-         Result:= (FParent as jForm).ScreenWH.Height - gapp.GetContextTop
+         Result:= (FParent as jForm).ScreenWH.Height
       else
          Result:= (FParent as jVisualControl).GetHeight;
 end;
@@ -2225,7 +2224,6 @@ begin
   FInitialized:= False;
   FEnabled:= False;
   FjObject := nil;
-  FClassPath:= '';
   FCustomColor:= $FF2C2F3E;    // <<--- thanks to Ps
 end;
 
@@ -2236,10 +2234,8 @@ end;
 
 procedure jControl.Init(refApp: jApp);
 begin
-  FjEnv:= refApp.Jni.jEnv;
-  FjThis:= refApp.Jni.jThis;
-  if  FClassPath <> '' then
-     FjClass:= Get_jClassLocalRef(FClassPath);  //needed by new direct jni component model...
+  FjEnv  := refApp.Jni.jEnv;
+  FjThis := refApp.Jni.jThis;
 end;
 
 procedure jControl.SetEnabled(Value: boolean);
@@ -2924,12 +2920,22 @@ begin
        Randomize; //thanks to Gerrit
 
     FScreenStyle:= refApp.Orientation;
+
     FScreenWH:= refApp.Screen.WH;   //sAved on start!
+    FWidth   := refApp.Screen.WH.Width;
+    FHeight  := refApp.Screen.WH.Height;
+
     FPackageName:= refApp.AppName;
     ScreenStyleAtStart:= FScreenStyle;   //saved on start!
 
     FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self); {jSef}
+
+    if FjObject = nil then exit;
+
     FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {View}    //jni grobal ref
+
+    if FjRLayout = nil then exit;
+
     FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin  //jni grobal ref
     FjPRLayout:= FjPRLayoutHome; //base appLayout
 
@@ -3002,7 +3008,7 @@ begin
     begin
        gApp.TopIndex:= FormIndex;
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
-       if Assigned(FOnShow) then FOnShow(Self); //by TR3E
+       DoOnShow; //by TR3E
     end;
 
     if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
@@ -3016,12 +3022,22 @@ begin
   else    //actEasel ...
   begin
     FScreenStyle:= refApp.Orientation;
+
     FScreenWH:= refApp.Screen.WH;   //sAved on start!
+    FWidth   := refApp.Screen.WH.Width;
+    FHeight  := refApp.Screen.WH.Height;
+
     FPackageName:= refApp.AppName;
     ScreenStyleAtStart:= FScreenStyle;   //saved on start!
 
     FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self);
+
+    if FjObject = nil then exit;
+
     FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout} //GetView
+
+    if FjRLayout = nil then exit;
+
     FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin
     FjPRLayout:= FjPRLayoutHome;  //base appLayout
 
@@ -3160,6 +3176,8 @@ procedure jForm.Show;
 begin
   if FActivityMode = actEasel then Exit;
   if FVisible then Exit;
+  if not FInitialized then Exit;
+
   FormState := fsFormWork;
   FVisible:= True;
 
@@ -3173,7 +3191,7 @@ begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
 
-  if Assigned(FOnShow) then FOnShow(Self); //by TR3E
+  DoOnShow; //by TR3E
 end;
 
 procedure jForm.Show(jniPrompt: boolean);
@@ -3193,7 +3211,7 @@ begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
 
-  if Assigned(FOnShow) then FOnShow(Self); //by TR3E
+  DoOnShow; //by TR3E
 end;
 
 
@@ -3206,9 +3224,26 @@ end;
 //by TR3E
 procedure jForm.DoOnShow;
 begin
+
+  // if change size
+  if (FScreenWH.Width <> gapp.Screen.WH.Width) or
+     (FScreenWH.Height <> gapp.Screen.WH.Height) then
+  begin
+   FScreenWH:= gapp.Screen.WH;
+   FWidth   := gapp.Screen.WH.Width;
+   FHeight  := gapp.Screen.WH.Height;
+
+   FormChangeSize;
+  end;
+
   if Assigned(FOnShow) then FOnShow(Self);
 end;
 
+procedure jForm.FormChangeSize;
+begin
+ if self.Initialized then
+  jni_proc( FjEnv, FjObject, 'FormChangeSize');
+end;
 
 {events sequences after user click the "back key"
    OnCanClose
@@ -6333,7 +6368,7 @@ begin
 
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);
-  startOrient:= jSystem_GetOrientation(env, this);
+  startOrient   := jSystem_GetOrientation(env, this);
 
   if  startOrient = 1 then
        Orientation   :=  ssPortrait
@@ -6375,8 +6410,13 @@ var
   Instance: TComponent;
 begin
   Instance := TComponent(InstanceClass.NewInstance);
-  TComponent(Reference):= Instance;
-  Instance.Create(Self);
+
+  if Instance <> nil then
+  begin
+   TComponent(Reference) := Instance;
+   Instance.Create(Self);
+  end else
+   TComponent(Reference) := nil;
 end;
 
 function jApp.GetCurrentFormsIndex: integer;
@@ -6704,7 +6744,7 @@ function GetParamBySide(App:jApp; side: TSide): DWord;
 begin
    case side of
      sdW: Result:= App.Screen.WH.Width;
-     sdH: Result:= App.Screen.WH.Height - app.GetContextTop;
+     sdH: Result:= App.Screen.WH.Height;
    end;
 end;
 

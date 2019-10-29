@@ -30,6 +30,8 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
 
    private OnClickListener onClickListener;   // click event
    private Boolean enabled  = true;           // click-touch enabled!
+   
+   private int admobWidth = 0; // Control change of width
 
    private AdView    admobView    = null;
    private AdRequest admobRequest = null;
@@ -95,6 +97,23 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
 	   admobView    = null;
 	   admobRequest = null;
    }
+   
+   public void AdMobUpdate(){
+	   if( (admobView == null) || (admobWidth == this.getWidth()) ) return;
+	   
+	   AdMobStop();	   	     
+	   AdMobRun();
+	   
+	   admobWidth = this.getWidth();
+   }
+   
+   public void AdMobStop(){
+       if(admobView == null) return;
+	   
+	   this.removeView(admobView);
+	   admobView.destroy();
+	   admobView = null;
+   }
 
    public void AdMobRun(){
         
@@ -103,6 +122,8 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
         RelativeLayout.LayoutParams bannerLParams = (RelativeLayout.LayoutParams)this.getLayoutParams();
 
         admobView = new AdView(controls.activity);
+        
+        if( admobView == null ) return;
         
         admobView.setAdListener(new AdListener() {
         	
@@ -167,7 +188,9 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
         admobRequest = new AdRequest.Builder().build();
 
         // Start loading the ad in the background.
-        admobView.loadAd(admobRequest);       
+        admobView.loadAd(admobRequest);
+        
+        admobWidth = this.getWidth();
    }
 
    public View GetView() {
