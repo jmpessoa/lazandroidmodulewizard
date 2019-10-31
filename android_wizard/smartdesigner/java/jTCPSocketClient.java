@@ -34,9 +34,10 @@ import android.os.Handler;
  *         ref. http://www.darksleep.com/player/SocketExample/
  */
 
-/*Draft java code by "Lazarus Android Module Wizard" */
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jControl template*/
+//-------------------------------------------------------------------------
+// jTCPSocketClient
+// Reviewed by TR3E on 31/10/2019
+//-------------------------------------------------------------------------
 
 public class jTCPSocketClient {
 
@@ -100,14 +101,16 @@ public class jTCPSocketClient {
     }
 
     public boolean Connect(String _serverIP, int _serverPort, int _timeOut) {
+    	
+    	  Boolean connected = isConnected();
+    	  
+    	  if( (connected) && (mServerIP == _serverIP) && (mServerPort == _serverPort) ) return true;
+    	  
+    	  CloseConnection();
     	  
           mServerIP         = _serverIP;    //IP address
           mServerPort       = _serverPort;  //port number;
-          mServerTimeOut    = _timeOut;     //timeout
-          Boolean connected = false;
-
-          if (mSocket != null)
-        	  CloseConnection();
+          mServerTimeOut    = _timeOut;     //timeout          
           
           try {                  
                    mSocket = new Socket();
@@ -182,15 +185,14 @@ public class jTCPSocketClient {
     public void CloseConnection( ) {
     	  mRunClose   = true;
     	  
-    	  if (mSocket != null) {
-          	      			  
+    	  if (mSocket != null) {          	      			 
           	  try{ 
     				mSocket.close();				
     			  } catch (IOException e) {				
     			  }
           	  
           	  mSocket = null;
-            }
+          }
                               
           if ( mStreamBufferOut != null ){
         	  try{
@@ -255,9 +257,7 @@ public class jTCPSocketClient {
 					
 		   mFileSendDOS = null;
       	  }      	        	
-          
-          while (mRun){}; // Wait for run
-          
+                    
       	  mRun      = false;      	 
           mRunClose = false;          
       }
@@ -277,12 +277,13 @@ public class jTCPSocketClient {
     	
     	int fileSize    = 0;
         String fileName = "";
+        boolean bufferInInit  = false;
+        boolean bufferOutInit = false;
                
         @Override
         protected String doInBackground(String... message) {
             mRun = true;
-            
-            //mServerMessage = null;
+                        
             mServerBytes   = new byte[1024];
             
             mByteBufferInput  = null;
@@ -294,6 +295,7 @@ public class jTCPSocketClient {
                 try {
                 	if ( mSocket == null ){
                 		mRun = false;
+                		CloseConnection();
                 		break;
                 	}
                 	
@@ -304,18 +306,32 @@ public class jTCPSocketClient {
                 	}
                 	                    
                     if( mStreamBufferOut == null )
+                     if( !bufferOutInit ){ 
                        mStreamBufferOut = mSocket.getOutputStream();
-                                                                                                              
-                    int bytes_read = -1;
+                       bufferOutInit = true;
+                       
+                       if( mStreamBufferOut == null){
+                     	  mRun = false;
+                  		  CloseConnection();
+                       }
+                     } else {
+                       mRun = false;                 	   
+                 	   break; 
+                     }                                                                                                                                                     
                     
                     if( mByteBufferInput == null )
-                    	mByteBufferInput = new BufferedInputStream(mSocket.getInputStream());
-                                                                                                           
-                    if ( mByteBufferInput == null) {
-                    	mRun = false;
-                    	CloseConnection();
-                    	break;                    	
-                    }
+                     if( !bufferInInit ){
+                    	 mByteBufferInput = new BufferedInputStream(mSocket.getInputStream());
+                    	 bufferInInit = true;
+                    	 
+                    	 if( mByteBufferInput == null){
+                    	  mRun = false;
+                 		  CloseConnection();
+                    	 }
+                     } else {
+                    	 mRun = false;                       	 
+                       	 break;	
+                     }                                                                                                                               
                     
                     if( mDataType == 2 ) // dtmFile
                      if( fileSize == 0 )
@@ -323,7 +339,9 @@ public class jTCPSocketClient {
                          //mFileGetSizeRemaining = mFileGetSize;	
                        	 fileSize              = mFileGetSize;
                        	 fileName              = mFileGetPath;
-                        }   
+                        }
+                    
+                    int bytes_read = -1;
                                                             	                       
                     bytes_read =  mByteBufferInput.read(mServerBytes, 0, mServerBytes.length);   //blocking ...
                     
@@ -353,7 +371,8 @@ public class jTCPSocketClient {
                             	mBufferOutput = new ByteArrayOutputStream();
                             	mBufferOutput.write(mServerMessage.getBytes(), 0, mServerMessage.length());
                             	
-                              	publishProgress(mBufferOutput);                              	
+                              	publishProgress(mBufferOutput);
+                              	                              	
                        }
                        while ( (mFileGetSizeRemaining > 0) && ((bytes_read = mByteBufferInput.read(mServerBytes, 0, mServerBytes.length)) > 0) );   //blocking ...
                         
@@ -363,22 +382,24 @@ public class jTCPSocketClient {
                         	mFileGetFOS = null;
                         	 
                         	if( mFileGetSizeRemaining <= 0 ) fileSize = 0;
-                       }
-                      break;
+                       }                                             
+                       
+                       mRun = false;
+                       CloseConnection();
+                       return null;
+                       //break;
                      }    	                                                                                                                 
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     //Log.e("jTCPSocketClient", "Error_doInBackground_ClientByte", e);
-                    e.printStackTrace();
-                    
-                    mRun = false;
-                    CloseConnection();                                                            
+                    //e.printStackTrace();
+                                                                                                                    
                     break;
                 }
 
             }
             
-            // dtmGetFile
+            // dtmGetFile - if error found
             if( mDataType == 2 ){
                 File file = new File(fileName);
                
@@ -392,10 +413,11 @@ public class jTCPSocketClient {
             	mBufferOutput = new ByteArrayOutputStream();
             	mBufferOutput.write(mServerMessage.getBytes(), 0, mServerMessage.length());
             	
-              	publishProgress(mBufferOutput);                                
-            }
+              	publishProgress(mBufferOutput);              	
+            }           
             
             mRun = false;
+            CloseConnection(); 
             return null;
         }
 
