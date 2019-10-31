@@ -148,7 +148,7 @@ public class App extends Activity {
     protected void onRestart() {super.onRestart(); controls.jAppOnRestart();}
                                     	                                        
     @Override
-    protected void onResume() { super.onResume(); controls.jAppOnResume();}
+    protected void onResume() { super.onResume(); controls.jAppOnResume(); }
     	                                        
     @Override
     protected void onStart() { super.onStart(); controls.jAppOnStart(); }
@@ -162,7 +162,8 @@ public class App extends Activity {
     @Override
     public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
-    	screenOrientation = newConfig.orientation;    	
+    	screenOrientation = newConfig.orientation;
+    	controls.appLayout.requestLayout();
     }	   	
  
     @Override
@@ -220,7 +221,7 @@ public boolean onOptionsItemSelected(MenuItem item) {
    /*by jmpessoa: TODO :Handles prepare menu item*/
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
-       //super.onPrepareOptionsMenu(menu);        
+               
 	   boolean changeMenuItems = false;
 	   boolean continueChangingItem = true;
 	   	   

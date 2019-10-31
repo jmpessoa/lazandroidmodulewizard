@@ -2263,7 +2263,7 @@ begin
   Result:= method+'=Java_Event_'+method+signature+');';
   if method = 'pAppOnCreate' then
   begin
-    Result := Result + FStartModuleVarName + '.Init(gApp);'
+    Result := Result + FStartModuleVarName + '.ReInit(gApp);'
   end;
 
   listParam.Free;
