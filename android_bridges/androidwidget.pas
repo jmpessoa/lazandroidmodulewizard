@@ -868,6 +868,8 @@ type
     Lock          : Boolean;     //
     Orientation   : TScreenStyle;   //orientation on app start....
 
+    IsAppActivityRecreate : boolean; // For detect AppActivityRecreate
+
     Locale        : TLocale;    //by thierrydijoux
     ControlsVersionInfo: string; //
     TopIndex: integer;
@@ -1142,6 +1144,7 @@ type
     FOnPrepareOptionsMenu: TOnPrepareOptionsMenu;
     FOnPrepareOptionsMenuItem: TOnPrepareOptionsMenuItem;
     FOnActivityCreate: TOnActivityCreate;
+    FOnActivityReCreate : TOnNotify;
     //FOnActivityPause: TOnActivityPause;  //gdx change
     //FOnActivityResume: TOnActivityResume; //gdx change
     FOnRequestPermissionResult: TOnRequestPermissionResult;
@@ -1444,6 +1447,7 @@ type
     property OnClickContextMenuItem: TOnClickContextMenuItem read FOnClickContextMenuItem write FOnClickContextMenuItem;
 
     property OnActivityCreate: TOnActivityCreate read FOnActivityCreate write FOnActivityCreate;
+    property OnActivityReCreate : TOnNotify read FOnActivityReCreate write FOnActivityReCreate;
     property OnActivityPause: TOnActivityPause read FOnActivityPause write FOnActivityPause;
     property OnActivityResume: TOnActivityResume read FOnActivityResume write FOnActivityResume;
     property OnRequestPermissionResult: TOnRequestPermissionResult read FOnRequestPermissionResult write FOnRequestPermissionResult;
@@ -1801,7 +1805,7 @@ function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: 
 procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject);
 procedure jForm_RemoveFromViewParent(env: PJNIEnv; _jform: JObject);
 procedure jForm_SetLayoutVisibility(env: PJNIEnv; _jform: JObject; _value: boolean);
-function jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
+function  jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
 function jForm_GetSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string): integer;
 function jForm_GetSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string): string;
 function jForm_GetSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string): single;
@@ -1992,6 +1996,9 @@ end;
 
 procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject; layout:jobject; intent: jobject);
 begin
+  gApp.IsAppActivityRecreate := gApp.FInitialized;
+
+  gApp.FInitialized := false;
   gApp.Init(env,this,context,layout, intent);
 end;
 
@@ -2971,8 +2978,9 @@ begin
 
     FormBaseIndex:= gApp.TopIndex;           //initial = -1
 
-    if FormIndex < 0 then //if it is a new form .... [not a ReInit form ...]
-        FormIndex:= gApp.GetNewFormsIndex;  //first valid index = 0;
+    if (FormIndex < 0) or    //if it is a new form .... [not a ReInit form ...]
+       (FormIndex > gApp.Forms.index) then  // if ReCretateActivity
+        FormIndex:= gApp.GetNewFormsIndex;  // first valid index = 0;
 
     gApp.Forms.Stack[FormIndex].Form    := Self;
     gApp.Forms.Stack[FormIndex].CloseCB := FCloseCallBack;
@@ -3012,6 +3020,15 @@ begin
     end;
 
     if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
+
+    // Detect AppActivityRecreate, launch this event only in the main process or splash
+    if gapp.IsAppActivityRecreate then
+    begin
+     if (FActivityMode = actMain) or (FActivityMode = actSplash) then
+      if Assigned(FOnActivityReCreate) then FOnActivityReCreate(Self);
+
+     gapp.IsAppActivityRecreate := false;
+    end;
 
     if DoJNIPromptOnInit then
     begin
@@ -3079,8 +3096,13 @@ procedure jForm.ReInit(refApp: jApp);
 var
   i: integer;
 begin
-  if FActivityMode = actEasel then Exit;
-  if not FInitialized then Exit;
+
+  if not FInitialized then
+  begin
+   Self.Init(refApp);
+   Exit;
+  end;
+
   for i:= (Self.ComponentCount-1) downto 0 do
   begin
     if (Self.Components[i] is jControl) then
@@ -3174,17 +3196,25 @@ end;
 
 procedure jForm.Show;
 begin
+
   if FActivityMode = actEasel then Exit;
   if FVisible then Exit;
   if not FInitialized then Exit;
 
+  // If AppRecreateActivity [by TR3E]
+  if FormIndex = -1 then
+  begin
+    ReInit(gapp);
+    if FVisible then exit;
+  end;
+
   FormState := fsFormWork;
-  FVisible:= True;
 
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
 
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
+  FVisible:= True;
 
   if DoJNIPromptOnShow then
   begin
@@ -3198,6 +3228,15 @@ procedure jForm.Show(jniPrompt: boolean);
 begin
   if FActivityMode = actEasel then Exit;
   if FVisible then Exit;
+  if not FInitialized then Exit;
+
+  // If AppRecreateActivity [by TR3E]
+  if FormIndex = -1 then
+  begin
+    ReInit(gapp);
+    if FVisible then exit;
+  end;
+
   FormState := fsFormWork;
   FVisible:= True;
 
@@ -6304,13 +6343,16 @@ begin
   Lock             := False;
   //
   FForm            := nil;
-  StopOnException  :=True;
+  StopOnException  := True;
   //Device.PhoneNumber := '';
   //Device.ID          := '';
   FInitialized     := False;
   TopIndex:= -1;
 
   FNewId := 0;
+  Forms.Index:= -1;
+
+  IsAppActivityRecreate := false; // For detect AppActivityRecreate
 end;
 
 destructor jApp.Destroy;
@@ -6347,12 +6389,27 @@ end;
 procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject;
   layout: jObject; intent: jobject);
 var
-  startOrient: integer;
+  i, startOrient : integer;
+  Form: TAndroidForm; //jForm;  //gdx change
 begin
   if FInitialized  then Exit;
 
+  // If AppRecreateActivity reset forms
+  if gapp.Forms.Index >= 0 then
+  begin
+   gapp.TopIndex:= -1;
+
+   for i := 0 to gapp.Forms.Index do
+   begin
+    Form := gApp.Forms.Stack[i].Form;
+    Form.FormIndex := -1;
+    Form.FVisible  := false;
+   end;
+  end;
+
   // Setting Global Environment
   FillChar(Forms,SizeOf(Forms),#0);
+
   Forms.Index:= -1; //initial dummy index ...
 
   // Jni
@@ -6403,12 +6460,15 @@ begin
   //Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
   //Device.ID          := jSysInfo_DeviceID(env, this);
   FInitialized       := True;
+
 end;
 
 procedure jApp.CreateForm(InstanceClass: TComponentClass; out Reference);
 var
   Instance: TComponent;
 begin
+  if (TComponent(Reference) <> nil) then TComponent(Reference).Destroy;
+
   Instance := TComponent(InstanceClass.NewInstance);
 
   if Instance <> nil then

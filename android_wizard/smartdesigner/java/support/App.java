@@ -72,7 +72,7 @@ public class App extends AppCompatActivity {
             //to start the application.  Allows a perfect fit of all components.
             if ((controls.screenWidth == 0) || (controls.screenHeight == 0)){
             	controls.screenWidth  = controls.appLayout.getWidth();
-            	controls.screenHeight = controls.appLayout.getHeight();
+            	controls.screenHeight = controls.appLayout.getHeight();            	
             	controls.jAppOnCreate(controls.activity, controls.appLayout, controls.activity.getIntent());
             	return;
             }
@@ -80,7 +80,7 @@ public class App extends AppCompatActivity {
             // If change size call "jAppOnRotate" for update screen. [by TR3E]
             if(controls.formChangeSize){
             	controls.formChangeSize = false;            	
-            	controls.jAppOnRotate(screenOrientation);
+            	controls.jAppOnRotate(screenOrientation);            	
             }
         }
     }
@@ -101,7 +101,7 @@ public class App extends AppCompatActivity {
       controls.activity    = this; 
     //New "RelativeLayout" adapted to "Multiwindows" and automatic resizing. [by TR3E]
       controls.appLayout   = new RLAppLayout(this);
-      controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);
+      controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);      
       controls.screenStyle = controls.jAppOnScreenStyle();
       controls.systemVersion = systemVersion;
       switch( controls.screenStyle ) {
@@ -113,7 +113,7 @@ public class App extends AppCompatActivity {
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
       
       // Force updating the screen would need for Android 8 or higher [by TR3E]
-      controls.appLayout.requestLayout();      
+      controls.appLayout.requestLayout();
     }
 
     //[ifdef_api23up]
@@ -138,13 +138,13 @@ public class App extends AppCompatActivity {
     protected void onDestroy() { super.onDestroy(); controls.jAppOnDestroy();}
     
     @Override
-    protected void onPause() {super.onPause();  controls.jAppOnPause();}
+    protected void onPause() {super.onPause(); controls.jAppOnPause();  }
     
     @Override
-    protected void onRestart() {super.onRestart(); controls.jAppOnRestart();}
+    protected void onRestart() {super.onRestart(); controls.jAppOnRestart(); }
                                     	                                        
     @Override
-    protected void onResume() { super.onResume(); controls.jAppOnResume();}  
+    protected void onResume() { super.onResume(); controls.jAppOnResume(); }  
     	                                        
     @Override
     protected void onStart() { super.onStart(); controls.jAppOnStart(); }
@@ -159,8 +159,7 @@ public class App extends AppCompatActivity {
     public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
     	screenOrientation = newConfig.orientation;
-    	//controls.jAppOnRotate(newConfig.orientation);
-    	//controls.jAppOnConfigurationChanged();
+    	controls.appLayout.requestLayout();    	
     }	   	
  
     @Override
@@ -218,7 +217,7 @@ public boolean onOptionsItemSelected(MenuItem item) {
    /*by jmpessoa: TODO :Handles prepare menu item*/
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
-       //super.onPrepareOptionsMenu(menu);        
+               
 	   boolean changeMenuItems = false;
 	   boolean continueChangingItem = true;
 	   	   

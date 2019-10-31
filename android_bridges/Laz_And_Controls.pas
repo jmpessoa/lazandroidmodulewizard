@@ -2163,6 +2163,7 @@ type
   Procedure Java_Event_pAppOnStop                (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnBackPressed         (env: PJNIEnv; this: jobject);
 
+
   function Java_Event_pAppOnSpecialKeyDown              (env: PJNIEnv; this: jobject; keyChar: JChar; keyCode: integer; keyCodeString: JString): jBoolean;
 
   Function  Java_Event_pAppOnRotate              (env: PJNIEnv; this: jobject; rotate : Integer) : integer;

@@ -189,7 +189,7 @@ private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
 public  jForm(Controls ctrls, long pasobj) {
  PasObj   = pasobj;
  controls = ctrls;
- parent = controls.appLayout;
+ parent   = controls.appLayout;
  
  layout   = new RelativeLayout(controls.activity);
  
@@ -274,7 +274,7 @@ public void SetLayoutVisibility(boolean _value) {
 public  void SetVisible ( boolean visible ) {	
   if (visible) { 
 	  if (layout.getParent() == null) { 
-		   controls.appLayout.addView(layout);
+		   parent.addView(layout);
 		   layout.setVisibility(android.view.View.VISIBLE);
 		   mRemovedFromParent = false;
 	  } 
@@ -282,7 +282,7 @@ public  void SetVisible ( boolean visible ) {
   else { 
 	  if (layout.getParent() != null) { 
 		 layout.setVisibility(android.view.View.INVISIBLE);
-		 controls.appLayout.removeView(layout);
+		 parent.removeView(layout);
 		 mRemovedFromParent = true;
       }   
    }
@@ -366,8 +366,8 @@ public void SetViewParent( android.view.ViewGroup _viewgroup) {
 	private void slidefromRightToLeft(View view, long duration) {
 		TranslateAnimation animate;
 		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(controls.appLayout.getWidth(),
+			//parent.getHeight(); // parent layout
+			animate = new TranslateAnimation(parent.getWidth(),
 					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 		} else {
 			animate = new TranslateAnimation(view.getWidth(),0, 0, 0); // View for animation
@@ -382,9 +382,9 @@ public void SetViewParent( android.view.ViewGroup _viewgroup) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
+			//parent.getHeight(); // parent layout
 			animate = new TranslateAnimation(0,
-					controls.appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+					parent.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
 		} else {
 			animate = new TranslateAnimation(0,view.getWidth(), 0, 0); // View for animation
 		}
@@ -399,11 +399,11 @@ public void SetViewParent( android.view.ViewGroup _viewgroup) {
 private void slidefromRightToLeft3(View view, long duration) {
 	TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 	if (view.getHeight() == 0) {
-		//controls.appLayout.getHeight(); // parent layout
-		animate = new TranslateAnimation(0, -controls.appLayout.getWidth(),
+		//parent.getHeight(); // parent layout
+		animate = new TranslateAnimation(0, -parent.getWidth(),
 				                         0, 0); //(xFrom,xTo, yFrom,yTo)
 	} else {
-		animate = new TranslateAnimation(0,-controls.appLayout.getWidth(),
+		animate = new TranslateAnimation(0,-parent.getWidth(),
 				                         0, 0); // View for animation
 	}
 
@@ -417,11 +417,11 @@ private void slidefromRightToLeft3(View view, long duration) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(-controls.appLayout.getWidth(),
+			//parent.getHeight(); // parent layout
+			animate = new TranslateAnimation(-parent.getWidth(),
 					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 		} else {
-			animate = new TranslateAnimation(-controls.appLayout.getWidth(),0, 0, 0); // View for animation
+			animate = new TranslateAnimation(-parent.getWidth(),0, 0, 0); // View for animation
 		}
 
 		animate.setDuration(duration);
@@ -453,12 +453,14 @@ public void Show(int effect) {
 		}
 	}
 
-	controls.appLayout.addView(layout);
-    parent = controls.appLayout;
+	//controls.appLayout.addView(layout);
+    //parent = controls.appLayout;
+    parent.addView(layout);
+    
 }
 
 public ViewGroup GetParent() {	
-  return controls.appLayout; //parent;
+  return parent; //parent;
 }
 
 public  void Close(int effect ) {
@@ -484,7 +486,7 @@ public  void Close2() {
 			}
 		}
 	}
-	controls.appLayout.removeView(layout);
+	parent.removeView(layout);
   controls.pOnClose(PasObj);
 }
 
@@ -599,7 +601,7 @@ public String GetDateTime() {
 
 //Free object except Self, Pascal Code Free the class.
  public void Free() {	
-   if (parent != null) { controls.appLayout.removeView(layout); }  
+   if (parent != null) { parent.removeView(layout); }  
    onClickListener = null;
    layout.setOnClickListener(null);
    layparam = null;
@@ -1672,11 +1674,11 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 
 	//by TR3E
 	public int getScreenWidth( ){
-		return this.controls.activity.getResources().getDisplayMetrics().widthPixels;
+		return layout.getWidth();
 	}
 	//by TR3E
 	public int getScreenHeight( ){
-		return this.controls.activity.getResources().getDisplayMetrics().heightPixels;
+		return layout.getHeight();
 	}
 	//by TR3E
 	public String getSystemVersionString(){
@@ -1774,7 +1776,7 @@ public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }
 public  void jAppOnCreate(Context context,RelativeLayout layout, Intent intent) //android.os.Bundle;
                                           { pAppOnCreate(context,layout,intent); }
 
-public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent); }     
+public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent); } 
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
 public  void jAppOnRestart()              { pAppOnRestart();               }    
