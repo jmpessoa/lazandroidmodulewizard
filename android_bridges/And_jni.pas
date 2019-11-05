@@ -540,6 +540,8 @@ function JNI_OnLoad(vm:PJavaVM;reserved:pointer):jint;{$ifdef mswindows}stdcall;
 procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer);{$ifdef mswindows}stdcall;{$else}cdecl;{$endif}
 *)
 
+function JBool( Bool : Boolean ) : byte;
+
 (*
  Abbreviation for variable types for "jni_func" or "jni_proc"
 
@@ -583,8 +585,10 @@ function jni_func_bmp_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : strin
 function jni_func_n_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _intent: jObject): jObject;
 function jni_func_t_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): jObject;
 function jni_func_t_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): string;
+function jni_func_t_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _str: string): boolean;
 function jni_func_uri_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): jObject;
 function jni_func_dab_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte): jObject;
+function jni_func_dab_z_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte; _bool1: boolean): boolean;
 
 function jni_func_i_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): boolean;
 function jni_func_ii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2: integer): jObject;
@@ -595,6 +599,8 @@ function jni_func_bmp_t_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : str
 function jni_func_bmp_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str1, _str2: string) : boolean;
 function jni_func_tt_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string): jObject;
 function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
+function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): boolean;
+function jni_func_tii_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int1, _int2: integer): boolean;
 
 implementation
 
@@ -609,6 +615,14 @@ procedure JNI_OnUnload(vm:PJavaVM;reserved:pointer);{$ifdef mswindows}stdcall;{$
 begin
 end;
   *)
+
+function JBool( Bool : Boolean ) : byte;
+ begin
+  Case Bool of
+   True  : Result := 1;
+   False : Result := 0;
+  End;
+ end;
 
 procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string );
 var
@@ -849,6 +863,30 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jni_func_dab_z_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                              var _byteArray: TDynArrayOfJByte; _bool1: boolean): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_byteArray);
+  jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
+  env^.SetByteArrayRegion(env, jNewArray0, 0 , newSize0, @_byteArray[0] {source});
+  jParams[0].l:= jNewArray0;
+  jParams[1].z:= JBool(_bool1);
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '([BZ)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jni_func_bmp_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                           _bitmap: JObject): jObject;
 var
@@ -978,6 +1016,45 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str: string; _int: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].i:= _int;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_tii_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str: string; _int1, _int2: integer): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].i:= _int1;
+  jParams[2].i:= _int2;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;II)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jni_func_bmp_t_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                            _bitmap: jObject; _str: string) : boolean;
 var
@@ -1074,6 +1151,24 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_t_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string;
+                          _str: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+  Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;

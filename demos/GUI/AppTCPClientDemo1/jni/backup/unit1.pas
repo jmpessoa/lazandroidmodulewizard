@@ -54,7 +54,7 @@ begin
   //how to get IP? [windows] go to console cmd: >ipconfig
   //how to get Port? Look in your app socker server [test code below]!
 
-  jTCPSocketClient1.ConnectAsync('192.168.1.100', 54321); //IP Server/Port
+  jTCPSocketClient1.ConnectAsync('192.168.19.75', 54321); //IP Server/Port
 
 end;
 

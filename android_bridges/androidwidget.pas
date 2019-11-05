@@ -1861,8 +1861,6 @@ Procedure View_Invalidate             (env:PJNIEnv;this:jobject; view : jObject)
 Procedure View_Invalidate             (env:PJNIEnv; view : jObject); overload;
 Procedure View_PostInvalidate(env:PJNIEnv; view : jObject);
 
-function JBool( Bool : Boolean ) : byte;
-
 // System Info
 Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject;context : jObject) : TWH;
 Function  jSysInfo_PathApp             (env:PJNIEnv;this:jobject;context : jObject; AppName : String) : String;
@@ -8245,15 +8243,6 @@ begin
  env^.CallVoidMethod(env,view,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
-
-//------------------------------
-function JBool( Bool : Boolean ) : byte;
- begin
-  Case Bool of
-   True  : Result := 1;
-   False : Result := 0;
-  End;
- end;
 
 //------------------------------------------------------------------------------
 // System Info

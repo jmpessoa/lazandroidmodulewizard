@@ -1,103 +1,3 @@
-{Hint: save all files to location: C:\adt32\eclipse\workspace\AppTCPClientDemo1\jni }
-unit unit1;
-
-{$mode delphi}
-
-interface
-
-uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-    Laz_And_Controls_Events, AndroidWidget, tcpsocketclient;
-
-type
-
-  { TAndroidModule1 }
-
-  TAndroidModule1 = class(jForm)
-    jButton1: jButton;
-    jButton2: jButton;
-    jButton3: jButton;
-    jEditText1: jEditText;
-    jEditText2: jEditText;
-    jTCPSocketClient1: jTCPSocketClient;
-    jTextView1: jTextView;
-    jTextView2: jTextView;
-    jTextView3: jTextView;
-    procedure AndroidModule1JNIPrompt(Sender: TObject);
-    procedure jButton1Click(Sender: TObject);
-    procedure jButton2Click(Sender: TObject);
-    procedure jButton3Click(Sender: TObject);
-    procedure jTCPSocketClient1Connected(Sender: TObject);
-    procedure jTCPSocketClient1MessagesReceived(Sender: TObject;
-      messageReceived: string);
-
-  private
-    {private declarations}
-      FConnected: boolean;
-  public
-    {public declarations}
-  end;
-
-var
-  AndroidModule1: TAndroidModule1;
-
-implementation
-
-{$R *.lfm}
-
-{ TAndroidModule1 }
-
-procedure TAndroidModule1.jButton1Click(Sender: TObject);
-begin
-  jEditText2.Clear;
-
-  //how to get IP? [windows] go to console cmd: >ipconfig
-  //how to get Port? Look in your app socker server [test code below]!
-
-  jTCPSocketClient1.ConnectAsync('192.168.1.100', 54321); //IP Server/Port
-
-end;
-
-procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
-begin
-  FConnected:= False;
-  jEditText1.Clear;
-  jEditText2.Clear;
-  jEditText1.SetFocus;
-  if not Self.IsWifiEnabled() then Self.SetWifiEnabled(True);
-end;
-
-procedure TAndroidModule1.jButton2Click(Sender: TObject);
-begin
-   if  FConnected then
-      jTCPSocketClient1.SendMessage(jEditText1.Text);
-
-end;
-
-procedure TAndroidModule1.jButton3Click(Sender: TObject);
-begin
-   if  FConnected then
-   begin
-     jTCPSocketClient1.SendMessage('goodbye');
-     jTCPSocketClient1.CloseConnection();
-   end;
-end;
-
-procedure TAndroidModule1.jTCPSocketClient1Connected(Sender: TObject);
-begin
-   ShowMessage('Connected ...');
-   FConnected:= True;
-end;
-
-procedure TAndroidModule1.jTCPSocketClient1MessagesReceived(Sender: TObject;
-  messageReceived: string);
-begin
-  jEditText2.AppendLn(messageReceived);
-end;
-
-end.
-
-(*-----------------------------------------------------------
 
 // JUST FOR TEST: SIMPLE JAVA SERVER SOCKET !!! Thanks to Sean R. Owens!
 
@@ -111,7 +11,7 @@ end.
 // to use this code under any version of the GPL, LPGL, or BSD licenses,
 // or contact me for use of another license.
 // http://darksleep.com/player
-//http://www.darksleep.com/player/SocketExample/
+// http://www.darksleep.com/player/SocketExample/
 
 import java.net.Socket;
 import java.net.ServerSocket;
@@ -226,5 +126,4 @@ class SimpleHandler implements Runnable {
         }
 
     }
-}
----------------------------------*)
+} 

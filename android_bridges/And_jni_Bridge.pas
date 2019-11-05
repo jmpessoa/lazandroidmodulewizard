@@ -1232,14 +1232,6 @@ procedure dbg(obj : jObject; objName : String); overload;
                else dbg(objName + ' not nil');
  end;
 
-function JBool( Bool : Boolean ) : byte;
- begin
-  Case Bool of
-   True  : Result := 1;
-   False : Result := 0;
-  End;
- end;
-
 //------------------------------------------------------------------------------
 // Base Conversion
 //------------------------------------------------------------------------------
