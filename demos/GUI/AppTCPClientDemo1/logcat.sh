@@ -1,1 +1,1 @@
-/adt32/sdk/platform-tools/adb logcat
+/laztoapk/downloads/android-sdk-windows/platform-tools/adb logcat &

@@ -36,7 +36,7 @@ import android.os.Handler;
 
 //-------------------------------------------------------------------------
 // jTCPSocketClient
-// Reviewed by TR3E on 31/10/2019
+// Reviewed by TR3E on 5/11/2019
 //-------------------------------------------------------------------------
 
 public class jTCPSocketClient {
@@ -48,16 +48,14 @@ public class jTCPSocketClient {
     private String mServerIP      = "" ;//"192.168.1.100"   
     private int    mServerPort;
     private int    mServerTimeOut = 5000; // 300 LAN TIMEOUT 5000 INTERNET TIMEOUT
+    
+    private InputStream  mSockInput  = null;
+    private OutputStream mSockOutput = null;
        
     // message to send to the server
     private String mServerMessage;
     private byte[] mServerBytes;
-
-    private boolean mRun        = false;    
-    private boolean mRunClose   = false;    
         
-    private OutputStream     mStreamBufferOut;
-    
     // used to send messages
     private PrintWriter mTextBufferOut; //Prints formatted representations of objects to a text-output stream
      
@@ -72,6 +70,9 @@ public class jTCPSocketClient {
     private int                 mFileGetSize 		  = 0;
     private int                 mFileGetSizeRemaining = 0;
     private FileOutputStream    mFileGetFOS  		  = null;
+    
+    private AsyncTask mClientGetAllTask = null;
+    private AsyncTask mClientSendFileTask = null;
    
     // used to send file
     private DataOutputStream mFileSendDOS = null;  	    
@@ -85,7 +86,10 @@ public class jTCPSocketClient {
     public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
  	       context   = _ctrls.activity;
     	   pascalObj = _Self;
-    	   controls  = _ctrls; 	
+    	   controls  = _ctrls;
+    	   
+    	   mClientGetAllTask = null;
+    	   mClientSendFileTask = null;
     }
 
     public void jFree() {
@@ -107,6 +111,16 @@ public class jTCPSocketClient {
     	  if( (connected) && (mServerIP == _serverIP) && (mServerPort == _serverPort) ) return true;
     	  
     	  CloseConnection();
+    	 
+    	  // Wait for close connection
+    	  while( !isCloseConnection() ){ 
+    		  try {
+    		      Thread.sleep(10);    		      
+    		    } catch (Exception e) {    		      
+    		    }
+    	  }
+    	  
+    	  if ((mClientGetAllTask != null) || (mClientSendFileTask != null)) return false;
     	  
           mServerIP         = _serverIP;    //IP address
           mServerPort       = _serverPort;  //port number;
@@ -116,28 +130,34 @@ public class jTCPSocketClient {
                    mSocket = new Socket();
                    mSocket.connect( new InetSocketAddress(mServerIP, mServerPort), mServerTimeOut );
                                       
+                   mSockOutput = mSocket.getOutputStream();               
+                   mSockInput  = mSocket.getInputStream();                
+                                                           
                    connected = true;
 		  } catch (IOException e) {
 			  // TODO Auto-generated catch block
-		      e.printStackTrace();
+		      //e.printStackTrace();
 		      CloseConnection();
 		      return false;
 		  }
-
-          if( connected && !mRun )                                                              
-              if( mDataType < 3 ){
-               mStreamBufferOut = null; 
-            	  
-               new TCPSocketClientGetAllTask().execute();
-               
-               while (mStreamBufferOut == null) {
-                      if (!mRun) break;
-               }// Wait for run*/
-              }                                    
           
-          if( connected ) controls.pOnTCPSocketClientConnected(pascalObj);
+          if((mSockOutput == null) || (mSockInput == null)){
+        	  CloseConnection();
+        	  return false;
+          }
 
-          return connected;
+          if( connected && (mClientGetAllTask == null) && (mClientSendFileTask == null) ){                                                              
+              if( mDataType < 3 )               	  
+               mClientGetAllTask = new TCPSocketClientGetAllTask().execute();                                            
+             
+              if( connected ) controls.pOnTCPSocketClientConnected(pascalObj);
+              
+              return true;
+          } else{
+        	  CloseConnection();
+        	  return false;
+          }
+        	           
     }
     
     public boolean isConnected(){
@@ -155,52 +175,53 @@ public class jTCPSocketClient {
         
     	if ( mSocket == null || mSocket.isClosed() ) return false;
     	
-    	if ( mSocket.isClosed() || !mSocket.isConnected() ){
+    	if ( mSocket.isClosed() || !mSocket.isConnected() || (mSockOutput == null) ){
     		CloseConnection();
     		return false;
-    	}
-        
-        try{
+    	}              
         	
-         if( mTextBufferOut == null )
-          mTextBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream())), true);                 
+        if( mTextBufferOut == null )
+         mTextBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(mSockOutput)), true);                 
             
-         if ( (mTextBufferOut != null) && !mTextBufferOut.checkError()) {
+        if ( (mTextBufferOut != null) && !mTextBufferOut.checkError()) {
              mTextBufferOut.println(message);
              mTextBufferOut.flush();
              return true;
-         } else{ 
+        } else{ 
         	 CloseConnection();        	
         	 return false;
-         }
-         
-    	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		CloseConnection();
+        }
+                 
+    }
+    
+    public boolean isCloseConnection(){
+    	if ( (mSocket == null) && (mClientGetAllTask == null) && (mClientSendFileTask == null) )
+    		return true;
+    	else
     		return false;
-    	}
-        
-    }    
+    }
 
     public void CloseConnection( ) {
-    	  mRunClose   = true;
-    	  
-    	  if (mSocket != null) {          	      			 
-          	  try{ 
-    				mSocket.close();				
-    			  } catch (IOException e) {				
-    			  }
-          	  
-          	  mSocket = null;
-          }
-                              
-          if ( mStreamBufferOut != null ){
+    	 	  
+    	  if( mClientGetAllTask != null ) mClientGetAllTask.cancel(false);
+    	  if( mClientSendFileTask != null ) mClientSendFileTask.cancel(false);
+    	      	     	                             
+          if ( mSockOutput != null ){
         	  try{
-        		  mStreamBufferOut.close();					
+        		  mSockOutput.close();					
   			  } catch (IOException e) {
   			  }
         	  
-        	  mStreamBufferOut = null;
+        	  mSockOutput = null;
+          }
+          
+          if ( mSockInput != null ){
+        	  try{
+        		  mSockInput.close();					
+  			  } catch (IOException e) {
+  			  }
+        	  
+        	  mSockInput = null;
           }
            
           // for send text
@@ -211,11 +232,11 @@ public class jTCPSocketClient {
           
           // for get bytes
           if ( mByteBufferInput   != null ){
-        	  try{
+        	  try{        		  
         		  mByteBufferInput.close();					
   			  } catch (IOException e) {
   			  }
-        	  
+        	          	          	  
         	  mByteBufferInput = null;
           }
           
@@ -256,10 +277,16 @@ public class jTCPSocketClient {
 			}
 					
 		   mFileSendDOS = null;
-      	  }      	        	
-                    
-      	  mRun      = false;      	 
-          mRunClose = false;          
+      	  }
+      	  
+      	if (mSocket != null) {          	      			 
+      	  try{ 
+				mSocket.close();				
+			  } catch (IOException e) {				
+			  }
+      	  
+      	  mSocket = null;
+        }
       }
     
     /* https://stackoverflow.com/questions/6053602/what-arguments-are-passed-into-asynctaskarg1-arg2-arg3
@@ -276,73 +303,52 @@ public class jTCPSocketClient {
     class TCPSocketClientGetAllTask extends AsyncTask<String, ByteArrayOutputStream, String> {
     	
     	int fileSize    = 0;
-        String fileName = "";
-        boolean bufferInInit  = false;
-        boolean bufferOutInit = false;
+        String fileName = "";        
+        
+        boolean mIsCreated       = false;
+        
+        TCPSocketClientGetAllTask(){
+        	
+        	mIsCreated        = false;
+        	
+        	if (mSocket == null) return;                                	
+        	if ( mSocket.isClosed() || !mSocket.isConnected() ) return;
+        	if ( (mSockInput == null) || (mSockOutput == null) ) return; 
+        	
+        	mByteBufferInput = new BufferedInputStream(mSockInput);       	                
+       	    
+       	    if( mByteBufferInput == null) return;
+            
+            mIsCreated = true;        	
+        }
                
         @Override
         protected String doInBackground(String... message) {
-            mRun = true;
+        	
+        	if( !mIsCreated ){ 
+        		mClientGetAllTask = null;
+        	    return null;
+        	}
                         
             mServerBytes   = new byte[1024];
-            
-            mByteBufferInput  = null;
             ByteArrayOutputStream mBufferOutput = null;
             
             //in this while the client listens for the messages sent by the server
-            while (!mRunClose) {
+            while ( !isCancelled() ) {
 
                 try {
-                	if ( mSocket == null ){
-                		mRun = false;
-                		CloseConnection();
-                		break;
-                	}
-                	
-                	if ( mSocket.isClosed() || !mSocket.isConnected() ){
-                		mRun = false;
-                		CloseConnection();
-                		break;
-                	}
+                	if ( mSocket == null ) break;                                	
+                	if ( mSocket.isClosed() || !mSocket.isConnected() ) break;                	
                 	                    
-                    if( mStreamBufferOut == null )
-                     if( !bufferOutInit ){ 
-                       mStreamBufferOut = mSocket.getOutputStream();
-                       bufferOutInit = true;
-                       
-                       if( mStreamBufferOut == null){
-                     	  mRun = false;
-                  		  CloseConnection();
-                       }
-                     } else {
-                       mRun = false;                 	   
-                 	   break; 
-                     }                                                                                                                                                     
+                    if( (mSockOutput == null) || (mByteBufferInput == null) ) break;                    
                     
-                    if( mByteBufferInput == null )
-                     if( !bufferInInit ){
-                    	 mByteBufferInput = new BufferedInputStream(mSocket.getInputStream());
-                    	 bufferInInit = true;
-                    	 
-                    	 if( mByteBufferInput == null){
-                    	  mRun = false;
-                 		  CloseConnection();
-                    	 }
-                     } else {
-                    	 mRun = false;                       	 
-                       	 break;	
-                     }                                                                                                                               
+                    if( (mDataType == 2) && (mFileGetSize > 0) ){ // dtmFile
+                    	fileSize = -1; // -1 if error, 0 if not error
+                       	fileName = mFileGetPath; 
+                    }
                     
-                    if( mDataType == 2 ) // dtmFile
-                     if( fileSize == 0 )
-                        if( mFileGetSize > 0 ){
-                         //mFileGetSizeRemaining = mFileGetSize;	
-                       	 fileSize              = mFileGetSize;
-                       	 fileName              = mFileGetPath;
-                        }
+                    int bytes_read = -1;                    
                     
-                    int bytes_read = -1;
-                                                            	                       
                     bytes_read =  mByteBufferInput.read(mServerBytes, 0, mServerBytes.length);   //blocking ...
                     
                     if (bytes_read > 0)                                       
@@ -365,7 +371,14 @@ public class jTCPSocketClient {
                               	
                             	mFileGetSizeRemaining = mFileGetSizeRemaining - bytes_read;
                             	
-                            	if( mFileGetSizeRemaining < 0 ) mFileGetSizeRemaining = 0;
+                            	if( mFileGetSizeRemaining <= 0 ){
+                            		mFileGetSizeRemaining = 0;
+                            		fileSize              = mFileGetSize; // If not error
+                            		
+                            		mFileGetFOS.close();
+                                	mFileGetFOS = null;
+                            	}
+                            	
                             	mServerMessage = "" + mFileGetSizeRemaining;
                             	
                             	mBufferOutput = new ByteArrayOutputStream();
@@ -375,19 +388,11 @@ public class jTCPSocketClient {
                               	                              	
                        }
                        while ( (mFileGetSizeRemaining > 0) && ((bytes_read = mByteBufferInput.read(mServerBytes, 0, mServerBytes.length)) > 0) );   //blocking ...
-                        
-                                                
-                       if( mFileGetFOS != null ){ 
-                        	mFileGetFOS.close();
-                        	mFileGetFOS = null;
-                        	 
-                        	if( mFileGetSizeRemaining <= 0 ) fileSize = 0;
-                       }                                             
                        
-                       mRun = false;
-                       CloseConnection();
-                       return null;
-                       //break;
+                       fileName = "";
+                       fileSize = 0;
+                                                                                                                                                                                                                                       
+                       break;
                      }    	                                                                                                                 
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
@@ -400,12 +405,11 @@ public class jTCPSocketClient {
             }
             
             // dtmGetFile - if error found
-            if( mDataType == 2 ){
+            if( (mDataType == 2) && (fileSize == -1) ){
                 File file = new File(fileName);
                
                 if( file.exists() ) file.delete();
-               
-                fileSize              = -1;
+                               
                 mFileGetSizeRemaining = 0;
                 
                 mServerMessage = "" + fileSize;
@@ -416,7 +420,7 @@ public class jTCPSocketClient {
               	publishProgress(mBufferOutput);              	
             }           
             
-            mRun = false;
+            mClientGetAllTask = null;
             CloseConnection(); 
             return null;
         }
@@ -471,18 +475,17 @@ public class jTCPSocketClient {
       	TCPSocketClientFileSend(String fullPath){
       		
       		mIsCreated    = false;
-         	mRun          = false;
-      		        		  
+         	        		  
       		File file     = new File(fullPath);
          	mFileSendName = file.getName();
-         	mFileSendSize = (int)file.length();         	         	
-         	         	
+         	mFileSendSize = (int)file.length();
+         	         	         	         	
         	if ( mSocket == null ) {
     			mFileSendSize = -1;
     			return;
     		}
     	
-    		if ( mSocket.isClosed() || !mSocket.isConnected() ){
+    		if ( mSocket.isClosed() || !mSocket.isConnected() || (mSockOutput == null) ){
     			mFileSendSize = -1;
     			CloseConnection();
     			return;
@@ -491,9 +494,10 @@ public class jTCPSocketClient {
     	   try{
     		   
     		if( mFileSendDOS == null )
-        		mFileSendDOS = new DataOutputStream(new BufferedOutputStream(mSocket.getOutputStream()));
+        		mFileSendDOS = new DataOutputStream(new BufferedOutputStream(mSockOutput));
     		
     		if( mFileSendDOS == null ){
+    			
     			mFileSendSize = -1;
     			CloseConnection();
     			return;
@@ -512,22 +516,25 @@ public class jTCPSocketClient {
             mFileSendSizeOut = 0;                               
                           
             mIsCreated       = true;
-    	    
+                          	   
     	   } catch (IOException e) {
     			    		   		  		
     		   mFileSendSize = -1;
     	  	   CloseConnection();
     	  	   return;    		      		 	      		 
            }
+    	       	  
       	}
     	
         @Override
         protected Void doInBackground(Void... params) {
         	
-        	if( !mIsCreated ) return null;
-        	
-        	mRun = true;
-        	
+        	if( !mIsCreated ){
+        		mFileSendSize = -1;
+        		mClientSendFileTask = null;
+        		return null;
+        	}        	        	
+        	        	
         	int  n = 0;
         	byte[] buf;
         	                
@@ -540,7 +547,7 @@ public class jTCPSocketClient {
 	                 //write file to dos
 	                 while( (n = mFileSendFIS.read(buf)) > 0 ){
 	                	 
-	                	 if( mRunClose ){
+	                	 if( isCancelled() ){
                 	    	 mFileSendSize = -1;
                 	    	 break; 
                 	     }
@@ -559,18 +566,14 @@ public class jTCPSocketClient {
 	                 }
 	                 	                 	                 	                 	               	    	    	    	    	    	   
 			} catch (IOException e) {
-						// TODO Auto-generated catch block
-					e.printStackTrace();
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
 					
 					mFileSendSize = -1;
-					mRun      = false;
-					CloseConnection();
-					return null;
+					CloseConnection();					
 			}
-        	
-        					        
-        	mRun = false;
-        	
+        	        			
+        	mClientSendFileTask = null;
             // your async action
             return null;
         }
@@ -593,10 +596,10 @@ public class jTCPSocketClient {
         
     public boolean SendFile(String fullPath) {
       // dtmFileSend	
-      if( SetDataTransferMode(3) ){
-          if( mRun ) return false;
-    		 
-       	  new TCPSocketClientFileSend(fullPath).execute();
+      if( isConnected() ){
+    	  if( mClientGetAllTask != null ) return false;
+    		    	  
+          mClientSendFileTask = new TCPSocketClientFileSend(fullPath).execute();
       
           return true;
       } else
@@ -629,22 +632,20 @@ public class jTCPSocketClient {
         
     	if ( mSocket == null || mSocket.isClosed() ) return false;
     	
-    	if ( mSocket.isClosed() || !mSocket.isConnected() ){
+    	if ( mSocket.isClosed() || !mSocket.isConnected() || (mSockOutput == null) ){
     		CloseConnection();
     		return false;
-    	}
-        
-    	try{    	
+    	}            	  	
     	
-         if ( mByteBufferOut == null )
-             mByteBufferOut = new DataOutputStream(mSocket.getOutputStream());
+        if ( mByteBufferOut == null )
+             mByteBufferOut = new DataOutputStream(mSockOutput);
         
-         if (mByteBufferOut == null){
+        if (mByteBufferOut == null){
         	 CloseConnection();
         	 return false;
-         }
+        }
         
-         if (_writeLen) 
+        if (_writeLen) 
                 try {
                     mByteBufferOut.writeInt(len);
                 } catch (IOException e) {
@@ -652,7 +653,7 @@ public class jTCPSocketClient {
                     return false;
                 }        
 
-         if (len > 0) 
+        if (len > 0) 
                 try {
                     mByteBufferOut.write(myByteArray, start, len);
                     mByteBufferOut.flush();
@@ -661,13 +662,8 @@ public class jTCPSocketClient {
                     return false;
                 }        
         
-         return true;
-    	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		CloseConnection();
-    		return false;
-    	}
-
+        return true;
+    	
     }
 
     public boolean SendBytes(byte[] _jbyteArray, boolean _writeLength) throws IOException {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="11"/>
+    <Version Value="9"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -18,15 +18,14 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <CustomData Count="8">
-      <Item0 Name="BuildSystem" Value="Ant"/>
-      <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.4"/>
-      <Item3 Name="NdkApi" Value="android-22"/>
-      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r17c\"/>
-      <Item5 Name="Package" Value="com.example.apptcpclientdemo1"/>
-      <Item6 Name="SdkPath" Value="C:\laztoapk\downloads\android-sdk-windows\"/>
-      <Item7 Name="Theme" Value="DeviceDefault"/>
+    <VersionInfo>
+      <StringTable ProductVersion=""/>
+    </VersionInfo>
+    <CustomData Count="4">		
+      <Item0 Name="LAMW" Value="GUI"/>
+      <Item1 Name="Package" Value="com.example.apptcpclientdemo1"/>
+      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
+      <Item3 Name="SdkPath" Value="C:\adt32\sdk\"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -35,10 +34,9 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="1">
-        <Mode0 Name="default"/>
-      </Modes>
+      <local>
+        <FormatVersion Value="1"/>
+      </local>
     </RunParams>
     <RequiredPackages Count="1">
       <Item1>
@@ -55,9 +53,6 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
-        <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jEditText;jTCPSocketClient;jTextView"/>
-        </CustomData>
       </Unit1>
     </Units>
   </ProjectOptions>
@@ -68,7 +63,7 @@
       <Filename Value="..\libs\armeabi\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r17c\platforms\android-22\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r17c\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9.x\"/>
+      <Libraries Value="C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
@@ -97,7 +92,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r17c\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>
