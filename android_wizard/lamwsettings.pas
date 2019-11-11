@@ -13,7 +13,7 @@ type
 
   TLamwGlobalSettings = class
   public const
-    Version = '0.8.4';
+    Version = '0.8.5';
   private const
     IniFileName = 'LAMW.ini';
     IniFileSection = 'NewProject';
@@ -204,7 +204,7 @@ var
   flag: boolean;
 begin
 
-  flag:= false;
+  flag:= False;
   if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
   begin
     if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
@@ -224,13 +224,15 @@ begin
   end;
 
   FIniFile.Free;
-  FIniFile := TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + IniFileName);
-  FIniFile.CacheUpdates := False;
+  FIniFile:= TIniFile.Create(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + IniFileName);
+  FIniFile.CacheUpdates:= False;
+
   if flag then
   begin
     WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
     WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
   end;
+
 end;
 
 {

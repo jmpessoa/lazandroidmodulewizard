@@ -5,7 +5,7 @@ unit uJavaParser;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, Dialogs;
 
 type
   TLexType = (ltError, ltIdent, ltNumber, ltString, ltDelim);
@@ -227,6 +227,7 @@ begin
       FPascalJNI.Add('  ' + str);
       FPascalJNI.Add('end;');
       FPascalJNI.Add('');
+
     end;
   FPascalJNI.Add(Format('const NativeMethods:array[0..%d] of JNINativeMethod = (',
     [FNativeMethods.Count - 1]));

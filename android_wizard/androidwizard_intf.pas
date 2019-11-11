@@ -7,11 +7,14 @@ interface
 uses
   Classes, SysUtils, FileUtil, Controls, Forms, Dialogs, Graphics,
   LCLProc, LCLType, LCLIntf, LazIDEIntf, ProjectIntf, FormEditingIntf,
-  uFormAndroidProject, uformworkspace, FPimage, AndroidWidget;
+  uFormAndroidProject, uformworkspace, FPimage, AndroidWidget, gdxform;
 
 type
 
-  TAndroidModule = class(jForm)            //support to Adroid Bridges [components]
+  TAndroidModule = class(jForm)            //support to Android Bridges [components]
+  end;
+
+  TGdxModule = class(jGdxForm)            //support to Android libGDX [components]
   end;
 
   TNoGUIAndroidModule = class(TDataModule) //raw JNI ".so"
@@ -38,7 +41,7 @@ type
      FPathToJavaTemplates: string;
      FPathToSmartDesigner: string;
      FAndroidProjectName: string;
-     FModuleType: integer;     {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+     FModuleType: integer;     {-1: Gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console; }
      FSyntaxMode: TSyntaxMode;   {}
 
      FPieChecked: boolean;
@@ -117,6 +120,18 @@ type
     function DoInitDescriptor: TModalResult; override;
   end;
 
+  {TAndroidGdxProjectDescriptor}
+
+  TAndroidGdxProjectDescriptor = class(TAndroidProjectDescriptor)
+  public
+    constructor Create; override;
+    function GetLocalizedName: string; override;
+    function GetLocalizedDescription: string; override;
+    function DoInitDescriptor: TModalResult; override;
+  end;
+
+  {TAndroidNoGUIExeProjectDescriptor}
+
   TAndroidNoGUIExeProjectDescriptor = class(TAndroidProjectDescriptor)   //console executable App
   public
     constructor Create; override;
@@ -131,7 +146,36 @@ type
   public
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
-    ModuleType: integer;   //0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
+    ModuleType: integer;   //-1:gdx 0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
+
+    constructor Create; override;
+
+    function CreateSource(const Filename     : string;
+                          const SourceName   : string;
+                          const ResourceName : string): string; override;
+
+    function GetInterfaceUsesSection: string; override;
+
+    function GetInterfaceSource(const Filename     : string;
+                                const SourceName   : string;
+                                const ResourceName : string): string; override;
+
+    function GetResourceType: TResourceType; override;
+    function GetLocalizedName: string; override;
+    function GetLocalizedDescription: string; override;
+    function GetImplementationSource(const Filename     : string;
+                                     const SourceName   : string;
+                                     const ResourceName : string): string; override;
+  end;
+
+
+  TAndroidFileDescPascalUnitWithResourceGDX = class(TFileDescPascalUnitWithResource)
+  private
+    //
+  public
+    SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
+    PathToJNIFolder: string;
+    ModuleType: integer;   //-1:gdx 0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
 
     constructor Create; override;
 
@@ -157,9 +201,13 @@ type
 
 var
   AndroidProjectDescriptor: TAndroidProjectDescriptor;
-  AndroidFileDescriptor: TAndroidFileDescPascalUnitWithResource;
+
+  AndroidFileDescriptor: TAndroidFileDescPascalUnitWithResource;  //GUI
+  AndroidFileDescriptorGDX: TAndroidFileDescPascalUnitWithResourceGDX;
 
   AndroidGUIProjectDescriptor: TAndroidGUIProjectDescriptor;
+  AndroidGdxProjectDescriptor: TAndroidGdxProjectDescriptor;
+
   AndroidNoGUIExeProjectDescriptor: TAndroidNoGUIExeProjectDescriptor;
 
 
@@ -177,8 +225,10 @@ procedure Register;
 begin
   FormEditingHook.RegisterDesignerMediator(TAndroidWidgetMediator);
   AndroidFileDescriptor := TAndroidFileDescPascalUnitWithResource.Create;
+  AndroidFileDescriptorGDX := TAndroidFileDescPascalUnitWithResourceGDX.Create;
 
   RegisterProjectFileDescriptor(AndroidFileDescriptor);
+  RegisterProjectFileDescriptor(AndroidFileDescriptorGDX);
 
   AndroidProjectDescriptor:= TAndroidProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidProjectDescriptor);
@@ -186,14 +236,287 @@ begin
   AndroidGUIProjectDescriptor:= TAndroidGUIProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidGUIProjectDescriptor);
 
+  AndroidGdxProjectDescriptor:= TAndroidGdxProjectDescriptor.Create;
+  RegisterProjectDescriptor(AndroidGdxProjectDescriptor);
+
   AndroidNoGUIExeProjectDescriptor:= TAndroidNoGUIExeProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidNoGUIExeProjectDescriptor);
 
   FormEditingHook.RegisterDesignerBaseClass(TAndroidModule);
+  FormEditingHook.RegisterDesignerBaseClass(TGdxModule);
+
   FormEditingHook.RegisterDesignerBaseClass(TNoGUIAndroidModule);
   FormEditingHook.RegisterDesignerBaseClass(TAndroidConsoleDataForm);
 
   LamwSmartDesigner.Init;
+end;
+
+{ TAndroidGdxProjectDescriptor }
+
+constructor TAndroidGdxProjectDescriptor.Create;
+begin
+  inherited Create;
+  Name := 'Create a new LAMW [libGDX] Android Project';
+end;
+
+function TAndroidGdxProjectDescriptor.GetLocalizedName: string;
+begin
+  //Result:=inherited GetLocalizedName;
+   Result:= 'LAMW [libGDX] Android Module';
+end;
+
+function TAndroidGdxProjectDescriptor.GetLocalizedDescription: string;
+begin
+  //Result:=inherited GetLocalizedDescription;
+  Result:=  'WARNING!!! A Proof of Concept!!!!'+ LineEnding +
+            'LAMW [libGDX] Android loadable module (.so)'+ LineEnding +
+            'with Form and Android libGDX Components.'+ LineEnding +
+            'The project and library file are maintained by Lazarus.';
+  ActivityModeDesign:= actMain;  //main
+end;
+
+function TAndroidGdxProjectDescriptor.DoInitDescriptor: TModalResult;
+var
+  strAfterReplace, strPack, aux: string;
+  auxList, ControlsJava: TStringList;
+  outTag, i: integer;
+begin
+
+  ShowMessage('WARNING!!! libGDX Proof of Concept!! Go to "...demos/libGDX" !!');
+  Exit;
+
+  try
+    FModuleType := -1; //-1: gdx 0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
+    FJavaClassName := 'Controls';
+    FPathToClassName := '';
+    if GetWorkSpaceFromForm(-1, outTag) then //Gdx
+    begin
+      with TStringList.Create do
+        try
+          strPack := FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
+
+          LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
+          Strings[0] := 'package ' + strPack + ';';  //replace dummy - Controls.java
+          aux:=  StringReplace(Text, '/*libsmartload*/' ,
+                 'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
+                 [rfReplaceAll,rfIgnoreCase]);
+          Text:= aux;
+          SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
+
+          Clear;
+
+          if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java') then
+          begin
+              LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java');
+              Strings[0] := 'package ' + strPack + ';'; //replace dummy App.java
+              SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'App.java');
+          end;
+
+          if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java') then
+          begin
+            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java');
+            Strings[0] := 'package ' + strPack + ';'; //replace dummy
+            SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'MyGdxGame.java');
+          end;
+
+          if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.java') then
+          begin
+            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.java');
+            Strings[0] := 'package ' + strPack + ';'; //replace dummy
+            SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jGdxForm.java');
+
+            ControlsJava:= TStringList.Create;
+            ControlsJava.LoadFromFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
+
+            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.create');
+            auxList:= TStringList.Create;
+            auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.native');
+            for i:= 0 to auxList.Count-1 do
+            begin
+              Add(auxList.Strings[i]);
+            end;
+            ControlsJava.Insert(ControlsJava.Count-1, Text);
+            ControlsJava.SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
+            ControlsJava.Free;
+            auxList.Free;
+          end;
+
+          CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
+
+          if FileExists(FPathToJavaTemplates+DirectorySeparator + 'Controls.native') then
+          begin
+            CopyFile(FPathToJavaTemplates+DirectorySeparator + 'Controls.native',
+              FAndroidProjectName+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.native');
+          end;
+
+          if FileExists(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java') then
+          begin
+            LoadFromFile(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java');
+            Strings[0] := 'package ' + strPack + ';';  //replace dummy
+            SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
+          end;
+
+      finally
+          Free;
+      end;
+
+      FPathToJNIFolder := FAndroidProjectName;
+      AndroidFileDescriptorGDX.PathToJNIFolder:= FPathToJNIFolder;
+      AndroidFileDescriptorGDX.ModuleType:= -1;
+
+      with TJavaParser.Create(FFullJavaSrcPath + DirectorySeparator+  'Controls.java') do
+      try         //"Controls.events" produced by FormWorkspace
+        FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'Controls.events');
+      finally
+        Free;
+      end;
+
+      CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni');
+      CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'arm64-v8a');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86_64');
+      CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
+
+      if  FModuleType < 2 then
+        CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
+
+      if FProjectModel = 'Ant' then
+      begin
+        auxList:= TStringList.Create;
+        //eclipe compatibility [Neon!]
+        CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
+        auxList.Add('eclipse.preferences.version=1');
+        auxList.Add('org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.7');
+        auxList.Add('org.eclipse.jdt.core.compiler.compliance=1.7');
+        auxList.Add('org.eclipse.jdt.core.compiler.source=1.7');
+        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.settings'+DirectorySeparator+'org.eclipse.jdt.core.prefs');
+        auxList.Clear;
+        auxList.Add('<?xml version="1.0" encoding="UTF-8"?>');
+        auxList.Add('<classpath>');
+	auxList.Add('<classpathentry kind="src" path="src"/>');
+	auxList.Add('<classpathentry kind="src" path="gen"/>');
+	auxList.Add('<classpathentry kind="con" path="org.eclipse.andmore.ANDROID_FRAMEWORK"/>');
+	auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.LIBRARIES"/>');
+	auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.DEPENDENCIES"/>');
+	auxList.Add('<classpathentry kind="output" path="bin/classes"/>');
+        auxList.Add('</classpath>');
+        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.classpath');
+
+        auxList.Clear;
+        auxList.Add('<projectDescription>');
+        auxList.Add('	<name>'+FSmallProjName+'</name>');
+        auxList.Add('	<comment></comment>');
+        auxList.Add('	<projects>');
+        auxList.Add('	</projects>');
+        auxList.Add('	<buildSpec>');
+        auxList.Add('		<buildCommand>');
+        auxList.Add('			<name>org.eclipse.andmore.ResourceManagerBuilder</name>');
+        auxList.Add('			<arguments>');
+        auxList.Add('			</arguments>');
+        auxList.Add('		</buildCommand>');
+        auxList.Add('		<buildCommand>');
+        auxList.Add('			<name>org.eclipse.andmore.PreCompilerBuilder</name>');
+        auxList.Add('			<arguments>');
+        auxList.Add('			</arguments>');
+        auxList.Add('		</buildCommand>');
+        auxList.Add('		<buildCommand>');
+        auxList.Add('			<name>org.eclipse.jdt.core.javabuilder</name>');
+        auxList.Add('			<arguments>');
+        auxList.Add('			</arguments>');
+        auxList.Add('		</buildCommand>');
+        auxList.Add('		<buildCommand>');
+        auxList.Add('			<name>org.eclipse.andmore.ApkBuilder</name>');
+        auxList.Add('			<arguments>');
+        auxList.Add('			</arguments>');
+        auxList.Add(' 		</buildCommand>');
+        auxList.Add('	</buildSpec>');
+        auxList.Add('	<natures>');
+        auxList.Add('		<nature>org.eclipse.andmore.AndroidNature</nature>');
+        auxList.Add('		<nature>org.eclipse.jdt.core.javanature</nature>');
+        auxList.Add('	</natures>');
+        auxList.Add('</projectDescription>');
+        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.project');
+
+        auxList.Clear;
+        auxList.Add('# To enable ProGuard in your project, edit project.properties');
+        auxList.Add('# to define the proguard.config property as described in that file.');
+        auxList.Add('#');
+        auxList.Add('# Add project specific ProGuard rules here.');
+        auxList.Add('# By default, the flags in this file are appended to flags specified');
+        auxList.Add('# in ${sdk.dir}/tools/proguard/proguard-android.txt');
+        auxList.Add('# You can edit the include path and order by changing the ProGuard');
+        auxList.Add('# include property in project.properties.');
+        auxList.Add('#');
+        auxList.Add('# For more details, see');
+        auxList.Add('#   http://developer.android.com/guide/developing/tools/proguard.html');
+        auxList.Add(' ');
+        auxList.Add('# Add any project specific keep options here:');
+        auxList.Add(' ');
+        auxList.Add('# If your project uses WebView with JS, uncomment the following');
+        auxList.Add('# and specify the fully qualified class name to the JavaScript interface');
+        auxList.Add('# class:');
+        auxList.Add('#-keepclassmembers class fqcn.of.javascript.interface.for.webview {');
+        auxList.Add('#   public *;');
+        auxList.Add('#}');
+        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'proguard-project.txt');
+
+        auxList.Clear;
+        auxList.Add('# This file is automatically generated by Android Tools.');
+        auxList.Add('# Do not modify this file -- YOUR CHANGES WILL BE ERASED!');
+        auxList.Add('#');
+        auxList.Add('# This file must be checked in Version Control Systems.');
+        auxList.Add('#');
+        auxList.Add('# To customize properties used by the Ant build system edit');
+        auxList.Add('# "ant.properties", and override values to adapt the script to your');
+        auxList.Add('# project structure.');
+        auxList.Add('#');
+        auxList.Add('# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):');
+        auxList.Add('#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
+        auxList.Add(' ');
+        auxList.Add('# Project target.');
+
+        auxList.Add('target=android-'+FTargetApi);
+
+        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
+        auxList.Free;
+      end;
+
+      //AndroidManifest.xml creation:
+      with TStringList.Create do
+      try
+
+        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'androidmanifest.txt');
+
+        strAfterReplace  := StringReplace(Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
+
+        strPack:= strPack+'.'+FMainActivity; {gApp}
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
+
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
+
+        Clear;
+        Text:= strAfterReplace;
+        SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+      finally
+        Free;
+      end;
+
+      Result := mrOK
+    end else
+      Result := mrAbort;
+  except
+    on e: Exception do
+    begin
+      MessageDlg('Error', e.Message, mtError, [mbOk], 0);
+      Result := mrAbort;
+    end;
+  end;
 end;
 
 {TAndroidNoGUIExeProjectDescriptor}
@@ -223,7 +546,7 @@ var
   outTag: integer;
 begin
   try
-    FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console  3: generic library
+    FModuleType := 2; //-1: gdx 0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console  3: generic library
     FPathToClassName := '';
     if GetWorkSpaceFromForm(2, outTag) then
     begin
@@ -412,7 +735,6 @@ var
   strAfterReplace, strPack, aux: string;
   auxList: TStringList;
   outTag: integer;
-
 begin
   try
     FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
@@ -438,6 +760,11 @@ begin
              if FileExists(FPathToJavaTemplates + DirectorySeparator + 'support'+DirectorySeparator+'App.java') then
                LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'support'+DirectorySeparator+'App.java');
           end
+          {else if Pos('GDXGame', FAndroidTheme) > 0 then
+          begin
+             if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java') then
+               LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java');
+          end }
           else
           begin
              if FileExists(FPathToJavaTemplates + DirectorySeparator + 'App.java') then
@@ -446,6 +773,18 @@ begin
 
           Strings[0] := 'package ' + strPack + ';'; //replace dummy App.java
           SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'App.java');
+
+          (*
+          if Pos('GDXGame', FAndroidTheme) > 0 then
+          begin
+             if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java') then
+             begin
+               LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java');
+               Strings[0] := 'package ' + strPack + ';'; //replace dummy App.java
+               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'MyGdxGame.java');
+             end;
+          end;
+          *)
 
           CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
           if FileExists(FPathToJavaTemplates+DirectorySeparator + 'Controls.native') then
@@ -615,13 +954,17 @@ begin
       //AndroidManifest.xml creation:
       with TStringList.Create do
       try
+
+        //if Pos('GDXGame', FAndroidTheme) > 0 then
+          //LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'androidmanifest.txt')
+        //else
         LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'androidmanifest.txt');
+
         strAfterReplace  := StringReplace(Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
 
         strPack:= strPack+'.'+FMainActivity; {gApp}
         strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
 
-        {fix bug  - 04 jan 2014}
         strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
         strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
@@ -732,7 +1075,7 @@ var
   frm: TFormAndroidProject;
 begin
   Result := False;
-  FModuleType:= projectType; //0:GUI <--> 1:NoGUI <--> 2:NoGUI console Exe
+  FModuleType:= projectType; //-1:gdx 0:GUI <--> 1:NoGUI <--> 2:NoGUI console Exe
   frm:= TFormAndroidProject.Create(nil);  //Create Form
 
   frm.PathToJavaTemplates:= FPathToJavaTemplates;
@@ -1071,13 +1414,16 @@ var
   directive, compatVer, designVer, cardVer, recyclerVer: string;
 begin
   Result:= False;
-  FModuleType:= projectType; //0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
+  FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
 
   AndroidFileDescriptor.ModuleType:= projectType;
   strList:= nil;
   frm:= TFormWorkspace.Create(nil);
   try
     strList:= TStringList.Create;
+
+    frm.ModuleType:= projectType;
+
     frm.LoadSettings(SettingsFilename);
 
     frm.ComboSelectProjectName.Text:= MakeUniqueName('AppLAMWProject', frm.ComboSelectProjectName.Items);
@@ -1088,6 +1434,27 @@ begin
 
     frm.CheckBoxPIE.Visible:= False;
     frm.CheckBoxLibrary.Visible:= False;
+
+    if projectType = -1 then //Gdx
+    begin
+      frm.Color:= clWhite;
+      frm.PanelButtons.Color:= clWhite;
+
+      frm.ComboSelectProjectName.Text:= MakeUniqueName('AppLAMWGdxProject', frm.ComboSelectProjectName.Items);
+
+      frm.LabelTheme.Caption:= 'App LAMW [libGDX] Project';
+
+      frm.cbBuildSystem.Clear;
+      frm.cbBuildSystem.Items.Add('Gradle');
+      frm.cbBuildSystem.Text:= 'Gradle';
+
+      frm.ComboBoxTheme.Clear;
+      frm.ComboBoxTheme.Items.Add('GDXGame');
+      frm.ComboBoxTheme.Text:= 'GDXGame';
+      FAndroidTheme:= 'GDXGame';
+      //frm.ComboBoxTheme.Visible:= False;
+      frm.SpeedButtonHintTheme.Visible:= False;
+    end;
 
     if projectType = 1 then //No GUI
     begin
@@ -1124,8 +1491,6 @@ begin
       frm.CheckBoxLibrary.Visible:= True;  //support to generic [not jni] .so library
 
     end;
-
-    frm.ModuleType:= projectType;  //<-- input to form
 
     if frm.ShowModal = mrOK then
     begin
@@ -1175,7 +1540,7 @@ begin
         FModuleType:= 3;
       end;
 
-      FMainActivity:= frm.MainActivity;
+      FMainActivity:= frm.MainActivity;  //App
       FJavaClassName:= frm.JavaClassName;
 
       FProjectModel:= frm.ProjectModel;   //<-- output from [Eclipse or Ant Project]
@@ -1194,7 +1559,7 @@ begin
       try
         if  FProjectModel = 'Ant' then
         begin
-          if FModuleType < 2 then   //0: GUI project   1: NoGui project   2: NoGUI Exe
+          if FModuleType < 2 then   //-1:gdx 0: GUI project   1: NoGui project   2: NoGUI Exe
           begin
             ForceDirectories(FAndroidProjectName + DirectorySeparator + 'src');
 
@@ -1245,6 +1610,11 @@ begin
                 CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+FAndroidTheme+'.xml',
                           FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
             end
+            else if Pos('GDXGame', FAndroidTheme) > 0 then
+            begin
+                CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+FAndroidTheme+'.xml',
+                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
+            end
             else
             begin
                CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'styles.xml',
@@ -1285,7 +1655,7 @@ begin
 
             //replace "dummyTheme" ..res\values-v21
             strList.Clear;
-            if Pos('AppCompat', FAndroidTheme) <= 0 then  //not AppCompat
+            if (Pos('AppCompat', FAndroidTheme) <= 0) and (Pos('GDXGame', FAndroidTheme) <= 0) then  //not AppCompat
             begin
               CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
               //replace "dummyTheme" ..res\values-v21
@@ -1319,7 +1689,7 @@ begin
 
           end;
 
-          if FModuleType = 0 then  //Android Bridges Controls... [GUI]
+          if FModuleType <= 0 then  //Android Bridges Controls... [GUI] and Gdx
           begin
             if not FileExists(FFullJavaSrcPath+DirectorySeparator+'App.java') then
             begin
@@ -1960,12 +2330,24 @@ begin
 
                 strList.Add('allprojects {');
                 strList.Add('    repositories {');
+
                 if androidPluginNumber >= 300 then
-                strList.Add('       google()')
+                  strList.Add('       google()')
                 else
-                strList.Add('     //google()');
+                  strList.Add('     //google()');
+
                 strList.Add('       jcenter()');
+
+                if Pos('GDXGame', FAndroidTheme) > 0 then
+                begin
+                  strList.Add('       mavenLocal()');
+                  strList.Add('       mavenCentral()');
+                  strList.Add('       maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }');
+                  strList.Add('       maven { url "https://oss.sonatype.org/content/repositories/releases/" }');
+                end;
+
                 strList.Add('       maven { url ''https://jitpack.io'' }');
+
                 strList.Add('    }');
                 strList.Add('}');
 
@@ -2081,13 +2463,15 @@ begin
                    strList.Add('    '+directive+' ''com.android.support:cardview-v7:'+cardVer+'''');
                    strList.Add('    '+directive+' ''com.android.support:recyclerview-v7:'+recyclerVer+'''');
                    //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
-                   {from:
-                   C:\android\sdk\extras\android\m2repository\com\android\support\appcompat-v7
-                   C:\android\sdk\extras\android\m2repository\com\android\support\design
-                   C:\android\sdk\extras\android\m2repository\com\android\support\cardview-v7
-                   C:\android\sdk\extras\android\m2repository\com\android\support\recyclerview-v7  //25.3.1
-                   C:\android\sdk\extras\google\m2repository\com\google\android\gms\play-services-ads   //11.0.4
-                   }
+                end;
+
+                if Pos('GDXGame', FAndroidTheme) > 0 then
+                begin
+                   if androidPluginNumber >=  300 then directive:= 'api';
+                   strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx:1.9.10''');
+                   strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
+                   strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-backend-android:1.9.10''');
+                   strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
                 end;
 
                 strList.Add('}');
@@ -2666,12 +3050,17 @@ begin
   else
      projDir:= FPathToJNIFolder+DirectorySeparator;
 
-  if FModuleType = 0 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+  if FModuleType = -1 then    {-1: gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+  begin
+    AProject.CustomData.Values['LAMW'] := 'GDX';
+    AProject.CustomData.Values['Theme']:= 'GDXGame';
+    AProject.CustomData['StartModule'] := 'GdxModule1';
+  end
+  else if FModuleType = 0 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
   begin
     AProject.CustomData.Values['LAMW'] := 'GUI';
     AProject.CustomData.Values['Theme']:= FAndroidTheme;
     AProject.CustomData['StartModule'] := 'AndroidModule1';
-    //AProject.CustomData['TAG']:= '0';
   end
   else if  FModuleType = 1 then
     AProject.CustomData.Values['LAMW'] := 'NoGUI'
@@ -2680,7 +3069,7 @@ begin
   else
     AProject.CustomData.Values['LAMW'] := 'NoGUIGenericLibrary';    // FModuleType = 3
 
-  if FModuleType < 2 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+  if FModuleType < 2 then    {-1:gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
     AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
 
   AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
@@ -2696,8 +3085,8 @@ begin
   AProject.AddFile(MainFile, False);
   AProject.MainFileID := 0;
 
-  if FModuleType = 0 then  //GUI
-    AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI controls
+  if FModuleType <= 0 then  //GUI
+    AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI or gdx  controls
 
   sourceList:= TStringList.Create;
   sourceList.Add('{hint: save all files to location: ' + projDir + ' }');
@@ -2715,7 +3104,7 @@ begin
 
   sourceList.Add('uses');
 
-  if FModuleType = 0 then  //GUI controls
+  if FModuleType <= 0 then  //GUI or gdx controls
   begin
     sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,');
     sourceList.Add('  Laz_And_Controls_Events;');
@@ -2805,7 +3194,7 @@ begin
     sourceList.Add('  Unit1;');  //ok
   end;
 
-  if FModuleType = 0 then //GUI
+  if FModuleType <= 0 then //GUI
   begin
     sourceList.Add('{%region /fold ''LAMW generated code''}');
     sourceList.Add('');
@@ -2817,7 +3206,18 @@ begin
 
   if FModuleType < 3 then sourceList.Add('begin');
 
-  if FModuleType = 0 then  //Android Bridges controls...
+  if FModuleType = -1 then  //Gdx Android Bridges controls...
+  begin
+    sourceList.Add('  gApp:= jApp.Create(nil);');
+    sourceList.Add('  gApp.Title:= ''LAMW GDX Android Bridges Library'';');
+    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';'); //com.example.appasynctaskdemo1
+    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';');           //com/example/appasynctaskdemo1/Controls
+    sourceList.Add('  gApp.AppName:=gjAppName;');
+    sourceList.Add('  gApp.ClassName:=gjClassName;');
+    sourceList.Add('  gApp.Initialize;');
+    sourceList.Add('  gApp.CreateForm(TGdxModule1, GdxModule1);');
+  end
+  else if FModuleType = 0 then  //GUI Android Bridges controls...
   begin
     sourceList.Add('  gApp:= jApp.Create(nil);');
     sourceList.Add('  gApp.Title:= ''LAMW JNI Android Bridges Library'';');
@@ -3073,6 +3473,15 @@ begin
   if auxInstr = 'mipsel' then auxStr:='mips';
   if auxInstr = 'armv8'  then auxStr:='arm64-v8a';
 
+  if Self.FAndroidTheme = 'GDXGame' then
+  begin
+    CopyFile(FPathToJavaTemplates+DirectorySeparator+'gdx'+DirectorySeparator+auxStr+DirectorySeparator+'libgdx.so',
+             FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'libgdx.so');
+
+    CopyFile(FPathToJavaTemplates+DirectorySeparator+'gdx'+DirectorySeparator+auxStr+DirectorySeparator+'libgdx-box2d.so',
+             FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'libgdx-box2d.so');
+  end;
+
   AProject.LazCompilerOptions.TargetCPU:= 'arm';    {-P}
   AProject.LazCompilerOptions.Libraries:= libraries_arm;  { -Fl}
 
@@ -3262,17 +3671,6 @@ begin
   auxList.Add('   > [LAMW] Build Android Apk and Run');
   auxList.Add(' ');
 
-  (*
-  if FProjectModel = 'Eclipse' then
-  begin
-    auxList.Add(' or [Eclipse IDE]');
-    auxList.Add(' ');
-    auxList.Add('   -right click your  project: -> Refresh [F5]');
-    auxList.Add(' ');
-    auxList.Add('   -right click your  project: -> Run as -> Android Application');
-  end;
-  *)
-
   if FModuleType < 2 then
     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt')
   else
@@ -3316,13 +3714,15 @@ var
   s: TLazProjectFile;
 begin
   case FModuleType of
-  0: // GUI Controls
-    AndroidFileDescriptor.ResourceClass:= TAndroidModule;
-  1: // NoGUI Controls
+  -1: // Gdx Controls
+    AndroidFileDescriptor.ResourceClass:= TGdxModule;
+   0: // GUI Controls
+    AndroidFileDescriptor.ResourceClass:= TAndroidModule;  //GUI
+   1: // NoGUI Controls
     AndroidFileDescriptor.ResourceClass:= TNoGUIAndroidModule;
-  2: // NoGUI Exe
+   2: // NoGUI Exe
     AndroidFileDescriptor.ResourceClass:= TAndroidConsoleDataForm;
-  3: // NoGUI generic library
+   3: // NoGUI generic library
     AndroidFileDescriptor.ResourceClass:= nil;
   end;
 
@@ -3344,6 +3744,19 @@ begin
       end;
   end;
 
+  if FModuleType = -1 then // Gdx
+  begin
+    // refresh theme
+    with LazarusIDE do
+      if ActiveProject.FileCount > 1 then
+      begin
+        s := ActiveProject.Files[1];
+        d := GetDesignerWithProjectFile(s, True);
+        c := d.LookupRoot;
+        (TGdxModule(c).Designer as TAndroidWidgetMediator).UpdateTheme;
+      end;
+  end;
+
   LazarusIDE.DoSaveProject([]); // save prompt for unit1
 
   Result := mrOK;
@@ -3358,7 +3771,13 @@ begin
   if  ModuleType < 3 then
   begin
     Name:= 'AndroidDataModule';
-    if ModuleType = 0 then
+
+    if ModuleType = -1 then
+    begin
+      Name:= 'AndroidGDXDataModule';
+      ResourceClass := TGdxModule;
+    end
+    else if ModuleType = 0 then
     begin
       Name:= 'AndroidDataModule';
       ResourceClass := TAndroidModule
@@ -3377,7 +3796,23 @@ begin
   end;
 end;
 
+constructor TAndroidFileDescPascalUnitWithResourceGDX.Create;
+begin
+  inherited Create;
+    //if ModuleType = -1 then
+    //begin
+      Name:= 'AndroidGDXDataModule';
+      ResourceClass := TGdxModule;
+    //end
+    UseCreateFormStatements:= True;
+end;
+
 function TAndroidFileDescPascalUnitWithResource.GetResourceType: TResourceType;
+begin
+   Result:= rtRes;
+end;
+
+function TAndroidFileDescPascalUnitWithResourceGDX.GetResourceType: TResourceType;
 begin
    Result:= rtRes;
 end;
@@ -3387,10 +3822,21 @@ begin
    Result := 'LAMW [GUI] Android jForm';
 end;
 
+function TAndroidFileDescPascalUnitWithResourceGDX.GetLocalizedName: string;
+begin
+    Result := 'LAMW [libGDX] Android jGdxForm';
+end;
+
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;
 begin
-   Result := 'Create a new LAMW [GUI] Android Module/jForm';
-   ActivityModeDesign:= actRecyclable;  //secondary jForm
+    Result := 'Create a new LAMW [GUI] Android jForm';
+    ActivityModeDesign:= actRecyclable;  //secondary GUI jForm
+end;
+
+function TAndroidFileDescPascalUnitWithResourceGDX.GetLocalizedDescription: string;
+begin
+   Result := 'Create a new LAMW [libGDX] Android jGdxForm';
+   ActivityModeDesign:= actGdxScreen; //actRecyclable;  //secondary jGdxForm
 end;
 
 function TAndroidFileDescPascalUnitWithResource.CreateSource(const Filename     : string;
@@ -3475,14 +3921,104 @@ begin
    sourceList.Free;
 end;
 
+function TAndroidFileDescPascalUnitWithResourceGDX.CreateSource(const Filename     : string;
+                                                       const SourceName   : string;
+                                                       const ResourceName : string): string;
+var
+   sourceList: TStringList;
+   uName:  string;
+begin
+   uName:= FileName;
+   uName:= SplitStr(uName,'.');
+   sourceList:= TStringList.Create;
+
+   if ModuleType < 2 then
+     sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }')
+   else
+     sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder +'}');
+
+   sourceList.Add('unit '+uName+';');
+   sourceList.Add('');
+   if SyntaxMode = smDelphi then
+      sourceList.Add('{$mode delphi}');
+   if SyntaxMode = smObjFpc then
+     sourceList.Add('{$mode objfpc}{$H+}');
+   sourceList.Add('');
+   sourceList.Add('interface');
+   sourceList.Add('');
+
+   if ModuleType = 3 then    sourceList.Add('{');
+
+   sourceList.Add('uses');
+
+   sourceList.Add('  {$IFDEF UNIX}{$IFDEF UseCThreads}');
+   sourceList.Add('  cthreads,');
+   sourceList.Add('  {$ENDIF}{$ENDIF}');
+
+
+   sourceList.Add('  ' + GetInterfaceUsesSection);
+
+   if ModuleType = 3 then    sourceList.Add('}');
+
+   if ModuleType = 1 then //no GUI
+   begin
+    sourceList.Add('');
+    sourceList.Add('const');
+    sourceList.Add('  gNoGUIjClassPath: string='''';');
+    sourceList.Add('  gNoGUIjClass: JClass=nil;');
+    sourceList.Add('  gNoGUIPDalvikVM: PJavaVM=nil;');
+   end;
+
+   if ModuleType < 3 then
+   begin
+     sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
+   end
+   else
+   begin
+      sourceList.Add(' ');
+     sourceList.Add('function SumAB(A: longint; B: longint): longint;');
+     sourceList.Add(' ');
+   end;
+
+   sourceList.Add('implementation');
+   sourceList.Add(' ');
+
+   if ModuleType < 3 then
+   begin
+      sourceList.Add(GetImplementationSource(Filename, SourceName, ResourceName));
+   end
+   else
+   begin
+      sourceList.Add('function SumAB(A: longint; B: longint): longint;');
+      sourceList.Add('begin');
+      sourceList.Add('  Result:= A + B;');
+      sourceList.Add('end;');
+      sourceList.Add(' ');
+   end;
+
+   sourceList.Add('end.');
+
+   Result:= sourceList.Text;
+
+   sourceList.Free;
+end;
+
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
-  if ModuleType = 0 then //GUI controls module
-     Result := 'Classes, SysUtils, AndroidWidget;'
+  if ModuleType = -1 then //GDX or GUI controls module
+     Result := 'Classes, SysUtils, AndroidWidget, GdxForm;'
+  else if ModuleType = 0 then //GDX or GUI controls module
+        Result := 'Classes, SysUtils, AndroidWidget;'
   else if ModuleType = 1  then  //generic module: No GUI Controls
      Result := 'Classes, SysUtils, jni;'
   else // console app or generic library
      Result := 'Classes, SysUtils;'
+end;
+
+function TAndroidFileDescPascalUnitWithResourceGDX.GetInterfaceUsesSection: string;
+begin
+    //GDX or GUI controls module
+     Result := 'Classes, SysUtils, AndroidWidget, GdxForm;'
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filename     : string;
@@ -3495,7 +4031,14 @@ begin
 
   strList.Add(' ');
   strList.Add('type');
-  if ModuleType = 0 then //GUI controls module
+  if ModuleType = -1 then //Gdx controls module
+  begin
+    if ResourceName <> '' then
+       strList.Add('  T' + ResourceName + ' = class(jGdxForm)')
+    else
+       strList.Add('  TGdxModuleXX = class(jGdxForm)');
+  end
+  else if ModuleType = 0 then //GUI controls module
   begin
     if ResourceName <> '' then
        strList.Add('  T' + ResourceName + ' = class(jForm)')
@@ -3525,7 +4068,14 @@ begin
   strList.Add('');
   strList.Add('var');
 
-  if ModuleType = 0 then //GUI controls module
+  if ModuleType = -1 then //GUI controls module
+  begin
+    if ResourceName <> '' then
+       strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
+    else
+       strList.Add('  GdxModuleXX: TDataMoule');
+  end
+  else if ModuleType = 0 then //GUI controls module
   begin
     if ResourceName <> '' then
        strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
@@ -3555,6 +4105,38 @@ begin
   strList.Free;
 end;
 
+function TAndroidFileDescPascalUnitWithResourceGDX.GetInterfaceSource(const Filename     : string;
+                                                             const SourceName   : string;
+                                                           const ResourceName : string): string;
+var
+  strList: TStringList;
+begin
+  strList:= TStringList.Create;
+
+  strList.Add(' ');
+  strList.Add('type');
+    if ResourceName <> '' then
+       strList.Add('  T' + ResourceName + ' = class(jGdxForm)')
+    else
+       strList.Add('  TGdxModuleXX = class(jGdxForm)');
+  strList.Add('  private');
+  strList.Add('    {private declarations}');
+  strList.Add('  public');
+  strList.Add('    {public declarations}');
+  strList.Add('  end;');
+  strList.Add('');
+  strList.Add('var');
+
+  if ResourceName <> '' then
+    strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
+  else
+    strList.Add('  GdxModuleXX: TDataMoule');
+
+  Result := strList.Text;
+
+  strList.Free;
+end;
+
 function TAndroidFileDescPascalUnitWithResource.GetImplementationSource(
                                            const Filename     : string;
                                            const SourceName   : string;
@@ -3567,6 +4149,20 @@ begin
 
   sttList.Add(' ');
 
+  Result:= sttList.Text;
+  sttList.Free;
+end;
+
+function TAndroidFileDescPascalUnitWithResourceGDX.GetImplementationSource(
+                                           const Filename     : string;
+                                           const SourceName   : string;
+                                           const ResourceName : string): string;
+var
+  sttList: TStringList;
+begin
+  sttList:= TStringList.Create;
+  sttList.Add('{$R *.lfm}');
+  sttList.Add(' ');
   Result:= sttList.Text;
   sttList.Free;
 end;

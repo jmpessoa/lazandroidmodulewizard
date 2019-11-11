@@ -659,7 +659,7 @@ type
 
   TPaintStyle = (psDefault, psFill , psFillAndStroke, psStroke);
 
-  TActivityMode = (actMain, actRecyclable, actSplash, actEasel);  //Conteiner
+  TActivityMode = (actMain, actRecyclable, actSplash, actEasel, actGdxScreen);
 
   //TDeviceType = (dtPhone, dtWatch);
 
@@ -814,7 +814,6 @@ type
 
 
   jForm         = class; // Forward Declaration
-  jGdxForm      = class; // Forward Declaration
   TAndroidForm  = class; // Forward Declaration
 
   TjFormStack=  record
@@ -879,10 +878,10 @@ type
     procedure CreateForm(InstanceClass: TComponentClass; out Reference);
     procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject; intent: jobject);
 
-    function GetNewId() : integer;  // by TR3E
-    function GetLastId() : integer; // by TR3E
+    function GetNewId(): integer; // by TR3E
+    function GetLastId(): integer; // by TR3E
 
-    function  GetJavaLastId : integer; // by TR3E
+    function  GetJavaLastId(): integer; // by TR3E
     procedure SetDensityAssets( _value : TDensityAssets ); // by TR3E
 
     procedure Finish();
@@ -928,6 +927,8 @@ type
 
   jControl = class(TComponent)
   protected
+    FjClass: jObject;
+    FClassPath: string; //need by new pure jni model! -->> initialized by widget.Create
     FjObject     : jObject; //jSelf - java object
     FInitialized : boolean;
     FjEnv: PJNIEnv;
@@ -1007,7 +1008,6 @@ type
     property Text: string read GetText write SetText;
     property CustomColor: DWord read FCustomColor write FCustomColor;
 
-  published
     property Left: integer read FLeft write SetLeft;
     property Top: integer read FTop write SetTop;
     property Width: integer read GetWidth write SetWidth;
@@ -1017,6 +1017,9 @@ type
     property MarginRight: integer read FMarginRight write SetMarginRight default 3;
     property MarginBottom: integer read FMarginBottom write SetMarginBottom default 3;
     property Enabled     : boolean read FEnabled  write SetEnabled;
+
+  published
+    //
   end;
 
   IAndroidWidgetDesigner = interface(IUnknown)
@@ -1029,26 +1032,22 @@ type
 
   TAndroidForm = class(TAndroidWidget)
   private
-    FAutoAssignIDs: Boolean;
     FDesigner: IAndroidWidgetDesigner;
-    //FOnAutoAssignIDs: TNotifyEvent;
     FOnCreate: TNotifyEvent;
-    FOnInit: TNotifyEvent; // by TR3E
     FOnDestroy: TNotifyEvent;
-    //FOnAutoAssignIDs: TNotifyEvent;
 
-    FOnActivityPause: TOnActivityPause;  //gdx change
-    FOnActivityResume: TOnActivityResume; //gdx
+    procedure ReadBoolAutoAssignIDs(Reader: TReader);   //hide "AutoAssignIDs"  in [old] ".lfm"
+    procedure WriteBoolAutoAssignIDs(Writer: TWriter);  //hide "AutoAssignIDs"  in [old] ".lfm"
+
+  protected
+    FModuleType: integer; //gdx
+    FPackageName: string; //gdx
+    FActivityMode: TActivityMode; //gdx
     FScreenWH: TWH; //gdx
     FScreenStyle  : TScreenStyle; //gdx
-    FOnRotate      : TOnRotate; //gdx
-    FOnActivityRst: TOnActivityRst; //gdx
 
-    procedure ReadBoolAutoAssignIDs(Reader: TReader);   //hide "AutoAssignIDs"  in ".lfm"
-    procedure WriteBoolAutoAssignIDs(Writer: TWriter);  //hide "AutoAssignIDs"  in ".lfm"
+    procedure SetActivityMode(Value: TActivityMode); virtual;
 
-    //procedure SetAutoAssignIDs(AValue: Boolean);
-  protected
     procedure InternalInvalidateRect(ARect: TRect; Erase: boolean); override;
     // tk
     procedure Loaded; override;
@@ -1056,43 +1055,31 @@ type
     procedure DefineProperties(Filer: TFiler); override;  //hide "AutoAssignIDs"  in ".lfm"
   public
 
-    //begin gdx
     ScreenStyleAtStart: TScreenStyle;    //device direction [vertical=1 and vertical=2]
     FormState     : TjFormState;
     FormIndex: integer;
     FormBaseIndex: integer;
     Finished: boolean;
-    //end gdx
 
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
     procedure Init(refApp: jApp); override;
 
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
+
     property Designer: IAndroidWidgetDesigner read FDesigner write FDesigner;
-    // tk
-    //property OnAutoAssignIDs: TNotifyEvent read FOnAutoAssignIDs write FOnAutoAssignIDs;
-    // end tk
 
-    property OnActivityPause: TOnActivityPause read FOnActivityPause write FOnActivityPause; //gdx
-    property OnActivityResume: TOnActivityResume read FOnActivityResume write FOnActivityResume;  //gdx
-
-     property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle; //gdx
-     property ScreenWH      : TWH read FScreenWH write FScreenWH; //gdx
-
-     property OnRotate     : TOnRotate      read FOnRotate      write FOnRotate;  //gdx
-     property OnActivityResult: TOnActivityRst read FOnActivityRst write FOnActivityRst; //gdx
-
-     // tk
-     property AutoAssignIDs: Boolean read FAutoAssignIDs; //write SetAutoAssignIDs default False;
-     // end tk
+    property ActivityMode: TActivityMode read FActivityMode write SetActivityMode;
+    property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle; //gdx
+    property ScreenWH      : TWH read FScreenWH write FScreenWH; //gdx
+    property ModuleType: integer read FModuleType write FModuleType; //gdx
+    property Width: integer read GetWidth write SetWidth;
+    property Height: integer read GetHeight write SetHeight;
 
   published
     property OnCreate: TNotifyEvent read FOnCreate write FOnCreate;
-    property OnInit: TNotifyEvent read FOnInit write FOnInit; // by TR3E
     property OnDestroy: TNotifyEvent read FOnDestroy write FOnDestroy;
   end;
 
@@ -1107,35 +1094,33 @@ type
     FCBDataDouble: double;
     FCBPointer: Pointer;
 
-    FjRLayout: jObject;      //form Relative Layout/view
+    FjRLayout: jObject;  //form Relative Layout/view
     FjPRLayout: jObject; //base actvity layout/view
 
     FjPRLayoutHome: jObject;  //save origin
-
-    FOnViewClick      : TViewClick; //gdx
-    FOnListItemClick  : TListItemClick;  //gdx
-
-    //FScreenWH      : TWH;  //gdx
-    //FScreenStyle   : TScreenStyle; //gdx
-    FPackageName: string;
+    FOnViewClick      : TViewClick;
+    FOnListItemClick  : TListItemClick;
 
     FAnimation     : TAnimation;
-    FActivityMode  : TActivityMode;
     FActionBarTitle: TActionBarTitle;
 
     FOnClick      : TOnNotify;
-    FOnClose      : TOnNotify;
+    FOnClose      :   TOnNotify;
     FOnCloseQuery  : TOnCloseQuery;
-
-    FOnShow      : TOnNotify; //by TR3E
-
-    //FOnRotate      : TOnRotate; //gdx
-    //FOnActivityRst : TOnActivityRst;  //gdx
-
+    FOnRotate      : TOnRotate;
+    FOnActivityRst : TOnActivityRst;
     FOnJNIPrompt   : TOnNotify;
+
     FOnBackButton  : TOnNotify;
-    FOnSpecialKeyDown      : TOnKeyDown;
-    FActionBarHeight: integer;
+    FOnSpecialKeyDown : TOnKeyDown;
+
+    //FOnNewIntent: TOnNewIntent;
+    FCloseCallback : TjCallBack; // Close Call Back Event
+
+    FOnShow: TOnNotify;       //by TR3E
+    FOnInit: TNotifyEvent;    // by TR3E
+
+    //FActionBarHeight: integer;
     FOnOptionMenuCreate: TOnOptionMenuItemCreate;
     FOnClickOptionMenuItem: TOnClickOptionMenuItem;
     FOnContextMenuCreate: TOnContextMenuItemCreate;
@@ -1144,11 +1129,10 @@ type
     FOnPrepareOptionsMenu: TOnPrepareOptionsMenu;
     FOnPrepareOptionsMenuItem: TOnPrepareOptionsMenuItem;
     FOnActivityCreate: TOnActivityCreate;
-    FOnActivityReCreate : TOnNotify;
-    //FOnActivityPause: TOnActivityPause;  //gdx change
-    //FOnActivityResume: TOnActivityResume; //gdx change
+    FOnActivityReCreate: TOnNotify;
+    FOnActivityPause: TOnActivityPause;
+    FOnActivityResume: TOnActivityResume;
     FOnRequestPermissionResult: TOnRequestPermissionResult;
-    //FOnNewIntent: TOnNewIntent;
     FLayoutVisibility: boolean;
     FBackgroundImageIdentifier: string;
 
@@ -1160,18 +1144,15 @@ type
     Procedure SetColor   (Value : TARGBColorBridge);
 
   protected
-    FCloseCallback : TjCallBack;   // Close Call Back Event
+
     Procedure SetVisible (Value : Boolean);
     Procedure SetEnabled (Value : Boolean); override;
+    procedure SetActivityMode(Value: TActivityMode); override;
+
     function  GetOnViewClickListener(jObjForm: jObject): jObject;
     function  GetOnListItemClickListener(jObjForm: jObject): jObject;
 
   public
-   (* ScreenStyleAtStart: TScreenStyle;    //device direction [vertical=1 and vertical=2]
-    FormState     : TjFormState;
-    FormIndex: integer;
-    FormBaseIndex: integer;
-    Finished: boolean; *)
     PromptOnBackKey: boolean;
     TryBacktrackOnClose: boolean;
     DoJNIPromptOnShow: boolean;
@@ -1181,9 +1162,6 @@ type
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
-    Procedure GenEvent_OnClick(Obj: TObject);
-
     procedure Init(refApp: jApp); override;
     procedure InitShowing(refApp: jApp);
     procedure ReInitShowing(refApp: jApp);
@@ -1194,9 +1172,12 @@ type
     Procedure Show(jniPrompt: boolean); overload;
 
     procedure Show(refApp: jApp); overload; //call ReInit to force the form to recreate the layout...
+
     Procedure DoJNIPrompt;
     procedure DoOnShow; //by TR3E
     procedure FormChangeSize;
+
+    Procedure GenEvent_OnClick(Obj: TObject);
 
     Procedure Close;
     Procedure Refresh;
@@ -1276,7 +1257,10 @@ type
     function  GetScreenOrientationStyle(): TScreenStyle;
 
     function GetScreenSize(): string;
-    function GetScreenDensity(): string;
+    function GetScreenDensity(): string; overload;
+    function GetScreenDensity(strDensity: string): integer; overload;
+    procedure SetDensityAssets(strDensity: string);
+
     procedure LogDebug(_tag: string; _msg: string);
     procedure Vibrate(_milliseconds: integer);  overload;
     procedure Vibrate(var _millisecondsPattern: TDynArrayOfInt64);overload;
@@ -1382,6 +1366,7 @@ type
     procedure SetAnimationDurationOut(_animationDurationOut: integer);
 
     procedure SetAnimationMode(_animationMode: TAnimationMode);
+    function GetRealPathFromURI(_Uri: jObject): string; //thanks to Segator!
 
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
@@ -1391,9 +1376,6 @@ type
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
 
     property Animation    : TAnimation     read FAnimation      write FAnimation;
-    //property ScreenStyle  : TScreenStyle   read FScreenStyle    write FScreenStyle; //gdx
-    //property ScreenWH      : TWH read FScreenWH write FScreenWH; //gdx
-
     property CallBackDataString: string read FCBDataString write FCBDataString;
     property CallBackDataInteger: integer read FCBDataInteger write FCBDataInteger;
     property CallBackDataDouble: double read FCBDataDouble write FCBDataDouble;
@@ -1414,8 +1396,19 @@ type
     property  OnListItemClick: TListItemClick read FOnListItemClick write FOnListItemClick;
 
   published
+
+    property MarginLeft: integer read FMarginLeft write SetMarginLeft default 3;
+    property MarginTop: integer read FMarginTop write SetMarginTop default 3;
+    property MarginRight: integer read FMarginRight write SetMarginRight default 3;
+    property MarginBottom: integer read FMarginBottom write SetMarginBottom default 3;
+    property Enabled     : boolean read FEnabled  write SetEnabled;
+    property Left: integer read FLeft write SetLeft;
+    property Top: integer read FTop write SetTop;
+    property Width: integer read GetWidth write SetWidth;
+    property Height: integer read GetHeight write SetHeight;
+
     property Text: string read GetText write SetText;
-    property ActivityMode  : TActivityMode read FActivityMode write FActivityMode;
+    property ActivityMode  : TActivityMode read FActivityMode write SetActivityMode;
     property BackgroundColor: TARGBColorBridge  read FColor write SetColor;
     property BackgroundImageIdentifier: string read FBackgroundImageIdentifier write SetBackgroundImageIdentifier;
     property ActionBarTitle: TActionBarTitle read FActionBarTitle write FActionBarTitle;
@@ -1424,19 +1417,16 @@ type
     property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
 
     // Event
+    property OnInit: TNotifyEvent read FOnInit write FOnInit; // by TR3E
     property OnCloseQuery : TOnCloseQuery  read FOnCloseQuery  write FOnCloseQuery;
     property OnRotate     : TOnRotate      read FOnRotate      write FOnRotate;
     property OnClick      : TOnNotify      read FOnClick       write FOnClick;
     property OnActivityResult: TOnActivityRst read FOnActivityRst write FOnActivityRst;
-
     property OnJNIPrompt  : TOnNotify read FOnJNIPrompt write FOnJNIPrompt;
-
     property OnBackButton : TOnNotify read FOnBackButton write FOnBackButton;
     property OnClose      : TOnNotify read FOnClose write FOnClose;
     property OnShow       : TOnNotify read FOnShow write FOnShow; //by TR3E
-
     property OnSpecialKeyDown    :TOnKeyDown read FOnSpecialKeyDown write FOnSpecialKeyDown;
-
     property OnCreateOptionMenu: TOnOptionMenuItemCreate read FOnOptionMenuCreate write FOnOptionMenuCreate;
     property OnClickOptionMenuItem: TOnClickOptionMenuItem read FOnClickOptionMenuItem write FOnClickOptionMenuItem;
 
@@ -1448,20 +1438,13 @@ type
 
     property OnActivityCreate: TOnActivityCreate read FOnActivityCreate write FOnActivityCreate;
     property OnActivityReCreate : TOnNotify read FOnActivityReCreate write FOnActivityReCreate;
+
     property OnActivityPause: TOnActivityPause read FOnActivityPause write FOnActivityPause;
     property OnActivityResume: TOnActivityResume read FOnActivityResume write FOnActivityResume;
     property OnRequestPermissionResult: TOnRequestPermissionResult read FOnRequestPermissionResult write FOnRequestPermissionResult;
     //property OnNewIntent: TOnNewIntent read FOnNewIntent write FOnNewIntent;
   end;
 
-  { jGdxForm }
-
-  jGdxForm = class(TAndroidForm)
-  private
-      //
-  public
-      //
-  end;
 
   {jVisualControl}
 
@@ -1549,6 +1532,20 @@ type
     property Id: DWord read FId; // Id must be read only, NOT published anymore...!
 
   published
+
+    //gdx begin
+    property MarginLeft: integer read FMarginLeft write SetMarginLeft default 3;
+    property MarginTop: integer read FMarginTop write SetMarginTop default 3;
+    property MarginRight: integer read FMarginRight write SetMarginRight default 3;
+    property MarginBottom: integer read FMarginBottom write SetMarginBottom default 3;
+    property Enabled     : boolean read FEnabled  write SetEnabled;
+
+    property Left: integer read FLeft write SetLeft;
+    property Top: integer read FTop write SetTop;
+    property Width: integer read GetWidth write SetWidth;
+    property Height: integer read GetHeight write SetHeight;
+    //gdx end
+
     property Visible: boolean read GetVisible write SetVisible;
     property Anchor  : jVisualControl read FAnchor write SetAnchor;
     property PosRelativeToAnchor: TPositionRelativeToAnchorIDSet read FPositionRelativeToAnchor
@@ -1671,6 +1668,7 @@ end;
   function jForm_GetDeviceDataMobileIPAddress(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetDeviceWifiIPAddress(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetWifiBroadcastIPAddress(env: PJNIEnv; _jform: JObject): string;
+  function jForm_GetRealPathFromURI(env: PJNIEnv; _jform: JObject; _Uri: jObject): string;
 
 //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -1805,7 +1803,7 @@ function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: 
 procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject);
 procedure jForm_RemoveFromViewParent(env: PJNIEnv; _jform: JObject);
 procedure jForm_SetLayoutVisibility(env: PJNIEnv; _jform: JObject; _value: boolean);
-function  jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
+function jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
 function jForm_GetSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string): integer;
 function jForm_GetSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string): string;
 function jForm_GetSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string): single;
@@ -1938,7 +1936,6 @@ var
 
   ActivityModeDesign: TActivityMode = actMain;
 
-
 implementation
 
 
@@ -1979,7 +1976,7 @@ end;
 function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
 begin
       if FParent is jForm then
-         Result:= (FParent as jForm).ScreenWH.Height
+         Result:= (FParent as jForm).ScreenWH.Height // - gapp.GetContextTop
       else
          Result:= (FParent as jVisualControl).GetHeight;
 end;
@@ -1995,8 +1992,7 @@ end;
 procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject; layout:jobject; intent: jobject);
 begin
   gApp.IsAppActivityRecreate := gApp.FInitialized;
-
-  gApp.FInitialized := false;
+  gApp.FInitialized := False;
   gApp.Init(env,this,context,layout, intent);
 end;
 
@@ -2221,6 +2217,7 @@ begin
   Result:= gjClass;
 end;
 
+
    {jControl: by jmpessoa}
 
 constructor jControl.Create(AOwner: TComponent);
@@ -2229,6 +2226,7 @@ begin
   FInitialized:= False;
   FEnabled:= False;
   FjObject := nil;
+  FClassPath:= '';
   FCustomColor:= $FF2C2F3E;    // <<--- thanks to Ps
 end;
 
@@ -2239,8 +2237,10 @@ end;
 
 procedure jControl.Init(refApp: jApp);
 begin
-  FjEnv  := refApp.Jni.jEnv;
-  FjThis := refApp.Jni.jThis;
+  FjEnv:= refApp.Jni.jEnv;
+  FjThis:= refApp.Jni.jThis;
+  if  FClassPath <> '' then
+     FjClass:= Get_jClassLocalRef(FClassPath);  //needed by new direct jni component model...
 end;
 
 procedure jControl.SetEnabled(Value: boolean);
@@ -2742,9 +2742,6 @@ constructor TAndroidForm.Create(AOwner: TComponent);
 begin
   CreateNew(AOwner); //no stream loaded yet.
   FAcceptChildrenAtDesignTime:= True;
-  // tk
-  //FAutoAssignIDs := True;
-  // end tk
 end;
 
 destructor TAndroidForm.Destroy;
@@ -2755,8 +2752,6 @@ end;
 procedure TAndroidForm.Init(refApp: jApp);
 begin
    Inherited Init(refApp);
-   if not (csDesigning in ComponentState) then
-     if Assigned(FOnInit) then FOnInit(Self);
 end;
 
 procedure TAndroidForm.AfterConstruction;
@@ -2780,7 +2775,6 @@ begin
   Filer.DefineProperty('AutoAssignIDs', ReadBoolAutoAssignIDs, WriteBoolAutoAssignIDs, False);
 end;
 
-
 procedure TAndroidForm.ReadBoolAutoAssignIDs(Reader: TReader);
 begin
   Reader.ReadBoolean; // Not load the AutoAssignIDs
@@ -2791,15 +2785,11 @@ begin
   Writer.WriteBoolean(False); // id write to False
 end;
 
-(*
-procedure TAndroidForm.SetAutoAssignIDs(AValue: Boolean);
+procedure TAndroidForm.SetActivityMode(Value: TActivityMode);
 begin
-  if FAutoAssignIDs=AValue then Exit;
-  FAutoAssignIDs:=AValue;
-  if Assigned(FOnAutoAssignIDs) then
-    FOnAutoAssignIDs(Self);
+   FActivityMode:= Value;
 end;
-*)
+
 procedure TAndroidForm.InternalInvalidateRect(ARect: TRect; Erase: boolean);
 begin
  if (Parent=nil) and (Designer<>nil) then
@@ -2896,7 +2886,7 @@ end;
 
 procedure jForm.Finish;
 begin
-  if FInitialized  and (not Finished)  then
+  if FInitialized and (not Finished)  then
   begin
     jForm_FreeLayout(FjEnv, FjRLayout);      //free jni jForm Layout global reference
     jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni [saved copy] jForm Layout global reference
@@ -2915,6 +2905,11 @@ begin
 
   Inherited Init(refApp);
 
+  //gdx
+  if not (csDesigning in ComponentState) then
+    if Assigned(FOnInit) then FOnInit(Self);    //by TRE3
+
+
   if FActivityMode <> actEasel then
   begin
 
@@ -2925,8 +2920,8 @@ begin
        Randomize; //thanks to Gerrit
 
     FScreenStyle:= refApp.Orientation;
-
     FScreenWH:= refApp.Screen.WH;   //sAved on start!
+
     FWidth   := refApp.Screen.WH.Width;
     FHeight  := refApp.Screen.WH.Height;
 
@@ -2976,15 +2971,15 @@ begin
 
     FormBaseIndex:= gApp.TopIndex;           //initial = -1
 
-    if (FormIndex < 0) or    //if it is a new form .... [not a ReInit form ...]
-       (FormIndex > gApp.Forms.index) then  // if ReCretateActivity
+    //if it is a new form .... [not a ReInit form ...]
+    if (FormIndex < 0) or (FormIndex > gApp.Forms.index) then  // if ReCretateActivity
         FormIndex:= gApp.GetNewFormsIndex;  // first valid index = 0;
+
 
     gApp.Forms.Stack[FormIndex].Form    := Self;
     gApp.Forms.Stack[FormIndex].CloseCB := FCloseCallBack;
 
     FormState := fsFormWork;
-    //gApp.TopIndex:= FormIndex;
 
     if Self.HasActionBar() then
     begin
@@ -3008,13 +3003,14 @@ begin
     begin
       FVisible := True;
     end;
-
     //Show ...
     if FVisible then
     begin
        gApp.TopIndex:= FormIndex;
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
+
        DoOnShow; //by TR3E
+
     end;
 
     if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
@@ -3022,10 +3018,10 @@ begin
     // Detect AppActivityRecreate, launch this event only in the main process or splash
     if gapp.IsAppActivityRecreate then
     begin
-     if (FActivityMode = actMain) or (FActivityMode = actSplash) then
-      if Assigned(FOnActivityReCreate) then FOnActivityReCreate(Self);
+       if (FActivityMode = actMain) or (FActivityMode = actSplash) then
+          if Assigned(FOnActivityReCreate) then FOnActivityReCreate(Self);
 
-     gapp.IsAppActivityRecreate := false;
+       gapp.IsAppActivityRecreate := false;
     end;
 
     if DoJNIPromptOnInit then
@@ -3037,8 +3033,8 @@ begin
   else    //actEasel ...
   begin
     FScreenStyle:= refApp.Orientation;
-
     FScreenWH:= refApp.Screen.WH;   //sAved on start!
+
     FWidth   := refApp.Screen.WH.Width;
     FHeight  := refApp.Screen.WH.Height;
 
@@ -3097,8 +3093,8 @@ begin
 
   if not FInitialized then
   begin
-   Self.Init(refApp);
-   Exit;
+     Self.Init(refApp);
+     Exit;
   end;
 
   for i:= (Self.ComponentCount-1) downto 0 do
@@ -3194,12 +3190,12 @@ end;
 
 procedure jForm.Show;
 begin
-
   if FActivityMode = actEasel then Exit;
   if FVisible then Exit;
-  if not FInitialized then Exit;
 
-  // If AppRecreateActivity [by TR3E]
+  if not FInitialized then Exit; //by TR3E
+
+  //If AppRecreateActivity [by TR3E]
   if FormIndex = -1 then
   begin
     ReInit(gapp);
@@ -3207,10 +3203,8 @@ begin
   end;
 
   FormState := fsFormWork;
-
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
-
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
   FVisible:= True;
 
@@ -3237,20 +3231,17 @@ begin
 
   FormState := fsFormWork;
   FVisible:= True;
-
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
-
   jForm_Show2(FjEnv,FjObject,FAnimation.In_);
-
   if jniPrompt then
   begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
 
   DoOnShow; //by TR3E
-end;
 
+end;
 
 procedure jForm.DoJNIPrompt;
 begin
@@ -3269,7 +3260,6 @@ begin
    FScreenWH:= gapp.Screen.WH;
    FWidth   := gapp.Screen.WH.Width;
    FHeight  := gapp.Screen.WH.Height;
-
    FormChangeSize;
   end;
 
@@ -3314,7 +3304,7 @@ begin
 
   if not Assigned(Form) then exit; //just precaution...
 
-  jForm(Form).UpdateJNI(gApp); //+++
+  jForm(Form).UpdateJNI(gApp);
 
   if jForm(Form).ActivityMode = actEasel then Exit;
 
@@ -3323,10 +3313,10 @@ begin
   // Prevents the error that is called close before it has been show [by TR3E]
   if Inx = gapp.TopIndex then
   begin
-   formBaseInx:= jForm(Form).FormBaseIndex;
-   gApp.TopIndex:= formBaseInx; //update topIndex...
+    formBaseInx:= jForm(Form).FormBaseIndex;
+    gApp.TopIndex:= formBaseInx; //update topIndex...
   end else
-   formBaseInx:= -1;
+    formBaseInx:= -1;
 
   if Assigned(jForm(Form).OnClose) then
   begin
@@ -3472,13 +3462,13 @@ begin
     Result:= jForm_IsWifiEnabled(FjEnv, FjObject);
 end;
 
-function jForm.isConnected(): boolean; // by renabor
+function jForm.IsConnected(): boolean; // by renabor
 begin
    if FInitialized then
     Result:= jForm_IsConnected(FjEnv, FjObject);
 end;
 
-function jForm.isConnectedWifi(): boolean; // by renabor
+function jForm.IsConnectedWifi(): boolean; // by renabor
 begin
   if FInitialized then
      Result:= jForm_IsConnectedWifi(FjEnv, FjObject);
@@ -3766,6 +3756,23 @@ begin
    Result:= jForm_GetScreenDensity(FjEnv, FjObject);
 end;
 
+//SplitStr(var theString: string; delimiter: string): string;
+function jForm.GetScreenDensity(strDensity: string): integer;
+begin
+   SplitStr(strDensity, ':');
+   if (strDensity <> '') then
+     Result:= StrToInt(strDensity)
+   else Result:= 0;
+end;
+
+procedure jForm.SetDensityAssets(strDensity: string);
+var
+  intDensity: integer;
+begin
+   intDensity:= Self.GetScreenDensity(strDensity);
+   gApp.SetDensityAssets(TDensityAssets(intDensity));
+end;
+
 function jForm.GetScreenSize(): string;
 begin
   //in designing component state: result value here...
@@ -3878,7 +3885,7 @@ begin
     Result := Result + LineEnding + BackTraceStrFunc(ExceptFrames[i]);
 end;
 
-function jForm.GetActionBarHeight(): integer;
+function jForm.GetActionBarHeight: integer;
 begin
   //in designing component state: result value here...
   Result:= 0;
@@ -3887,6 +3894,13 @@ begin
      if FActionBarTitle <> abtNone then
         Result:= jForm_GetActionBarHeight(FjEnv, FjObject);
   end;
+end;
+
+function jForm.GetRealPathFromURI(_Uri: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetRealPathFromURI(FjEnv, FjObject, _Uri);
 end;
 
 function jForm.ActionBarIsShowing(): boolean;
@@ -3918,6 +3932,12 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetDeviceManufacturer(FjEnv, FjObject);
+end;
+
+procedure jForm.SetActivityMode(Value: TActivityMode);
+begin
+   if Value <> actGdxScreen then
+     FActivityMode:= Value;
 end;
 
 procedure jForm.SetKeepScreenOn(_value: boolean);
@@ -5851,7 +5871,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 function jForm_GetPrimaryDarkColor(env: PJNIEnv; _jfom: JObject): integer;
 var
   jMethod: jMethodID=nil;
@@ -6312,6 +6331,28 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jForm_GetRealPathFromURI(env: PJNIEnv; _jform: JObject; _Uri: jObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _Uri;
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetRealPathFromURI', '(Landroid/net/Uri;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //-----{ jApp } ------
 
@@ -6350,7 +6391,7 @@ begin
   FNewId := 0;
   Forms.Index:= -1;
 
-  IsAppActivityRecreate := false; // For detect AppActivityRecreate
+  IsAppActivityRecreate := False; // For detect AppActivityRecreate
 end;
 
 destructor jApp.Destroy;
@@ -6359,7 +6400,6 @@ begin
 end;
 
 // To automatically enter id from 1 to the limit set by "Controls.java" [by TR3E]
-
 function jApp.GetNewId() : integer;
 begin
  FNewId := FNewId + 1;
@@ -6387,27 +6427,25 @@ end;
 procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject;
   layout: jObject; intent: jobject);
 var
-  i, startOrient : integer;
-  Form: TAndroidForm; //jForm;  //gdx change
+  startOrient, i: integer;
+  AForm: TAndroidForm;
 begin
   if FInitialized  then Exit;
 
-  // If AppRecreateActivity reset forms
+  //If AppRecreateActivity reset forms
   if gapp.Forms.Index >= 0 then
   begin
-   gapp.TopIndex:= -1;
-
-   for i := 0 to gapp.Forms.Index do
-   begin
-    Form := gApp.Forms.Stack[i].Form;
-    Form.FormIndex := -1;
-    Form.FVisible  := false;
-   end;
+    gapp.TopIndex:= -1;
+    for i := 0 to gapp.Forms.Index do
+    begin
+      AForm := gApp.Forms.Stack[i].Form;
+      AForm.FormIndex := -1;
+      AForm.FVisible  := false;
+    end;
   end;
 
   // Setting Global Environment
   FillChar(Forms,SizeOf(Forms),#0);
-
   Forms.Index:= -1; //initial dummy index ...
 
   // Jni
@@ -6423,7 +6461,7 @@ begin
 
   // Screen
   Screen.WH     := jSysInfo_ScreenWH(env, this, activity);
-  startOrient   := jSystem_GetOrientation(env, this);
+  startOrient:= jSystem_GetOrientation(env, this);
 
   if  startOrient = 1 then
        Orientation   :=  ssPortrait
@@ -6458,7 +6496,6 @@ begin
   //Device.PhoneNumber := jSysInfo_DevicePhoneNumber(env, this);
   //Device.ID          := jSysInfo_DeviceID(env, this);
   FInitialized       := True;
-
 end;
 
 procedure jApp.CreateForm(InstanceClass: TComponentClass; out Reference);
@@ -6471,10 +6508,10 @@ begin
 
   if Instance <> nil then
   begin
-   TComponent(Reference) := Instance;
-   Instance.Create(Self);
+    TComponent(Reference) := Instance;
+    Instance.Create(Self);
   end else
-   TComponent(Reference) := nil;
+    TComponent(Reference) := nil;
 end;
 
 function jApp.GetCurrentFormsIndex: integer;
@@ -6802,7 +6839,7 @@ function GetParamBySide(App:jApp; side: TSide): DWord;
 begin
    case side of
      sdW: Result:= App.Screen.WH.Width;
-     sdH: Result:= App.Screen.WH.Height;
+     sdH: Result:= App.Screen.WH.Height; // - app.GetContextTop;
    end;
 end;
 

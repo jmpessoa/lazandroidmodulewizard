@@ -1,0 +1,3 @@
+public java.lang.Object jGdxSprite_jCreate(long _Self) {
+  return (java.lang.Object)(new jGdxSprite(this,_Self));
+}

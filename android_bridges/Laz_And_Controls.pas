@@ -528,10 +528,10 @@ type
     Destructor  Destroy; override;
     procedure Init(refApp: jApp) override;
 
-    procedure LoadFromBuffer(buffer: Pointer; size: Integer); // by Kordal
+    procedure LoadFromBuffer(buffer: Pointer; size: Integer); overload;// by Kordal
+    function LoadFromBuffer(var buffer: TDynArrayOfJByte): jObject;  overload;
     Procedure LoadFromFile(fullFileName : String);
     Procedure LoadFromRes( imgResIdentifier: String);  // ..res/drawable
-
 
     Procedure CreateJavaBitmap(w,h : Integer);
     Function  GetJavaBitmap: jObject;  //deprecated ..
@@ -558,7 +558,7 @@ type
     function AntiClockWise(_bmp: jObject): jObject;
     function SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject; overload;
     function SetScale(_scaleX: single; _scaleY: single): jObject; overload;
-    function LoadFromAssets(strName: string): jObject;
+    function LoadFromAssets(fileName: string): jObject;
     function GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject; overload;
     function GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject; overload;
     function GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject; overload;
@@ -570,15 +570,21 @@ type
     function GetJByteBufferFromImage(_bmap: jObject): jObject; overload;
     function GetJByteBufferFromImage(): jObject; overload;
     function GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
-    function GetImageFromFile(_fullFilename: string): jObject;
+    function GetImageFromFile(_fullPathFile: string): jObject;
     function GetRoundedShape(_bitmapImage: jObject): jObject;   overload;
     function GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject; overload;
     function DrawText(_bitmapImage: jObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;overload;
     function DrawText(_text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;overload;
     function DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
-    procedure SaveToFileJPG(_fullPathFileName: string);
+    procedure SaveToFileJPG(_fullPathFile: string);
     procedure SetImage(_bitmapImage: jObject);
     function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
+    function GetThumbnailImage(_fullPathFile: string; _thumbnailSize: integer): jObject; overload;
+    function GetThumbnailImage(_fullPathFile: string; _width: integer; _height: integer): jObject;overload;
+    function GetThumbnailImage(_bitmap: jObject; _thumbnailSize: integer): jObject; overload;
+    function GetThumbnailImage(_bitmap: jObject; _width: integer; _height: integer): jObject; overload;
+    function GetThumbnailImageFromAssets(_filename: string; thumbnailSize: integer): jObject; overload;
+    function GetThumbnailImageFromAssets(_filename: string; _width: integer; _height: integer): jObject;overload;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -1429,6 +1435,7 @@ type
     procedure SetImage(_bitmap: jObject; _width: integer; _height: integer); overload;
     Procedure SetImage(_fullFilename: string); overload;
     procedure SetImageFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer);
+    procedure SetImageFromAssets(_filename: string);
 
     procedure SetRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
@@ -1740,15 +1747,22 @@ type
 
   TOnScrollChanged = procedure(Sender: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; position:  TScrollPosition; scrolldiff: integer) of Object;
 
+  TOnScrollViewInnerItemClick=procedure(Sender:TObject;itemId:integer) of object;
+  TScrollInnerLayout = (ilRelative, ilLinear);
+
+  { jScrollView }
+
   jScrollView = class(jVisualControl)
   private
+    FInnerLayout: TScrollInnerLayout;
     FScrollSize : integer;
     FFillViewportEnabled: boolean;
     FOnScrollChanged: TOnScrollChanged;
+    FOnScrollViewInnerItemClick: TOnScrollViewInnerItemClick;
 
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
-    
+    procedure SetInnerLayout(layout: TScrollInnerLayout);
   protected
     function GetView: jObject; override;
     //procedure SetParamWidth(Value: TLayoutParams); override; TODO
@@ -1780,20 +1794,44 @@ type
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
 
+    procedure AddView(_view: jObject);
+    procedure AddImage(_bitmap: jObject); overload;
+    procedure AddImage(_bitmap: jObject; _itemId: integer); overload;
+    procedure AddImage(_bitmap: jObject; _itemId: integer; _scaleType: TImageScaleType); overload;
+
+    procedure AddImageFromFile(_path: string; _filename: string);  overload;
+    procedure AddImageFromFile(_path: string; _filename: string; _itemId: integer); overload;
+    procedure AddImageFromFile(_path: string; _filename: string; _itemId: integer; _scaleType: TImageScaleType);overload;
+
+    procedure AddImageFromAssets(_filename: string); overload;
+    procedure AddImageFromAssets(_filename: string; _itemId: integer); overload;
+    procedure AddImageFromAssets(_filename: string; _itemId: integer; _scaleType: TImageScaleType);overload;
+
+    procedure AddText(_text: string);
+
+    procedure GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
+
   published
+    property InnerLayout: TScrollInnerLayout read FInnerLayout write SetInnerLayout;
     property FillViewportEnabled: boolean read FFillViewportEnabled write SetFillViewport;
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     property BackgroundColor: TARGBColorBridge read FColor  write SetColor;
     property OnScrollChanged: TOnScrollChanged read FOnScrollChanged write FOnScrollChanged;
+    property OnInnerItemClick: TOnScrollViewInnerItemClick read FOnScrollViewInnerItemClick write FOnScrollViewInnerItemClick;
   end;
+
+  { jHorizontalScrollView }
 
   jHorizontalScrollView = class(jVisualControl)
   private
+    FInnerLayout: TScrollInnerLayout;
     FScrollSize : integer;
     FOnScrollChanged: TOnScrollChanged;
+    FOnScrollViewInnerItemClick: TOnScrollViewInnerItemClick;
 
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
+    procedure SetInnerLayout(layout: TScrollInnerLayout);
     
   protected
     function GetView: jObject; override;
@@ -1820,10 +1858,32 @@ type
     procedure SetViewParent(Value: jObject); override;
     procedure RemoveFromViewParent;  override;
 
+    function GetWidth: integer;  override;
+    function GetHeight: integer; override;
+
+    procedure AddView(_view: jObject);
+    procedure AddImage(_bitmap: jObject); overload;
+    procedure AddImage(_bitmap: jObject; _itemId: integer); overload;
+    procedure AddImage(_bitmap: jObject; _itemId: integer; _scaleType: TImageScaleType); overload;
+
+    procedure AddImageFromFile(_path: string; _filename: string);  overload;
+    procedure AddImageFromFile(_path: string; _filename: string; _itemId: integer); overload;
+    procedure AddImageFromFile(_path: string; _filename: string; _itemId: integer; _scaleType: TImageScaleType);overload;
+
+    procedure AddImageFromAssets(_filename: string); overload;
+    procedure AddImageFromAssets(_filename: string; _itemId: integer); overload;
+    procedure AddImageFromAssets(_filename: string; _itemId: integer; _scaleType: TImageScaleType);overload;
+
+    procedure AddText(_text: string);
+
+    procedure GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
+
   published
+    property InnerLayout: TScrollInnerLayout read FInnerLayout write SetInnerLayout;
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
     property OnScrollChanged: TOnScrollChanged read FOnScrollChanged write FOnScrollChanged;
+    property OnInnerItemClick: TOnScrollViewInnerItemClick read FOnScrollViewInnerItemClick write FOnScrollViewInnerItemClick;
   end;
 
   //------------------------------------------------------------------
@@ -1955,9 +2015,8 @@ type
     procedure SetCanvas(_canvas: jObject);
     procedure DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
-    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject; overload;
-    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject; overload;
-
+    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;overload;
+    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject; overload; //by tr3e
     function GetBitmap(): jObject;
 
     procedure SetBitmap(_bitmap: jObject); overload;
@@ -1968,8 +2027,8 @@ type
     procedure DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
     procedure DrawRect(var _box: TDynArrayOfSingle); overload;
     procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
-    procedure Clear( _color : TARGBColorBridge ); overload;
-    procedure Clear( _color : integer); overload;
+    procedure Clear( _color : TARGBColorBridge ); overload; //by tr3e
+    procedure Clear(_color: integer); overload;
     function GetJInstance(): jObject;
     procedure SaveBitmapJPG(_fullPathFileName: string);
 
@@ -2087,7 +2146,7 @@ type
 
     procedure SetImageDownScale(Value: single); // by TR3E
     procedure SetAlpha( Value : integer ); // by TR3E
-    procedure SetSaturation( value : single ); // by TR3E
+    procedure SetSaturation(Value: single); // by TR3E
 
   published
     property OnDown : TOnNotify read FOnDown write FOnDown; // by TR3E
@@ -2162,7 +2221,6 @@ type
   Procedure Java_Event_pAppOnStart              (env: PJNIEnv; this: jobject); //old OnActive
   Procedure Java_Event_pAppOnStop                (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnBackPressed         (env: PJNIEnv; this: jobject);
-
 
   function Java_Event_pAppOnSpecialKeyDown              (env: PJNIEnv; this: jobject; keyChar: JChar; keyCode: integer; keyCodeString: JString): jBoolean;
 
@@ -2279,6 +2337,9 @@ type
                                                                                       previousVertical: integer;
                                                                                       onPosition: integer; scrolldiff: integer);
 
+  procedure Java_Event_pOnScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
+  procedure Java_Event_pOnHorScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
+
   Procedure Java_Event_pOnClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
   Procedure Java_Event_pOnLongClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
   procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
@@ -2388,11 +2449,12 @@ but can be killed by the system in extremely low memory situations.
 // Another activity is taking focus (this activity is about to be "paused").
 Procedure Java_Event_pAppOnPause(env: PJNIEnv; this: jobject);
 var
-  Form: TAndroidForm; //jForm;  gdx change
+  Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if gApp.TopIndex < 0 then Exit;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnActivityPause) then Form.OnActivityPause(Form);
@@ -2411,11 +2473,12 @@ Resume: The activity is in the foreground of the screen and has user focus.
 }
 Procedure Java_Event_pAppOnResume(env: PJNIEnv; this: jobject);
 var
-  Form: TAndroidForm; //jForm; //gdx change
+  Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+  if gApp.TopIndex < 0 then Exit;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnActivityResume) then Form.OnActivityResume(Form);
@@ -2442,22 +2505,27 @@ begin
   gApp.Jni.jThis:= this;
 end;
 
-// Event : OnBackPressed -> Form OnClose
-
+//Event : OnBackPressed -> Form OnClose
 procedure Java_Event_pAppOnBackPressed(env: PJNIEnv; this: jobject);
 var
-  Form : jForm;
+  Form: jForm;
   CanClose: boolean;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  if gApp.TopIndex < 0 then Exit;
+
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
+
   if not Assigned(Form) then Exit;
+
   Form.UpdateJNI(gApp);
+
   // Event : OnCloseQuery
   if Assigned(Form.OnCloseQuery)  then
   begin
-   // Form.ShowMessage('Back Pressed: OnCloseQuery: '+ IntTostr(gApp.TopIndex));
+    // Form.ShowMessage('Back Pressed: OnCloseQuery: '+ IntTostr(gApp.TopIndex));
     canClose := True;
     Form.OnCloseQuery(Form, canClose);
     if canClose = False then Exit;
@@ -2473,16 +2541,18 @@ end;
 // Event : OnRotate -> Form OnRotate
 Function Java_Event_pAppOnRotate(env: PJNIEnv; this: jobject; rotate : integer) : Integer;
 var                   {rotate=1 --> device vertical/default position ; 2: device horizontal position}
-  Form: TAndroidForm; //jForm;  //gdx change
+  Form: jForm;
   rotOrientation: TScreenStyle;
 begin
 
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
+  if gApp.TopIndex < 0 then Exit;
+
   Result := rotate;
 
-  Form := gApp.Forms.Stack[gApp.TopIndex].Form;
+  Form := jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
 
@@ -2516,11 +2586,14 @@ Procedure Java_Event_pAppOnActivityResult(env: PJNIEnv; this: jobject;
                                                 requestCode, resultCode : Integer;
                                                intentData : jObject);
 var
-  Form: TAndroidForm; //jForm; //gdx
+  Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  Form:= gApp.Forms.Stack[gApp.TopIndex].Form;
+
+  if gApp.TopIndex < 0 then Exit;
+
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnActivityResult) then Form.OnActivityResult(Form,requestCode,TAndroidResult(resultCode),intentData);
@@ -2533,6 +2606,9 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  if gApp.TopIndex < 0 then Exit;
+
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -2545,6 +2621,9 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  if gApp.TopIndex < 0 then Exit;
+
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -2558,6 +2637,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -2574,7 +2654,8 @@ begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
-  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form); //gdx
+  if gApp.TopIndex < 0 then Exit;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
 
@@ -2593,6 +2674,9 @@ begin
   prepareMoreItems:= True;
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  if gApp.TopIndex < 0 then Exit;
+
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -2610,6 +2694,9 @@ begin
   mute:= False;
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  if gApp.TopIndex < 0 then Exit;
+
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
@@ -2644,6 +2731,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -2666,6 +2754,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -2689,6 +2778,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -2712,6 +2802,7 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
@@ -3760,6 +3851,29 @@ begin
     jHorizontalScrollView(Obj).GenEvent_OnChanged(Obj, currenthorizontal, currentVertical, previousHorizontal, previousVertical, onPosition, scrolldiff);
   end;
 end;
+
+procedure Java_Event_pOnScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jScrollView then
+  begin
+    jForm(jScrollView(Sender).Owner).UpdateJNI(gApp);
+    jScrollView(Sender).GenEvent_OnScrollViewInnerItemClick(Sender,itemId);
+  end;
+end;
+
+procedure Java_Event_pOnHorScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jHorizontalScrollView then
+  begin
+    jForm(jHorizontalScrollView(Sender).Owner).UpdateJNI(gApp);
+    jHorizontalScrollView(Sender).GenEvent_OnScrollViewInnerItemClick(Sender,itemId);
+  end;
+end;
+
 
 procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
 begin
@@ -6740,6 +6854,13 @@ begin
      jImageView_SetAnimationMode(FjEnv, FjObject, Ord(_animationMode) );
 end;
 
+procedure jImageView.SetImageFromAssets(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageFromAssets(FjEnv, FjObject, _filename);
+end;
+
 procedure jImageView.GenEvent_OnImageViewPopupItemSelected(Sender:TObject;caption:string);
 begin
   if Assigned(FOnPopupItemSelected) then FOnPopupItemSelected(Sender,caption);
@@ -6798,8 +6919,7 @@ var
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
-  FjObject := jCreate(); if FjObject = nil then exit;
-
+  FjObject:= jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
   for i:= 0 to FImages.Count - 1 do
   begin
@@ -6902,7 +7022,7 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject := jCreate(); if FjObject = nil then exit;
+  FjObject:= jCreate(); if FjObject = nil then exit;
 
   if FResponseTimeout <> 15000 then
      jHttpClient_SetResponseTimeout(FjEnv, FjObject, FResponseTimeout);
@@ -8787,12 +8907,11 @@ begin
   FLParamHeight:= lpWrapContent;
   FHeight:= 96;
   FWidth:= 100;
-  //FAcceptChildsAtDesignTime:= True;
   FAcceptChildrenAtDesignTime:= True;
   FFillViewportEnabled:= False;
 end;
 
-Destructor jScrollView.Destroy;
+destructor jScrollView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
@@ -8805,7 +8924,7 @@ begin
   inherited Destroy;
 end;
 
-Procedure jScrollView.Init(refApp: jApp);
+procedure jScrollView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -8814,7 +8933,7 @@ begin
   begin
    inherited Init(refApp);
 
-   FjObject := jScrollView_Create(FjEnv,  FjThis, Self); //View  !!!
+   FjObject := jScrollView_jCreate(FjEnv, int64(Self) , Ord(FInnerLayout), FjThis);
 
    if FjObject = nil then exit;
 
@@ -8887,27 +9006,32 @@ begin
        Result:= jScrollView_getView(FjEnv, FjObject);
 end;
 
-Procedure jScrollView.SetColor(Value: TARGBColorBridge);
+procedure jScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
      View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
-Procedure jScrollView.Refresh;
+procedure jScrollView.Refresh;
 begin
   if FInitialized then
      View_Invalidate(FjEnv, FjObject );
 end;
 
-Procedure jScrollView.SetScrollSize(Value: integer);
+procedure jScrollView.SetScrollSize(Value: integer);
 begin
   FScrollSize:= Value;
   if FInitialized then
      jScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
 end;
 
-procedure jScrollView.ClearLayout();
+procedure jScrollView.SetInnerLayout(layout: TScrollInnerLayout);
+begin
+   FInnerLayout:= layout;
+end;
+
+procedure jScrollView.ClearLayout;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -9042,17 +9166,98 @@ begin
      jScrollView_DispatchOnScrollChangedEvent(FjEnv, FjObject, _value);
 end;
 
+procedure jScrollView.AddView(_view: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddView(FjEnv, FjObject, _view);
+end;
+
+procedure jScrollView.AddImage(_bitmap: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImage(FjEnv, FjObject, _bitmap);
+end;
+
+procedure jScrollView.AddImageFromFile(_path: string; _filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename);
+end;
+
+procedure jScrollView.AddImageFromAssets(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImageFromAssets(FjEnv, FjObject, _filename);
+end;
+
+procedure jScrollView.AddImage(_bitmap: jObject; _itemId: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImage(FjEnv, FjObject, _bitmap ,_itemId);
+end;
+
+procedure jScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename ,_itemId);
+end;
+
+procedure jScrollView.AddImageFromAssets(_filename: string; _itemId: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId);
+end;
+
+procedure jScrollView.AddText(_text: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddText(FjEnv, FjObject, _text);
+end;
+
+procedure jScrollView.AddImage(_bitmap: jObject; _itemId: integer; _scaleType: TImageScaleType);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImage(FjEnv, FjObject, _bitmap ,_itemId ,Ord(_scaleType));
+end;
+
+procedure jScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer; _scaleType: TImageScaleType);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename ,_itemId ,Ord(_scaleType));
+end;
+
+procedure jScrollView.AddImageFromAssets(_filename: string; _itemId: integer; _scaleType: TImageScaleType);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId , Ord(_scaleType));
+end;
+
 procedure jScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
 begin
    if Assigned(FOnScrollChanged) then FOnScrollChanged(Obj,currHor,currVerti,prevHor,prevVertical,TScrollPosition(onPosition), scrolldiff);
 end;
 
+procedure jScrollView.GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
+begin
+  if Assigned(FOnScrollViewInnerItemClick) then FOnScrollViewInnerItemClick(Sender,itemId);
+end;
 //------------------------------------------------------------------------------
 // jHorizontalScrollView
 // LORDMAN 2013-09-03
 //------------------------------------------------------------------------------
 
-Constructor jHorizontalScrollView.Create(AOwner: TComponent);
+constructor jHorizontalScrollView.Create(AOwner: TComponent);
  begin
   inherited Create(AOwner);
 
@@ -9067,7 +9272,7 @@ Constructor jHorizontalScrollView.Create(AOwner: TComponent);
   FAcceptChildrenAtDesignTime:= True;
  end;
 
-Destructor jHorizontalScrollView.Destroy;
+destructor jHorizontalScrollView.Destroy;
 begin
   if not (csDesigning in ComponentState) then
   begin
@@ -9080,19 +9285,19 @@ begin
   inherited Destroy;
 end;
 
-Procedure jHorizontalScrollView.Init(refApp: jApp);
+procedure jHorizontalScrollView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);                   //fix create
-   FjObject  := jHorizontalScrollView_Create(FjEnv, FjThis, Self);
+   inherited Init(refApp);
+
+   //FjObject  := jHorizontalScrollView_Create(FjEnv, FjThis, Self);
+   FjObject  := jHorizontalScrollView_jCreate(FjEnv, int64(Self) , Ord(FInnerLayout), FjThis);
 
    if FjObject = nil then exit;
-
-   FInitialized:= True;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -9152,30 +9357,57 @@ begin
   // jHorizontalScrollView_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
+function jHorizontalScrollView.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if not FInitialized then exit;
+
+  Result:= jHorizontalScrollView_getLParamWidth(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetWidthOfParent(FParent);
+end;
+
+function jHorizontalScrollView.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if not FInitialized then exit;
+
+  Result:= jHorizontalScrollView_getLParamHeight(FjEnv, FjObject );
+
+  if Result = -1 then //lpMatchParent
+    Result := sysGetHeightOfParent(FParent);
+end;
+
 function jHorizontalScrollView.GetView: jObject;
 begin
     if FInitialized then
        Result:= jHorizontalScrollView_getView(FjEnv, FjObject);
 end;
 
-Procedure jHorizontalScrollView.SetColor(Value: TARGBColorBridge);
+procedure jHorizontalScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
      View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
-Procedure jHorizontalScrollView.Refresh;
+procedure jHorizontalScrollView.Refresh;
 begin
   if not FInitialized then Exit;
   View_Invalidate(FjEnv, FjObject );
 end;
 
-Procedure jHorizontalScrollView.SetScrollSize(Value: integer);
+procedure jHorizontalScrollView.SetScrollSize(Value: integer);
 begin
   FScrollSize := Value;
   if FInitialized then
      jHorizontalScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
+end;
+
+procedure jHorizontalScrollView.SetInnerLayout(layout: TScrollInnerLayout);
+begin
+  FInnerLayout:= layout;
 end;
 
 procedure jHorizontalScrollView.ClearLayout();
@@ -9282,11 +9514,93 @@ begin
      jHorizontalScrollView_DispatchOnScrollChangedEvent(FjEnv, FjObject, _value);
 end;
 
+procedure jHorizontalScrollView.AddView(_view: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddView(FjEnv, FjObject, _view);
+end;
+
+procedure jHorizontalScrollView.AddImage(_bitmap: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImage(FjEnv, FjObject, _bitmap);
+end;
+
+procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename);
+end;
+
+procedure jHorizontalScrollView.AddImageFromAssets(_filename: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImageFromAssets(FjEnv, FjObject, _filename);
+end;
+
+procedure jHorizontalScrollView.AddImage(_bitmap: jObject; _itemId: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImage(FjEnv, FjObject, _bitmap ,_itemId);
+end;
+
+procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename ,_itemId);
+end;
+
+procedure jHorizontalScrollView.AddImageFromAssets(_filename: string; _itemId: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId);
+end;
+
+procedure jHorizontalScrollView.AddText(_text: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddText(FjEnv, FjObject, _text);
+end;
+
+procedure jHorizontalScrollView.AddImage(_bitmap: jObject; _itemId: integer; _scaleType: TImageScaleType);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImage(FjEnv, FjObject, _bitmap ,_itemId ,Ord(_scaleType));
+end;
+
+procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer; _scaleType: TImageScaleType);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename ,_itemId ,Ord(_scaleType));
+end;
+
+procedure jHorizontalScrollView.AddImageFromAssets(_filename: string; _itemId: integer; _scaleType: TImageScaleType);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId ,Ord(_scaleType));
+end;
+
+
 procedure jHorizontalScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer;  scrolldiff: integer);
 begin
    if Assigned(FOnScrollChanged) then FOnScrollChanged(Obj,currHor,currVerti,prevHor,prevVertical,TScrollPosition(onPosition), scrolldiff);
 end;
 
+procedure jHorizontalScrollView.GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
+begin
+  if Assigned(FOnScrollViewInnerItemClick) then FOnScrollViewInnerItemClick(Sender,itemId);
+end;
 //------------------------------------------------------------------------------
 // jWebView
 //------------------------------------------------------------------------------
@@ -10012,17 +10326,24 @@ begin
    Result:= jni_func_ff_out_bmp(FjEnv, FjObject, 'SetScale' ,_scaleX ,_scaleY);
 end;
 
-function jBitmap.LoadFromAssets(strName: string): jObject;
+function jBitmap.LoadFromAssets(fileName: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_LoadFromAssets(FjEnv, FjObject, strName);
+   Result:= jBitmap_LoadFromAssets(FjEnv, FjObject, fileName);
 end;
 
 procedure jBitmap.LoadFromBuffer(buffer: Pointer; size: Integer);
 begin
   if FInitialized then
     jBitmap_LoadFromBuffer(FjEnv, FjObject, buffer, size);
+end;
+
+function jBitmap.LoadFromBuffer(var buffer: TDynArrayOfJByte): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_LoadFromBuffer(FjEnv, FjObject, buffer);
 end;
 
 function jBitmap.GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject;
@@ -10086,11 +10407,11 @@ begin
    Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject);
 end;
 
-function jBitmap.GetImageFromFile(_fullFilename: string): jObject;
+function jBitmap.GetImageFromFile(_fullPathFile: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_LoadFromFile(FjEnv, FjObject, _fullFilename);
+   Result:= jBitmap_LoadFromFile(FjEnv, FjObject, _fullPathFile);
 end;
 
 function jBitmap.GetRoundedShape(_bitmapImage: jObject): jObject;
@@ -10114,11 +10435,11 @@ begin
    Result:= jBitmap_DrawText(FjEnv, FjObject, _bitmapImage ,_text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
 end;
 
-procedure jBitmap.SaveToFileJPG(_fullPathFileName: string);
+procedure jBitmap.SaveToFileJPG(_fullPathFile: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBitmap_SaveToFileJPG(FjEnv, FjObject, _fullPathFileName);
+     jBitmap_SaveToFileJPG(FjEnv, FjObject, _fullPathFile);
 end;
 
 procedure jBitmap.SetImage(_bitmapImage: jObject);
@@ -10151,6 +10472,48 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_CreateBitmap(FjEnv, FjObject, _width ,_height, GetARGB(FCustomColor, _backgroundColor));
+end;
+
+function jBitmap.GetThumbnailImage(_fullPathFile: string; _thumbnailSize: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _fullPathFile ,_thumbnailSize);
+end;
+
+function jBitmap.GetThumbnailImage(_bitmap: jObject; _thumbnailSize: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _bitmap ,_thumbnailSize);
+end;
+
+function jBitmap.GetThumbnailImage(_bitmap: jObject; _width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _bitmap ,_width ,_height);
+end;
+
+function jBitmap.GetThumbnailImageFromAssets(_fileName: string; thumbnailSize: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetThumbnailImageFromAssets(FjEnv, FjObject, _fileName ,thumbnailSize);
+end;
+
+function jBitmap.GetThumbnailImage(_fullPathFile: string; _width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _fullPathFile ,_width ,_height);
+end;
+
+function jBitmap.GetThumbnailImageFromAssets(_filename: string; _width: integer; _height: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetThumbnailImageFromAssets(FjEnv, FjObject, _filename ,_width ,_height);
 end;
 
 //------------------------------------------------------------------------------
@@ -10211,13 +10574,11 @@ end;
 
 Procedure jCanvas.SetColor(Value : TARGBColorBridge);
 begin
-
   FPaintColor:= Value;
 
-  if not FInitialized then exit;
+  if not FInitialized then Exit;
 
-  jCanvas_setColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor))
-
+  jCanvas_setColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
 end;
 
 Procedure jCanvas.SetTextSize(Value: single);
@@ -10505,11 +10866,11 @@ begin
      jCanvas_DrawTextMultiLine(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
 end;
 
-procedure jCanvas.Clear( _color : TARGBColorBridge ); overload;
+procedure jCanvas.Clear( _color : TARGBColorBridge );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_Clear(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+    jCanvas_Clear(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jCanvas.Clear(_color: integer);
@@ -11233,6 +11594,7 @@ begin
      View_Invalidate(FjEnv, FjObject );
 end;
 
+// by TR3E
 Procedure jImageBtn.SetImageDownScale(Value: single);
 begin
 
@@ -11263,13 +11625,14 @@ begin
         jImageBtn_setButtonDown(FjEnv, FjObject , GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageDownName);
       end;
    end;
+
 end;
 
 Procedure jImageBtn.SetImageUpByIndex(Value: integer);
 begin
 
    FImageUpIndex:= Value;
-   
+
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
       FImageUpName:= Trim(FImageList.Images.Strings[Value]);
@@ -11278,6 +11641,7 @@ begin
         jImageBtn_setButtonUp(FjEnv, FjObject ,GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageUpName);
       end;
    end;
+   
 end;
 
 procedure jImageBtn.SetImageDownByRes(imgResIdentifief: string);
@@ -11441,7 +11805,7 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
 
-  FjObject := jAsyncTask_Create(FjEnv, FjThis, Self);
+  FjObject:= jAsyncTask_Create(FjEnv, FjThis, Self);
 
   if FjObject = nil then exit;
 
@@ -12331,7 +12695,6 @@ begin
   if not FInitialized  then
   begin
     inherited Init(refApp);
-
     FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
 
     if FjObject = nil then exit;

@@ -68,12 +68,11 @@ uses
    procedure Java_Event_pOnTCPSocketClientMessageReceived(env: PJNIEnv; this: jobject; Obj: TObject; messageReceived: JString);
    procedure Java_Event_pOnTCPSocketClientBytesReceived(env: PJNIEnv; this: jobject; Obj: TObject; byteArrayReceived: JByteArray);
    procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
-
    procedure Java_Event_pOnTCPSocketClientFileSendProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; sendFileSize: integer; filesize: integer);
    procedure Java_Event_pOnTCPSocketClientFileSendFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
-
    procedure Java_Event_pOnTCPSocketClientFileGetProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; remainingFileSize: integer; filesize: integer);
    procedure Java_Event_pOnTCPSocketClientFileGetFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
+   procedure Java_Event_pOnTCPSocketClientError(env:PJNIEnv;this:JObject;Sender:TObject;errorMessage:jString);
 
    Procedure Java_Event_pOnMediaPlayerVideoSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeight: integer);
    Procedure Java_Event_pOnMediaPlayerCompletion(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -202,9 +201,16 @@ uses
    procedure Java_Event_pOnSignaturePadSigned(env:PJNIEnv;this:JObject;Sender:TObject);
    procedure Java_Event_pOnSignaturePadClear(env:PJNIEnv;this:JObject;Sender:TObject);
 
-   //procedure Java_Event_pOnGDXScreenShow(env:PJNIEnv;this:JObject;Sender:TObject);
-   //procedure Java_Event_pOnGDXScreenResize(env:PJNIEnv;this:JObject;Sender:TObject;width:integer;height:integer);
-   //procedure Java_Event_pOnGDXScreenRender(env:PJNIEnv;this:JObject;Sender:TObject;deltaTime:single);
+   procedure Java_Event_pOnGDXFormShow(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnGDXFormResize(env:PJNIEnv;this:JObject;Sender:TObject;width:integer;height:integer);
+   procedure Java_Event_pOnGDXFormRender(env:PJNIEnv;this:JObject;Sender:TObject;deltaTime:single);
+   procedure Java_Event_pOnGDXFormClose(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnGDXFormTouchDown(env:PJNIEnv;this:JObject;Sender:TObject;screenX:integer;screenY:integer;pointer:integer;button:integer);
+   procedure Java_Event_pOnGDXFormTouchUp(env:PJNIEnv;this:JObject;Sender:TObject;screenX:integer;screenY:integer;pointer:integer;button:integer);
+   function Java_Event_pOnGDXFormKeyPressed(env:PJNIEnv;this:JObject;Sender:TObject;keyCode:integer):integer;
+   procedure Java_Event_pOnGDXFormResume(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnGDXFormPause(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnGDXFormHide(env:PJNIEnv;this:JObject;Sender:TObject);
 
    procedure Java_Event_pOnMailMessagesCount(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
    procedure Java_Event_pOnMailMessageRead(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;Header:jString;Date:jString;Subject:jString;ContentType:jString;ContentText:jString;Attachments:jString);
@@ -221,7 +227,6 @@ uses
    procedure Java_Event_pOnFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
    procedure Java_Event_pOnFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
 
-
 implementation
 
 uses
@@ -234,7 +239,7 @@ uses
    stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
    customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
-   midimanager, copenmapview, csignaturepad, soundpool{, gdxscreen}, cmail, sftpclient, ftpclient;
+   midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient, ftpclient;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -1145,8 +1150,6 @@ begin
 
 end;
 
-
-
 Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
@@ -1235,6 +1238,17 @@ begin
       pasfilename:= string( env^.GetStringUTFChars(Env,filename,@jBoo) );
     end;
     jTCPSocketClient(Obj).GenEvent_pOnTCPSocketClientFileGetFinished(Obj, pasfilename, filesize);
+  end;
+end;
+
+procedure Java_Event_pOnTCPSocketClientError(env:PJNIEnv;this:JObject;Sender:TObject;errorMessage:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jTCPSocketClient then
+  begin
+    jForm(jTCPSocketClient(Sender).Owner).UpdateJNI(gApp);
+    //jTCPSocketClient(Sender).GenEvent_OnTCPSocketClientError(Sender,GetString(env,errorMessage));
   end;
 end;
 
@@ -2419,40 +2433,120 @@ begin
   end;
 end;
 
-(*
-procedure Java_Event_pOnGDXScreenRender(env:PJNIEnv;this:JObject;Sender:TObject;deltaTime:single);
+procedure Java_Event_pOnGDXFormRender(env:PJNIEnv;this:JObject;Sender:TObject;deltaTime:single);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  if Sender is jGdxScreen then
+  if Sender is jGdxForm then
   begin
-    jForm(jGdxScreen(Sender).Owner).UpdateJNI(gApp);
-    jGdxScreen(Sender).GenEvent_OnGDXScreenRender(Sender,deltaTime);
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormRender(Sender,deltaTime);
   end;
 end;
 
-procedure Java_Event_pOnGDXScreenShow(env:PJNIEnv;this:JObject;Sender:TObject);
+procedure Java_Event_pOnGDXFormShow(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  if Sender is jGdxScreen then
+  if Sender is jGdxForm then
   begin
-    jForm(jGdxScreen(Sender).Owner).UpdateJNI(gApp);
-    jGdxScreen(Sender).GenEvent_OnGDXScreenShow(Sender);
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormShow(Sender);
   end;
 end;
 
-procedure Java_Event_pOnGDXScreenResize(env:PJNIEnv;this:JObject;Sender:TObject;width:integer;height:integer);
+procedure Java_Event_pOnGDXFormResize(env:PJNIEnv;this:JObject;Sender:TObject;width:integer;height:integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  if Sender is jGdxScreen then
+  if Sender is jGdxForm then
   begin
-    jForm(jGdxScreen(Sender).Owner).UpdateJNI(gApp);
-    jGdxScreen(Sender).GenEvent_OnGDXScreenResize(Sender,width,height);
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormResize(Sender,width,height);
   end;
 end;
-*)
+
+procedure Java_Event_pOnGDXFormClose(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxForm then
+  begin
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormClose(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnGDXFormTouchDown(env:PJNIEnv;this:JObject;Sender:TObject;screenX:integer;screenY:integer;pointer:integer;button:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxForm then
+  begin
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormTouchDown(Sender,screenX,screenY,pointer,button);
+  end;
+end;
+
+procedure Java_Event_pOnGDXFormTouchUp(env:PJNIEnv;this:JObject;Sender:TObject;screenX:integer;screenY:integer;pointer:integer;button:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxForm then
+  begin
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormTouchUp(Sender,screenX,screenY,pointer,button);
+  end;
+end;
+
+function Java_Event_pOnGDXFormKeyPressed(env:PJNIEnv;this:JObject;Sender:TObject;keyCode:integer):integer;
+var
+  outReturn: integer;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outReturn:=0;
+  if Sender is jGdxForm then
+  begin
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormKeyPressed(Sender,keyCode{,outReturn});
+  end;
+  Result:=outReturn;
+end;
+
+procedure Java_Event_pOnGDXFormResume(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxForm then
+  begin
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormResume(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnGDXFormPause(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxForm then
+  begin
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormPause(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnGDXFormHide(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jGdxForm then
+  begin
+    jGdxForm(Sender).UpdateJNI(gApp);
+    jGdxForm(Sender).GenEvent_OnGDXFormHide(Sender);
+  end;
+end;
+
 
 procedure Java_Event_pOnMailMessageRead(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;Header:jString;Date:jString;Subject:jString;ContentType:jString;ContentText:jString;Attachments:jString);
 begin
@@ -2464,7 +2558,6 @@ begin
     jcMail(Sender).GenEvent_OnMailMessageRead(Sender,position,GetString(env,Header),GetString(env,Date),GetString(env,Subject),GetString(env,ContentType),GetString(env,ContentText),GetString(env,Attachments));
   end;
 end;
-
 
 procedure Java_Event_pOnMailMessagesCount(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
 begin

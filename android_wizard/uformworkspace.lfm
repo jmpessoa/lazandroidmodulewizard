@@ -95,6 +95,7 @@ object FormWorkspace: TFormWorkspace
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
+  LCLVersion = '2.0.0.4'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
@@ -1367,6 +1368,7 @@ object FormWorkspace: TFormWorkspace
         'AppCompat.Light.DarkActionBar'
         'Holo.Light.NoActionBar'
         'Holo.Light.DarkActionBar'
+        'GDXGame'
       )
       OnChange = ComboBoxThemeChange
       Style = csDropDownList

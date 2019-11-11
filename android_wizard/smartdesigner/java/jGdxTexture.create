@@ -1,0 +1,3 @@
+public java.lang.Object jGdxTexture_jCreate(long _Self) {
+  return (java.lang.Object)(new jGdxTexture(this,_Self));
+}

@@ -471,6 +471,7 @@ procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: a
 
 procedure jImageView_SetAnimationDurationIn(env: PJNIEnv; _jimageview: JObject; _animationDurationIn: integer);
 procedure jImageView_SetAnimationMode(env: PJNIEnv; _jimageview: JObject; _animationMode: integer);
+procedure jImageView_SetImageFromAssets(env: PJNIEnv; _jimageview: JObject; _filename: string);
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -609,6 +610,7 @@ procedure jListView_SetDrawItemBackColorAlpha(env: PJNIEnv; _jlistview: JObject;
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
+function  jScrollView_jCreate(env: PJNIEnv;_Self: int64; _innerLayout: integer; this: jObject): jObject;
 
 Procedure jScrollView_Free           (env:PJNIEnv; ScrollView : jObject);
 //
@@ -620,7 +622,7 @@ Procedure jScrollView_setScrollSize    (env:PJNIEnv;
 
 Function  jScrollView_getView          (env:PJNIEnv;
                                         ScrollView : jObject) : jObject;
-//by jmpessoa
+
 Procedure jScrollView_setId(env:PJNIEnv; ScrollView : jObject; id: DWord);
 
 Procedure jScrollView_setLParamWidth(env:PJNIEnv; ScrollView : jObject; w: DWord);
@@ -647,6 +649,17 @@ function jScrollView_GetRight(env: PJNIEnv; _jscrollview: JObject): integer;
 function jScrollView_getLParamWidth(env: PJNIEnv; _jscrollview: JObject): integer;
 function jScrollView_getLParamHeight(env: PJNIEnv; _jscrollview: JObject): integer;
 procedure jScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jscrollview: JObject; _value: boolean);
+procedure jScrollView_AddView(env: PJNIEnv; _jscrollview: JObject; _view: jObject);
+procedure jScrollView_AddImage(env: PJNIEnv; _jscrollview: JObject; _bitmap: jObject);overload;
+procedure jScrollView_AddImageFromFile(env: PJNIEnv; _jscrollview: JObject; _path: string; _filename: string);overload;
+procedure jScrollView_AddImageFromAssets(env: PJNIEnv; _jscrollview: JObject; _filename: string);overload;
+procedure jScrollView_AddText(env: PJNIEnv; _jscrollview: JObject; _text: string);
+procedure jScrollView_AddImage(env: PJNIEnv; _jscrollview: JObject; _bitmap: jObject; _itemId: integer);overload;
+procedure jScrollView_AddImageFromFile(env: PJNIEnv; _jscrollview: JObject; _path: string; _filename: string; _itemId: integer);overload;
+procedure jScrollView_AddImageFromAssets(env: PJNIEnv; _jscrollview: JObject; _filename: string; _itemId: integer);overload;
+procedure jScrollView_AddImage(env: PJNIEnv; _jscrollview: JObject; _bitmap: jObject; _itemId: integer; _scaleType: integer);overload;
+procedure jScrollView_AddImageFromFile(env: PJNIEnv; _jscrollview: JObject; _path: string; _filename: string; _itemId: integer; _scaleType: integer);overload;
+procedure jScrollView_AddImageFromAssets(env: PJNIEnv; _jscrollview: JObject; _filename: string; _itemId: integer; _scaleType: integer);overload;
 
 { jPanel }
 Function  jPanel_Create           (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
@@ -688,10 +701,10 @@ procedure jPanel_SetVisibilityGone(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetAnimationDurationIn(env: PJNIEnv; _jpanel: JObject; _animationDurationIn: integer);
 procedure jPanel_SetAnimationMode(env: PJNIEnv; _jpanel: JObject; _animationMode: integer);
 
-
-//-----------------
 // HorizontalScrollView
+
 function jHorizontalScrollView_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
+function jHorizontalScrollView_jCreate(env: PJNIEnv;_Self: int64; _innerLayout: integer; this: jObject): jObject;
 
 Procedure jHorizontalScrollView_Free          (env:PJNIEnv; ScrollView : jObject);
 Procedure jHorizontalScrollView_setParent     (env:PJNIEnv;
@@ -703,7 +716,6 @@ Procedure jHorizontalScrollView_setScrollSize (env:PJNIEnv;
 Function  jHorizontalScrollView_getView       (env:PJNIEnv;
                                                ScrollView : jObject) : jObject;
 
-//by jmpessoa
 Procedure jHorizontalScrollView_setId(env:PJNIEnv; ScrollView : jObject; id: DWord);
 
 Procedure jHorizontalScrollView_setLParamWidth(env:PJNIEnv; ScrollView : jObject; w: DWord);
@@ -727,6 +739,21 @@ function jHorizontalScrollView_GetTop(env: PJNIEnv; _jhorizontalscrollview: JObj
 function jHorizontalScrollView_GetLeft(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
 function jHorizontalScrollView_GetRight(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
 procedure jHorizontalScrollView_DispatchOnScrollChangedEvent(env: PJNIEnv; _jhorizontalscrollview: JObject; _value: boolean);
+
+function jHorizontalScrollView_getLParamWidth(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+function jHorizontalScrollView_getLParamHeight(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+
+procedure jHorizontalScrollView_AddView(env: PJNIEnv; _jhorizontalscrollview: JObject; _view: jObject);
+procedure jHorizontalScrollView_AddImage(env: PJNIEnv; _jhorizontalscrollview: JObject; _bitmap: jObject);overload;
+procedure jHorizontalScrollView_AddImageFromFile(env: PJNIEnv; _jhorizontalscrollview: JObject; _path: string; _filename: string);overload;
+procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscrollview: JObject; _filename: string);overload;
+procedure jHorizontalScrollView_AddText(env: PJNIEnv; _jhorizontalscrollview: JObject; _text: string);
+procedure jHorizontalScrollView_AddImage(env: PJNIEnv; _jhorizontalscrollview: JObject; _bitmap: jObject; _itemId: integer);overload;
+procedure jHorizontalScrollView_AddImageFromFile(env: PJNIEnv; _jhorizontalscrollview: JObject; _path: string; _filename: string; _itemId: integer);overload;
+procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscrollview: JObject; _filename: string; _itemId: integer);overload;
+procedure jHorizontalScrollView_AddImage(env: PJNIEnv; _jhorizontalscrollview: JObject; _bitmap: jObject; _itemId: integer; _scaleType: integer);overload;
+procedure jHorizontalScrollView_AddImageFromFile(env: PJNIEnv; _jhorizontalscrollview: JObject; _path: string; _filename: string; _itemId: integer; _scaleType: integer);overload;
+procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscrollview: JObject; _filename: string; _itemId: integer; _scaleType: integer);overload;
 
 // WebView
 Function  jWebView_Create              (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -850,7 +877,8 @@ function jBitmap_GetWidth(env: PJNIEnv; bmap: JObject): integer;
 function jBitmap_GetHeight(env: PJNIEnv; bmap: JObject): integer;
 Function  jBitmap_jInstance(env:PJNIEnv;  bmap: jObject): jObject;
 function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
-procedure jBitmap_LoadFromBuffer(env: PJNIEnv; _jbitmap: JObject; buffer: PJByte; size: Integer);//by Kordal
+procedure jBitmap_LoadFromBuffer(env: PJNIEnv; _jbitmap: JObject; buffer: PJByte; size: Integer);overload;//by Kordal
+function jBitmap_LoadFromBuffer(env: PJNIEnv; _jbitmap: JObject; var buffer: TDynArrayOfJByte): jObject;overload;
 function jBitmap_GetByteArrayFromBitmap(env:PJNIEnv;  bmap: jObject;
                                                    var bufferImage: TDynArrayOfJByte): integer;
 procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TDynArrayOfJByte; size: integer);
@@ -871,6 +899,12 @@ function jBitmap_DrawText(env: PJNIEnv; _jbitmap: JObject; _text: string; _left:
 function jBitmap_DrawBitmap(env: PJNIEnv; _jbitmap: JObject; _bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
 procedure jBitmap_SaveToFileJPG(env: PJNIEnv; _jbitmap: JObject; _fullPathFileName: string);
 function jBitmap_CreateBitmap(env: PJNIEnv; _jbitmap: JObject; _width: integer; _height: integer; _backgroundColor: integer): jObject; overload;
+function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _fullPathFile: string; _thumbnailSize: integer): jObject; overload;
+function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jObject; _thumbnailSize: integer): jObject; overload;
+function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jObject; _width: integer; _height: integer): jObject;overload;
+function jBitmap_GetThumbnailImageFromAssets(env: PJNIEnv; _jbitmap: JObject; _fileName: string; thumbnailSize: integer): jObject;overload;
+function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _fullFilename: string; _width: integer; _height: integer): jObject;overload;
+function jBitmap_GetThumbnailImageFromAssets(env: PJNIEnv; _jbitmap: JObject; _filename: string; _width: integer; _height: integer): jObject;overload;
 
 //GLSurfaceView
 Function  jGLSurfaceView_Create1       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
@@ -5014,7 +5048,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
 procedure jImageView_SetAnimationMode(env: PJNIEnv; _jimageview: JObject; _animationMode: integer);
 var
   jParams: array[0..0] of jValue;
@@ -5025,6 +5058,20 @@ begin
   jCls:= env^.GetObjectClass(env, _jimageview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetAnimationMode', '(I)V');
   env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetImageFromAssets(env: PJNIEnv; _jimageview: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -6658,6 +6705,20 @@ begin
   Result := env^.NewGlobalRef(env,Result);
 end;
 
+function jScrollView_jCreate(env: PJNIEnv;_Self: int64; _innerLayout: integer; this: jObject): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jParams[1].i:= _innerLayout;
+  jCls:= Get_gjClass(env);
+  jMethod:= env^.GetMethodID(env, jCls, 'jScrollView_jCreate', '(JI)Ljava/lang/Object;');
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+end;
+
 Procedure jScrollView_Free(env:PJNIEnv; ScrollView : jObject);
 var
    _jMethod: jMethodID = nil;
@@ -6726,7 +6787,7 @@ Function jScrollView_getView(env:PJNIEnv;
   cls: jClass;
  begin
    cls := env^.GetObjectClass(env, ScrollView);
- _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/widget/RelativeLayout;');
+ _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/view/ViewGroup;'); //Landroid/widget/RelativeLayout;
   Result := env^.CallObjectMethod(env,ScrollView,_jMethod);
   env^.DeleteLocalRef(env, cls);
  end;
@@ -6984,8 +7045,178 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jScrollView_AddView(env: PJNIEnv; _jscrollview: JObject; _view: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _view;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddView', '(Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jScrollView_AddImage(env: PJNIEnv; _jscrollview: JObject; _bitmap: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImage', '(Landroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jScrollView_AddImageFromFile(env: PJNIEnv; _jscrollview: JObject; _path: string; _filename: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromFile', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jScrollView_AddImageFromAssets(env: PJNIEnv; _jscrollview: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jScrollView_AddText(env: PJNIEnv; _jscrollview: JObject; _text: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddText', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jScrollView_AddImage(env: PJNIEnv; _jscrollview: JObject; _bitmap: jObject; _itemId: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _itemId;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImage', '(Landroid/graphics/Bitmap;I)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jScrollView_AddImageFromFile(env: PJNIEnv; _jscrollview: JObject; _path: string; _filename: string; _itemId: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[2].i:= _itemId;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromFile', '(Ljava/lang/String;Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jScrollView_AddImageFromAssets(env: PJNIEnv; _jscrollview: JObject; _filename: string; _itemId: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[1].i:= _itemId;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromAssets', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jScrollView_AddImage(env: PJNIEnv; _jscrollview: JObject; _bitmap: jObject; _itemId: integer; _scaleType: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _itemId;
+  jParams[2].i:= _scaleType;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImage', '(Landroid/graphics/Bitmap;II)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jScrollView_AddImageFromFile(env: PJNIEnv; _jscrollview: JObject; _path: string; _filename: string; _itemId: integer; _scaleType: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[2].i:= _itemId;
+  jParams[3].i:= _scaleType;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromFile', '(Ljava/lang/String;Ljava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jScrollView_AddImageFromAssets(env: PJNIEnv; _jscrollview: JObject; _filename: string; _itemId: integer; _scaleType: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[1].i:= _itemId;
+  jParams[2].i:= _scaleType;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromAssets', '(Ljava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 //----------------------------------------
-//Panel - new by jmpessoa
+//Panel
 //----------------------------------------
 function jPanel_Create(env: PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 var
@@ -7457,6 +7688,20 @@ begin
   Result := env^.NewGlobalRef(env,Result);
 end;
 //
+function jHorizontalScrollView_jCreate(env: PJNIEnv;_Self: int64; _innerLayout: integer; this: jObject): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jParams[1].i:= _innerLayout;
+  jCls:= Get_gjClass(env);
+  jMethod:= env^.GetMethodID(env, jCls, 'jHorizontalScrollView_jCreate', '(JI)Ljava/lang/Object;');
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+end;
+
 Procedure jHorizontalScrollView_Free(env:PJNIEnv; ScrollView : jObject);
 var
    _jMethod : jMethodID = nil;
@@ -7527,7 +7772,7 @@ var
   cls: jClass;
  begin
   cls := env^.GetObjectClass(env, ScrollView);
- _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/widget/RelativeLayout;'); //Landroid/view/ViewGroup;
+ _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/view/ViewGroup;'); //Landroid/widget/RelativeLayout;
   Result := env^.CallObjectMethod(env,ScrollView,_jMethod);
   env^.DeleteLocalRef(env, cls);
  end;
@@ -7751,6 +7996,200 @@ begin
   jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
   jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnScrollChangedEvent', '(Z)V');
   env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHorizontalScrollView_getLParamWidth(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'getLParamWidth', '()I');
+  Result:= env^.CallIntMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHorizontalScrollView_getLParamHeight(env: PJNIEnv; _jhorizontalscrollview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'getLParamHeight', '()I');
+  Result:= env^.CallIntMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHorizontalScrollView_AddView(env: PJNIEnv; _jhorizontalscrollview: JObject; _view: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _view;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddView', '(Landroid/view/View;)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHorizontalScrollView_AddImage(env: PJNIEnv; _jhorizontalscrollview: JObject; _bitmap: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImage', '(Landroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHorizontalScrollView_AddImageFromFile(env: PJNIEnv; _jhorizontalscrollview: JObject; _path: string; _filename: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromFile', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscrollview: JObject; _filename: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromAssets', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHorizontalScrollView_AddText(env: PJNIEnv; _jhorizontalscrollview: JObject; _text: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddText', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHorizontalScrollView_AddImage(env: PJNIEnv; _jhorizontalscrollview: JObject; _bitmap: jObject; _itemId: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _itemId;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImage', '(Landroid/graphics/Bitmap;I)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHorizontalScrollView_AddImageFromFile(env: PJNIEnv; _jhorizontalscrollview: JObject; _path: string; _filename: string; _itemId: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[2].i:= _itemId;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromFile', '(Ljava/lang/String;Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscrollview: JObject; _filename: string; _itemId: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[1].i:= _itemId;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromAssets', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHorizontalScrollView_AddImage(env: PJNIEnv; _jhorizontalscrollview: JObject; _bitmap: jObject; _itemId: integer; _scaleType: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _itemId;
+  jParams[2].i:= _scaleType;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImage', '(Landroid/graphics/Bitmap;II)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHorizontalScrollView_AddImageFromFile(env: PJNIEnv; _jhorizontalscrollview: JObject; _path: string; _filename: string; _itemId: integer; _scaleType: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[2].i:= _itemId;
+  jParams[3].i:= _scaleType;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromFile', '(Ljava/lang/String;Ljava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscrollview: JObject; _filename: string; _itemId: integer; _scaleType: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[1].i:= _itemId;
+  jParams[2].i:= _scaleType;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromAssets', '(Ljava/lang/String;II)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9064,6 +9503,26 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jBitmap_LoadFromBuffer(env: PJNIEnv; _jbitmap: JObject; var buffer: TDynArrayOfJByte): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(buffer);
+  jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
+  env^.SetByteArrayRegion(env, jNewArray0, 0 , newSize0, @buffer[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromBuffer2', '([B)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 procedure jBitmap_SetByteArrayToBitmap(env:PJNIEnv;  bmap: jObject; var bufferImage: TDynArrayOfJByte; size: integer);
 var
   _jMethod: jMethodID = nil;
@@ -9347,6 +9806,98 @@ begin
   jCls:= env^.GetObjectClass(env, _jbitmap);
   jMethod:= env^.GetMethodID(env, jCls, 'CreateBitmap', '(III)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _fullPathFile: string; _thumbnailSize: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPathFile));
+  jParams[1].i:= _thumbnailSize;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetThumbnailImage', '(Ljava/lang/String;I)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jObject; _thumbnailSize: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _thumbnailSize;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetThumbnailImage', '(Landroid/graphics/Bitmap;I)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jObject; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetThumbnailImage', '(Landroid/graphics/Bitmap;II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetThumbnailImageFromAssets(env: PJNIEnv; _jbitmap: JObject; _fileName: string; thumbnailSize: integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fileName));
+  jParams[1].i:= thumbnailSize;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetThumbnailImageFromAssets', '(Ljava/lang/String;I)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _fullFilename: string; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFilename));
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetThumbnailImage', '(Ljava/lang/String;II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jBitmap_GetThumbnailImageFromAssets(env: PJNIEnv; _jbitmap: JObject; _filename: string; _width: integer; _height: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
+  jParams[1].i:= _width;
+  jParams[2].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetThumbnailImageFromAssets', '(Ljava/lang/String;II)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

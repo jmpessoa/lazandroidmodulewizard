@@ -87,7 +87,7 @@ type
     FPathToGradle: string;
 
     FProjectModel: string;
-    FModuleType: integer;  //0: GUI project   1: NoGui project   2: NoGUI Exe
+    FModuleType: integer;  //-1:gdx 0: GUI project   1: NoGui project   2: NoGUI Exe
     FSmallProjName: string;
     FPackagePrefaceName: string;
 
@@ -170,7 +170,7 @@ type
     property PrebuildOSYS: string read FPrebuildOSYS write FPrebuildOSYS;
     property FullJavaSrcPath: string read FFullJavaSrcPath write FFullJavaSrcPath;
     property JavaClassName: string read   FJavaClassName write FJavaClassName;
-    property ModuleType: integer read FModuleType write FModuleType;  //0: GUI project   1: NoGui project
+    property ModuleType: integer read FModuleType write FModuleType;  //-1: gdx 0: GUI project   1: NoGui project
     property SmallProjName: string read FSmallProjName write FSmallProjName;
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
     property PieChecked: boolean read FPieChecked write FPieChecked;
@@ -617,7 +617,7 @@ begin
      FAndroidProjectName:= FPathToWorkspace + DirectorySeparator+ FSmallProjName;
        FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
        if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
-       if FModuleType <> 0 then //NoGUI
+       if FModuleType > 0 then //NoGUI
           FJavaClassName:=  FSmallProjName;
   end
   else
@@ -631,13 +631,13 @@ begin
      FSmallProjName:=  aList.Strings[aList.Count-1];; //ex. "AppTest1"
      FPackagePrefaceName:= '';
      aList.Free;
-     if FModuleType <> 0 then  //NoGUI
+     if FModuleType > 0 then  //NoGUI
        FJavaClassName:=  FSmallProjName //ex. "AppTest1"
   end;
 
   FAndroidNdkPlatform:= GetNDKPlatformByApi(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]); //(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]);
 
-  if FProjectModel = 'Eclipse' then
+  if FProjectModel = 'Eclipse' then ////please, read as "project exists!"
   begin
 
      strList:= TStringList.Create;
@@ -699,6 +699,15 @@ begin
                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
      end;
 
+     if Pos('GDXGame', ComboBoxTheme.Text) > 0 then
+     begin
+      { CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors.xml',
+                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');}
+       tempStr:= ComboBoxTheme.Text;      // AppCompat.Light.DarkActionBar  or AppCompat.Light.DarkActionBar
+       CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+tempStr+'.xml',
+                  FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
+     end;
+
   end;
 
   if FProjectModel = 'Ant' then
@@ -735,6 +744,9 @@ begin
       CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'x86');
       CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi');
       CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'armeabi-v7a');
+
+      CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'arm64-v8a');
+      CreateDir(FAndroidProjectName+ DirectorySeparator + 'libs'+DirectorySeparator+'x86_64');
 
     end;
 
@@ -873,7 +885,14 @@ begin
     end;
   end;
   Result:= method+'=Java_Event_'+method+signature+');';
-  if Pos('pAppOnCreate=', Result) > 0 then  Result:= Result +  'AndroidModule1.Init(gApp);';
+  if Pos('pAppOnCreate=', Result) > 0 then
+  begin
+    if FModuleType = 0 then  //GUI
+      Result:= Result +  'AndroidModule1.Init(gApp);';
+
+    if FModuleType = -1 then //Gdx
+      Result:= Result +  'GdxModule1.Init(gApp);';
+  end;
 
   listParam.Free;
 end;
@@ -882,8 +901,8 @@ procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
 var
   indexNdk: integer;
   frm: TFormPathMissing;
-  nativeMethodList, tempList: TStringList;
-  i: integer;
+  nativeMethodList, tempList, gdxList: TStringList;
+  i, k: integer;
   strIndexNdk: string;
 begin
   if FileExists(fileName) then
@@ -1010,8 +1029,26 @@ begin
         begin
           tempList.Add(GetEventSignature(nativeMethodList.Strings[i]));
         end;
+
+        //if Pos('GDXGame', Self.ComboBoxTheme.Text) > 0 then
+        if FModuleType = -1 then //GDXGame;
+        begin
+          gdxList:= TStringList.Create;
+          if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.native') then
+          begin
+            gdxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.native');
+            for k:= 0 to gdxList.Count-1 do
+            begin
+              tempList.Add(GetEventSignature(gdxList.Strings[k]));
+              nativeMethodList.Add(gdxList.Strings[k]);
+            end;
+          end;
+          gdxList.Free;
+        end;
+
         tempList.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'Controls.events');  //old "ControlsEvents.txt"
         nativeMethodList.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'Controls.native');
+
       end;
 
       nativeMethodList.Free;
@@ -1115,6 +1152,18 @@ procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
 var
   index: integer;
 begin
+
+  if Pos('GDXGame', ComboBoxTheme.Text) > 0 then
+  begin
+    if Pos('Gradle',cbBuildSystem.Items.Text) > 0 then
+    begin
+      index:= cbBuildSystem.Items.IndexOf('Gradle');
+      cbBuildSystem.ItemIndex:= index;
+      cbBuildSystem.Text:= 'Gradle';
+      cbBuildSystemCloseUp(Self);
+    end;
+  end;
+
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then
   begin
     if (FMaxSdkPlatform < 28) or (FPathToGradle = '')   then
@@ -1150,6 +1199,7 @@ begin
     if ListBoxMinSDK.ItemIndex < 1 then ListBoxMinSDK.ItemIndex:= 1;   //Api 14
 
   end;
+
 end;
 
 procedure TFormWorkspace.CheckBoxPIEClick(Sender: TObject);
@@ -1167,7 +1217,7 @@ var
   s: string;
 begin
 
-  if cbBuildSystem.Text = 'Gradle' then
+  if (cbBuildSystem.Text = 'Gradle') and ( Pos('AppCompat', ComboBoxTheme.Text) > 0) then
   begin
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then

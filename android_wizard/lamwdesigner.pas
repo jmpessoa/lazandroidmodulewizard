@@ -47,8 +47,9 @@ type
     FProjFile: TLazProjectFile;
     FjControlDeleted: Boolean;
     FTheme: TAndroidTheme;
+    FSplashExists: boolean;
 
-    function GetAndroidForm: jForm;
+    function GetAndroidForm: TandroidForm; //jForm;   //jGdxForm
 
     //Smart Designer helpers
     procedure InitSmartDesignerHelpers;
@@ -94,7 +95,7 @@ type
     function AssetsDir: string; inline;
     function ResDir: string; inline;
     function FindDrawable(AResourceName: string): string;
-    property AndroidForm: jForm read GetAndroidForm;
+    property AndroidForm: TAndroidForm{jForm} read GetAndroidForm;  //gdx
     property AndroidTheme: TAndroidTheme read FTheme;
     property ImageCache: TImageCache read FImageCache;
   public
@@ -1784,8 +1785,7 @@ begin
   if LazarusIDE <> nil then
     LazarusIDE.RemoveAllHandlersOfObject(Self);
 
-  if Assigned(AndroidForm) then
-    AndroidForm.Designer := nil;
+  if Assigned(AndroidForm) then AndroidForm.Designer := nil;
 
   FImageCache.Free;
   FStarted.Free;
@@ -1809,10 +1809,21 @@ begin
   for i := 0 to TPropertyEditor(Sender).PropCount - 1 do
   begin
     Instance := TPropertyEditor(Sender).GetComponent(i);
-    if (Instance = AndroidForm)
-    and (AndroidForm.ActivityMode in [actMain, actSplash])
-    and FProjFile.IsPartOfProject then
-      LamwSmartDesigner.UpdateProjectStartModule(AndroidForm.Name);
+    if (Instance = AndroidForm) and (AndroidForm.ActivityMode in [actMain, actSplash]) and FProjFile.IsPartOfProject then
+    begin
+
+      FSplashExists:= False;           //try Dio Affriza suggestion!
+      if AndroidForm.ActivityMode = actSplash then
+      begin
+        FSplashExists:= True;
+        LamwSmartDesigner.UpdateProjectStartModule(AndroidForm.Name, AndroidForm.ModuleType)
+      end;
+
+      if not FSplashExists then
+        LamwSmartDesigner.UpdateProjectStartModule(AndroidForm.Name, AndroidForm.ModuleType);
+
+    end;
+
     if (Instance = AndroidForm) or (Instance is jVisualControl)
     and (jVisualControl(Instance).Owner = AndroidForm) then
     begin
@@ -1873,9 +1884,9 @@ begin
     jForm(AValue).OnAutoAssignIDs := @OnAutoAssignIDs;*)
 end;
 
-function TAndroidWidgetMediator.GetAndroidForm: jForm;
+function TAndroidWidgetMediator.GetAndroidForm: TAndroidForm; //jForm;
 begin
-  Result := jForm(Root);
+   Result := TAndroidForm(Root); //jForms
 end;
 
 procedure TAndroidWidgetMediator.InitSmartDesignerHelpers;
@@ -1913,8 +1924,9 @@ begin
   Result := inherited CreateMediator(TheOwner, nil);
 
   Mediator := TAndroidWidgetMediator(Result);
+
   Mediator.Root := TheForm;
-  Mediator.AndroidForm.Designer := Mediator;
+  Mediator.AndroidForm.Designer:= Mediator;
 
   Mediator.UpdateTheme;
   Mediator.FProjFile := LazarusIDE.GetProjectFileWithRootComponent(TheForm);

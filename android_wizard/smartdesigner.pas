@@ -90,7 +90,6 @@ type
     function GetPathToSmartDesigner(): string;
     procedure UpdateBuildModes();
 
-
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
@@ -107,10 +106,10 @@ type
     procedure Init4Project(AProject: TLazProject);
     function IsLaz4Android(): boolean;
 
-    // called from Designer
+    // calleds from Designer/TAndroidWidgetMediator
     procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
-    procedure UpdateProjectStartModule(const NewName: string);
+    procedure UpdateProjectStartModule(const NewName: string; moduleType: integer);
 
   end;
 
@@ -210,10 +209,33 @@ function TLamwSmartDesigner.AddClicked(ADesigner: TIDesigner;
              Shift: TShiftState; X, Y: Integer;
              var AComponentClass: TComponentClass;
              var NewParent: TComponent): boolean;
+var
+  temp: string;
 begin
   Result:= True;
   if LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
   begin
+
+      temp:= Lowercase(Copy(AComponentClass.ClassName, 1,4));
+
+      if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
+      begin
+         if temp <> 'jgdx' then
+         begin
+          Result:= False;
+          ShowMessage('Sorry.. ['+AComponentClass.ClassName+'] not for a libGDX project...');
+          Exit;
+         end;
+      end
+      else
+      begin
+         if temp = 'jgdx' then
+         begin
+           Result:= False;
+           ShowMessage('Sorry..['+AComponentClass.ClassName+'] only for a libGDX project...');
+           Exit;
+         end;
+      end;
 
       if Pos('AppCompat.',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then Exit;
 
@@ -658,22 +680,23 @@ begin
 
   if not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml') then
   begin
-    if (AndroidTheme = '') or (Pos('AppCompat', AndroidTheme) <= 0) then
-    begin
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'styles.xml') then
-      begin
-         strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'styles.xml');
-         strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
-      end;
-    end;
-    if Pos('AppCompat', AndroidTheme) > 0 then
+    if (Pos('AppCompat', AndroidTheme) > 0) or (Pos('GDXGame', AndroidTheme) > 0) then
     begin
        if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+AndroidTheme+'.xml') then
        begin
           CopyFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+AndroidTheme+'.xml',
                      FPathToAndroidProject+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
        end;
+    end
+    else
+    begin
+       if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'styles.xml') then
+       begin
+          strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'styles.xml');
+          strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
+       end;
     end;
+
   end;
 
   minsdkApi:= 14;
@@ -989,17 +1012,17 @@ begin
                 end;
             end;
             requiredList.Free;
-           {Extras
-            Android Support Repository
-            Android Support Library
-            C:\adt32\sdk\extras\android\m2repository\com\android\support\appcompat-v7
-            C:\adt32\sdk\extras\android\m2repository\com\android\support\design
-            C:/adt32/sdk/extras/android/m2repository/com/android/support/design/26.0.0-alpha1/
-            C:\adt32\sdk\extras\android\m2repository\com\android\support\cardview-v7
-            C:\adt32\sdk\extras\android\m2repository\com\android\support\recyclerview-v7  //25.3.1
-            C:\adt32\sdk\extras\google\m2repository\com\google\android\gms\play-services-ads   //11.0.4}
-
          end;
+
+         if Pos('GDXGame', AndroidTheme) > 0 then
+         begin
+           directive:= 'api';
+           strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx:1.9.10''');
+           strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
+           strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-backend-android:1.9.10''');
+           strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
+         end;
+
          strList.Add('}');
 
          strList.Add(' ');
@@ -1558,7 +1581,12 @@ begin
   jControls := TStringList.Create;
   jControls.Sorted := True;
   jControls.Duplicates := dupIgnore;
-  jControls.Add('jForm');
+
+  if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0  then
+    jControls.Add('jForm')
+  else
+    jControls.Add('jGdxForm');
+
   for i := 0 to AndroidForm.ComponentCount - 1 do
   begin
     c := AndroidForm.Components[i];
@@ -1603,7 +1631,7 @@ begin
   fclList.Free;
 end;
 
-procedure TLamwSmartDesigner.UpdateProjectStartModule(const NewName: string);
+procedure TLamwSmartDesigner.UpdateProjectStartModule(const NewName: string; moduleType: integer);
 var
   cb: TCodeBuffer;
   IdentList: TStringList;
@@ -1612,7 +1640,14 @@ begin
   if not FProjFile.IsPartOfProject then Exit;
 
   OldName := LazarusIDE.ActiveProject.CustomData['StartModule'];
-  if OldName = '' then OldName := 'AndroidModule1';
+
+  if OldName = '' then
+  begin
+    if moduleType <> -1 then    //??
+      OldName := 'AndroidModule1'
+    else OldName:= 'GdxModule1';
+  end;
+
   if (NewName = '') or (OldName = NewName) then Exit;
   IdentList := TStringList.Create;
   try
@@ -1642,7 +1677,7 @@ var
   i: integer;
   fileName: string;
 begin
-  // By TR3E, disable backup of .java for not incrementase .apk file
+   // By TR3E, disable backup of .java for not incrementase .apk file
   // of gradle and not showing source code of program
 
   //ForceDirectory(FPathToJavaSource+'bak');
@@ -1650,9 +1685,9 @@ begin
   for i:= 0 to contentList.Count-1 do
   begin         //do backup
     //CopyFile(contentList.Strings[i],
-    //      FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
+          //FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
 
-    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher]
+    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher and gdx]
     if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
       DeleteFile(contentList.Strings[i]);
 
@@ -1814,9 +1849,18 @@ begin
      if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational') then
      begin
        list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational');
-       tempStr:= Copy(list.Strings[0], 3, 100);  //get file name...
-       list.Strings[1]:= 'package '+FPackageName+';';
-       list.SaveToFile(FPathToJavaSource + tempStr);
+       for i:= 0 to list.Count-1 do
+       begin
+          if FileExists(LamwGlobalSettings.PathToJavaTemplates + list.Strings[i]) then
+          begin
+            auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + list.Strings[i]);
+            auxList.Strings[0]:= 'package '+FPackageName+';';
+            auxList.SaveToFile(FPathToJavaSource + list.Strings[i]);
+          end;
+       end;
+       //tempStr:= Copy(list.Strings[0], 3, 100);  //get file name...
+       //list.Strings[1]:= 'package '+FPackageName+';';
+       //list.SaveToFile(FPathToJavaSource + tempStr);
      end;
      Result:= True;
    end;
@@ -2258,12 +2302,14 @@ begin
       else
         signature:= signature + ',' + listParam.Strings[i];
     end;
+
   end;
 
   Result:= method+'=Java_Event_'+method+signature+');';
   if method = 'pAppOnCreate' then
   begin
-    Result := Result + FStartModuleVarName + '.ReInit(gApp);'
+    //Result := Result + FStartModuleVarName + '.Init(gApp);';
+    Result := Result + FStartModuleVarName + '.ReInit(gApp);' //by tr3e
   end;
 
   listParam.Free;
@@ -2589,17 +2635,25 @@ end;
 
 function TLamwSmartDesigner.OnProjectSavingAll(Sender: TObject): TModalResult;
 var
-  ControlsJava, auxList, controlsList, libList: TStringList;
-  i, j, p: Integer;
+  ControlsJava, auxList, controlsList, libList, nativeGdxFormList, gdxList: TStringList;
+  i, j, p, k: Integer;
   nativeExists: Boolean;
   aux, PathToJavaTemplates, LibPath, linkLibrariesPath: string;
   AndroidTheme: string;
   compoundList: TStringList;
   lprModuleName: string;
+  hasControls: boolean;
+  nativeMethodList, tempList: TStringList;
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
-  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] <> 'GUI' then Exit;
+
+  hasControls:= False;
+
+  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GUI' then hasControls:= True;
+  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GDX' then hasControls:= True;
+
+  if not hasControls then Exit;  //no form basead
 
   AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
 
@@ -2707,7 +2761,6 @@ begin
                [rfReplaceAll,rfIgnoreCase]);
 
     ControlsJava.Text:= aux;
-      //auxList.SaveToFile(FPathToJavaSource+'Controls.java');
     ControlsJava.SaveToFile(FPathToJavaSource+'Controls.java');
 
     auxList.Clear;
@@ -2716,14 +2769,54 @@ begin
       if FileExists(PathToJavaTemplates +'support'+DirectorySeparator+'App.java') then
         auxList.LoadFromFile(PathToJavaTemplates + 'support'+DirectorySeparator+'App.java');
     end
+    else if Pos('GDXGame', AndroidTheme) > 0 then
+    begin
+      if FileExists(PathToJavaTemplates +'gdx'+DirectorySeparator+'App.java') then
+      begin
+
+        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'App.java');
+        auxList.Strings[0]:= 'package '+FPackageName+';';
+        auxList.SaveToFile(FPathToJavaSource+'App.java');
+
+        auxList.Clear;
+        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.java');
+        auxList.Strings[0]:= 'package '+FPackageName+';';
+        auxList.SaveToFile(FPathToJavaSource+'jGdxForm.java');
+
+        auxList.Clear;
+        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'MyGdxGame.java');
+        auxList.Strings[0]:= 'package '+FPackageName+';';
+        auxList.SaveToFile(FPathToJavaSource+'MyGdxGame.java');
+
+        ControlsJava.LoadFromFile(FPathToJavaSource+'Controls.java');
+
+        nativeGdxFormList:= TStringList.Create;
+        nativeGdxFormList.LoadFromFile(PathToJavaTemplates + 'gdx'+ DirectorySeparator+'jGdxForm.create');
+
+        gdxList:= TStringList.Create;
+        gdxList.LoadFromFile(PathToJavaTemplates  + 'gdx'+DirectorySeparator+'jGdxForm.native');
+        for i:= 0 to gdxList.Count-1 do
+        begin
+          nativeGdxFormList.Add(gdxList.Strings[i]);
+        end;
+        ControlsJava.Insert(ControlsJava.Count-1, nativeGdxFormList.Text);
+        ControlsJava.SaveToFile(FPathToJavaSource+'Controls.java');
+        gdxList.Free;
+        nativeGdxFormList.Free;
+      end;
+    end
     else
     begin
       if FileExists(PathToJavaTemplates + 'App.java') then
+      begin
          auxList.LoadFromFile(PathToJavaTemplates + 'App.java');
+         auxList.Strings[0]:= 'package '+FPackageName+';';
+         auxList.SaveToFile(FPathToJavaSource+'App.java');
+      end
     end;
-    auxList.Strings[0]:= 'package '+FPackageName+';';
-    auxList.SaveToFile(FPathToJavaSource+'App.java');
+
     auxList.Clear;
+
     if Pos('AppCompat', AndroidTheme) > 0 then
     begin
       if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'jCommons.java') then
@@ -2745,6 +2838,41 @@ begin
     ControlsJava.Free;
 
   end;  //CanUpdateJavaTemplate
+
+  if FileExists(LamwGlobalSettings.PathToJavaTemplates+'Controls.java') then
+  begin
+    nativeMethodList:= TStringList.Create;
+    tempList:= TStringList.Create;
+    tempList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.java');
+    for i:= 0 to tempList.Count - 1 do
+    begin
+       if Pos(' native ', tempList.Strings[i]) > 0 then
+          nativeMethodList.Add(Trim(tempList.Strings[i]));
+    end;
+    tempList.Clear;
+    for i:= 0 to nativeMethodList.Count-1 do
+    begin
+      tempList.Add(GetEventSignature(nativeMethodList.Strings[i]));
+    end;
+    if Pos('GDXGame', AndroidTheme) > 0 then
+    begin
+      gdxList:= TStringList.Create;
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.native') then
+      begin
+        gdxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.native');
+        for k:= 0 to gdxList.Count-1 do
+        begin
+          tempList.Add(GetEventSignature(gdxList.Strings[k]));
+          nativeMethodList.Add(gdxList.Strings[k]);
+        end;
+      end;
+      gdxList.Free;
+    end;
+    tempList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.events');  //old "ControlsEvents.txt"
+    nativeMethodList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.native');
+    nativeMethodList.Free;
+    tempList.Free;
+  end;
 
   if FileExists(PathToJavaTemplates + 'Controls.native') then
   begin
