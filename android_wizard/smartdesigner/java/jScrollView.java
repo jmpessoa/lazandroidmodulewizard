@@ -327,7 +327,7 @@ public class jScrollView extends ScrollView {
         imageView.setScaleType(GetScaleType(_scaleType));
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                controls.pOnHorScrollViewInnerItemClick(PasObj, imgId);
+                controls.pOnScrollViewInnerItemClick(PasObj, imgId);
             }
         });
 
@@ -367,7 +367,7 @@ public class jScrollView extends ScrollView {
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Your code.
-                controls.pOnHorScrollViewInnerItemClick(PasObj, imgId);
+                controls.pOnScrollViewInnerItemClick(PasObj, imgId);
             }
         });
 
@@ -398,7 +398,7 @@ public class jScrollView extends ScrollView {
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Your code.
-                controls.pOnHorScrollViewInnerItemClick(PasObj, imgId);
+                controls.pOnScrollViewInnerItemClick(PasObj, imgId);
             }
         });
         scrollview.addView(imageView);
