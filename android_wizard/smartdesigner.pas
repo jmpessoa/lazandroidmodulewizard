@@ -2768,6 +2768,8 @@ begin
     begin
       if FileExists(PathToJavaTemplates +'support'+DirectorySeparator+'App.java') then
         auxList.LoadFromFile(PathToJavaTemplates + 'support'+DirectorySeparator+'App.java');
+        auxList.Strings[0]:= 'package '+FPackageName+';';
+        auxList.SaveToFile(FPathToJavaSource+'App.java');
     end
     else if Pos('GDXGame', AndroidTheme) > 0 then
     begin
