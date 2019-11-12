@@ -144,7 +144,7 @@ interface
 
 uses
   SysUtils, Classes,
-  And_bitmap_h, And_jni, And_jni_Bridge,
+  And_bitmap_h, And_jni, And_jni_Bridge, PaintShader,
   AndroidWidget, systryparent;
 
 type
@@ -1961,7 +1961,7 @@ type
   private
     FInitialized : boolean;
 
-    //FjObject: jObject; //Java side  // jSelf !
+    FPaintShader: JPaintShader;  // new component! by kordal
 
     FPaintStrokeWidth: single;
     FPaintStyle: TPaintStyle;
@@ -1969,26 +1969,27 @@ type
     FPaintColor: TARGBColorBridge;
     FTypeface: TFontFace;
 
-    Procedure SetStrokeWidth  (Value : single );
+    Procedure SetStrokeWidth       (Value : single);
     Procedure SetStyle             (Value : TPaintStyle);
     Procedure SetColor             (Value : TARGBColorBridge);
     Procedure SetTextSize          (Value : single );
     Procedure SetTypeface          (Value : TFontFace);
 
+    procedure SetPaintShader(Value: jPaintShader);//by kordal
+
   protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
-    //constructor Create;
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-
     procedure Init(refApp: jApp); override;
-    //
-    Procedure DrawLine(x1,y1,x2,y2 : single); overload;
+
+    Procedure DrawLine(x1, y1, x2, y2: single); overload;
     procedure DrawLine(var _points: TDynArrayOfSingle);  overload;
 
     // LORDMAN 2013-08-13
-    Procedure DrawPoint(x1,y1 : single);
-    Procedure DrawText(Text : String; x,y : single); overload;
+    Procedure DrawPoint(x1, y1 : single);
+    Procedure DrawText(_text: string; x, y: single); overload;
 
     procedure DrawCircle(_cx: single; _cy: single; _radius: single);
     procedure DrawOval(_left, _top, _right, _bottom: single);
@@ -2018,9 +2019,10 @@ type
     function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;overload;
     function CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject; overload; //by tr3e
     function GetBitmap(): jObject;
-
     procedure SetBitmap(_bitmap: jObject); overload;
     procedure SetBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
+
+    function GetPaint(): JObject;  // uses jPaintShader
 
     procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean); overload;
     procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single); overload;
@@ -2033,15 +2035,19 @@ type
     procedure SaveBitmapJPG(_fullPathFileName: string);
 
     //by Kordal
-    procedure DrawBitmap(bitMap: jBitmap; srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB: Integer); overload;
-    procedure DrawFrame(_bitMap: jObject; _srcX: integer; _srcY: integer; _srcW: integer; _srcH: integer; _X: integer; _Y: integer; _Wh: integer; _Ht: integer; _rotateDegree: single); overload;
-    procedure DrawFrame(_bitMap: jObject; _X: integer; _Y: integer; _Index: integer; _Size: integer; _scaleFactor: single; _rotateDegree: single); overload;
+    function GetDensity(): single;
+    procedure ClipRect(Left, Top, Right, Bottom: single);
+    procedure DrawGrid(Left, Top, Width, Height: single; cellsX, cellsY: Integer);
+    procedure DrawBitmap(bitMap: jBitmap; srcL, srcT, srcR, srcB: Integer; dstL, dstT, dstR, dstB: single); overload;
+    procedure DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH: Integer; X, Y, Wh, Ht, rotateDegree: single); overload;
+    procedure DrawFrame(bitMap: jObject; X, Y: single; Index, Size: Integer; scaleFactor, rotateDegree: single); overload;
 
     //Property
     property CustomColor : DWord read FCustomColor write FCustomColor;
-    //property  jSelf {JavaObj} : jObject read FjObject;
+    property Density: single read GetDensity;
 
   published
+    property PaintShader: JPaintShader read FPaintShader write SetPaintShader; // new! //by kordal
     property PaintStrokeWidth: single read FPaintStrokeWidth write SetStrokeWidth;
     property PaintStyle: TPaintStyle read FPaintStyle write setStyle;
     property PaintTextSize: single read FPaintTextSize write setTextSize;
@@ -2087,6 +2093,7 @@ type
     function GetImage(): jObject;
 
     property FilePath    : TFilePath read FFilePath write FFilePath;
+    procedure SetLayerType(Value: TLayerType);  //by kordal
 
   published
     property Canvas      : jCanvas read FjCanvas write SetjCanvas; // Java : jCanvas
@@ -9294,7 +9301,6 @@ begin
   begin
    inherited Init(refApp);
 
-   //FjObject  := jHorizontalScrollView_Create(FjEnv, FjThis, Self);
    FjObject  := jHorizontalScrollView_jCreate(FjEnv, int64(Self) , Ord(FInnerLayout), FjThis);
 
    if FjObject = nil then exit;
@@ -10556,6 +10562,10 @@ begin
   jCanvas_setColor(FjEnv, FjObject ,GetARGB(FCustomColor, FPaintColor));
   jCanvas_setTextSize(FjEnv, FjObject ,FPaintTextSize);
   FInitialized:= True;
+
+  // PaintShader new! //by kordal
+  if FPaintShader <> nil then
+    FPaintShader.Init(refApp, GetPaint);
 end;
 
 Procedure jCanvas.SetStrokeWidth(Value : single );
@@ -10596,10 +10606,34 @@ begin
      jCanvas_SetTypeface(FjEnv, FjObject, Ord(FTypeFace));
 end;
 
-Procedure jCanvas.drawText(Text: string; x,y: single);
+procedure jCanvas.SetPaintShader(Value: jPaintShader);
+begin
+  if Value <> FPaintShader then
+  begin
+    if Assigned(FPaintShader) then
+       FPaintShader.RemoveFreeNotification(Self); // remove free notification...
+    FPaintShader := Value;
+    if Value <> nil then  // re- add free notification...
+       Value.FreeNotification(Self);
+  end;
+end;
+
+procedure jCanvas.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if Operation = opRemove then
+  begin
+    if AComponent = FPaintShader then
+    begin
+      FPaintShader := nil;
+    end
+  end;
+end;
+
+Procedure jCanvas.drawText(_text: string; x, y: single);
 begin
   if FInitialized then
-     jCanvas_drawText(FjEnv, FjObject ,text,x,y);
+     jCanvas_drawText(FjEnv, FjObject ,_text, x, y);
 end;
 
 Procedure jCanvas.DrawLine(x1,y1,x2,y2 : single);
@@ -10690,24 +10724,43 @@ begin
      jCanvas_drawBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
-procedure jCanvas.DrawBitmap(bitMap: jBitmap; srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB: Integer);
+// by Kordal
+procedure jCanvas.DrawBitmap(bitMap: jBitmap; srcL, srcT, srcR, srcB: Integer; dstL, dstT, dstR, dstB: Single);
 begin
   if FInitialized then
     jCanvas_DrawBitmap(FjEnv, FjObject, bitMap.GetImage, srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB);
 end;
 
-procedure jCanvas.DrawFrame(_bitMap: jObject; _srcX: integer; _srcY: integer; _srcW: integer; _srcH: integer; _X: integer; _Y: integer; _Wh: integer; _Ht: integer; _rotateDegree: single);
+procedure jCanvas.DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH: Integer; X, Y, Wh, Ht, rotateDegree: Single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawFrame(FjEnv, FjObject, _bitMap ,_srcX ,_srcY ,_srcW ,_srcH ,_X ,_Y ,_Wh ,_Ht ,_rotateDegree);
+     jCanvas_DrawFrame(FjEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, Wh, Ht, rotateDegree);
 end;
 
-procedure jCanvas.DrawFrame(_bitMap: jObject; _X: integer; _Y: integer; _Index: integer; _Size: integer; _scaleFactor: single; _rotateDegree: single);
+procedure jCanvas.DrawFrame(bitMap: jObject; X, Y: Single; Index, Size: Integer; scaleFactor, rotateDegree: Single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawFrame(FjEnv, FjObject, _bitMap ,_X ,_Y ,_Index ,_Size ,_scaleFactor ,_rotateDegree);
+     jCanvas_DrawFrame(FjEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
+end;
+
+function jCanvas.GetDensity(): Single;
+begin
+  if FInitialized then
+    Result := jCanvas_GetDensity(FjEnv, FjObject);
+end;
+
+procedure jCanvas.ClipRect(Left, Top, Right, Bottom: Single);
+begin
+  if FInitialized then
+    jCanvas_ClipRect(FjEnv, FjObject, Left, Top, Right, Bottom);
+end;
+
+procedure jCanvas.DrawGrid(Left, Top, Width, Height: Single; cellsX, cellsY: Integer);
+begin
+  if FInitialized then
+    jCanvas_DrawGrid(FjEnv, FjObject, Left, Top, Width, Height, cellsX, cellsY);
 end;
 
 procedure jCanvas.SetCanvas(_canvas: jObject);
@@ -10801,6 +10854,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCanvas_GetBitmap(FjEnv, FjObject);
+end;
+
+// by Kordal
+function jCanvas.GetPaint(): JObject;
+begin
+  if FInitialized then
+    Result := jCanvas_GetPaint(FjEnv, FjObject);
 end;
 
 procedure jCanvas.DrawBitmap(_left: single; _top: single; _bitmap: jObject);
@@ -11149,6 +11209,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jView_GetBitmap(FjEnv, FjObject);
+end;
+
+
+procedure jView.SetLayerType(Value: TLayerType);
+begin
+  if FInitialized then
+    jView_SetLayerType(FjEnv, FjObject, Byte(Value));
 end;
 
 //------------------------------------------------------------------------------

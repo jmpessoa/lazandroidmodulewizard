@@ -1,0 +1,3 @@
+<Libraries Value="K:\Android_SDK_NDK\android-ndk-r20\platforms\android-22\arch-arm\usr\lib;K:\Android_SDK_NDK\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x"/>
+<TargetCPU Value="arm"/>
+<CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDK:\Android_SDK_NDK\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>

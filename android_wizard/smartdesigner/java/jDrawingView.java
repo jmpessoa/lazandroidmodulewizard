@@ -425,7 +425,11 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
             return b;
         }
     }
-
+	
+	public Paint GetPaint() {
+		return mDrawPaint;
+	}	
+	
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
@@ -448,7 +452,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     @Override
     /*.*/ public void onDraw(Canvas canvas) {
         //super.onDraw(canvas);
-        if (mBufferedDraw)
+		if (mBufferedDraw)
             canvas.drawBitmap(mBitmap,0,0,null); //mDrawPaint  draw offscreen changes
         else
             mCanvas = canvas;
@@ -533,13 +537,13 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
     // new by Kordal
     private String decodeUTF8(byte[] bytes) {
-     return new String(bytes, UTF8_CHARSET);
-     //return new String(bytes);
+		return new String(bytes, UTF8_CHARSET);
+        //return new String(bytes);
     }
 
     // new by Kordal
     public void DrawText(byte[] _text, float _x, float _y) {
-                mCanvas.drawText(decodeUTF8(_text), _x, _y, mTextPaint);
+		mCanvas.drawText(decodeUTF8(_text), _x, _y, mTextPaint);
     }
  
     public void DrawBitmap(Bitmap _bitmap, float _x, float _y, float _angleDegree) {
@@ -1331,6 +1335,10 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
             mCanvas.drawLine(_left, _top + i * ch, _left + _width, _top + i * ch, mDrawPaint); // draw X lines
         }
     }
-
+	
+	public void SetLayerType(byte _value) {
+		setLayerType(_value/*View.LAYER_TYPE_SOFTWARE*/, null);
+	}	
+		
 } //end class
 

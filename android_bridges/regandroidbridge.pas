@@ -42,7 +42,8 @@ uses
   captionpanel,
   customcamera,
   searchview,
-  zbarcodescannerview;
+  zbarcodescannerview,
+  paintshader; // new!;
 
 Procedure Register;
   
@@ -85,12 +86,13 @@ begin
   {$I jWebView_icon.lrs}
   {$I jImageView_icon.lrs}
   {$I jImageList_icon.lrs}
+  {$I jView_icon.lrs}
+  {$I jcanvas_icon.lrs}
   {$I jdrawingview_icon.lrs}
+  {$I jPaintShader_icon.lrs}
   {$I jsurfaceview_icon.lrs}
   {$I jcustomcamera_icon.lrs}
   {$I jBitmap_icon.lrs}
-  {$I jView_icon.lrs}
-  {$I jcanvas_icon.lrs}
   {$I jcanvases1_icon.lrs}
   {$I jcanvases2_icon.lrs}
   {$I jviewflipper_icon.lrs}
@@ -137,12 +139,13 @@ begin
       jWebView,
       jImageView,
       jImageList,
+      jView,
+      jCanvas,
       jDrawingView,
+      jPaintShader,
       jSurfaceView,
       jCustomCamera,
       jBitmap,
-      jView,
-      jCanvas,
       jCanvasES1,
       jCanvasES2,
       jViewFlipper,

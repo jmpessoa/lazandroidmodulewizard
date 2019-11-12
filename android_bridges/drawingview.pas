@@ -5,7 +5,7 @@ unit drawingview;
 interface
 
 uses
-  Classes, SysUtils, And_jni, AndroidWidget, systryparent;
+  Classes, SysUtils, And_jni, AndroidWidget, systryparent, PaintShader;
 
 type
 
@@ -23,163 +23,171 @@ type
 { jDrawingView }
 
 jDrawingView = class(jVisualControl)    //jDrawingView
- private
-    FOnDraw      : TOnTouchExtended;
-    FOnTouchDown : TOnTouchExtended;
-    FOnTouchMove : TOnTouchExtended;
-    FOnTouchUp   : TOnTouchExtended;
-    FOnSizeChanged: TOnDrawingViewSizeChanged;
+private
+  FOnDraw       : TOnTouchExtended;
+  FOnTouchDown  : TOnTouchExtended;
+  FOnTouchMove  : TOnTouchExtended;
+  FOnTouchUp    : TOnTouchExtended;
+  FOnSizeChanged: TOnDrawingViewSizeChanged;
 
-    FPaintStrokeWidth: single;
-    FPaintStyle: TPaintStyle;
-    FPaintColor: TARGBColorBridge;
-    FPaintStrokeJoin: TStrokeJoin;
-    FPaintStrokeCap: TStrokeCap;
+  FPaintStrokeWidth: Single;
+  FPaintStyle: TPaintStyle;
+  FPaintColor: TARGBColorBridge;
+  FPaintStrokeJoin: TStrokeJoin;
+  FPaintStrokeCap: TStrokeCap;
+  // new
+  FPaintShader: JPaintShader; // Java : jPaintShader
+  
+  FImageIdentifier: string;
 
-    FImageIdentifier: string;
+  FMinZoomFactor: Single;
+  FMaxZoomFactor: Single;
 
-    FMinZoomFactor: single;
-    FMaxZoomFactor: single;
+  FMinWorldX: Single;
+  FMaxWorldX: Single;
+  FMinWorldY: Single;
+  FMaxWorldY: Single;
+  FScaleX: Single;
+  FScaleY: Single;
+  FBufferedDraw: Boolean;
 
-    FMinWorldX: single;
-    FMaxWorldX: single;
-    FMinWorldY: single;
-    FMaxWorldY: single;
-    FScaleX: single;
-    FScaleY: single;
-    FBufferedDraw: boolean;
+  procedure SetVisible(Value: Boolean);
+  procedure SetColor(Value: TARGBColorBridge); //background
+  function GetCanvas(): jObject;
+  // new 
+  procedure SetPaintShader(Value: JPaintShader); // Java : jPaintShader
+protected
+  procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+public
+  constructor Create(AOwner: TComponent); override;
+  destructor  Destroy; override;
+  procedure Init(refApp: jApp); override;
+  procedure Refresh;
+  procedure UpdateLayout; override;
+  function jCreate( _bufferedDraw: boolean; _backgroundColor: integer): jObject;
 
-    procedure SetVisible(Value: Boolean);
-    procedure SetColor(Value: TARGBColorBridge); //background
-    function GetCanvas(): jObject;
- public
-    constructor Create(AOwner: TComponent); override;
-    destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
-    procedure Refresh;
-    procedure UpdateLayout; override;
-    function jCreate( _bufferedDraw: boolean; _backgroundColor: integer): jObject;
+  procedure jFree();
+  procedure SetViewParent(_viewgroup: jObject); override;
+  procedure RemoveFromViewParent(); override;
+  function GetView(): jObject; override;
+  procedure SetLParamWidth(_w: integer);
+  procedure SetLParamHeight(_h: integer);
+  procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+  procedure AddLParamsAnchorRule(_rule: integer);
+  procedure AddLParamsParentRule(_rule: integer);
+  procedure SetLayoutAll(_idAnchor: integer);
+  procedure ClearLayout();
+  function GetDrawingCache(): jObject;
+  function GetImage(): jObject;
+  function GetPaint(): jObject;
 
-    procedure jFree();
-    procedure SetViewParent(_viewgroup: jObject); override;
-    procedure RemoveFromViewParent(); override;
-    function GetView(): jObject; override;
-    procedure SetLParamWidth(_w: integer);
-    procedure SetLParamHeight(_h: integer);
-    procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-    procedure AddLParamsAnchorRule(_rule: integer);
-    procedure AddLParamsParentRule(_rule: integer);
-    procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayout();
-    function GetDrawingCache(): jObject;
-    function GetImage(): jObject;
+  function GetHeight(): integer; override;
+  function GetWidth(): integer; override;
+  procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
+  procedure DrawBitmap(_bitmap: jObject; _left: integer; _top: integer; _right: integer; _bottom: integer); overload;
 
-    function GetHeight(): integer; override;
-    function GetWidth(): integer; override;
-    procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
-    procedure DrawBitmap(_bitmap: jObject; _left: integer; _top: integer; _right: integer; _bottom: integer); overload;
+  procedure SetPaintStrokeWidth(_width: single);
+  procedure SetPaintStyle(_style: TPaintStyle);  //TPaintStyle
+  procedure SetPaintColor( _color: TARGBColorBridge); overload;
+  procedure SetPaintColor(Color: TAlphaColor); overload;
+  procedure SetTextSize(_textsize: DWord);
 
-    procedure SetPaintStrokeWidth(_width: single);
-    procedure SetPaintStyle(_style: TPaintStyle);  //TPaintStyle
-    procedure SetPaintColor( _color: TARGBColorBridge); overload;
-    procedure SetTextSize(_textsize: DWord);
+  procedure DrawLine(_x1: single; _y1: single; _x2: single; _y2: single); overload;
+  procedure DrawLine(var _points: TDynArrayOfSingle); overload;
+  procedure DrawLine(_points: array of single); overload;
 
-    procedure DrawLine(_x1: single; _y1: single; _x2: single; _y2: single); overload;
-    procedure DrawLine(var _points: TDynArrayOfSingle); overload;
-    procedure DrawLine(_points: array of single); overload;
+  function GetPath(var _points: TDynArrayOfSingle): jObject; overload;
+  function GetPath(_points: array of single): jObject; overload;
 
-    function GetPath(var _points: TDynArrayOfSingle): jObject; overload;
-    function GetPath(_points: array of single): jObject; overload;
+  procedure DrawPath(_path: jObject); overload;
+  procedure DrawPath(var _points: TDynArrayOfSingle); overload;
+  procedure DrawPath(_points: array of single); overload;
+  procedure SetPaintStrokeJoin(_strokeJoin: TStrokeJoin);
+  procedure SetPaintStrokeCap(_strokeCap: TStrokeCap);
+  procedure SetPaintCornerPathEffect(_radius: single);
+  procedure SetPaintDashPathEffect(_lineDash: single; _dashSpace: single; _phase: single);
+  function GetPath(): jObject; overload;
+  function ResetPath(): jObject; overload;
+  function ResetPath(_path: jObject): jObject; overload;
+  procedure AddCircleToPath(_x: single; _y: single; _r: single; _pathDirection: TPathDirection); overload;
+  procedure AddCircleToPath(_path: jObject; _x: single; _y: single; _r: single; _pathDirection: TPathDirection); overload;
+  function GetNewPath(var _points: TDynArrayOfSingle): jObject; overload;
+  function GetNewPath(_points: array of single): jObject; overload;
+  function GetNewPath(): jObject; overload;
+  function AddPointsToPath(_path: jObject; var _points: TDynArrayOfSingle): jObject; overload;
+  function AddPointsToPath(_path: jObject; _points: array of single): jObject;  overload;
+  function AddPathToPath(_srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
+  procedure DrawTextOnPath(_path: jObject; _text: string; _xOffset: single; _yOffset: single); overload;
+  procedure DrawTextOnPath(_text: string; _xOffset: single; _yOffset: single); overload;
 
-    procedure DrawPath(_path: jObject); overload;
-    procedure DrawPath(var _points: TDynArrayOfSingle); overload;
-    procedure DrawPath(_points: array of single); overload;
-    procedure SetPaintStrokeJoin(_strokeJoin: TStrokeJoin);
-    procedure SetPaintStrokeCap(_strokeCap: TStrokeCap);
-    procedure SetPaintCornerPathEffect(_radius: single);
-    procedure SetPaintDashPathEffect(_lineDash: single; _dashSpace: single; _phase: single);
-    function GetPath(): jObject; overload;
-    function ResetPath(): jObject; overload;
-    function ResetPath(_path: jObject): jObject; overload;
-    procedure AddCircleToPath(_x: single; _y: single; _r: single; _pathDirection: TPathDirection); overload;
-    procedure AddCircleToPath(_path: jObject; _x: single; _y: single; _r: single; _pathDirection: TPathDirection); overload;
-    function GetNewPath(var _points: TDynArrayOfSingle): jObject; overload;
-    function GetNewPath(_points: array of single): jObject; overload;
-    function GetNewPath(): jObject; overload;
-    function AddPointsToPath(_path: jObject; var _points: TDynArrayOfSingle): jObject; overload;
-    function AddPointsToPath(_path: jObject; _points: array of single): jObject;  overload;
-    function AddPathToPath(_srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
-    procedure DrawTextOnPath(_path: jObject; _text: string; _xOffset: single; _yOffset: single); overload;
-    procedure DrawTextOnPath(_text: string; _xOffset: single; _yOffset: single); overload;
+  procedure DrawText(_text: string; _x: single; _y: single);  overload;
+  procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single); overload;
 
-    procedure DrawText(_text: string; _x: single; _y: single);  overload;
-    procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single); overload;
+  procedure DrawPoint(_x1: single; _y1: single);
+  procedure DrawCircle(_cx: single; _cy: single; _radius: single);
+  procedure DrawBackground(_color: integer);
 
-    procedure DrawPoint(_x1: single; _y1: single);
-    procedure DrawCircle(_cx: single; _cy: single; _radius: single);
-    procedure DrawBackground(_color: integer);
+  procedure DrawRect(_left: single; _top: single; _right: single; _bottom: single); overload;
+  //procedure DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
+  procedure DrawRect(var _xyArray8: TDynArrayOfSingle); overload;
+  procedure DrawRect(var _xyArray8: array of single); overload;
 
-    procedure DrawRect(_left: single; _top: single; _right: single; _bottom: single); overload;
-    //procedure DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
-    procedure DrawRect(var _xyArray8: TDynArrayOfSingle); overload;
-    procedure DrawRect(var _xyArray8: array of single); overload;
-
-    procedure SetImageByResourceIdentifier(_imageResIdentifier: string);    // ../res/drawable
-    procedure DrawBitmap(_bitmap: jObject);  overload;
+  procedure SetImageByResourceIdentifier(_imageResIdentifier: string);    // ../res/drawable
+  procedure DrawBitmap(_bitmap: jObject);  overload;
 
     //procedure DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom: Integer); overload; // by Kordal
     //procedure DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH, X, Y, W, H: Integer; rotateDegree: Single=0); overload; // by Kordal
     //procedure DrawFrame(bitMap: jObject; X, Y, Index, Size: Integer; scaleFactor: Single=1; rotateDegree: Single=0); overload;
 
-    //by Kordal
-    procedure DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom: Integer; dstLeft, dstTop, dstRight, dstBottom: Single); overload;
-    procedure DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH: Integer; X, Y, W, H: Single; rotateDegree: Single=0); overload;
-    procedure DrawFrame(bitMap: jObject; X, Y: Single; Index, Size: Integer; scaleFactor: Single=1; rotateDegree: Single=0); overload;
+  //by Kordal
+  procedure DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom: Integer; dstLeft, dstTop, dstRight, dstBottom: Single); overload;
+  procedure DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH: Integer; X, Y, W, H: Single; rotateDegree: Single=0); overload;
+  procedure DrawFrame(bitMap: jObject; X, Y: Single; Index, Size: Integer; scaleFactor: Single=1; rotateDegree: Single=0); overload;
 
-    procedure SaveToFile(_filename: string); overload;
-    procedure SaveToFile(_path: string; _filename: string);  overload;
+  procedure SaveToFile(_filename: string); overload;
+  procedure SaveToFile(_path: string; _filename: string);  overload;
 
-    procedure SetMinZoomFactor(_minZoomFactor: single);
-    procedure SetMaxZoomFactor(_maxZoomFactor: single);
+  procedure SetMinZoomFactor(_minZoomFactor: single);
+  procedure SetMaxZoomFactor(_maxZoomFactor: single);
 
-    procedure DrawTextAligned(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
+  procedure DrawTextAligned(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
-    procedure DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
-    procedure DrawOval(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
+  procedure DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
+  procedure DrawOval(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
 
-    function GetViewportX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewportWidth: integer): integer; overload;
-    function GetViewportY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewportHeight: integer): integer;  overload;
+  function GetViewportX(_worldX: single; _minWorldX: single; _maxWorldX: single; _viewportWidth: integer): integer; overload;
+  function GetViewportY(_worldY: single; _minWorldY: single; _maxWorldY: single; _viewportHeight: integer): integer;  overload;
 
-    procedure SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);
-    function GetViewportY(_worldY: single): integer; overload;
-    function GetViewportX(_worldX: single): integer; overload;
+  procedure SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);
+  function GetViewportY(_worldY: single): integer; overload;
+  function GetViewportX(_worldX: single): integer; overload;
 
-    function GetWorldY(_viewportY:integer): single;
-    function GetWorldX(_viewportX:integer): single;
+  function GetWorldY(_viewportY:integer): single;
+  function GetWorldX(_viewportX:integer): single;
 
-    procedure DrawBitmap(_bitmap: jObject; _x: single; _y: single; _angleDegree: single); overload;
-    procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean); overload;
-    procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
-    procedure Invalidate();
-    procedure Clear(_color: TARGBColorBridge); overload;
-    procedure Clear();  overload;
-    procedure SetBufferedDraw(_value: boolean);
-    function GetTextHeight(_text: string): single;
-    function GetTextWidth(_text: string): single;
-    function GetTextLeft(_text: string): single; //LMB
-    function GetTextBottom(_text: string): single; //LMB
+  procedure DrawBitmap(_bitmap: jObject; _x: single; _y: single; _angleDegree: single); overload;
+  procedure DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean); overload;
+  procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
+  procedure Invalidate();
+  procedure Clear(_color: TARGBColorBridge); overload;
+  procedure Clear();  overload;
+  procedure SetBufferedDraw(_value: boolean);
+  function GetTextHeight(_text: string): single;
+  function GetTextWidth(_text: string): single;
+  function GetTextLeft(_text: string): single; //LMB
+  function GetTextBottom(_text: string): single; //LMB
 
-    procedure SetFontFace(AValue: TFontFace);
-    procedure SetTextTypeFace(AValue: TTextTypeFace);
-    procedure SetFontFromAssets(_fontName: string);
-    procedure DrawTextFromAssetsFont(_text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: TARGBColorBridge);
+  procedure SetFontFace(AValue: TFontFace);
+  procedure SetTextTypeFace(AValue: TTextTypeFace);
+  procedure SetFontFromAssets(_fontName: string);
+  procedure DrawTextFromAssetsFont(_text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: TARGBColorBridge);
 
     {GetTextBox :: result len=4
      array[0] => x //left-top
      array[1] => y
      array[2] => x //right-bottom
      array[3] => y}
-    function GetTextBox(_text: string; _x: single; _y: single): TDynArrayOfSingle; overload;
+  function GetTextBox(_text: string; _x: single; _y: single): TDynArrayOfSingle; overload;
 
     {GetTextBox :: result len=8
      array[0] => x //left-top
@@ -190,14 +198,14 @@ jDrawingView = class(jVisualControl)    //jDrawingView
      array[5] => y
      array[6] => x //right-bottom
      array[7] => y}
-    function GetTextBox(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;overload;
+  function GetTextBox(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;overload;
 
     {DrawTextEx :: result len=4
      array[0] => x //left-top
      array[1] => y
      array[2] => x //right-bottom
      array[3] => y}
-    function DrawTextEx(_text: string; _x: single; _y: single): TDynArrayOfSingle; overload;
+  function DrawTextEx(_text: string; _x: single; _y: single): TDynArrayOfSingle; overload;
 
     {DrawTextEx :: result len=8
     array[0] => x //left-top
@@ -208,8 +216,7 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     array[5] => y
     array[6] => x //right-bottom
     array[7] => y}
-    function DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle; overload;
-
+  function DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle; overload;
 
     {DrawTextEx :: result len=8
     array[0] => x //left-top
@@ -220,61 +227,59 @@ jDrawingView = class(jVisualControl)    //jDrawingView
     array[5] => y
     array[6] => x //right-bottom
     array[7] => y}
-    function DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;  overload;
-
+  function DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;  overload;
 
     {DrawTextAlignedEx  :: result len=4
     array[0] => x //left-top
     array[1] => y
     array[2] => x //right-bottom
     array[3] => y}
-    function DrawTextAlignedEx(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
+  function DrawTextAlignedEx(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
 
-    procedure DrawCroppedBitmap(_bitmap: jObject; _x: single; _y: single; _cropOffsetLeft: integer; _cropOffsetTop: integer; _cropWidth: integer; _cropHeight: integer);
+  procedure DrawCroppedBitmap(_bitmap: jObject; _x: single; _y: single; _cropOffsetLeft: integer; _cropOffsetTop: integer; _cropWidth: integer; _cropHeight: integer);
 
-    //by Kordal
-    procedure SetPaintColor( _color: TColor); overload;
-    procedure DrawRoundRect(Left, Top, Right, Bottom, radiusX, radiusY: Single);
-    procedure DrawGrid(Left, Top, Width, Height: Single; cellsX, cellsY: Integer);
-    procedure ClipRect(Left, Top, Right, Bottom: Single);
-    function GetDensity(): Single;
+  //by Kordal
+  procedure DrawRoundRect(Left, Top, Right, Bottom, radiusX, radiusY: Single);
+  procedure DrawGrid(Left, Top, Width, Height: Single; cellsX, cellsY: Integer);
+  procedure ClipRect(Left, Top, Right, Bottom: Single);
+  function GetDensity(): Single;
+  procedure SetLayerType(Value: TLayerType);
 
-    Procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
+  procedure GenEvent_OnDrawingViewTouch(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 
-    Procedure GenEvent_OnDrawingViewDraw(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
+  procedure GenEvent_OnDrawingViewDraw(Obj: TObject; Act, Cnt: integer; X,Y: array of Single;
                                  fligGesture: integer; pinchZoomGestureState: integer; zoomScaleFactor: single);
 
-    Procedure GenEvent_OnDrawingViewSizeChanged(Obj: TObject; width: integer; height: integer; oldWidth: integer; oldHeight: integer);
+  procedure GenEvent_OnDrawingViewSizeChanged(Obj: TObject; width: integer; height: integer; oldWidth: integer; oldHeight: integer);
 
-    property Density: Single read GetDensity; //by Kordal
+  property Density: Single read GetDensity; //by Kordal
+published
+  property BackgroundColor: TARGBColorBridge read FColor write SetColor;
+  property FontSize: DWord read FFontSize write SetTextSize;
+  property FontFace: TFontFace read FFontFace write SetFontface;
+  property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
+  property PaintShader: JPaintShader read FPaintShader write SetPaintShader; // new!
+  property PaintStrokeWidth: single read FPaintStrokeWidth write SetPaintStrokeWidth;
+  property PaintStyle: TPaintStyle read FPaintStyle write SetPaintStyle;
+  property PaintColor: TARGBColorBridge read FPaintColor write SetPaintColor;
+  property PaintStrokeJoin: TStrokeJoin read FPaintStrokeJoin write SetPaintStrokeJoin;
+  property PaintStrokeCap: TStrokeCap read FPaintStrokeCap write SetPaintStrokeCap;
 
- published
-    property BackgroundColor: TARGBColorBridge read FColor write SetColor;
-    property FontSize: DWord read FFontSize write SetTextSize;
-    property FontFace: TFontFace read FFontFace write SetFontface;
-    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
-    property PaintStrokeWidth: single read FPaintStrokeWidth write SetPaintStrokeWidth;
-    property PaintStyle: TPaintStyle read FPaintStyle write SetPaintStyle;
-    property PaintColor: TARGBColorBridge read FPaintColor write SetPaintColor;
-    property PaintStrokeJoin: TStrokeJoin read FPaintStrokeJoin write SetPaintStrokeJoin;
-    property PaintStrokeCap: TStrokeCap read FPaintStrokeCap write SetPaintStrokeCap;
+  property ImageIdentifier : string read FImageIdentifier write SetImageByResourceIdentifier;
 
-    property ImageIdentifier : string read FImageIdentifier write SetImageByResourceIdentifier;
-
-    property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
-    property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
-    property BufferedDraw: boolean read FBufferedDraw write SetBufferedDraw;
-    // Event - Click
-    //property OnClick: TOnNotify read FOnClick write FOnClick;
-    // Event - Drawing
-    property OnDraw      : TOnTouchExtended read FOnDraw write FOnDraw;
-    property OnSizeChanged: TOnDrawingViewSizeChanged read FOnSizeChanged write FOnSizeChanged;
-    // Event - Touch
-    property OnTouchDown : TOnTouchExtended read FOnTouchDown write FOnTouchDown;
-    property OnTouchMove : TOnTouchExtended read FOnTouchMove write FOnTouchMove;
-    property OnTouchUp   : TOnTouchExtended read FOnTouchUp   write FOnTouchUp;
-
+  property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
+  property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
+  property BufferedDraw: boolean read FBufferedDraw write SetBufferedDraw;
+  // Event - Click
+  //property OnClick: TOnNotify read FOnClick write FOnClick;
+  // Event - Drawing
+  property OnDraw      : TOnTouchExtended read FOnDraw write FOnDraw;
+  property OnSizeChanged: TOnDrawingViewSizeChanged read FOnSizeChanged write FOnSizeChanged;
+  // Event - Touch
+  property OnTouchDown : TOnTouchExtended read FOnTouchDown write FOnTouchDown;
+  property OnTouchMove : TOnTouchExtended read FOnTouchMove write FOnTouchMove;
+  property OnTouchUp   : TOnTouchExtended read FOnTouchUp   write FOnTouchUp;
 end;
 
 function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean;  _backgroundColor: integer; this: jObject): jObject;
@@ -291,6 +296,7 @@ procedure jDrawingView_SetLayoutAll(env: PJNIEnv; _jdrawingview: JObject; _idAnc
 procedure jDrawingView_ClearLayoutAll(env: PJNIEnv; _jdrawingview: JObject);
 procedure jDrawingView_SetId(env: PJNIEnv; _jdrawingview: JObject; _id: integer);
 function jDrawingView_GetDrawingCache(env: PJNIEnv; _jdrawingview: JObject): jObject;
+function jDrawingView_GetPaint(env: PJNIEnv; _jdrawingview: JObject): jObject;
 
 function jDrawingView_GetHeight(env: PJNIEnv; _jdrawingview: JObject): integer;
 function jDrawingView_GetWidth(env: PJNIEnv; _jdrawingview: JObject): integer;
@@ -384,10 +390,11 @@ procedure jDrawingView_DrawCroppedBitmap(env: PJNIEnv; _jdrawingview: JObject; _
 procedure jDrawingView_DrawBitmap(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _sl, _st, _sr, _sb: Integer; _dl, _dt, _dr, _db: Single); overload;
 procedure jDrawingView_DrawFrame(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _srcX, _srcY, _srcW, _srcH: Integer; _X, _Y, _Wh, _Ht, _rotateDegree: Single); overload;
 procedure jDrawingView_DrawFrame(env: PJNIEnv; _jdrawingview: JObject; _bitmap: jObject; _X, _Y: Single; _Index, _Size: Integer; _scaleFactor, _rotateDegree: Single); overload;
-procedure jDrawingView_DrawRoundRect(env: PJNIEnv; _jdrawingview: JObject; _left, _top, _right, _bottom, _rx, _ry: Single);
-procedure jDrawingView_DrawGrid(env: PJNIEnv; _jdrawingview: JObject; _left, _top, _width, _height: Single; _cellsX, _cellsY: Integer);
+procedure jDrawingView_DrawRoundRect(env: PJNIEnv; _jdrawingview: JObject; _Left, _Top, _Right, _Bottom, _rX, _rY: Single);
+procedure jDrawingView_DrawGrid(env: PJNIEnv; _jdrawingview: JObject; _Left, _Top, _Width, _Height: Single; _cellsX, _cellsY: Integer);
 procedure jDrawingView_ClipRect(env: PJNIEnv; _jdrawingview: JObject; Left, Top, Right, Bottom: Single);
 function  jDrawingView_GetDensity(env: PJNIEnv; _jdrawingview: JObject): Single;
+procedure jDrawingView_SetLayerType(env: PJNIEnv; _jdrawingview: JObject; _Value: JByte);
 
 implementation
 
@@ -448,22 +455,21 @@ procedure jDrawingView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
+  obj: JObject=nil;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-   //your code here: set/initialize create params....
-   FjObject:= jCreate(FBufferedDraw, GetARGB(FCustomColor, FColor)); //jSelf !
+    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+    //your code here: set/initialize create params....
+    FjObject:= jCreate(FBufferedDraw, GetARGB(FCustomColor, FColor)); //jSelf !
+   	
+    if FParent <> nil then
+      sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-   if FjObject = nil then exit;
+    FjPRLayoutHome:= FjPRLayout;
 
-   if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
-
-   FjPRLayoutHome:= FjPRLayout;
-
-   jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jDrawingView_SetId(FjEnv, FjObject, Self.Id);
+    jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+    jDrawingView_SetId(FjEnv, FjObject, Self.Id);
   end;
 
   jDrawingView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -493,36 +499,40 @@ begin
 
   if not FInitialized then
   begin
-   FInitialized:= True;
+    FInitialized := True;
 
-   if FPaintStrokeWidth > 1 then
-     jDrawingView_SetPaintWidth(FjEnv, FjObject, FPaintStrokeWidth);
+    if FPaintStrokeWidth > 1 then
+      jDrawingView_SetPaintWidth(FjEnv, FjObject, FPaintStrokeWidth);
 
-   if  FPaintStyle <> psDefault then
-     jDrawingView_SetPaintStyle(FjEnv, FjObject, ord(FPaintStyle));
+    if  FPaintStyle <> psDefault then
+      jDrawingView_SetPaintStyle(FjEnv, FjObject, ord(FPaintStyle));
 
-   if  FPaintColor <> colbrDefault then
-   jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
+    if  FPaintColor <> colbrDefault then
+      jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
 
-   if FFontSize <> 0 then
-     jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
+    if FFontSize <> 0 then
+      jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
 
-   if (FFontFace <> ffNormal) or (FTextTypeFace <> tfNormal) then //jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
-     jDrawingView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+    if (FFontFace <> ffNormal) or (FTextTypeFace <> tfNormal) then //jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
+      jDrawingView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
-   if FPaintStrokeJoin <>  sjDefault then
-        jDrawingView_SetPaintStrokeJoin(FjEnv, FjObject, Ord(FPaintStrokeJoin));
+    if FPaintStrokeJoin <>  sjDefault then
+      jDrawingView_SetPaintStrokeJoin(FjEnv, FjObject, Ord(FPaintStrokeJoin));
 
-   if FPaintStrokeCap <>  scDefault then
-        jDrawingView_SetPaintStrokeCap(FjEnv, FjObject, Ord(FPaintStrokeCap));
+    if FPaintStrokeCap <>  scDefault then
+      jDrawingView_SetPaintStrokeCap(FjEnv, FjObject, Ord(FPaintStrokeCap));
 
-   if FImageIdentifier <> '' then
-     jDrawingView_SetImageByResourceIdentifier(FjEnv, FjObject , FImageIdentifier);
+    if FImageIdentifier <> '' then
+      jDrawingView_SetImageByResourceIdentifier(FjEnv, FjObject , FImageIdentifier);
 
-  // if  FColor <> colbrDefault then
+    // if  FColor <> colbrDefault then
     //View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(FjEnv, FjObject, FVisible);
+
+    // PaintShader new!
+    if FPaintShader <> nil then
+      FPaintShader.Init(refApp, GetPaint);
   end;
 end;
 
@@ -672,6 +682,12 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jDrawingView_GetDrawingCache(FjEnv, FjObject);
+end;
+
+function jDrawingView.GetPaint(): jObject;
+begin
+  if FInitialized then
+    Result := jDrawingView_GetPaint(FjEnv, FjObject);
 end;
 
 function jDrawingView.GetWidth(): integer;
@@ -1092,6 +1108,31 @@ begin
    Result:= jDrawingView_GetCanvas(FjEnv, FjObject);
 end;
 
+
+procedure jDrawingView.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if Operation = opRemove then
+  begin
+    if AComponent = FPaintShader then
+    begin
+      FPaintShader := nil;
+    end
+  end;
+end;
+
+procedure jDrawingView.SetPaintShader(Value: JPaintShader);
+begin
+  if Value <> FPaintShader then
+  begin
+    if Assigned(FPaintShader) then
+       FPaintShader.RemoveFreeNotification(Self); //remove free notification...
+    FPaintShader := Value;
+    if Value <> nil then  //re- add free notification...
+       Value.FreeNotification(Self);
+  end;
+end;
+
 procedure jDrawingView.DrawTextAligned(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 var
   alignHor, aligVer: single;
@@ -1490,10 +1531,10 @@ begin
      jDrawingView_DrawCroppedBitmap(FjEnv, FjObject, _bitmap ,_x ,_y ,_cropOffsetLeft ,_cropOffsetTop ,_cropWidth ,_cropHeight);
 end;
 
-procedure jDrawingView.SetPaintColor(_color: TColor);
+procedure jDrawingView.SetPaintColor(Color: TAlphaColor);
 begin
   if FInitialized then
-     jDrawingView_SetPaintColor(FjEnv, FjObject, _color);
+     jDrawingView_SetPaintColor(FjEnv, FjObject, Color);
 end;
 
 procedure jDrawingView.DrawRoundRect(Left, Top, Right, Bottom, radiusX, radiusY: Single);
@@ -1507,6 +1548,12 @@ begin
   Result := 1;
   if not FInitialized then Exit;
   Result := jDrawingView_GetDensity(FjEnv, FjObject);
+end;
+
+procedure jDrawingView.SetLayerType(Value: TLayerType);
+begin
+  if FInitialized then
+    jDrawingView_SetLayerType(FjEnv, FjObject, Byte(Value));
 end;
 
 procedure jDrawingView.ClipRect(Left, Top, Right, Bottom: Single);
@@ -1710,6 +1757,18 @@ begin
   jCls:= env^.GetObjectClass(env, _jdrawingview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDrawingCache', '()Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethod(env, _jdrawingview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jDrawingView_GetPaint(env: PJNIEnv; _jdrawingview: JObject): jObject;
+var
+  jMethod: jMethodID = nil;
+  jCls   : jClass = nil;
+begin
+  jCls := env^.GetObjectClass(env, _jdrawingview);
+  jMethod := env^.GetMethodID(env, jCls, 'GetPaint', '()Landroid/graphics/Paint;');
+  Result := env^.CallObjectMethod(env, _jdrawingview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -3045,6 +3104,19 @@ begin
   jParams[0].f:= Bottom;
   jCls:= env^.GetObjectClass(env, _jdrawingview);
   jMethod:= env^.GetMethodID(env, jCls, 'ClipRect', '(FFFF)V');
+  env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jDrawingView_SetLayerType(env: PJNIEnv; _jdrawingview: JObject; _Value: JByte);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID = nil;
+  jCls   : jClass = nil;
+begin
+  jParams[0].b:= _Value;
+  jCls:= env^.GetObjectClass(env, _jdrawingview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLayerType', '(B)V');
   env^.CallVoidMethodA(env, _jdrawingview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

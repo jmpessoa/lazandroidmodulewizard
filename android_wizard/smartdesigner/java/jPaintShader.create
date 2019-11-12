@@ -1,0 +1,3 @@
+public java.lang.Object jPaintShader_jCreate(long _Self, java.lang.Object _Paint) {
+  return (java.lang.Object)(new jPaintShader(this, _Self, _Paint));
+}

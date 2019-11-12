@@ -328,7 +328,12 @@ public class jCanvas {
 	public Bitmap GetBitmap() {
 		return innerBitmap;
 	}
-
+	
+	// by Kordal
+	public Paint GetPaint() {
+		return paint; // uses jPaintShader
+	}	
+	
 	public void DrawBitmap(float _left, float _top, Bitmap _bitmap) {
 		
 		if((mCanvas == null) || (_bitmap == null)) return;
@@ -430,43 +435,56 @@ public class jCanvas {
 	}
 
 	// by Kordal
-	public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, int _dstLeft, int _dstTop, int _dstRight, int _dstBottom) {
-		
-		if( (mCanvas == null) || (_bitMap == null) ) return;
-		
-		Rect srcRect = new Rect(_srcLeft, _srcTop, _srcRight, _srcBottom);
-		Rect dstRect = new Rect(_dstLeft, _dstTop, _dstRight, _dstBottom);
-
-		mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+	public float GetDensity() {
+		return controls.activity.getResources().getDisplayMetrics().density;
 	}
+	
+	public void ClipRect(float _left, float _top, float _right, float _bottom) {
+        if (mCanvas == null) return;
+        mCanvas.clipRect(_left, _top, _right, _bottom);
+    }
+	
+	public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, float _dstLeft, float _dstTop, float _dstRight, float _dstBottom) {
+        if (mCanvas == null) return;
+        Rect srcRect = new Rect(_srcLeft, _srcTop, _srcRight, _srcBottom);
+        RectF dstRect = new RectF(_dstLeft, _dstTop, _dstRight, _dstBottom);
+               
+        mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+    }
+       
+    public void DrawFrame(Bitmap _bitMap, int _srcX, int _srcY, int _srcW, int _srcH, float _X, float _Y, float _Wh, float _Ht, float _rotateDegree) {
+        if (mCanvas == null) return;
+        Rect srcRect = new Rect(_srcX, _srcY, _srcX + _srcW, _srcY + _srcH);
+        RectF dstRect = new RectF(_X, _Y, _X + _Wh, _Y + _Ht);
+               
+        if (_rotateDegree != 0) {
+            mCanvas.save();
+            mCanvas.rotate(_rotateDegree, _X + _Wh / 2, _Y + _Ht / 2);
+            mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+            mCanvas.restore();
+         } else {
+            mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+         }
+    }
+       
+    public void DrawFrame(Bitmap _bitMap, float _X, float _Y, int _Index, int _Size, float _scaleFactor, float _rotateDegree) {
+          float sf = _Size * _scaleFactor;
+          DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
+    }
+	
+    public void DrawGrid(float _left, float _top, float _width, float _height, int _cellsX, int _cellsY) {
+        if (mCanvas == null) return;
 
-    // by Kordal
-    public void DrawFrame(Bitmap _bitMap, int _srcX, int _srcY, int _srcW, int _srcH, int _X, int _Y, int _Wh, int _Ht, float _rotateDegree) {
-    	
-    	if( (mCanvas == null) || (_bitMap == null) ) return;
-    	
-		Rect srcRect = new Rect(_srcX, _srcY, _srcX + _srcW, _srcY + _srcH);
-		Rect dstRect = new Rect(_X, _Y, _X + _Wh, _Y + _Ht);
-
-		if (_rotateDegree != 0) {
-			mCanvas.save();
-			mCanvas.rotate(_rotateDegree, _X + _Wh / 2, _Y + _Ht / 2);
-			mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
-			mCanvas.restore();
-		} else {
-			mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
-		}
-	}
-
-	// by Kordal
-	public void DrawFrame(Bitmap _bitMap, int _X, int _Y, int _Index, int _Size, float _scaleFactor, float _rotateDegree) {
-		
-		if( (mCanvas == null) || (_bitMap == null) ) return;
-		
-		int sf = (int) (_Size * _scaleFactor);
-		DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
-	}
-
+        float cw = _width / _cellsX;
+        float ch = _height / _cellsY;
+        for (int i = 0; i < _cellsX + 1; i++) {
+            mCanvas.drawLine(_left + i * cw, _top, _left + i * cw, _top + _height, paint); // draw Y lines
+        }
+        for (int i = 0; i < _cellsY + 1; i++) {
+            mCanvas.drawLine(_left, _top + i * ch, _left + _width, _top + i * ch, paint); // draw X lines
+        }
+    }	
+	
 	public void SaveBitmapJPG(String _fullPathFileName) {
 		if (innerBitmap == null) return;
 

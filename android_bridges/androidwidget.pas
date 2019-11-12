@@ -37,8 +37,11 @@ uses
 
 type
 
-  PColor = ^TColor;   //by Kordal
-  TColor = -$7FFFFFFF-1..$7FFFFFFF; // by Kordal
+
+  PAlphaColor = ^TAlphaColor; //by Kordal
+  TAlphaColor = 0..$FFFFFFFF; // ARGB
+  TLayerType = (ltNONE, ltSOFTWARE, ltHARDWARE);
+
 
   TStrokeCap = (scDefault, scRound);
   TStrokeJoin = (sjDefault, sjRound);

@@ -40,15 +40,19 @@ public class jView extends View {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
+	public void setParent( android.view.ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
 
 	//
-	public  void setjCanvas(java.lang.Object canvas) {
+	public void setjCanvas(java.lang.Object canvas) {
 		jcanvas = (jCanvas)canvas;
 	}
-
+	
+	public void SetLayerType(byte _value) {
+		setLayerType(_value/*View.LAYER_TYPE_SOFTWARE*/, null);
+	}	
+	
 	//
 	@Override
 	public  boolean onTouchEvent( MotionEvent event) {
