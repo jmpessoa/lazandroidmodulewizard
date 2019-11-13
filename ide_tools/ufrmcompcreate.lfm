@@ -92,7 +92,6 @@ object FrmCompCreate: TFrmCompCreate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '2.0.0.4'
   object Panel1: TPanel
     Left = 0
     Height = 50

@@ -639,6 +639,11 @@ begin
      strList.Add('	 LAMWCommon.clearLayoutAll();');
      strList.Add('    }');
      strList.Add(' ');
+     strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
+     strList.Add('    public void SetIid(int _id) {');  //need by code generation....
+     strList.Add('       this.setId(_id)');
+     strList.Add('    }');
+     strList.Add(' ');
      strList.Add('}');
 
      SynMemo1.Clear;
@@ -1380,7 +1385,7 @@ begin
                   Inc(i);
                   strList.Insert(i, '  {$I '+LowerCase(FJavaClassName)+'_icon.lrs}');
                end else
-               if Pos('[', strList.strings[i]) > 0 then
+               if ( Pos('[', strList.strings[i]) > 0) and ( Pos('RegisterClasses', strList.strings[i+1]) <= 0) then
                begin
                   if Pos(']', strList.strings[i+1]) > 0 then
                   begin

@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  zoomableimageview,
   SysUtils,
   LResources,
   AndroidWidget,
@@ -85,6 +86,7 @@ begin
   {$I jImageBtn_icon.lrs}
   {$I jWebView_icon.lrs}
   {$I jImageView_icon.lrs}
+  {$I jzoomableimageview_icon.lrs}
   {$I jImageList_icon.lrs}
   {$I jView_icon.lrs}
   {$I jcanvas_icon.lrs}
@@ -103,7 +105,6 @@ begin
   {$I jframelayout_icon.lrs}
   {$I jcaptionpanel_icon.lrs}
   {$I jzbarcodescannerview_icon.lrs}
-
   RegisterComponents('Android Bridges',
     [
       jMenu,
@@ -138,6 +139,7 @@ begin
       jImageBtn,
       jWebView,
       jImageView,
+      jZoomableImageView,
       jImageList,
       jView,
       jCanvas,

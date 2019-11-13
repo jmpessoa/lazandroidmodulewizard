@@ -4500,18 +4500,18 @@ Procedure jImageView_setBitmapImage(env:PJNIEnv;
  end;
 
 Procedure jImageView_SetImageByResIdentifier(env:PJNIEnv; ImageView : jObject; _imageResIdentifier: string);
- var
+var
   _jMethod : jMethodID = nil;
   _jParams : array[0..0] of jValue;
   cls: jClass;
- begin
+begin
   _jParams[0].l := env^.NewStringUTF(env, PChar(_imageResIdentifier) );
   cls := env^.GetObjectClass(env, ImageView);
  _jMethod:= env^.GetMethodID(env, cls, 'SetImageByResIdentifier', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
- end;
+end;
 
 Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
  var
