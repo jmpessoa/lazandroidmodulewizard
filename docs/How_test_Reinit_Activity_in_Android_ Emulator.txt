@@ -1,0 +1,19 @@
+
+ Create Android Virtual Device (AVD)
+
+ Name   : Tablet1280x800-A7-64
+ Device : 10.1" WXGA (Tablet)(1280x800: mdpi)
+ Target : Android 7.0 - API Lever 24
+ CPU/ABI: ARM (arm64-v8a)
+ Skin   : Skin with diynamic hardware controls
+ Front Camera: Emulated
+ Back Camera: None
+ Memory Options: 512
+ Internal Storage: 200
+ Snapshot: uncheck
+ Use Host GPU: check
+
+ Once we have created the emulator, we launch the application and keep 
+ the square button pressed. We go to multiwindows mode and modify the 
+ size of our application until we get it to restart the activity. 
+ So we can test if it works correctly.
