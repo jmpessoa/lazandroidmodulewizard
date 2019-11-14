@@ -2229,6 +2229,7 @@ type
   Procedure Java_Event_pAppOnStart              (env: PJNIEnv; this: jobject); //old OnActive
   Procedure Java_Event_pAppOnStop                (env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnBackPressed         (env: PJNIEnv; this: jobject);
+  procedure Java_Event_pAppOnUpdateLayout        (env: PJNIEnv; this: jobject);
 
   function Java_Event_pAppOnSpecialKeyDown              (env: PJNIEnv; this: jobject; keyChar: JChar; keyCode: integer; keyCodeString: JString): jBoolean;
 
@@ -2544,6 +2545,31 @@ begin
      Form.OnBackButton(Form);
   end;
   Form.Close;
+end;
+
+// Event : OnUpdateLayout -> Form OnUpdateLayout
+procedure Java_Event_pAppOnUpdateLayout(env: PJNIEnv; this: jobject);
+var
+  Form: jForm; //jForm;  //gdx change
+begin
+
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  Form := jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
+
+  if not Assigned(Form) then Exit;
+
+  Form.UpdateJNI(gApp);
+
+  // Update width and height when rotating
+  gApp.Screen.WH  := jSysInfo_ScreenWH(env, this, gApp.GetContext);
+  Form.ScreenWH   := gApp.Screen.WH;
+  Form.Width      := gApp.Screen.WH.Width;
+  Form.Height     := gApp.Screen.WH.Height;
+
+  Form.UpdateLayout;
+
 end;
 
 // Event : OnRotate -> Form OnRotate

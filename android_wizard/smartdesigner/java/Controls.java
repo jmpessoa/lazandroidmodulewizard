@@ -250,6 +250,7 @@ class jForm {
 
 	public void FormChangeSize() {
 		controls.formChangeSize = true;
+		controls.appLayout.requestLayout();
 	}
 
 	public RelativeLayout GetLayout() {
@@ -1828,7 +1829,9 @@ public int systemVersion;
 
 public int screenWidth = 0;
 public int screenHeight = 0;
-public boolean formChangeSize = false;
+
+public boolean formChangeSize = false; // OnRotate if change size or show form with rotate [by TR3E]
+public boolean formNeedLayout = false; // Automatic updatelayout [by TR3E]
 
 private int javaNewId = 100000;   // To assign java id from 100001 onwards [by TR3E]
 
@@ -1851,6 +1854,7 @@ public native void pAppOnStart();
 public native void pAppOnStop();
 public native void pAppOnBackPressed();
 public native int pAppOnRotate(int rotate);
+public native void pAppOnUpdateLayout();
 public native void pAppOnConfigurationChanged();
 public native void pAppOnActivityResult(int requestCode, int resultCode, Intent data);
 public native void pAppOnCreateOptionsMenu(Menu menu);
@@ -1904,6 +1908,7 @@ public  void jAppOnStart()                { pAppOnStart();                 }
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
 public  int  jAppOnRotate(int rotate)     {  return(pAppOnRotate(rotate)); }
+public  void jAppOnUpdateLayout()         { pAppOnUpdateLayout();          }
 
 //rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position 
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }

@@ -54,6 +54,8 @@ type
     procedure Show(); overload;
     procedure Show(_title: string); overload;
     procedure Show(_title: string; _iconIdentifier: string); overload;
+    function  GetWidth() : integer; overload;
+    function  GetHeight() : integer; overload;
     function  GetDialogWidth(): integer;
     function  GetDialogHeight(): integer;
     procedure Close();
@@ -211,6 +213,28 @@ begin
 
    View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
   end;
+end;
+
+function jCustomDialog.GetWidth: integer;
+begin
+  Result:= FWidth;
+  if not FInitialized then exit;
+
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result := GetDialogWidth();
+end;
+
+function jCustomDialog.GetHeight: integer;
+begin
+  Result:= FHeight;
+  if not FInitialized then exit;
+
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result := GetDialogHeight();
 end;
 
 procedure jCustomDialog.SetColor(Value: TARGBColorBridge);
