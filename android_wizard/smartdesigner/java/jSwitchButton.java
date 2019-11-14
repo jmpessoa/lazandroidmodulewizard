@@ -117,7 +117,7 @@ public class jSwitchButton extends Switch /*API 14*/ { //please, fix what GUI ob
    }
 
    public boolean IsChecked(){
-      return this.IsChecked();
+      return this.isChecked();
    }
 
    public void SetThumbIcon(String _thumbIconIdentifier) {	   //Api  16
