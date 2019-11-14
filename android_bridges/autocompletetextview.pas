@@ -619,7 +619,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jAutoTextView_GetLParamWidth(FjEnv, FjObject );
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jAutoTextView_GetLParamWidth(FjEnv, FjObject );
 
   if Result = -1 then //lpMatchParent
    Result := sysGetWidthOfParent(FParent);
@@ -630,10 +633,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jAutoTextView_GetLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jAutoTextView_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jAutoTextView.ShowSoftInput();

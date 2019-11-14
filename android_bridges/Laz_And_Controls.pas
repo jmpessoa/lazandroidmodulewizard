@@ -4187,10 +4187,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jTextView_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jTextView_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jTextView.GetHeight: integer;
@@ -4198,10 +4198,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jTextView_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jTextView_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jTextView.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
@@ -4994,10 +4994,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jEditText_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jEditText_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jEditText.GetHeight: integer;
@@ -5005,10 +5005,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jEditText_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jEditText_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jEditText.SetFontFromAssets(_fontName: string);
@@ -5367,10 +5367,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jButton_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jButton_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jButton.GetHeight: integer;
@@ -5378,10 +5378,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jButton_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jButton_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
@@ -6513,10 +6513,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jImageView_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jImageView_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jImageView.GetHeight: integer;
@@ -6524,10 +6524,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jImageView_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jImageView_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jImageView.ClearLayout();
@@ -8556,13 +8556,12 @@ end;
 function jListView.GetWidth: integer;
 begin
   Result:= FWidth;
-
   if not FInitialized then exit;
 
-  Result:= jListView_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jListView_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jListView.GetHeight: integer;
@@ -8570,10 +8569,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jListView_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jListView_getLParamHeight(FjEnv, FjObject );
 end;
 
 function jListView.GetTotalHeight: integer;
@@ -9149,10 +9148,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jScrollView_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jScrollView_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jScrollView.GetHeight: integer;
@@ -9160,10 +9159,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jScrollView_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jScrollView_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jScrollView.DispatchOnScrollChangedEvent(_value: boolean);
@@ -9368,10 +9367,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jHorizontalScrollView_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jHorizontalScrollView_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jHorizontalScrollView.GetHeight: integer;
@@ -9379,10 +9378,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jHorizontalScrollView_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jHorizontalScrollView_getLParamHeight(FjEnv, FjObject );
 end;
 
 function jHorizontalScrollView.GetView: jObject;
@@ -9916,18 +9915,22 @@ function jWebView.GetWidth: integer;
 begin
   Result:= fWidth;
   if not FInitialized then exit;
-  Result:= jWebView_getWidth(FjEnv, FjObject );
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jWebView_getWidth(FjEnv, FjObject );
 end;
 
 function jWebView.GetHeight: integer;
 begin
   Result:= fHeight;
   if not FInitialized then exit;
-  Result:= jWebView_getHeight(FjEnv, FjObject );
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jWebView_getHeight(FjEnv, FjObject );
 end;
 
 //------------------------------------------------------------------------------
@@ -11152,10 +11155,10 @@ begin
    Result:= FWidth;
    if not FInitialized then exit;
 
-   Result:= jView_getLParamWidth(FjEnv, FjObject );
-
-   if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+   if sysIsWidthExactToParent(Self) then
+    Result := sysGetWidthOfParent(FParent)
+   else
+    Result:= jView_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jView.GetHeight: integer;
@@ -11163,10 +11166,10 @@ begin
    Result:= FHeight;
    if not FInitialized then exit;
 
-   Result:= jView_getLParamHeight(FjEnv, FjObject );
-
-   if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+   if sysIsHeightExactToParent(Self) then
+    Result := sysGetHeightOfParent(FParent)
+   else
+    Result:= jView_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -12863,10 +12866,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jPanel_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jPanel_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jPanel.GetHeight: integer;
@@ -12874,10 +12877,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jPanel_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jPanel_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jPanel.ClearLayout;

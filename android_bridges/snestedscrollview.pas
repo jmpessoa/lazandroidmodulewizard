@@ -270,10 +270,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jsNestedScrollView_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jsNestedScrollView_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jsNestedScrollView.GetHeight(): integer;
@@ -281,10 +281,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jsNestedScrollView_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jsNestedScrollView_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jsNestedScrollView.SetLGravity(_gravity: integer);

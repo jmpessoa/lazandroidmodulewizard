@@ -695,10 +695,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jDrawingView_GetWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jDrawingView_GetWidth(FjEnv, FjObject );
 end;
 
 function jDrawingView.GetHeight(): integer;
@@ -706,10 +706,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jDrawingView_GetHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-   Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jDrawingView_GetHeight(FjEnv, FjObject );
 end;
 
 (*

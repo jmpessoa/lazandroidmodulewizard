@@ -275,10 +275,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jLinearLayout_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent); 
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jLinearLayout_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jLinearLayout.GetHeight(): integer;
@@ -286,10 +286,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jLinearLayout_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jLinearLayout_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jLinearLayout.SetLGravity(_gravity: TLayoutGravity);
