@@ -273,10 +273,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jsCardView_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jsCardView_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jsCardView.GetHeight(): integer;
@@ -284,10 +284,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jsCardView_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jsCardView_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jsCardView.SetLGravity(_gravity: TLayoutGravity);

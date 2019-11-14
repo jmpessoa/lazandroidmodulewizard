@@ -280,10 +280,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jsCollapsingToolbarLayout_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jsCollapsingToolbarLayout_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jsCollapsingToolbarLayout.GetHeight(): integer;
@@ -291,10 +291,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jsCollapsingToolbarLayout_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jsCollapsingToolbarLayout_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jsCollapsingToolbarLayout.SetLGravity(_g: integer);

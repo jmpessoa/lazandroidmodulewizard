@@ -1925,7 +1925,9 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject;  layout:jobject; intent: jobject);
 
   function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;
+  function sysIsHeightExactToParent(widget: jVisualControl) : boolean;
   function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
+  function sysIsWidthExactToParent(widget: jVisualControl) : boolean;
   function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
   function GetPString(env: PJNIEnv; jstr: JString): string;
 
@@ -1952,6 +1954,57 @@ begin
       _jBoolean:= JNI_False;
       Result:= string(env^.GetStringUTFChars(env,jstr,@_jBoolean) );
     end;
+end;
+
+function sysIsHeightExactToParent(widget: jVisualControl) : boolean;
+begin
+  Result := false;
+
+  if widget.FLParamHeight = lpMatchParent then
+  begin
+   if widget.FAnchor = nil then
+   begin
+    Result := true;
+    exit;
+   end;
+
+   if (not (raBelow in widget.FPositionRelativeToAnchor)) and
+      (not (raAbove in widget.FPositionRelativeToAnchor)) and
+      (not (raAlignBottom in widget.FPositionRelativeToAnchor)) and
+      (not (raAlignTop in widget.FPositionRelativeToAnchor)) and
+      (not (raAlignBaseline in widget.FPositionRelativeToAnchor)) then
+   begin
+    Result := true;
+    exit;
+   end;
+  end;
+end;
+
+function sysIsWidthExactToParent(widget: jVisualControl) : boolean;
+begin
+ result := false;
+
+ if widget.FLParamWidth = lpMatchParent then
+  begin
+   if widget.FAnchor = nil then
+   begin
+    Result := true;
+    exit;
+   end;
+
+   if (not (raAlignLeft in widget.FPositionRelativeToAnchor)) and
+      (not (raAlignRight in widget.FPositionRelativeToAnchor)) and
+      (not (raAlignEnd in widget.FPositionRelativeToAnchor)) and
+      (not (raAlignStart in widget.FPositionRelativeToAnchor)) and
+      (not (raToLeftOf in widget.FPositionRelativeToAnchor)) and
+      (not (raToRightOf in widget.FPositionRelativeToAnchor)) and
+      (not (raToEndOf in widget.FPositionRelativeToAnchor)) and
+      (not (raToStartOf in widget.FPositionRelativeToAnchor)) then
+   begin
+    Result := true;
+    exit;
+   end;
+  end;
 end;
 
 function sysGetLayoutParams( data : integer; layoutParam : TLayoutParams; parent : TAndroidWidget; sd : TSide; margins: integer): integer;

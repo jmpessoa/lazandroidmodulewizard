@@ -281,10 +281,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jViewFlipper_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jViewFlipper_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jViewFlipper.GetHeight(): integer;
@@ -292,10 +292,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jViewFlipper_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jViewFlipper_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jViewFlipper.SetLGravity(_g: integer);
