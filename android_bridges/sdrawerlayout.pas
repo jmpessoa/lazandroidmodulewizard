@@ -34,8 +34,6 @@ jsDrawerLayout = class(jVisualControl)
     function GetParent(): jObject;
     procedure RemoveFromViewParent(); override;
     function GetView(): jObject;  override;
-    procedure SetLParamWidth(_w: integer);
-    procedure SetLParamHeight(_h: integer);
     function GetWidth(): integer; override;
     function GetHeight(): integer; override;
     procedure SetLGravity(_g: integer);
@@ -65,13 +63,8 @@ procedure jsDrawerLayout_SetViewParent(env: PJNIEnv; _jsdrawerlayout: JObject; _
 function jsDrawerLayout_GetParent(env: PJNIEnv; _jsdrawerlayout: JObject): jObject;
 procedure jsDrawerLayout_RemoveFromViewParent(env: PJNIEnv; _jsdrawerlayout: JObject);
 function jsDrawerLayout_GetView(env: PJNIEnv; _jsdrawerlayout: JObject): jObject;
-procedure jsDrawerLayout_SetLParamWidth(env: PJNIEnv; _jsdrawerlayout: JObject; _w: integer);
-procedure jsDrawerLayout_SetLParamHeight(env: PJNIEnv; _jsdrawerlayout: JObject; _h: integer);
-function jsDrawerLayout_GetLParamWidth(env: PJNIEnv; _jsdrawerlayout: JObject): integer;
-function jsDrawerLayout_GetLParamHeight(env: PJNIEnv; _jsdrawerlayout: JObject): integer;
 procedure jsDrawerLayout_SetLGravity(env: PJNIEnv; _jsdrawerlayout: JObject; _g: integer);
 procedure jsDrawerLayout_SetLWeight(env: PJNIEnv; _jsdrawerlayout: JObject; _w: single);
-procedure jsDrawerLayout_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jsdrawerlayout: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 procedure jsDrawerLayout_AddLParamsAnchorRule(env: PJNIEnv; _jsdrawerlayout: JObject; _rule: integer);
 procedure jsDrawerLayout_AddLParamsParentRule(env: PJNIEnv; _jsdrawerlayout: JObject; _rule: integer);
 procedure jsDrawerLayout_SetLayoutAll(env: PJNIEnv; _jsdrawerlayout: JObject; _idAnchor: integer);
@@ -103,7 +96,7 @@ begin
   FHeight       := 96; //??
   FWidth        := 192; //??
   FLParamWidth  := lpMatchParent;  //lpWrapContent
-  FLParamHeight := lpMatchParent; //lpMatchParent
+  FLParamHeight := lpMatchParent;  //lpMatchParent
   FPositionRelativeToParent:= [rpTop];
   FAcceptChildrenAtDesignTime:= True;
 //your code here....
@@ -143,10 +136,10 @@ begin
    jsDrawerLayout_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  jsDrawerLayout_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+  jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
+                  FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                  sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
+                  -1); // OnlyWork MATCH_PARENT
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -259,29 +252,15 @@ begin
    Result:= jsDrawerLayout_GetView(FjEnv, FjObject);
 end;
 
-procedure jsDrawerLayout.SetLParamWidth(_w: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsDrawerLayout_SetLParamWidth(FjEnv, FjObject, _w);
-end;
-
-procedure jsDrawerLayout.SetLParamHeight(_h: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsDrawerLayout_SetLParamHeight(FjEnv, FjObject, _h);
-end;
-
 function jsDrawerLayout.GetWidth(): integer;
 begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  Result:= jsDrawerLayout_getLParamWidth(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetWidthOfParent(FParent);
+  if sysIsWidthExactToParent(Self) then
+   Result := sysGetWidthOfParent(FParent)
+  else
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamWidth' );
 end;
 
 function jsDrawerLayout.GetHeight(): integer;
@@ -289,10 +268,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  Result:= jsDrawerLayout_getLParamHeight(FjEnv, FjObject );
-
-  if Result = -1 then //lpMatchParent
-    Result := sysGetHeightOfParent(FParent);
+  if sysIsHeightExactToParent(Self) then
+   Result := sysGetHeightOfParent(FParent)
+  else
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamHeight' );
 end;
 
 procedure jsDrawerLayout.SetLGravity(_g: integer);
@@ -313,7 +292,7 @@ procedure jsDrawerLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: 
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight', _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsDrawerLayout.AddLParamsAnchorRule(_rule: integer);
@@ -504,31 +483,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
-function jsDrawerLayout_GetLParamWidth(env: PJNIEnv; _jsdrawerlayout: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsdrawerlayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jsdrawerlayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsDrawerLayout_GetLParamHeight(env: PJNIEnv; _jsdrawerlayout: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsdrawerlayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jsdrawerlayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
 procedure jsDrawerLayout_SetLGravity(env: PJNIEnv; _jsdrawerlayout: JObject; _g: integer);
 var
   jParams: array[0..0] of jValue;
@@ -555,26 +509,6 @@ begin
   env^.CallVoidMethodA(env, _jsdrawerlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-
-procedure jsDrawerLayout_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jsdrawerlayout: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jsdrawerlayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jsdrawerlayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 
 procedure jsDrawerLayout_AddLParamsAnchorRule(env: PJNIEnv; _jsdrawerlayout: JObject; _rule: integer);
 var
