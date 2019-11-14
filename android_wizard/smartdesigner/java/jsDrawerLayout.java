@@ -47,6 +47,15 @@ public class jsDrawerLayout extends DrawerLayout /*dummy*/ { //please, fix what 
   	 //setOnClickListener(null);
 	 LAMWCommon.free();
    }
+   
+   @Override
+   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+   	super.onSizeChanged(w, h, oldw, oldh);
+   	
+   	// Change the size and update the layout               
+    controls.formNeedLayout = true;
+    controls.appLayout.requestLayout();
+   }
  
    public void SetViewParent(ViewGroup _viewgroup) {
 	 LAMWCommon.setParent(_viewgroup);

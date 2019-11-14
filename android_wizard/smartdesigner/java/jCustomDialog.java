@@ -84,6 +84,14 @@ public class jCustomDialog extends RelativeLayout {
 		mDialog = null;
 		lparams = null;
 	}
+	
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+	   	super.onSizeChanged(w, h, oldw, oldh);
+	   	
+	   	// Change the size and update the layout               	   	
+	   	controls.jAppOnUpdateLayout();
+	}
 
 	private static MarginLayoutParams newLayoutParams(ViewGroup _aparent, ViewGroup.MarginLayoutParams _baseparams) {
 		if (_aparent instanceof FrameLayout) {
@@ -301,6 +309,10 @@ public class jCustomDialog extends RelativeLayout {
 		        public void onShow(DialogInterface d) {
 		        			            
 		        	controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
+		        	
+		        	// Change the size and update the layout                
+		            controls.formNeedLayout = true;
+		            controls.appLayout.requestLayout();
 		        }
 		    });
 						
@@ -313,13 +325,13 @@ public class jCustomDialog extends RelativeLayout {
 	public int GetDialogWidth(){
 		if (mDialog == null) return 0;
 	 
-		return this.getWidth() + marginLeft + marginRight;
+		return this.getWidth();
 	}
 	
 	public int GetDialogHeight(){
 		if (mDialog == null) return 0;
 		
-		return this.getHeight() + marginTop + marginBottom;
+		return this.getHeight();
 	}
 
 	public void SetTitle(String _title) {

@@ -41,6 +41,15 @@ public class jsNestedScrollView extends NestedScrollView /*dummy*/ { //please, f
       //free local objects...
 	 LAMWCommon.free();
    }
+   
+   @Override
+   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+   	super.onSizeChanged(w, h, oldw, oldh);
+   	
+   	// Change the size and update the layout               
+    controls.formNeedLayout = true;
+    controls.appLayout.requestLayout();
+   }
  
    public void SetViewParent(ViewGroup _viewgroup) {
 	 LAMWCommon.setParent(_viewgroup);

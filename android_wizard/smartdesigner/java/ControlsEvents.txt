@@ -9,6 +9,7 @@ pAppOnStart=Java_Event_pAppOnStart(PEnv,this);
 pAppOnStop=Java_Event_pAppOnStop(PEnv,this);
 pAppOnBackPressed=Java_Event_pAppOnBackPressed(PEnv,this);
 pAppOnRotate=Java_Event_pAppOnRotate(PEnv,this,rotate);
+pAppOnUpdateLayout=Java_Event_pAppOnUpdateLayout(PEnv,this);
 pAppOnConfigurationChanged=Java_Event_pAppOnConfigurationChanged(PEnv,this);
 pAppOnActivityResult=Java_Event_pAppOnActivityResult(PEnv,this,requestCode,resultCode,data);
 pAppOnCreateOptionsMenu=Java_Event_pAppOnCreateOptionsMenu(PEnv,this,menu);

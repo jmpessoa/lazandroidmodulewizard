@@ -48,6 +48,15 @@ public class jLinearLayout extends LinearLayout /*dummy*/ { //please, fix what G
   	 //setOnClickListener(null);
 	 LAMWCommon.free();
    }
+   
+   @Override
+   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+   	super.onSizeChanged(w, h, oldw, oldh);
+   	
+   	// Change the size and update the layout               
+    controls.formNeedLayout = true;
+    controls.appLayout.requestLayout();
+   }
  
    public void SetViewParent(ViewGroup _viewgroup) {
 	 LAMWCommon.setParent(_viewgroup);

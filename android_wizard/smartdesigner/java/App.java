@@ -44,6 +44,7 @@ public class App extends Activity {
     private Controls       controls;
     
     private int screenOrientation = 0; //For udapte screen orientation. [by TR3E]
+    private boolean rlSizeChanged = false;
     
     //New "RelativeLayout" adapted to "Multiwindow" and automatic resizing. [by TR3E]
     public class RLAppLayout extends RelativeLayout {
@@ -60,7 +61,7 @@ public class App extends Activity {
             if ((controls.screenWidth != 0) && (controls.screenHeight != 0)){            	
             	controls.screenWidth  = w;
             	controls.screenHeight = h;
-            	controls.formChangeSize = true;
+            	rlSizeChanged = true;            	
             }
                         
         }
@@ -79,9 +80,18 @@ public class App extends Activity {
             }
             
             // If change size call "jAppOnRotate" for update screen. [by TR3E]
-            if(controls.formChangeSize){
-            	controls.formChangeSize = false;            	
+            if( controls.formChangeSize || rlSizeChanged ){            	
+            	controls.formChangeSize = false;
+            	rlSizeChanged = false;
+            	
+            	controls.formNeedLayout = true;
             	controls.jAppOnRotate(screenOrientation);
+            }
+            
+            // Call updatelayout automatically if necessary. [by TR3E]
+            if( controls.formNeedLayout ){
+            	controls.formNeedLayout = false;
+                controls.jAppOnUpdateLayout();
             }
         }
     }

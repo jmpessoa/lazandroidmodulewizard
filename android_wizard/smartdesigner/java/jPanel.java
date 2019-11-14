@@ -53,6 +53,15 @@ public class jPanel extends RelativeLayout {
 
 		scaleGestureDetector = new ScaleGestureDetector(controls.activity, new simpleOnScaleGestureListener());
 	}
+	
+	@Override
+	   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+	   	super.onSizeChanged(w, h, oldw, oldh);
+	   	
+	   	// Change the size and update the layout               
+	    controls.formNeedLayout = true;
+	    controls.appLayout.requestLayout();
+	   }
 
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		 String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
