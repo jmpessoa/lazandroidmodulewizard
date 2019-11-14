@@ -1,4 +1,4 @@
-package org.lamw.appscrollingimages;
+package org.lamw.appzoomableimageviewdemo1;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -617,7 +617,6 @@ public Bitmap DrawText(Bitmap _bitmapImage, String _text, int _left, int _top, i
                 ratio = width/height;
             else
                 ratio = height/width;
-            //imageBitmap = Bitmap.createScaledBitmap(imageBitmap, (int)(thumbnailSize * ratio), thumbnailSize, false);
             thumbnailImage = ThumbnailUtils.extractThumbnail(thumbnailImage,(int)(thumbnailSize * ratio), thumbnailSize);
         }
         catch(Exception ex) {
@@ -629,24 +628,22 @@ public Bitmap DrawText(Bitmap _bitmapImage, String _text, int _left, int _top, i
     public Bitmap GetThumbnailImage(Bitmap _bitmap, int _thumbnailSize) {
         Bitmap thumbnailImage = null;
         try {
-            int width = thumbnailImage.getWidth();
-            int height = thumbnailImage.getHeight();
-            float ratio = width/height;
+            int width = _bitmap.getWidth();
+            int height = _bitmap.getHeight();
+            float ratio = width / height;
 
             if (width >= height)
-                ratio = width/height;
+                ratio = width / height;
             else
-                ratio = height/width;
+                ratio = height / width;
 
-            thumbnailImage = ThumbnailUtils.extractThumbnail(thumbnailImage,(int)(_thumbnailSize * ratio), _thumbnailSize);
-            //imageBitmap = Bitmap.createScaledBitmap(_bitmap, (int)(_thumbnailSize * ratio), _thumbnailSize, false);
+            thumbnailImage = ThumbnailUtils.extractThumbnail(_bitmap, (int)(_thumbnailSize * ratio),  _thumbnailSize);
         }
         catch(Exception ex) {
             //
         }
         return thumbnailImage;
     }
-
     //https://www.rogerethomas.com/blog/generating-square-cropped-thumbnails-in-android-java
     public Bitmap GetThumbnailImage(Bitmap _bitmap, int _width, int _height) {
         return ThumbnailUtils.extractThumbnail(_bitmap, _width, _height);
@@ -654,39 +651,41 @@ public Bitmap DrawText(Bitmap _bitmapImage, String _text, int _left, int _top, i
 
     public Bitmap GetThumbnailImage(String _fullFileName, int _width, int _height) {
 
-        Bitmap thumbnailImage;
+        Bitmap thumbnailImage = null;
+        Bitmap bitmap;
 
         if( controls.GetDensityAssets() > 0 ) {
             BitmapFactory.Options bo = new BitmapFactory.Options();
             if (bo != null) {
                 bo.inDensity = controls.GetDensityAssets();
-                thumbnailImage = BitmapFactory.decodeFile(_fullFileName, bo);
+                bitmap = BitmapFactory.decodeFile(_fullFileName, bo);
             }
             else
-                thumbnailImage = BitmapFactory.decodeFile(_fullFileName);
+                bitmap = BitmapFactory.decodeFile(_fullFileName);
         }
         else
-            thumbnailImage = BitmapFactory.decodeFile(_fullFileName);
+            bitmap = BitmapFactory.decodeFile(_fullFileName);
 
-        return ThumbnailUtils.extractThumbnail(thumbnailImage, _width, _height);
+        return ThumbnailUtils.extractThumbnail(bitmap, _width, _height);
     }
 
     public Bitmap GetThumbnailImageFromAssets(String _filename, int _width, int _height) {
-        Bitmap thumbnailImage = LoadFromAssets(_filename);
-        return ThumbnailUtils.extractThumbnail(thumbnailImage, _width, _height);
+        Bitmap bitmap = LoadFromAssets(_filename);
+        return ThumbnailUtils.extractThumbnail(bitmap, _width, _height);
     }
 
     public Bitmap GetThumbnailImageFromAssets(String _filename, int thumbnailSize) {
-        Bitmap thumbnailImage = LoadFromAssets(_filename);
+        Bitmap bitmap = LoadFromAssets(_filename);
+        Bitmap thumbnailImage = null;
         try {
-            int width = thumbnailImage.getWidth();
-            int height = thumbnailImage.getHeight();
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
             float ratio;
             if (width >= height)
               ratio = width/height;
             else
                 ratio = height/width;
-            thumbnailImage = ThumbnailUtils.extractThumbnail(thumbnailImage,(int)(thumbnailSize * ratio), thumbnailSize);
+            thumbnailImage = ThumbnailUtils.extractThumbnail(bitmap,(int)(thumbnailSize * ratio), thumbnailSize);
         }
         catch(Exception ex) {
            //
