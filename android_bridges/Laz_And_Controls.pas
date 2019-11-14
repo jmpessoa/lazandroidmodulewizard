@@ -585,6 +585,7 @@ type
     function GetThumbnailImage(_bitmap: jObject; _width: integer; _height: integer): jObject; overload;
     function GetThumbnailImageFromAssets(_filename: string; thumbnailSize: integer): jObject; overload;
     function GetThumbnailImageFromAssets(_filename: string; _width: integer; _height: integer): jObject;overload;
+    procedure LoadFromStream(Stream: TMemoryStream);
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -10524,6 +10525,13 @@ begin
   if FInitialized then
    Result:= jBitmap_GetThumbnailImageFromAssets(FjEnv, FjObject, _filename ,_width ,_height);
 end;
+
+procedure jBitmap.LoadFromStream(Stream: TMemoryStream);
+ begin
+   if Stream = nil then Exit;
+   if FInitialized then
+     jBitmap_LoadFromBuffer(FjEnv, FjObject, Stream.Memory, Stream.Size);
+ end;
 
 //------------------------------------------------------------------------------
 // jCanvas
