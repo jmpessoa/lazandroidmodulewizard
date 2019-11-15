@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, And_jni, AndroidWidget, systryparent;
 
 type
-
+  TCustomDialogShow = Procedure(Sender: TObject; dialog: jObject; title: string) of Object;
   TCustomDialogBackKeyPressed = Procedure(Sender: TObject; title: string) of Object;
 {Draft Component code by "Lazarus Android Module Wizard" [12/5/2014 1:49:10]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
