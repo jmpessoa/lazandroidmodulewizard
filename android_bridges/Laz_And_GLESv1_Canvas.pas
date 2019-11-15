@@ -215,6 +215,9 @@ jCanvasES1 = class(jGLViewEvent)
   Procedure Texture_Clear;
   //
   Procedure Request_GLThread;
+
+  procedure Pause;
+  procedure Resume;
   //
   Procedure Update;
   Procedure Refresh;
@@ -755,6 +758,16 @@ begin
   inherited Destroy;
 end;
 
+procedure jCanvasES1.Pause;
+begin
+ jni_proc(FjEnv, FjObject, 'SetOnPause');
+end;
+
+procedure jCanvasES1.Resume;
+begin
+ jni_proc(FjEnv, FjObject, 'SetOnResume');
+end;
+
 Procedure jCanvasES1.Init(refApp: jApp);
 var
    rToP: TPositionRelativeToParent;
@@ -768,10 +781,10 @@ begin
    jGLSurfaceView_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jGLSurfaceView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+  jni_proc_iiiiii(FjEnv, FjObject, 'setLeftTopRightBottomWidthHeight',
+                  FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                  sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
+                  sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -1127,7 +1140,7 @@ begin
    if sysIsWidthExactToParent(Self) then
     Result := sysGetWidthOfParent(FParent)
    else
-    Result:= jGLSurfaceView_getLParamWidth(FjEnv, FjObject );
+    Result:= jni_func_out_i(FjEnv, FjObject, 'getLParamWidth' );
 end;
 
 function jCanvasES1.GetHeight: integer;
@@ -1138,7 +1151,7 @@ begin
    if sysIsHeightExactToParent(Self) then
     Result := sysGetHeightOfParent(FParent)
    else
-    Result:= jGLSurfaceView_getLParamHeight(FjEnv, FjObject );
+    Result:= jni_func_out_i(FjEnv, FjObject, 'getLParamHeight' );
 end;
 
 procedure jCanvasES1.ClearLayout();
