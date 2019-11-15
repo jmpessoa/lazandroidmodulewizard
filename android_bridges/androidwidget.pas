@@ -718,7 +718,6 @@ type
   TOnNewIntent = Procedure(Sender: TObject; intentData: jObject) of Object;
 
   TActionBarTabSelected = Procedure(Sender: TObject; view: jObject; title: string) of Object;
-  TCustomDialogShow = Procedure(Sender: TObject; dialog: jObject; title: string) of Object;
 
   TOnGLChange        = Procedure(Sender: TObject; W, H: integer) of object;
 
