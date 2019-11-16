@@ -1749,6 +1749,8 @@ type
   TOnScrollChanged = procedure(Sender: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; position:  TScrollPosition; scrolldiff: integer) of Object;
 
   TOnScrollViewInnerItemClick=procedure(Sender:TObject;itemId:integer) of object;
+  TOnScrollViewInnerItemLongClick=procedure(Sender:TObject;index:integer;itemId:integer) of object;
+
   TScrollInnerLayout = (ilRelative, ilLinear);
 
   { jScrollView }
@@ -1759,7 +1761,8 @@ type
     FScrollSize : integer;
     FFillViewportEnabled: boolean;
     FOnScrollChanged: TOnScrollChanged;
-    FOnScrollViewInnerItemClick: TOnScrollViewInnerItemClick;
+    FOnInnerItemClick: TOnScrollViewInnerItemClick;
+    FOnInnerItemLongClick: TOnScrollViewInnerItemLongClick;
 
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
@@ -1810,15 +1813,21 @@ type
 
     procedure AddText(_text: string);
 
-    procedure GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
+    function GetInnerItemId(_index: integer): integer;
+    function GetInnerItemIndex(_itemId: integer): integer;
+    procedure Delete(_index: integer);
+    procedure Clear();
 
+    procedure GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
+    procedure GenEvent_OnScrollViewInnerItemLongClick(Sender:TObject;index:integer;itemId:integer);
   published
     property InnerLayout: TScrollInnerLayout read FInnerLayout write SetInnerLayout;
     property FillViewportEnabled: boolean read FFillViewportEnabled write SetFillViewport;
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     property BackgroundColor: TARGBColorBridge read FColor  write SetColor;
     property OnScrollChanged: TOnScrollChanged read FOnScrollChanged write FOnScrollChanged;
-    property OnInnerItemClick: TOnScrollViewInnerItemClick read FOnScrollViewInnerItemClick write FOnScrollViewInnerItemClick;
+    property OnInnerItemClick: TOnScrollViewInnerItemClick read FOnInnerItemClick write FOnInnerItemClick;
+    property OnInnerItemLongClick: TOnScrollViewInnerItemLongClick read FOnInnerItemLongClick write FOnInnerItemLongClick;
   end;
 
   { jHorizontalScrollView }
@@ -1828,7 +1837,8 @@ type
     FInnerLayout: TScrollInnerLayout;
     FScrollSize : integer;
     FOnScrollChanged: TOnScrollChanged;
-    FOnScrollViewInnerItemClick: TOnScrollViewInnerItemClick;
+    FOnInnerItemClick: TOnScrollViewInnerItemClick;
+    FOnInnerItemLongClick: TOnScrollViewInnerItemLongClick;
 
     Procedure SetColor      (Value : TARGBColorBridge);
     Procedure SetScrollSize (Value : integer);
@@ -1877,14 +1887,21 @@ type
 
     procedure AddText(_text: string);
 
-    procedure GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
+    function GetInnerItemId(_index: integer): integer;
+    function GetInnerItemIndex(_itemId: integer): integer;
+    procedure Delete(_index: integer);
+    procedure Clear();
 
+    procedure GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
+    procedure GenEvent_OnScrollViewInnerItemLongClick(Sender:TObject;index:integer;itemId:integer);
   published
     property InnerLayout: TScrollInnerLayout read FInnerLayout write SetInnerLayout;
     property ScrollSize: integer read FScrollSize write SetScrollSize;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
     property OnScrollChanged: TOnScrollChanged read FOnScrollChanged write FOnScrollChanged;
-    property OnInnerItemClick: TOnScrollViewInnerItemClick read FOnScrollViewInnerItemClick write FOnScrollViewInnerItemClick;
+    property OnInnerItemClick: TOnScrollViewInnerItemClick read FOnInnerItemClick write FOnInnerItemClick;
+    property OnInnerItemLongClick: TOnScrollViewInnerItemLongClick read FOnInnerItemLongClick write FOnInnerItemLongClick;
+
   end;
 
   //------------------------------------------------------------------
@@ -2347,7 +2364,10 @@ type
                                                                                       onPosition: integer; scrolldiff: integer);
 
   procedure Java_Event_pOnScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
+  procedure Java_Event_pOnScrollViewInnerItemLongClick(env:PJNIEnv;this:JObject;Sender:TObject;index:integer;itemId:integer);
+
   procedure Java_Event_pOnHorScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
+  procedure Java_Event_pOnHorScrollViewInnerItemLongClick(env:PJNIEnv;this:JObject;Sender:TObject;index:integer;itemId:integer);
 
   Procedure Java_Event_pOnClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
   Procedure Java_Event_pOnLongClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
@@ -3897,6 +3917,17 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnScrollViewInnerItemLongClick(env:PJNIEnv;this:JObject;Sender:TObject;index:integer;itemId:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jScrollView then
+  begin
+    jForm(jScrollView(Sender).Owner).UpdateJNI(gApp);
+    jScrollView(Sender).GenEvent_OnScrollViewInnerItemLongClick(Sender,index,itemId);
+  end;
+end;
+
 procedure Java_Event_pOnHorScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
@@ -3908,6 +3939,16 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnHorScrollViewInnerItemLongClick(env:PJNIEnv;this:JObject;Sender:TObject;index:integer;itemId:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jHorizontalScrollView then
+  begin
+    jForm(jHorizontalScrollView(Sender).Owner).UpdateJNI(gApp);
+    jHorizontalScrollView(Sender).GenEvent_OnScrollViewInnerItemLongClick(Sender,index,itemId);
+  end;
+end;
 
 procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
 begin
@@ -9276,6 +9317,34 @@ begin
      jScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId , Ord(_scaleType));
 end;
 
+function jScrollView.GetInnerItemId(_index: integer): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jScrollView_GetInnerItemId(FjEnv, FjObject, _index);
+end;
+
+function jScrollView.GetInnerItemIndex(_itemId: integer): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jScrollView_GetInnerItemIndex(FjEnv, FjObject, _itemId);
+end;
+
+procedure jScrollView.Delete(_index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_Delete(FjEnv, FjObject, _index);
+end;
+
+procedure jScrollView.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jScrollView_Clear(FjEnv, FjObject);
+end;
+
 procedure jScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
 begin
    if Assigned(FOnScrollChanged) then FOnScrollChanged(Obj,currHor,currVerti,prevHor,prevVertical,TScrollPosition(onPosition), scrolldiff);
@@ -9283,8 +9352,14 @@ end;
 
 procedure jScrollView.GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
 begin
-  if Assigned(FOnScrollViewInnerItemClick) then FOnScrollViewInnerItemClick(Sender,itemId);
+  if Assigned(FOnInnerItemClick) then FOnInnerItemClick(Sender,itemId);
 end;
+
+procedure jScrollView.GenEvent_OnScrollViewInnerItemLongClick(Sender:TObject;index:integer;itemId:integer);
+begin
+  if Assigned(FOnInnerItemLongClick) then FOnInnerItemLongClick(Sender,index,itemId);
+end;
+
 //------------------------------------------------------------------------------
 // jHorizontalScrollView
 // LORDMAN 2013-09-03
@@ -9623,6 +9698,33 @@ begin
      jHorizontalScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId ,Ord(_scaleType));
 end;
 
+function jHorizontalScrollView.GetInnerItemId(_index: integer): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHorizontalScrollView_GetInnerItemId(FjEnv, FjObject, _index);
+end;
+
+function jHorizontalScrollView.GetInnerItemIndex(_itemId: integer): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHorizontalScrollView_GetInnerItemIndex(FjEnv, FjObject, _itemId);
+end;
+
+procedure jHorizontalScrollView.Delete(_index: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_Delete(FjEnv, FjObject, _index);
+end;
+
+procedure jHorizontalScrollView.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHorizontalScrollView_Clear(FjEnv, FjObject);
+end;
 
 procedure jHorizontalScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer;  scrolldiff: integer);
 begin
@@ -9631,8 +9733,14 @@ end;
 
 procedure jHorizontalScrollView.GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
 begin
-  if Assigned(FOnScrollViewInnerItemClick) then FOnScrollViewInnerItemClick(Sender,itemId);
+  if Assigned(FOnInnerItemClick) then FOnInnerItemClick(Sender,itemId);
 end;
+
+procedure jHorizontalScrollView.GenEvent_OnScrollViewInnerItemLongClick(Sender:TObject;index:integer;itemId:integer);
+begin
+  if Assigned(FOnInnerItemLongClick) then FOnInnerItemLongClick(Sender,index,itemId);
+end;
+
 //------------------------------------------------------------------------------
 // jWebView
 //------------------------------------------------------------------------------

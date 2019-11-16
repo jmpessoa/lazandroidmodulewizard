@@ -660,6 +660,10 @@ procedure jScrollView_AddImageFromAssets(env: PJNIEnv; _jscrollview: JObject; _f
 procedure jScrollView_AddImage(env: PJNIEnv; _jscrollview: JObject; _bitmap: jObject; _itemId: integer; _scaleType: integer);overload;
 procedure jScrollView_AddImageFromFile(env: PJNIEnv; _jscrollview: JObject; _path: string; _filename: string; _itemId: integer; _scaleType: integer);overload;
 procedure jScrollView_AddImageFromAssets(env: PJNIEnv; _jscrollview: JObject; _filename: string; _itemId: integer; _scaleType: integer);overload;
+function jScrollView_GetInnerItemId(env: PJNIEnv; _jscrollview: JObject; _index: integer): integer;
+function jScrollView_GetInnerItemIndex(env: PJNIEnv; _jscrollview: JObject; _itemId: integer): integer;
+procedure jScrollView_Delete(env: PJNIEnv; _jscrollview: JObject; _index: integer);
+procedure jScrollView_Clear(env: PJNIEnv; _jscrollview: JObject);
 
 { jPanel }
 Function  jPanel_Create           (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
@@ -754,6 +758,10 @@ procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscr
 procedure jHorizontalScrollView_AddImage(env: PJNIEnv; _jhorizontalscrollview: JObject; _bitmap: jObject; _itemId: integer; _scaleType: integer);overload;
 procedure jHorizontalScrollView_AddImageFromFile(env: PJNIEnv; _jhorizontalscrollview: JObject; _path: string; _filename: string; _itemId: integer; _scaleType: integer);overload;
 procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscrollview: JObject; _filename: string; _itemId: integer; _scaleType: integer);overload;
+function jHorizontalScrollView_GetInnerItemId(env: PJNIEnv; _jhorizontalscrollview: JObject; _index: integer): integer;
+function jHorizontalScrollView_GetInnerItemIndex(env: PJNIEnv; _jhorizontalscrollview: JObject; _itemId: integer): integer;
+procedure jHorizontalScrollView_Delete(env: PJNIEnv; _jhorizontalscrollview: JObject; _index: integer);
+procedure jHorizontalScrollView_Clear(env: PJNIEnv; _jhorizontalscrollview: JObject);
 
 // WebView
 Function  jWebView_Create              (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -7222,6 +7230,56 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jScrollView_GetInnerItemId(env: PJNIEnv; _jscrollview: JObject; _index: integer): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetInnerItemId', '(I)I');
+  Result:= env^.CallIntMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jScrollView_Delete(env: PJNIEnv; _jscrollview: JObject; _index: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Delete', '(I)V');
+  env^.CallVoidMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jScrollView_Clear(env: PJNIEnv; _jscrollview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _jscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jScrollView_GetInnerItemIndex(env: PJNIEnv; _jscrollview: JObject; _itemId: integer): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _itemId;
+  jCls:= env^.GetObjectClass(env, _jscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetInnerItemIndex', '(I)I');
+  Result:= env^.CallIntMethodA(env, _jscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //----------------------------------------
 //Panel
@@ -8068,11 +8126,10 @@ begin
   jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
   jMethod:= env^.GetMethodID(env, jCls, 'AddImageFromFile', '(Ljava/lang/String;Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jHorizontalScrollView_AddImageFromAssets(env: PJNIEnv; _jhorizontalscrollview: JObject; _filename: string);
 var
@@ -8087,7 +8144,6 @@ begin
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jHorizontalScrollView_AddText(env: PJNIEnv; _jhorizontalscrollview: JObject; _text: string);
 var
@@ -8200,6 +8256,57 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+function jHorizontalScrollView_GetInnerItemId(env: PJNIEnv; _jhorizontalscrollview: JObject; _index: integer): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetInnerItemId', '(I)I');
+  Result:= env^.CallIntMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHorizontalScrollView_Delete(env: PJNIEnv; _jhorizontalscrollview: JObject; _index: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _index;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Delete', '(I)V');
+  env^.CallVoidMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHorizontalScrollView_Clear(env: PJNIEnv; _jhorizontalscrollview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _jhorizontalscrollview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jHorizontalScrollView_GetInnerItemIndex(env: PJNIEnv; _jhorizontalscrollview: JObject; _itemId: integer): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _itemId;
+  jCls:= env^.GetObjectClass(env, _jhorizontalscrollview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetInnerItemIndex', '(I)I');
+  Result:= env^.CallIntMethodA(env, _jhorizontalscrollview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // WebView

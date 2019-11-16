@@ -36,6 +36,7 @@ public class jScrollView extends ScrollView {
     int onPosition;
     boolean mDispacthScrollChanged = true;
     private int activeInnerLayout;
+    private int magicNumber = 99001;
 
     //Constructor
     public jScrollView(Controls ctrls, long pasobj, int innerLayout) {
@@ -326,9 +327,9 @@ public class jScrollView extends ScrollView {
     public void AddImage(Bitmap _bitmap, int _itemId, int _scaleType) {
         final int imgId;
         if (_itemId == 0)
-            imgId = getRandomNumberInRange(1, 10000);
+            imgId = magicNumber + scrollview.getChildCount(); //getRandomNumberInRange(1, 10000);
         else
-            imgId = _itemId;
+            imgId = magicNumber + _itemId;
         ImageView imageView = new ImageView(controls.activity);
         imageView.setId(imgId);
         imageView.setPadding(10, 2, 2, 2);
@@ -336,7 +337,17 @@ public class jScrollView extends ScrollView {
         imageView.setScaleType(GetScaleType(_scaleType));
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                controls.pOnScrollViewInnerItemClick(PasObj, imgId);
+                controls.pOnScrollViewInnerItemClick(PasObj,  ((ImageView)v).getId() -  magicNumber);
+            }
+        });
+
+        imageView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int id = ((ImageView)v).getId();
+                int index = GetInnerItemIndexByInternalId(id); //private
+                controls.pOnScrollViewInnerItemLongClick(PasObj, index, id - magicNumber);
+                return true;
             }
         });
 
@@ -361,9 +372,9 @@ public class jScrollView extends ScrollView {
     public void AddImageFromFile(String _path, String _filename, int _itemId, int _scaleType) {
         final int imgId;
         if (_itemId == 0)
-            imgId = getRandomNumberInRange(1, 10000);
+            imgId = magicNumber + scrollview.getChildCount(); //getRandomNumberInRange(1, 10000);
         else
-            imgId = _itemId;
+            imgId = magicNumber + _itemId;
         ImageView imageView = new ImageView(controls.activity);
         imageView.setId(imgId);
         imageView.setPadding(10, 2, 2, 2);
@@ -375,8 +386,17 @@ public class jScrollView extends ScrollView {
 
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Your code.
-                controls.pOnScrollViewInnerItemClick(PasObj, imgId);
+                controls.pOnScrollViewInnerItemClick(PasObj, ((ImageView)v).getId() - magicNumber);
+            }
+        });
+
+        imageView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int id = ((ImageView)v).getId();
+                int index = GetInnerItemIndexByInternalId(id); //private
+                controls.pOnScrollViewInnerItemLongClick(PasObj, index, id - magicNumber);
+                return true;
             }
         });
 
@@ -394,9 +414,9 @@ public class jScrollView extends ScrollView {
     public void AddImageFromAssets(String _filename, int _itemId, int _scaleType) {
         final int imgId;
         if (_itemId == 0)
-            imgId = getRandomNumberInRange(1, 10000);
+            imgId = magicNumber + scrollview.getChildCount(); //getRandomNumberInRange(1, 10000);
         else
-            imgId = _itemId;
+            imgId = magicNumber + _itemId;
         ImageView imageView = new ImageView(controls.activity);
         imageView.setId(imgId);
         imageView.setPadding(10, 2, 2, 2);
@@ -406,10 +426,20 @@ public class jScrollView extends ScrollView {
         imageView.setScaleType(GetScaleType(_scaleType));
         imageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Your code.
-                controls.pOnScrollViewInnerItemClick(PasObj, imgId);
+                controls.pOnScrollViewInnerItemClick(PasObj, ((ImageView)v).getId() -  magicNumber);
             }
         });
+
+        imageView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int id = ((ImageView)v).getId();
+                int index = GetInnerItemIndexByInternalId(id); //private
+                controls.pOnScrollViewInnerItemLongClick(PasObj, index, id - magicNumber);
+                return true;
+            }
+        });
+
         scrollview.addView(imageView);
     }
 
@@ -422,6 +452,79 @@ public class jScrollView extends ScrollView {
 
     public int GetActiveInnerLayout() { //TODO Pascal
         return activeInnerLayout;
+    }
+
+    public void Delete(int _index) {
+        if (scrollview.getChildCount() == 0) return;
+        if (_index < 0) return;
+        if (_index >= scrollview.getChildCount() ) return;
+
+        scrollview.removeViewAt(_index);
+        scrollview.invalidate();
+    }
+
+    public void Clear() {
+        scrollview.removeAllViews();
+        scrollview.invalidate();
+    }
+
+    public int Count() {
+        return scrollview.getChildCount();
+    }
+
+    public int GetInnerItemId(int _index) {
+
+        int i = _index;
+
+        if (_index < 0) i = 0;
+        if ( _index > ( scrollview.getChildCount() -1) )
+            i = scrollview.getChildCount() -1;
+
+        View v = scrollview.getChildAt(i);
+        if (v != null)
+            return v.getId() - magicNumber;
+        else
+            return -1;
+    }
+
+    private int GetInnerItemIndexByInternalId(int _internalId) {
+        int i;
+        int index = -1;
+        int id;
+        View v;
+        int count = scrollview.getChildCount();
+        i = 0;
+        boolean found = false;
+        while(  (i < count) && (!found) ) {
+            v = scrollview.getChildAt(i);
+            id = v.getId();
+            if (id == _internalId) {
+                index = i;
+                found = true;
+            }
+            i++;
+        }
+        return index;
+    }
+
+    public int GetInnerItemIndex(int _itemId) {
+        int i;
+        int index = -1;
+        int id;
+        View v;
+        int count = scrollview.getChildCount();
+        i = 0;
+        boolean found = false;
+        while(  (i < count) && (!found) ) {
+            v = scrollview.getChildAt(i);
+            id = v.getId() - magicNumber;
+            if (id == _itemId) {
+                index = i;
+                found = true;
+            }
+            i++;
+        }
+        return index;
     }
 
 }
