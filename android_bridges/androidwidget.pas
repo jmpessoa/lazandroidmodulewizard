@@ -6802,7 +6802,7 @@ end;
 function GetLayoutParamsByParent(paren: jVisualControl; lpParam: TLayoutParams;  side: TSide): DWord;
 begin
   case lpParam of
-     lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];  //-1
+     lpMatchParent:          Result:= GetParamByParentSide(paren, side);//TLayoutParamsArray[altMATCHPARENT];  //-1
      lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];  //-2
      lpTwoThirdOfParent:     Result:= Trunc((2/3)*GetParamByParentSide(paren, side));
      lpOneThirdOfParent:     Result:= Trunc((1/3)*GetParamByParentSide(paren, side));
@@ -6839,7 +6839,8 @@ begin
      // not yet implemented
      // lpUseWeight: Result:= 0;
      // so, for now:
-     lpUseWeight: Result:= TLayoutParamsArray[altMATCHPARENT];
+     //lpUseWeight: Result:= TLayoutParamsArray[altMATCHPARENT];
+     lpUseWeight: Result:= GetParamByParentSide(paren, side);
 
      //lpDesigner: Result:= 0;
   end;
