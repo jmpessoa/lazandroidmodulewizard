@@ -149,6 +149,9 @@ import android.provider.Settings.SettingNotFoundException;
 
 import android.app.KeyguardManager;
 import android.os.PowerManager;
+import android.os.BatteryManager;
+
+import android.content.IntentFilter;
 
 import java.text.Normalizer;
 
@@ -1048,6 +1051,34 @@ class jForm {
 		if (!jCommons.IsAppCompatProject()) {
 			return (controls.activity).getActionBar();
 		} else return null;
+	}
+	
+	// BY TR3E
+	public int GetBatteryPercent() {
+		
+		int ret = -1;
+
+	    if (Build.VERSION.SDK_INT >= 21) {
+
+	         BatteryManager bm = (BatteryManager) this.controls.activity.getSystemService(this.controls.activity.BATTERY_SERVICE);
+	         
+	         if( bm != null )
+	          ret = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+
+	    } else {
+
+	         IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+	         Intent batteryStatus = this.controls.activity.registerReceiver(null, iFilter);
+
+	         int level = batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : -1;
+	         int scale = batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1) : -1;
+
+	         double batteryPct = level / (double) scale;
+
+	         ret = (int) (batteryPct * 100);
+	   }
+	   
+	   return ret;
 	}
 
 /*

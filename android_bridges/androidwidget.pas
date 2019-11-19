@@ -1185,7 +1185,9 @@ type
     Procedure Refresh;
     procedure ShowMessage(msg: string); overload;
     procedure ShowMessage(_msg: string; _gravity: TGravity; _timeLength: TShowLength); overload;
+    
     function GetDateTime: String;
+    function GetBatteryPercent : integer; // BY TR3E
 
     function GetStringExtra(intentData: jObject; extraName: string): string;
     function GetIntExtra(intentData: jObject; extraName: string; defaultValue: integer): integer;
@@ -3203,6 +3205,13 @@ function jForm.GetDateTime: String;
 begin
   if not FInitialized then Exit;
   Result:= jForm_GetDateTime(FjEnv,FjObject);
+end;
+
+// BY TR3E
+function jForm.GetBatteryPercent: integer;
+begin
+  if not FInitialized then Exit;
+  Result:= jni_func_out_i(FjEnv, FjObject, 'GetBatteryPercent');
 end;
 
 procedure jForm.SetEnabled(Value: Boolean);
