@@ -216,6 +216,16 @@ begin
   if LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
   begin
 
+      if AComponentClass.ClassName[1] = 'T' then
+      begin
+        case QuestionDlg ('Warning: LCL Component','"'+AComponentClass.ClassName+'"'+sLineBreak+
+                                    'does not seem to be a LAMW component...',
+                                    mtCustom,[mrYes,'Continue', mrNo, 'Exit'],'') of
+             mrNo: begin Result:= False; Exit; end;
+        end;
+      end;
+
+
       temp:= Lowercase(Copy(AComponentClass.ClassName, 1,4));
 
       if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
@@ -1576,6 +1586,7 @@ var
   jControls: TStringList;
   i: Integer;
   c: TComponent;
+  temp: string;
 begin
   if (ProjFile = nil) or (AndroidForm = nil) then Exit;
   jControls := TStringList.Create;
@@ -1590,7 +1601,12 @@ begin
   for i := 0 to AndroidForm.ComponentCount - 1 do
   begin
     c := AndroidForm.Components[i];
-    if c is jControl then jControls.Add(c.ClassName);
+    if c is jControl then
+    begin
+       temp:= c.ClassName;  //Fixed JPaintShader.pas -->  jPaintShader.java
+       if temp[1] = 'J' then temp[1]:= LowerCase(temp[1]);
+       jControls.Add(temp);
+    end;
     //else if Pos(c.ClassName, fclList.Text) > 0 then jControls.Add(c.ClassName); //else if c.ClassName = 'TFPNoGUIGraphicsBridge' then
   end;
   jControls.Delimiter := ';';
