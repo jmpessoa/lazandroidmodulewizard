@@ -1,0 +1,3 @@
+public java.lang.Object jGif_jCreate(long _Self) {
+  return (java.lang.Object)(new jGif(this,_Self));
+}

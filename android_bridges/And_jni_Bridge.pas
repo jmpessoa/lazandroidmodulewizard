@@ -472,6 +472,8 @@ procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: a
 procedure jImageView_SetAnimationDurationIn(env: PJNIEnv; _jimageview: JObject; _animationDurationIn: integer);
 procedure jImageView_SetAnimationMode(env: PJNIEnv; _jimageview: JObject; _animationMode: integer);
 procedure jImageView_SetImageFromAssets(env: PJNIEnv; _jimageview: JObject; _filename: string);
+procedure jImageView_SetImageDrawable(env: PJNIEnv; _jimageview: JObject; _imageAnimation: jObject);
+procedure jImageView_Clear(env: PJNIEnv; _jimageview: JObject);
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -5088,6 +5090,30 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetImageFromAssets', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetImageDrawable(env: PJNIEnv; _jimageview: JObject; _imageAnimation: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _imageAnimation;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageDrawable', '(Landroid/graphics/drawable/AnimationDrawable;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_Clear(env: PJNIEnv; _jimageview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _jimageview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

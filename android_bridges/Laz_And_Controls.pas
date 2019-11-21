@@ -1460,6 +1460,9 @@ type
     procedure SetAnimationDurationIn(_animationDurationIn: integer);
     procedure SetAnimationMode(_animationMode: TAnimationMode);
 
+    procedure SetImageDrawable(_imageAnimation: jObject);
+    procedure Clear();
+
     procedure GenEvent_OnImageViewPopupItemSelected(Sender:TObject; caption:string);
 
     property Count: integer read GetCount;
@@ -6934,6 +6937,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jImageView_SetImageFromAssets(FjEnv, FjObject, _filename);
+end;
+
+procedure jImageView.SetImageDrawable(_imageAnimation: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageDrawable(FjEnv, FjObject, _imageAnimation);
+end;
+
+procedure jImageView.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_Clear(FjEnv, FjObject);
 end;
 
 procedure jImageView.GenEvent_OnImageViewPopupItemSelected(Sender:TObject;caption:string);
