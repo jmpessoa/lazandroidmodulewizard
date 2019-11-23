@@ -126,7 +126,6 @@ procedure jSpinner_jFree(env: PJNIEnv; _jspinner: JObject);
 procedure jSpinner_SetViewParent(env: PJNIEnv; _jspinner: JObject; _viewgroup: jObject);
 procedure jSpinner_SetLParamWidth(env: PJNIEnv; _jspinner: JObject; _w: integer);
 procedure jSpinner_SetLParamHeight(env: PJNIEnv; _jspinner: JObject; _h: integer);
-procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 procedure jSpinner_AddLParamsAnchorRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
 procedure jSpinner_AddLParamsParentRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
 procedure jSpinner_ClearLayoutAll(env: PJNIEnv; _JSpinner: JObject);
@@ -134,7 +133,6 @@ procedure jSpinner_SetLayoutAll(env: PJNIEnv; _jspinner: JObject; _idAnchor: int
 procedure jSpinner_SetId(env: PJNIEnv; _jspinner: JObject; _id: integer);
 function jSpinner_GetSelectedItemPosition(env: PJNIEnv; _jspinner: JObject): integer;
 function jSpinner_GetSelectedItem(env: PJNIEnv; _jspinner: JObject): string;
-procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string); overload;
 procedure jSpinner_Clear(env: PJNIEnv; _JSpinner: JObject);
 procedure jSpinner_SetSelectedTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
 procedure jSpinner_SetDropListTextColor(env: PJNIEnv; _jspinner: JObject; _color: integer);
@@ -155,7 +153,6 @@ procedure jSpinner_SetSelectedIndex(env: PJNIEnv; _jspinner: JObject; _index: in
 function jSpinner_GetSelectedIndex(env: PJNIEnv; _jspinner: JObject): integer;
 
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string; _strTag: string); overload;
-procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string; _strTag: string); overload;
 function jSpinner_GetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer): string;
 procedure jSpinner_SetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer; _strTag: string);
 
@@ -245,10 +242,10 @@ begin
    jSpinner_SetId(FjEnv, FjObject , Self.Id);
   end;
 
-  jSpinner_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+  jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
+                  FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                  sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
+                  sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -297,7 +294,7 @@ begin
 
    for i:= 0 to FItems.Count-1 do
    begin
-     jSpinner_Add(FjEnv, FjObject , FItems.Strings[i]);
+     jni_proc_ttz( FjEnv, FjObject, 'Add', FItems.Strings[i], '0', false);
    end;
 
    if FItems.Count > 0 then
@@ -320,7 +317,7 @@ begin
 
    jSpinner_SetSelectedIndex(FjEnv, FjObject, FSelectedIndex);
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
   end;
 end;
 
@@ -414,7 +411,7 @@ procedure jSpinner.SetLeftTopRightBottomWidthHeight(_left: integer; _top: intege
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject , _left ,_top ,_right ,_bottom ,_w ,_h);
+     jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight', _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jSpinner.AddLParamsAnchorRule(_rule: integer);
@@ -457,7 +454,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jSpinner_Add(FjEnv, FjObject , _item);
+     jni_proc_ttz( FjEnv, FjObject, 'Add', _item, '0', true);
      FItems.Add(_item);
   end;
 end;
@@ -645,7 +642,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jSpinner_Add(FjEnv, FjObject, _item ,_strTag);
+     jni_proc_ttz( FjEnv, FjObject, 'Add', _item, _strTag, true);
      FItems.Add(_item);
   end;
 end;
@@ -784,26 +781,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
-procedure jSpinner_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jspinner: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
 procedure jSpinner_AddLParamsAnchorRule(env: PJNIEnv; _jspinner: JObject; _rule: integer);
 var
   jParams: array[0..0] of jValue;
@@ -900,20 +877,6 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_item));
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jCls);
 end;
 
 procedure jSpinner_Clear(env: PJNIEnv; _JSpinner: JObject); 
@@ -1163,25 +1126,6 @@ env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-
-procedure jSpinner_Add(env: PJNIEnv; _jspinner: JObject; _item: string; _strTag: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_item));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_strTag));
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
 
 function jSpinner_GetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer): string;
 var
