@@ -499,6 +499,8 @@ type
     property OnTimer: TOnNotify read FOnTimer write FOnTimer;//SetOnTimer;
   end;
 
+  TBitmapCompressFormat = (cfJPG, cfPNG, cfNone);
+
   jBitmap = class(jControl)
   private
     FWidth: integer;
@@ -586,6 +588,10 @@ type
     function GetThumbnailImageFromAssets(_filename: string; thumbnailSize: integer): jObject; overload;
     function GetThumbnailImageFromAssets(_filename: string; _width: integer; _height: integer): jObject;overload;
     procedure LoadFromStream(Stream: TMemoryStream);
+
+    function GetBase64StringFromImage(_bitmap: jObject; _compressFormat: TBitmapCompressFormat): string;
+    function GetImageFromBase64String(_imageBase64String: string): jObject;
+    function GetBase64StringFromImageFile(_fullPathToImageFile: string): string;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -10683,6 +10689,27 @@ procedure jBitmap.LoadFromStream(Stream: TMemoryStream);
    if FInitialized then
      jBitmap_LoadFromBuffer(FjEnv, FjObject, Stream.Memory, Stream.Size);
  end;
+
+function jBitmap.GetBase64StringFromImage(_bitmap: jObject; _compressFormat: TBitmapCompressFormat): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetBase64StringFromImage(FjEnv, FjObject, _bitmap ,Ord(_compressFormat));
+end;
+
+function jBitmap.GetImageFromBase64String(_imageBase64String: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetImageFromBase64String(FjEnv, FjObject, _imageBase64String);
+end;
+
+function jBitmap.GetBase64StringFromImageFile(_fullPathToImageFile: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetBase64StringFromImageFile(FjEnv, FjObject, _fullPathToImageFile);
+end;
 
 //------------------------------------------------------------------------------
 // jCanvas
