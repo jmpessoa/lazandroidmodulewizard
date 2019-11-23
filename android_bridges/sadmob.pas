@@ -9,6 +9,15 @@ uses
 
 type
 
+TAdMobBannerSize = (
+admobSmartBanner      = 0,       //screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
+admobBanner           = 320050,  //320x50	Banner	Phones and Tablets	BANNER
+admobLargeBanner      = 320100,  //320x100	Large Banner	Phones and Tablets	LARGE_BANNER
+admobMediumRectangle  = 300250,  //300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
+admobFullBanner       = 468060,  //468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
+admobLeaderBoard      = 728090  //728x90	IAB Leaderboard	Tablets	LEADERBOARD
+                   );
+
 TOnAdMobLoaded = procedure(Sender: TObject) of Object;
 TOnAdMobFailedToLoad = procedure(Sender: TObject;  errorCode: integer) of Object;
 TOnAdMobOpened = procedure(Sender: TObject) of Object;
@@ -27,6 +36,7 @@ jsAdMob = class(jVisualControl)
     FOnAdMobOpened:          TOnAdMobOpened;
     FOnAdMobClosed:          TOnAdMobClosed;
     FOnAdMobLeftApplication: TOnAdMobLeftApplication;
+    FAdMobBannerSize: TAdMobBannerSize;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -49,6 +59,10 @@ jsAdMob = class(jVisualControl)
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetViewParent(): jObject;  override;
     procedure RemoveFromViewParent(); override;
+
+    //LMB
+    procedure AdMobSetBannerSize(_whBannerSize: TAdMobBannerSize);
+    function  AdMobGetBannerSize: TAdMobBannerSize;
 
     procedure AdMobSetId(_admobid: string);
     function  AdMobGetId(): string;
@@ -74,13 +88,13 @@ jsAdMob = class(jVisualControl)
  published
 
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
+    property AdMobBannerSize : TAdMobBannerSize read  AdMobGetBannerSize write AdMobSetBannerSize;
 
     property OnAdMobLoaded      :   TOnAdMobLoaded read FOnAdMobLoaded write FOnAdMobLoaded;
     property OnAdMobFailedToLoad:   TOnAdMobFailedToLoad read FOnAdMobFailedToLoad write FOnAdMobFailedToLoad;
     property OnAdMobOpened      :   TOnAdMobOpened read FOnAdMobOpened write FOnAdMobOpened;
     property OnAdMobClosed      :   TOnAdMobClosed read FOnAdMobClosed write FOnAdMobClosed;
     property OnAdMobLeftApplication  :   TOnAdMobLeftApplication read FOnAdMobLeftApplication write FOnAdMobLeftApplication;
-
 
 end;
 
@@ -106,6 +120,7 @@ begin
   FLParamHeight := lpWrapContent;
   FAcceptChildrenAtDesignTime:= False;
 //your code here....
+  FAdMobBannerSize:= admobSmartBanner;
 end;
 
 destructor jsAdMob.Destroy;
@@ -139,7 +154,9 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    SetViewParent( FjPRLayout );
-   
+
+   jni_proc_i(FjEnv, FjObject, 'AdMobSetBannerSize', Ord(FAdMobBannerSize));
+
    jni_proc_i(FjEnv, FjObject, 'setId', FId);
   end;
 
@@ -264,6 +281,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
+end;
+
+procedure jsAdMob.AdMobSetBannerSize(_whBannerSize: TAdMobBannerSize);
+begin
+  FAdMobBannerSize:= _whBannerSize;
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'AdMobSetBannerSize', Ord(_whBannerSize));
+end;
+
+function jsAdMob.AdMobGetBannerSize: TAdMobBannerSize;
+begin
+  Result := FAdMobBannerSize;
+  if FInitialized then
+    Result := TAdMobBannerSize(jni_func_out_i(FjEnv, FjObject, 'AdMobGetBannerSize'))
 end;
 
 procedure jsAdMob.AdMobSetId(_admobid: string);

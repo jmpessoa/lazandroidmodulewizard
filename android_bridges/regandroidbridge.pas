@@ -8,10 +8,11 @@ interface
 
 uses 
   Classes,
-  zoomableimageview,
   SysUtils,
   LResources,
   AndroidWidget,
+  gif,
+  zoomableimageview,
   Laz_And_Controls,
   Laz_And_GLESv1_Canvas,
   Laz_And_GLESv2_Canvas,
@@ -95,6 +96,7 @@ begin
   {$I jsurfaceview_icon.lrs}
   {$I jcustomcamera_icon.lrs}
   {$I jBitmap_icon.lrs}
+  {$I jgif_icon.lrs}
   {$I jcanvases1_icon.lrs}
   {$I jcanvases2_icon.lrs}
   {$I jviewflipper_icon.lrs}
@@ -148,6 +150,7 @@ begin
       jSurfaceView,
       jCustomCamera,
       jBitmap,
+      jGif,
       jCanvasES1,
       jCanvasES2,
       jViewFlipper,

@@ -472,6 +472,8 @@ procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: a
 procedure jImageView_SetAnimationDurationIn(env: PJNIEnv; _jimageview: JObject; _animationDurationIn: integer);
 procedure jImageView_SetAnimationMode(env: PJNIEnv; _jimageview: JObject; _animationMode: integer);
 procedure jImageView_SetImageFromAssets(env: PJNIEnv; _jimageview: JObject; _filename: string);
+procedure jImageView_SetImageDrawable(env: PJNIEnv; _jimageview: JObject; _imageAnimation: jObject);
+procedure jImageView_Clear(env: PJNIEnv; _jimageview: JObject);
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -918,6 +920,10 @@ function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jOb
 function jBitmap_GetThumbnailImageFromAssets(env: PJNIEnv; _jbitmap: JObject; _fileName: string; thumbnailSize: integer): jObject;overload;
 function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _fullFilename: string; _width: integer; _height: integer): jObject;overload;
 function jBitmap_GetThumbnailImageFromAssets(env: PJNIEnv; _jbitmap: JObject; _filename: string; _width: integer; _height: integer): jObject;overload;
+
+function jBitmap_GetBase64StringFromImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jObject; _compressFormat: integer): string;
+function jBitmap_GetImageFromBase64String(env: PJNIEnv; _jbitmap: JObject; _imageBase64String: string): jObject;
+function jBitmap_GetBase64StringFromImageFile(env: PJNIEnv; _jbitmap: JObject; _fullPathToImageFile: string): string;
 
 //GLSurfaceView
 Function  jGLSurfaceView_Create1       (env:PJNIEnv;  this:jobject; SelfObj: TObject; version: integer): jObject;
@@ -5088,6 +5094,30 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetImageFromAssets', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_SetImageDrawable(env: PJNIEnv; _jimageview: JObject; _imageAnimation: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _imageAnimation;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageDrawable', '(Landroid/graphics/drawable/AnimationDrawable;)V');
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jImageView_Clear(env: PJNIEnv; _jimageview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
+  env^.CallVoidMethod(env, _jimageview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -10067,6 +10097,66 @@ begin
   jCls:= env^.GetObjectClass(env, _jbitmap);
   jMethod:= env^.GetMethodID(env, jCls, 'GetThumbnailImageFromAssets', '(Ljava/lang/String;II)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetBase64StringFromImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jObject; _compressFormat: integer): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _compressFormat;
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBase64StringFromImage', '(Landroid/graphics/Bitmap;I)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetImageFromBase64String(env: PJNIEnv; _jbitmap: JObject; _imageBase64String: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageBase64String));
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetImageFromBase64String', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBitmap_GetBase64StringFromImageFile(env: PJNIEnv; _jbitmap: JObject; _fullPathToImageFile: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPathToImageFile));
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBase64StringFromImageFile', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;

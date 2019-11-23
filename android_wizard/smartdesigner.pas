@@ -47,6 +47,7 @@ type
     procedure AddSupportToFCLControls(chipArchitecture: string);
     function GetEventSignature(const nativeMethod: string): string;
     function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
+    function GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
     function TryAddJControl(ControlsJava: TStringList; jclassname: string; out nativeAdded: boolean): boolean;
     procedure UpdateProjectLpr(oldModuleName: string; newModuleName: string);
     procedure InitSmartDesignerHelpers;
@@ -215,6 +216,16 @@ begin
   Result:= True;
   if LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
   begin
+
+      if AComponentClass.ClassName[1] = 'T' then
+      begin
+        case QuestionDlg ('Warning: LCL Component','"'+AComponentClass.ClassName+'"'+sLineBreak+
+                                    'does not seem to be a LAMW component...',
+                                    mtCustom,[mrYes,'Continue', mrNo, 'Exit'],'') of
+             mrNo: begin Result:= False; Exit; end;
+        end;
+      end;
+
 
       temp:= Lowercase(Copy(AComponentClass.ClassName, 1,4));
 
@@ -1576,6 +1587,7 @@ var
   jControls: TStringList;
   i: Integer;
   c: TComponent;
+  temp: string;
 begin
   if (ProjFile = nil) or (AndroidForm = nil) then Exit;
   jControls := TStringList.Create;
@@ -1590,7 +1602,12 @@ begin
   for i := 0 to AndroidForm.ComponentCount - 1 do
   begin
     c := AndroidForm.Components[i];
-    if c is jControl then jControls.Add(c.ClassName);
+    if c is jControl then
+    begin
+       temp:= c.ClassName;  //Fixed JPaintShader.pas -->  jPaintShader.java
+       if temp[1] = 'J' then temp[1]:= LowerCase(temp[1]);
+       jControls.Add(temp);
+    end;
     //else if Pos(c.ClassName, fclList.Text) > 0 then jControls.Add(c.ClassName); //else if c.ClassName = 'TFPNoGUIGraphicsBridge' then
   end;
   jControls.Delimiter := ';';
@@ -1818,6 +1835,19 @@ begin
   fileList.Free;
 end;
 
+// returns the original file name from the JAVA template directory
+// ex: JClasSs = class(JControl) -> jClass.java
+//warning: On Linux, this should also work because TSearchRec is cross-platform, but I have not tested it.
+function TLamwSmartDesigner.GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
+var
+  SR: TSearchRec;
+begin
+  Result := FileName;
+  if FindFirst(Path + FileName, faAnyFile, SR) = 0 then
+    Result := SR.Name;
+  FindClose(SR);
+end;
+
 function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
@@ -1844,8 +1874,13 @@ begin
    begin
      list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java');
      list.Strings[0]:= 'package '+FPackageName+';';
-     list.SaveToFile(FPathToJavaSource+jclassname+'.java');
-     //add class relational
+
+     //list.SaveToFile(FPathToJavaSource+jclassname+'.java'); //old
+
+     //Pascal classes can now be written case-insensitively :)
+     list.SaveToFile(FPathToJavaSource + GetCorrectTemplateFileName(LamwGlobalSettings.PathToJavaTemplates, jclassname + '.java')); // by kordal
+
+     //add relational class
      if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational') then
      begin
        list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational');
@@ -1858,9 +1893,6 @@ begin
             auxList.SaveToFile(FPathToJavaSource + list.Strings[i]);
           end;
        end;
-       //tempStr:= Copy(list.Strings[0], 3, 100);  //get file name...
-       //list.Strings[1]:= 'package '+FPackageName+';';
-       //list.SaveToFile(FPathToJavaSource + tempStr);
      end;
      Result:= True;
    end;

@@ -499,6 +499,8 @@ type
     property OnTimer: TOnNotify read FOnTimer write FOnTimer;//SetOnTimer;
   end;
 
+  TBitmapCompressFormat = (cfJPG, cfPNG, cfNone);
+
   jBitmap = class(jControl)
   private
     FWidth: integer;
@@ -586,6 +588,10 @@ type
     function GetThumbnailImageFromAssets(_filename: string; thumbnailSize: integer): jObject; overload;
     function GetThumbnailImageFromAssets(_filename: string; _width: integer; _height: integer): jObject;overload;
     procedure LoadFromStream(Stream: TMemoryStream);
+
+    function GetBase64StringFromImage(_bitmap: jObject; _compressFormat: TBitmapCompressFormat): string;
+    function GetImageFromBase64String(_imageBase64String: string): jObject;
+    function GetBase64StringFromImageFile(_fullPathToImageFile: string): string;
 
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -1459,6 +1465,9 @@ type
     procedure ShowPopupMenu(_items: array of string);   overload;
     procedure SetAnimationDurationIn(_animationDurationIn: integer);
     procedure SetAnimationMode(_animationMode: TAnimationMode);
+
+    procedure SetImageDrawable(_imageAnimation: jObject);
+    procedure Clear();
 
     procedure GenEvent_OnImageViewPopupItemSelected(Sender:TObject; caption:string);
 
@@ -6936,6 +6945,20 @@ begin
      jImageView_SetImageFromAssets(FjEnv, FjObject, _filename);
 end;
 
+procedure jImageView.SetImageDrawable(_imageAnimation: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetImageDrawable(FjEnv, FjObject, _imageAnimation);
+end;
+
+procedure jImageView.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_Clear(FjEnv, FjObject);
+end;
+
 procedure jImageView.GenEvent_OnImageViewPopupItemSelected(Sender:TObject;caption:string);
 begin
   if Assigned(FOnPopupItemSelected) then FOnPopupItemSelected(Sender,caption);
@@ -10666,6 +10689,27 @@ procedure jBitmap.LoadFromStream(Stream: TMemoryStream);
    if FInitialized then
      jBitmap_LoadFromBuffer(FjEnv, FjObject, Stream.Memory, Stream.Size);
  end;
+
+function jBitmap.GetBase64StringFromImage(_bitmap: jObject; _compressFormat: TBitmapCompressFormat): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetBase64StringFromImage(FjEnv, FjObject, _bitmap ,Ord(_compressFormat));
+end;
+
+function jBitmap.GetImageFromBase64String(_imageBase64String: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetImageFromBase64String(FjEnv, FjObject, _imageBase64String);
+end;
+
+function jBitmap.GetBase64StringFromImageFile(_fullPathToImageFile: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBitmap_GetBase64StringFromImageFile(FjEnv, FjObject, _fullPathToImageFile);
+end;
 
 //------------------------------------------------------------------------------
 // jCanvas
