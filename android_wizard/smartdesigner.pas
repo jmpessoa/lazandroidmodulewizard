@@ -47,6 +47,7 @@ type
     procedure AddSupportToFCLControls(chipArchitecture: string);
     function GetEventSignature(const nativeMethod: string): string;
     function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
+    function GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
     function TryAddJControl(ControlsJava: TStringList; jclassname: string; out nativeAdded: boolean): boolean;
     procedure UpdateProjectLpr(oldModuleName: string; newModuleName: string);
     procedure InitSmartDesignerHelpers;
@@ -1834,6 +1835,19 @@ begin
   fileList.Free;
 end;
 
+// returns the original file name from the JAVA template directory
+// ex: JClasSs = class(JControl) -> jClass.java
+//warning: On Linux, this should also work because TSearchRec is cross-platform, but I have not tested it.
+function TLamwSmartDesigner.GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
+var
+  SR: TSearchRec;
+begin
+  Result := FileName;
+  if FindFirst(Path + FileName, faAnyFile, SR) = 0 then
+    Result := SR.Name;
+  FindClose(SR);
+end;
+
 function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
@@ -1860,8 +1874,13 @@ begin
    begin
      list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java');
      list.Strings[0]:= 'package '+FPackageName+';';
-     list.SaveToFile(FPathToJavaSource+jclassname+'.java');
-     //add class relational
+
+     //list.SaveToFile(FPathToJavaSource+jclassname+'.java'); //old
+
+     //Pascal classes can now be written case-insensitively :)
+     list.SaveToFile(FPathToJavaSource + GetCorrectTemplateFileName(LamwGlobalSettings.PathToJavaTemplates, jclassname + '.java')); // by kordal
+
+     //add relational class
      if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational') then
      begin
        list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational');
@@ -1874,9 +1893,6 @@ begin
             auxList.SaveToFile(FPathToJavaSource + list.Strings[i]);
           end;
        end;
-       //tempStr:= Copy(list.Strings[0], 3, 100);  //get file name...
-       //list.Strings[1]:= 'package '+FPackageName+';';
-       //list.SaveToFile(FPathToJavaSource + tempStr);
      end;
      Result:= True;
    end;
