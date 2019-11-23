@@ -14,7 +14,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.view.Gravity;
 
-//by jmpessoa
+//-------------------------------------------------------------------------
+// jSpinner
+// Reviewed by TR3E on 23/11/2019
+//-------------------------------------------------------------------------
+
 class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 
     Context ctx;
@@ -172,9 +176,8 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     private boolean mLastItemAsPrompt = false;
     private int mTextAlignment;
     
-    private String mSelectedText="";
-    
-    private int mSelectedIndex= -1;
+    private String mSelectedText  = "";    
+    private int    mSelectedIndex = -1;
 
     private int mSelectedPadTop = 15;
     private int mSelectedPadBottom = 5;
@@ -218,15 +221,18 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         @Override   
    /*.*/public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             ((TextView) parent.getChildAt(0)).setGravity(mTextAlignment); //Gravity.CENTER
+            
             String caption = mStrList.get(position).toString();           
             setSelection(position);
+            
             mSelectedIndex = position;
-            mSelectedText = caption;
+            mSelectedText  = caption;
+            
             controls.pOnSpinnerItemSelected(pascalObj,position,caption);
         }
 
         @Override
-   /*.*/public void onNothingSelected(AdapterView<?> parent) {}
+   /*.*/public void onNothingSelected(AdapterView<?> parent) { }
 
     };
 
@@ -282,12 +288,15 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ..
 
     public int GetSelectedItemPosition() {
-        return this.getSelectedItemPosition();
+    	if(mStrList.size() <= 0) return -1;
+    	
+        return mSelectedIndex;    
     }
 
     public String GetSelectedItem() {
-    	mSelectedText = this.getSelectedItem().toString();
-        return mSelectedText;
+    	if(mStrList.size() <= 0) return "";
+    	
+    	return mSelectedText;
     }
 
     //ELERA_04032015
@@ -295,14 +304,17 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
         mStrList.clear();
         mTagList.clear();
         mSpAdapter.notifyDataSetChanged();
+        
+        mSelectedText  = "";    
+        mSelectedIndex = -1;
     }
 
-    public void SetSelectedTextColor(int _color) {
+    public void SetSelectedTextColor(int _color) {    	    
         mSpAdapter.SetSelectedTextColor(_color);
     }
 
-    public void SetDropListTextColor(int _color) {
-        mSpAdapter.SetTextColor(_color);
+    public void SetDropListTextColor(int _color) {    	
+         mSpAdapter.SetTextColor(_color);
     }
 
     public void SetDropListBackgroundColor(int _color) {
@@ -322,27 +334,20 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     }
 
     public void Delete(int _index) {
-        if (_index < 0) mStrList.remove(0);
-        else if (_index > (mStrList.size()-1)) { 
-        	mStrList.remove(mStrList.size()-1);
-        	mTagList.remove(mStrList.size()-1);
-        }	
-        else {
-        	 mStrList.remove(_index);
-        	 mTagList.remove(_index);
-        }	 
+    	if (mStrList.size() <= 0) return;
+        if ((_index < 0) || (_index >= mStrList.size())) return;
+                
+        mStrList.remove(_index);
+        mTagList.remove(_index);
+        	 
         mSpAdapter.notifyDataSetChanged();
     }
     
     public void SetSelection(int _index) {
-    	
-    	int i = _index;    	
-    	if (i < 0) i = 0;     	    	      	    	
-    	if (mStrList.size() > 0) {    		
-    		if ( i >= mStrList.size() ) i = mStrList.size()-1;    		    		    	
-    		setSelection(i);
-    	  	mSelectedText = this.getSelectedItem().toString();    		
-    	}   	
+    	if (mStrList.size() <= 0) return;
+    	if ((_index < 0) || (_index >= mStrList.size())) return;
+    	    			    		    
+    	setSelection(_index);    	   		    	  
     }
    
     public void SetTextFontSize(int _txtFontSize) {
@@ -403,93 +408,77 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     }
     
     public String GetText() {
-    	mSelectedText = this.getSelectedItem().toString();
+    	if (mStrList.size() <= 0) return "";
+    	
         return mSelectedText;
     }
     
     public void SetText(int _index) {
+    	if (mStrList.size() <= 0) return;
+    	
     	SetSelection(_index);
     }
         
     public void SetSelectedIndex(int _index) {
-	    int i = _index;    	
-    	if (i < 0) i = 0;     	    		
-    	if (mStrList.size() > 0) {
-    		if ( i >= mStrList.size() ) i = mStrList.size()-1;
-    		SetSelection(_index);
-    	}
+    	if (mStrList.size() <= 0) return;
+    	if ((_index < 0) || (_index >= mStrList.size())) return;
+    	
+    	setSelection(_index);    	
     }
 
     public int GetSelectedIndex() {
-        return this.getSelectedItemPosition();      //or -1   
+    	if (mStrList.size() <= 0) return -1;
+    	
+        return mSelectedIndex;      //or -1   
     }
     
    
     public void SetItem(int _index, String _item) {
-    	
-        if (_index < 0) mStrList.set(0,_item);
-        else if (_index > (mStrList.size()-1)) { 
-        	    mStrList.set(mStrList.size()-1,_item);
-        }
-        else {
-        	mStrList.set(_index,_item);
-        }
-        mSpAdapter.notifyDataSetChanged();
+    	if (mStrList.size() <= 0) return;
+    	if ((_index < 0) || (_index >= mStrList.size())) return;
+    	        
+        mStrList.set(_index,_item);
         
+        mSpAdapter.notifyDataSetChanged();       
     }
     
     public void SetItem(int _index, String _item,  String _strTag) {
-    	
-        if (_index < 0) mStrList.set(0,_item);
-        else if (_index > (mStrList.size()-1)) { 
-        	    mStrList.set(mStrList.size()-1,_item);
-        	    mTagList.set(mStrList.size()-1,_strTag);
-        }
-        else {
-        	mStrList.set(_index,_item);
-        	mStrList.set(_index,_strTag);
-        }
-        mSpAdapter.notifyDataSetChanged();
-            
+    	if (mStrList.size() <= 0) return;
+    	if ((_index < 0) || (_index >= mStrList.size())) return;
+    	        
+        mStrList.set(_index,_item);
+        mStrList.set(_index,_strTag);
+        
+        mSpAdapter.notifyDataSetChanged();           
     }    
-
-    public void Add(String _item) {
-        mStrList.add(_item);
-        mTagList.add("0");
-        //Log.i("Spinner_Add: ",_item);
-        mSpAdapter.notifyDataSetChanged();
-    }
     
-    public void Add(String _item,  String _strTag) {
+    public void Add(String _item, String _strTag, boolean runEvent) {
         mStrList.add(_item);
         mTagList.add(_strTag);
         //Log.i("Spinner_Add: ",_item);
         mSpAdapter.notifyDataSetChanged();
-
-    }
+        
+        if(mSelectedIndex == -1){
+        	mSelectedIndex = mStrList.size() - 1;
+        	mSelectedText  = _item;
+        	
+        	if( runEvent )
+        	 controls.pOnSpinnerItemSelected(pascalObj, mSelectedIndex, mSelectedText);
+        }
+    }    
     
 	public void SetItemTagString(int _index, String _strTag) {
-        if (_index < 0) mTagList.set(0, _strTag);
-        else if (_index > (mStrList.size()-1)) { 
-        	    mTagList.set(mStrList.size()-1,_strTag);
-        }
-        else {        	
-        	mStrList.set(_index,_strTag);
-        }
-   					
+		if (mStrList.size() <= 0) return;
+    	if ((_index < 0) || (_index >= mStrList.size())) return;
+    	                
+        mStrList.set(_index,_strTag);           					
 	}
 
-	public String GetItemTagString(int _index){		
-		String s="";
-	    int i = _index;    	    	
-	    if (i < 0) i = 0;    	
-    	if (mTagList.size() > 0) {
-    		if ( i >= mTagList.size() ) {
-    			i = mStrList.size()-1;
-    		}    		
-    		s = mTagList.get(i);
-    	}    		
-    	return s;
+	public String GetItemTagString(int _index){
+		if (mStrList.size() <= 0) return "";
+		if ((_index < 0) || (_index >= mStrList.size())) return "";
+				  	
+    	return mTagList.get(_index);
 	}    
     
 	public void SetSelectedPaddingTop(int _paddingTop) {	    
