@@ -156,7 +156,7 @@ begin
   jWebView1.Navigate(urlLocation);
 
   jLocation1.StopTracker();
-  jLocation1.ShowLocationSourceSettings()
+  jLocation1.ShowLocationSouceSettings()
 
 end;
 
@@ -167,7 +167,7 @@ begin
       if not jLocation1.IsGPSProvider then
       begin
          ShowMessage('Sorry, GPS is Off. Please, active it and try again.');
-         jLocation1.ShowLocationSourceSettings();
+         jLocation1.ShowLocationSouceSettings()
       end
       else
       begin
