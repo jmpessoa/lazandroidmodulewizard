@@ -70,6 +70,8 @@ jLocation = class(jControl)
     procedure RequestLocationUpdates(); overload;
     procedure StopTracker();
 
+    function GPSCreate(): boolean;
+
     procedure SetCriteriaAccuracy(_accuracy: TCriteriaAccuracy);
 
     function IsGPSProvider(): boolean;
@@ -81,7 +83,8 @@ jLocation = class(jControl)
     function GetAltitude(): double;
     function IsWifiEnabled(): boolean;
     procedure SetWifiEnabled(_status: boolean);
-    function GetGoogleMapsUrl(_latitude: double; _longitude: double): string; overload;
+    function  GetGoogleMapsUrl(_latitude: double; _longitude: double): string; overload;
+    function  GetGoogleMapsWebUrl(_latitude: double; _longitude: double; _zoom : boolean): string;
     procedure SetMapWidth(_mapwidth: integer);
     procedure SetMapHeight(_mapheight: integer);
     procedure SetMapZoom(_mapzoom: integer);
@@ -240,6 +243,11 @@ begin
    Result:= jLocation_jCreate(FjEnv, FjThis , int64(Self) ,_TimeForUpdates ,_DistanceForUpdates ,_CriteriaAccuracy ,_MapType);
 end;
 
+function jLocation.GPSCreate(): boolean;
+begin
+  if FInitialized then
+   Result:= jni_func_out_z(FjEnv, FjThis, 'GPSCreate');
+end;
 
 procedure jLocation.jFree();
 begin
@@ -355,6 +363,12 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject , _latitude ,_longitude);
+end;
+
+function jLocation.GetGoogleMapsWebUrl(_latitude : double; _longitude: double; _zoom : boolean): string;
+begin
+ if FInitialized then
+  Result:= jni_func_ffz_out_t(FjEnv, FjObject, 'GetGoogleMapsWebUrl', _latitude, _longitude, _zoom);
 end;
 
 procedure jLocation.SetMapWidth(_mapwidth: integer);

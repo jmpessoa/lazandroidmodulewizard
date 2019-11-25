@@ -65,7 +65,7 @@ public class jLocation /*extends ...*/ {
     private int mMapZoom;
     private int mMapSizeW;
     private int mMapSizeH;
-    private Location location;
+    private Location mLocation;
 
     private String mMarkerHighlightColor = "blue";
 
@@ -88,9 +88,10 @@ public class jLocation /*extends ...*/ {
         context = _ctrls.activity;
         pascalObj = _Self;
         controls = _ctrls;
-
-        //Get the location manager
-        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        
+        mLocationManager = null;
+        mProvider        = null;
+        mLocation        = null;
 
         //Define the criteria how to select the location provider
         mCriteria = new Criteria();
@@ -137,12 +138,6 @@ public class jLocation /*extends ...*/ {
         mMapSizeW = 512;
         mMapSizeH = 512;
 
-        //get the best provider depending on the criteria
-        mProvider = mLocationManager.getBestProvider(mCriteria, false); //fixed by Damian [if true then only a provider that is currently enabled is returned]
-
-        //Register the listener with the Location Manager to receive location updates
-        //mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener); //**
-
         gpsListener = new GpsStatus.Listener() {
             public void onGpsStatusChanged(int event) {
 
@@ -174,11 +169,30 @@ public class jLocation /*extends ...*/ {
                 }
             }
         };
-        //mLocationManager.addGpsStatusListener(gpsListener);  //***
+        
+    }
+    
+    public boolean GPSCreate(){
+    	//Get the location manager
+        if( mLocationManager == null ){
+         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+         
+         //get the best provider depending on the criteria
+         if( mLocationManager != null )
+          mProvider = mLocationManager.getBestProvider(mCriteria, false); //fixed by Damian [if true then only a provider that is currently enabled is returned]
+        }
+        
+        if( (mLocationManager != null) && (mProvider != null)  ) 
+        	return true;
+        else
+        	return false;
     }
 
     private boolean TrySatellitesInfo() {
         mSatCount = 0;
+        
+        if( !GPSCreate() ) return false;
+        
         try {
             mGpsStatus = mLocationManager.getGpsStatus(mGpsStatus);
         }
@@ -222,7 +236,7 @@ public class jLocation /*extends ...*/ {
         mLocationManager = null;
         mCriteria = null;
         mlistener = null;
-        location = null;
+        mLocation = null;
     }
 
     //write others [public] methods code here......
@@ -245,13 +259,15 @@ public class jLocation /*extends ...*/ {
 
     public boolean StartTracker() {
         boolean res = false;
+        
+        if( !GPSCreate() ) return false;
 
         if (!mListening) Listen();
 
         mCriteria.setAccuracy(mCriteriaAccuracy);
         //mCriteria.setCostAllowed(false);
-        if (location != null) {
-            mlistener.onLocationChanged(location);
+        if (mLocation != null) {
+            mlistener.onLocationChanged(mLocation);
             res = true;
         }
         return res;
@@ -288,17 +304,19 @@ public class jLocation /*extends ...*/ {
     public boolean StartTracker(String _locationName) {
         boolean res = false;
         double[] d;
+        
+        if( !GPSCreate() ) return false;
 
         if (!mListening) Listen();
 
         mCriteria.setAccuracy(mCriteriaAccuracy);
         //mCriteria.setCostAllowed(false);
-        if (location != null) {
+        if (mLocation != null) {
             d = this.GetLatitudeLongitude(_locationName);
-            location.reset();
-            location.setLatitude(d[0]);
-            location.setLongitude(d[1]);
-            mlistener.onLocationChanged(location); //force
+            mLocation.reset();
+            mLocation.setLatitude(d[0]);
+            mLocation.setLongitude(d[1]);
+            mlistener.onLocationChanged(mLocation); //force
             res = true;
         }
         return res;
@@ -310,6 +328,9 @@ public class jLocation /*extends ...*/ {
     }
 
     public void RequestLocationUpdates() {
+    	
+    	if( !GPSCreate() ) return;
+    	
         try {
             mLocationManager.requestLocationUpdates(mProvider, mTimeForUpdates, mDistanceForUpdates, mlistener);
         }
@@ -320,6 +341,9 @@ public class jLocation /*extends ...*/ {
     }
 
     public void RequestLocationUpdates(int _provider) {
+    	
+    	if( !GPSCreate() ) return;
+    	
         if (_provider == 0) {
             try {
                 mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, mTimeForUpdates, mDistanceForUpdates, mlistener);
@@ -354,9 +378,11 @@ public class jLocation /*extends ...*/ {
     }
 
     public boolean IsGPSProvider() {
+    	if( !GPSCreate() ) return false;
+    	
         if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
              try {
-                 location = mLocationManager.getLastKnownLocation(mProvider);
+            	 mLocation = mLocationManager.getLastKnownLocation(mProvider);
                  return true;
              }
              catch (SecurityException se) {
@@ -367,11 +393,13 @@ public class jLocation /*extends ...*/ {
     	} else return false;
     }
     
-    public boolean IsNetProvider() {    	
+    public boolean IsNetProvider() {
+    	if( !GPSCreate() ) return false;
+    	
     	if ( mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ) { 
           //the last known location of this provider
           try {
-              location = mLocationManager.getLastKnownLocation(mProvider);
+        	  mLocation = mLocationManager.getLastKnownLocation(mProvider);
               return true;
           }
           catch (SecurityException se) {
@@ -502,7 +530,20 @@ public class jLocation /*extends ...*/ {
     	}
     	
         return url;
-    }    
+    }
+    
+    //http://stackz.ru/en/1801732/how-do-i-link-to-google-maps-with-a-particular-longitude-and-latitude
+    public String GetGoogleMapsWebUrl(double _latitude, double _longitude, boolean _zoom){
+    	String url="http://www.google.com/maps/place/" + String.valueOf(_latitude) + "," + String.valueOf(_longitude);
+    	
+    	if(_zoom)
+    	 url = url + "/@" + String.valueOf(_latitude) + "," + String.valueOf(_longitude) + ",17z";
+    	
+    	if(mMapType.equals("satellite"))
+    		url = url + "/data=!3m1!1e3";
+    	
+    	return url;
+    }
     
     //black, brown, green, purple, yellow, blue, gray, orange, red, white
     public void SetMarkerHighlightColor(int _color) {
@@ -599,19 +640,19 @@ public class jLocation /*extends ...*/ {
    public float GetDistanceBetween(double _startLatitude, double _startLongitude, double _endLatitude, double _endLongitude) {
 	 float[] result=new float[1];
 	 result[0] = 0;
-	 if (location != null)   
+	 if (mLocation != null)   
         Location.distanceBetween(_startLatitude, _startLongitude, _endLatitude, _endLongitude, result);	 
 	 return result[0];  // it's output is a WGS84 ellipsoid !!
    }
 
    public float GetDistanceTo(double _latitude, double _longitude) {
 	 float r = 0;  
-	 if (location != null) {
-	   Location loc = new Location(location); //or new Location(String provider)   
+	 if (mLocation != null) {
+	   Location loc = new Location(mLocation); //or new Location(String provider)   
 	   loc.reset();
 	   loc.setLatitude(_latitude);
 	   loc.setLongitude(_longitude);	   
-       r = location.distanceTo(loc);   // meters   
+       r = mLocation.distanceTo(loc);   // meters   
 	 }
 	 return r;
    }
