@@ -1,0 +1,3 @@
+public java.lang.Object jcBluetoothSPP_jCreate(long _Self) {
+  return (java.lang.Object)(new jcBluetoothSPP(this,_Self));
+}

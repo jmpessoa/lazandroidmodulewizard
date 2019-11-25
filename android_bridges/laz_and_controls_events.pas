@@ -227,19 +227,28 @@ uses
    procedure Java_Event_pOnFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
    procedure Java_Event_pOnFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
 
+   procedure Java_Event_pOnBluetoothSPPDataReceived(env:PJNIEnv;this:JObject;Sender:TObject;jbyteArrayData:jbyteArray;messageData:jString);
+   procedure Java_Event_pOnBluetoothSPPDeviceConnected(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString);
+   procedure Java_Event_pOnBluetoothSPPDeviceDisconnected(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnBluetoothSPPDeviceConnectionFailed(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnBluetoothSPPServiceStateChanged(env:PJNIEnv;this:JObject;Sender:TObject;serviceState:integer);
+   procedure Java_Event_pOnBluetoothSPPListeningNewAutoConnection(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString);
+   procedure Java_Event_pOnBluetoothSPPAutoConnectionStarted(env:PJNIEnv;this:JObject;Sender:TObject);
+
 implementation
 
 uses
    AndroidWidget, bluetooth, bluetoothclientsocket, bluetoothserversocket,
    spinner, location, actionbartab, customdialog, togglebutton, switchbutton, gridview,
    sensormanager, broadcastreceiver, datepickerdialog, timepickerdialog, shellcommand,
-   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar, radiogroup, drawingview,
-   autocompletetextview, chronometer, numberpicker, udpsocket, opendialog, comboedittext,
-   toolbar, expandablelistview, gl2surfaceview, sfloatingbutton, framelayout,
-   stoolbar, snavigationview, srecyclerview, sbottomnavigationview, stablayout, treelistview,
-   customcamera, calendarview, searchview, telephonymanager,
+   tcpsocketclient, surfaceview, mediaplayer, contactmanager, seekbar, ratingbar,
+   radiogroup, drawingview, autocompletetextview, chronometer, numberpicker,
+   udpsocket, opendialog, comboedittext,toolbar, expandablelistview, gl2surfaceview,
+   sfloatingbutton, framelayout,stoolbar, snavigationview, srecyclerview, sbottomnavigationview,
+   stablayout, treelistview, customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
-   midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient, ftpclient;
+   midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
+   ftpclient, cbluetoothspp;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2677,6 +2686,83 @@ begin
   begin
     jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
     jFTPClient(Sender).GenEvent_OnFTPClientListed(Sender,count);
+  end;
+end;
+
+procedure Java_Event_pOnBluetoothSPPDataReceived(env:PJNIEnv;this:JObject;Sender:TObject;jbyteArrayData:jbyteArray;messageData:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcBluetoothSPP then
+  begin
+    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
+    jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPDataReceived(Sender,GetDynArrayOfJByte(env,jbyteArrayData),GetString(env,messageData));
+  end;
+end;
+
+procedure Java_Event_pOnBluetoothSPPDeviceConnected(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcBluetoothSPP then
+  begin
+    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
+    jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPDeviceConnected(Sender,GetString(env,deviceName),GetString(env,deviceAddress));
+  end;
+end;
+
+procedure Java_Event_pOnBluetoothSPPDeviceDisconnected(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcBluetoothSPP then
+  begin
+    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
+    jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPDeviceDisconnected(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnBluetoothSPPDeviceConnectionFailed(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcBluetoothSPP then
+  begin
+    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
+    jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPDeviceConnectionFailed(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnBluetoothSPPServiceStateChanged(env:PJNIEnv;this:JObject;Sender:TObject;serviceState:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcBluetoothSPP then
+  begin
+    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
+    jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPServiceStateChanged(Sender, serviceState);
+  end;
+end;
+
+procedure Java_Event_pOnBluetoothSPPListeningNewAutoConnection(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcBluetoothSPP then
+  begin
+    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
+    jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPListeningNewAutoConnection(Sender,GetString(env,deviceName),GetString(env,deviceAddress));
+  end;
+end;
+
+procedure Java_Event_pOnBluetoothSPPAutoConnectionStarted(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcBluetoothSPP then
+  begin
+    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
+    jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPAutoConnectionStarted(Sender);
   end;
 end;
 

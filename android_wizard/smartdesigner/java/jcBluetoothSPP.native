@@ -1,0 +1,7 @@
+public native void pOnBluetoothSPPDataReceived(long pasobj, byte[] jbyteArrayData, String messageData);
+public native void pOnBluetoothSPPDeviceConnected(long pasobj, String deviceName, String deviceAddress);
+public native void pOnBluetoothSPPDeviceDisconnected(long pasobj);
+public native void pOnBluetoothSPPDeviceConnectionFailed(long pasobj);
+public native void pOnBluetoothSPPServiceStateChanged(long pasobj, int serviceState);
+public native void pOnBluetoothSPPListeningNewAutoConnection(long pasobj, String deviceName, String deviceAddress);
+public native void pOnBluetoothSPPAutoConnectionStarted(long pasobj);

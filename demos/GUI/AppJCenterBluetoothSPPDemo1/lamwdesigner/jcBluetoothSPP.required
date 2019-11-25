@@ -1,0 +1,4 @@
+<uses-permission android:name="android.permission.BLUETOOTH"/>
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+<activity android:name="app.akexorcist.bluetoothspp.DeviceList"/>
+implementation 'com.akexorcist:bluetoothspp:1.0.0'

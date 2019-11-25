@@ -6,6 +6,7 @@ interface
   
 uses
   Classes,
+  cbluetoothspp,
   cmail,
   csignaturepad,
   copenmapview,
@@ -21,6 +22,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jcbluetoothspp_icon.lrs}
   {$I jcmail_icon.lrs}
   {$I jcsignaturepad_icon.lrs}
   {$I jcopenmapview_icon.lrs}
@@ -29,6 +31,7 @@ begin
   {$I jcmikrotikrouteros_icon.lrs}
   RegisterComponents('Android Bridges jCenter',
     [
+      jcBluetoothSPP,
       jcMail,
       jcSignaturePad,
       jcOpenMapView,

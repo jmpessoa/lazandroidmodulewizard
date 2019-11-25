@@ -367,10 +367,8 @@ type
 
  TDynArrayOfJObject = array of JObject;
 
-
  TArrayOfByte = array of JByte;
  TArrayOfJByte = array of JByte;
-
 
  TScanByte = Array[0..0] of JByte;
  PScanByte = ^TScanByte;
@@ -1371,6 +1369,24 @@ type
 
     procedure SetAnimationMode(_animationMode: TAnimationMode);
     function GetRealPathFromURI(_Uri: jObject): string; //thanks to Segator!
+
+    { We are using pascal "shortint" to simulate the [Signed] java byte ....
+      however "shortint" works in the range "-127 to 128" equal to the byte in java ....
+      So every time we assign a value outside this range, for example 192, we get
+      the "range check" message...
+
+      How to Fix:
+
+      var
+        bufferToSend: array of jbyte; //jbyte = shortint
+      begin
+        ...........
+        bufferToSend[0] := ToSignedByte($C0);    //<-- fixed!
+        ........
+      end;}
+
+
+    function ToSignedByte(b: byte): shortint;
 
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
@@ -3965,6 +3981,11 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetRealPathFromURI(FjEnv, FjObject, _Uri);
+end;
+
+function jForm.ToSignedByte(b: byte): shortint;
+begin
+  Result:= shortint(b);
 end;
 
 function jForm.ActionBarIsShowing(): boolean;
