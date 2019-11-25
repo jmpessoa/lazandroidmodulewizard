@@ -20,6 +20,8 @@ type
       jLocation1: jLocation;
       jTextView1: jTextView;
       jWebView1: jWebView;
+      procedure AndroidModule1ActivityCreate(Sender: TObject;
+        intentData: jObject);
       procedure AndroidModule1RequestPermissionResult(Sender: TObject;
         requestCode: integer; manifestPermission: string;
         grantResult: TManifestPermissionResult);
@@ -37,6 +39,7 @@ type
         provider: string);
       procedure jLocation1LocationStatusChanged(Sender: TObject;
         status: integer; provider: string; msgStatus: string);
+      procedure jTextView1Click(Sender: TObject);
     private
       {private declarations}
     public
@@ -75,6 +78,7 @@ begin
      Self.RequestRuntimePermission('android.permission.ACCESS_FINE_LOCATION', 1003); //from AndroodManifest.xml
   end;
 
+
 end;
 
 procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
@@ -83,14 +87,21 @@ procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
 begin
     case requestCode of
      1003:begin   //android.permission.ACCESS_FINE_LOCATION
+
                if grantResult = PERMISSION_GRANTED  then
                begin
-                   ShowMessage(manifestPermission + ' :: Success! Permission grant!!! ' )
+                   ShowMessage(manifestPermission + ' :: Success! Permission grant!!! ' );
                end
                else  //PERMISSION_DENIED
                  ShowMessage(manifestPermission + '   :: Sorry... permission not grant... ' )
            end;
   end;
+end;
+
+procedure TAndroidModule1.AndroidModule1ActivityCreate(Sender: TObject;
+  intentData: jObject);
+begin
+
 end;
 
 procedure TAndroidModule1.jCheckBox1Click(Sender: TObject);
@@ -125,10 +136,10 @@ begin
 
      gpsSatelliteStatus:
      begin
-       ShowMessage('Satellites count = '+IntToStr(countSatellites));
+       //ShowMessage('Satellites count = '+IntToStr(countSatellites));
        for i:= 0 to countSatellites-1 do
        begin
-         ShowMessage('Satellite ['+IntToStr(i)+'] Info: ' +jLocation1.GetSatelliteInfo(i));
+         //ShowMessage('Satellite ['+IntToStr(i)+'] Info: ' +jLocation1.GetSatelliteInfo(i));
        end;
      end;
 
@@ -142,21 +153,14 @@ var
   urlLocation: string;
 begin
 
-  //jLocation1.SetGoogleMapsApiKey('mykey');    // << ----------  IMPORTANT !!!!
+  showmessage('LocationChanged');
 
-  if jLocation1.GoogleMapsApiKey = '' then
-  begin
-    ShowMessage('Found address='+ address);
-    ShowMessage('Sorry .... Google Static Maps API needs an apikey...');
-    jLocation1.StopTracker();
-    Exit;
-  end;
+  jTextView1.Text:= 'Latitude: ' + floatTostr(latitude) +
+                    ' Longitude: ' + floatTostr(longitude) + #13#10 +
+                    ' Altitude: ' + floatTostr(altitude);
 
-  urlLocation:= jLocation1.GetGoogleMapsUrl(latitude, longitude);
+  urlLocation := jLocation1.GetGoogleMapsWebUrl(latitude, longitude, true);
   jWebView1.Navigate(urlLocation);
-
-  jLocation1.StopTracker();
-  jLocation1.ShowLocationSourceSettings()
 
 end;
 
@@ -167,14 +171,15 @@ begin
       if not jLocation1.IsGPSProvider then
       begin
          ShowMessage('Sorry, GPS is Off. Please, active it and try again.');
-         jLocation1.ShowLocationSourceSettings();
+         jLocation1.ShowLocationSouceSettings()
       end
       else
       begin
          ShowMessage('GPS is On! Starting Tracker...');
          //jLocation1.MapType:= mtHybrid;  // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
-         jLocation1.StartTracker();  //handled by "OnLocationChanged"
+         jLocation1.StartTracker(true);  //handled by "OnLocationChanged"
       end;
+
   end
   else  ShowMessage('Sorry.. Runtime Permission NOT Granted ...');
 end;
@@ -261,6 +266,11 @@ procedure TAndroidModule1.jLocation1LocationStatusChanged(Sender: TObject;
   status: integer; provider: string; msgStatus: string);
 begin
   ShowMessage('provider= '+provider+' ::: msgStatus= '+ msgStatus);
+end;
+
+procedure TAndroidModule1.jTextView1Click(Sender: TObject);
+begin
+
 end;
 
 end.
