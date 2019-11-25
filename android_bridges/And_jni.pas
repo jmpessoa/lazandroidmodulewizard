@@ -594,7 +594,7 @@ function jni_func_dab_z_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : str
 function jni_func_i_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): boolean;
 function jni_func_ii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2: integer): jObject;
 function jni_func_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single): jObject;
-function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
+function jni_func_ffz_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: double; _bool: boolean): string;function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
 function jni_func_bmp_t_out_dab(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string): TDynArrayOfJByte;
 function jni_func_bmp_t_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string) : boolean;
 function jni_func_bmp_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str1, _str2: string) : boolean;
@@ -1131,6 +1131,32 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FF)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_ffz_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                             _float1, _float2: double; _bool: boolean): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].d:= _float1;
+  jParams[1].d:= _float2;
+  jParams[2].z:= JBool(_bool);
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(DDZ)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
   env^.DeleteLocalRef(env, jCls);
 end;
 
