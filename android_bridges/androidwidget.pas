@@ -1346,12 +1346,14 @@ type
     function IsAppCompatProject(): boolean;
 
     //by TR3E
-    function  GetDateTimeDecode(
-                                 var day : integer; var month : integer; var year : integer;
+    function  GetDateTimeDecode( var day : integer; var month : integer; var year : integer;
                                  var hours : integer; var minutes: integer; var seconds : integer ) : boolean;
     function  GetScreenWidth(): integer;
     function  GetScreenHeight(): integer;
     function  GetSystemVersionString(): string;
+
+    function  GetTimeInMilliseconds : longint;
+    function  GetTimeHHssSS( millisTime : longint ) : string;
 
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string); overload;
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer); overload; // by TR3E
@@ -3227,6 +3229,20 @@ function jForm.GetBatteryPercent: integer;
 begin
   if not FInitialized then Exit;
   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBatteryPercent');
+end;
+
+// BY TR3E
+function jForm.GetTimeInMilliseconds: longint;
+begin
+  if not FInitialized then Exit;
+  Result:= jni_func_out_j(FjEnv,FjObject, 'GetTimeInMilliseconds');
+end;
+
+// BY TR3E
+function jForm.GetTimeHHssSS( millisTime : longint ) : string;
+begin
+  if not FInitialized then Exit;
+  Result:= jni_func_j_out_t(FjEnv,FjObject, 'GetTimeHHssSS', millisTime);
 end;
 
 procedure jForm.SetEnabled(Value: Boolean);

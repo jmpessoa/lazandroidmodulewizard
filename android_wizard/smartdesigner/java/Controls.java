@@ -621,6 +621,17 @@ class jForm {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 		return (formatter.format(new Date()));
 	}
+	
+	// by TR3E
+	public long GetTimeInMilliseconds(){
+		return controls.getTick();
+	}
+
+	//by TR3E
+	public String GetTimeHHssSS( long millisTime ) {
+		  SimpleDateFormat formatter = new SimpleDateFormat ( "mm:ss:SS" );
+		  return( formatter.format ( new Date (millisTime) ) );	
+	}
 
 	//Free object except Self, Pascal Code Free the class.
 	public void Free() {
