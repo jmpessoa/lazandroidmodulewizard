@@ -579,6 +579,7 @@ procedure jni_proc_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _boo
 
 function jni_func_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string): single;
 function jni_func_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string): integer;
+function jni_func_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string): longint;
 function jni_func_out_d(env: PJNIEnv; _jobject: JObject; javaFuncion : string): double;
 function jni_func_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string): string;
 function jni_func_out_viw(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
@@ -601,6 +602,7 @@ function jni_func_z_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
 
 function jni_func_i_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): boolean;
 function jni_func_i_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): string;
+function jni_func_j_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: longint): string;
 function jni_func_ii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2: integer): jObject;
 function jni_func_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single): jObject;
 function jni_func_ffz_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: double; _bool: boolean): string;function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
@@ -875,6 +877,17 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jni_func_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): longint;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()J');
+  Result:= env^.CallLongMethod(env, _jobject, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jni_func_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): string;
 var
   jStr: JString;
@@ -1135,6 +1148,31 @@ begin
 
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)Ljava/lang/String;');
+
+  jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_j_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _long: longint): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _long;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(J)Ljava/lang/String;');
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
   case jStr = nil of
