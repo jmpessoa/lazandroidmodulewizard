@@ -44,9 +44,6 @@ type
     procedure SetViewParent(_viewgroup: jObject); override;
     procedure RemoveFromViewParent(); override;
 
-    procedure SetLParamWidth(_w: integer);
-    procedure SetLParamHeight(_h: integer);
-    procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
@@ -54,8 +51,8 @@ type
     procedure Show(); overload;
     procedure Show(_title: string); overload;
     procedure Show(_title: string; _iconIdentifier: string); overload;
-    function  GetWidth() : integer; overload;
-    function  GetHeight() : integer; overload;
+    function  GetWidth : integer; override;
+    function  GetHeight : integer; override;
     function  GetDialogWidth(): integer;
     function  GetDialogHeight(): integer;
     procedure Close();
@@ -78,32 +75,9 @@ type
   end;
 
 function jCustomDialog_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _showTitle : boolean): jObject;
-procedure jCustomDialog_jFree(env: PJNIEnv; _jcustomdialog: JObject);
-procedure jCustomDialog_SetViewParent(env: PJNIEnv; _jcustomdialog: JObject; _viewgroup: jObject);
-procedure jCustomDialog_RemoveFromViewParent(env: PJNIEnv; _jcustomdialog: JObject);
 
-procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; _jcustomdialog: JObject; _w: integer);
-procedure jCustomDialog_SetLParamHeight(env: PJNIEnv; _jcustomdialog: JObject; _h: integer);
-procedure jCustomDialog_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jcustomdialog: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jCustomDialog_AddLParamsAnchorRule(env: PJNIEnv; _jcustomdialog: JObject; _rule: integer);
-procedure jCustomDialog_AddLParamsParentRule(env: PJNIEnv; _jcustomdialog: JObject; _rule: integer);
-procedure jCustomDialog_SetLayoutAll(env: PJNIEnv; _jcustomdialog: JObject; _idAnchor: integer);
-procedure jCustomDialog_ClearLayoutAll(env: PJNIEnv; _jcustomdialog: JObject);
-procedure jCustomDialog_SetId(env: PJNIEnv; _jcustomdialog: JObject; _id: integer);
-
-procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject);overload;
-procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string);overload;
-procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string; _iconIdentifier: string);overload;
-
-function  jCustomDialog_GetDialogWidth(env: PJNIEnv; _jcustomdialog: JObject): integer;
-function  jCustomDialog_GetDialogHeight(env: PJNIEnv; _jcustomdialog: JObject): integer;
-
-procedure jCustomDialog_SetTitle(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
-procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; _jcustomdialog: JObject; _iconIdentifier: string);
-procedure jCustomDialog_Close(env: PJNIEnv; _jcustomdialog: JObject);
 //procedure jCustomDialog_SetCloseOnBackKeyPressed(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
 //procedure jCustomDialog_SetCanceledOnTouchOutside(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
-procedure jCustomDialog_SetCancelable(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
 
 
 implementation
@@ -163,35 +137,29 @@ begin
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-   jCustomDialog_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jCustomDialog_SetId(FjEnv, FjObject, Self.Id);
-
+   SetViewParent(FjPRLayout);
+   jni_proc_i(FjEnv, FjObject, 'setId', Self.Id);
   end;
 
-  jCustomDialog_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
-
+  jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
+                  FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                  sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
+                  sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-      jCustomDialog_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
-  for rToP := rpBottom to rpCenterVertical do
-  begin
-    if rToP in FPositionRelativeToParent then
-    begin
-      jCustomDialog_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
-    end;
-  end;
-  if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
-  else Self.AnchorId:= -1; //dummy
+      AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
 
-  jCustomDialog_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  for rToP := rpBottom to rpCenterVertical do
+    if rToP in FPositionRelativeToParent then
+      AddLParamsParentRule(GetPositionRelativeToParent(rToP));
+
+  if Self.Anchor <> nil then
+   Self.AnchorId:= Self.Anchor.Id
+  else
+   Self.AnchorId:= -1; //dummy
+
+  SetLayoutAll(Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -209,7 +177,7 @@ begin
    }
 
    if not FCancelable then
-      jCustomDialog_SetCancelable(FjEnv, FjObject, FCancelable);
+      SetCancelable(FCancelable);
 
    View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
   end;
@@ -220,10 +188,10 @@ begin
   Result:= FWidth;
   if not FInitialized then exit;
 
-  if sysIsWidthExactToParent(Self) then
-   Result := sysGetWidthOfParent(FParent)
+  if GetDialogWidth() <> 0 then
+   Result := GetDialogWidth()
   else
-   Result := GetDialogWidth();
+   Result := sysGetWidthOfParent(FParent);
 end;
 
 function jCustomDialog.GetHeight: integer;
@@ -231,10 +199,10 @@ begin
   Result:= FHeight;
   if not FInitialized then exit;
 
-  if sysIsHeightExactToParent(Self) then
-   Result := sysGetHeightOfParent(FParent)
+  if GetDialogHeight() <> 0 then
+   Result := GetDialogHeight()
   else
-   Result := GetDialogHeight();
+   Result := sysGetHeightOfParent(FParent);
 end;
 
 procedure jCustomDialog.SetColor(Value: TARGBColorBridge);
@@ -267,14 +235,14 @@ function jCustomDialog.GetDialogWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCustomDialog_GetDialogWidth(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetDialogWidth');
 end;
 
 function jCustomDialog.GetDialogHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCustomDialog_GetDialogHeight(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetDialogHeight');
 end;
 
 //Event : Java -> Pascal
@@ -292,7 +260,7 @@ procedure jCustomDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jCustomDialog.SetViewParent(_viewgroup: jObject);
@@ -300,57 +268,36 @@ begin
   //in designing component state: set value here...
   //inherited SetViewParent(_viewgroup);
   FjPRLayout:= _viewgroup;
-  if FInitialized then
-     jCustomDialog_SetViewParent(FjEnv, FjObject, _viewgroup);
+  if FjObject <> nil then
+     jni_proc_vig(FjEnv, FjObject, 'SetViewParent', FjPRLayout);
 end;
 
 procedure jCustomDialog.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
-end;
-
-procedure jCustomDialog.SetLParamWidth(_w: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jCustomDialog_SetLParamWidth(FjEnv, FjObject, _w);
-end;
-
-procedure jCustomDialog.SetLParamHeight(_h: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jCustomDialog_SetLParamHeight(FjEnv, FjObject, _h);
-end;
-
-procedure jCustomDialog.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jCustomDialog_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
 end;
 
 procedure jCustomDialog.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jCustomDialog_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
 end;
 
 procedure jCustomDialog.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jCustomDialog_AddLParamsParentRule(FjEnv, FjObject, _rule);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
 end;
 
 procedure jCustomDialog.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jCustomDialog_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
 end;
 
 procedure jCustomDialog.ClearLayout();
@@ -361,15 +308,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jCustomDialog_clearLayoutAll(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ClearLayoutAll');
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jCustomDialog_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          AddLParamsParentRule(GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jCustomDialog_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -380,9 +327,9 @@ begin
   begin
      //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
      if FText <> '' then
-       jCustomDialog_Show(FjEnv, FjObject, FText)
+       jni_proc_t(FjEnv, FjObject, 'Show', FText)
      else
-       jCustomDialog_Show(FjEnv, FjObject);
+       jni_proc(FjEnv, FjObject, 'Show');
   end;
 end;
 
@@ -395,9 +342,9 @@ begin
   begin
      //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
      if FIconIdentifier <> '' then
-        jCustomDialog_Show(FjEnv, FjObject, _title, FIconIdentifier)
+        jni_proc_tt(FjEnv, FjObject, 'Show', _title, FIconIdentifier)
      else
-        jCustomDialog_Show(FjEnv, FjObject, _title)
+        jni_proc_t(FjEnv, FjObject, 'Show', _title)
   end;
 end;
 
@@ -409,7 +356,7 @@ begin
   if FInitialized then
   begin
      //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
-     jCustomDialog_Show(FjEnv, FjObject, _title, _iconIdentifier);
+     jni_proc_tt(FjEnv, FjObject, 'Show', _title, _iconIdentifier);
   end;
 end;
 
@@ -418,21 +365,21 @@ begin
   //in designing component state: set value here...
   inherited SetText(_title);
   if FInitialized then
-    jCustomDialog_SetTitle(FjEnv, FjObject, _title);
+    jni_proc_t(FjEnv, FjObject, 'SetTitle', _title);
 end;
 
 procedure jCustomDialog.SetIconIdentifier(_iconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jCustomDialog_SetIconIdentifier(FjEnv, FjObject, _iconIdentifier);
+    jni_proc_t(FjEnv, FjObject, 'SetIconIdentifier', _iconIdentifier);
 end;
 
 procedure jCustomDialog.Close();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jCustomDialog_Close(FjEnv, FjObject);
+    jni_proc(FjEnv, FjObject, 'Close');
 end;
 
 {
@@ -457,8 +404,9 @@ procedure jCustomDialog.SetCancelable(_value: boolean);
 begin
   //in designing component state: set value here...
   FCancelable:= _value;
-  if FInitialized then
-     jCustomDialog_SetCancelable(FjEnv, FjObject, FCancelable);
+
+  if FjObject <> nil then
+     jni_proc_z(FjEnv, FjObject, 'SetCancelable', FCancelable);
 end;
 
 procedure jCustomDialog.GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);
@@ -498,261 +446,6 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-
-procedure jCustomDialog_jFree(env: PJNIEnv; _jcustomdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jcustomdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_SetViewParent(env: PJNIEnv; _jcustomdialog: JObject; _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_RemoveFromViewParent(env: PJNIEnv; _jcustomdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jcustomdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jCustomDialog_SetLParamWidth(env: PJNIEnv; _jcustomdialog: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_SetLParamHeight(env: PJNIEnv; _jcustomdialog: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jcustomdialog: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_AddLParamsAnchorRule(env: PJNIEnv; _jcustomdialog: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_AddLParamsParentRule(env: PJNIEnv; _jcustomdialog: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_SetLayoutAll(env: PJNIEnv; _jcustomdialog: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_ClearLayoutAll(env: PJNIEnv; _jcustomdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jcustomdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jCustomDialog_SetId(env: PJNIEnv; _jcustomdialog: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'Show', '()V');
-  env^.CallVoidMethod(env, _jcustomdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'Show', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jCustomDialog_Show(env: PJNIEnv; _jcustomdialog: JObject; _title: string; _iconIdentifier: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'Show', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jCustomDialog_GetDialogWidth(env: PJNIEnv; _jcustomdialog: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetDialogWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jcustomdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jCustomDialog_GetDialogHeight(env: PJNIEnv; _jcustomdialog: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetDialogHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jcustomdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jCustomDialog_SetTitle(env: PJNIEnv; _jcustomdialog: JObject; _title: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTitle', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jCustomDialog_SetIconIdentifier(env: PJNIEnv; _jcustomdialog: JObject; _iconIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetIconIdentifier', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jCustomDialog_Close(env: PJNIEnv; _jcustomdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'Close', '()V');
-  env^.CallVoidMethod(env, _jcustomdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 {
 procedure jCustomDialog_SetCloseOnBackKeyPressed(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
 var
@@ -780,18 +473,5 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 }
-
-procedure jCustomDialog_SetCancelable(env: PJNIEnv; _jcustomdialog: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jcustomdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetCancelable', '(Z)V');
-  env^.CallVoidMethodA(env, _jcustomdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 end.
