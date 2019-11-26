@@ -3076,15 +3076,6 @@ begin
     begin
       FVisible := True;
     end;
-    //Show ...
-    if FVisible then
-    begin
-       gApp.TopIndex:= FormIndex;
-       jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
-
-       DoOnShow; //by TR3E
-
-    end;
 
     if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
 
@@ -3095,6 +3086,14 @@ begin
           if Assigned(FOnActivityReCreate) then FOnActivityReCreate(Self);
 
        gapp.IsAppActivityRecreate := false;
+    end;
+
+    //Show ...
+    if FVisible then
+    begin
+       gApp.TopIndex:= FormIndex;
+       jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
+       DoOnShow; //by TR3E
     end;
 
     if DoJNIPromptOnInit then
