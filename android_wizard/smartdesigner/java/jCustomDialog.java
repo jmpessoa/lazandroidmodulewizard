@@ -21,7 +21,7 @@ import android.graphics.Point;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jVisualControl template*/
 
-// Reviewed by TR3E on 08/27/2019
+// Reviewed by TR3E on 11/26/2019
 
 public class jCustomDialog extends RelativeLayout {
 
@@ -43,6 +43,10 @@ public class jCustomDialog extends RelativeLayout {
 	private int marginTop    = 10;
 	private int marginRight  = 10;
 	private int marginBottom = 10;
+	
+	private int mDialogWidth  = 0;
+	private int mDialogHeight = 0;
+	
 	private float lweight = 0;
  //[ifdef_api14up]
  private int lgravity = Gravity.TOP | Gravity.START;
@@ -152,8 +156,8 @@ public class jCustomDialog extends RelativeLayout {
 		marginTop = _top;
 		marginRight = _right;
 		marginBottom = _bottom;
-		lparamH = _h;
-		lparamW = _w;
+		lparamH = _h;		
+		lparamW = _w;		
 	}
 
 	public void AddLParamsAnchorRule(int _rule) {
@@ -308,6 +312,8 @@ public class jCustomDialog extends RelativeLayout {
 		        @Override
 		        public void onShow(DialogInterface d) {
 		        			            
+		        	updateWH();
+		        	
 		        	controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
 		        	
 		        	// Change the size and update the layout                
@@ -317,21 +323,25 @@ public class jCustomDialog extends RelativeLayout {
 		    });
 						
 			mDialog.show();					
-						
-			
+									
 		}
+	}
+	
+	private void updateWH(){
+		mDialogWidth  = this.getWidth();
+    	mDialogHeight = this.getHeight();
 	}
 	
 	public int GetDialogWidth(){
 		if (mDialog == null) return 0;
 	 
-		return this.getWidth();
+		return mDialogWidth;
 	}
 	
 	public int GetDialogHeight(){
 		if (mDialog == null) return 0;
 		
-		return this.getHeight();
+		return mDialogHeight;
 	}
 
 	public void SetTitle(String _title) {

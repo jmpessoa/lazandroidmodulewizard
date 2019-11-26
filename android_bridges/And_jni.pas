@@ -572,6 +572,7 @@ procedure jni_proc_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int
 procedure jni_proc_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: int64);
 procedure jni_proc_iiiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2, _int3, _int4, _int5, _int6: integer);
 procedure jni_proc_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string);
+procedure jni_proc_tt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string);
 procedure jni_proc_ttz(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string; _bool : boolean);
 procedure jni_proc_vig(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _viewgroup: jObject);
 procedure jni_proc_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bool: boolean);
@@ -788,6 +789,25 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jni_proc_tt(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                      _str1, _str2: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l := env^.NewStringUTF(env, PChar(_str1));
+  jParams[1].l := env^.NewStringUTF(env, PChar(_str2));
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
