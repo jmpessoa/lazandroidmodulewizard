@@ -2560,6 +2560,12 @@ begin
 
   Form.UpdateJNI(gApp);
 
+  if Assigned(Form.OnBackButton) then
+  begin
+    // Form.ShowMessage('Back Pressed: OnBackButton: '+ IntTostr(gApp.TopIndex));
+    Form.OnBackButton(Form);
+  end;
+
   // Event : OnCloseQuery
   if Assigned(Form.OnCloseQuery)  then
   begin
@@ -2568,11 +2574,7 @@ begin
     Form.OnCloseQuery(Form, canClose);
     if canClose = False then Exit;
   end;
-  if Assigned(Form.OnBackButton) then
-  begin
-    // Form.ShowMessage('Back Pressed: OnBackButton: '+ IntTostr(gApp.TopIndex));
-     Form.OnBackButton(Form);
-  end;
+
   Form.Close;
 end;
 
