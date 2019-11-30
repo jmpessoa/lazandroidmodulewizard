@@ -140,7 +140,7 @@ public class jHorizontalScrollView extends HorizontalScrollView {
 	public void setLayoutAll(int idAnchor) {
 		LAMWCommon.setLayoutAll(idAnchor);
 		//
-		scrollxywh.width = LAMWCommon.getLParamHeight(); //lparamW;
+		scrollxywh.height = LAMWCommon.getLParamHeight(); //lparams.height;
 		scrollview.setLayoutParams(scrollxywh);
 	}
 
