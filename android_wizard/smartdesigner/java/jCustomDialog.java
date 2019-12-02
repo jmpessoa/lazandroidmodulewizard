@@ -93,6 +93,9 @@ public class jCustomDialog extends RelativeLayout {
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 	   	super.onSizeChanged(w, h, oldw, oldh);
 	   	
+	   	mDialogWidth  = w;
+    	mDialogHeight = h;
+	   	
 	   	// Change the size and update the layout               	   	
 	   	controls.jAppOnUpdateLayout();
 	}
