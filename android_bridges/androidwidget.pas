@@ -2460,7 +2460,7 @@ end;
 
 procedure TAndroidWidget.SetName(const NewName: TComponentName);
 begin
-  if (csDesigning in ComponentState) then
+  if [csDesigning, csLoading] * ComponentState = [csDesigning] then
     if Name = FText then FText:= NewName;
 
   inherited SetName(NewName);
