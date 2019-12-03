@@ -680,7 +680,7 @@ class jForm {
 		return this.onListItemClickListener;
 	}
 
-	public int getSystemVersion() {
+	public int GetSystemVersion() {
 		return controls.systemVersion;
 	}
 
@@ -1776,17 +1776,17 @@ class jForm {
 	}
 
 	//by TR3E
-	public int getScreenWidth() {
-		return layout.getWidth();
+	public int GetScreenWidth() {
+		return controls.appLayout..getWidth();
 	}
 
 	//by TR3E
-	public int getScreenHeight() {
-		return layout.getHeight();
+	public int GetScreenHeight() {
+		return controls.appLayout..getHeight();
 	}
 
 	//by TR3E
-	public String getSystemVersionString() {
+	public String GetSystemVersionString() {
 		return android.os.Build.VERSION.RELEASE;
 	}
 

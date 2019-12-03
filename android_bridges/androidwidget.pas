@@ -1843,9 +1843,6 @@ procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _android
 function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
 function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
 
-function jForm_getScreenWidth(env: PJNIEnv; _jform: JObject): integer;
-function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
-function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
 procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string); overload;
 procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string; _scaleType : integer); overload;
 procedure jForm_SetBackgroundImageMatrix(env: PJNIEnv; _jform: JObject;
@@ -1893,7 +1890,6 @@ Function jSysInfo_Language (env:PJNIEnv; this: jobject; localeType: TLocaleType)
 
 Function  jSysInfo_PathDataBase             (env:PJNIEnv;this:jobject;context : jObject) : String;
 // Device Info
-function jSysInfo_GetSystemVersion(env: PJNIEnv; _jform: JObject) : Integer;
 Function  jSysInfo_DevicePhoneNumber   (env:PJNIEnv;this:jobject) : String;
 Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
 
@@ -3799,7 +3795,7 @@ end;
 function jForm.GetSystemVersion: Integer;
 begin
   if(FInitialized) then
-    Result:= jSysInfo_GetSystemVersion(FjEnv, FjObject);
+    Result:= jni_func_out_i(FjEnv, FjObject, 'GetSystemVersion');
 end;
 
 function jForm.GetDevicePhoneNumber: String;
@@ -4445,21 +4441,21 @@ function jForm.GetScreenWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_getScreenWidth(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenWidth');
 end;
 
 function jForm.GetScreenHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_getScreenHeight(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenHeight');
 end;
 
 function jForm.GetSystemVersionString(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetSystemVersionString(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetSystemVersionString');
 end;
 
 function jForm.GetDateTimeDecode(
@@ -6265,50 +6261,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'IsAppCompatProject', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_getScreenWidth(env: PJNIEnv; _jform: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'getScreenWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_getScreenHeight(env: PJNIEnv; _jform: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'getScreenHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_getSystemVersionString(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'getSystemVersionString', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -8539,17 +8491,6 @@ end;
 //------------------------------------------------------------------------------
 // Device Info
 //------------------------------------------------------------------------------
-function jSysInfo_GetSystemVersion(env: PJNIEnv; _jform: JObject) : Integer;
-  var
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jform);
-  jMethod := env^.GetMethodID(env, jCls, 'getSystemVersion', '()I');
-  Result := env^.CallIntMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 Function  jSysInfo_DevicePhoneNumber(env:PJNIEnv;this:jobject) : String;
  Const
   _cFuncName = 'getDevPhoneNumber';
