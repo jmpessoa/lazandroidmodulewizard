@@ -680,7 +680,7 @@ class jForm {
 		return this.onListItemClickListener;
 	}
 
-	public int getSystemVersion() {
+	public int GetSystemVersion() {
 		return controls.systemVersion;
 	}
 
@@ -1245,18 +1245,18 @@ class jForm {
 		}
 	}
 
+	// ssPortrait  = 1, //Portrait
+	// ssLandscape = 2, //LandScape
+	// ssUnknown   = 3
+
 	public int GetScreenOrientation() {
-		int orientation = controls.activity.getResources().getConfiguration().orientation;
-		int r = 0;
-		switch (orientation) {
-			case Configuration.ORIENTATION_PORTRAIT:
-				r = 1;//setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-				break;
-			case Configuration.ORIENTATION_LANDSCAPE:
-				r = 2; //setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-				break;
-		}
-		return r;
+		    
+		   int r = 3; // ssUnknown
+		    
+		   if( controls.screenWidth <= controls.screenHeight ) r = 1; // Portrait
+		   if( controls.screenWidth >  controls.screenHeight ) r = 2; // LandScape
+		  
+	       return r; 
 	}
 
 	public String GetScreenDensity() {
@@ -1776,17 +1776,17 @@ class jForm {
 	}
 
 	//by TR3E
-	public int getScreenWidth() {
-		return layout.getWidth();
+	public int GetScreenWidth() {
+		return controls.appLayout..getWidth();
 	}
 
 	//by TR3E
-	public int getScreenHeight() {
-		return layout.getHeight();
+	public int GetScreenHeight() {
+		return controls.appLayout..getHeight();
 	}
 
 	//by TR3E
-	public String getSystemVersionString() {
+	public String GetSystemVersionString() {
 		return android.os.Build.VERSION.RELEASE;
 	}
 

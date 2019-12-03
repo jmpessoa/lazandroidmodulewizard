@@ -84,6 +84,12 @@ public class App extends AppCompatActivity {
             	rlSizeChanged = false;
             	
             	controls.formNeedLayout = true;
+            	
+            	//ssPortrait  = 1, //Force Portrait
+                //ssLandscape = 2, //Force LandScape
+            	if( controls.screenWidth < controls.screenHeight ) screenOrientation = 1;
+            	if( controls.screenWidth > controls.screenHeight ) screenOrientation = 2;
+            	
             	controls.jAppOnRotate(screenOrientation);            	                        	
             }
             
