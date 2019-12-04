@@ -3759,24 +3759,17 @@ begin
     begin
 
         if FImage.Width > Self.Width then
-          FMinWidth:= Self.Width
+           FMinWidth:= Self.Width
         else
-          FMinWidth:= FImage.Width;
+           FMinWidth:= FImage.Width;
 
-        aspectratio:= FImage.Width/FImage.Height;
-        adjustedheight:= Trunc(FMinWidth/aspectratio);
+        aspectratio    := FImage.Width/FImage.Height;
+        adjustedheight := Trunc(FMinWidth/aspectratio);
 
-        if adjustedheight < 200 then
-           FMinHeight:= adjustedheight
-        else
-           FMinHeight:= 200;
+        FMinHeight:= adjustedheight;
 
-        //FMinWidth:= Min(FMinWidth,FImage.Width) + 8;
-        //FMinHeight:= Min(FMinHeight,FImage.Height) + 8;
-
-        if FMinWidth < 72 then FMinWidth:= 72;
-        if FMinHeight < 72 then FMinHeight:= 72;
-
+        if FMinWidth < 32 then FMinWidth:= 32;
+        if FMinHeight < 32 then FMinHeight:= 32;
 
     end;
   end;
