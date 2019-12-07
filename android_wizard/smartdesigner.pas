@@ -444,6 +444,7 @@ begin
            if IsAllCharNumber(PChar(numberAsString))  then
            begin
                builderNumber:=  StrToInt(numberAsString);
+
                if savedBuilder < builderNumber then
                begin
                  savedBuilder:= builderNumber;
@@ -452,9 +453,11 @@ begin
 
                if platform = builderNumber then
                begin
-                 outBuildTool:= auxStr; //19.1.0
+                 FCandidateSdkBuild:= auxStr;
                  Result:= True;
                end;
+
+               outBuildTool:= FCandidateSdkBuild; //19.1.0
            end;
          end;
        end;
@@ -469,10 +472,11 @@ var
   tempOutBuildTool: string;
 begin
   Result:= '';
-  if HasBuildTools(sdkApi, tempOutBuildTool) then
+  if not HasBuildTools(sdkApi, tempOutBuildTool) then
   begin
-     Result:= tempOutBuildTool;  //26.0.2
+     ShowMessage('Warning: Android "sdk\build-tools" not installed for Api ' + IntToStr(sdkApi));
   end;
+  Result:= tempOutBuildTool;  //26.0.2
 end;
 
 function TLamwSmartDesigner.GetPluginVersion(buildTool: string): string;
@@ -729,6 +733,7 @@ begin
   end;
 
   sdkManifestTarqet:= GetTargetFromManifest();
+
   if sdkManifestTarqet <> '' then
   begin
        strList.Clear;
@@ -833,9 +838,7 @@ begin
   begin
     if buildTool <> '' then
     begin
-
        buildToolApi:= Copy(buildTool,1,2);   //26.0.2  --> 26
-
        if IsAllCharNumber(PChar(buildToolApi))  then
        begin
          if StrToInt(buildToolApi) >= 25 then
@@ -851,7 +854,6 @@ begin
 
        if pluginVersion <> '' then
        begin
-
          //gradleCompatible:= TryGradleCompatibility(pluginVersion, FGradleVersion);
          outgradleCompatible:= '';
          gradleCompatible:= FGradleVersion;
@@ -1060,7 +1062,6 @@ begin
          end;
          strList.Add('//how to use: look for "gradle_readme.txt"');
          strList.SaveToFile(FPathToAndroidProject+'build.gradle');
-
        end;
     end;
 
@@ -1369,6 +1370,7 @@ begin
       else manifestTargetApi:= 28;
 
       buildTool:=  GetBuildTool(manifestTargetApi);
+
       if manifestTargetApi < 28 then
       begin
          queryValue:= '28';
@@ -1393,9 +1395,13 @@ begin
       begin
         outMaxBuildTool:= FCandidateSdkBuild;
         if not LamwGlobalSettings.KeepManifestTargetApi  then
+        begin
            buildTool:= outMaxBuildTool
+        end
         else
+        begin
            buildTool:= GetBuildTool(manifestTargetApi);
+        end
       end;
 
       KeepBuildUpdated(manifestTargetApi, buildTool);
