@@ -67,6 +67,14 @@ jsNavigationView = class(jVisualControl)
     procedure SetSubtitleTextColor(_color: integer);
     procedure SetTitleTextColor(_color: integer);
 
+    procedure SetTitleTextSize(_textSize: integer);
+    procedure SetTitleSizeDecorated(_sizeDecorated: TTextSizeDecorated);
+    procedure SetTitleSizeDecoratedGap(_textSizeGap: single);  //default = 3
+    procedure AddHeaderView(_color: integer; _bitmapLogo: jObject; _text: string; _height: integer);overload;
+    procedure AddHeaderView(_drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);overload;
+    procedure SetLogoPosition(_logoPosition: TPositionRelativeToParent); //default = rpCenterInParent
+
+
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
@@ -112,6 +120,12 @@ procedure jsNavigationView_SetSubtitleTextColor(env: PJNIEnv; _jsnavigationview:
 procedure jsNavigationView_SetTitleTextColor(env: PJNIEnv; _jsnavigationview: JObject; _color: integer);
 procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _drawableBackgroundIdentifier: string; _drawableLogoIdentifier: string; _text: string; _height: integer); overload;
 
+procedure jsNavigationView_SetTitleTextSize(env: PJNIEnv; _jsnavigationview: JObject; _textSize: integer);
+procedure jsNavigationView_SetTitleSizeDecorated(env: PJNIEnv; _jsnavigationview: JObject; _sizeDecorated: integer);
+procedure jsNavigationView_SetTitleSizeDecoratedGap(env: PJNIEnv; _jsnavigationview: JObject; _textSizeGap: single);
+procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _color: integer; _bitmapLogo: jObject; _text: string; _height: integer);overload;
+procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);overload;
+procedure jsNavigationView_SetLogoPosition(env: PJNIEnv; _jsnavigationview: JObject; _logoPosition: integer);
 
 implementation
 
@@ -514,6 +528,48 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jsNavigationView_AddHeaderView(FjEnv, FjObject, _drawableBackgroundIdentifier ,_drawableLogoIdentifier ,_text ,_height);
+end;
+
+procedure jsNavigationView.SetTitleTextSize(_textSize: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_SetTitleTextSize(FjEnv, FjObject, _textSize);
+end;
+
+procedure jsNavigationView.SetTitleSizeDecorated(_sizeDecorated: TTextSizeDecorated);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_SetTitleSizeDecorated(FjEnv, FjObject, Ord(_sizeDecorated) );
+end;
+
+procedure jsNavigationView.SetTitleSizeDecoratedGap(_textSizeGap: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_SetTitleSizeDecoratedGap(FjEnv, FjObject, _textSizeGap);
+end;
+
+procedure jsNavigationView.AddHeaderView(_color: integer; _bitmapLogo: jObject; _text: string; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_AddHeaderView(FjEnv, FjObject, _color ,_bitmapLogo ,_text ,_height);
+end;
+
+procedure jsNavigationView.AddHeaderView(_drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_AddHeaderView(FjEnv, FjObject, _drawableBackgroundIdentifier ,_bitmapLogo ,_text ,_height);
+end;
+
+procedure jsNavigationView.SetLogoPosition(_logoPosition: TPositionRelativeToParent);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_SetLogoPosition(FjEnv, FjObject, GetPositionRelativeToParent(_logoPosition) );
 end;
 
 {-------- jsNavigationView_JNI_Bridge ----------}
@@ -1043,5 +1099,95 @@ begin
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jsNavigationView_SetTitleTextSize(env: PJNIEnv; _jsnavigationview: JObject; _textSize: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _textSize;
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTitleTextSize', '(I)V');
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jsNavigationView_SetTitleSizeDecorated(env: PJNIEnv; _jsnavigationview: JObject; _sizeDecorated: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _sizeDecorated;
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTitleSizeDecorated', '(I)V');
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jsNavigationView_SetTitleSizeDecoratedGap(env: PJNIEnv; _jsnavigationview: JObject; _textSizeGap: single);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].f:= _textSizeGap;
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTitleSizeDecoratedGap', '(F)V');
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _color: integer; _bitmapLogo: jObject; _text: string; _height: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jParams[1].l:= _bitmapLogo;
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[3].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddHeaderView', '(ILandroid/graphics/Bitmap;Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_drawableBackgroundIdentifier));
+  jParams[1].l:= _bitmapLogo;
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[3].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  jMethod:= env^.GetMethodID(env, jCls, 'AddHeaderView', '(Ljava/lang/String;Landroid/graphics/Bitmap;Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jsNavigationView_SetLogoPosition(env: PJNIEnv; _jsnavigationview: JObject; _logoPosition: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _logoPosition;
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLogoPosition', '(I)V');
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.
