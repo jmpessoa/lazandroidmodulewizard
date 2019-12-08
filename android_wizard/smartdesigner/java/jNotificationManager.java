@@ -1,7 +1,10 @@
 package com.example.appnotificationmanagerdemo1;
 
 import java.lang.reflect.Field;
+import java.util.Random;
+
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -40,17 +43,42 @@ public class jNotificationManager /*extends ...*/ {
 	
 	private int mPriority = Notification.PRIORITY_HIGH; //Notification.PRIORITY_DEFAULT;   //Notification.PRIORITY_LOW; //Notification.PRIORITY_HIGH;
 	private int mVisibility = 0;
-    
+
+    int NOTIFICATION_ID = 234;
+
+    String cannal_id = "my_lamw_channel_01";
+    CharSequence name = "my_lamw_channel";
+    //String Description = "This is my lamw channel";
+    int importance = NotificationManager.IMPORTANCE_HIGH;
+
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jNotificationManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
        //super(_ctrls.activity);
        context   = _ctrls.activity;
        pascalObj = _Self;
        controls  = _ctrls;
-       
-       mNotificationManager = (NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);       
-       mNotificationBuilder = new Notification.Builder(controls.activity);  //need API >= 11 !!
-              
+
+        Random random = new Random();
+        int randomInteger = random.nextInt(11000);
+        cannal_id =  "cannal_" + String.valueOf(randomInteger);
+
+        String packageName = this.controls.activity.getPackageName();
+        name = cannal_id + "_" + packageName;
+
+        mNotificationManager = (NotificationManager)controls.activity.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        //https://stackoverflow.com/questions/45711925/failed-to-post-notification-on-channel-null-target-api-is-26
+        //[ifdef_api26up]
+        if(Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel mChannel = new NotificationChannel(cannal_id, name, importance);
+            mChannel.enableLights(true);
+            mNotificationManager.createNotificationChannel(mChannel);
+            mNotificationBuilder = new Notification.Builder(controls.activity, cannal_id);
+        }//[endif_api26up]
+
+        if(Build.VERSION.SDK_INT < 26)
+           mNotificationBuilder = new Notification.Builder(controls.activity);  //need API >= 11 !!
+
     }
   
     public void jFree() {
@@ -111,8 +139,11 @@ public class jNotificationManager /*extends ...*/ {
     	        //mNotificationManager.notify(mId, mNotification);    	            
     	     }
 
-    	     if ( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) && (Build.VERSION.SDK_INT < 21) ) {    	    	 	   	    	  	    	   
-    	      	 mNotification =  mNotificationBuilder.build();
+    	     if ( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) && (Build.VERSION.SDK_INT < 21) ) {
+                 //[ifdef_api16up]
+                 if(Build.VERSION.SDK_INT >= 16)
+                     mNotification =  mNotificationBuilder.build();
+                 //[endif_api16up]
     	     }  //https://www.laurivan.com/android-make-your-notification-sticky/
     	       
     	   //[ifdef_api21up]
@@ -124,7 +155,7 @@ public class jNotificationManager /*extends ...*/ {
     	      	    //mNotificationBuilder.setVibrate(new long[] {1, 1, 1});
     	      	 }       	      	
     	     }	 
-    	     //[endif_api17up]
+    	     //[endif_api21up]
     	     
     	     mNotificationManager.notify(mId, mNotification);    	    
             
@@ -253,16 +284,27 @@ public class jNotificationManager /*extends ...*/ {
      mNotificationBuilder.setLights(mColor, mLightOn, mLightOff); //thanks to freris
      mNotificationBuilder.setAutoCancel(mAutoCancel);
      mNotificationBuilder.setOngoing(mOngoing);
-     
-     mNotificationBuilder.setPriority(mPriority);//https://stackoverflow.com/questions/26451893/heads-up-notification-android-lollipop
-     
+
+       //[ifdef_api26up]
+       if(Build.VERSION.SDK_INT >= 26)
+           mNotificationBuilder.setChannelId(cannal_id);
+       //[endif_api26up]
+
+           //[ifdef_api16up]
+       if(Build.VERSION.SDK_INT >= 16)
+          mNotificationBuilder.setPriority(mPriority);//https://stackoverflow.com/questions/26451893/heads-up-notification-android-lollipop
+       //[endif_api16up]
+
      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN ) {
  	   mNotification =   mNotificationBuilder.getNotification(); 	    	   
        //mNotificationManager.notify(mId, mNotification);    	            
      }
 
-     if ( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) && (Build.VERSION.SDK_INT < 21) ) {    	    	 	   	    	  	    	   
-    	 mNotification =  mNotificationBuilder.build();
+     if ( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) && (Build.VERSION.SDK_INT < 21) ) {
+         //[ifdef_api16up]
+         if(Build.VERSION.SDK_INT >= 16)
+            mNotification =  mNotificationBuilder.build();
+         //[endif_api16up]
      }  //https://www.laurivan.com/android-make-your-notification-sticky/
      
    //[ifdef_api21up]
