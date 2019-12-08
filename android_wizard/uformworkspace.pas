@@ -62,6 +62,7 @@ type
     procedure ListBoxMinSDKChange(Sender: TObject);
     procedure ListBoxNdkPlatformChange(Sender: TObject);
     procedure ListBoxTargetAPIChange(Sender: TObject);
+    procedure ListBoxTargetAPICloseUp(Sender: TObject);
     procedure RGInstructionClick(Sender: TObject);
 
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
@@ -335,6 +336,7 @@ begin
      13: Result:= 'Oreo 8.0'; // Api(26)
      14: Result:= 'Oreo 8.1'; // Api(27)
      15: Result:= 'Pie 9.0'; // Api(28)
+     16: Result:= 'Android 10'; // Api(29)
    end;
 end;
 
@@ -389,12 +391,17 @@ begin
     if intTarqetApi  < 28 then
        ShowMessage('Warning: remember that "google play" store NOW equires Target Api >= 28 !');
 
-    if (intTarqetApi> 28) and ( Pos('AppCompat', FAndroidTheme) > 0) then
+    if (intTarqetApi > 28) and ( Pos('AppCompat', ComboBoxTheme.Text) > 0) then
     begin
        FTargetApi:= '28'; //LAMW dont support AndroidX, yet!
     end;
 
   end;
+end;
+
+procedure TFormWorkspace.ListBoxTargetAPICloseUp(Sender: TObject);
+begin
+  ShowMessage('AppCompat theme need Target Api = 28'+ sLineBreak + '[android-sdk/platforms/android-28]');
 end;
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
@@ -560,7 +567,7 @@ begin
 
   apiTarg:= StrToInt(FTargetApi);
 
-  if (apiTarg> 28) and ( Pos('AppCompat', FAndroidTheme) > 0) then
+  if (apiTarg > 28) and ( Pos('AppCompat', ComboBoxTheme.Text) > 0) then
   begin
      FTargetApi:= '28'; //LAMW dont support AndroidX, yet!
   end;
@@ -1150,7 +1157,7 @@ end;
 
 procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
 var
-  index: integer;
+  index, intTargetApi: integer;
 begin
 
   if Pos('GDXGame', ComboBoxTheme.Text) > 0 then
@@ -1172,7 +1179,7 @@ begin
                sLineBreak+
                sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
                sLineBreak+' 1. Java JDK 1.8'+
-               sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
+               sLineBreak+' 2. Gradle 5.4.1 [https://gradle.org/next-steps/?version=5.4.1&format=bin]' +
                sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
                sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
                sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
@@ -1188,7 +1195,28 @@ begin
 
     end;
 
-    if Pos('Gradle',cbBuildSystem.Items.Text) > 0 then
+    if Pos('Gradle',cbBuildSystem.Items.Text) > 0 then //Apk system builder...
+    begin
+      index:= cbBuildSystem.Items.IndexOf('Gradle');
+      cbBuildSystem.ItemIndex:= index;
+      cbBuildSystem.Text:= 'Gradle';
+      cbBuildSystemCloseUp(Self);
+    end;
+
+    intTargetApi:= StrToInt(ListBoxTargetAPI.Text);
+
+    if intTargetApi > 28 then
+    begin
+       if Pos('28',ListBoxTargetAPI.Items.Text) > 0 then
+       begin
+          index:= ListBoxTargetAPI.Items.IndexOf('28');
+          ListBoxTargetAPI.ItemIndex:= index;
+          ListBoxTargetAPI.Text:= '28';
+          ListBoxTargetAPICloseUp(Self);
+       end;
+    end;
+
+    if Pos('Gradle',cbBuildSystem.Items.Text) > 0 then //Apk system builder...
     begin
       index:= cbBuildSystem.Items.IndexOf('Gradle');
       cbBuildSystem.ItemIndex:= index;
@@ -1311,7 +1339,8 @@ begin
              begin
                if HasBuildTools(intApi, outBuildTool) then
                begin
-                  ListBoxTargetAPI.Items.Add(strApi);
+                  //if intApi <= 28 then //LAMW dont support AndroidX [yet]
+                    ListBoxTargetAPI.Items.Add(strApi);
                end;
              end;
          end;
@@ -1322,7 +1351,8 @@ begin
     begin
       ListBoxTargetAPI.ItemIndex:= ListBoxTargetAPI.Items.Count - 1;
       FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-    end else ShowMessage('Fail! Folder '+ IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms is empty!');
+    end
+      else ShowMessage('Fail! Folder '+ IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms is empty!');
 
   end else ShowMessage('Fail! Folder '+ IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms is empty!');
   lisDir.free;

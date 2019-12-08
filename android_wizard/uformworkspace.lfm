@@ -1798,6 +1798,7 @@ object FormWorkspace: TFormWorkspace
         Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 20
         OnChange = ListBoxTargetAPIChange
+        OnCloseUp = ListBoxTargetAPICloseUp
         Style = csDropDownList
         TabOrder = 0
       end

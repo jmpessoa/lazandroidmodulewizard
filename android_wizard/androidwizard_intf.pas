@@ -2360,7 +2360,15 @@ begin
                if Pos('AppCompat', FAndroidTheme) > 0 then
                begin
 
-                  if compileSdkVersion = '28'  then
+                  if compileSdkVersion = '29'  then
+                  begin
+                      compileSdkVersion:= '28';
+                      compatVer:= '28.0.0';
+                      designVer:= '28.0.0';
+                      cardVer:= '28.0.0';
+                      recyclerVer:= '28.0.0';
+                  end
+                  else if compileSdkVersion = '28'  then
                   begin
                      compatVer:= '28.0.0';
                      designVer:= '28.0.0';

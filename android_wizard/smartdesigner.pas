@@ -914,7 +914,15 @@ begin
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin
 
-           if buildToolApi = '28'  then
+           if buildToolApi = '29'  then
+           begin
+              buildToolApi:= '28';
+              compatVer:= '28.0.0';
+              designVer:= '28.0.0';
+              cardVer:= '28.0.0';
+              recyclerVer:= '28.0.0';
+           end
+           else if buildToolApi = '28'  then
            begin
               compatVer:= '28.0.0';
               designVer:= '28.0.0';
