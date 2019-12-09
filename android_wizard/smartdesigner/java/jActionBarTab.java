@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 /*Draft java code by "Lazarus Android Module Wizard"*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -83,10 +84,12 @@ public class jActionBarTab {
 	private ActionBar.Tab CreateTab(String title, View v) {	  	
 	  ActionBar actionBar = this.controls.activity.getActionBar();
 	  ActionBar.Tab tab = actionBar.newTab();           
-	  tab.setText(title); //
+	  tab.setText(title);
+
 	  if (mCountTab != 0) {
 	     v.setVisibility(View.INVISIBLE);
-	  }   
+	  }
+
 	  TabContentFragment content = new TabContentFragment();
 	  content.setTabContentFragment(v, title);
 
@@ -111,12 +114,17 @@ public class jActionBarTab {
 	  	  actionBar.addTab(tab, false);  	    	 
 	}
 
-	public void Add(String _title, View _panel, View _customTabView){
-		  ActionBar.Tab tab = CreateTab(_title, _panel);
-		  _customTabView.setVisibility(View.VISIBLE); 
-		  tab.setCustomView(_customTabView);	//This overrides values set by setText(CharSequence) and setIcon(Drawable).	  
-		  ActionBar actionBar = this.controls.activity.getActionBar();
-		  actionBar.addTab(tab, false);	  
+	public void Add(String _title, View _panel, View _customTabView){ //BUG!!!
+		 ActionBar.Tab tab = CreateTab(_title, _panel);
+
+		  _customTabView.setVisibility(View.VISIBLE);
+		//ViewGroup parent = (ViewGroup)_customTabView.getParent();
+		//if (parent != null) parent.removeView(_customTabView);
+		//tab.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId("ic_launcher"))); //dummy
+		tab.setCustomView(_customTabView);	//This overrides values set by setText(CharSequence) and setIcon(Drawable).
+
+		ActionBar actionBar = this.controls.activity.getActionBar();
+		actionBar.addTab(tab, false);
 	}
 
 	public void SetTabNavigationMode(){
@@ -146,13 +154,17 @@ public class jActionBarTab {
 	
 	public Tab GetTabAtIndex(int _index){
 		ActionBar actionBar = this.controls.activity.getActionBar();
-		actionBar.setSelectedNavigationItem(_index);
-		return actionBar.getTabAt(_index); 
+		if (_index < actionBar.getTabCount()) {
+			actionBar.setSelectedNavigationItem(_index);
+			return actionBar.getTabAt(_index);
+		}
+		else return null;
 	}
 		
 	public void SelectTabByIndex(int _index){
 		ActionBar actionBar = this.controls.activity.getActionBar();
-		actionBar.setSelectedNavigationItem(_index);		 
+		if (_index < actionBar.getTabCount())
+	    	actionBar.setSelectedNavigationItem(_index);
 	}
 	
 }

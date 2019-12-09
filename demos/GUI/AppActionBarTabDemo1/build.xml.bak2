@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="AppActionBarTabDemo1" default="help">
-<property name="sdk.dir" location="C:\android\sdk\"/>
-<property name="target" value="android-28"/>
+<property name="sdk.dir" location="C:\adt32\sdk\"/>
+<property name="target" value="android-26"/>
 <property file="ant.properties"/>
 <fail message="sdk.dir is missing." unless="sdk.dir"/>
 
@@ -28,8 +28,8 @@
 <property name="api24" value="true"/>
 <property name="api25" value="true"/>
 <property name="api26" value="true"/>
-<property name="api27" value="true"/>
-<property name="api28" value="true"/>
+<property name="api27" value="false"/>
+<property name="api28" value="false"/>
 
 <!-- API conditions, do not modify -->
 <condition property="ifdef_api10up" value="/*">

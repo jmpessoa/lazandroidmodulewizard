@@ -1,6 +1,6 @@
 package com.example.appactionbartabdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8.2.2  - 6 October - 2018
+//Lamw: Lazarus Android Module Wizard - version 0.8.4 - 12 March - 2019
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -36,10 +36,71 @@ import android.view.WindowManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.content.Context;
+import android.graphics.Canvas;
 
 public class App extends Activity {
     
     private Controls       controls;
+    
+    private int screenOrientation = 0; //For udapte screen orientation. [by TR3E]
+    private boolean rlSizeChanged = false;
+    
+    //New "RelativeLayout" adapted to "Multiwindow" and automatic resizing. [by TR3E]
+    public class RLAppLayout extends RelativeLayout {
+    	
+    	public RLAppLayout(Context context) {
+            super(context);
+        }             
+
+        @Override
+        protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        	super.onSizeChanged(w, h, oldw, oldh);
+        	
+        	// We update the size before being drawn       
+            if ((controls.screenWidth != 0) && (controls.screenHeight != 0)){            	
+            	controls.screenWidth  = w;
+            	controls.screenHeight = h;
+            	rlSizeChanged = true;            	
+            }
+                        
+        }
+        
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+                        
+            //If this is the first time it is drawn, change the size and call "jOnCreate"
+            //to start the application. Allows a perfect fit of all components.
+            if ((controls.screenWidth == 0) || (controls.screenHeight == 0)){
+            	controls.screenWidth  = controls.appLayout.getWidth();
+            	controls.screenHeight = controls.appLayout.getHeight();
+            	controls.jAppOnCreate(controls.activity, controls.appLayout, controls.activity.getIntent());
+            	return;
+            }
+            
+            // If change size call "jAppOnRotate" for update screen. [by TR3E]
+            if( controls.formChangeSize || rlSizeChanged ){            	
+            	controls.formChangeSize = false;
+            	rlSizeChanged = false;
+            	
+            	controls.formNeedLayout = true;
+            	
+            	//ssPortrait  = 1, //Force Portrait
+                //ssLandscape = 2, //Force LandScape
+            	if( controls.screenWidth < controls.screenHeight ) screenOrientation = 1;
+            	if( controls.screenWidth > controls.screenHeight ) screenOrientation = 2;
+            	
+            	controls.jAppOnRotate(screenOrientation);
+            }
+            
+            // Call updatelayout automatically if necessary. [by TR3E]
+            if( controls.formNeedLayout ){
+            	controls.formNeedLayout = false;
+                controls.jAppOnUpdateLayout();
+            }
+        }
+    }
 	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,25 +116,25 @@ public class App extends Activity {
       //Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();
       controls.activity    = this; 
-      controls.appLayout   = new RelativeLayout(this);
+      //New "RelativeLayout" adapted to "Multiwindows" and automatic resizing. [by TR3E]
+      controls.appLayout   = new RLAppLayout(this);
       controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);
+      
       controls.screenStyle = controls.jAppOnScreenStyle();
       controls.systemVersion = systemVersion;
+      
       switch( controls.screenStyle ) {
       	case 1  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );  break;
       	case 2  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  break;
       	default : ; // Device Default , Rotation by Device
-      } 	
+      }
+      
       this.setContentView(controls.appLayout);
+      
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-               
-      // Event : Java -> Pascal
-      //Log.i("jApp","02.Controls.jAppOnCreate");
-      //Bundle extras = getIntent().getExtras();      
       
-      controls.jAppOnCreate(this, controls.appLayout, getIntent());
-      
-      //Log.i("jApp","03.Controls.jAppOnCreate");
+      // Force updating the screen would need for Android 8 or higher [by TR3E]
+      controls.appLayout.requestLayout();                 
     }
 
    //[ifdef_api23up]
@@ -103,7 +164,7 @@ public class App extends Activity {
     protected void onRestart() {super.onRestart(); controls.jAppOnRestart();}
                                     	                                        
     @Override
-    protected void onResume() { super.onResume(); controls.jAppOnResume();}  
+    protected void onResume() { super.onResume(); controls.jAppOnResume(); }
     	                                        
     @Override
     protected void onStart() { super.onStart(); controls.jAppOnStart(); }
@@ -117,8 +178,8 @@ public class App extends Activity {
     @Override
     public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
-    	controls.jAppOnRotate(newConfig.orientation);
-    	//controls.jAppOnConfigurationChanged();
+    	screenOrientation = newConfig.orientation;
+    	controls.appLayout.requestLayout();
     }	   	
  
     @Override
@@ -176,7 +237,7 @@ public boolean onOptionsItemSelected(MenuItem item) {
    /*by jmpessoa: TODO :Handles prepare menu item*/
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
-       //super.onPrepareOptionsMenu(menu);        
+               
 	   boolean changeMenuItems = false;
 	   boolean continueChangingItem = true;
 	   	   

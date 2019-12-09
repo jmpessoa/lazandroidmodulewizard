@@ -1,4 +1,3 @@
-//TabContentFragment.java
 package com.example.appactionbartabdemo1;
 
 //relational: jActionBarTab.java
@@ -10,10 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-
-/*Draft java code by "Lazarus Android Module Wizard"*/
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jControl template*/
 
 public class TabContentFragment extends Fragment {
     private View mView;

@@ -7,6 +7,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.View.MeasureSpec;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -41,17 +42,21 @@ public class jCommons {
  /* //[endif_api14up]
  private int lgravity = Gravity.TOP | Gravity.LEFT;
  //[ifdef_api14up] */
-	private float lweight = 0;
+	private float lweight = 1.0f;
 	private boolean mRemovedFromParent = false;
 	private int algravity;
 	private int algravityAnchorId;
+	
+	private android.content.Context context;
 
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
 		aOwnerView = _view;       // set owner
 		PasObj   = _pasobj; 	//Connect Pascal I/F						
 		lgravity = Gravity.NO_GRAVITY;
 		algravity = Gravity.NO_GRAVITY;
-                algravityAnchorId = -1;
+        algravityAnchorId = -1;
+                
+        context = _context;
 
 		if (aOwnerView != null) {
 			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
@@ -161,18 +166,46 @@ public class jCommons {
 	}
 		
 	public int getLParamHeight() {
-		int r = lparamH;		
+		int r = lparamH;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getHeight();
-		}		
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;				
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		    			
+			r = aOwnerView.getMeasuredHeight();
+		}
+		
+		//Fix the "match_parent" error with an "anchor" and 
+		// within the component a "half_parent" is set
+		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {
+			if( aOwnerView.getHeight() > 0 ) r = aOwnerView.getHeight();			
+		}
+		
 		return r;
 	}
 
 	public int getLParamWidth() {				
-		int r = lparamW;		
+		int r = lparamW;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getWidth();		
-		}				
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		   			
+			r = aOwnerView.getMeasuredWidth();		
+		}
+		
+		//Fix the "match_parent" error with an "anchor" and 
+		// within the component a "half_parent" is set
+		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {  
+			if( aOwnerView.getWidth() > 0 ) r = aOwnerView.getWidth(); 
+		}
+		
 		return r;		
 	}	
 	
@@ -278,11 +311,12 @@ public class jCommons {
 			}			
 		}        
  		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
+          		((FrameLayout.LayoutParams)lparams).gravity = lgravity;
 		}
  		
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
+		if (lparams instanceof LinearLayout.LayoutParams) { //.weight
+                        ((LinearLayout.LayoutParams)lparams).weight = lweight; //lweight = 1 <-- the trick!!
+			((LinearLayout.LayoutParams)lparams).gravity = lgravity; //lweight;
 		}
 		
 		if (aOwnerView != null) { aOwnerView.setLayoutParams(lparams); }

@@ -208,30 +208,17 @@ public class jButton extends Button {
 		this.performLongClick();
 	}
 
-	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null; // by tr3e
-		
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-
-	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));			
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource( controls.GetDrawableResourceId(_imgResIdentifier) );			
 	}	
 	
-	public  void SetBackgroundByImage(Bitmap _image) {	
+	public  void SetBackgroundByImage(Bitmap _image) {
+	  if(_image == null) return;
+	  
 	  Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+	  
+	  if( d == null ) return;
+	  
       //[ifdef_api16up]
 	  if(Build.VERSION.SDK_INT >= 16) 
           this.setBackground(d);
@@ -265,11 +252,8 @@ public class jButton extends Button {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
 		
-		if( id == 0 ) return; // by tr3e
-		
-		Drawable d = GetDrawableResourceById(id);
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
 		if( d == null ) return; // by tr3e
 		
@@ -414,5 +398,14 @@ public class jButton extends Button {
    */
    public void SetFrameGravity(int _value) {	   
       LAMWCommon.setLGravity(_value);
+   }
+   
+   public void SetAllCaps(boolean allCaps)
+   {
+	   this.setAllCaps(allCaps);
+   }
+
+   public void SetFocus() {
+   	  this.requestFocus();
    }
 }

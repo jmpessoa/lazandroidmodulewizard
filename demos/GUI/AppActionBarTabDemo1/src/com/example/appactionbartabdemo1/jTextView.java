@@ -9,6 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.RadialGradient;
@@ -23,6 +26,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
 //import android.text.util.Linkify;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -108,7 +112,7 @@ public class jTextView extends TextView {
 
 	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		String tag = ""+left+"|"+top+"|"+right+"|"+bottom;
-	    this.setTag(tag);
+	    this.setTag(tag); ////nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 		
@@ -270,22 +274,6 @@ public class jTextView extends TextView {
 	    if (!mEnabled) this.setEnabled(false); 
 	}
 	
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 		int h = d.getIntrinsicHeight(); 
@@ -301,8 +289,11 @@ public class jTextView extends TextView {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		if( d == null ) return;
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -476,8 +467,24 @@ public class jTextView extends TextView {
 		LAMWCommon.WrapParent();		
 	}		
 	
-	public void SetContentDescription(String _description) {		
-		this.setContentDescription(_description);
+	public void SetContentDescription(String _description) {
+	    this.setContentDescription(_description);
 	}
-	
+
+	public void SetScrollingMovement() {  //TODO Pascal
+		this.setMovementMethod(new ScrollingMovementMethod());
+	}
+
+	public void SetAllCaps(boolean _value) {
+		this.setAllCaps(_value);
+	}
+
+	public void SetTextAsHtml(String _htmlText) {
+		//[ifdef_api24up]
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+			this.setText(Html.fromHtml(_htmlText, Html.FROM_HTML_MODE_LEGACY));
+		}else //[endif_api24up]
+			this.setText(Html.fromHtml(_htmlText)); //Html.fromHtml("5x<sup>2</sup>")
+	}
+
 }

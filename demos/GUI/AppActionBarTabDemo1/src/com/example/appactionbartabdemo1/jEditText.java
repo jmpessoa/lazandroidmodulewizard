@@ -1,6 +1,7 @@
 package com.example.appactionbartabdemo1;
 
 import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -34,6 +35,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
 import android.view.Gravity;
+import android.widget.TextView;
+
+//Reviewed by TR3E on 08/20/2019
 
 public class jEditText extends EditText {
 	//Pascal Interface
@@ -51,6 +55,7 @@ public class jEditText extends EditText {
 	private boolean canDispatchChangedEvent = false;
 	private boolean mFlagSuggestion = false;
 	private boolean mFlagCapSentence = false;
+	private boolean mFlagCaptureBackPressed = false; // by tr3e
 
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
@@ -93,24 +98,62 @@ public class jEditText extends EditText {
 			};
 		};
 		setOnClickListener(onClickListener);
-
+		
+		// Fixed "Go / Next / Done / Ok" command capture [by TR3E]
+		setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			        @Override
+			        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+			            if (actionId != 0) {
+			            	final EditText caption = (EditText)v;
+						    
+			            	if (mCloseSoftInputOnEnter) {
+								InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+								imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							}
+						    
+							if (!caption.getText().toString().equals("")){  //try fix program logic...
+								controls.pOnEnter(LAMWCommon.getPasObj());							
+							}
+											    
+			                return true;
+			            } else {
+			                return false;
+			            }
+			        }
+	     });
+		
 		onKeyListener = new OnKeyListener() {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
-				//if (event.getAction() == KeyEvent.ACTION_UP) {
-					if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok						
+				
+				    final EditText caption = (EditText)v;
+				    
+				    // by tr3e fix back_key close app
+				    if( mFlagCaptureBackPressed && (event.getAction() == KeyEvent.ACTION_DOWN) &&
+					   	(KeyEvent.KEYCODE_BACK == keyCode) )
+				    {			            
+				    	InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						controls.pOnBackPressed(LAMWCommon.getPasObj());
+						return true;
+			        }
+				    					
+				    if( (event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
 						if (mCloseSoftInputOnEnter) {
 							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 						}
-						controls.pOnEnter(LAMWCommon.getPasObj());
+						if (! caption.getText().toString().equals("")){  //try fix program logic...
+						 controls.pOnEnter(LAMWCommon.getPasObj());
+						}
 						return mCloseSoftInputOnEnter;
 					}
-				//}
+				
 				return false;
 			}
 		};
 
 		setOnKeyListener(onKeyListener);
+		
 		//Event
 		textwatcher = new TextWatcher() {
 			@Override
@@ -278,7 +321,9 @@ public class jEditText extends EditText {
 
 	public  void InputMethodShow() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+		//Repaired forever show the "softInput" by TR3E
+		this.requestFocus();
+		imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
 	}
 
 
@@ -402,6 +447,11 @@ public class jEditText extends EditText {
 	public void SetCapSentence(boolean _value) {
 		mFlagCapSentence = _value;
 	}
+	
+	// by tr3e
+	public void SetCaptureBackPressed(boolean _value) {
+		mFlagCaptureBackPressed = _value;
+	}
 
 	public void CopyToClipboard() {
 		mClipData = ClipData.newPlainText("text", this.getText().toString());
@@ -439,6 +489,11 @@ public class jEditText extends EditText {
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
 	}
+	
+	//by TR3E
+	public void SetSelection(int _value){
+		this.setSelection(_value);
+	}
 
 	public void SetSelectAllOnFocus(boolean _value){
 		this.setSelectAllOnFocus(_value);
@@ -446,32 +501,18 @@ public class jEditText extends EditText {
 
 	public void SelectAll() {
 		this.selectAll();
-	}
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null; // by tr3e
-		
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
 	}	
 	
-	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));
+	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource(controls.GetDrawableResourceId(_imgResIdentifier));
 	}		
 
-	public void SetBackgroundByImage(Bitmap _image) {	
+	public void SetBackgroundByImage(Bitmap _image) {
+		if( _image == null ) return;
+		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		if( d == null ) return;
 //[ifdef_api16up]
 	if(Build.VERSION.SDK_INT >= 16) 
              this.setBackground(d);
@@ -502,13 +543,10 @@ public class jEditText extends EditText {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
 		
-		if( id == 0 ) return; // by tr3e
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
-		Drawable d = GetDrawableResourceById(id);  		
-		
-		if( d == null ) return; // by tr3e
+		if( d == null ) return;
 		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
@@ -633,6 +671,6 @@ public class jEditText extends EditText {
 		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
 		     }
     }
-	   
+
 }
 

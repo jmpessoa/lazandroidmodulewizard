@@ -5,7 +5,14 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.0'
+    }
+}
+allprojects {
+    repositories {
+       google()
+       jcenter()
+       maven { url 'https://jitpack.io' }
     }
 }
 apply plugin: 'com.android.application'
@@ -13,10 +20,10 @@ android {
     lintOptions {
        abortOnError false
     }
-    compileSdkVersion 27
+    compileSdkVersion 29
     defaultConfig {
             minSdkVersion 14
-            targetSdkVersion 26
+            targetSdkVersion 28
             versionCode 1
             versionName "1.0"
     }
@@ -37,6 +44,7 @@ android {
     }
 }
 dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
  
 task run(type: Exec, dependsOn: ':installDebug') {
@@ -47,7 +55,7 @@ task run(type: Exec, dependsOn: ':installDebug') {
 	}
 }
  
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.4.1'
+wrapper {
+    gradleVersion = '5.4.1'
 }
 //how to use: look for "gradle_readme.txt"
