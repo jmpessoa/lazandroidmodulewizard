@@ -43,8 +43,9 @@ public class App extends Activity {
     
     private Controls       controls;
     
-    private int screenOrientation = 0; //For udapte screen orientation. [by TR3E]
+    private int screenOrientation = 0;     //For update screen orientation. [by TR3E]
     private boolean rlSizeChanged = false;
+    private boolean appCreate     = false; //Fixed event error before creating app [by TR3E]
     
     //New "RelativeLayout" adapted to "Multiwindow" and automatic resizing. [by TR3E]
     public class RLAppLayout extends RelativeLayout {
@@ -76,6 +77,7 @@ public class App extends Activity {
             	controls.screenWidth  = controls.appLayout.getWidth();
             	controls.screenHeight = controls.appLayout.getHeight();
             	controls.jAppOnCreate(controls.activity, controls.appLayout, controls.activity.getIntent());
+            	appCreate = true;
             	return;
             }
             
@@ -104,7 +106,9 @@ public class App extends Activity {
 	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
-     super.onCreate(savedInstanceState);                            
+     super.onCreate(savedInstanceState);
+     
+     appCreate = false;
      
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
      int systemVersion = android.os.Build.VERSION.SDK_INT; 
@@ -140,6 +144,9 @@ public class App extends Activity {
    //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+    	
+    	if( !appCreate ) return;
+    	
         if ( (permissions.length > 0) && (grantResults.length > 0) ) {
             for (int i = 0; i < permissions.length; i++) {
                 controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[i], grantResults[i]);
@@ -151,40 +158,46 @@ public class App extends Activity {
     protected void onNewIntent(Intent intent) {
     	super.onNewIntent(intent);
     	//Bundle extras = intent.getExtras();    	
-    	//if (extras != null) Log.i("onNewIntent",  extras.getString("data"));    	
-    	controls.jAppOnNewIntent(intent);}
+    	//if (extras != null) Log.i("onNewIntent",  extras.getString("data"));
+    	
+    	if(appCreate)
+    	 controls.jAppOnNewIntent(intent);}
     
     @Override
-    protected void onDestroy() { super.onDestroy(); controls.jAppOnDestroy();}
+    protected void onDestroy() { super.onDestroy(); if(appCreate) controls.jAppOnDestroy();}
     
     @Override
-    protected void onPause() {super.onPause();  controls.jAppOnPause();}
+    protected void onPause() {super.onPause(); if(appCreate) controls.jAppOnPause();}
     
     @Override
-    protected void onRestart() {super.onRestart(); controls.jAppOnRestart();}
+    protected void onRestart() {super.onRestart(); if(appCreate) controls.jAppOnRestart();}
                                     	                                        
     @Override
-    protected void onResume() { super.onResume(); controls.jAppOnResume(); }
+    protected void onResume() { super.onResume(); if(appCreate) controls.jAppOnResume(); }
     	                                        
     @Override
-    protected void onStart() { super.onStart(); controls.jAppOnStart(); }
+    protected void onStart() { super.onStart(); if(appCreate) controls.jAppOnStart(); }
                                                   	                                        
     @Override
-    protected void onStop() { super.onStop(); controls.jAppOnStop();} 
+    protected void onStop() { super.onStop(); if(appCreate) controls.jAppOnStop();} 
     	                                        
     @Override
-    public    void onBackPressed() { controls.jAppOnBackPressed();}
+    public    void onBackPressed() { if(appCreate) controls.jAppOnBackPressed();}
     
     @Override
     public    void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
     	screenOrientation = newConfig.orientation;
-    	controls.appLayout.requestLayout();
+    	
+    	if(appCreate)
+    	 controls.appLayout.requestLayout();
     }	   	
  
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-      controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
+    
+      if(appCreate) 	
+       controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
     }
 
    /*by jmpessoa: Handles menu item selections */
@@ -198,6 +211,8 @@ public class App extends Activity {
 // http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar
 @Override
 public boolean onOptionsItemSelected(MenuItem item) {
+	if(!appCreate) return false;
+		
     switch (item.getItemId()) {
         case android.R.id.home:
             // app icon in action bar clicked; go home
@@ -216,12 +231,16 @@ public boolean onOptionsItemSelected(MenuItem item) {
    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
       super.onCreateContextMenu(menu, v, menuInfo);
       //Log.i("App.Java_onCreateContextMenu", "long_pressed!");
-      controls.jAppOnCreateContextMenu(menu);              
+      
+      if(appCreate)
+       controls.jAppOnCreateContextMenu(menu);              
    }
 
    /*by jmpessoa: Handles menu item selections*/
    @Override    
    public boolean onContextItemSelected(MenuItem item) {
+	  if(!appCreate) return false;
+	   
    	  String caption = item.getTitle().toString();
    	  controls.jAppOnClickContextMenuItem(item, item.getItemId(), caption, item.isChecked());
       return true; // stop propagating event
@@ -230,6 +249,8 @@ public boolean onOptionsItemSelected(MenuItem item) {
    //by jmpessoa: option menu support
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
+	    if(!appCreate) return false;
+	    
 	    controls.jAppOnCreateOptionsMenu(menu);
         return true;
    }   
@@ -237,7 +258,8 @@ public boolean onOptionsItemSelected(MenuItem item) {
    /*by jmpessoa: TODO :Handles prepare menu item*/
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
-               
+	   if(!appCreate) return false;
+	   
 	   boolean changeMenuItems = false;
 	   boolean continueChangingItem = true;
 	   	   
@@ -267,7 +289,9 @@ public boolean onOptionsItemSelected(MenuItem item) {
    //or false to indicate that you have not handled this event and it should continue to be propagated.  
    
    @Override
-   public boolean onKeyDown(int keyCode, KeyEvent event) {	   
+   public boolean onKeyDown(int keyCode, KeyEvent event) {
+	  if(!appCreate) return false;
+	   
 	  char c = event.getDisplayLabel();	        
 	  //boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));  //TODO
       //if (mute) return false;	  
