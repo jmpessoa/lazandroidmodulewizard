@@ -1609,9 +1609,9 @@ begin
   jControls.Duplicates := dupIgnore;
 
   if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0  then
-    jControls.Add('jForm')
+    jControls.Add('jGdxForm')
   else
-    jControls.Add('jGdxForm');
+    jControls.Add('jForm');
 
   for i := 0 to AndroidForm.ComponentCount - 1 do
   begin
