@@ -553,7 +553,7 @@ type
                     itxPhone,
                     itxNumberPassword,
                     itxTextPassword,
-                    itxMultiLine);
+                    itxMultiLine, itxNull);
 
   //http://www.semurjengkol.com/android-relative-layout-example/#sthash.JdHGbyti.dpuf
   TPositionRelativeToAnchorID = ( raAbove,
@@ -6699,6 +6699,7 @@ Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
    itxNumberPassword : Result := 'PASSNUMBER';
    itxTextPassword   : Result := 'PASSTEXT';
    itxMultiLine  : Result := 'TEXTMULTILINE';
+   itxNull  : Result := 'NULL';  //thanks to jjhofman
   end;
  end;
 

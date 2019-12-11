@@ -1,4 +1,4 @@
-package org.lamw.appcompatnavigationdrawerdemo1;
+package org.lamw.applearnlanguagesbylistening;
 
 import java.io.BufferedReader;
 
@@ -272,7 +272,9 @@ public class jEditText extends EditText {
 		else if (str.equals("TEXTMULTILINE")){
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		}
-
+		else if (str.equals("NULL")){
+			this.setInputType(InputType.TYPE_NULL);
+		}
 		else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
 
 		if (!mFlagSuggestion) {
