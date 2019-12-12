@@ -1776,13 +1776,23 @@ class jForm {
 	}
 
 	//by TR3E
-	public int GetScreenWidth() {
-		return controls.appLayout.getWidth();
+	public int GetScreenWidth( ){
+			int w = controls.appLayout.getWidth();
+			
+			if( w <= 0 )
+				w = controls.screenWidth;
+			
+			return w;
 	}
-
+		
 	//by TR3E
-	public int GetScreenHeight() {
-		return controls.appLayout.getHeight();
+	public int GetScreenHeight( ){
+			int h = controls.appLayout.getHeight();
+			
+			if( h <= 0 )
+				h = controls.screenHeight;
+			
+			return h;
 	}
 
 	//by TR3E

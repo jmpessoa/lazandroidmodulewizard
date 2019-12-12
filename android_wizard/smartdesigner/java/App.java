@@ -41,11 +41,10 @@ import android.graphics.Canvas;
 
 public class App extends Activity {
     
-    private Controls       controls;
+private Controls       controls;
     
-    private int screenOrientation = 0;     //For update screen orientation. [by TR3E]
+    private int screenOrientation = 0; //For update screen orientation. [by TR3E]
     private boolean rlSizeChanged = false;
-    private boolean appCreate     = false; //Fixed event error before creating app [by TR3E]
     
     //New "RelativeLayout" adapted to "Multiwindow" and automatic resizing. [by TR3E]
     public class RLAppLayout extends RelativeLayout {
@@ -57,9 +56,8 @@ public class App extends Activity {
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         	super.onSizeChanged(w, h, oldw, oldh);
-        	
-        	// We update the size before being drawn       
-            if ((controls.screenWidth != 0) && (controls.screenHeight != 0)){            	
+        	        	      
+            if ((controls.screenWidth != w) || (controls.screenHeight != h)){            	
             	controls.screenWidth  = w;
             	controls.screenHeight = h;
             	rlSizeChanged = true;            	
@@ -69,17 +67,7 @@ public class App extends Activity {
         
         @Override
         protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-                        
-            //If this is the first time it is drawn, change the size and call "jOnCreate"
-            //to start the application. Allows a perfect fit of all components.
-            if ((controls.screenWidth == 0) || (controls.screenHeight == 0)){
-            	controls.screenWidth  = controls.appLayout.getWidth();
-            	controls.screenHeight = controls.appLayout.getHeight();
-            	controls.jAppOnCreate(controls.activity, controls.appLayout, controls.activity.getIntent());
-            	appCreate = true;
-            	return;
-            }
+            super.onDraw(canvas);                                    
             
             // If change size call "jAppOnRotate" for update screen. [by TR3E]
             if( controls.formChangeSize || rlSizeChanged ){            	
@@ -106,9 +94,7 @@ public class App extends Activity {
 	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
-     super.onCreate(savedInstanceState);
-     
-     appCreate = false;
+     super.onCreate(savedInstanceState);          
      
       //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
      int systemVersion = android.os.Build.VERSION.SDK_INT; 
@@ -119,7 +105,11 @@ public class App extends Activity {
      
       //Log.i("jApp","01.Activity.onCreate");
       controls             = new Controls();
-      controls.activity    = this; 
+      controls.activity    = this;
+      
+      controls.screenWidth  = getResources().getDisplayMetrics().widthPixels;
+      controls.screenHeight = getResources().getDisplayMetrics().heightPixels;
+      
       //New "RelativeLayout" adapted to "Multiwindows" and automatic resizing. [by TR3E]
       controls.appLayout   = new RLAppLayout(this);
       controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);
@@ -137,6 +127,8 @@ public class App extends Activity {
       
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
       
+      controls.jAppOnCreate(this, controls.appLayout, getIntent());
+      
       // Force updating the screen would need for Android 8 or higher [by TR3E]
       controls.appLayout.requestLayout();                 
     }
@@ -144,8 +136,6 @@ public class App extends Activity {
    //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
-    	
-    	if( !appCreate ) return;
     	
         if ( (permissions.length > 0) && (grantResults.length > 0) ) {
             for (int i = 0; i < permissions.length; i++) {
@@ -160,86 +150,70 @@ public class App extends Activity {
     	//Bundle extras = intent.getExtras();    	
     	//if (extras != null) Log.i("onNewIntent",  extras.getString("data"));
     	
-    	if(appCreate)
-    	 controls.jAppOnNewIntent(intent);}
+    	controls.jAppOnNewIntent(intent);}
     
     @Override
-    protected void onDestroy() { super.onDestroy(); if(appCreate) controls.jAppOnDestroy();}
+    protected void onDestroy() { super.onDestroy(); controls.jAppOnDestroy();}
     
     @Override
-    protected void onPause() {super.onPause(); if(appCreate) controls.jAppOnPause();}
+    protected void onPause() {super.onPause(); controls.jAppOnPause();}
     
     @Override
-    protected void onRestart() {super.onRestart(); if(appCreate) controls.jAppOnRestart();}
+    protected void onRestart() {super.onRestart(); controls.jAppOnRestart();}
                                     	                                        
     @Override
-    protected void onResume() { super.onResume(); if(appCreate) controls.jAppOnResume(); }
+    protected void onResume() { super.onResume(); controls.jAppOnResume(); }
     	                                        
     @Override
-    protected void onStart() { super.onStart(); if(appCreate) controls.jAppOnStart(); }
+    protected void onStart() { super.onStart(); controls.jAppOnStart(); }
                                                   	                                        
     @Override
-    protected void onStop() { super.onStop(); if(appCreate) controls.jAppOnStop();} 
+    protected void onStop() { super.onStop(); controls.jAppOnStop();} 
     	                                        
     @Override
-    public    void onBackPressed() { if(appCreate) controls.jAppOnBackPressed();}
+    public    void onBackPressed() { controls.jAppOnBackPressed();}
     
     @Override
     public    void onConfigurationChanged(Configuration newConfig) {
-    	super.onConfigurationChanged(newConfig);
+    	super.onConfigurationChanged(newConfig);    
+    	
     	screenOrientation = newConfig.orientation;
     	
-    	if(appCreate)
-    	 controls.appLayout.requestLayout();
+    	controls.appLayout.requestLayout();
     }	   	
  
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    
-      if(appCreate) 	
-       controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
+     controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
     }
 
-   /*by jmpessoa: Handles menu item selections */
-/*	@Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-      String caption = item.getTitle().toString();
-      controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption, item.isChecked());
-      return false;
-   }
-*/
-// http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar
-@Override
-public boolean onOptionsItemSelected(MenuItem item) {
-	if(!appCreate) return false;
-		
-    switch (item.getItemId()) {
+    // http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+	 switch (item.getItemId()) {
         case android.R.id.home:
             // app icon in action bar clicked; go home
 	    controls.jAppOnBackPressed();
             return true;
         default:
 		String caption = item.getTitle().toString();
-		controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption,
-				item.isChecked());
+		controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption, item.isChecked());
 		return true; //renabor
-    }
-}
+     }
+   }
 
- //by jmpessoa: context menu support -  Context menu items do not support icons!
+   //by jmpessoa: context menu support -  Context menu items do not support icons!
    @Override    
    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
       super.onCreateContextMenu(menu, v, menuInfo);
       //Log.i("App.Java_onCreateContextMenu", "long_pressed!");
       
-      if(appCreate)
-       controls.jAppOnCreateContextMenu(menu);              
+      controls.jAppOnCreateContextMenu(menu);              
    }
 
    /*by jmpessoa: Handles menu item selections*/
    @Override    
    public boolean onContextItemSelected(MenuItem item) {
-	  if(!appCreate) return false;
 	   
    	  String caption = item.getTitle().toString();
    	  controls.jAppOnClickContextMenuItem(item, item.getItemId(), caption, item.isChecked());
@@ -249,7 +223,6 @@ public boolean onOptionsItemSelected(MenuItem item) {
    //by jmpessoa: option menu support
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
-	    if(!appCreate) return false;
 	    
 	    controls.jAppOnCreateOptionsMenu(menu);
         return true;
@@ -258,8 +231,7 @@ public boolean onOptionsItemSelected(MenuItem item) {
    /*by jmpessoa: TODO :Handles prepare menu item*/
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
-	   if(!appCreate) return false;
-	   
+	           
 	   boolean changeMenuItems = false;
 	   boolean continueChangingItem = true;
 	   	   
@@ -276,7 +248,7 @@ public boolean onOptionsItemSelected(MenuItem item) {
    }
    
    /*by jmpessoa: TODO :Handles opened menu */
-   @Override     
+  @Override     
    public boolean onMenuOpened(int featureId, Menu menu) {
 	   //TODO!!!!
      return super.onMenuOpened(featureId, menu);
@@ -290,7 +262,6 @@ public boolean onOptionsItemSelected(MenuItem item) {
    
    @Override
    public boolean onKeyDown(int keyCode, KeyEvent event) {
-	  if(!appCreate) return false;
 	   
 	  char c = event.getDisplayLabel();	        
 	  //boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));  //TODO
