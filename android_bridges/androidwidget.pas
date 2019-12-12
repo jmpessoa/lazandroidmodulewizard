@@ -6554,16 +6554,13 @@ procedure jApp.CreateForm(InstanceClass: TComponentClass; out Reference);
 var
   Instance: TComponent;
 begin
-  if (TComponent(Reference) <> nil) then TComponent(Reference).Destroy;
 
-  Instance := TComponent(InstanceClass.NewInstance);
+  Instance              := TComponent(InstanceClass.NewInstance);
+  TComponent(Reference) := Instance;
 
   if Instance <> nil then
-  begin
-    TComponent(Reference) := Instance;
-    Instance.Create(Self);
-  end else
-    TComponent(Reference) := nil;
+   Instance.Create(Self);
+   
 end;
 
 function jApp.GetCurrentFormsIndex: integer;
