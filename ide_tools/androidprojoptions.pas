@@ -1207,7 +1207,7 @@ begin
            begin
              LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'x86'+PathDelim+'libcontrols';
              LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_x86.txt', 2);
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'x86';
+             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'i386';
              LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_x86.txt', 0);
            end;
          end;
