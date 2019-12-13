@@ -182,6 +182,10 @@ type
      Procedure UpdateLayout; override;
      procedure Init(refApp: jApp);  override;
 
+     function GetTop: integer;    // By TR3E
+     function GetLeft: integer;   // By TR3E
+     function GetBottom: integer; // By TR3E
+     function GetRight: integer;  // By TR3E
      function GetWidth: integer;  override;
      function GetHeight: integer; override;
 
@@ -13047,6 +13051,42 @@ begin
    begin
      //
    end;
+end;
+
+// By TR3E
+function jPanel.GetTop: integer;
+begin
+  Result:= 0;
+  if not FInitialized then exit;
+
+  Result:= jni_func_out_i(FjEnv, FjObject, 'getTop' );
+end;
+
+// By TR3E
+function jPanel.GetLeft: integer;
+begin
+  Result:= 0;
+  if not FInitialized then exit;
+
+  Result:= jni_func_out_i(FjEnv, FjObject, 'getLeft' );
+end;
+
+// By TR3E
+function jPanel.GetBottom: integer;
+begin
+  Result:= 0;
+  if not FInitialized then exit;
+
+  Result:= jni_func_out_i(FjEnv, FjObject, 'getBottom' );
+end;
+
+// By TR3E
+function jPanel.GetRight: integer;
+begin
+  Result:= 0;
+  if not FInitialized then exit;
+
+  Result:= jni_func_out_i(FjEnv, FjObject, 'getRight' );
 end;
 
 function jPanel.GetWidth: integer;
