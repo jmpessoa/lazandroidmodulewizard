@@ -1310,6 +1310,7 @@ type
     function GetDriverList(): TDynArrayOfString;
     function GetFolderList(_envPath: string): TDynArrayOfString;
     function GetFileList(_envPath: string): TDynArrayOfString;
+    function ToStringList(_dynArrayOfString: TDynArrayOfString; _delimiter: char): TStringList;
 
     function FileExists(_fullFileName: string): boolean;
     function DirectoryExists(_fullDirectoryName: string): boolean;
@@ -4241,6 +4242,23 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetFileList(FjEnv, FjObject, _envPath);
+end;
+
+function jForm.ToStringList(_dynArrayOfString: TDynArrayOfString; _delimiter: char): TStringList;
+var
+  count, i: integer;
+  resList: TStringList;
+begin
+   resList:= TStringList.Create;
+   resList.Delimiter:= _delimiter;
+   resList.StrictDelimiter:= True;
+   count:= Length(_dynArrayOfString);
+   for i:= 0 to  count-1 do
+   begin
+      if _dynArrayOfString[i] <> '' then
+        resList.Add(_dynArrayOfString[i]);
+   end;
+   Result:= resList;
 end;
 
 function jForm.FileExists(_fullFileName: string): boolean;

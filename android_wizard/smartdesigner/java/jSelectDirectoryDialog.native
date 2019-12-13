@@ -1,0 +1,1 @@
+public native void pOnDirectorySelected(long pasobj, String path);

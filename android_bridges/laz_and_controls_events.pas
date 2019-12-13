@@ -235,6 +235,8 @@ uses
    procedure Java_Event_pOnBluetoothSPPListeningNewAutoConnection(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString);
    procedure Java_Event_pOnBluetoothSPPAutoConnectionStarted(env:PJNIEnv;this:JObject;Sender:TObject);
 
+   procedure Java_Event_pOnDirectorySelected(env:PJNIEnv;this:JObject;Sender:TObject;path:jString);
+
 implementation
 
 uses
@@ -248,7 +250,7 @@ uses
    stablayout, treelistview, customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
-   ftpclient, cbluetoothspp;
+   ftpclient, cbluetoothspp, selectdirectorydialog;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2763,6 +2765,17 @@ begin
   begin
     jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
     jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPAutoConnectionStarted(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnDirectorySelected(env:PJNIEnv;this:JObject;Sender:TObject;path:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jSelectDirectoryDialog then
+  begin
+    jForm(jSelectDirectoryDialog(Sender).Owner).UpdateJNI(gApp);
+    jSelectDirectoryDialog(Sender).GenEvent_OnDirectorySelected(Sender,GetString(env,path));
   end;
 end;
 

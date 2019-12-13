@@ -10,6 +10,7 @@ uses
 type
 
 TOnFileSelected = procedure(Sender: TObject; path: string; fileName: string) of Object;
+
 {Draft Component code by "Lazarus Android Module Wizard" [1/27/2017 22:26:55]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 

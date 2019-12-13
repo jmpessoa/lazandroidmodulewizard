@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  selectdirectorydialog,
   ftpclient,
   sftpclient,
   brightness,
@@ -83,6 +84,7 @@ begin
   {$I jtexttospeech_icon.lrs}
   {$I jmaps_icon.lrs}
   {$I jwindowmanager_icon.lrs}
+  {$I jselectdirectorydialog_icon.lrs}
   {$I jopendialog_icon.lrs}
   {$I jfileprovider_icon.lrs}
   {$I judpsocket_icon.lrs}
@@ -145,6 +147,7 @@ begin
       jTextToSpeech,
       jMaps,
       jWindowManager,
+      jSelectDirectoryDialog,
       jOpenDialog,
       jFileProvider,
       jUDPSocket,
