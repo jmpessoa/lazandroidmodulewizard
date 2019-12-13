@@ -58,8 +58,8 @@ type
     procedure TryChangeDemoProjecPaths;
     procedure TryFindDemoPathsFromReadme(out pathToDemoNDK, pathToDemoSDK: string);
 
-    function IsChipSetDefault(var projectChipSet: string): boolean;
-    procedure TryChangeChipSetConfigs(projectChipSet: string);
+    //function IsChipSetDefault(var projectChipSet: string): boolean;
+    //procedure TryChangeChipSetConfigs(projectChipSet: string);
 
     function GetTargetFromManifest(): string;
     function GetMinSDKFromManifest(): string;
@@ -1469,7 +1469,7 @@ begin          //C:\adt32\sdk\tools\ant
   end;
 end;
 
-procedure TLamwSmartDesigner.TryChangeChipSetConfigs(projectChipSet: string);
+(*procedure TLamwSmartDesigner.TryChangeChipSetConfigs(projectChipSet: string);
 var
   customResult: string;
   libTarget: string;
@@ -1559,9 +1559,9 @@ begin
     end;
   end;
 
-end;
+end; *)
 
-function TLamwSmartDesigner.IsChipSetDefault(var projectChipSet: string): boolean;
+(*function TLamwSmartDesigner.IsChipSetDefault(var projectChipSet: string): boolean;
 var
   projectTarget: string;
 begin
@@ -1593,7 +1593,7 @@ begin
      Result:= True
   else
      Result:= False;
-end;
+end; *)
 
 procedure TLamwSmartDesigner.UpdateJControls(ProjFile: TLazProjectFile;
   AndroidForm: TAndroidForm);
