@@ -2971,16 +2971,17 @@ procedure jForm.Init(refApp: jApp);
 var
   i: integer;
 begin
-  if FInitialized  then Exit;
   if refApp = nil then Exit;
   if not refApp.Initialized then Exit;
+
+  // For Reinit if calling 2 times or more [need split-screen] by TR3E
+  if FInitialized then begin Reinit(refApp); Exit; end;
 
   Inherited Init(refApp);
 
   //gdx
   if not (csDesigning in ComponentState) then
     if Assigned(FOnInit) then FOnInit(Self);    //by TRE3
-
 
   if FActivityMode <> actEasel then
   begin
