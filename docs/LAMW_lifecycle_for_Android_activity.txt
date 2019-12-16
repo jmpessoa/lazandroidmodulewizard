@@ -5,28 +5,22 @@
  | ----------------------------------- |
  ---------------------------------------
 
- ReCreate   ------------
- Activity   | Activity |
- |--------->|  Create  |
- |          ------------
+ ReCreate  ------------------------------
+ Activity  | Activity                   |
+ |-------->|  Create  OnActivityCreate()|
+ |         ------------------------------
+ |               |
+ |              \|/
+ |         OnActivityReCreate() // Only main or splash module call this, if recreate activity
  |               |
  |              \|/
  | |------>OnActivityResume()
  | |             |
  | |            \|/  
- | |	   App Visible
- | |      ----------------------
- | |      | OnActivityCreate()   // When app is visible call this for perfect ajust to screen 
- | |      |      |
- | |      |     \|/  
- | |      | OnActivityReCreate() // Only main or splash module call this, if recreate activity
- | |      |      |
- | |      |     \|/
- | |      |  OnJNIPromt()
- | |      |      |
- | |      |     \|/
- | |      | ....Run LAMW App
- | |      ----------------------
+ | |	   When the application is visible, automatic "updatelayout" of the main form
+ | |       ----------------------
+ | |       | ....Run LAMW App   |
+ | |       ----------------------
  | |             |
  | |            \|/
  | |-------OnPause()
