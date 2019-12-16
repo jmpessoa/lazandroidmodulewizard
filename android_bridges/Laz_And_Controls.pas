@@ -2603,6 +2603,8 @@ begin
   Form.Width      := gApp.Screen.WH.Width;
   Form.Height     := gApp.Screen.WH.Height;
 
+  if Assigned(Form.OnLayoutDraw) then Form.OnLayoutDraw(Form);
+
   Form.UpdateLayout;
 
 end;
@@ -2639,6 +2641,7 @@ begin
       else
         rotOrientation:=ssUnknown;
 
+  gApp.Orientation:= rotOrientation;
   Form.ScreenStyle:= rotOrientation;
 
   if Assigned(Form.OnRotate) then Form.OnRotate(Form, rotOrientation);
