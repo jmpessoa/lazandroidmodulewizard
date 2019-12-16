@@ -1117,8 +1117,9 @@ type
     //FOnNewIntent: TOnNewIntent;
     FCloseCallback : TjCallBack; // Close Call Back Event
 
-    FOnShow: TOnNotify;       //by TR3E
-    FOnInit: TNotifyEvent;    // by TR3E
+    FOnShow       : TOnNotify;    // by TR3E
+    FOnLayoutDraw : TOnNotify;    // by TR3E
+    FOnInit       : TNotifyEvent; // by TR3E
 
     //FActionBarHeight: integer;
     FOnOptionMenuCreate: TOnOptionMenuItemCreate;
@@ -1449,6 +1450,7 @@ type
     property OnBackButton : TOnNotify read FOnBackButton write FOnBackButton;
     property OnClose      : TOnNotify read FOnClose write FOnClose;
     property OnShow       : TOnNotify read FOnShow write FOnShow; //by TR3E
+    property OnLayoutDraw : TOnNotify read FOnLayoutDraw write FOnLayoutDraw; //by TR3E
     property OnSpecialKeyDown    :TOnKeyDown read FOnSpecialKeyDown write FOnSpecialKeyDown;
     property OnCreateOptionMenu: TOnOptionMenuItemCreate read FOnOptionMenuCreate write FOnOptionMenuCreate;
     property OnClickOptionMenuItem: TOnClickOptionMenuItem read FOnClickOptionMenuItem write FOnClickOptionMenuItem;
