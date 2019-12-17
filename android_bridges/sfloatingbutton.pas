@@ -9,7 +9,7 @@ uses
 
 type
 
-TFABSize = (fabNormal, fabMini, fabAuto); //SIZE_MINI  SIZE_AUTO  SIZE_NORMAL
+TFABSize = (fabNormal, fabMini, fabAuto); //SIZE_MINI SIZE_AUTO  SIZE_NORMAL
 
 {Draft Component code by "Lazarus Android Module Wizard" [12/11/2017 23:35:15]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}

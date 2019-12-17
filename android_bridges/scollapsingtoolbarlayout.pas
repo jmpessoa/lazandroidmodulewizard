@@ -46,6 +46,7 @@ jsCollapsingToolbarLayout = class(jVisualControl)
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
     procedure SetScrollFlag(_collapsingScrollFlag: TCollapsingScrollflag);
+    procedure SetCollapseMode(_collapsemode: TCollapsingMode);
     procedure SetExpandedTitleColorTransparent();
     procedure SetExpandedTitleColor(_color: TARGBColorBridge);
     procedure SetExpandedTitleGravity(_gravity: TLayoutGravity);
@@ -88,7 +89,7 @@ procedure jsCollapsingToolbarLayout_SetCollapsedTitleGravity(env: PJNIEnv; _jsco
 procedure jsCollapsingToolbarLayout_SetContentScrimColor(env: PJNIEnv; _jscollapsingtoolbarlayout: JObject; _color: integer);
 procedure jsCollapsingToolbarLayout_SetScrollFlag(env: PJNIEnv; _jscollapsingtoolbarlayout: JObject; _collapsingScrollFlag: integer);
 procedure jsCollapsingToolbarLayout_SetFitsSystemWindows(env: PJNIEnv; _jscollapsingtoolbarlayout: JObject; _value: boolean);
-
+procedure jsCollapsingToolbarLayout_SetCollapseMode(env: PJNIEnv; _jscollapsingtoolbarlayout: JObject; _mode: integer);
 
 implementation
 
@@ -364,6 +365,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jsCollapsingToolbarLayout_SetScrollFlag(FjEnv, FjObject, Ord(_collapsingScrollFlag) );
+end;
+
+procedure jsCollapsingToolbarLayout.SetCollapseMode(_collapsemode: TCollapsingMode);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsCollapsingToolbarLayout_SetCollapseMode(FjEnv, FjObject, Ord(_collapsemode));
 end;
 
 procedure jsCollapsingToolbarLayout.SetExpandedTitleColorTransparent();
@@ -772,6 +780,19 @@ begin
   jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jscollapsingtoolbarlayout);
   jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
+  env^.CallVoidMethodA(env, _jscollapsingtoolbarlayout, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jsCollapsingToolbarLayout_SetCollapseMode(env: PJNIEnv; _jscollapsingtoolbarlayout: JObject; _mode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _mode;
+  jCls:= env^.GetObjectClass(env, _jscollapsingtoolbarlayout);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCollapseMode', '(I)V');
   env^.CallVoidMethodA(env, _jscollapsingtoolbarlayout, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

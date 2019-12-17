@@ -6,15 +6,18 @@ unit unit2;
 interface
 
 uses
-  Classes, SysUtils, AndroidWidget, Laz_And_Controls;
+  Classes, SysUtils, AndroidWidget, Laz_And_Controls, ratingbar, switchbutton;
   
 type
 
   { TAndroidModule2 }
 
   TAndroidModule2 = class(jForm)
+    jCheckBox1: jCheckBox;
     jImageView1: jImageView;
     jPanel1: jPanel;
+    jRatingBar1: jRatingBar;
+    jSwitchButton1: jSwitchButton;
     jTextView1: jTextView;
   private
     {private declarations}

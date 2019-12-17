@@ -56,6 +56,15 @@ public class jsCollapsingToolbarLayout extends CollapsingToolbarLayout /*dummy*/
   	 //setOnClickListener(null);
 	 LAMWCommon.free();
    }
+   
+   @Override
+   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+   	super.onSizeChanged(w, h, oldw, oldh);
+   	
+   	// Change the size and update the layout               
+    controls.formNeedLayout = true;
+    controls.appLayout.requestLayout();
+   }
  
    public void SetViewParent(ViewGroup _viewgroup) {
 	 LAMWCommon.setParent(_viewgroup);
@@ -118,37 +127,16 @@ public class jsCollapsingToolbarLayout extends CollapsingToolbarLayout /*dummy*/
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-   
-   public void SetScrollFlag(int _collapsingScrollFlag) {   //called in OnJNIPrompt
-       
-	      int scrflag = -1;
-	      
-	      ViewGroup.LayoutParams params1 = this.getLayoutParams(); //to clear In order to clear flags params.setScrollFlags(0)
-	      AppBarLayout.LayoutParams newParams1;
-	      if (params1 instanceof AppBarLayout.LayoutParams) {
-	          newParams1 = (AppBarLayout.LayoutParams)params1;
-	      } else {
-	         newParams1 = new AppBarLayout.LayoutParams(params1);
-	      }                            	      
-	      switch(_collapsingScrollFlag) {
-	        case 0: scrflag =  AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED; break;  //default
-	        case 1: scrflag =  AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED; break;
-	        case 2: scrflag =  AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS; break; 
-	        case 3: scrflag =  AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP;  break;
-	        case 4: scrflag =  -1;	        
-	      }	 
-	      
-	      if (scrflag >= 0) { 
-	          newParams1.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | scrflag);  
-	          this.setLayoutParams(newParams1);
-	          this.requestLayout();
-	      }
-   }
-    
-   public void SetExpandedTitleColorTransparent() {
+
+    public void SetCollapseMode(int _mode) {  //called on JNIPrompt
+        LAMWCommon.setCollapseMode(_mode);
+    }
+
+    public void SetScrollFlag(int _collapsingScrollFlag) {   //called in OnJNIPrompt
+        LAMWCommon.setScrollFlag(_collapsingScrollFlag);
+    }
+
+    public void SetExpandedTitleColorTransparent() {
       this.setExpandedTitleColor(Color.TRANSPARENT);
    }   
    

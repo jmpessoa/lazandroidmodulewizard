@@ -1,4 +1,4 @@
-package org.lamw.appcompatrecyclerviewdemo1;
+package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -1023,8 +1023,7 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
       //linearLayoutManager.setAutoMeasureEnabled(true);
       
       rcAdapter = new RecyclerViewAdapter(controls, pascalObj, rowListItem);
-      
-      
+
       //this.setHorizontalScrollBarEnabled(true);      
       this.setVerticalScrollBarEnabled(true);
       // this.scrollToPosition(0);
@@ -1134,7 +1133,6 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   
    public void SetItemContentDictionary(String _delimitedContentDictionary, String _delimiter) {
 	   rcAdapter.setItemContentDictionary(_delimitedContentDictionary, _delimiter);
    }
@@ -1161,12 +1159,9 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
 	       this.addItemDecoration(decoration);
 	   }
 	   else {
-		   
 		   TopBottomDecorator  decoration = new TopBottomDecorator(0);  //EdgeDecorator 
 	       this.addItemDecoration(decoration);
-		   
 	   }
-		   	   	   	   
 	   rcAdapter.setlayoutView(_itemViewLayout, _forceCardStyle);  //true = cardStyle
    }
    
@@ -1180,7 +1175,7 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
    
    public void SetAppBarLayoutScrollingViewBehavior() { //This attribute will trigger event in the Toolbar.
      CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)this.getLayoutParams();
-     params.setBehavior(new AppBarLayout.ScrollingViewBehavior(context, null));
+     params.setBehavior(new AppBarLayout.ScrollingViewBehavior(controls.activity, null));
      this.requestLayout();
    }
 
@@ -1201,5 +1196,9 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
       this.setClipToPadding(_value);
    }
 
+	public void SetAnchorGravity(int _gravity, int _anchorId) {
+		LAMWCommon.setAnchorLGravity(_gravity, _anchorId);
+	}
+	
 }
 

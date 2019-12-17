@@ -1,4 +1,4 @@
-package org.lamw.appcompatnavigationdrawerdemo1;
+package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -6,6 +6,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -90,8 +92,6 @@ public class jCommons {
 
 	public static  MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
 		
-		//CollapsingToolbarLayout
-		
 		if (aparent instanceof NestedScrollView) {
 			return new NestedScrollView.LayoutParams(baseparams);
 		} else if (aparent instanceof CollapsingToolbarLayout) {
@@ -115,7 +115,7 @@ public class jCommons {
 		} else if (aparent == null) {
 			throw new NullPointerException("Parent is null");
 		} else {
-			throw new IllegalArgumentException("LAMW/jCommons: Parent is neither FrameLayout or RelativeLayout or LinearLayout: [ "
+			throw new IllegalArgumentException("LAMW/jCommons: Parent is UNKNOW!: [ "
 					+ aparent.getClass().getName() + " ]");
 		}
 	}
@@ -129,7 +129,6 @@ public class jCommons {
 		parent = _viewgroup;
 		if ( (parent != null) && (aOwnerView != null) ) {
 			parent.addView(aOwnerView, newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-			lparams = null;
 			lparams = (ViewGroup.MarginLayoutParams)aOwnerView.getLayoutParams();
             aOwnerView.setVisibility(android.view.View.VISIBLE);
 		}
@@ -452,27 +451,27 @@ public class jCommons {
 	}
 
 	public void setCollapseMode(int _mode) {  //called on JNIPrompt
-		
-	      ViewGroup.LayoutParams params = aOwnerView.getLayoutParams();
-	      CollapsingToolbarLayout.LayoutParams newParams;
-	      	      
-	      if (params instanceof CollapsingToolbarLayout.LayoutParams) {
-	        newParams = (CollapsingToolbarLayout.LayoutParams)params;
-	      } else {
-	        newParams = new CollapsingToolbarLayout.LayoutParams(params);
-	      }
-	      
-		  int  collapsingMode = 0;
-		  switch(_mode) {
-		    case 0: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN; break;
-		    case 1: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX; break;//deafault - imageView
-		    case 2: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_OFF;break;
-		  }
-		  
+		ViewGroup.LayoutParams params;
+
+        if (lparams == null)  params = aOwnerView.getLayoutParams();
+        else params = lparams;
+
+		CollapsingToolbarLayout.LayoutParams newParams;
+		if (params instanceof CollapsingToolbarLayout.LayoutParams) {
+            newParams = (CollapsingToolbarLayout.LayoutParams)lparams;
+    	} else {
+	        newParams = new CollapsingToolbarLayout.LayoutParams(params); //bug???
+		}
+     	int collapsingMode = 0;
+    	switch(_mode) {
+			case 0: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_OFF;break;
+			case 1: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN; break;
+			case 2: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX; break;//default - imageView
+		}
 	      //CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX
-	      newParams.setCollapseMode(collapsingMode);  //COLLAPSE_MODE_OFF
-	      aOwnerView.setLayoutParams(newParams);
-	      aOwnerView.requestLayout();
+		newParams.setCollapseMode(collapsingMode);  //COLLAPSE_MODE_OFF
+		aOwnerView.setLayoutParams(newParams);
+		aOwnerView.requestLayout();
 	}
 	
 	
@@ -486,16 +485,18 @@ public class jCommons {
     
     
     public void setScrollFlag(int _collapsingScrollFlag) {   //called in OnJNIPrompt
-	       
-	      int scrflag = -1;
-	      
-	      ViewGroup.LayoutParams params1 = aOwnerView.getLayoutParams(); //to clear In order to clear flags params.setScrollFlags(0)
-	      AppBarLayout.LayoutParams newParams1;
-	      if (params1 instanceof AppBarLayout.LayoutParams) {
-	          newParams1 = (AppBarLayout.LayoutParams)params1;
+	    int scrflag = -1;
+        ViewGroup.LayoutParams params;
+        if (lparams == null)  params = aOwnerView.getLayoutParams();
+        else params = lparams;
+        //In order to clear flags params.setScrollFlags(0)
+	      AppBarLayout.LayoutParams newParams = null;
+	      if (params instanceof AppBarLayout.LayoutParams) {
+	          newParams = (AppBarLayout.LayoutParams)params;
 	      } else {
-	         newParams1 = new AppBarLayout.LayoutParams(params1);
-	      }                            	      
+	         newParams = new AppBarLayout.LayoutParams(params); //BUG ???
+	      }
+
 	      switch(_collapsingScrollFlag) {
 	        case 0: scrflag =  AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED; break;
 	        case 1: scrflag =  AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED; break;
@@ -504,10 +505,10 @@ public class jCommons {
 	        case 4: scrflag =  -1;	        
 	      }	 
 	      
-	      if (scrflag >= 0) { 
-	          newParams1.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | scrflag);  
-	          aOwnerView.setLayoutParams(newParams1);
-	          aOwnerView.requestLayout();
+	      if  (scrflag >= 0)  {
+	          newParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | scrflag);
+			  aOwnerView.setLayoutParams(newParams);
+			  aOwnerView.requestLayout();
 	      }
     }
     

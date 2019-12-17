@@ -233,7 +233,7 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
    
    //https://github.com/codepath/android_guides/wiki/Handling-Scrolls-with-CoordinatorLayout
    public void SetCollapseMode(int _collapseMode) {   //called: Pascal "OnJNIPrompt" event
-	   LAMWCommon.setCollapseMode(_collapseMode);
+       LAMWCommon.setCollapseMode(_collapseMode);
    }
 
    /*
@@ -304,7 +304,8 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
 	      //this.setMinimumHeight(42);
          this.setLayoutParams(newParams1);
          this.requestLayout();                              
-}
+   }
+
 
 }
 

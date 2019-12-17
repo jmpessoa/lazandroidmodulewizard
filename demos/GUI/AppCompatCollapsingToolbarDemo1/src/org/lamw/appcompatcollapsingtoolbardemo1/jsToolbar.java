@@ -38,8 +38,8 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
       LAMWCommon = new jCommons(this,context,pascalObj);
 
      //https://www.101apps.co.za/index.php/articles/using-toolbars-in-your-apps.html
-     //you should call this first if you’re going to be adding logos and navigation icons 
-     //else they won’t show.       
+     //you should call this first if you are going to be adding logos and navigation icons
+     //else they won't show.
      if (_asActionBar == true)  {  
     	 IsActionBar = true;
          this.SetAsActionBar(true);    
@@ -73,6 +73,15 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
       //free local objects...
   	 //setOnClickListener(null);
 	 LAMWCommon.free();
+   }
+   
+   @Override
+   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+   	super.onSizeChanged(w, h, oldw, oldh);
+   	
+   	// Change the size and update the layout               
+    controls.formNeedLayout = true;
+    controls.appLayout.requestLayout();
    }
  
    public void SetViewParent(ViewGroup _viewgroup) {
@@ -136,9 +145,6 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
    
    private int GetDrawableResourceId(String _resName) {
 		  try {
@@ -227,7 +233,7 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
    
    //https://github.com/codepath/android_guides/wiki/Handling-Scrolls-with-CoordinatorLayout
    public void SetCollapseMode(int _collapseMode) {   //called: Pascal "OnJNIPrompt" event
-	   LAMWCommon.setCollapseMode(_collapseMode);
+       LAMWCommon.setCollapseMode(_collapseMode);
    }
 
    /*
@@ -298,7 +304,8 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
 	      //this.setMinimumHeight(42);
          this.setLayoutParams(newParams1);
          this.requestLayout();                              
-}
+   }
+
 
 }
 

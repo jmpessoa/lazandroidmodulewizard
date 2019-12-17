@@ -55,6 +55,15 @@ public class jsAppBarLayout extends AppBarLayout /*dummy*/ { //please, fix what 
   	 //setOnClickListener(null);
 	 LAMWCommon.free();
    }
+   
+   @Override
+   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+   	super.onSizeChanged(w, h, oldw, oldh);
+   	
+   	// Change the size and update the layout               
+    controls.formNeedLayout = true;
+    controls.appLayout.requestLayout();
+   }
  
    public void SetViewParent(ViewGroup _viewgroup) {
 	 LAMWCommon.setParent(_viewgroup);
@@ -117,9 +126,6 @@ public class jsAppBarLayout extends AppBarLayout /*dummy*/ { //please, fix what 
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
    
    public void	SetFitsSystemWindows(boolean _value) { //TODO Pascal
 		LAMWCommon.setFitsSystemWindows(_value);
@@ -129,7 +135,6 @@ public class jsAppBarLayout extends AppBarLayout /*dummy*/ { //please, fix what 
        context.setTheme(R.style.ThemeOverlay_AppCompat_Dark_ActionBar);
        this.invalidate();
    }
-
 
   public void SetBackgroundToPrimaryColor() {	   
 	   this.setBackgroundColor(LAMWCommon.getColorFromResources(context, R.color.primary)); 

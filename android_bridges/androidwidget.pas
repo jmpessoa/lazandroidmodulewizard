@@ -49,7 +49,8 @@ type
   TAndroidLayoutType = (altMATCHPARENT,altWRAPCONTENT);
   TViewVisibility = (vvVisible=0,  vvInvisible=4, vvGone=8);
 
-  TCollapsingMode = (cmPin, cmParallax, cmOff);
+  TCollapsingMode = (cmOff, cmPin, cmParallax);
+
   TCollapsingScrollflag = (csfExitUntilCollapsed, csfEnterAlwaysCollapsed, csfEnterAlways, csfSnap, csfNone);
 
   TOnClickNavigationViewItem = procedure(Sender: TObject; itemId: integer; itemCaption: string) of object;

@@ -2,6 +2,7 @@ package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.design.widget.FloatingActionButton;
@@ -110,10 +111,7 @@ public class jsFloatingButton extends FloatingActionButton /*dummy*/ { //please,
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-
+   
    public void SetVisibility(int _value) {  //	   
 	  this.setVisibility(_value);   //View.GONE=8   View.VISIBLE=0  View.INVISIBLE=4
    }
@@ -127,9 +125,6 @@ public class jsFloatingButton extends FloatingActionButton /*dummy*/ { //please,
        this.setImageResource(imageId);  //this.SetImageResource("ic_launcher");            
    }
    
-   public void BringToFront() {
-	   this.bringToFront();
-   }
    
    public void SetSize(int _value) {	   
 	   this.setSize(_value);  //SIZE_MINI  SIZE_AUTO  SIZE_NORMAL
@@ -194,5 +189,21 @@ public class jsFloatingButton extends FloatingActionButton /*dummy*/ { //please,
    
    public void SetAnchorGravity(int _gravity, int _anchorId) {
 	   LAMWCommon.setAnchorLGravity(_gravity, _anchorId);
+   }
+   
+   public void SetBackgroundToPrimaryColor() {	   
+	   this.setBackgroundColor(LAMWCommon.getColorFromResources(context, R.color.primary)); 
+   }
+   
+   public void BringToFront() {
+		this.bringToFront();	
+		if (Build.VERSION.SDK_INT < 19 ) {			
+			ViewGroup parent = LAMWCommon.getParent();
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+		}		
+		this.setVisibility(android.view.View.VISIBLE);
    }
 }

@@ -1,4 +1,4 @@
-package org.lamw.appgifanimationdemo1;
+package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -635,15 +635,15 @@ public class jImageView extends ImageView {
 	public void SetCollapseMode(int _collapsemode) {  //called on JNIPrompt
 		LAMWCommon.setCollapseMode(_collapsemode);
 	}
-	
+
+	public void	SetScrollFlag(int _collapsingScrollFlag) {
+		LAMWCommon.setScrollFlag(_collapsingScrollFlag);
+	}
+
     public void	SetFitsSystemWindows(boolean _value) {
 		LAMWCommon.setFitsSystemWindows(_value);
     }
 
-    public void	SetScrollFlag(int _collapsingScrollFlag) {
- 		LAMWCommon.setScrollFlag(_collapsingScrollFlag);
-    }
-    
     /*
     Change the view's z order in the tree, so it's on top of other sibling views.
     Prior to KITKAT/4.4/Api 19 this method should be followed by calls to requestLayout() and invalidate()
@@ -990,7 +990,6 @@ public class jImageView extends ImageView {
 	}
 
 	private void slidefromLeftToRight3(View view, long duration) {  //try
-
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		if (view.getHeight() == 0) {
 			//controls.appLayout.getHeight(); // parent layout

@@ -12,6 +12,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,9 +36,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout.LayoutParams;
 
 
@@ -46,26 +51,55 @@ interface OnItemSelecteListener {
 } 
 
 class ItemObject {
-	
+
     public String[] label;
     public int countlabel = 0;
-    
+
     public String[] image;
     public int countimage = 0;
-        
-    public ItemObject(String content, String format,  String delimiter) {
+
+	public String[] check;
+	public int countcheck = 0;
+
+	public String[] rating;
+	public int countrating = 0;
+
+	public String[] switchbtn;
+	public int countswitchbtn = 0;
+
+	public int position;
+
+    public ItemObject(String content, String format,  String delimiter, int pos) {
+		position = pos;
     	String upperFormat = format.toUpperCase();
-        countlabel = countSubString(upperFormat, "TEXT");  
+
+		countlabel = countSubString(upperFormat, "TEXT");
 		label = new String[countlabel];				    	
-		countimage= countSubString(upperFormat, "IMAGE");  
-		image = new String[countimage];				    			
+
+		countimage= countSubString(upperFormat, "IMAGE");
+		image = new String[countimage];
+
+		countcheck = countSubString(upperFormat, "CHECK");
+		check = new String[countcheck];
+
+		countrating = countSubString(upperFormat, "RATING");
+		rating = new String[countrating];
+
+		countswitchbtn = countSubString(upperFormat, "SWITCH");
+		switchbtn = new String[countswitchbtn];
+
 		int indexText = 0;
-		int indexImage = 0;		
+		int indexImage = 0;
+		int indexCheck = 0;
+		int indexRating = 0;
+		int indexSwitchbtn = 0;
+
 		String[] formats = upperFormat.split(Pattern.quote(delimiter));  //  "\\s+"   [space]						
 		String[] contents = content.split(Pattern.quote(delimiter));		
-		int countAll =  formats.length;		
+
+		int countAll =  formats.length;
 		for (int i=0; i < countAll; i++) {
-			
+
 			if ( formats[i].startsWith("TEXT") )	{
 				label[indexText] =  contents[i];
 				indexText++;
@@ -75,7 +109,23 @@ class ItemObject {
 				image[indexImage] = contents[i];  //data@location					
 				indexImage++;
 			}
-			
+
+			if ( formats[i].startsWith("CHECK") )	{  //visited@0   or visited@1
+				check[indexCheck] =  contents[i]; //caption@value
+				indexCheck++;
+			}
+
+			if ( formats[i].startsWith("RATING") )	{  //value  ex: 2 or 3.5
+				rating[indexRating] =  contents[i];
+				indexRating++;
+			}
+
+
+			if ( formats[i].startsWith("SWITCH") )	{  //value  ex: OFF:ON@0  OFF:ON@1   //1=checked
+				switchbtn[indexSwitchbtn] =  contents[i];
+				indexSwitchbtn++;
+			}
+
 		}              
     }
     
@@ -146,35 +196,84 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     public View mDraftLayoutView;
     public boolean mCardStyle;
     String mFormat="dummy";
-        
-    public RecyclerViewAdapter(Controls controls, List<ItemObject> itemList) {
-        this.itemList = itemList;
+    public Controls  controls;
+    public long pasObject;
+
+	public RecyclerViewAdapter(Controls _controls,  long PasObj, List<ItemObject> _itemList) {
+        this.itemList = _itemList;
+		controls = _controls;
+		pasObject = PasObj;
         this.context = controls.activity; 
     }
 
     @Override
     public RecyclerViewHolders onCreateViewHolder(ViewGroup parent, int viewType) {
-    	View v  = getlayoutView(context, mFormat);    	
-    	return new RecyclerViewHolders(context, v, mFormat);  //holderView    	        
+		View v  = getlayoutView(context, mFormat);
+    	return new RecyclerViewHolders(context, pasObject, v, mFormat);  //holderView
     }
 
     @Override
     public void onBindViewHolder(RecyclerViewHolders holderView, final int position) {
-    	int countlabel = itemList.get(position).countlabel;
+
+		int itemPosition = itemList.get(position).position;
+
+		int countlabel = itemList.get(position).countlabel;
     	int countimage = itemList.get(position).countimage;
-    	
+		int countcheck = itemList.get(position).countcheck;
+		int countrating = itemList.get(position).countrating;
+		int countswitchbtn = itemList.get(position).countswitchbtn;
+
     	for (int i=0; i < countlabel; i++) {
     		holderView.label[i].setText( itemList.get(position).label[i]);
     	}
-    	    	
-    	for (int i=0; i < countimage; i++) {
-    		String imageData = itemList.get(position).image[i];  //image@drawable    		
+
+		for (int i=0; i < countcheck; i++) {
+            String delimiter = "@";
+            String checkData = itemList.get(position).check[i];  //image@drawable
+            String[] namevalue = checkData.split(Pattern.quote(delimiter));
+            holderView.check[i].setText( namevalue[0]);
+            if ( namevalue[1].equals("1"))
+               holderView.check[i].setChecked(true);
+		}
+
+		for (int i=0; i < countswitchbtn; i++) {
+			String delimiter = "@";
+			String data = itemList.get(position).switchbtn[i];  //OFF:ON@0  OFF:ON@1   1=checked
+			String[] nameval = data.split(Pattern.quote(delimiter));
+
+
+			if (nameval[0].contains(":")) {
+				//[ifdef_api21up]
+				if (Build.VERSION.SDK_INT >= 21) {
+					holderView.switchbtn[i].setShowText(true);
+				}//[endif_api21up]
+				delimiter = ":";
+				String[] OffOn = nameval[0].split(Pattern.quote(delimiter));  //OFF:ON
+				holderView.switchbtn[i].setTextOff(OffOn[0]);
+				holderView.switchbtn[i].setTextOn(OffOn[1]);
+			}
+			else {
+				holderView.switchbtn[i].setText( nameval[0]);
+			}
+
+			if ( nameval[1].equals("1"))
+				holderView.switchbtn[i].setChecked(true);
+
+		}
+
+		for (int i=0; i < countrating; i++) {
+			float r = Float.parseFloat(itemList.get(position).rating[i]);
+			holderView.rating[i].setRating(r);
+		}
+
+		for (int i=0; i < countimage; i++) {
+		    String imageData = itemList.get(position).image[i];  //image@drawable
     		String delimiter = "@";    		
     		String[] namevalue = imageData.split(Pattern.quote(delimiter)); 
     		if 	( namevalue[1].equals("drawable") ) {  	
     		  int id = context.getResources().getIdentifier(namevalue[0], "drawable", context.getPackageName() );    		
     		  holderView.image[i].setImageResource(id);
-    		}    		
+    		}
     		else if 	( namevalue[1].equals("assets") ) {    			
     			holderView.image[i].setImageBitmap( LoadFromAssets(namevalue[0]) ); 
     		}    		
@@ -229,7 +328,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     
     public void add(String content) {    	    	
     	int position = this.itemList.size();
-    	itemList.add(position, new ItemObject(content, mItemContentDictionary, mItemContentDelimiter) );    	
+    	itemList.add(position, new ItemObject(content, mItemContentDictionary, mItemContentDelimiter, position) );
         notifyItemInserted(position);
     }
 
@@ -267,7 +366,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     public View getlayoutView(Context ctx, String holderItemFormat) {
     	
        RelativeLayout layout = new RelativeLayout(ctx);       
-       layout.setId(1234567);
+       layout.setId(controls.getJavaNewId());
               
        RelativeLayout drafPanel = null;
               
@@ -275,11 +374,23 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 	   TextView[] label = new TextView[countlabel];	
 		
        int countimage= countSubString(holderItemFormat, "Image");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
-	   ImageView[] image = new ImageView[countimage];				    	
-		
-	   int indexText = 0;
+	   ImageView[] image = new ImageView[countimage];
+
+	   int countcheck = countSubString(holderItemFormat, "Check");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		CheckBox[] check = new CheckBox[countcheck];
+
+		int countrating= countSubString(holderItemFormat, "Rating");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		RatingBar[] rating = new RatingBar[countrating];
+
+		int countswitchbtn= countSubString(holderItemFormat, "Switch");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		Switch[] switchbtn = new Switch[countswitchbtn];
+
+		int indexText = 0;
 	   int indexImage = 0;
-		
+	   int indexCheck = 0;
+	   int indexRating = 0;
+		int indexSwitchbtn = 0;
+
 	   String delimiter = "|";
 	   String[] words = holderItemFormat.split(Pattern.quote(delimiter));
 	   int countAll =  words.length;
@@ -293,17 +404,17 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				TextView drafTextView = (TextView)mDraftLayoutView.findViewById(idText);
 				
 				label[indexText] = new TextView(context);				
-				label[indexText].setId(idText);
+				label[indexText].setId(idText);				
 				
 				ViewGroup.LayoutParams lp = (ViewGroup.LayoutParams) drafTextView.getLayoutParams();
 								
 				label[indexText].setLayoutParams(drafTextView.getLayoutParams());
 				
-				String pad = (String) drafTextView.getTag();
+				String pad = (String) drafTextView.getTag(); //seted in "jTextView.java"
 				String paddelimiter = "|";
 				String[] paddingValues = pad.split(Pattern.quote(paddelimiter));								
 				label[indexText].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]), 
-						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[2]));						                    						                   
+						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
 				
 				label[indexText].setTextColor(drafTextView.getCurrentTextColor());
 				
@@ -332,21 +443,105 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				
 				image[indexImage] = new ImageView(context);				
 				image[indexImage].setId(idImage);
+								
 				image[indexImage].setLayoutParams(drafImageView.getLayoutParams());
 			
-				String pad = (String) drafImageView.getTag();
+				String pad = (String) drafImageView.getTag(); //seted in "jImageView.java"
 				String paddelimiter = "|";
 				String[] paddingValues = pad.split(Pattern.quote(paddelimiter));								
 				image[indexImage].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]), 
-						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[2]));						                    						                   
-				
-				
-				layout.addView(image[indexImage]);				
+						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
+				layout.addView(image[indexImage]);
 
 				indexImage++;
-		   }						
-		   
-		   
+		   }
+
+		   if ( words[i].contains("Check") )	{
+
+			   String[] nameValueCheck = words[i].split(Pattern.quote(delimiter));
+			   int idCheck = Integer.valueOf(nameValueCheck[1]);
+			   CheckBox draftCheckBox = (CheckBox)mDraftLayoutView.findViewById(idCheck);
+
+			   check[indexCheck] = new CheckBox(context);
+			   check[indexCheck].setId(idCheck);
+			   
+			   check[indexCheck].setLayoutParams(draftCheckBox.getLayoutParams());
+
+			   String pad = (String) draftCheckBox.getTag(); //seted in "jCheckBox.java"
+			   String paddelimiter = "|";
+
+			   String[] paddingValues = pad.split(Pattern.quote(paddelimiter));
+			   check[indexCheck].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]),
+					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
+
+			   layout.addView(check[indexCheck]);
+
+			   indexCheck++;
+		   }
+
+		   if ( words[i].contains("Rating") )	{
+
+			   String[] nameVal = words[i].split(Pattern.quote(delimiter));
+			   int idRat = Integer.valueOf(nameVal[1]);
+			   RatingBar draftRatingBar = (RatingBar)mDraftLayoutView.findViewById(idRat);
+
+			   String tagData = (String) draftRatingBar.getTag(); //seted in "jRatingBar.java"
+			   //String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom + "|" + smallStyle
+
+			   String paddelimiter = "|";
+			   String[] paddingValues = tagData.split(Pattern.quote(paddelimiter));
+
+			   if (Integer.valueOf(paddingValues[4]) == 1)    //smallStyle
+			       rating[indexRating] = new RatingBar(context, null, android.R.attr.ratingBarStyleSmall);
+			   else
+				   rating[indexRating] = new RatingBar(context, null, android.R.attr.ratingBarStyle);
+
+			   rating[indexRating].setId(idRat);
+			   
+			   rating[indexRating].setStepSize(draftRatingBar.getStepSize());
+     	       rating[indexRating].setIsIndicator(draftRatingBar.isIndicator());
+
+			   rating[indexRating].setLayoutParams(draftRatingBar.getLayoutParams());
+
+			   /*need this.setPadding(_left,_top,_right, _bottom);//nedd by jRatingBar.java
+			   rating[indexRating].setPadding( draftRatingBar.getPaddingLeft(),
+					                           draftRatingBar.getPaddingTop(),
+			                                   draftRatingBar.getPaddingRight(),
+			                                   draftRatingBar.getPaddingBottom());
+			   */
+
+			   //setPadding(int left, int top, int right, int bottom)  by force!!!
+			   rating[indexRating].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]),
+					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
+
+			   layout.addView(rating[indexRating]);
+
+			   indexRating++;
+		   }
+
+		   if ( words[i].contains("Switch") )	{
+
+			   String[] nameVal = words[i].split(Pattern.quote(delimiter));
+			   int idSwitch = Integer.valueOf(nameVal[1]);
+			   Switch draftSwitch = (Switch)mDraftLayoutView.findViewById(idSwitch);
+
+			   switchbtn[indexSwitchbtn] = new Switch(context);
+			   switchbtn[indexSwitchbtn].setId(idSwitch);
+			   
+			   switchbtn[indexSwitchbtn].setLayoutParams(draftSwitch.getLayoutParams());
+
+			   String pad = (String) draftSwitch.getTag(); //seted in "jSwitchButton.java"
+			   String paddelimiter = "|";
+
+			   String[] paddingValues = pad.split(Pattern.quote(paddelimiter));
+			   switchbtn[indexSwitchbtn].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]),
+					   Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
+
+			   layout.addView(switchbtn[indexSwitchbtn]);
+
+			   indexSwitchbtn++;
+		   }
+
 		   if ( words[i].contains("Panel") )	{
 			   
 				String[] nameValueText = words[i].split(Pattern.quote(delimiter));
@@ -371,15 +566,14 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 	       cardView.setUseCompatPadding(true);	       
 	       cardView.setContentPadding(10, 10,10, 10);
 	       cardView.setPadding(30, 40, 30, 40);	       
-	       cardView.setId(12345678);                    
+	       cardView.setId(controls.getJavaNewId()); 
 	       cardView.addView(layout);                                  
 	       return cardView; 
 	   }	   
 	   else return layout;
 	   
-    }    
-    
-    
+    }
+
     public String getholderContentFormat(View v) {    	
         // "jTextView:5|jTextView:6|jImageView:7";    	
     	return 	getAllChildrenBFS(v);    		  
@@ -423,18 +617,43 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 	    public ImageView[] image;
 	    public int countimage = 0;
 
-	    public RecyclerViewHolders(Context ctx,  View itemLayoutView, String holderItemFormat) {    	
+		public CheckBox[] check;
+		public int countcheck = 0;
+
+		public RatingBar[] rating;
+		public int countrating = 0;
+
+		public Switch[] switchbtn;
+		public int countswitchbtn = 0;
+
+
+		public final long pascalObject;
+
+	    public RecyclerViewHolders(Context ctx, long pasObj,  View itemLayoutView, String holderItemFormat) {
 	        super(itemLayoutView);
-	      	      	       
-	        countlabel = countSubString(holderItemFormat, "Text");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+
+			pascalObject =  pasObj;
+	        countlabel = countSubString(holderItemFormat, "Text");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200|CHECK:100";
 			label = new TextView[countlabel];	
 			
-	        countimage= countSubString(holderItemFormat, "Image");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
-			image = new ImageView[countimage];				    	
-			
+	        countimage= countSubString(holderItemFormat, "Image");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200|CHECK:100";
+			image = new ImageView[countimage];
+
+			countcheck= countSubString(holderItemFormat, "Check");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200|CHECK:100";
+			check = new CheckBox[countcheck];
+
+			countrating= countSubString(holderItemFormat, "Rating");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200|RATING:50";
+			rating = new RatingBar[countrating];
+
+			countswitchbtn= countSubString(holderItemFormat, "Switch");  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200|RATING:50";
+			switchbtn = new Switch[countswitchbtn];
+
 			int indexText = 0;
 			int indexImage = 0;
-			
+			int indexCheck = 0;
+			int indexRating = 0;
+			int indexSwitchbtn = 0;
+
 			String delimiter = "|";
 			
 			String[] words = holderItemFormat.split(Pattern.quote(delimiter));
@@ -442,7 +661,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 			int countAll =  words.length;
 								
 			delimiter = ":";
-			for (int i=0; i < (countAll); i++) {
+			for (int i=0; i < countAll; i++) {
 				
 				if ( words[i].contains("Text") )	{
 					String[] nameValueText = words[i].split(Pattern.quote(delimiter));
@@ -454,13 +673,82 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 								
 				if ( words[i].contains("Image") )	{					
 					String[] nameValueImage = words[i].split(Pattern.quote(delimiter));
-					int idImage = Integer.valueOf(nameValueImage[1]);
+					final int idImage = Integer.valueOf(nameValueImage[1]);
 					image[indexImage] = (ImageView)itemLayoutView.findViewById(idImage);
+
+					image[indexImage].setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							String caption =  "ImageId=" + Integer.toString(idImage);
+							//Pascal: TItemWidgetStatus = (wsNone=0, wsChecked=1);
+							//Pascal: TItemContentFormat = (cfText=0, cfImage=1, cfCheck=2, cfRating=3, cfSwitch=4);
+							controls.pOnRecyclerViewItemWidgetClick(pascalObject, getAdapterPosition(),1, caption, 0 );
+						}
+					});
+
 					indexImage++;
 				}
-				
+
+				if ( words[i].contains("Check") )	{
+					final String[] nameValueCheck = words[i].split(Pattern.quote(delimiter)); //jCheckBox:4
+					int idCheck = Integer.valueOf(nameValueCheck[1]);
+					//Log.i("indexText="+ indexText , "idText="+idText);
+					check[indexCheck] = (CheckBox)itemLayoutView.findViewById(idCheck);
+	                check[indexCheck].setOnClickListener(new View.OnClickListener() {
+	                    @Override
+	                    public void onClick(View v) {
+	                    	int status = 0;
+	                    	String caption = (String)((CheckBox)v).getText();
+							//Pascal: TItemWidgetStatus = (wsNone=0, wsChecked=1);
+	            	        //Pascal: TItemContentFormat = (cfText=0, cfImage=1, cfCheck=2, cfRating=3, cfSwitch);
+							if  ( ((CheckBox)v).isChecked() ) status = 1;
+							controls.pOnRecyclerViewItemWidgetClick(pascalObject, getAdapterPosition(),2, caption, status );
+	                    }
+	                });
+
+					indexCheck++;
+				}
+
+				if ( words[i].contains("Rating") )	{
+					final String[] nameValueRating = words[i].split(Pattern.quote(delimiter)); //jRatingBar:6
+					int idRating = Integer.valueOf(nameValueRating[1]);
+					rating[indexRating] = (RatingBar)itemLayoutView.findViewById(idRating);
+					rating[indexRating].setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() { //OnRatingBarChangeListener
+						@Override
+						public void onRatingChanged(RatingBar ratingBar, float rating,  boolean fromUser) {
+							if (fromUser) {
+								float r = ((RatingBar) ratingBar).getRating();
+								String caption = Float.toString(r);
+								//Pascal: TItemWidgetStatus = (wsNone=0, wsChecked=1);
+								//Pascal: TItemContentFormat = (cfText=0, cfImage=1, cfCheck=2, cfRating=3, cfSwitch=4);
+								controls.pOnRecyclerViewItemWidgetClick(pascalObject, getAdapterPosition(), 3, caption, 0);
+							}
+						}
+					});
+
+					indexRating++;
+				}
+
+				if ( words[i].contains("Switch") )	{
+					final String[] nameVal = words[i].split(Pattern.quote(delimiter)); //jSwitchButton:9
+					int idSwitch = Integer.valueOf(nameVal[1]);
+					switchbtn[indexSwitchbtn] = (Switch)itemLayoutView.findViewById(idSwitch);
+					switchbtn[indexSwitchbtn].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+						@Override
+						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+							int status = 0;
+							String caption = (String)((Switch)buttonView).getText();
+							//Pascal: TItemWidgetStatus = (wsNone=0, wsChecked=1);
+							//Pascal: TItemContentFormat = (cfText=0, cfImage=1, cfCheck=2, cfRating=3, cfSwitch=4);
+							if  ( ((Switch)buttonView).isChecked() ) status = 1;
+							controls.pOnRecyclerViewItemWidgetClick(pascalObject, getAdapterPosition(),4, caption, status );
+						}
+					});
+
+					indexSwitchbtn++;
+				}
 			}
-				        	        
+
 	        /*
 	        labelView.setOnClickListener(new View.OnClickListener() {
 	            @Override
@@ -734,9 +1022,8 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
       
       //linearLayoutManager.setAutoMeasureEnabled(true);
       
-      rcAdapter = new RecyclerViewAdapter(controls, rowListItem);      
-      
-      
+      rcAdapter = new RecyclerViewAdapter(controls, pascalObj, rowListItem);
+
       //this.setHorizontalScrollBarEnabled(true);      
       this.setVerticalScrollBarEnabled(true);
       // this.scrollToPosition(0);
@@ -846,10 +1133,6 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
-   
    public void SetItemContentDictionary(String _delimitedContentDictionary, String _delimiter) {
 	   rcAdapter.setItemContentDictionary(_delimitedContentDictionary, _delimiter);
    }
@@ -876,12 +1159,9 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
 	       this.addItemDecoration(decoration);
 	   }
 	   else {
-		   
 		   TopBottomDecorator  decoration = new TopBottomDecorator(0);  //EdgeDecorator 
 	       this.addItemDecoration(decoration);
-		   
 	   }
-		   	   	   	   
 	   rcAdapter.setlayoutView(_itemViewLayout, _forceCardStyle);  //true = cardStyle
    }
    
@@ -895,7 +1175,7 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
    
    public void SetAppBarLayoutScrollingViewBehavior() { //This attribute will trigger event in the Toolbar.
      CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)this.getLayoutParams();
-     params.setBehavior(new AppBarLayout.ScrollingViewBehavior(context, null));
+     params.setBehavior(new AppBarLayout.ScrollingViewBehavior(controls.activity, null));
      this.requestLayout();
    }
 
@@ -916,5 +1196,9 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
       this.setClipToPadding(_value);
    }
 
+	public void SetAnchorGravity(int _gravity, int _anchorId) {
+		LAMWCommon.setAnchorLGravity(_gravity, _anchorId);
+	}
+	
 }
 

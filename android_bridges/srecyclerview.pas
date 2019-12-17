@@ -16,7 +16,6 @@ type
 
   TItemWidgetStatus = (wsNone, wsChecked);
 
-
   TRecyclerViewOnItemClick = procedure(Sender: TObject; itemPosition: integer; itemArrayOfStringCount: integer) of object;
 
   TRecyclerViewOnItemWidgetClick = procedure(Sender: TObject; itemPosition: integer; widget: TItemContentFormat;
@@ -92,6 +91,7 @@ jsRecyclerView = class(jVisualControl)
     procedure AddItemContentFormat(cf: TItemContentFormat);
 
     procedure SetItemContentDelimiter(_delimiter: string);
+    procedure SetAnchorGravity(_gravity: TLayoutGravity; _anchorId: integer);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -135,6 +135,7 @@ procedure jsRecyclerView_Remove(env: PJNIEnv; _jsrecyclerview: JObject; _positio
 function jsRecyclerView_GetItemCount(env: PJNIEnv; _jsrecyclerview: JObject): integer;
 procedure jsRecyclerView_SetFitsSystemWindows(env: PJNIEnv; _jsrecyclerview: JObject; _value: boolean);
 procedure jsRecyclerView_SetClipToPadding(env: PJNIEnv; _jsrecyclerview: JObject; _value: boolean);
+procedure jsRecyclerView_SetAnchorGravity(env: PJNIEnv; _jsrecyclerview: JObject; _gravity: integer; _anchorId: integer);
 
 implementation
 
@@ -524,6 +525,14 @@ begin
    FItemContentDelimiter:= _delimiter;
    FItemContentFormat.Delimiter:= _delimiter[1];
 end;
+
+procedure jsRecyclerView.SetAnchorGravity(_gravity: TLayoutGravity; _anchorId: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsRecyclerView_SetAnchorGravity(FjEnv, FjObject, Ord(_gravity) ,_anchorId);
+end;
+
 
 {-------- jsRecyclerView_JNI_Bridge ----------}
 
@@ -924,6 +933,20 @@ begin
   jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetClipToPadding', '(Z)V');
+  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jsRecyclerView_SetAnchorGravity(env: PJNIEnv; _jsrecyclerview: JObject; _gravity: integer; _anchorId: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _gravity;
+  jParams[1].i:= _anchorId;
+  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAnchorGravity', '(II)V');
   env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
