@@ -1,4 +1,4 @@
-package org.lamw.applearnlanguagesbylistening;
+package org.lamw.appselectdirectorydialogdemo1;
 
 import java.io.BufferedReader;
 
@@ -674,5 +674,11 @@ public class jEditText extends EditText {
 		     }
     }
 
+    public void SetSoftInputShownOnFocus(boolean _show) {
+		//[ifdef_api21up]
+		if (Build.VERSION.SDK_INT >= 21) {
+			this.setShowSoftInputOnFocus(_show);
+		} //[endif_api21up]
+	}
 }
 

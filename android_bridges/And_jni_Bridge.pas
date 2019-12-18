@@ -291,6 +291,7 @@ procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _filename: str
 procedure jEditText_ClearLayoutAll(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetFrameGravity(env: PJNIEnv; _jedittext: JObject; _value: integer);
 procedure jEditText_RemoveFromViewParent(env: PJNIEnv; _jedittext: JObject);
+procedure jEditText_SetSoftInputShownOnFocus(env: PJNIEnv; _jedittext: JObject; _show: boolean);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -3092,6 +3093,20 @@ _jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
  env^.CallVoidMethod(env,_jedittext,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
+
+procedure jEditText_SetSoftInputShownOnFocus(env: PJNIEnv; _jedittext: JObject; _show: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_show);
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSoftInputShownOnFocus', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // Button

@@ -1129,6 +1129,7 @@ type
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
     procedure ResetViewParent();  override;
+    procedure SetSoftInputShownOnFocus(_show: boolean);
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -5196,6 +5197,13 @@ begin
   FGravityInParent:= _value;
   if FInitialized then
      jEditText_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+end;
+
+procedure jEditText.SetSoftInputShownOnFocus(_show: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetSoftInputShownOnFocus(FjEnv, FjObject, _show);
 end;
 
 //------------------------------------------------------------------------------

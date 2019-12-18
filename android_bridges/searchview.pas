@@ -12,6 +12,7 @@ type
 TOnFocusChange = procedure(Sender: TObject; hasFocus: boolean) of object;
 TOnQueryTextSubmit = procedure(Sender: TObject; query: string) of object;
 TOnQueryTextChange = procedure(Sender: TObject; newQuery: string) of object;
+//TOnClickX=procedure(Sender:TObject) of object;
 
 {Draft Component code by "Lazarus Android Module Wizard" [9/23/2018 23:32:36]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -26,6 +27,7 @@ jSearchView = class(jVisualControl)
     FOnQueryTextSubmit: TOnQueryTextSubmit;
     FOnQueryTextChange: TOnQueryTextChange;
     FOnXClick: TOnNotify;
+    FOnClick: TOnNotify;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -66,10 +68,14 @@ jSearchView = class(jVisualControl)
     procedure SetFocus();
     procedure ClearFocus();
     procedure SetIconified(_value: boolean);
+    procedure SetSoftInputShownOnFocus(_show: boolean);
+    function GetInnerEditView(): jObject;
 
     procedure GenEvent_OnSearchViewFocusChange(Sender: TObject; hasFocus: boolean);
     procedure GenEvent_OnSearchViewQueryTextSubmit(Sender: TObject; query: string);
     procedure GenEvent_OnSearchViewQueryTextChange(Sender: TObject; newText: string);
+    procedure GenEvent_OnClickX(Sender:TObject);
+
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -77,6 +83,7 @@ jSearchView = class(jVisualControl)
     property Hint: string read FHint write SetQueryHint;
     property Iconified: boolean read FIconified write SetIconified;
     property OnXClick: TOnNotify read FOnXClick write FOnXClick;
+    property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnFocusChange: TOnFocusChange read FOnFocusChange write FOnFocusChange;
     property OnQueryTextSubmit: TOnQueryTextSubmit read FOnQueryTextSubmit write FOnQueryTextSubmit;
     property OnQueryTextChange: TOnQueryTextChange read FOnQueryTextChange write FOnQueryTextChange;
@@ -112,7 +119,8 @@ procedure jSearchView_SelectAll(env: PJNIEnv; _jsearchview: JObject; _color: int
 procedure jSearchView_SetFocus(env: PJNIEnv; _jsearchview: JObject);
 procedure jSearchView_ClearFocus(env: PJNIEnv; _jsearchview: JObject);
 procedure jSearchView_SetIconified(env: PJNIEnv; _jsearchview: JObject; _value: boolean);
-
+procedure jSearchView_SetSoftInputShownOnFocus(env: PJNIEnv; _jsearchview: JObject; _show: boolean);
+function jSearchView_GetInnerEditView(env: PJNIEnv; _jsearchview: JObject): jObject;
 
 
 implementation
@@ -245,7 +253,12 @@ end;
 //Event : Java -> Pascal
 procedure jSearchView.GenEvent_OnClick(Obj: TObject);
 begin
-  if Assigned(FOnXClick) then FOnXClick(Obj);
+  if Assigned(FOnClick) then FOnClick(Obj);
+end;
+
+procedure jSearchView.GenEvent_OnClickX(Sender:TObject);
+begin
+  if Assigned(FOnXClick) then FOnXClick(Sender);
 end;
 
 function jSearchView.jCreate( _iconified: boolean): jObject;
@@ -448,6 +461,20 @@ begin
   FIconified:= _value;
   if FInitialized then
      jSearchView_SetIconified(FjEnv, FjObject, _value);
+end;
+
+procedure jSearchView.SetSoftInputShownOnFocus(_show: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSearchView_SetSoftInputShownOnFocus(FjEnv, FjObject, _show);
+end;
+
+function jSearchView.GetInnerEditView(): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jSearchView_GetInnerEditView(FjEnv, FjObject);
 end;
 
 procedure jSearchView.GenEvent_OnSearchViewFocusChange(Sender: TObject; hasFocus: boolean);
@@ -852,6 +879,30 @@ begin
   jCls:= env^.GetObjectClass(env, _jsearchview);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearFocus', '()V');
   env^.CallVoidMethod(env, _jsearchview, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jSearchView_SetSoftInputShownOnFocus(env: PJNIEnv; _jsearchview: JObject; _show: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_show);
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSoftInputShownOnFocus', '(Z)V');
+  env^.CallVoidMethodA(env, _jsearchview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jSearchView_GetInnerEditView(env: PJNIEnv; _jsearchview: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jsearchview);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetInnerEditView', '()Landroid/widget/EditText;');
+  Result:= env^.CallObjectMethod(env, _jsearchview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

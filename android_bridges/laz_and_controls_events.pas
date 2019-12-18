@@ -180,6 +180,7 @@ uses
    Procedure Java_Event_pOnSearchViewFocusChange(env: PJNIEnv; this: jobject; Obj: TObject; hasFocus: jBoolean);
    Procedure Java_Event_pOnSearchViewQueryTextSubmit(env: PJNIEnv; this: jobject; Obj: TObject; query: JString);
    Procedure Java_Event_pOnSearchViewQueryTextChange(env: PJNIEnv; this: jobject; Obj: TObject; newText: JString );
+   procedure Java_Event_pOnClickX(env:PJNIEnv;this:JObject;Sender:TObject);
 
    Procedure Java_Event_pOnTelephonyCallStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; state: integer; phoneNumber: JString );
 
@@ -2267,6 +2268,17 @@ begin
       pasnewText:= string( env^.GetStringUTFChars(env,newText,@_jBoolean) );
     end;
     jSearchView(Obj).GenEvent_OnSearchViewQueryTextChange(Obj, pasnewText);
+  end;
+end;
+
+procedure Java_Event_pOnClickX(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jSearchView then
+  begin
+    jForm(jSearchView(Sender).Owner).UpdateJNI(gApp);
+    jSearchView(Sender).GenEvent_OnClickX(Sender);
   end;
 end;
 

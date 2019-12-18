@@ -1,9 +1,10 @@
-package org.lamw.appsearchviewdemo1;
+package org.lamw.appselectdirectorydialogdemo1;
 
 
 import android.content.Context;
 //import android.util.Log;
 import android.graphics.Color;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -41,7 +42,7 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
 
             /*.*/public void onClick(View view) {     // *.* is a mask to future parse...;
                 if (enabled) {
-                    controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+                   // controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
                 }
             }
 
@@ -55,6 +56,9 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
             /*.*/ public void onFocusChange(View v, boolean hasFocus) {
                 // do something when the focus of the query text field changes
                 controls.pOnSearchViewFocusChange(pascalObj, hasFocus);
+
+                if (hasFocus)
+                    controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
             }
         });
 
@@ -88,7 +92,7 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
                 // Manage this event.
                 //Log.i("[x] button", "Clicked!!");
                 thisView.setQuery("", false);
-                controls.pOnClickGeneric(pascalObj, 0);
+                controls.pOnClickX(pascalObj);
             }
         });
 
@@ -257,4 +261,18 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
         //this.setIconified(true);
     }
 
+    public void SetSoftInputShownOnFocus(boolean _show) {
+        //[ifdef_api21up]
+        if (Build.VERSION.SDK_INT >= 21) {
+            int id = this.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+            EditText editText = (EditText) this.findViewById(id);
+            editText.setShowSoftInputOnFocus(_show);
+        } //[endif_api21up]
+    }
+
+    public EditText GetInnerEditView() {
+            int id = this.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+            EditText editText = (EditText) this.findViewById(id);
+            return  editText;
+    }
 }
