@@ -661,7 +661,7 @@ end;
 //https://community.oracle.com/blogs/schaefa/2005/01/20/how-do-conditional-compilation-java
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
-  strList, listRequirements, requiredList: TStringList;
+  strList, {listRequirements,} requiredList: TStringList;
   i, p, k, minsdkApi, sdkManifMInApiNumber: integer;
   strTargetApi, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
   AndroidTheme: string;
@@ -678,9 +678,9 @@ var
 begin
 
   strList:= TStringList.Create;
-  listRequirements:= TStringList.Create;
-  listRequirements.Sorted:= True;
-  listRequirements.Duplicates:= dupIgnore;
+  //listRequirements:= TStringList.Create;
+  //listRequirements.Sorted:= True;
+  //listRequirements.Duplicates:= dupIgnore;
 
   if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'colors.xml') then
   begin
@@ -1016,6 +1016,7 @@ begin
             strList.Add('    '+directive+' ''com.android.support:recyclerview-v7:'+recyclerVer+'''');
             //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
 
+            {
             requiredList:= TStringList.Create;
             requiredList:= FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.required', False);
             for i:= 0 to requiredList.Count-1 do
@@ -1033,6 +1034,8 @@ begin
                 end;
             end;
             requiredList.Free;
+            }
+
          end;
 
          if Pos('GDXGame', AndroidTheme) > 0 then
@@ -1146,7 +1149,7 @@ begin
 
   end;
 
-  listRequirements.Free;
+  //listRequirements.Free;
   strList.Free;
 end;
 
@@ -1469,7 +1472,8 @@ begin          //C:\adt32\sdk\tools\ant
   end;
 end;
 
-(*procedure TLamwSmartDesigner.TryChangeChipSetConfigs(projectChipSet: string);
+(*
+procedure TLamwSmartDesigner.TryChangeChipSetConfigs(projectChipSet: string);
 var
   customResult: string;
   libTarget: string;
@@ -1559,9 +1563,11 @@ begin
     end;
   end;
 
-end; *)
+end;
+*)
 
-(*function TLamwSmartDesigner.IsChipSetDefault(var projectChipSet: string): boolean;
+(*
+function TLamwSmartDesigner.IsChipSetDefault(var projectChipSet: string): boolean;
 var
   projectTarget: string;
 begin
@@ -1593,7 +1599,8 @@ begin
      Result:= True
   else
      Result:= False;
-end; *)
+end;
+*)
 
 procedure TLamwSmartDesigner.UpdateJControls(ProjFile: TLazProjectFile;
   AndroidForm: TAndroidForm);
@@ -1628,6 +1635,7 @@ begin
   ProjFile.CustomData['jControls'] := jControls.DelimitedText;
   jControls.Free;
 end;
+
 
 procedure TLamwSmartDesigner.UpdateFCLControls(ProjFile: TLazProjectFile;
   AndroidForm: TAndroidForm);
@@ -1708,29 +1716,37 @@ var
   i: integer;
   fileName: string;
 begin
-   // By TR3E, disable backup of .java for not incrementase .apk file
-  // of gradle and not showing source code of program
+   //By TR3E, disable backup of .java for not incrementase .apk file
+  //of gradle and not showing source code of program
 
   //ForceDirectory(FPathToJavaSource+'bak');
   contentList:= FindAllFiles(FPathToJavaSource, '*.java', False);
   for i:= 0 to contentList.Count-1 do
-  begin         //do backup
+  begin
+
+    //dont backup anymore...
     //CopyFile(contentList.Strings[i],
           //FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
 
     fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher and gdx]
+
     if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
-      DeleteFile(contentList.Strings[i]);
+    begin
+       DeleteFile(contentList.Strings[i]);
+    end;
 
   end;
   contentList.Free;
 
-  ForceDirectory(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'bak');
+  //ForceDirectory(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'bak');
   contentList := FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.native', False);
   for i:= 0 to contentList.Count-1 do
-  begin     //do backup
+  begin
+
+    { //dont backup anymore...
     CopyFile(contentList.Strings[i],
          FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
+    }
 
     DeleteFile(contentList.Strings[i]);
   end;
@@ -1741,14 +1757,22 @@ procedure TLamwSmartDesigner.GetAllJControlsFromForms(jControlsList: TStrings);
 var
   list: TStringList;
   i: integer;
+  data: string;
 begin
   list := TStringList.Create;
   list.Delimiter := ';';
   with LazarusIDE.ActiveProject do
     for i := 0 to FileCount - 1 do
     begin
-      list.DelimitedText := Files[i].CustomData['jControls'];
-      jControlsList.AddStrings(list);
+      if Files[i].IsPartOfProject then
+      begin
+        data:=  Files[i].CustomData['jControls'];
+        if data <> '' then
+        begin
+          list.DelimitedText := data;
+          jControlsList.AddStrings(list);
+        end;
+      end;
     end;
   list.Free;
 end;
@@ -1865,7 +1889,7 @@ end;
 function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
-  list, listRequirements, auxList, manifestList, gradleList: TStringList;
+  list, {listRequirements,} auxList, manifestList, gradleList: TStringList;
   p, p1, p2, i, minSdkManifest, minSdkControl: integer;
   aux, tempStr, auxStr: string;
   insertRef: string;
@@ -1881,15 +1905,13 @@ begin
 
    list:= TStringList.Create;
    manifestList:= TStringList.Create;
-   listRequirements:= TStringList.Create;  //android maninfest Requirements
+   //listRequirements:= TStringList.Create;  //android maninfest Requirements
    auxList:= TStringList.Create;
 
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java') then
    begin
      list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java');
      list.Strings[0]:= 'package '+FPackageName+';';
-
-     //list.SaveToFile(FPathToJavaSource+jclassname+'.java'); //old
 
      //Pascal classes can now be written case-insensitively :)
      list.SaveToFile(FPathToJavaSource + GetCorrectTemplateFileName(LamwGlobalSettings.PathToJavaTemplates, jclassname + '.java')); // by kordal
@@ -1908,6 +1930,7 @@ begin
           end;
        end;
      end;
+
      Result:= True;
    end;
 
@@ -1984,7 +2007,7 @@ begin
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
-       listRequirements.Add(Trim(auxList.Text));  //Add permissions
+       //listRequirements.Add(Trim(auxList.Text));  //Add permissions
        list.Clear;
        for i:= 0 to auxList.Count-1 do
        begin
@@ -2023,7 +2046,7 @@ begin
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
-       listRequirements.Add(Trim(auxList.Text));  //Add feature
+       //listRequirements.Add(Trim(auxList.Text));  //Add feature
        list.Clear;
        for i:= 0 to auxList.Count-1 do
        begin
@@ -2063,7 +2086,7 @@ begin
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
-       listRequirements.Add(Trim(auxList.Text));  //Add intentfilters
+       //listRequirements.Add(Trim(auxList.Text));  //Add intentfilters
 
        list.Clear;
        for i:= 0 to auxList.Count-1 do
@@ -2093,7 +2116,7 @@ begin
        insertRef:= '</activity>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-       listRequirements.Add(tempStr);  //Add service
+       //listRequirements.Add(tempStr);  //Add service
        if Pos(tempStr , aux) <= 0 then
        begin
          p1:= Pos(insertRef, aux);
@@ -2113,7 +2136,7 @@ begin
        insertRef:= '</activity>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-       listRequirements.Add(tempStr);  //Add service
+       //listRequirements.Add(tempStr);  //Add service
        if Pos(tempStr , aux) <= 0 then
        begin
          p1:= Pos(insertRef, aux);
@@ -2135,7 +2158,7 @@ begin
        insertRef:= '</activity>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-       listRequirements.Add(tempStr);  //Add providers
+       //listRequirements.Add(tempStr);  //Add providers
        if Pos(tempStr , aux) <= 0 then
        begin
          p1:= Pos(insertRef, aux);
@@ -2156,7 +2179,7 @@ begin
        insertRef:= '</activity>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-       listRequirements.Add(tempStr);  //Add receiver
+       //listRequirements.Add(tempStr);  //Add receiver
        if Pos(tempStr , aux) <= 0 then
        begin
          p1:= Pos(insertRef, aux);
@@ -2277,7 +2300,7 @@ begin
         for i:= 0 to auxList.Count-1 do
         begin
            auxStr:=auxList.Strings[i];
-           listRequirements.Add(auxStr); // implementation 'com.android.support:design:25.3.1'
+           //listRequirements.Add(auxStr); // implementation 'com.android.support:design:25.3.1'
            SplitStr(auxStr, ' ');
            p:= LastDelimiter(':',auxStr);
            tempStr:= Copy(auxStr, 2, p - 2);
@@ -2293,11 +2316,11 @@ begin
       end;
    end;
    //-----
-   if listRequirements.Count > 0 then
-     listRequirements.SaveToFile(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
+   //if listRequirements.Count > 0 then
+     //listRequirements.SaveToFile(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
 
    manifestList.Free;
-   listRequirements.Free;
+   //listRequirements.Free;
    list.Free;
    auxList.Free;
 
@@ -2928,36 +2951,7 @@ begin
        FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'Controls.native');
   end;
 
-  (*
-  controlsList := TStringList.Create;
-  controlsList.Sorted := True;
-  controlsList.Duplicates := dupIgnore;
-
-  GetAllJControlsFromForms(controlsList);
-
-  compoundList:= TStringList.Create;
-  for i:= 0 to controlsList.Count - 1 do       //Add component compound support
-  begin
-    if FileExists(PathToJavaTemplates+controlsList.Strings[i]+'.compound') then
-    begin
-      compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+controlsList.Strings[i]+'.compound');
-      for j:= 0 to compoundList.Count - 1 do
-      begin
-        if compoundList.Strings[j] <> '' then
-           controlsList.Add(compoundList.Strings[j]);
-      end;
-    end;
-  end;
-  compoundList.Free;
-
-  //re-add all [updated] java code ...
-  for j:= 0 to controlsList.Count - 1 do
-  begin
-    if FileExists(PathToJavaTemplates+controlsList.Strings[j]+'.java') then
-       TryAddJControl(controlsList.Strings[j], nativeExists);
-  end;
-  controlsList.Free;
-  *)
+  //*cleanup! old commented code was here.... [by jmpessoa]
 
   UpdateProjectLpr(lprModuleName, FStartModuleVarName);
 end;
