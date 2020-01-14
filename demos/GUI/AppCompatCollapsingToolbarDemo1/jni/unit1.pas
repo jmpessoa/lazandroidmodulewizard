@@ -100,7 +100,6 @@ begin
     AndroidModule2.Init(gApp);  //dispatch "OnJNIPrompt" in  AndroidModule2
   end;
 
-  jsCoordinatorLayout1.SetFitsSystemWindows(True);
   jsAppBarLayout1.SetFitsSystemWindows(True);
 
   jsCollapsingToolbarLayout1.SetFitsSystemWindows(True);
