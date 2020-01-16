@@ -67,6 +67,7 @@ jLocation = class(jControl)
     procedure jFree();
     function StartTracker(): boolean;  overload;
     function StartTracker( lastKnownLocation: boolean ): boolean;  overload;
+    function StartTrackerSingle(): boolean;
     procedure ShowLocationSouceSettings();
     procedure RequestLocationUpdates(); overload;
     procedure StopTracker();
@@ -230,6 +231,14 @@ begin
   Result:= False;
   if FInitialized then
    Result:= jni_func_z_out_z(FjEnv, FjObject, 'StartTracker', false);
+end;
+
+function jLocation.StartTrackerSingle(): boolean;
+begin
+  //in designing component state: result value here...
+  Result:= False;
+  if FInitialized then
+   Result:= jni_func_out_z(FjEnv, FjObject, 'StartTrackerSingle');
 end;
 
 function jLocation.StartTracker( lastKnownLocation : boolean ): boolean;

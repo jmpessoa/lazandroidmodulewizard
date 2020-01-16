@@ -123,6 +123,14 @@ public class jTextView extends TextView {
 	public void SetLParamHeight(int h) {
 		LAMWCommon.setLParamHeight(h);
 	}
+	
+	public int GetTop(){
+		return getTop();
+	}
+	
+	public int GetLeft(){
+		return getLeft();
+	}
     
 	public int GetLParamHeight() {
 		return  LAMWCommon.getLParamHeight();

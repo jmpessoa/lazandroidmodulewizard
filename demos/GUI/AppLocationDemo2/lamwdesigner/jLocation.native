@@ -1,0 +1,5 @@
+public native void pOnLocationChanged(long pasobj, double latitude,  double longitude, double altitude, String address);
+public native void pOnLocationStatusChanged(long pasobj, int status, String provider, String msgStatus);
+public native void pOnLocationProviderEnabled(long pasobj, String provider);
+public native void pOnLocationProviderDisabled(long pasobj, String provider);
+public native void pOnGpsStatusChanged(long pasobj, int  countSatellites, int gpsStatusEvent);

@@ -20,6 +20,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.Settings;
 
 
@@ -96,11 +97,12 @@ public class jLocation /*extends ...*/ {
         //Define the criteria how to select the location provider
         mCriteria = new Criteria();
 
-        if (_CriteriaAccuracy == 0) {
+        if (_CriteriaAccuracy == 0) 
             mCriteriaAccuracy = Criteria.ACCURACY_COARSE; //default::Network-based/wi-fi
-        } else {
+        else 
             mCriteriaAccuracy = Criteria.ACCURACY_FINE;
-        }
+                
+        mCriteria.setAccuracy(mCriteriaAccuracy);
 
         switch (_MapType) { //mt, mt, mtHybrid
             case 0:
@@ -175,7 +177,7 @@ public class jLocation /*extends ...*/ {
     public boolean GPSCreate(){
     	//Get the location manager
         if( mLocationManager == null ){
-         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);       
          
          //get the best provider depending on the criteria
          if( mLocationManager != null )
@@ -263,7 +265,7 @@ public class jLocation /*extends ...*/ {
 
         if (!mListening) Listen();
 
-        mCriteria.setAccuracy(mCriteriaAccuracy);
+       
         //mCriteria.setCostAllowed(false);
         
         if( lastKnownLocation ){ 
@@ -272,6 +274,20 @@ public class jLocation /*extends ...*/ {
          if( mLocation != null )
           mlistener.onLocationChanged(mLocation);            
         }
+        
+        return true;
+    }
+    
+    public boolean StartTrackerSingle( ) {
+        
+        if( !GPSCreate() ) return false;
+
+        if (mListening) return false;
+        
+        // This is the Best And IMPORTANT part
+        final Looper looper = null;
+        
+        mLocationManager.requestSingleUpdate(mCriteria, mlistener, looper);
         
         return true;
     }
@@ -367,9 +383,9 @@ public class jLocation /*extends ...*/ {
         }
     }
 
-    public void StopTracker() {  // finalize ....
-        //mListening = false;
+    public void StopTracker() {  // finalize ....        
         mlistener.RemoveUpdates(mLocationManager);
+        mListening = false;
     }
 
     public void SetCriteriaAccuracy(int _accuracy) {
