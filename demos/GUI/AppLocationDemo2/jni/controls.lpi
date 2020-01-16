@@ -23,7 +23,7 @@
       <Item1 Name="LAMW" Value="GUI"/>
       <Item2 Name="LamwVersion" Value="0.8.4"/>
       <Item3 Name="NdkApi" Value="android-22"/>
-      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r17c\"/>
+      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r20\"/>
       <Item5 Name="Package" Value="com.example.applocationdemo1"/>
       <Item6 Name="SdkPath" Value="C:\laztoapk\downloads\android-sdk-windows\"/>
       <Item7 Name="Theme" Value="DeviceDefault"/>
@@ -56,7 +56,7 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCheckBox;jLocation;jTextView;jWebView"/>
+          <Item0 Name="jControls" Value="jButton;jCheckBox;jForm;jLocation;jTextView;jWebView"/>
         </CustomData>
       </Unit1>
     </Units>
@@ -68,7 +68,7 @@
       <Filename Value="..\libs\armeabi\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r17c\platforms\android-22\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r17c\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9.x\"/>
+      <Libraries Value="C:\laztoapk\downloads\android-ndk-r20\platforms\android-22\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
@@ -92,7 +92,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r17c\\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r20\\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

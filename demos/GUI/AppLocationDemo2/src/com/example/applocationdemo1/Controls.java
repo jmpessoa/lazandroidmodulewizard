@@ -460,7 +460,6 @@ public void Show(int effect) {
 	//controls.appLayout.addView(layout);
     //parent = controls.appLayout;
     parent.addView(layout);
-    
 }
 
 public ViewGroup GetParent() {	
@@ -603,6 +602,17 @@ public String GetDateTime() {
   return( formatter.format ( new Date () ) );	
 }
 
+// by TR3E
+public long GetTimeInMilliseconds(){
+	return controls.getTick();
+}
+
+//by TR3E
+public String GetTimeHHssSS( long millisTime ) {
+	  SimpleDateFormat formatter = new SimpleDateFormat ( "mm:ss:SS" );
+	  return( formatter.format ( new Date (millisTime) ) );	
+}
+
 //Free object except Self, Pascal Code Free the class.
  public void Free() {	
    if (parent != null) { parent.removeView(layout); }  
@@ -648,7 +658,7 @@ public  OnItemClickListener  GetOnListItemClickListener  () {
 	return this.onListItemClickListener; 
 }
 
-public int getSystemVersion()
+public int GetSystemVersion()
 {	
 	return controls.systemVersion;	
 }
@@ -1165,17 +1175,17 @@ public void SetScreenOrientation(int _orientation) {
     }            
 }
 
+// ssPortrait  = 1, //Portrait
+// ssLandscape = 2, //LandScape
+// ssUnknown   = 3
+
 public int GetScreenOrientation() {
-	    int orientation = controls.activity.getResources().getConfiguration().orientation;
-	    int r = 0;       	    
-        switch(orientation) {
-           case Configuration.ORIENTATION_PORTRAIT:
-               r= 1;//setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-               break;
-           case Configuration.ORIENTATION_LANDSCAPE:
-               r = 2; //setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-               break;               
-       }
+	    
+	   int r = 3; // ssUnknown
+	    
+	   if( controls.screenWidth <= controls.screenHeight ) r = 1; // Portrait
+	   if( controls.screenWidth >  controls.screenHeight ) r = 2; // LandScape
+	  
        return r; 
 }
 
@@ -1704,15 +1714,25 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	}
 
 	//by TR3E
-	public int getScreenWidth( ){
-		return layout.getWidth();
+	public int GetScreenWidth( ){
+		int w = controls.appLayout.getWidth();
+		
+		if( w <= 0 )
+			w = controls.screenWidth;
+		
+		return w;
 	}
 	//by TR3E
-	public int getScreenHeight( ){
-		return layout.getHeight();
+	public int GetScreenHeight( ){
+		int h = controls.appLayout.getHeight();
+		
+		if( h <= 0 )
+			h = controls.screenHeight;
+		
+		return h;
 	}
 	//by TR3E
-	public String getSystemVersionString(){
+	public String GetSystemVersionString(){
 		return android.os.Build.VERSION.RELEASE;
 	}
 

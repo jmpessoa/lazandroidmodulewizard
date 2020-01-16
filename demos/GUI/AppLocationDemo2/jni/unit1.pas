@@ -6,8 +6,8 @@ unit unit1;
 interface
   
 uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls, 
-  Laz_And_Controls_Events, AndroidWidget, location;
+  Classes, SysUtils, And_jni, Laz_And_Controls,
+  AndroidWidget, location;
   
 type
 
@@ -15,7 +15,6 @@ type
 
   TAndroidModule1 = class(jForm)
       jButton1: jButton;
-      jButton2: jButton;
       jCheckBox1: jCheckBox;
       jLocation1: jLocation;
       jTextView1: jTextView;
@@ -175,9 +174,10 @@ begin
       end
       else
       begin
-         ShowMessage('GPS is On! Starting Tracker...');
+         jTextView1.Text := 'GPS is On! Starting Tracker...';
          //jLocation1.MapType:= mtHybrid;  // default/mtRoadmap, mtSatellite, mtTerrain, mtHybrid
-         jLocation1.StartTracker(true);  //handled by "OnLocationChanged"
+         //jLocation1.StartTracker(false);  //handled by "OnLocationChanged"
+         jLocation1.StartTrackerSingle;
       end;
 
   end
