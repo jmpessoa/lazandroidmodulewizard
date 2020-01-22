@@ -10,13 +10,13 @@ uses
 type
 
 TAdMobBannerSize = (
-admobSmartBanner      = 0,       //screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
-admobBanner           = 320050,  //320x50	Banner	Phones and Tablets	BANNER
-admobLargeBanner      = 320100,  //320x100	Large Banner	Phones and Tablets	LARGE_BANNER
-admobMediumRectangle  = 300250,  //300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
-admobFullBanner       = 468060,  //468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
-admobLeaderBoard      = 728090  //728x90	IAB Leaderboard	Tablets	LEADERBOARD
-                   );
+   admobSmartBanner,       //0 - screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
+   admobBanner,            //1 - 320x50	Banner	Phones and Tablets	BANNER
+   admobLargeBanner,       //2 - 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
+   admobMediumRectangle,   //3 - 300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
+   admobFullBanner,        //4 - 468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
+   admobLeaderBoard        //5 - 728x90	IAB Leaderboard	Tablets	LEADERBOARD
+  );
 
 TOnAdMobLoaded = procedure(Sender: TObject) of Object;
 TOnAdMobFailedToLoad = procedure(Sender: TObject;  errorCode: integer) of Object;
@@ -36,7 +36,7 @@ jsAdMob = class(jVisualControl)
     FOnAdMobOpened:          TOnAdMobOpened;
     FOnAdMobClosed:          TOnAdMobClosed;
     FOnAdMobLeftApplication: TOnAdMobLeftApplication;
-    FAdMobBannerSize: TAdMobBannerSize;
+    FAdMobBannerSize:        TAdMobBannerSize;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -54,8 +54,6 @@ jsAdMob = class(jVisualControl)
     procedure GenEvent_OnAdMobClosed(Obj: TObject);
     procedure GenEvent_OnAdMobLeftApplication(Obj: TObject);
 
-    function jCreate(): jObject;
-    procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetViewParent(): jObject;  override;
     procedure RemoveFromViewParent(); override;
@@ -71,14 +69,9 @@ jsAdMob = class(jVisualControl)
     procedure AdMobRun();
     procedure AdMobStop();
     procedure AdMobUpdate();
+    function  AdMobIsLoading(): boolean;
 
     function GetView(): jObject;  override;
-    procedure SetLParamWidth(_w: integer);
-    procedure SetLParamHeight(_h: integer);
-    function GetLParamWidth(): integer;
-    function GetLParamHeight(): integer;
-    procedure SetLGravity(_g: integer);
-    procedure SetLWeight(_w: single);
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
     procedure AddLParamsAnchorRule(_rule: integer);
     procedure AddLParamsParentRule(_rule: integer);
@@ -96,9 +89,8 @@ jsAdMob = class(jVisualControl)
     property OnAdMobClosed      :   TOnAdMobClosed read FOnAdMobClosed write FOnAdMobClosed;
     property OnAdMobLeftApplication  :   TOnAdMobLeftApplication read FOnAdMobLeftApplication write FOnAdMobLeftApplication;
 
-end;
 
-function jsAdMob_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+end;
 
 implementation
 
@@ -129,7 +121,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -146,7 +138,7 @@ begin
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject := jCreate(); if FjObject = nil then exit;
+   FjObject := jni_create(FjEnv, FjThis, Self, 'jsAdMob_jCreate'); if FjObject = nil then exit;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -155,15 +147,15 @@ begin
 
    SetViewParent( FjPRLayout );
 
-   jni_proc_i(FjEnv, FjObject, 'AdMobSetBannerSize', Ord(FAdMobBannerSize));
-
+   AdMobSetBannerSize( FAdMobBannerSize );
+   
    jni_proc_i(FjEnv, FjObject, 'setId', FId);
   end;
 
   jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
                     FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                    sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                    sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+                    sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
+                    sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
 
   for rToA := raAbove to raAlignRight do
     if rToA in FPositionRelativeToAnchor then
@@ -250,18 +242,6 @@ begin
   if Assigned(FOnAdMobLeftApplication) then FOnAdMobLeftApplication(Obj);
 end;
 
-function jsAdMob.jCreate(): jObject;
-begin
-   Result:= jsAdMob_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jsAdMob.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
-end;
-
 procedure jsAdMob.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
@@ -286,8 +266,8 @@ end;
 procedure jsAdMob.AdMobSetBannerSize(_whBannerSize: TAdMobBannerSize);
 begin
   FAdMobBannerSize:= _whBannerSize;
-  if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'AdMobSetBannerSize', Ord(_whBannerSize));
+  if FjObject <> nil then
+   jni_proc_i(FjEnv, FjObject, 'AdMobSetBannerSize', Ord(_whBannerSize));
 end;
 
 function jsAdMob.AdMobGetBannerSize: TAdMobBannerSize;
@@ -302,6 +282,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_t(FjEnv, FjObject, 'AdMobSetId', _admobid);
+end;
+
+function jsAdMob.AdMobIsLoading(): boolean;
+begin
+ //in designing component state: result value here...
+ if FInitialized then
+   Result:= jni_func_out_z(FjEnv, FjObject, 'AdMobIsLoading');
 end;
 
 function jsAdMob.AdMobGetId(): string;
@@ -353,48 +340,6 @@ begin
    Result:= jni_func_out_viw(FjEnv, FjObject, 'GetView');
 end;
 
-procedure jsAdMob.SetLParamWidth(_w: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLParamWidth', _w);
-end;
-
-procedure jsAdMob.SetLParamHeight(_h: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLParamHeight', _h);
-end;
-
-function jsAdMob.GetLParamWidth(): integer;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamWidth');
-end;
-
-function jsAdMob.GetLParamHeight(): integer;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamHeight');
-end;
-
-procedure jsAdMob.SetLGravity(_g: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLGravity', _g);
-end;
-
-procedure jsAdMob.SetLWeight(_w: single);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc_f(FjEnv, FjObject, 'SetLWeight', _w);
-end;
-
 procedure jsAdMob.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
@@ -442,32 +387,6 @@ begin
         self.AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
   end;
 end;
-
-{-------- jsAdMob_JNI_Bridge ----------}
-
-function jsAdMob_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].j:= _Self;
-  jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jsAdMob_jCreate', '(J)Ljava/lang/Object;');
-  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
-end;
-
-(*
-//Please, you need insert:
-
-public java.lang.Object jsAdMob_jCreate(long _Self) {
-  return (java.lang.Object)(new jFrameLayout(this,_Self));
-}
-
-//to end of "public class Controls" in "Controls.java"
-*)
-
 
 
 end.

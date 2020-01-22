@@ -16,28 +16,28 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdListener;
 
-/*Draft java code by "Lazarus Android Module Wizard" [12/13/2017 17:18:12]*/
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jVisualControl LAMW template*/
+//-------------------------------------------------------------------------
+// jsAdMob
+// Reviewed by TR3E on 2019-01-22
+//-------------------------------------------------------------------------
 
 /* Banner sizes:
-https://developers.google.com/admob/android/banner#banner_sizes
-Size in dp (WxH)	Description	Availability	AdSize constant
-320x50	Banner	Phones and Tablets	BANNER
-320x100	Large Banner	Phones and Tablets	LARGE_BANNER
-300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
-468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
-728x90	IAB Leaderboard	Tablets	LEADERBOARD
-screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
-To set banner size, use the above banner W and H:
-0 (default) = SMART_BANNER
-32050 (or 320050) = BANNER
-320100 = LARGE_BANNER
-etc.
+  https://developers.google.com/admob/android/banner#banner_sizes
+  Size in dp (WxH)	Description	Availability	AdSize constant
+   320x50	Banner	Phones and Tablets	BANNER
+   320x100	Large Banner	Phones and Tablets	LARGE_BANNER
+   300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
+   468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
+   728x90	IAB Leaderboard	Tablets	LEADERBOARD
+   screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
+   To set banner size, use the above banner W and H:
+   0 (default) = SMART_BANNER
+   32050 (or 320050) = BANNER
+   320100 = LARGE_BANNER
+   etc.
 */
 
-// by TR3E
-public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI object will be extended!
+public class jsAdMob extends FrameLayout { 
 
    private long pascalObj = 0;        // Pascal Object
    private Controls controls  = null; //Java/Pascal [events] Interface ...
@@ -48,14 +48,13 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
    private Boolean enabled  = true;           // click-touch enabled!
    
    private int admobWidth = 0; // Control change of width
+   private boolean mIsLoading = false;
 
    private AdView    admobView    = null;
    private AdRequest admobRequest = null;
    private Boolean   admobInit    = false;
    private String    admobId      = "ca-app-pub-3940256099942544/6300978111";
-   private int bannerSize = 0;  //LMB initialize banner size to SMART_BANNER (0)
-
-   //private String banner_id = "ca-app-pub-3940256099942544/6300978111";
+   private int       admobBannerSize = 0;  //LMB initialize banner size to SMART_BANNER (0)
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jsAdMob(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -67,9 +66,10 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
 
       admobInit = false;
       admobView = null;
+      
+      mIsLoading = false;
 
-      LAMWCommon = new jCommons(this,context,pascalObj);
-
+      LAMWCommon = new jCommons(this,context,pascalObj);      
    } //end constructor
 
    public void jFree() {
@@ -99,15 +99,15 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
    public String AdMobGetId(){
       return admobId;
    }
-
+   
    //LMB Call this BEFORE AdMobRun to set banner size
    public void AdMobSetBannerSize( int _bannerSize ) {
-      bannerSize = _bannerSize;
+	   admobBannerSize = _bannerSize;
    }
 
    //LMB
    public int AdMobGetBannerSize(){
-      return bannerSize;
+      return admobBannerSize;
    }
 
    public void AdMobInit(){	  
@@ -125,41 +125,49 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
    }
    
    public void AdMobUpdate(){
-	   if( (admobView == null) || (admobWidth == this.getWidth()) ) return;
+	   if( (admobView == null) || (admobWidth == this.getWidth()) || mIsLoading ) return;
 	   
 	   AdMobStop();	   	     
 	   AdMobRun();
-	   
-	   admobWidth = this.getWidth();
    }
    
    public void AdMobStop(){
-       if(admobView == null) return;
+       if( (admobView == null) || mIsLoading ) return;
 	   
 	   this.removeView(admobView);
 	   admobView.destroy();
 	   admobView = null;
    }
+   
+   public boolean AdMobIsLoading(){
+	   return mIsLoading;
+   }
 
    public void AdMobRun(){
         
-	    if( admobView != null ) return;              
+	    if( (admobView != null) || mIsLoading ) return;
+	    
+	    mIsLoading = true;
 
         RelativeLayout.LayoutParams bannerLParams = (RelativeLayout.LayoutParams)this.getLayoutParams();
 
         admobView = new AdView(controls.activity);
         
-        if( admobView == null ) return;
+        if( admobView == null ){
+        	mIsLoading = false;
+        	return;
+        }
         
         admobView.setAdListener(new AdListener() {
         	
             /*private void showToast(String message) {            	
                 Toast.makeText(controls.activity, message, Toast.LENGTH_SHORT).show();
             }*/
+                        
             
             @Override
             public void onAdLoaded() {
-
+            	            	
                 //showToast("Ad loaded.");
                 if (admobView.getVisibility() == View.GONE) {                	
                 	admobView.setVisibility(View.VISIBLE);                	
@@ -204,29 +212,27 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
         });
 
         admobView.setLayoutParams(bannerLParams);
-
-        switch (bannerSize) {
-		case 32050:
-        case 320050: // 320x50	Banner	Phones and Tablets	BANNER
-			admobView.setAdSize(AdSize.SMART_BANNER);
-			break;
-		case 320100: // 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
-			admobView.setAdSize(AdSize.LARGE_BANNER);
-			break;
-		case 300250: // 300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
-			admobView.setAdSize(AdSize.MEDIUM_RECTANGLE);
-			break;
-		case 46860:
-		case 468060: // 468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
-			admobView.setAdSize(AdSize.FULL_BANNER);
-			break;
-		case 72890:
-		case 728090: // 728x90	IAB Leaderboard	Tablets	LEADERBOARD
-			admobView.setAdSize(AdSize.LEADERBOARD);
-			break;
-		default: // screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
+                
+        switch (admobBannerSize) {		 
+         case 1: // 320x50	Banner	Phones and Tablets	BANNER
+		 	   admobView.setAdSize(AdSize.SMART_BANNER);
+			  break;
+		 case 2: // 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
+			   admobView.setAdSize(AdSize.LARGE_BANNER);
+			  break;
+		 case 3: // 300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
+			   admobView.setAdSize(AdSize.MEDIUM_RECTANGLE);
+			  break;		 
+		 case 4: // 468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
+			   admobView.setAdSize(AdSize.FULL_BANNER);
+			  break;		 
+		 case 5: // 728x90	IAB Leaderboard	Tablets	LEADERBOARD
+			   admobView.setAdSize(AdSize.LEADERBOARD);
+			  break;
+		 default: // screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
 			admobView.setAdSize(AdSize.SMART_BANNER);
 		}
+        
         admobView.setAdUnitId(admobId);
 
         this.addView(admobView);
@@ -238,34 +244,11 @@ public class jsAdMob extends FrameLayout /*dummy*/ { //please, fix what GUI obje
         admobView.loadAd(admobRequest);
         
         admobWidth = this.getWidth();
+        mIsLoading = false;
    }
 
    public View GetView() {
       return this;
-   }
-
-   public void SetLParamWidth(int _w) {
-  	 LAMWCommon.setLParamWidth(_w);
-   }
-
-   public void SetLParamHeight(int _h) {
-  	 LAMWCommon.setLParamHeight(_h);
-   }
-
-   public int GetLParamWidth() {
-      return LAMWCommon.getLParamWidth();
-   }
-
-   public int GetLParamHeight() {
-	 return  LAMWCommon.getLParamHeight();
-   }
-
-   public void SetLGravity(int _g) {
-  	 LAMWCommon.setLGravity(_g);
-   }
-
-   public void SetLWeight(float _w) {
-  	 LAMWCommon.setLWeight(_w);
    }
 
    public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
