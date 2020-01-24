@@ -482,6 +482,8 @@ begin
 
     jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);
     jDrawingView_SetId(FjEnv, FjObject, Self.Id);
+
+    jni_proc_ii(FjEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
   end;
 
   jDrawingView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
