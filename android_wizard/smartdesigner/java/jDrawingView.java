@@ -60,8 +60,8 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     private ScaleGestureDetector scaleGestureDetector;
 
     private float mScaleFactor = 1.0f;
-    private float MIN_ZOOM = 0.25f;
-    private float MAX_ZOOM = 4.0f;
+    private float mMinZoom = 0.25f;
+    private float mMaxZoom = 4.0f;
 
     int mPinchZoomGestureState = 3;//pzNone
     int mFling = 0;
@@ -77,8 +77,12 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     private int mWidth;
     private int mHeight;
     private Paint.Style mStyle;
-
-    private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+	
+	private long mLastClickTime    = 0;
+	private int  mTimeClick        = 250;
+	private int  mTimeDoubleClick  = 350;
+    
+	private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jDrawingView(Controls _ctrls, long _Self, boolean _bufferedDraw, int _backgroundColor) { //Add more others news "_xxx"p arams if needed!
@@ -242,8 +246,18 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
                         mPointY[i] = point.y;
                     }
                 }
-
-                controls.pOnDrawingViewTouch(pascalObj, Const.TouchDown, mActivePointers.size(),
+				
+				byte mAction = Const.TouchDown;
+				
+				// double click event
+				long mClickTime = controls.getTick();
+				if ((mClickTime - mLastClickTime) < mTimeDoubleClick) {
+					mAction = Const.DoubleClick;
+				}		
+				mLastClickTime = mClickTime;                   
+				
+				
+                controls.pOnDrawingViewTouch(pascalObj, mAction/*Const.TouchDown*/, mActivePointers.size(),
                         mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
                 break;
             }
@@ -292,7 +306,13 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
                         mPointY[i] = point.y;
                     }
                 }
-
+				
+				// click event
+				if ((controls.getTick() - mLastClickTime) < mTimeClick) {
+					controls.pOnDrawingViewTouch(pascalObj, Const.Click, mActivePointers.size(),
+                        mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
+				}	
+				
                 controls.pOnDrawingViewTouch(pascalObj, Const.TouchUp, mActivePointers.size(),
                         mPointX, mPointY, mFling, mPinchZoomGestureState, mScaleFactor);
                 break;
@@ -395,7 +415,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             mScaleFactor *= detector.getScaleFactor();
-            mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
+            mScaleFactor = Math.max(mMinZoom, Math.min(mScaleFactor, mMaxZoom));
             mPinchZoomGestureState = 1;
             return true;
         }
@@ -1006,11 +1026,11 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     public void SetMinZoomFactor(float _minZoomFactor) {
-        MIN_ZOOM = _minZoomFactor;
+        mMinZoom = _minZoomFactor;
     }
 
     public void SetMaxZoomFactor(float _maxZoomFactor) {
-        MAX_ZOOM = _maxZoomFactor;
+        mMaxZoom = _maxZoomFactor;
     }
 
     public Canvas GetCanvas() {
@@ -1314,7 +1334,12 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
     }
 
     //by Kordal
-    public float GetDensity() {
+    public void SetTimeClicks(int _timeClick, int _timeDbClick) {
+		mTimeClick       = _timeClick;
+		mTimeDoubleClick = _timeDbClick;
+	}	
+	
+	public float GetDensity() {
         return controls.activity.getResources().getDisplayMetrics().density;
     }      
  
@@ -1339,6 +1364,6 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 	public void SetLayerType(byte _value) {
 		setLayerType(_value/*View.LAYER_TYPE_SOFTWARE*/, null);
 	}	
-		
+	 
 } //end class
 
