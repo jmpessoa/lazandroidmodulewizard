@@ -162,6 +162,8 @@ class Const {
   public static final int TouchDown                   =  0;
   public static final int TouchMove                   =  1;
   public static final int TouchUp                     =  2;
+  public static final int Click                 	  =  3; // new
+  public static final int DoubleClick                 =  4;  // new
   public static final int Click_Default               =  0;
 }
 

@@ -28,6 +28,8 @@ private
   FOnTouchDown  : TOnTouchExtended;
   FOnTouchMove  : TOnTouchExtended;
   FOnTouchUp    : TOnTouchExtended;
+  FOnClick      : TOnTouch;
+  FOnDoubleClick: TOnTouch;
   FOnSizeChanged: TOnDrawingViewSizeChanged;
 
   FPaintStrokeWidth: Single;
@@ -37,7 +39,9 @@ private
   FPaintStrokeCap: TStrokeCap;
   // new
   FPaintShader: JPaintShader; // Java : jPaintShader
-  
+  FTimeClick: Integer;
+  FTimeDoubleClick: Integer;
+
   FImageIdentifier: string;
 
   FMinZoomFactor: Single;
@@ -53,9 +57,11 @@ private
 
   procedure SetVisible(Value: Boolean);
   procedure SetColor(Value: TARGBColorBridge); //background
-  function GetCanvas(): jObject;
+  function  GetCanvas(): jObject;
   // new 
   procedure SetPaintShader(Value: JPaintShader); // Java : jPaintShader
+  procedure SetTimeClick(Value: Integer);
+  procedure SetTimeDoubleClick(Value: Integer);
 protected
   procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 public
@@ -271,15 +277,19 @@ published
   property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
   property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
   property BufferedDraw: boolean read FBufferedDraw write SetBufferedDraw;
-  // Event - Click
-  //property OnClick: TOnNotify read FOnClick write FOnClick;
+
+  property TimeClick: Integer read FTimeClick write SetTimeClick; // default 250
+  property TimeDoubleClick: Integer read FTimeDoubleClick write SetTimeDoubleClick; // default 350
   // Event - Drawing
-  property OnDraw      : TOnTouchExtended read FOnDraw write FOnDraw;
+  property OnDraw       : TOnTouchExtended read FOnDraw write FOnDraw;
   property OnSizeChanged: TOnDrawingViewSizeChanged read FOnSizeChanged write FOnSizeChanged;
   // Event - Touch
-  property OnTouchDown : TOnTouchExtended read FOnTouchDown write FOnTouchDown;
-  property OnTouchMove : TOnTouchExtended read FOnTouchMove write FOnTouchMove;
-  property OnTouchUp   : TOnTouchExtended read FOnTouchUp   write FOnTouchUp;
+  property OnTouchDown  : TOnTouchExtended read FOnTouchDown write FOnTouchDown;
+  property OnTouchMove  : TOnTouchExtended read FOnTouchMove write FOnTouchMove;
+  property OnTouchUp    : TOnTouchExtended read FOnTouchUp   write FOnTouchUp;
+  // Event - Click
+  property OnClick      : TOnTouch read FOnClick write FOnClick;
+  property OnDoubleClick: TOnTouch read FOnDoubleClick write FOnDoubleClick;
 end;
 
 function jDrawingView_jCreate(env: PJNIEnv;_Self: int64; _bufferedDraw: boolean;  _backgroundColor: integer; this: jObject): jObject;
@@ -435,6 +445,8 @@ begin
   FBufferedDraw:= False;
   FColor:= colbrWhite;
 
+  FTimeClick := 250;
+  FTimeDoubleClick := 350;
 end;
 
 destructor jDrawingView.Destroy;
@@ -470,6 +482,8 @@ begin
 
     jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);
     jDrawingView_SetId(FjEnv, FjObject, Self.Id);
+
+    jni_proc_ii(FjEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
   end;
 
   jDrawingView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -542,7 +556,8 @@ begin
   if (FInitialized = True) and (FColor <> colbrDefault)  then //View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
     jDrawingView_SetBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
-procedure jDrawingView.SetVisible(Value : Boolean);
+
+procedure jDrawingView.SetVisible(Value: Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
@@ -831,22 +846,24 @@ begin
 end;
 
 procedure jDrawingView.GenEvent_OnDrawingViewTouch(Obj: TObject; Act,
-  Cnt: integer; X, Y: array of Single; fligGesture: integer;
-  pinchZoomGestureState: integer; zoomScaleFactor: single);
+  Cnt: Integer; X, Y: array of Single; fligGesture: Integer;
+  pinchZoomGestureState: Integer; zoomScaleFactor: Single);
 begin
   case Act of
-   cTouchDown : begin
-                   if Assigned(FOnTouchDown) then
-                      FOnTouchDown(Obj,Cnt,X,Y,TFlingGesture(fligGesture),TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
-                end;
-   cTouchMove : begin
-                   if Assigned(FOnTouchMove) then
-                      FOnTouchMove(Obj,Cnt,X,Y,TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
-                end;
-   cTouchUp   : begin
-                   if Assigned(FOnTouchUp) then
-                      FOnTouchUp(Obj,Cnt,X,Y,TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState),zoomScaleFactor)
-                end;
+    cTouchDown: if Assigned(FOnTouchDown) then
+      FOnTouchDown(Obj, Cnt, X, Y, TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState), zoomScaleFactor);
+
+    cTouchMove: if Assigned(FOnTouchMove) then
+      FOnTouchMove(Obj,Cnt, X, Y, TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState), zoomScaleFactor);
+
+    cTouchUp: if Assigned(FOnTouchUp) then
+      FOnTouchUp(Obj, Cnt, X, Y, TFlingGesture(fligGesture), TPinchZoomScaleState(pinchZoomGestureState), zoomScaleFactor);
+
+    cClick: if Assigned(FOnClick) then
+      FOnClick(Obj, Cnt, X[0], Y[0]);
+
+    cDoubleClick: if Assigned(FOnDoubleClick) then
+      FOnDoubleClick(Obj, Cnt, X[0], Y[0]);
   end;
 end;
 
@@ -1100,14 +1117,27 @@ begin
 end;
 *)
 
+procedure jDrawingView.SetTimeClick(Value: Integer);
+begin
+  FTimeClick := Value;
+  if FInitialized then
+    jni_proc_ii(FjEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
+end;
+
+procedure jDrawingView.SetTimeDoubleClick(Value: Integer);
+begin
+  FTimeDoubleClick := Value;
+  if FInitialized then
+    jni_proc_ii(FjEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
+end;
+
 function jDrawingView.GetCanvas(): jObject;
 begin
   //in designing component state: result value here...
-  Result:= nil;
+  Result := nil;
   if FInitialized then
-   Result:= jDrawingView_GetCanvas(FjEnv, FjObject);
+    Result := jDrawingView_GetCanvas(FjEnv, FjObject);
 end;
-
 
 procedure jDrawingView.Notification(AComponent: TComponent; Operation: TOperation);
 begin
