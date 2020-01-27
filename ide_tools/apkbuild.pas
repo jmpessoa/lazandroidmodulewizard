@@ -195,7 +195,8 @@ begin
   msgLine.Urgency := mluProgress;
   if Trim(Line) <> '' then
   begin
-    if Pos('FAILURE', Line) > 0 then
+    //if Pos('FAILURE', Line) > 0 then
+    if Pos('> Task', Line) > 0 then //To show Gradle errors [by TR3E]
     begin
       FFailureGot := True;
       msgLine.Urgency := mluFatal;
