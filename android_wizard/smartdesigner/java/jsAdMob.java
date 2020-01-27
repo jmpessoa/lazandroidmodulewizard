@@ -1,6 +1,6 @@
 package org.lamw.appadmoddemo1;
 
-
+import android.os.AsyncTask;
 import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -18,7 +19,7 @@ import com.google.android.gms.ads.AdListener;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Reviewed by TR3E on 2019-01-22
+// Reviewed by TR3E on 2019-01-27
 //-------------------------------------------------------------------------
 
 /* Banner sizes:
@@ -109,13 +110,23 @@ public class jsAdMob extends FrameLayout {
    public int AdMobGetBannerSize(){
       return admobBannerSize;
    }
+   
+   class atAdModInit extends AsyncTask<Void, Void, Void> {
+	   @Override
+       protected Void doInBackground(Void... params) {
+		   
+		   if( !admobInit ) {
+		       MobileAds.initialize(controls.activity, admobId);
+		       admobInit = true;
+		    }
+		   
+		   return null;
+	   }
+   }
 
    public void AdMobInit(){	  
-       
-    if( !admobInit ) {
-       MobileAds.initialize(controls.activity, admobId);
-       admobInit = true;
-    }
+           
+	new atAdModInit().execute();
     
    }
    
