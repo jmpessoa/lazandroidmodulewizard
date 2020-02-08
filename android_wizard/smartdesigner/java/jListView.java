@@ -66,6 +66,7 @@ class jListItemRow {
 	boolean checked;
 	int textSize;
 	int textColor;
+	int textColorInfo;
 	int highLightColor = Color.TRANSPARENT;
 	int textDecorated;
 	int textSizeDecorated;
@@ -714,8 +715,14 @@ class jArrayAdapter extends ArrayAdapter {
 				
 				itemText[i].setText(lines[i]);
 
-				if (items.get(position).textColor != 0) {
+				if( i == 0 ){
+				 if (items.get(position).textColor != 0) {
 					itemText[i].setTextColor(items.get(position).textColor);
+				 }
+				} else {
+					if (items.get(position).textColorInfo != 0) {
+						itemText[i].setTextColor(items.get(position).textColorInfo);
+					 }	
 				}
 
 				if (mDispatchOnDrawItemTextColor)  {
@@ -1410,7 +1417,8 @@ public class jListView extends ListView {
 	private int             widgetItem;
 	private String          widgetText;
 	private int             widgetTextColor;	
-	private int             textColor;		
+	private int             textColor;
+	private int				textColorInfo;
 	private int             textSize;
 	private Typeface        typeFace = Typeface.DEFAULT;
 
@@ -1587,6 +1595,10 @@ public class jListView extends ListView {
 		this.textColor =textcolor;
 	}
 	
+	public  void SetTextColorInfo( int textcolorinfo) {
+		this.textColorInfo = textcolorinfo;
+	}
+	
 	public void setTextSize (int textsize) {
 		this.textSize = textsize;
 	}
@@ -1747,7 +1759,8 @@ public class jListView extends ListView {
 		info.widgetText= widgetText;
 		info.checked = false;
 		info.textSize= textSize;
-		info.textColor= textColor;		
+		info.textColor     = textColor;
+		info.textColorInfo = textColorInfo;
 		info.widgetTextColor= widgetTextColor;		
 		info.bmp = genericBmp;
 
@@ -1778,7 +1791,8 @@ public class jListView extends ListView {
 		info.widgetText= widgetText;
 		info.checked = false;
 		info.textSize= textSize;
-		info.textColor= textColor;
+		info.textColor     = textColor;
+		info.textColorInfo = textColorInfo;
 		info.widgetTextColor= widgetTextColor;
 		info.bmp = bm;
 
@@ -1809,7 +1823,8 @@ public class jListView extends ListView {
 		info.leftDelimiter = leftDelimiter;
 		info.rightDelimiter = rightDelimiter;		
 		info.textSize= fontSize;
-		info.textColor= fontColor;
+		info.textColor     = fontColor;
+		info.textColorInfo = fontColor;
 		info.bmp = img;
 
 		info.textDecorated = textDecorated;
@@ -1840,7 +1855,8 @@ public class jListView extends ListView {
 		info.leftDelimiter = leftDelimiter;
 		info.rightDelimiter = rightDelimiter;		
 		info.textSize= fontSize;
-		info.textColor= fontColor;
+		info.textColor     = fontColor;
+		info.textColorInfo = fontColor;
 		info.bmp = null;
 
 		info.textDecorated = textDecorated;
@@ -1867,6 +1883,13 @@ public class jListView extends ListView {
 	public  void setTextSize2(int textsize, int index) {
 		if (textsize != 0) {
 			alist.get(index).textSize = textsize;
+			aadapter.notifyDataSetChanged();
+		}
+	}
+	
+	public void SetTextColorInfoByIndex(int value, int index) {
+		if (value != 0) {
+			alist.get(index).textColorInfo = value;
 			aadapter.notifyDataSetChanged();
 		}
 	}

@@ -1525,6 +1525,7 @@ type
     FWidgetText   : string;
     FDelimiter    : string;
     FImageItem    : jBitmap;
+    FTextColorInfo: TARGBColorBridge; // by tr3e
     FTextDecorated: TTextDecorated;
     FTextSizeDecorated: TTextSizeDecorated;
     FItemLayout   : TItemLayout;
@@ -1625,6 +1626,9 @@ type
 
     procedure SetImageByIndex(imgResIdentifier: string; index: integer);  overload; // ..res/drawable
 
+    procedure SetTextColorInfo(_color: TARGBColorBridge); // by tr3e
+    procedure SetTextColorInfoByIndex(Value: TARGBColorBridge; index: integer); // by tr3e
+
     procedure SetTextDecoratedByIndex(Value: TTextDecorated; index: integer);
     procedure SetTextSizeDecoratedByIndex(value: TTextSizeDecorated; index: integer);
     procedure SetTextAlignByIndex(Value: TTextAlign; index: integer);
@@ -1711,6 +1715,7 @@ type
     property WidgetText: string read FWidgetText write FWidgetText;
     property ImageItem: jBitmap read FImageItem write SetImage;
     property Delimiter: string read FDelimiter write FDelimiter;
+    property TextColorInfo: TARGBColorBridge read FTextColorInfo write SetTextColorInfo; // by tr3e
     property TextDecorated: TTextDecorated read FTextDecorated write FTextDecorated;
     property ItemLayout: TItemLayout read FItemLayout write FItemLayout;
     property TextSizeDecorated: TTextSizeDecorated read FTextSizeDecorated write FTextSizeDecorated;
@@ -7889,7 +7894,8 @@ begin
   FHeight:= 96;
   FWidth:= 100;
 
-  FHighLightSelectedItemColor:= colbrDefault;
+  FHighLightSelectedItemColor := colbrDefault;
+  FTextColorInfo              := colbrDefault;
   FImageItemIdentifier:= '';
 
   FItemPaddingTop    := 10;
@@ -8097,7 +8103,12 @@ begin
 
    if FHighLightSelectedItemColor <> colbrDefault then
    begin
-    jListView_SetHighLightSelectedItemColor(FjEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedItemColor));
+    SetHighLightSelectedItemColor(FHighLightSelectedItemColor);
+   end;
+
+   if FTextColorInfo <> colbrDefault then
+   begin
+    SetTextColorInfo(FTextColorInfo);
    end;
   end;
 
@@ -8570,6 +8581,23 @@ end;
 procedure jListView.GenEvent_OnScrollStateChanged(Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: boolean);
 begin
   if Assigned(FOnScrollStateChanged) then FOnScrollStateChanged(Obj, firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
+end;
+
+// by tr3e
+procedure jListView.SetTextColorInfo(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  FTextColorInfo:= _color;
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetTextColorInfo', GetARGB(FCustomColor, _color));
+end;
+
+// by tr3e
+procedure jListView.SetTextColorInfoByIndex(Value: TARGBColorBridge; index: integer);
+begin
+  //FFontColor:= Value;
+  if FInitialized  and (Value <> colbrDefault) then
+     jni_proc_ii(FjEnv, FjObject, 'SetTextColorInfoByIndex', GetARGB(FCustomColor, Value), index);
 end;
 
 procedure jListView.SetHighLightSelectedItemColor(_color: TARGBColorBridge);
