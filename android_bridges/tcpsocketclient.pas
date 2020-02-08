@@ -16,6 +16,9 @@ TOnSendFileFinished =  procedure(Sender: TObject; fileName: string; fileSize: in
 TOnGetFileProgress =  procedure(Sender: TObject; fileName: string; remainingFileSize: integer; fileSize: integer) of object;
 TOnGetFileFinished =  procedure(Sender: TObject; fileName: string; fileSize: integer) of object;
 
+TOnDisConnected=procedure(Sender:TObject) of object;
+
+
 TDataTransferMode = (dtmText, dtmByte, dtmFileGet, dtmFileSend);
 
 {Draft Component code by "Lazarus Android Module Wizard" [5/19/2015 18:49:35]}
@@ -32,6 +35,7 @@ jTCPSocketClient = class(jControl)
     FOnSendFileFinished: TOnSendFileFinished;
     FOnGetFileProgress: TOnGetFileProgress;
     FOnGetFileFinished: TOnGetFileFinished;
+    FOnDisConnected: TOnDisConnected;
   public
 
     constructor Create(AOwner: TComponent); override;
@@ -65,6 +69,7 @@ jTCPSocketClient = class(jControl)
     procedure GenEvent_pOnTCPSocketClientFileSendFinished(Sender: TObject;  filename: string;  filesize: integer);
     procedure GenEvent_OnTCPSocketClientFileGetProgress(Sender: TObject; filename: string; remainingFileSize: integer; filesize: integer);
     procedure GenEvent_pOnTCPSocketClientFileGetFinished(Sender: TObject;  filename: string;  filesize: integer);
+    procedure GenEvent_OnTCPSocketClientDisConnected(Sender:TObject);
 
  published
     property OnMessagesReceived: TOnMessageReceived read FOnMessageReceived write FOnMessageReceived;
@@ -74,6 +79,7 @@ jTCPSocketClient = class(jControl)
     property OnSendFileFinished: TOnSendFileFinished read FOnSendFileFinished write FOnSendFileFinished;
     property OnGetFileProgress: TOnGetFileProgress read FOnGetFileProgress write FOnGetFileProgress;
     property OnGetFileFinished: TOnGetFileFinished read FOnGetFileFinished write FOnGetFileFinished;
+    property OnDisConnected: TOnDisConnected read FOnDisConnected write FOnDisConnected;
 
 end;
 
@@ -238,6 +244,11 @@ end;
 procedure jTCPSocketClient.GenEvent_pOnTCPSocketClientFileGetFinished(Sender: TObject;  filename: string;  filesize: integer);
 begin
   if Assigned(FOnGetFileFinished) then FOnGetFileFinished(Sender, filename, filesize);
+end;
+
+procedure jTCPSocketClient.GenEvent_OnTCPSocketClientDisConnected(Sender:TObject);
+begin
+  if Assigned(FOnDisConnected) then FOnDisConnected(Sender);
 end;
 
 {-------- jTCPSocketClient_JNI_Bridge ----------}

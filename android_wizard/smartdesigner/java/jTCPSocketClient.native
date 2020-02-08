@@ -5,3 +5,4 @@ public native void pOnTCPSocketClientFileSendProgress(long pasobj, String filena
 public native void pOnTCPSocketClientFileSendFinished(long pasobj, String filename, int filesize);
 public native void pOnTCPSocketClientFileGetProgress(long pasobj, String filename, int remainingFileSize, int filesize);
 public native void pOnTCPSocketClientFileGetFinished(long pasobj, String filename, int filesize);
+public native void pOnTCPSocketClientDisConnected(long pasobj);

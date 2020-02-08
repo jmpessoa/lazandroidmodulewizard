@@ -72,7 +72,7 @@ uses
    procedure Java_Event_pOnTCPSocketClientFileSendFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
    procedure Java_Event_pOnTCPSocketClientFileGetProgress(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; remainingFileSize: integer; filesize: integer);
    procedure Java_Event_pOnTCPSocketClientFileGetFinished(env: PJNIEnv; this: jobject; Obj: TObject; filename: JString; filesize: integer);
-   procedure Java_Event_pOnTCPSocketClientError(env:PJNIEnv;this:JObject;Sender:TObject;errorMessage:jString);
+   procedure Java_Event_pOnTCPSocketClientDisConnected(env:PJNIEnv;this:JObject;Sender:TObject);
 
    Procedure Java_Event_pOnMediaPlayerVideoSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeight: integer);
    Procedure Java_Event_pOnMediaPlayerCompletion(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -1253,14 +1253,14 @@ begin
   end;
 end;
 
-procedure Java_Event_pOnTCPSocketClientError(env:PJNIEnv;this:JObject;Sender:TObject;errorMessage:jString);
+procedure Java_Event_pOnTCPSocketClientDisConnected(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
   if Sender is jTCPSocketClient then
   begin
     jForm(jTCPSocketClient(Sender).Owner).UpdateJNI(gApp);
-    //jTCPSocketClient(Sender).GenEvent_OnTCPSocketClientError(Sender,GetString(env,errorMessage));
+    jTCPSocketClient(Sender).GenEvent_OnTCPSocketClientDisConnected(Sender);
   end;
 end;
 

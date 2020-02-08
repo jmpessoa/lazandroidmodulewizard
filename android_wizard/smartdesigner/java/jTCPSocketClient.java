@@ -287,6 +287,8 @@ public class jTCPSocketClient {
       	  
       	  mSocket = null;
         }
+
+        controls.pOnTCPSocketClientDisConnected(pascalObj);
       }
     
     /* https://stackoverflow.com/questions/6053602/what-arguments-are-passed-into-asynctaskarg1-arg2-arg3
