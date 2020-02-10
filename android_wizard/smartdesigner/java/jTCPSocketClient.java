@@ -82,6 +82,8 @@ public class jTCPSocketClient {
     private int progressStep = -1;
    
     private int mDataType = 0;   //0=dtmText,  1=dtmByte, 2=dtmGetFile, 3=dtmSendFile
+
+    private boolean InitialConn = true;
     
     public jTCPSocketClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
  	       context   = _ctrls.activity;
@@ -112,14 +114,16 @@ public class jTCPSocketClient {
     	  
     	  CloseConnection();
     	 
-    	  // Wait for close connection
-    	  while( !isCloseConnection() ){ 
+    	  //Wait for close connection
+          /*
+    	  while( !isCloseConnection() ){  //inner to CloseConnection();
     		  try {
     		      Thread.sleep(10);    		      
-    		    } catch (Exception e) {    		      
+    		    } catch(Exception e) {
     		    }
     	  }
-    	  
+          */
+
     	  if ((mClientGetAllTask != null) || (mClientSendFileTask != null)) return false;
     	  
           mServerIP         = _serverIP;    //IP address
@@ -150,7 +154,7 @@ public class jTCPSocketClient {
               if( mDataType < 3 )               	  
                mClientGetAllTask = new TCPSocketClientGetAllTask().execute();                                            
              
-              if( connected ) controls.pOnTCPSocketClientConnected(pascalObj);
+              /*if( connected )*/ controls.pOnTCPSocketClientConnected(pascalObj);
               
               return true;
           } else{
@@ -201,7 +205,7 @@ public class jTCPSocketClient {
     		return false;
     }
 
-    public void CloseConnection( ) {
+    private void CloseConnection( ) {
     	 	  
     	  if( mClientGetAllTask != null ) mClientGetAllTask.cancel(false);
     	  if( mClientSendFileTask != null ) mClientSendFileTask.cancel(false);
@@ -282,14 +286,21 @@ public class jTCPSocketClient {
       	if (mSocket != null) {          	      			 
       	  try{ 
 				mSocket.close();				
-			  } catch (IOException e) {				
-			  }
-      	  
+      	  } catch (IOException e) {
+      	            	  }
       	  mSocket = null;
         }
 
-        controls.pOnTCPSocketClientDisConnected(pascalObj);
-      }
+      	//NEW code!!!
+        while( !isCloseConnection() ){
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+            }
+        }
+        controls.pOnTCPSocketClientDisConnected(pascalObj); //NEW!
+
+    }
     
     /* https://stackoverflow.com/questions/6053602/what-arguments-are-passed-into-asynctaskarg1-arg2-arg3
      * Params, the type of the parameters sent to the task upon execution.
@@ -423,7 +434,7 @@ public class jTCPSocketClient {
             }           
             
             mClientGetAllTask = null;
-            CloseConnection(); 
+            CloseConnection();
             return null;
         }
 
@@ -572,7 +583,7 @@ public class jTCPSocketClient {
 					//e.printStackTrace();
 					
 					mFileSendSize = -1;
-					CloseConnection();					
+					CloseConnection();
 			}
         	        			
         	mClientSendFileTask = null;
@@ -583,7 +594,6 @@ public class jTCPSocketClient {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-                        
             controls.pOnTCPSocketClientFileSendProgress(pascalObj, mFileSendName, values[0], mFileSendSize);  //TODO                                    
         }
 
@@ -591,7 +601,6 @@ public class jTCPSocketClient {
         protected void onPostExecute(Void aVoid) {
             // update the UI (this is executed on UI thread)
             super.onPostExecute(aVoid);
-                        
             controls.pOnTCPSocketClientFileSendFinished(pascalObj, mFileSendName, mFileSendSize);
         }
     }
@@ -687,9 +696,7 @@ public class jTCPSocketClient {
     	   }    	       	 
     		
     	return true;
-    	    	
     }
-    
 }
 
 

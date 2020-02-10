@@ -35,7 +35,7 @@ jTCPSocketClient = class(jControl)
     FOnSendFileFinished: TOnSendFileFinished;
     FOnGetFileProgress: TOnGetFileProgress;
     FOnGetFileFinished: TOnGetFileFinished;
-    FOnDisConnected: TOnDisConnected;
+    FOnDisconnected: TOnDisConnected;
   public
 
     constructor Create(AOwner: TComponent); override;
@@ -79,7 +79,7 @@ jTCPSocketClient = class(jControl)
     property OnSendFileFinished: TOnSendFileFinished read FOnSendFileFinished write FOnSendFileFinished;
     property OnGetFileProgress: TOnGetFileProgress read FOnGetFileProgress write FOnGetFileProgress;
     property OnGetFileFinished: TOnGetFileFinished read FOnGetFileFinished write FOnGetFileFinished;
-    property OnDisConnected: TOnDisConnected read FOnDisConnected write FOnDisConnected;
+    property OnDisconnected: TOnDisconnected read FOnDisconnected write FOnDisconnected;
 
 end;
 
@@ -248,7 +248,7 @@ end;
 
 procedure jTCPSocketClient.GenEvent_OnTCPSocketClientDisConnected(Sender:TObject);
 begin
-  if Assigned(FOnDisConnected) then FOnDisConnected(Sender);
+  if Assigned(FOnDisconnected) then FOnDisconnected(Sender);
 end;
 
 {-------- jTCPSocketClient_JNI_Bridge ----------}
