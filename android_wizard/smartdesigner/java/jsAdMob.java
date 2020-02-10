@@ -110,23 +110,13 @@ public class jsAdMob extends FrameLayout {
    public int AdMobGetBannerSize(){
       return admobBannerSize;
    }
-   
-   class atAdModInit extends AsyncTask<Void, Void, Void> {
-	   @Override
-       protected Void doInBackground(Void... params) {
-		   
-		   if( !admobInit ) {
-		       MobileAds.initialize(controls.activity, admobId);
-		       admobInit = true;
-		    }
-		   
-		   return null;
-	   }
-   }
 
    public void AdMobInit(){	  
            
-	new atAdModInit().execute();
+	   if( !admobInit ) {
+	       MobileAds.initialize(controls.activity, admobId);
+	       admobInit = true;
+	    }
     
    }
    
