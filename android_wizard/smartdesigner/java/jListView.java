@@ -1582,11 +1582,15 @@ public class jListView extends ListView {
 	}
 
 	public boolean isItemChecked(int index) {
+		if( (index < 0) || (index >= alist.size()) ) return false;
+		
 		return alist.get(index).checked;
 	}
 
 
 	public String GetWidgetText(int index) {
+		if( (index < 0) || (index >= alist.size()) ) return "";
+		
 		return alist.get(index).widgetText;
 	}
 
@@ -1653,15 +1657,21 @@ public class jListView extends ListView {
 	}
 
 	public  String  getItemText(int index) {
+		if( (index < 0) || (index >= alist.size()) ) return "";
+		
 		return alist.get(index).label;        
 	}
 	
 	// by tr3e
 	public void setItemTextByIndex( String _fullItemCaption, int index ) {
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).label = _fullItemCaption;        
 	}
 	
 	public  int GetFontSizeByIndex(int index) {
+		if( (index < 0) || (index >= alist.size()) ) return -1;
+		
 		return alist.get(index).textSize;		
 	}
 
@@ -1874,6 +1884,8 @@ public class jListView extends ListView {
 	}
 
 	public void setTextColor2(int value, int index) {
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		if (value != 0) {
 			alist.get(index).textColor = value;
 			aadapter.notifyDataSetChanged();
@@ -1881,6 +1893,8 @@ public class jListView extends ListView {
 	}
 
 	public  void setTextSize2(int textsize, int index) {
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		if (textsize != 0) {
 			alist.get(index).textSize = textsize;
 			aadapter.notifyDataSetChanged();
@@ -1888,6 +1902,8 @@ public class jListView extends ListView {
 	}
 	
 	public void SetTextColorInfoByIndex(int value, int index) {
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		if (value != 0) {
 			alist.get(index).textColorInfo = value;
 			aadapter.notifyDataSetChanged();
@@ -1906,11 +1922,15 @@ public class jListView extends ListView {
 	}
 
 	public  void setImageItem(Bitmap bm, int index) {
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).bmp = bm;
 		aadapter.notifyDataSetChanged();
 	}
 
-	public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable		
+	public  void setImageItem(String imgResIdentifier, int index) {	   // ..res/drawable
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(imgResIdentifier));
 		
 		if( d != null ){
@@ -1927,68 +1947,94 @@ public class jListView extends ListView {
 	}
 		
 	public void setTextDecorated(int value, int index){
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).textDecorated = value;
 		aadapter.notifyDataSetChanged();
 	}
 
 	public void setTextSizeDecorated(int value, int index) {
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).textSizeDecorated = value;
 		aadapter.notifyDataSetChanged();
 	}
 
 	public void setItemLayout(int value, int index){
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).itemLayout = value; //0: image-text-widget; 1 = widget-text-image; 2: just text
 		aadapter.notifyDataSetChanged();
 	}
 
 	public void setWidgetItem(int value, int index){
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).widget = value;
 		aadapter.notifyDataSetChanged();
 	}
 
 	public void setTextAlign(int value, int index){
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).textAlign = value;
 		aadapter.notifyDataSetChanged();
 	}
 	//by tr3e
 	public void setTextPosition(int value, int index){
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).textPosition = value;
 		aadapter.notifyDataSetChanged();
 	}
 
 	public void setWidgetItem(int value, String txt, int index){
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).widget = value;
 		alist.get(index).widgetText = txt;
 		aadapter.notifyDataSetChanged();
 	}
 
 	public void setWidgetText(String value, int index){
+		if( (index < 0) || (index >= alist.size()) ) return;
+		
 		alist.get(index).widgetText = value;
 		aadapter.notifyDataSetChanged();
 	}
 	
 	// tr3e add getChecker for widget
-	public boolean getWidgetCheck( int _index ){
-		return alist.get(_index).checked;
+	public boolean getWidgetCheck( int index ){
+		if( (index < 0) || (index >= alist.size()) ) return false;
+		
+		return alist.get(index).checked;
 	}
 
 	public void setWidgetCheck(boolean _value, int _index){
+		if( (_index < 0) || (_index >= alist.size()) ) return;
+		
 		alist.get(_index).checked = _value;
 		aadapter.notifyDataSetChanged();		
 	}
 
 	public void setItemTagString(String _tagString, int _index){
+		if( (_index < 0) || (_index >= alist.size()) ) return;
+		
 		alist.get(_index).tagString = _tagString;
 		aadapter.notifyDataSetChanged();
 	}
 
 
 	public String getItemTagString(int _index){
+		if( (_index < 0) || (_index >= alist.size()) ) return "";
+		
 		return alist.get(_index).tagString;
 	}
 
 
-	private void DoHighlight(int position, int _color) {	
+	private void DoHighlight(int position, int _color) {
+		if( (position < 0) || (position >= alist.size()) ) return;
+		
 		alist.get(position).highLightColor = _color;
 		aadapter.notifyDataSetChanged();
 	}
@@ -2284,6 +2330,8 @@ public class jListView extends ListView {
 	}
 	
 	public void SetSelection(int _index) {
+		if( (_index < 0) || (_index >= alist.size()) ) return;
+		
 		this.setSelection(_index);		
 		if (highLightSelectedItem) {	
 			 if (lastSelectedItem != -1) {
@@ -2294,7 +2342,9 @@ public class jListView extends ListView {
 		}			
 	}
 
-        public void SmoothScrollToPosition(int _index) {
+    public void SmoothScrollToPosition(int _index) {
+        if( (_index < 0) || (_index >= alist.size()) ) return;
+        
 		this.smoothScrollToPosition(_index);
 		if (highLightSelectedItem) {
 			 if (lastSelectedItem != -1) {
@@ -2306,6 +2356,8 @@ public class jListView extends ListView {
 	}
 
 	public void SetItemChecked(int _index, boolean _value) {
+		if( (_index < 0) || (_index >= alist.size()) ) return;
+		
 	    this.setItemChecked(_index, _value);
 		alist.get(_index).checked = _value;
 		
