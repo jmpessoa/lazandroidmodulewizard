@@ -1389,16 +1389,16 @@ begin
          if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 28',
                        '[Suggestion] Change Target API to 28'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
          begin
-           manifestTargetApi:= 28;
-           buildTool:= GetBuildTool(28);
-           if queryValue <> '28' then
-           begin
-              if IsAllCharNumber(PChar(queryValue)) then
+           if ( IsAllCharNumber(PChar(queryValue)) AND (queryValue <> '28') ) then
               begin
                  manifestTargetApi:= StrToInt(queryValue);
                  buildTool:= GetBuildTool(manifestTargetApi);
-              end;
-           end;
+           end
+           else
+           begin
+             manifestTargetApi:= 28;
+             buildTool:= GetBuildTool(28);
+           end;  ;
          end; //if input...
 
       end
