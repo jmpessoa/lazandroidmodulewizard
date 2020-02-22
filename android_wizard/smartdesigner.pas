@@ -1175,7 +1175,7 @@ begin
       Proc.Options := [poUsePipes];
       //Proc.Options:= Proc.Options + [poWaitOnExit];
       Proc.Parameters.Add('-v');
-      Proc.Executable:= path + 'bin' + pathDelim + 'gradle'+strExt;
+      Proc.Executable:= ConcatPaths([path,'bin'])+ pathDelim + 'gradle'+strExt;
       Proc.Execute();
       while (Proc.Running) or (Proc.Output.NumBytesAvailable > 0) or
         (Proc.Stderr.NumBytesAvailable > 0) do
