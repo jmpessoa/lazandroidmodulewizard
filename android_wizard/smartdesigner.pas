@@ -451,7 +451,7 @@ begin
                  if builderNumber > platform then FCandidateSdkBuild:= auxStr;
                end;
 
-               if platform = builderNumber then
+               if platform <= builderNumber then
                begin
                  FCandidateSdkBuild:= auxStr;
                  Result:= True;

@@ -214,7 +214,7 @@ begin
          begin
            numberAsString:= Copy(auxStr, 1 , 2);  //19
            builderNumber:=  StrToInt(numberAsString);
-           if  platform = builderNumber then Result:= True;
+           if  platform <= builderNumber then Result:= True;
          end;
        end;
     end;

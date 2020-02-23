@@ -1100,7 +1100,7 @@ begin
            if IsAllCharNumber(PChar(numberAsString)) then
                builderNumber:=  StrToInt(numberAsString);
 
-           if  platform = builderNumber then Result:= True;
+           if  platform <= builderNumber then Result:= True;
        end;
     end;
   end;

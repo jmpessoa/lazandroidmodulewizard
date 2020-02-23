@@ -1171,7 +1171,7 @@ begin
                savedBuilder:= builderNumber;
                if builderNumber > platform then FCandidateSdkBuild:= auxStr;
              end;
-             if  platform = builderNumber then
+             if  platform <= builderNumber then
              begin
                outBuildTool:= auxStr; //25.0.3
                Result:= True;
