@@ -1161,11 +1161,11 @@ end;
 function TLamwSmartDesigner.GetGradleVersionFromGradle(path: string): string;
 var
    Proc: TProcess;
-   CharBuffer: array [0..511] of char;
    p, ReadCount: integer;
-   strExt, strTemp: string;
+   strExt, strTemp, buff: string;
 begin
     Result:='';
+    strTemp:='';
     if path = '' then Exit;
     strExt:= '';
     {$IFDEF WINDOWS}
@@ -1182,18 +1182,19 @@ begin
       if FileExists(Proc.Executable) then
       begin
       Proc.Execute();
-      while (Proc.Running) or (Proc.Output.NumBytesAvailable > 0) or
-        (Proc.Stderr.NumBytesAvailable > 0) do
+      while (Proc.Running) do
       begin
         // read stdout and write to our stdout
         while Proc.Output.NumBytesAvailable > 0 do
         begin
-          ReadCount := Min(512, Proc.Output.NumBytesAvailable); //Read up to buffer, not more
-          Proc.Output.Read(CharBuffer, ReadCount);
-          strTemp:= Copy(CharBuffer, 0, ReadCount);
-          if Pos('Gradle', strTemp) > 0 then
+          ReadCount:=Proc.Output.NumBytesAvailable;
+          setlength(buff, ReadCount);
+          Proc.Output.ReadBuffer(buff[1], ReadCount);
+          strTemp := strTemp + buff;
+          p:=Pos('Gradle ', strTemp);
+          if (p > 0) then
           begin
-             Result:= Trim(strTemp);
+            Result:= Trim(Copy(strTemp,p,MaxInt));
              break;
           end;
         end;
@@ -1207,7 +1208,7 @@ begin
         end;
         }
         application.ProcessMessages;
-        //Sleep(200);
+        Sleep(1);
       end;
       ExitCode := Proc.ExitStatus;
       end;
@@ -1217,7 +1218,11 @@ begin
       if Result <> '' then
       begin
         p:= Pos(' ', Result);  //Gradle 3.3
-        Result:= Copy(Result, p+1, MaxInt); //3.3
+        if (p>1) then Result:= Copy(Result, p+1, MaxInt); //3.3
+        //Find line ending
+        p := Pos(#13, Result);
+        if (p=0) then p := Pos(#10, Result);
+        if (p>0) then Delete(Result, p, MaxInt);
         IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Success!! Found Gradle version: ' + Result);
       end
       else
