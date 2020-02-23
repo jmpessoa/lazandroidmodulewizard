@@ -141,13 +141,18 @@ var
    userString: string;
 begin
   Result:='';
-  strAux:= Trim(EditpathToGradle.Text);  // C:\adt32\gradle-3.3
+  strAux:= Trim(ExcludeTrailingPathDelimiter(EditpathToGradle.Text));  // C:\adt32\gradle-3.3
   if strAux <> '' then
   begin
-     p:= Pos('-', strAux);
-     if p > 0 then
+     p:= LastDelimiter(PathDelim, strAux);
+     strAux:= Copy(strAux, p+1, MaxInt);  //gradle-3.3
+
+     p:=1;
+     //skip characters that do not represent a version number
+     while (p<=Length(strAux)) AND (NOT (strAux[p] in ['0'..'9','.'])) do Inc(p);
+     if (p<=Length(strAux)) then
      begin
-        Result:= Copy(strAux, p+1, MaxInt);  // 3.3
+        Result:= Copy(strAux, p, MaxInt);  // 3.3
         numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
         if Length(numberAsString) < 3 then
         begin

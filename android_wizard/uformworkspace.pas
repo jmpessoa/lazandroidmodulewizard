@@ -1388,13 +1388,16 @@ begin
   Result:='';
   if FPathToGradle <> '' then
   begin
-    posLastDelim:= LastDelimiter(PathDelim, FPathToGradle);
-    strAux:= Copy(FPathToGradle, posLastDelim+1, MaxInt);  //gradle-3.3
+    strAux:=ExcludeTrailingPathDelimiter(FPathToGradle);
+    posLastDelim:= LastDelimiter(PathDelim, strAux);
+    strAux:= Copy(strAux, posLastDelim+1, MaxInt);  //gradle-3.3
 
-    p:= Pos('-', strAux);
-    if p > 0 then
+    p:=1;
+    //skip characters that do not represent a version number
+    while (p<=Length(strAux)) AND (NOT (strAux[p] in ['0'..'9','.'])) do Inc(p);
+    if (p<=Length(strAux)) then
     begin
-        Result:= Copy(strAux, p+1, MaxInt);  // 3.3
+        Result:= Copy(strAux, p, MaxInt);  // 3.3
 
         if Result = '4.10'   then Result:= '4.9.1'
         else if Result = '4.10.1' then Result:= '4.9.2'

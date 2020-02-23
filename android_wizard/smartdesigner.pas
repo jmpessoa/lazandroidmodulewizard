@@ -558,11 +558,14 @@ var
   numberAsString: string;
   len: integer;
 begin
+  if (Length(gradleVers)>0) then
+  begin
   numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]);
   len:= Length(numberAsString);
   if len = 2 then numberAsString:= numberAsString + '00';
   if len = 3 then numberAsString:= numberAsString + '0';
   Result:= StrToInt(numberAsString);
+  end else Result:=0;
 end;
 
 function TLamwSmartDesigner.TryPluginCompatibility(gradleVers: string): string;
@@ -1172,10 +1175,12 @@ begin
     //FillChar(CharBuffer,SizeOf(CharBuffer),#0);
     try
       Proc := TProcess.Create(nil);
-      Proc.Options := [poUsePipes];
+      Proc.Options := [poUsePipes,poNoConsole];
       //Proc.Options:= Proc.Options + [poWaitOnExit];
       Proc.Parameters.Add('-v');
       Proc.Executable:= ConcatPaths([path,'bin'])+ pathDelim + 'gradle'+strExt;
+      if FileExists(Proc.Executable) then
+      begin
       Proc.Execute();
       while (Proc.Running) or (Proc.Output.NumBytesAvailable > 0) or
         (Proc.Stderr.NumBytesAvailable > 0) do
@@ -1205,6 +1210,7 @@ begin
         //Sleep(200);
       end;
       ExitCode := Proc.ExitStatus;
+      end;
     finally
       Proc.Free;
 
@@ -1229,14 +1235,16 @@ begin
   Result:='';
   if path <> '' then
   begin
-     path:= Copy(path,1, Length(path)-1);  //delete last pathDelimiter
-     posLastDelim:= LastDelimiter(PathDelim, path);
-     strAux:= Copy(path, posLastDelim+1, MaxInt);  //gradle-3.3
+     strAux:=ExcludeTrailingPathDelimiter(path);
+     posLastDelim:= LastDelimiter(PathDelim, strAux);
+     strAux:= Copy(strAux, posLastDelim+1, MaxInt);  //gradle-3.3
 
-     p:= Pos('-', strAux);
-     if p > 0 then
+     p:=1;
+     //skip characters that do not represent a version number
+     while (p<=Length(strAux)) AND (NOT (strAux[p] in ['0'..'9','.'])) do Inc(p);
+     if (p<=Length(strAux)) then
      begin
-        Result:= Copy(strAux, p+1, MaxInt);  // 3.3
+       Result:= Copy(strAux, p, MaxInt);  // 3.3
      end;
 
      if Result = '' then
