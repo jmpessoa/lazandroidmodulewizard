@@ -914,33 +914,27 @@ begin
          strList.Add('       abortOnError false');
          strList.Add('    }');
 
-         auxStr:='armeabi'; //ARMv6
+         auxStr:='';
          tempStr:= LowerCase(FInstructionSet);
+         if tempStr = 'armv6'  then auxStr:='armeabi';
          if tempStr = 'armv7a' then auxStr:='armeabi-v7a';
          if tempStr = 'x86'    then auxStr:='x86';
          if tempStr = 'x86_64' then auxStr:='x86_64';
          if tempStr = 'mipsel' then auxStr:='mips';
          if tempStr = 'armv8'  then auxStr:='arm64-v8a';
 
+         if (Length(auxStr)>0) then
+         begin
          strList.Add('    splits {');
          strList.Add('        abi {');
          strList.Add('            enable true');
          strList.Add('            reset()');
          strList.Add('            include '''+auxStr+'''');
+         //strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
          strList.Add('            universalApk false');
          strList.Add('        }');
          strList.Add('    }');
-
-         (*
-         strList.Add('    splits {');
-         strList.Add('        abi {');
-         strList.Add('            enable true');
-         strList.Add('            reset()');
-         strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
-         strList.Add('            universalApk false');
-         strList.Add('        }');
-         strList.Add('    }');
-         *)
+         end;
 
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin

@@ -1067,16 +1067,20 @@ begin
      list:= TStringList.Create;
 
      if Pos('AppCompat', newTheme) > 0 then   //AppCompat.Light.DarkActionBar   or  AppCompat.Light.NoActionBar
-       pathToFile:= FProjectPath + 'res'+PathDelim+'values'
+       strTemp:= 'values'
      else  //DeviceDefault   or  Holo.Light.DarkActionBar or Holo.Light.NoActionBar
-       pathToFile:= FProjectPath + 'res'+PathDelim+'values-v21';
+       strTemp:='values-v21';
 
-     list.LoadFromFile(pathToFile + PathDelim + 'styles.xml');
-     strTemp:= StringReplace(list.Text, FDefaultTheme,newTheme,[]); //rfReplaceAll, rfIgnoreCase
-     list.Text:= strTemp;
-     list.SaveToFile(pathToFile + PathDelim + 'styles.xml');
-     LazarusIDE.ActiveProject.CustomData['Theme']:= newTheme;
+     pathToFile:= ConcatPaths([FProjectPath,'res',strTemp])+ PathDelim + 'styles.xml';
 
+     if FileExists(pathToFile) then
+     begin
+       list.LoadFromFile(pathToFile);
+       strTemp:= StringReplace(list.Text, FDefaultTheme,newTheme,[]); //rfReplaceAll, rfIgnoreCase
+       list.Text:= strTemp;
+       list.SaveToFile(pathToFile);
+       LazarusIDE.ActiveProject.CustomData['Theme']:= newTheme;
+     end;
      list.Free;
   end;
 end;
