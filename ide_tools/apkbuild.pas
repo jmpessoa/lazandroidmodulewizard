@@ -191,21 +191,26 @@ var
   msgLine: TMessageLine;
 begin
   msgLine := CreateMsgLine(OutputIndex);
-  msgLine.Msg := Line;
-  msgLine.Urgency := mluProgress;
-  if Trim(Line) <> '' then
+  msgLine.Msg := TrimRight(Line);
+  msgLine.Urgency := mluNone;
+  if msgLine.Msg <> '' then
   begin
-    //if Pos('FAILURE', Line) > 0 then
-    if Pos('> Task', Line) > 0 then //To show Gradle errors [by TR3E]
+    if Pos('FAILURE', Line) > 0 then
     begin
       FFailureGot := True;
       msgLine.Urgency := mluFatal;
       Tool.ErrorMessage := Line;
-    end else
+    end
+    else
+    if Pos('> Task', Line) > 0 then
+    begin
+      msgLine.Urgency := mluProgress;
+    end
+    else
     if FFailureGot then
       msgLine.Urgency := mluImportant;
+    AddMsgLine(msgLine);
   end;
-  AddMsgLine(msgLine);
   Handled := True;
 end;
 
