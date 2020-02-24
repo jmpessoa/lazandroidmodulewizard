@@ -360,6 +360,7 @@ var
   locationSrc: string;
   tempStr, oldTargetStr, oldCompileSdkVersion: string;
   p: integer;
+  cpuTarget:string;
 begin
   fn := ExtractFilePath(FFileName) + 'build.xml';
   if not FileExists(fn) then
@@ -485,6 +486,21 @@ begin
     tempStr := StringReplace(strList.Text, 'targetSdkVersion ' + oldTargetStr,
       'targetSdkVersion ' + IntToStr(FTargetSdkVersion), [rfIgnoreCase]);  //targetSdkVersion 23
     strList.Text := tempStr;
+
+    for i := 0 to (strList.Count-1) do
+    begin
+      tempStr := strList.Strings[i];
+      if Pos(' include ',tempStr)>0 then
+      begin
+        cpuTarget := ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+        cpuTarget := ExtractFileName(cpuTarget);
+        p:=Pos('include',tempStr);
+        Delete(tempStr,p,MaxInt);
+        tempStr:=tempStr+'include '''+cpuTarget+'''';
+        strList.Strings[i]:=tempStr;
+        break;
+      end;
+    end;
 
     if FOldMinSdkVersion <> FMinSdkVersion then
     begin
@@ -1703,6 +1719,8 @@ begin
   if not IsLamwProject then
     Exit;
 
+  TryChangeChipset();
+
   with FManifest do
   begin
     for i := PermissonGrid.RowCount - 1 downto 1 do
@@ -1738,9 +1756,6 @@ begin
     LazarusIDE.ActiveProject.CustomData['BuildSystem'] := cbBuildSystem.Text;
 
   TryUpdateStyleXML();
-
-  TryChangeChipset();
-
 end;
 
 initialization

@@ -666,7 +666,7 @@ procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: str
 var
   strList, {listRequirements,} requiredList: TStringList;
   i, p, k, minsdkApi, sdkManifMInApiNumber: integer;
-  strTargetApi, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
+  strTargetApi, auxStr, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
   AndroidTheme: string;
   androidPluginStr: string;
   androidPluginNumber: integer;
@@ -913,6 +913,34 @@ begin
          strList.Add('    lintOptions {');
          strList.Add('       abortOnError false');
          strList.Add('    }');
+
+         auxStr:='armeabi'; //ARMv6
+         tempStr:= LowerCase(FInstructionSet);
+         if tempStr = 'armv7a' then auxStr:='armeabi-v7a';
+         if tempStr = 'x86'    then auxStr:='x86';
+         if tempStr = 'x86_64' then auxStr:='x86_64';
+         if tempStr = 'mipsel' then auxStr:='mips';
+         if tempStr = 'armv8'  then auxStr:='arm64-v8a';
+
+         strList.Add('    splits {');
+         strList.Add('        abi {');
+         strList.Add('            enable true');
+         strList.Add('            reset()');
+         strList.Add('            include '''+auxStr+'''');
+         strList.Add('            universalApk false');
+         strList.Add('        }');
+         strList.Add('    }');
+
+         (*
+         strList.Add('    splits {');
+         strList.Add('        abi {');
+         strList.Add('            enable true');
+         strList.Add('            reset()');
+         strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
+         strList.Add('            universalApk false');
+         strList.Add('        }');
+         strList.Add('    }');
+         *)
 
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin
@@ -3066,6 +3094,19 @@ begin
    x:='';
    if StrToInt(FNDKIndex) > 4 then
      x:='.x';
+
+   if (Length(FPrebuildOSYS)=0) then
+   begin
+     {$ifdef Windows}
+     FPrebuildOSYS:='windows';
+     {$endif}
+     {$ifdef Linux}
+     FPrebuildOSYS:='linux';
+     {$endif}
+     {$ifdef Darwin}
+     FPrebuildOSYS:='darwin';
+     {$endif}
+   end;
 
    listBuildMode:= TStringList.Create;
 

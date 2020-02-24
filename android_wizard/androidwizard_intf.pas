@@ -1401,6 +1401,7 @@ var
   linuxAndroidProjectName: string;
   linuxPathToGradle: string;
   tempStr: string;
+  auxStr: string;
   linuxPathToAdbBin: string;
   linuxPathToAntBin: string;
   apk_aliaskey, strText: string;
@@ -2357,6 +2358,34 @@ begin
                 strList.Add('       abortOnError false');
                 strList.Add('    }');
 
+                auxStr:='armeabi'; //ARMv6
+                tempStr:= LowerCase(FInstructionSet);
+                if tempStr = 'armv7a' then auxStr:='armeabi-v7a';
+                if tempStr = 'x86'    then auxStr:='x86';
+                if tempStr = 'x86_64' then auxStr:='x86_64';
+                if tempStr = 'mipsel' then auxStr:='mips';
+                if tempStr = 'armv8'  then auxStr:='arm64-v8a';
+
+                strList.Add('    splits {');
+                strList.Add('        abi {');
+                strList.Add('            enable true');
+                strList.Add('            reset()');
+                strList.Add('            include '''+auxStr+'''');
+                strList.Add('            universalApk false');
+                strList.Add('        }');
+                strList.Add('    }');
+
+                (*
+                strList.Add('    splits {');
+                strList.Add('        abi {');
+                strList.Add('            enable true');
+                strList.Add('            reset()');
+                strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
+                strList.Add('            universalApk false');
+                strList.Add('        }');
+                strList.Add('    }');
+                *)
+
                if Pos('AppCompat', FAndroidTheme) > 0 then
                begin
 
@@ -3292,7 +3321,20 @@ begin
   AProject.UseManifest:= False;
   AProject.UseAppBundle:= False;
 
-  osys:= FPrebuildOSYS;
+  if (Length(FPrebuildOSYS)=0) then
+  begin
+    {$ifdef Windows}
+    FPrebuildOSYS:='windows';
+    {$endif}
+    {$ifdef Linux}
+    FPrebuildOSYS:='linux';
+    {$endif}
+    {$ifdef Darwin}
+    FPrebuildOSYS:='darwin';
+    {$endif}
+  end;
+
+  osys:= FPrebuildOSys;
 
   {Set compiler options for Android requirements}
 
