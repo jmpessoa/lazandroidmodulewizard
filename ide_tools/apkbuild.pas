@@ -195,10 +195,16 @@ begin
   msgLine.Urgency := mluNone;
   if msgLine.Msg <> '' then
   begin
-    if (Pos('FAILURE', msgLine.Msg) > 0) OR (Pos(' error: ', msgLine.Msg) > 0) then
+    if (Pos('FAILURE', msgLine.Msg) > 0) then
     begin
       FFailureGot := True;
       msgLine.Urgency := mluFatal;
+      Tool.ErrorMessage := Line;
+    end
+    else
+    if (Pos('error: ', msgLine.Msg) > 0) then
+    begin
+      msgLine.Urgency := mluError;
       Tool.ErrorMessage := Line;
     end
     else

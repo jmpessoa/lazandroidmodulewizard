@@ -2358,14 +2358,21 @@ begin
                 strList.Add('       abortOnError false');
                 strList.Add('    }');
 
-                auxStr:='';
                 tempStr:= LowerCase(FInstructionSet);
+                if Length(tempStr)>0 then
+                begin
                 if tempStr = 'armv6'  then auxStr:='armeabi';
                 if tempStr = 'armv7a' then auxStr:='armeabi-v7a';
                 if tempStr = 'x86'    then auxStr:='x86';
                 if tempStr = 'x86_64' then auxStr:='x86_64';
                 if tempStr = 'mipsel' then auxStr:='mips';
                 if tempStr = 'armv8'  then auxStr:='arm64-v8a';
+                end
+                else
+                begin
+                  auxStr := ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+                  auxStr := ExtractFileName(auxStr);
+                end;
 
                 if (Length(auxStr)>0) then
                 begin
