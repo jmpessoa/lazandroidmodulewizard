@@ -65,10 +65,14 @@ public class jRadioButton extends RadioButton {
 	}
 
 	public  void setParent2( android.view.ViewGroup _viewgroup ) { //need by RadioGroup [LinearLayout!]
-		ViewGroup parent = LAMWCommon.getParent();
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-		parent.addView(this, 0); //LinearLayout [no lparams], insert at index O ...
+		LAMWCommon.setParent(_viewgroup);
+
+		//With newer Android, the below gives an error: cannot cast marginlayout to linearlayout
+		//ViewGroup parent = LAMWCommon.getParent();
+		//if (parent != null) { parent.removeView(this); }
+		//parent = _viewgroup;
+		//parent.addView(this, 0); //LinearLayout [no lparams], insert at index O ...
+
 		// ?? better !!?? not sure
 		// parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
 		// lparams = null;

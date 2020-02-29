@@ -49,7 +49,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
 
                  if (c >= 0) {
                 	 	
-	                RadioButton rb = (RadioButton) findViewById(checkedId);
+	                RadioButton rb = (RadioButton) group.findViewById(checkedId);
 	                	               
 	                if (rb != null) {
 		                String checkedCaption = (String) rb.getText();
