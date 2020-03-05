@@ -10,7 +10,7 @@ uses
 // tk min and max API versions for build.xml
 const
   cMinAPI = 10;
-  cMaxAPI = 28;
+  cMaxAPI = 30;
 // end tk
 
 type
