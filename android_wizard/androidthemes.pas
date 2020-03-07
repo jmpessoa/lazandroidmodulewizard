@@ -647,7 +647,7 @@ begin
     n1 := AParent.FirstChild;
     while n1 <> nil do
     begin
-      if n1 is TDOMElement and TDOMElement(n1).hasAttribute(aname) then
+      if (n1 is TDOMElement) and TDOMElement(n1).hasAttribute(aname) then //fixed, thanks to Coldzer0
         with TDOMElement(n1) do
         begin
           lc := TDOMElement(n1);
