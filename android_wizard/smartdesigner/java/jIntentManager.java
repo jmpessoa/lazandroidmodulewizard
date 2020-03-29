@@ -257,7 +257,11 @@ Sending Data: Extras vs. URI Parameters
    public void PutExtraString(String _dataName, String _value) {
 	  mIntent.putExtra(_dataName, _value);
    }
-            
+
+   public void PutExtraBool(String _dataName, boolean _value) {
+	  mIntent.putExtra(_dataName, _value);
+   }
+
    public void SetDataUri(Uri _dataUri) { //Uri.parse(fileUrl) - just Strings!
 		  //final Uri uriContact = ContactsContract.Contacts.CONTENT_URI;
 		  //android.provider.ContactsContract.Contacts.CONTENT_URI

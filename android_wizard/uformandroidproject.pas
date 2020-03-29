@@ -86,6 +86,8 @@ type
     FMinApi: string;
     FTargetApi: string;
 
+    FSupport: boolean;
+
     Memo2List: TStringList;
 
     FHackJNIMethod: boolean;
@@ -132,6 +134,7 @@ type
     property MainActivity: string read FMainActivity write FMainActivity;
     property MinApi: string  read FMinApi write FMinApi;
     property TargetApi: string  read FTargetApi write FTargetApi;
+    property Support: boolean read FSupport write FSupport;
     property FullPackageName: string read FFullPackageName write FFullPackageName;
     property FullJavaSrcPath: string read FFullJavaSrcPath write FFullJavaSrcPath;
     property SmallProjName:  string read FSmallProjName write FSmallProjName;

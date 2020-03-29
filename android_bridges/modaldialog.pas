@@ -22,6 +22,7 @@ jModalDialog = class(jControl)
     FCaptionOK: string;
     FCaptionCancel: string;
     FTitle: string;
+    FMessage: string;
     FTitleFontSize: integer;
  public
     constructor Create(AOwner: TComponent); override;
@@ -53,6 +54,7 @@ jModalDialog = class(jControl)
     property CaptionOK: string read FCaptionOK write SetCaptionButtonOK;
     property CaptionCancel: string read FCaptionCancel write SetCaptionButtonCancel;
     property Title: string read FTitle write SetDialogTitle;
+    property Message: string read FMessage write SetDialogMessage;
     property TitleFontSize: integer read FTitleFontSize write SetTitleFontSize;
 end;
 
@@ -240,6 +242,7 @@ end;
 procedure jModalDialog.SetDialogMessage(_dialogMessage: string);
 begin
   //in designing component state: set value here...
+  FMessage:=_dialogMessage;
   if FInitialized then
      jModalDialog_SetDialogMessage(FjEnv, FjObject, _dialogMessage);
 end;

@@ -66,6 +66,7 @@ jIntentManager = class(jControl)
     procedure PutExtraIntArray(_dataName: string; var _values: TDynArrayOfInteger);
     function GetExtraInt(_intent: jObject; _dataName: string): integer;
     procedure PutExtraInt(_dataName: string; _value: integer);
+    procedure PutExtraBool(_dataName: string; _value: boolean);
     function GetExtraStringArray(_intent: jObject; _dataName: string): TDynArrayOfString;
     procedure PutExtraStringArray(_dataName: string; var _values: TDynArrayOfString);
     function GetExtraString(_intent: jObject; _dataName: string): string;
@@ -166,6 +167,7 @@ function jIntentManager_GetExtraIntArray(env: PJNIEnv; _jintentmanager: JObject;
 procedure jIntentManager_PutExtraIntArray(env: PJNIEnv; _jintentmanager: JObject; _dataName: string; var _values: TDynArrayOfInteger);
 function jIntentManager_GetExtraInt(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _dataName: string): integer;
 procedure jIntentManager_PutExtraInt(env: PJNIEnv; _jintentmanager: JObject; _dataName: string; _value: integer);
+procedure jIntentManager_PutExtraBool(env: PJNIEnv; _jintentmanager: JObject; _dataName: string; _value: boolean);
 function jIntentManager_GetExtraStringArray(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _dataName: string): TDynArrayOfString;
 procedure jIntentManager_PutExtraStringArray(env: PJNIEnv; _jintentmanager: JObject; _dataName: string; var _values: TDynArrayOfString);
 function jIntentManager_GetExtraString(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _dataName: string): string;
@@ -474,6 +476,14 @@ begin
   if FInitialized then
      jIntentManager_PutExtraInt(FjEnv, FjObject, _dataName ,_value);
 end;
+
+procedure jIntentManager.PutExtraBool(_dataName: string; _value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_PutExtraBool(FjEnv, FjObject, _dataName ,_value);
+end;
+
 
 function jIntentManager.GetExtraStringArray(_intent: jObject; _dataName: string): TDynArrayOfString;
 begin
@@ -1382,6 +1392,21 @@ begin
   jParams[1].i:= _value;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraInt', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jIntentManager_PutExtraBool(env: PJNIEnv; _jintentmanager: JObject; _dataName: string; _value: boolean);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_dataName));
+  jParams[1].z:=JBool(_value);
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'PutExtraBool', '(Ljava/lang/String;Z)V');
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);

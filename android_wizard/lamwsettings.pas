@@ -8,6 +8,11 @@ uses
   Classes, SysUtils, FileUtil, ProjectIntf, Forms, IniFiles;
 
 type
+  TSupportLib = record
+    MinAPI:integer;
+    Name:string;
+  end;
+  TSupportLibs = array[0..4] of TSupportLib;
 
   { TLamwGlobalSettings }
 
@@ -84,6 +89,15 @@ type
     property KeepManifestTargetApi: boolean read GetKeepManifestTargetApi;
     property PathToSmartDesigner: string read GetPathToSmartDesigner;
   end;
+
+const
+  SupportLibs: TSupportLibs = (
+    (MinAPI:18;Name:'com.android.support:support-v4:'),
+    (MinAPI:18;Name:'com.android.support:appcompat-v7:'),
+    (MinAPI:21;Name:'com.android.support:design:'),
+    (MinAPI:21;Name:'com.android.support:cardview-v7:'),
+    (MinAPI:21;Name:'com.android.support:recyclerview-v7:')
+  );
 
 var
   LamwGlobalSettings: TLamwGlobalSettings;

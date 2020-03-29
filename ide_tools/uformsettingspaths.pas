@@ -213,13 +213,23 @@ begin
     for i:=0 to lisDir.Count-1 do
     begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
+       lisDir.Strings[i]:=auxStr;
+    end;
+    lisDir.Sorted:=True;
+    for i:=0 to lisDir.Count-1 do
+    begin
+       auxStr:= lisDir.Strings[i];
        if  auxStr <> '' then
        begin
          if  Pos('rc2', auxStr) = 0  then   //escape some alien...
          begin
            numberAsString:= Copy(auxStr, 1 , 2);  //19
            builderNumber:=  StrToInt(numberAsString);
-           if  platform <= builderNumber then Result:= True;
+           if  platform <= builderNumber then
+           begin
+             Result:= True;
+             break;
+           end;
          end;
        end;
     end;

@@ -1,2 +1,7 @@
 .idea/
 *.iml
+*.bak
+*.o
+*.a
+*.ppu
+*.compiled

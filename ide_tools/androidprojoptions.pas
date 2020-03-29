@@ -34,6 +34,7 @@ type
     FLabelAvailable: boolean;
     FLabel, FRealLabel: string;
     FIconFileName: string;
+    FSupport:boolean;
     //FTheme: string;
 
     function GetString(const XMLPath, Ref: string; out Res: string): boolean;
@@ -58,6 +59,7 @@ type
     property VersionName: string read FVersionName write FVersionName;
     property AppLabel: string read FRealLabel write FRealLabel;
     property IconFileName: string read FIconFileName;
+    property Support:boolean read FSupport write FSupport;
     //property ThemeName: string read GetThemeName;
   end;
 
@@ -92,6 +94,8 @@ TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
  ImageList1: TImageList;
  imLauncherIcon: TImage;
  Label1: TLabel;
+ LabelSupport: TLabel;
+ CheckBoxSupport: TCheckBox; 
  lblGradleHint: TLabel;
  Label2: TLabel;
  Label3: TLabel;
@@ -228,6 +232,7 @@ end;
 function IsAllCharNumber(pcString: PChar): boolean;
 begin
   Result := False;
+  if StrLen(pcString)=0 then exit;
   while pcString^ <> #0 do // 0 indicates the end of a PChar string
   begin
     if not (pcString^ in ['0'..'9']) then
@@ -344,6 +349,7 @@ begin
   FUsesSDKNode := nil;
   FMinSdkVersion := 14;
   FTargetSdkVersion := 21;
+  FSupport:=False;
   FPermissions.Clear;
 end;
 
@@ -352,13 +358,13 @@ var
   fn: string;
   build: TXMLDocument;
   n: TDOMNode;
-
+  aSupportLib:TSupportLib;
   strList: TStringList;
   i: integer;
   smallProjName: string;
   pathToAndroidSDK: string;
   locationSrc: string;
-  tempStr, oldTargetStr, oldCompileSdkVersion: string;
+  tempStr, findString, oldTargetStr, oldCompileSdkVersion: string;
   p: integer;
   cpuTarget:string;
 begin
@@ -516,10 +522,21 @@ begin
     p := Pos(' ', tempStr);
     oldCompileSdkVersion := Trim(Copy(tempStr, p + 1, 2));
 
-    if FTargetSdkVersion > StrToInt(oldCompileSdkVersion) then
+    if FTargetSdkVersion <> StrToInt(oldCompileSdkVersion) then
     begin
-      tempStr := StringReplace(strList.Text, 'compileSdkVersion ' + oldCompileSdkVersion,
-        'compileSdkVersion ' + IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+
+      tempStr := strList.Text;
+
+      findString:='compileSdkVersion ';
+      if (Pos(findString,tempStr)>0) then
+        tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+
+      for aSupportLib in SupportLibs do
+      begin
+        if (Pos(aSupportLib.Name,tempStr)>0) then
+          tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+      end;
+
       strList.Text := tempStr;
     end;
 
@@ -1646,6 +1663,7 @@ begin
   if cbIndex >= 0 then
     cbChipset.ItemIndex := cbIndex;
 
+  CheckBoxSupport.Checked:=(LazarusIDE.ActiveProject.CustomData['Support']='TRUE');
 
   FBuildSystem := proj.CustomData['BuildSystem'];
   i := cbBuildSystem.Items.IndexOf(FBuildSystem);
@@ -1724,6 +1742,12 @@ begin
     Exit;
 
   TryChangeChipset();
+
+  if CheckBoxSupport.Checked then
+    LazarusIDE.ActiveProject.CustomData['Support']:='TRUE'
+  else
+    LazarusIDE.ActiveProject.CustomData['Support']:='FALSE';
+
 
   with FManifest do
   begin
