@@ -1,13 +1,12 @@
 object FormSettingsPaths: TFormSettingsPaths
-  Left = 296
-  Height = 631
-  Top = 101
-  Width = 543
+  Left = 297
+  Height = 505
+  Top = 245
+  Width = 434
   Caption = '[LAMW 0.8.5] Paths/Settings'
-  ClientHeight = 631
-  ClientWidth = 543
+  ClientHeight = 505
+  ClientWidth = 434
   Color = clGradientInactiveCaption
-  DesignTimePPI = 120
   FormStyle = fsStayOnTop
   Icon.Data = {
     9E09000000000100010018180000010020008809000016000000280000001800
@@ -92,41 +91,44 @@ object FormSettingsPaths: TFormSettingsPaths
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
+  LCLVersion = '2.1.0.0'
   object BitBtnOK: TBitBtn
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 435
-    Height = 40
-    Top = 550
-    Width = 100
+    Left = 348
+    Height = 32
+    Top = 440
+    Width = 80
     Anchors = [akTop, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
     Caption = '&OK'
     Default = True
     GlyphShowMode = gsmAlways
     Kind = bkOK
     ModalResult = 1
     OnClick = BitBtnOKClick
+    ParentFont = False
     TabOrder = 5
   end
   object BitBtnCancel: TBitBtn
     AnchorSideTop.Control = BitBtnOK
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = BitBtnOK
-    Left = 327
-    Height = 40
-    Top = 550
-    Width = 100
+    Left = 262
+    Height = 32
+    Top = 440
+    Width = 80
     Anchors = [akTop, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
     Cancel = True
     Caption = 'Cancel'
     GlyphShowMode = gsmAlways
     Kind = bkCancel
     ModalResult = 2
     OnClick = BitBtnCancelClick
+    ParentFont = False
     TabOrder = 6
   end
   object EditPathToAndroidSDK: TEdit
@@ -134,100 +136,108 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Control = LabelPathToAndroidSDK
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBPathToAndroidSDK
-    Left = 8
-    Height = 28
-    Top = 365
-    Width = 494
+    Left = 6
+    Height = 23
+    Top = 286
+    Width = 396
     Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
+    ParentFont = False
     TabOrder = 3
   end
   object LabelPathToAndroidSDK: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = RGNDKVersion
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 20
-    Top = 337
-    Width = 139
-    BorderSpacing.Around = 8
+    Left = 6
+    Height = 15
+    Top = 265
+    Width = 111
+    BorderSpacing.Around = 6
     Caption = 'Path to Android SDK:'
     ParentColor = False
+    ParentFont = False
     OnClick = LabelPathToAndroidSDKClick
   end
   object LabelPathToJavaJDK: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
-    Left = 8
-    Height = 20
-    Top = 8
-    Width = 427
-    BorderSpacing.Around = 8
+    Left = 6
+    Height = 15
+    Top = 6
+    Width = 341
+    BorderSpacing.Around = 6
     Caption = 'Path to Java JDK:  [ ex.  C:\Program Files (x86)\Java\jdk1.8.0_101 ]'
     ParentColor = False
+    ParentFont = False
   end
   object EditPathToJavaJDK: TEdit
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = LabelPathToJavaJDK
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBPathToJavaJDK
-    Left = 8
-    Height = 28
-    Top = 36
-    Width = 494
+    Left = 6
+    Height = 23
+    Top = 27
+    Width = 396
     Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
+    ParentFont = False
     TabOrder = 0
   end
   object LabelPathToAndroidNDK: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = EditPathToGradle
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 20
-    Top = 204
-    Width = 142
-    BorderSpacing.Around = 8
+    Left = 6
+    Height = 15
+    Top = 160
+    Width = 114
+    BorderSpacing.Around = 6
     Caption = 'Path to Android NDK:'
     ParentColor = False
+    ParentFont = False
   end
   object EditPathToAndroidNDK: TEdit
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = LabelPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBPathToAndroidNDK
-    Left = 8
-    Height = 28
-    Top = 232
-    Width = 494
+    Left = 6
+    Height = 23
+    Top = 181
+    Width = 396
     Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
     OnExit = EditPathToAndroidNDKExit
+    ParentFont = False
     TabOrder = 2
   end
   object LabelPathToAntBinary: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = EditPathToJavaJDK
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 20
-    Top = 72
-    Width = 261
-    BorderSpacing.Around = 8
+    Left = 6
+    Height = 15
+    Top = 56
+    Width = 213
+    BorderSpacing.Around = 6
     Caption = 'Path to Ant bin: [ ex.   C:\lamw\ant\bin ]'
     ParentColor = False
+    ParentFont = False
   end
   object EditPathToAntBinary: TEdit
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = LabelPathToAntBinary
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = SpBPathToAntBinary
-    Left = 8
-    Height = 28
-    Top = 100
-    Width = 494
+    Left = 6
+    Height = 23
+    Top = 77
+    Width = 396
     Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
+    ParentFont = False
     TabOrder = 1
   end
   object SpBPathToJavaJDK: TSpeedButton
@@ -235,42 +245,45 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 510
-    Height = 28
-    Top = 36
-    Width = 25
+    Left = 408
+    Height = 22
+    Top = 27
+    Width = 20
     Anchors = [akTop, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
     Caption = '...'
     OnClick = SpBPathToJavaJDKClick
+    ParentFont = False
   end
   object SpBPathToAndroidNDK: TSpeedButton
     AnchorSideTop.Control = EditPathToAndroidNDK
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 510
-    Height = 28
-    Top = 232
-    Width = 25
+    Left = 408
+    Height = 22
+    Top = 181
+    Width = 20
     Anchors = [akTop, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
     Caption = '...'
     OnClick = SpBPathToAndroidNDKClick
+    ParentFont = False
   end
   object SpBPathToAntBinary: TSpeedButton
     AnchorSideTop.Control = EditPathToAntBinary
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 510
-    Height = 28
-    Top = 100
-    Width = 25
+    Left = 408
+    Height = 22
+    Top = 77
+    Width = 20
     Anchors = [akTop, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
     Caption = '...'
     OnClick = SpBPathToAntBinaryClick
+    ParentFont = False
   end
   object BevelJDKAntAndSDKNDK: TBevel
     AnchorSideLeft.Control = Owner
@@ -278,24 +291,24 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 8
+    Left = 6
     Height = 2
-    Top = 136
-    Width = 527
+    Top = 106
+    Width = 422
     Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
   end
   object RGNDKVersion: TRadioGroup
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = EditPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 61
-    Top = 268
-    Width = 350
+    Left = 6
+    Height = 49
+    Top = 210
+    Width = 280
     Anchors = [akTop, akLeft, akRight]
     AutoFill = True
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
     Caption = 'NDK Version'
     ChildSizing.LeftRightSpacing = 6
     ChildSizing.TopBottomSpacing = 6
@@ -306,8 +319,8 @@ object FormSettingsPaths: TFormSettingsPaths
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 6
-    ClientHeight = 36
-    ClientWidth = 346
+    ClientHeight = 29
+    ClientWidth = 276
     Columns = 6
     Items.Strings = (
       '7x'
@@ -317,24 +330,26 @@ object FormSettingsPaths: TFormSettingsPaths
       '11x'
       '">11"'
     )
+    ParentFont = False
     TabOrder = 4
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 29
-    Top = 602
-    Width = 543
+    Height = 23
+    Top = 482
+    Width = 434
     Panels = <>
+    ParentFont = False
   end
   object Image1: TImage
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = EditPathToAndroidSDK
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 189
-    Top = 401
-    Width = 157
-    BorderSpacing.Around = 8
+    Left = 6
+    Height = 151
+    Top = 315
+    Width = 126
+    BorderSpacing.Around = 6
     Picture.Data = {
       1754506F727461626C654E6574776F726B47726170686963768B000089504E47
       0D0A1A0A0000000D494844520000009D000000BD0806000000A98A7FE0000000
@@ -1461,12 +1476,12 @@ object FormSettingsPaths: TFormSettingsPaths
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 511
-    Height = 28
-    Top = 401
-    Width = 25
+    Left = 408
+    Height = 22
+    Top = 314
+    Width = 20
     Anchors = [akTop, akRight]
-    BorderSpacing.Around = 7
+    BorderSpacing.Around = 6
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
       2000000000000004000064000000640000000000000000000000000000000000
@@ -1504,61 +1519,66 @@ object FormSettingsPaths: TFormSettingsPaths
       0FE9683400984E27004800000000000000000000000000000000
     }
     OnClick = SpeedButtonInfoClick
+    ParentFont = False
   end
   object SpBPathToAndroidSDK: TSpeedButton
     AnchorSideTop.Control = EditPathToAndroidSDK
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 510
-    Height = 28
-    Top = 365
-    Width = 25
+    Left = 408
+    Height = 22
+    Top = 286
+    Width = 20
     Anchors = [akTop, akRight]
-    BorderSpacing.Around = 8
+    BorderSpacing.Around = 6
     Caption = '...'
     OnClick = SpBPathToAndroidSDKClick
+    ParentFont = False
   end
   object LabelPathToGradle: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = BevelJDKAntAndSDKNDK
-    Left = 8
-    Height = 20
-    Top = 144
-    Width = 277
-    BorderSpacing.Around = 8
+    Left = 6
+    Height = 15
+    Top = 112
+    Width = 222
+    BorderSpacing.Around = 6
     Caption = 'Path to Gradle [ ex. C:\lamw\gradle-4.4.1 ]'
     ParentColor = False
+    ParentFont = False
   end
   object EditPathToGradle: TEdit
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = LabelPathToGradle
     AnchorSideRight.Control = SpBPathToGradle
-    Left = 8
-    Height = 28
+    Left = 6
+    Height = 23
     Hint = 'Required by "AppCompat" [material] theme'
-    Top = 168
-    Width = 496
+    Top = 131
+    Width = 397
     Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Top = 16
-    BorderSpacing.Around = 8
+    BorderSpacing.Top = 13
+    BorderSpacing.Around = 6
+    ParentFont = False
     TabOrder = 8
   end
   object SpBPathToGradle: TSpeedButton
     AnchorSideTop.Control = EditPathToGradle
-    Left = 512
-    Height = 28
-    Top = 168
-    Width = 25
+    Left = 409
+    Height = 22
+    Top = 131
+    Width = 20
     Anchors = [akTop, akRight]
     Caption = '...'
     OnClick = SpBPathToGradleClick
+    ParentFont = False
   end
   object SpeedButtonHelp: TSpeedButton
-    Left = 510
-    Height = 28
-    Top = 8
-    Width = 25
+    Left = 408
+    Height = 22
+    Top = 6
+    Width = 20
     Anchors = [akTop, akRight]
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
@@ -1597,33 +1617,36 @@ object FormSettingsPaths: TFormSettingsPaths
       3885000000000000000000000000000000000000000000000000
     }
     OnClick = SpeedButtonHelpClick
+    ParentFont = False
   end
   object GroupBox1: TGroupBox
     AnchorSideTop.Control = EditPathToAndroidNDK
     AnchorSideTop.Side = asrBottom
-    Left = 360
-    Height = 61
-    Top = 268
-    Width = 175
+    Left = 288
+    Height = 49
+    Top = 210
+    Width = 140
     Anchors = [akTop, akRight]
     Caption = 'NDK Prebuild'
-    ClientHeight = 36
-    ClientWidth = 171
+    ClientHeight = 29
+    ClientWidth = 136
+    ParentFont = False
     TabOrder = 9
     object ComboBoxPrebuild: TComboBox
-      Left = 6
-      Height = 28
-      Top = 4
-      Width = 157
+      Left = 4
+      Height = 23
+      Top = 3
+      Width = 126
       Anchors = [akTop, akRight]
-      ItemHeight = 20
+      ItemHeight = 15
       OnChange = ComboBoxPrebuildChange
+      ParentFont = False
       Style = csDropDownList
       TabOrder = 0
     end
   end
   object SelDirDlgPathTo: TSelectDirectoryDialog
-    left = 248
-    top = 408
+    Left = 198
+    Top = 326
   end
 end

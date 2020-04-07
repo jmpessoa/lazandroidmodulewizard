@@ -92,6 +92,7 @@ type
 function IsAllCharNumber(pcString: PChar): Boolean;
 begin
   Result := False;
+  if StrLen(pcString)=0 then exit;
   while pcString^ <> #0 do // 0 indicates the end of a PChar string
   begin
     if not (pcString^ in ['0'..'9']) then Exit;
@@ -640,41 +641,53 @@ end;
 
 function TApkBuilder.FixGradleConfig(ForceFixPaths: Boolean): TModalResult;
 var
-  i, j: Integer;
-  s, target, indent: string;
+  p:integer;
   WasChanged: Boolean;
+  strList: TStringList;
+  target, tempStr, findString, oldCompileSdkVersion: string;
+  aSupportLib: TSupportLib;
 begin
   Result := mrOk;
   WasChanged := False;
+
   if GetManifestSdkTarget(target) then
-    with TStringList.Create do
+  begin
+    strList:= TStringList.Create;
     try
-      LoadFromFile(FProjPath + 'build.gradle');
-      for i := 0 to Count - 1 do
-        if Pos('compileSdkVersion', Strings[i]) > 0 then
+      strList.LoadFromFile(FProjPath + 'build.gradle');
+
+      p := Pos('compileSdkVersion ', strList.Text);
+      tempStr := Trim(Copy(strList.Text, p, Length('compileSdkVersion ') + 2));
+      p := Pos(' ', tempStr);
+      oldCompileSdkVersion := Trim(Copy(tempStr, p + 1, 2));
+
+      if (oldCompileSdkVersion <> target) and
+         (MessageDlg('build.gradle',
+                     'Change compileSdkVersion to "' + target + '"?',
+                      mtConfirmation, [mbYes, mbNo], 0) = mrYes)
+      then
+      begin
+        tempStr := strList.Text;
+
+        findString:='compileSdkVersion ';
+        if (Pos(findString,tempStr)>0) then
+          tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+target, [rfIgnoreCase]);
+
+        for aSupportLib in SupportLibs do
         begin
-          s := Strings[i];
-          j := 1;
-          while s[j] in [' ', #9] do Inc(j);
-          indent := Copy(s, 1, j - 1);
-          System.Delete(s, 1, j);
-          System.Delete(s, 1, Pos(' ', s));
-          s := Trim(s);
-          if (s <> target) and
-             (MessageDlg('build.gradle',
-                         'Change compileSdkVersion to "' + target + '"?',
-                         mtConfirmation, [mbYes, mbNo], 0) = mrYes)
-          then begin
-            Strings[i] := indent + 'compileSdkVersion ' + target;
-            WasChanged := True;
-          end;
-          Break;
+          if (Pos(aSupportLib.Name,tempStr)>0) then
+            tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name+target, [rfIgnoreCase]);
         end;
+
+        strList.Text := tempStr;
+        WasChanged := True;
+      end;
       if WasChanged then
-        SaveToFile(FProjPath + 'build.gradle');
+        strList.SaveToFile(FProjPath + 'build.gradle');
     finally
-      Free;
+      strList.Free;
     end;
+  end;
 end;
 
 function TApkBuilder.BuildByAnt: Boolean;

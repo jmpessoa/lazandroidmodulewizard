@@ -16,6 +16,7 @@ type
     BitBtnCancel: TBitBtn;
     BitBtnOK: TBitBtn;
     CheckBoxLibrary: TCheckBox;
+    CheckBoxSupport: TCheckBox;
     CheckBoxPIE: TCheckBox;
     cbBuildSystem: TComboBox;
     Label1: TLabel;
@@ -52,6 +53,7 @@ type
     procedure cbBuildSystemCloseUp(Sender: TObject);
     procedure CheckBoxLibraryClick(Sender: TObject);  // raw library
     procedure CheckBoxPIEClick(Sender: TObject);
+    procedure CheckBoxSupportClick(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure EditPathToWorkspaceExit(Sender: TObject);
@@ -94,6 +96,8 @@ type
 
     FMinApi: string;
     FTargetApi: string;
+
+    FSupport: boolean;
 
     FTouchtestEnabled: string;
     FAntBuildMode: string;
@@ -161,6 +165,7 @@ type
     property PackagePrefaceName: string read FPackagePrefaceName write FPackagePrefaceName;
     property MinApi: string read FMinApi write FMinApi;
     property TargetApi: string read FTargetApi write FTargetApi;
+    property Support: boolean read FSupport write FSupport;
     property TouchtestEnabled: string read FTouchtestEnabled write FTouchtestEnabled;
     property AntBuildMode: string read FAntBuildMode write FAntBuildMode;
     property MainActivity: string read FMainActivity write FMainActivity;
@@ -1084,9 +1089,9 @@ var
   lisDir: TStringList;
   numberAsString, auxStr: string;
   i, builderNumber: integer;
+  savedBuilder: integer;
 begin
   Result:= False;
-  builderNumber:= 0;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
   FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
   if lisDir.Count > 0 then
@@ -1094,13 +1099,25 @@ begin
     for i:=0 to lisDir.Count-1 do
     begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
-       if  auxStr <> '' then
+       lisDir.Strings[i]:=auxStr;
+    end;
+    lisDir.Sorted:=True;
+    for i:= 0 to lisDir.Count-1 do
+    begin
+       auxStr:= lisDir.Strings[i];
+       if auxStr <> '' then    //19.1.0
        begin
            numberAsString:= Copy(auxStr, 1 , 2);  //19
            if IsAllCharNumber(PChar(numberAsString)) then
-               builderNumber:=  StrToInt(numberAsString);
-
-           if  platform <= builderNumber then Result:= True;
+           begin
+             builderNumber:=  StrToInt(numberAsString);
+             if  platform <= builderNumber then
+             begin
+               outBuildTool:= auxStr; //25.0.3
+               Result:= True;
+               break;
+             end;
+           end;
        end;
     end;
   end;
@@ -1235,9 +1252,14 @@ begin
   FPieChecked:= CheckBoxPIE.Checked;
 end;
 
+procedure TFormWorkspace.CheckBoxSupportClick(Sender: TObject);
+begin
+  FSupport:=TCheckBox(Sender).Checked;
+end;
+
 procedure TFormWorkspace.CheckBoxLibraryClick(Sender: TObject);
 begin
-  FLibraryChecked:=  CheckBoxLibrary.Checked;
+  FLibraryChecked:=TCheckBox(Sender).Checked;
 end;
 
 procedure TFormWorkspace.cbBuildSystemCloseUp(Sender: TObject);
@@ -1686,6 +1708,7 @@ end;
 function IsAllCharNumber(pcString: PChar): Boolean;
 begin
   Result := False;
+  if StrLen(pcString)=0 then exit;
   while pcString^ <> #0 do // 0 indicates the end of a PChar string
   begin
     if not (pcString^ in ['0'..'9']) then Exit;

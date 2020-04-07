@@ -1,4 +1,4 @@
-package org.lamw.appscrollingimages;
+this.controls.activitypackage com.sohit.sohitmachinelogger;
 
 //LAMW: Lazarus Android Module Wizard  - version 0.8.4.6  - 10 November - 2019
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -50,6 +50,8 @@ package org.lamw.appscrollingimages;
 //                              rename example Name
 //			12.2013 LAMW Started by jmpessoa
 
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.provider.DocumentsContract;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -152,6 +154,8 @@ import android.os.PowerManager;
 import android.os.BatteryManager;
 
 import android.content.IntentFilter;
+
+import android.media.MediaScannerConnection;
 
 import java.text.Normalizer;
 
@@ -1061,7 +1065,7 @@ class jForm {
 	}
 
 	public ActionBar GetActionBar() {
-		if (!jCommons.IsAppCompatProject()) {
+		if (!jCommons.IsAppCompatProject(controls)) {
 			return (controls.activity).getActionBar();
 		} else return null;
 	}
@@ -1167,7 +1171,7 @@ class jForm {
 	}
 
 	public boolean IsAppCompatProject() {
-		return jCommons.IsAppCompatProject();
+		return jCommons.IsAppCompatProject(controls);
 	}
 
 	public boolean IsPackageInstalled(String _packagename) {
@@ -1943,7 +1947,7 @@ public native void pAppOnRequestPermissionResult(int requestCode, String permiss
 //Load Pascal Library - Please, do not edit the static content commented in the template file
 // -------------------------------------------------------------------------------------------
 static {
-/*libsmartload*/
+try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
 }
 // -------------------------------------------------------------------------
 //  Activity Event
@@ -2096,7 +2100,7 @@ public  void classChkNull (Class<?> object) {
    if (object != null) { Log.i("JAVA","checkNull-Not Null"); };
 }
 
-public Context GetContext() {   
+public Context GetContext() {
    return this.activity; 
 }
 
@@ -2649,38 +2653,108 @@ public  int[] getBmpArray(String file) {
   pixels[length+1] = bmp.getHeight();
   return ( pixels );
 }
+
+private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = this.GetContext().getContentResolver().query(contentURI, null,
+                null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            try {
+                int idx = cursor
+                        .getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                result = cursor.getString(idx);
+            } catch (Exception e) {
+                result = "";
+            }
+            cursor.close();
+        }
+        return result;
+}
+
 // -------------------------------------------------------------------------
 //  Camera
 // -------------------------------------------------------------------------
-  public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
+  /*
+   * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
+   * you take with the device's built-in camera. When you open the Android Gallery app, 
+   * you are browsing the files saved in the DCIM folder....
+   */
+private void galleryAddPic(File image_uri) {
+          if (Build.VERSION.SDK_INT < 19) {
+             this.activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(image_uri)));
+          }
+          else
+          {
+             MediaScannerConnection.scanFile(
+               this.activity,
+               new String[] {image_uri.getAbsolutePath()},
+               new String[] {"image/jpg"},
+               new MediaScannerConnection.OnScanCompletedListener() {
+                   @Override
+                        public void onScanCompleted(String path, Uri uri) {
+                              Log.e("Camera","File " + path + " was scanned successfully: " + uri);
+                        }
+               });
+          }
+}
+
+public String jCamera_takePhoto(String path, String filename, int requestCode) {
+          Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+          String image_path;
+          Uri image_uri;
+
+          image_path = (path+File.separator+filename);
+
+          File newfile = new File(path, File.separator+filename);
+          File dirAsFile = newfile.getParentFile();
+          if (!dirAsFile.exists()) {
+            dirAsFile.mkdirs();
+          }
+
+          try {
+              newfile.createNewFile();
+          }
+          catch (IOException e) {
+            Log.e("File creation error",newfile.getPath());
+          }
+
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+             Uri outputFileUri = FileProvider.getUriForFile(this.GetContext(), this.GetContext().getApplicationContext().getPackageName() + ".provider", newfile);
+             intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+             image_uri = outputFileUri;
+          }
+          else
+          {
+	     Uri mImageCaptureUri = Uri.fromFile(newfile);
+	     intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+	     intent.putExtra("return-data", true);
+             image_uri = mImageCaptureUri;
+          }
+
+          if (intent.resolveActivity(this.GetContext().getPackageManager()) != null) {
+            this.activity.startActivityForResult(intent, requestCode);
+          }
+
+          galleryAddPic(newfile);
+          return newfile.toString();
+}
+public String jCamera_takePhoto(String path, String filename) {
+	  return jCamera_takePhoto(path, filename, 12345);
+}
+
+public void takePhoto(String filename) {
 	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);	
 	  Uri mImageCaptureUri = Uri.fromFile(new File("", filename));	  
 	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
 	  intent.putExtra("return-data", true);
 	  activity.startActivityForResult(intent, 12345);
   }
-  /*
-   * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
-   * you take with the device's built-in camera. When you open the Android Gallery app, 
-   * you are browsing the files saved in the DCIM folder....
-   */ 
-public String jCamera_takePhoto(String path, String filename) {
-  	     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	     Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
-	     intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	     intent.putExtra("return-data", true);
-	  this.activity.startActivityForResult(intent, 12345); //12345 = requestCode
-	  return (path+'/'+filename);
-}
-
-public String jCamera_takePhoto(String path, String filename, int requestCode) {
-	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
-	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	  intent.putExtra("return-data", true);
-	  this.activity.startActivityForResult(intent, requestCode); //12345 = requestCode
-	  return (path+'/'+filename);	  
-}
+  
 
 //-------------------------------------------------------------------------------------------------------
 //SMART LAMW DESIGNER

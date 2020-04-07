@@ -61,6 +61,8 @@ type
      FMinApi: string;
      FTargetApi: string;
 
+     FSupport: boolean;
+
      FTouchtestEnabled: string;
      FAntBuildMode: string;
      FMainActivity: string;
@@ -94,7 +96,7 @@ type
      function HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
      function TryGradleCompatibility(plugin: string; gradleVers: string; out outGradleVer: string) : boolean;
      function TryPluginCompatibility(gradleVers: string): string;
-     function GetGradleVerAsNumber(gradleVers: string): integer;
+     function GetVerAsNumber(aVers: string): integer;
 
      function DoNewPathToJavaTemplate(): string;
      function GetPathToSmartDesigner(): string;
@@ -219,7 +221,7 @@ implementation
 
 uses
    {$ifdef unix}BaseUnix,{$endif}
-   LazFileUtils, uJavaParser, LamwDesigner, SmartDesigner, IniFiles, PackageIntf;
+   LazFileUtils, uJavaParser, LamwSettings, LamwDesigner, SmartDesigner, IniFiles, PackageIntf;
 
 procedure Register;
 begin
@@ -746,7 +748,11 @@ begin
         try
           strPack := FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
 
-          LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
+          if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) AND FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java') then
+            LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java')
+          else
+            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
+
           Strings[0] := 'package ' + strPack + ';';  //replace dummy - Controls.java
           aux:=  StringReplace(Text, '/*libsmartload*/' ,
                  'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
@@ -755,7 +761,7 @@ begin
           SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
 
           Clear;
-          if Pos('AppCompat', FAndroidTheme) > 0 then
+          if (Pos('AppCompat', FAndroidTheme) > 0) then
           begin
              if FileExists(FPathToJavaTemplates + DirectorySeparator + 'support'+DirectorySeparator+'App.java') then
                LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'support'+DirectorySeparator+'App.java');
@@ -793,7 +799,7 @@ begin
               FAndroidProjectName+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.native');
           end;
 
-          if Pos('AppCompat', FAndroidTheme) > 0 then
+          if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) then
           begin
             if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jCommons.java') then
             begin
@@ -1083,6 +1089,8 @@ begin
   frm.MainActivity:= FMainActivity;
   frm.MinApi:= FMinApi;
   frm.TargetApi:= FTargetApi;
+  frm.Support:=FSupport;
+
   frm.ProjectModel:= FProjectModel; //'Ant'  or 'Eclipse'
   frm.FullJavaSrcPath:= FFullJavaSrcPath;
   frm.ModuleType:= projectType;
@@ -1157,9 +1165,15 @@ begin
   FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
   if lisDir.Count > 0 then
   begin
-    for i:= 0 to lisDir.Count-1 do
+    for i:=0 to lisDir.Count-1 do
     begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
+       lisDir.Strings[i]:=auxStr;
+    end;
+    lisDir.Sorted:=True;
+    for i:= 0 to lisDir.Count-1 do
+    begin
+       auxStr:= lisDir.Strings[i];
        if auxStr <> '' then    //19.1.0
        begin
            numberAsString:= Copy(auxStr, 1 , 2);  //19
@@ -1175,6 +1189,7 @@ begin
              begin
                outBuildTool:= auxStr; //25.0.3
                Result:= True;
+               break;
              end;
            end;
        end;
@@ -1253,12 +1268,12 @@ begin
 
 end;
 
-function TAndroidProjectDescriptor.GetGradleVerAsNumber(gradleVers: string): integer;
+function TAndroidProjectDescriptor.GetVerAsNumber(aVers: string): integer;
 var
   numberAsString: string;
   len: integer;
 begin
-  numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]);
+  numberAsString:= StringReplace(aVers,'.', '', [rfReplaceAll]);
   len:= Length(numberAsString);
   if len = 2 then numberAsString:= numberAsString + '00';
   if len = 3 then numberAsString:= numberAsString + '0';
@@ -1270,7 +1285,7 @@ var
   gradleVersNumber: integer;
 begin
   Result:= '3.0.1';
-  gradleVersNumber:= GetGradleVerAsNumber(gradleVers);
+  gradleVersNumber:= GetVerAsNumber(gradleVers);
   if gradleVersNumber <  4100 then Result:= '2.3.3'
   else if (gradleVersNumber >= 4100) and (gradleVersNumber < 4400) then Result:= '3.0.1'
   else if (gradleVersNumber >= 4400) and (gradleVersNumber < 4600) then Result:= '3.1.0'
@@ -1394,6 +1409,7 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
 var
   frm: TFormWorkspace;
   strList: TStringList;
+  aSupportLib:TSupportLib;
   i, intTargetApi, intMinApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
@@ -1412,7 +1428,7 @@ var
   androidPluginNumber: integer;
   gradleCompatible, outgradleCompatible: string;
   gradleCompatibleAsNumber: integer;
-  directive, compatVer, designVer, cardVer, recyclerVer: string;
+  directive: string;
 begin
   Result:= False;
   FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
@@ -1527,6 +1543,9 @@ begin
 
       FMinApi:= frm.MinApi;
       FTargetApi:= frm.TargetApi;
+
+      //FSupport:= (LazarusIDE.ActiveProject.CustomData.Values['Support']='TRUE');
+      FSupport:=frm.Support;
 
       FPieChecked:= frm.PieChecked;
       FLibraryChecked:= frm.LibraryChecked;
@@ -2263,15 +2282,14 @@ begin
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'jarsigner-verify-macos.sh');
 
           strList.Clear;
-          {$IFDEF UNIX}
           strList.Add('sdk.dir=' + FPathToAndroidSDK);
-          {$ENDIF}
+          strList.Add('ndk.dir=' + FPathToAndroidNDK);
 
           {$IFDEF WINDOWS}
-          tempStr:= ExcludeTrailingPathDelimiter(SetDirSeparators(FPathToAndroidSDK));
+          tempStr:= strList.Text;
           tempStr:= StringReplace(tempStr, '\', '\\', [rfReplaceAll]);
-          tempStr:= StringReplace(tempStr, ':', '\:', []);
-          strList.Add('sdk.dir=' + tempStr) ;
+          tempStr:= StringReplace(tempStr, ':', '\:', [rfReplaceAll]);
+          strList.Text:=tempStr;
           {$ENDIF}
           strList.SaveToFile(FAndroidProjectName+PathDelim+'local.properties');
 
@@ -2311,15 +2329,20 @@ begin
                           pluginVersion:= TryPluginCompatibility(FGradleVersion);
                 end;
 
-                androidPluginStr:= StringReplace(pluginVersion,'.', '', [rfReplaceAll]);
-                androidPluginNumber:= StrToInt(Trim(androidPluginStr));  //ex. 3.0.0 --> 300
+                androidPluginNumber:= GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
+                gradleCompatibleAsNumber:= GetVerAsNumber(TryPluginCompatibility(FGradleVersion));
+                if gradleCompatibleAsNumber>androidPluginNumber then
+                begin
+                  pluginVersion:= TryPluginCompatibility(FGradleVersion);
+                  androidPluginNumber:= GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
+                end;
 
                 strList.Clear;
                 strList.Add('buildscript {');
                 strList.Add('    repositories {');
                 strList.Add('        jcenter()');
                 strList.Add('        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method');
-                if androidPluginNumber >= 300 then
+                if androidPluginNumber >= 3000 then
                    strList.Add('        google()')
                 else
                    strList.Add('        //google()');
@@ -2332,7 +2355,7 @@ begin
                 strList.Add('allprojects {');
                 strList.Add('    repositories {');
 
-                if androidPluginNumber >= 300 then
+                if androidPluginNumber >= 3000 then
                   strList.Add('       google()')
                 else
                   strList.Add('     //google()');
@@ -2387,49 +2410,17 @@ begin
                 strList.Add('    }');
                 end;
 
-               if Pos('AppCompat', FAndroidTheme) > 0 then
-               begin
+                if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) then
+                begin
+                  if compileSdkVersion = '29'  then compileSdkVersion:= '28';
+                end;
 
-                  if compileSdkVersion = '29'  then
-                  begin
-                      compileSdkVersion:= '28';
-                      compatVer:= '28.0.0';
-                      designVer:= '28.0.0';
-                      cardVer:= '28.0.0';
-                      recyclerVer:= '28.0.0';
-                  end
-                  else if compileSdkVersion = '28'  then
-                  begin
-                     compatVer:= '28.0.0';
-                     designVer:= '28.0.0';
-                     cardVer:= '28.0.0';
-                     recyclerVer:= '28.0.0';
-                  end
-                  else if compileSdkVersion = '27'  then
-                  begin
-                     compatVer:= '27.1.0';
-                     designVer:= '27.1.0';
-                     cardVer:= '27.1.0';
-                     recyclerVer:= '27.1.0';
-                  end
-                  else if compileSdkVersion = '26'  then
-                  begin
-                     compatVer:= '26.1.0';
-                     designVer:= '26.1.0';
-                     cardVer:= '26.1.0';
-                     recyclerVer:= '26.1.0';
-                  end
-                  else if compileSdkVersion = '25'  then
-                  begin
-                     compatVer:= '25.3.1';
-                     designVer:= '25.3.1';
-                     cardVer:= '25.3.1';
-                     recyclerVer:= '25.3.1';
-                  end;
+                if Pos('AppCompat', FAndroidTheme) > 0 then
+                begin
 
                   strList.Add('    compileSdkVersion '+compileSdkVersion);
 
-                  if androidPluginNumber < 300 then
+                  if androidPluginNumber < 3000 then
                   begin
                      strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
                   end
@@ -2439,7 +2430,7 @@ begin
                else
                begin
                  strList.Add('    compileSdkVersion '+compileSdkVersion);
-                 if androidPluginNumber < 300 then
+                 if androidPluginNumber < 3000 then
                     strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
                  //else: each version of the Android Gradle Plugin now has a default version of the build tools
                end;
@@ -2487,25 +2478,26 @@ begin
                 strList.Add('}');
                 strList.Add('dependencies {');
 
-                if androidPluginNumber < 300 then
+                if androidPluginNumber < 3000 then
                   directive:='compile'
                 else
                   directive:='implementation';
 
                 strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-                if Pos('AppCompat', FAndroidTheme) > 0 then
+                if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) then
                 begin
-                   strList.Add('    '+directive+' ''com.android.support:appcompat-v7:'+compatVer+'''');
-                   strList.Add('    '+directive+' ''com.android.support:design:'+designVer+'''');
-                   strList.Add('    '+directive+' ''com.android.support:cardview-v7:'+cardVer+'''');
-                   strList.Add('    '+directive+' ''com.android.support:recyclerview-v7:'+recyclerVer+'''');
+                   for aSupportLib in SupportLibs do
+                   begin
+                     if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
+                       strList.Add('    '+directive+' '''+aSupportLib.Name+compileSdkVersion+'.+''');
+                   end;
                    //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
                 end;
 
                 if Pos('GDXGame', FAndroidTheme) > 0 then
                 begin
-                   if androidPluginNumber >=  300 then directive:= 'api';
+                   if androidPluginNumber >=  3000 then directive:= 'api';
                    strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx:1.9.10''');
                    strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
                    strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-backend-android:1.9.10''');
@@ -2523,7 +2515,7 @@ begin
                 strList.Add('}');
                 strList.Add(' ');
 
-                gradleCompatibleAsNumber:= Self.GetGradleVerAsNumber(gradleCompatible);
+                gradleCompatibleAsNumber:= Self.GetVerAsNumber(gradleCompatible);
 
                 if  gradleCompatibleAsNumber < 5000 then
                 begin
@@ -3099,6 +3091,10 @@ begin
     AProject.CustomData.Values['LAMW'] := 'GUI';
     AProject.CustomData.Values['Theme']:= FAndroidTheme;
     AProject.CustomData['StartModule'] := 'AndroidModule1';
+    if FSupport then
+      AProject.CustomData.Values['Support'] := 'TRUE'
+    else
+      AProject.CustomData.Values['Support'] := 'FALSE';
   end
   else if  FModuleType = 1 then
     AProject.CustomData.Values['LAMW'] := 'NoGUI'
@@ -4242,6 +4238,7 @@ end;
 function IsAllCharNumber(pcString: PChar): Boolean;
 begin
   Result := False;
+  if StrLen(pcString)=0 then exit;
   while pcString^ <> #0 do // 0 indicates the end of a PChar string
   begin
     if not (pcString^ in ['0'..'9']) then Exit;
