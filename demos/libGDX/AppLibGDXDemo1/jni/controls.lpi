@@ -22,7 +22,7 @@
       <Item3 Name="NdkApi" Value="android-22"/>
       <Item4 Name="NdkPath" Value="C:\android\ndkr18b\"/>
       <Item5 Name="Package" Value="org.lamw.applibgdxdemo1"/>
-      <Item6 Name="SdkPath" Value="C:\adt32\sdk\"/>
+      <Item6 Name="SdkPath" Value="C:\android\sdk\"/>
       <Item7 Name="StartModule" Value="GdxModule1"/>
       <Item8 Name="Theme" Value="GDXGame"/>
     </CustomData>

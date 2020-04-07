@@ -100,6 +100,14 @@ begin
 end;
 
 { Class:     org_lamw_applibgdxdemo1_Controls
+  Method:    pAppOnUpdateLayout
+  Signature: ()V }
+procedure pAppOnUpdateLayout(PEnv: PJNIEnv; this: JObject); cdecl;
+begin
+  Java_Event_pAppOnUpdateLayout(PEnv, this);
+end;
+
+{ Class:     org_lamw_applibgdxdemo1_Controls
   Method:    pAppOnConfigurationChanged
   Signature: ()V }
 procedure pAppOnConfigurationChanged(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -459,7 +467,7 @@ begin
     pointer, button);
 end;
 
-const NativeMethods: array[0..50] of JNINativeMethod = (
+const NativeMethods: array[0..51] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -494,6 +502,9 @@ const NativeMethods: array[0..50] of JNINativeMethod = (
    (name: 'pAppOnRotate';
     signature: '(I)I';
     fnPtr: @pAppOnRotate; ),
+   (name: 'pAppOnUpdateLayout';
+    signature: '()V';
+    fnPtr: @pAppOnUpdateLayout; ),
    (name: 'pAppOnConfigurationChanged';
     signature: '()V';
     fnPtr: @pAppOnConfigurationChanged; ),
@@ -686,6 +697,8 @@ exports
   pAppOnBackPressed name 'Java_org_lamw_applibgdxdemo1_Controls_'
     +'pAppOnBackPressed',
   pAppOnRotate name 'Java_org_lamw_applibgdxdemo1_Controls_pAppOnRotate',
+  pAppOnUpdateLayout name 'Java_org_lamw_applibgdxdemo1_Controls_'
+    +'pAppOnUpdateLayout',
   pAppOnConfigurationChanged name 'Java_org_lamw_applibgdxdemo1_Controls_'
     +'pAppOnConfigurationChanged',
   pAppOnActivityResult name 'Java_org_lamw_applibgdxdemo1_Controls_'

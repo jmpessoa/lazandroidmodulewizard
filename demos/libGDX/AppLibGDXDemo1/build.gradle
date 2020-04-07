@@ -12,10 +12,6 @@ allprojects {
     repositories {
        google()
        jcenter()
-       mavenLocal()
-       mavenCentral()
-       maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-       maven { url "https://oss.sonatype.org/content/repositories/releases/" }
        maven { url 'https://jitpack.io' }
     }
 }
@@ -23,6 +19,14 @@ apply plugin: 'com.android.application'
 android {
     lintOptions {
        abortOnError false
+    }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a'
+            universalApk false
+        }
     }
     compileSdkVersion 28
     defaultConfig {
@@ -63,7 +67,7 @@ task run(type: Exec, dependsOn: ':installDebug') {
 	}
 }
  
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10.2'
+wrapper {
+    gradleVersion = '5.4.1'
 }
 //how to use: look for "gradle_readme.txt"

@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl LAMW template*/
  
-public class jGdxBitmapFont /*extends ...*/ {
+public class jGdxBitmapFont /*extends ..*/ {
 
     private long pascalObj = 0;        //Pascal Object
     private Controls controls = null; //Java/Pascal [events] Interface ...

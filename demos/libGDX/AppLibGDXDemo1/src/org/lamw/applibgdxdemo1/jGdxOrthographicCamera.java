@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Matrix4;
 /*jControl LAMW template*/
 
 //http://libdgxtutorials.blogspot.com/2013/09/libgdx-tutorial-1-hello-world-hellogame.html
-public class jGdxOrthographicCamera /*extends ...*/ {
+public class jGdxOrthographicCamera /*extends ..*/ {
 
     private long pascalObj = 0;        //Pascal Object
     private Controls controls = null; //Java/Pascal [events] Interface ...

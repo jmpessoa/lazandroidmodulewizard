@@ -379,16 +379,16 @@ public class jCommons {
 		}
 	}
 
-	public void setCollapseMode(int _mode) {  //called on JNIPrompt
-		
+	public void setCollapseMode(int _mode) {  
+		//AppCompat theme
 	}
 		
-    public void setFitsSystemWindows(boolean _value) {
-    	
-    }
+        public void setFitsSystemWindows(boolean _value) {
+    	     //AppCompat theme
+        }
 
-    public void setScrollFlag(int _collapsingScrollFlag) {   //called in OnJNIPrompt
-  
+    public void setScrollFlag(int _collapsingScrollFlag) {  
+        //AppCompat theme
     }
 
     public int getColorFromResources(Context c, int colorResId) {    	
@@ -533,4 +533,5 @@ public class jCommons {
 	public static boolean IsAppCompatProject() {
 		return false;
 	}
+
 }

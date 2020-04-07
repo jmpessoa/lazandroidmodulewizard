@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Matrix4;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl LAMW template*/
 
-public class jGdxSpriteBatch /*extends ...*/ {
+public class jGdxSpriteBatch /*extends ..*/ {
 
     private long pascalObj = 0;        //Pascal Object
     private Controls controls = null; //Java/Pascal [events] Interface ...
