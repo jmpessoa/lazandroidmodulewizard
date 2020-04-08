@@ -19,7 +19,7 @@ import com.google.android.gms.ads.AdListener;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Reviewed by TR3E on 2019-01-27
+// Reviewed by TR3E on 2020-04-08
 //-------------------------------------------------------------------------
 
 /* Banner sizes:
@@ -56,6 +56,7 @@ public class jsAdMob extends FrameLayout {
    private Boolean   admobInit    = false;
    private String    admobId      = "ca-app-pub-3940256099942544/6300978111";
    private int       admobBannerSize = 0;  //LMB initialize banner size to SMART_BANNER (0)
+   private Boolean   admobBStop   = false;
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jsAdMob(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -126,18 +127,27 @@ public class jsAdMob extends FrameLayout {
    }
    
    public void AdMobUpdate(){
-	   if( (admobView == null) || (admobWidth == this.getWidth()) || mIsLoading ) return;
+	   if( mIsLoading ) return;
+	   
+	   if( (admobView != null) && (admobWidth == this.getWidth()) ) return;
 	   
 	   AdMobStop();	   	     
 	   AdMobRun();
    }
    
    public void AdMobStop(){
-       if( (admobView == null) || mIsLoading ) return;
+	   
+	   if (mIsLoading) admobBStop = true;
+	   
+	   if (admobView == null) return;	        
 	   
 	   this.removeView(admobView);
 	   admobView.destroy();
-	   admobView = null;
+	   admobView  = null;
+	   admobWidth = 0;
+	   
+	   admobBStop = false;
+	   mIsLoading = false;
    }
    
    public boolean AdMobIsLoading(){
@@ -246,6 +256,9 @@ public class jsAdMob extends FrameLayout {
         
         admobWidth = this.getWidth();
         mIsLoading = false;
+        
+        if (admobBStop)
+        	AdMobStop();
    }
 
    public View GetView() {
