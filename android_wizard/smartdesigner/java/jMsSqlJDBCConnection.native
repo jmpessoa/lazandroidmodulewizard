@@ -1,0 +1,3 @@
+public native void pOnMsSqlJDBCConnectionOpenAsync(long pasobj, String messageStatus);
+public native void pOnMsSqlJDBCConnectionExecuteQueryAsync(long pasobj, String messageStatus);
+public native void pOnMsSqlJDBCConnectionExecuteUpdateAsync(long pasobj, String messageStatus);

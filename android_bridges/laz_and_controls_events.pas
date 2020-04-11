@@ -238,6 +238,10 @@ uses
 
    procedure Java_Event_pOnDirectorySelected(env:PJNIEnv;this:JObject;Sender:TObject;path:jString);
 
+   procedure Java_Event_pOnMsSqlJDBCConnectionExecuteQueryAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
+   procedure Java_Event_pOnMsSqlJDBCConnectionOpenAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
+   procedure Java_Event_pOnMsSqlJDBCConnectionExecuteUpdateAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
+
 implementation
 
 uses
@@ -251,7 +255,7 @@ uses
    stablayout, treelistview, customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
-   ftpclient, cbluetoothspp, selectdirectorydialog;
+   ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2788,6 +2792,39 @@ begin
   begin
     jForm(jSelectDirectoryDialog(Sender).Owner).UpdateJNI(gApp);
     jSelectDirectoryDialog(Sender).GenEvent_OnDirectorySelected(Sender,GetString(env,path));
+  end;
+end;
+
+procedure Java_Event_pOnMsSqlJDBCConnectionExecuteQueryAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jMsSqlJDBCConnection then
+  begin
+    jForm(jMsSqlJDBCConnection(Sender).Owner).UpdateJNI(gApp);
+    jMsSqlJDBCConnection(Sender).GenEvent_OnMsSqlJDBCConnectionExecuteQueryAsync(Sender,GetString(env,messageStatus));
+  end;
+end;
+
+procedure Java_Event_pOnMsSqlJDBCConnectionOpenAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jMsSqlJDBCConnection then
+  begin
+    jForm(jMsSqlJDBCConnection(Sender).Owner).UpdateJNI(gApp);
+    jMsSqlJDBCConnection(Sender).GenEvent_OnMsSqlJDBCConnectionOpenAsync(Sender,GetString(env,messageStatus));
+  end;
+end;
+
+procedure Java_Event_pOnMsSqlJDBCConnectionExecuteUpdateAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jMsSqlJDBCConnection then
+  begin
+    jForm(jMsSqlJDBCConnection(Sender).Owner).UpdateJNI(gApp);
+    jMsSqlJDBCConnection(Sender).GenEvent_OnMsSqlJDBCConnectionExecuteUpdateAsync(Sender,GetString(env,messageStatus));
   end;
 end;
 

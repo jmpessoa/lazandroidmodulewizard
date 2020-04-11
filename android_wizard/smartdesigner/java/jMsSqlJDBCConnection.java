@@ -215,26 +215,27 @@ public class jMsSqlJDBCConnection /*extends ...*/ {
 
         @Override
         protected void onPostExecute(String r) {
-            if (r.trim().equals("success")) {
+            //if (r.trim().equals("success")) {
                 //controls.pOnConnection
-            }
+            //}
+            controls.pOnMsSqlJDBCConnectionOpenAsync(pascalObj, r.trim());
         }
 
         @Override
         protected String doInBackground(String... params) {
 
             if (un.trim().equals("") || password.trim().equals(""))
-                z = "errorOnLogin";
+                z = "ErrorOnLogin";
             else {
                 try {
                     Connection con = createConnection();
                     if (con == null) {
-                        z = "errorOnConnection";
+                        z = "ErrorOnConnection";
                     } else {
-                        z = "success";
+                        z = "Success";
                     }
                 } catch (Exception ex) {
-                    z = "exception";
+                    z = "Exception";
                 }
             }
             return z;
@@ -263,9 +264,10 @@ public class jMsSqlJDBCConnection /*extends ...*/ {
 
         @Override
         protected void onPostExecute(String r) {
-            if (r.trim().equals("success")) {
+            //if (r.trim().equals("success")) {
                 //controls.pOnConnection
-            }
+            //}
+            controls.pOnMsSqlJDBCConnectionExecuteQueryAsync(pascalObj, r.trim());
         }
 
         @Override
@@ -275,10 +277,10 @@ public class jMsSqlJDBCConnection /*extends ...*/ {
                     if (connection != null) {
                         z = ExecuteQuery(query) ;
                     } else {
-                        z = "success";
+                        z = "Success";
                     }
                 } catch (Exception ex) {
-                    z = "exception";
+                    z = "Exception";
                 }
             return z;
 
@@ -313,7 +315,10 @@ public class jMsSqlJDBCConnection /*extends ...*/ {
         @Override
         protected void onPostExecute(Boolean r) {
             if (r) {
-                //controls.pOnConnection
+                controls.pOnMsSqlJDBCConnectionExecuteUpdateAsync(pascalObj, "Success");
+            }
+            else {
+                controls.pOnMsSqlJDBCConnectionExecuteUpdateAsync(pascalObj, "Error");
             }
         }
 
@@ -330,7 +335,6 @@ public class jMsSqlJDBCConnection /*extends ...*/ {
                 z = false;
             }
             return z;
-
         }
     }
 
@@ -355,6 +359,5 @@ public class jMsSqlJDBCConnection /*extends ...*/ {
         }
 
     }
-
 
 }

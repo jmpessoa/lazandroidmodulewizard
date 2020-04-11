@@ -9,6 +9,10 @@ uses
 
 type
 
+TOnMsSqlJDBCConnectionExecuteQueryAsync=procedure(Sender:TObject;messageStatus:string) of object;
+TOnMsSqlJDBCConnectionOpenAsync=procedure(Sender:TObject;messageStatus:string) of object;
+TOnMsSqlJDBCConnectionExecuteUpdateAsync=procedure(Sender:TObject;messageStatus:string) of object;
+
 {Draft Component code by "LAMW: Lazarus Android Module Wizard" [8/18/2019 14:55:06]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -21,6 +25,10 @@ jMsSqlJDBCConnection = class(jControl)
     FUserName: string;
     FPassword: string;
     FLanguage: TSpeechLanguage;
+
+    FOnExecuteQueryAsync: TOnMsSqlJDBCConnectionExecuteQueryAsync;
+    FOnOpenAsync: TOnMsSqlJDBCConnectionOpenAsync;
+    FOnExecuteUpdateAsync: TOnMsSqlJDBCConnectionExecuteUpdateAsync;
 
  public
     constructor Create(AOwner: TComponent); override;
@@ -39,12 +47,25 @@ jMsSqlJDBCConnection = class(jControl)
     procedure Close();
     procedure SetLanguage(_language: TSpeechLanguage);
 
+    procedure ExecuteQueryAsync(_sqlQuery: string);
+    procedure OpenAsync();
+    procedure ExecuteUpdateAsync(_sqlUpdate: string);
+
+    procedure GenEvent_OnMsSqlJDBCConnectionExecuteQueryAsync(Sender:TObject;messageStatus:string);
+    procedure GenEvent_OnMsSqlJDBCConnectionOpenAsync(Sender:TObject;messageStatus:string);
+    procedure GenEvent_OnMsSqlJDBCConnectionExecuteUpdateAsync(Sender:TObject;messageStatus:string);
+
  published
     property ServerIP: string read FServerIP write SetServerIP;
     property DatabaseName: string  read FDatabaseName write SetDatabaseName;
     property UserName: string read FUserName write SetUserName;
     property Password: string read FPassword write SetPassword;
     property Language: TSpeechLanguage read FLanguage write SetLanguage;
+
+    property OnExecuteQueryAsync: TOnMsSqlJDBCConnectionExecuteQueryAsync read FOnExecuteQueryAsync write FOnExecuteQueryAsync;
+    property OnOpenAsync: TOnMsSqlJDBCConnectionOpenAsync read FOnOpenAsync write FOnOpenAsync;
+    property OnExecuteUpdateAsync: TOnMsSqlJDBCConnectionExecuteUpdateAsync read FOnExecuteUpdateAsync write FOnExecuteUpdateAsync;
+
 end;
 
 function jMsSqlJDBCConnection_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -60,6 +81,9 @@ procedure jMsSqlJDBCConnection_SetDatabaseName(env: PJNIEnv; _jmssqljdbcconnecti
 procedure jMsSqlJDBCConnection_Close(env: PJNIEnv; _jmssqljdbcconnection: JObject);
 procedure jMsSqlJDBCConnection_SetLanguage(env: PJNIEnv; _jmssqljdbcconnection: JObject; _language: integer);
 
+procedure jMsSqlJDBCConnection_ExecuteQueryAsync(env: PJNIEnv; _jmssqljdbcconnection: JObject; _sqlQuery: string);
+procedure jMsSqlJDBCConnection_OpenAsync(env: PJNIEnv; _jmssqljdbcconnection: JObject);
+procedure jMsSqlJDBCConnection_ExecuteUpdateAsync(env: PJNIEnv; _jmssqljdbcconnection: JObject; _sqlUpdate: string);
 
 implementation
 
@@ -191,6 +215,42 @@ begin
   FLanguage:= _language;
   if FInitialized then
      jMsSqlJDBCConnection_SetLanguage(FjEnv, FjObject, Ord(_language));
+end;
+
+procedure jMsSqlJDBCConnection.ExecuteQueryAsync(_sqlQuery: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMsSqlJDBCConnection_ExecuteQueryAsync(FjEnv, FjObject, _sqlQuery);
+end;
+
+procedure jMsSqlJDBCConnection.OpenAsync();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMsSqlJDBCConnection_OpenAsync(FjEnv, FjObject);
+end;
+
+procedure jMsSqlJDBCConnection.ExecuteUpdateAsync(_sqlUpdate: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jMsSqlJDBCConnection_ExecuteUpdateAsync(FjEnv, FjObject, _sqlUpdate);
+end;
+
+procedure jMsSqlJDBCConnection.GenEvent_OnMsSqlJDBCConnectionExecuteQueryAsync(Sender:TObject;messageStatus:string);
+begin
+  if Assigned(FOnExecuteQueryAsync) then FOnExecuteQueryAsync(Sender,messageStatus);
+end;
+
+procedure jMsSqlJDBCConnection.GenEvent_OnMsSqlJDBCConnectionOpenAsync(Sender:TObject;messageStatus:string);
+begin
+  if Assigned(FOnOpenAsync) then FOnOpenAsync(Sender,messageStatus);
+end;
+
+procedure jMsSqlJDBCConnection.GenEvent_OnMsSqlJDBCConnectionExecuteUpdateAsync(Sender:TObject;messageStatus:string);
+begin
+  if Assigned(FOnExecuteUpdateAsync) then FOnExecuteUpdateAsync(Sender,messageStatus);
 end;
 
 {-------- jMsSqlJDBCConnection_JNI_Bridge ----------}
@@ -355,6 +415,45 @@ begin
   jCls:= env^.GetObjectClass(env, _jmssqljdbcconnection);
   jMethod:= env^.GetMethodID(env, jCls, 'SetLanguage', '(I)V');
   env^.CallVoidMethodA(env, _jmssqljdbcconnection, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMsSqlJDBCConnection_ExecuteQueryAsync(env: PJNIEnv; _jmssqljdbcconnection: JObject; _sqlQuery: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_sqlQuery));
+  jCls:= env^.GetObjectClass(env, _jmssqljdbcconnection);
+  jMethod:= env^.GetMethodID(env, jCls, 'ExecuteQueryAsync', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jmssqljdbcconnection, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMsSqlJDBCConnection_OpenAsync(env: PJNIEnv; _jmssqljdbcconnection: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jmssqljdbcconnection);
+  jMethod:= env^.GetMethodID(env, jCls, 'OpenAsync', '()V');
+  env^.CallVoidMethod(env, _jmssqljdbcconnection, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jMsSqlJDBCConnection_ExecuteUpdateAsync(env: PJNIEnv; _jmssqljdbcconnection: JObject; _sqlUpdate: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_sqlUpdate));
+  jCls:= env^.GetObjectClass(env, _jmssqljdbcconnection);
+  jMethod:= env^.GetMethodID(env, jCls, 'ExecuteUpdateAsync', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jmssqljdbcconnection, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
