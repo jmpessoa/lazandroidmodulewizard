@@ -19,7 +19,7 @@ import com.google.android.gms.ads.AdListener;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Reviewed by TR3E on 2020-04-08
+// Reviewed by TR3E on 2020-04-13
 //-------------------------------------------------------------------------
 
 /* Banner sizes:
@@ -51,12 +51,12 @@ public class jsAdMob extends FrameLayout {
    private int admobWidth = 0; // Control change of width
    private boolean mIsLoading = false;
 
-   private AdView    admobView    = null;
-   private AdRequest admobRequest = null;
-   private Boolean   admobInit    = false;
-   private String    admobId      = "ca-app-pub-3940256099942544/6300978111";
-   private int       admobBannerSize = 0;  //LMB initialize banner size to SMART_BANNER (0)
-   private Boolean   admobBStop   = false;
+   private AdView     admobView    = null;
+   private AdRequest  admobRequest = null;
+   private Boolean    admobInit    = false;
+   private String     admobId      = "ca-app-pub-3940256099942544/6300978111";
+   private int        admobBannerSize = 0;  //LMB initialize banner size to SMART_BANNER (0)
+   private Boolean    admobBStop      = false;
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jsAdMob(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -115,7 +115,7 @@ public class jsAdMob extends FrameLayout {
    public void AdMobInit(){	  
            
 	   if( !admobInit ) {
-	       MobileAds.initialize(controls.activity, admobId);
+	       MobileAds.initialize(controls.activity, admobId);	      	    	     
 	       admobInit = true;
 	    }
     
@@ -131,8 +131,10 @@ public class jsAdMob extends FrameLayout {
 	   
 	   if( (admobView != null) && (admobWidth == this.getWidth()) ) return;
 	   
-	   AdMobStop();	   	     
-	   AdMobRun();
+	   AdMobStop();
+	   
+	   if( !mIsLoading && !admobBStop )
+	    AdMobRun();
    }
    
    public void AdMobStop(){
@@ -142,7 +144,7 @@ public class jsAdMob extends FrameLayout {
 	   if (admobView == null) return;	        
 	   
 	   this.removeView(admobView);
-	   admobView.destroy();
+	   
 	   admobView  = null;
 	   admobWidth = 0;
 	   
@@ -153,6 +155,7 @@ public class jsAdMob extends FrameLayout {
    public boolean AdMobIsLoading(){
 	   return mIsLoading;
    }
+  
 
    public void AdMobRun(){
         
@@ -169,58 +172,76 @@ public class jsAdMob extends FrameLayout {
         	return;
         }
         
-        admobView.setAdListener(new AdListener() {
-        	
-            /*private void showToast(String message) {            	
-                Toast.makeText(controls.activity, message, Toast.LENGTH_SHORT).show();
-            }*/
-                        
-            
-            @Override
-            public void onAdLoaded() {
-            	            	
-                //showToast("Ad loaded.");
-                if (admobView.getVisibility() == View.GONE) {                	
-                	admobView.setVisibility(View.VISIBLE);                	
-                }
-                
-                controls.pOnAdMobLoaded(pascalObj);
-            }
+        AdListener admobListener = new AdListener() {
+	        	
+	            /*private void showToast(String message) {            	
+	                Toast.makeText(controls.activity, message, Toast.LENGTH_SHORT).show();
+	            }*/
+	                        
+	            
+	            @Override
+	            public void onAdLoaded() {
+	            	            	
+	                //showToast("Ad loaded.");
+	                if (admobView.getVisibility() == View.GONE) {                	
+	                	admobView.setVisibility(View.VISIBLE);                	
+	                }
+	                
+	                controls.pOnAdMobLoaded(pascalObj);
+	                
+	                mIsLoading = false;
+	                
+	                if (admobBStop)
+	                	AdMobStop();
+	            }
 
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-            	                      
-            	controls.pOnAdMobFailedToLoad(pascalObj, errorCode);
-                /*showToast(String.format("Ad failed to load with error code %d.", errorCode));
-                
-                switch(errorCode){
-                 	case AdRequest.ERROR_CODE_INTERNAL_ERROR: showToast("INTERNAL ERROR"); break; 
-                 	case AdRequest.ERROR_CODE_INVALID_REQUEST: showToast("INVALID REQUEST"); break;
-                 	case AdRequest.ERROR_CODE_NETWORK_ERROR: showToast("NETWORK ERROR"); break;
-                 	case AdRequest.ERROR_CODE_NO_FILL: showToast("NO FILL"); break;
-                }*/
-            }
-            @Override
-            public void onAdOpened() {
-            	// Click in Ads
-                //showToast("Ad opened.");
-            	controls.pOnAdMobOpened(pascalObj);
-            }
+	            @Override
+	            public void onAdFailedToLoad(int errorCode) {
+	            	                      
+	            	controls.pOnAdMobFailedToLoad(pascalObj, errorCode);
+	                /*showToast(String.format("Ad failed to load with error code %d.", errorCode));
+	                
+	                switch(errorCode){
+	                 	case AdRequest.ERROR_CODE_INTERNAL_ERROR: showToast("INTERNAL ERROR"); break; 
+	                 	case AdRequest.ERROR_CODE_INVALID_REQUEST: showToast("INVALID REQUEST"); break;
+	                 	case AdRequest.ERROR_CODE_NETWORK_ERROR: showToast("NETWORK ERROR"); break;
+	                 	case AdRequest.ERROR_CODE_NO_FILL: showToast("NO FILL"); break;
+	                }*/
+	            	
+	            	mIsLoading = false;
+	                
+	                if (admobBStop)
+	                	AdMobStop();
+	            }
+	            @Override
+	            public void onAdOpened() {
+	            	// Click in Ads
+	                //showToast("Ad opened.");
+	            	controls.pOnAdMobOpened(pascalObj);
+	            }
 
-            @Override
-            public void onAdClosed() {
-            	// Return to Ads
-                //showToast("Ad closed.");
-            	controls.pOnAdMobClosed(pascalObj);
-            }
+	            @Override
+	            public void onAdClosed() {
+	            	// Return to Ads
+	                //showToast("Ad closed.");
+	            	controls.pOnAdMobClosed(pascalObj);
+	            }
 
-            @Override
-            public void onAdLeftApplication() {
-            	// After click in Ads
-                //showToast("Ad left application.");
-            	controls.pOnAdMobLeftApplication(pascalObj);
-            }
-        });
+	            @Override
+	            public void onAdLeftApplication() {
+	            	// After click in Ads
+	                //showToast("Ad left application.");
+	            	controls.pOnAdMobLeftApplication(pascalObj);
+	            }
+	        };
+        
+        if( (admobListener == null) || (bannerLParams == null) ){
+        	admobView  = null;
+        	mIsLoading = false;
+        	return;
+        }
+        
+        admobView.setAdListener(admobListener);
 
         admobView.setLayoutParams(bannerLParams);
                 
@@ -244,21 +265,18 @@ public class jsAdMob extends FrameLayout {
 			admobView.setAdSize(AdSize.SMART_BANNER);
 		}
         
+        
         admobView.setAdUnitId(admobId);
 
         this.addView(admobView);
 
-        //admobRequest = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
-        admobRequest = new AdRequest.Builder().build();
+        if( admobRequest == null )
+         admobRequest = new AdRequest.Builder().build();
 
         // Start loading the ad in the background.
         admobView.loadAd(admobRequest);
         
         admobWidth = this.getWidth();
-        mIsLoading = false;
-        
-        if (admobBStop)
-        	AdMobStop();
    }
 
    public View GetView() {
