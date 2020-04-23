@@ -33,14 +33,45 @@ Tutorial: How to get your signed release Apk
 4 [Gradle]: execute the [project] command "gradle-local-apksigner.bat" [or .sh] to get the [release] signed Apk! (thanks to TR3E!)
             hint: look for [project] folder "...\build\outputs\apk\release"
  
-
 4 [Ant]: execute the [project] command "ant-build-release.bat" [.sh] to get the [release] signed Apk!"
          hint: look for [project] folder "...\bin"
 
 
 Success! You can now upload your nice "AppNiceProject1-release.apk" to "Google Play" store!
 
-....  Thanks to All!
-....  Special thanks to TR3E!
+Posts: 1229 
+Re: Android Module Wizard 
+Reply#1210 on: March 13, 2020, 05:14:35 am
 
+[By DonAlfredo]
+
+Hi,
+
+...I have added a Gradle option into build.gradle:
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a'
+            universalApk false
+        }
+    }
+
+
+To make a combined apk, build with Gradle use [something like] this:
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a','arm64-v8a'
+            universalApk true
+        }
+    }
+
+
+....  Thanks to All!
+....  Special thanks to TR3E and DonAlfredo!
 ....  by jmpessoa_hotmail_com
+

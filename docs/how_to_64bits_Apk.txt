@@ -32,3 +32,37 @@
 		> [LAMW] Build Android Apk and Run
 
 	NOTE: If desirable/wanted repeat 4.1/4.2/4.3 for other CPUs...
+
+
+WARNING!
+
+Posts: 1229 [By DonAlfredo]
+Re: Android Module Wizard 
+Reply#1210 on: March 13, 2020, 05:14:35 am
+
+
+Hi,
+
+...I have added a Gradle option into build.gradle:
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a'
+            universalApk false
+        }
+    }
+
+
+To make a combined apk, build with Gradle use [something like] this:
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a','arm64-v8a'
+            universalApk true
+        }
+    }
+
