@@ -8,7 +8,7 @@ import android.os.Handler;
 //http://daddycat.blogspot.kr/2011/05/android-thread-ui.html
 //http://lsit81.tistory.com/entry/ActivityrunOnUiThread%EC%99%80-post%EC%9D%98-%EC%B0%A8%EC%9D%B4%EC%A0%90
 //
-// 2020/04/08
+// 2020/04/16
 // TR3E Software https://sites.google.com/view/tr3esoftware/start
 // Fix the error of could start 2 timers, if the deactivated one was still on time, 
 // when activating the same one again.
@@ -79,9 +79,9 @@ public class jTimer {
   } else{
 	  	  
 	  if( mRunnable != null ){
-		  mRunnable.disable();
-		  mHandler.removeCallbacksAndMessages(null);		  
+		  mRunnable.disable();		  		 
 		  mRunnable = null;
+		  mHandler.removeCallbacksAndMessages(null);
 	  }
   }
 	 
@@ -97,7 +97,7 @@ public class jTimer {
   }
 	 
   mEnabled = false;
-  mHandler  = null;
+  mHandler = null;
  }
 
 }
