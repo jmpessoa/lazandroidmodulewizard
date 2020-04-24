@@ -689,6 +689,8 @@ var
   directive: string;
   FSupport:boolean;
   sourcepath,targetpath:string;
+  includeList: TStringList;
+  universalApk: boolean;
 begin
 
   strList:= TStringList.Create;
@@ -963,15 +965,68 @@ begin
            auxStr := ExtractFileName(auxStr);
          end;
 
-         if (Length(auxStr)>0) then
+         includeList:= TStringList.Create;
+         includeList.Delimiter:= ',';
+         includeList.StrictDelimiter:= True;
+         includeList.Sorted:= True;
+         includeList.Duplicates:= dupIgnore;
+
+         includeList.Add(''''+auxStr+''''); //initial  Instruction Set
+
+         if FileExists(FPathToAndroidProject + 'libs\armeabi\libcontrols.so' ) then
+         begin
+           includeList.Add('''armeabi''');
+         end;
+
+         if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so' ) then
+         begin
+           includeList.Add('''armeabi-v7a''');
+         end;
+
+         if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\libcontrols.so' ) then
+         begin
+           includeList.Add('''arm64-v8a''');
+         end;
+
+         if FileExists(FPathToAndroidProject + 'libs\x86_64\libcontrols.so' ) then
+         begin
+           includeList.Add('''x86_64''');
+         end;
+
+         if FileExists(FPathToAndroidProject + 'libs\x86\libcontrols.so' ) then
+         begin
+           includeList.Add('''x86''');
+         end;
+
+         if FileExists(FPathToAndroidProject + 'libs\mips\libcontrols.so' ) then
+         begin
+           includeList.Add('''mips''');
+         end;
+
+         auxStr:= includeList.DelimitedText; //NEW! includeList based...
+
+         universalApk:= False;
+         if includeList.Count > 1 then
+           universalApk:= True;
+
+         includeList.Free;
+
+         if Length(auxStr) > 0 then //
          begin
          strList.Add('    splits {');
          strList.Add('        abi {');
          strList.Add('            enable true');
          strList.Add('            reset()');
-         strList.Add('            include '''+auxStr+'''');
+
+         strList.Add('            include '+auxStr); //NEW! includeList based...
+         //strList.Add('            include '''+auxStr+'''');
          //strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
-         strList.Add('            universalApk false');
+
+         if universalApk then
+           strList.Add('            universalApk true')
+         else
+           strList.Add('            universalApk false');
+
          strList.Add('        }');
          strList.Add('    }');
          end;
