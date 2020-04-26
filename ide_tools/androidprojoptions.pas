@@ -367,6 +367,9 @@ var
   tempStr, findString, oldTargetStr, oldCompileSdkVersion: string;
   p: integer;
   cpuTarget:string;
+  includeList: TStringList;
+  universalApk: boolean;
+  pathToAndroidProject: string;
 begin
   fn := ExtractFilePath(FFileName) + 'build.xml';
   if not FileExists(fn) then
@@ -485,6 +488,58 @@ begin
   strList.Add('target=android-' + IntToStr(FTargetSdkVersion));
   strList.SaveToFile(ExtractFilePath(FFileName) + 'project.properties');
 
+
+  cpuTarget := ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+  cpuTarget := ExtractFileName(cpuTarget);
+
+  includeList:= TStringList.Create;
+  includeList.Delimiter:= ',';
+  includeList.StrictDelimiter:= True;
+  includeList.Sorted:= True;
+  includeList.Duplicates:= dupIgnore;
+
+  includeList.Add(''''+cpuTarget+''''); //initial  Instruction Set
+
+  PathToAndroidProject:= ExtractFilePath(FFileName);
+
+  if FileExists(pathToAndroidProject + 'libs\armeabi\libcontrols.so' ) then
+  begin
+    includeList.Add('''armeabi''');
+  end;
+
+  if FileExists(pathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so' ) then
+  begin
+    includeList.Add('''armeabi-v7a''');
+  end;
+
+  if FileExists(pathToAndroidProject + 'libs\arm64-v8a\libcontrols.so' ) then
+  begin
+    includeList.Add('''arm64-v8a''');
+  end;
+
+  if FileExists(pathToAndroidProject + 'libs\x86_64\libcontrols.so' ) then
+  begin
+    includeList.Add('''x86_64''');
+  end;
+
+  if FileExists(pathToAndroidProject + 'libs\x86\libcontrols.so' ) then
+  begin
+    includeList.Add('''x86''');
+  end;
+
+  if FileExists(pathToAndroidProject + 'libs\mips\libcontrols.so' ) then
+  begin
+    includeList.Add('''mips''');
+  end;
+
+  cpuTarget:= includeList.DelimitedText; //NEW! includeList based...
+
+  universalApk:= False;
+  if includeList.Count > 1 then
+    universalApk:= True;
+
+  includeList.Free;
+
   strList.Clear;
   if FileExists(ExtractFilePath(FFileName) + 'build.gradle') then
   begin
@@ -498,11 +553,28 @@ begin
       tempStr := strList.Strings[i];
       if Pos(' include ',tempStr)>0 then
       begin
-        cpuTarget := ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
-        cpuTarget := ExtractFileName(cpuTarget);
         p:=Pos('include',tempStr);
         Delete(tempStr,p,MaxInt);
-        tempStr:=tempStr+'include '''+cpuTarget+'''';
+        tempStr:=tempStr+'include '+cpuTarget;  //NEW! includeList based...
+        strList.Strings[i]:=tempStr;
+        break;
+      end;
+    end;
+
+    for i := 0 to (strList.Count-1) do
+    begin
+      tempStr := strList.Strings[i];
+      if Pos(' universalApk ',tempStr)>0 then
+      begin
+        p:=Pos('universalApk',tempStr);
+
+        Delete(tempStr,p,MaxInt);
+
+        if universalApk then
+          tempStr:=tempStr+'universalApk true'
+        else
+          tempStr:=tempStr+'universalApk false';
+
         strList.Strings[i]:=tempStr;
         break;
       end;

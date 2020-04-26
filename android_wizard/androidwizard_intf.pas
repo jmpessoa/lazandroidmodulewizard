@@ -2127,11 +2127,12 @@ begin
           strList.Add(' ');
           strList.Add('');
           strList.Add('4 [Gradle]: execute the [project] command "gradle-local-apksigner.bat" [or .sh] to get the [release] signed Apk! (thanks to TR3E!)');
-          strList.Add('            hint: look for [project] folder "...\build\outputs\apk\release"');
+          strList.Add('            or execute "gradle-local-universal-apksigner.bat" if your are supporting multi-architecture (ex.: armeabi-v7a + arm64-v8a + ...) ');
+          strList.Add('            hint: look for your generated apk in [project] folder "...\build\outputs\apk\release"');
           strList.Add(' ');
           strList.Add('');
           strList.Add('4 [Ant]: execute the [project] command "ant-build-release.bat" [.sh] to get the [release] signed Apk!"');
-          strList.Add('         hint: look for [project] folder "...\bin"');
+          strList.Add('         hint: look for your generated apk in [project] folder "...\bin"');
           strList.Add('');
           strList.Add('');
           strList.Add('Success! You can now upload your nice "'+FSmallProjName+'-release.apk" to "Google Play" store!');
@@ -2801,6 +2802,14 @@ begin
                 strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release-unsigned-aligned.apk');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-apksigner.bat');
 
+                strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
+                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools;'+FPathToAndroidSDK+'build-tools\'+sdkBuildTools);
+                strList.Add('set GRADLE_HOME='+FPathToGradle);
+                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+                strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.bat');
+
                 strList.Clear;
                 strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
                 if FPathToGradle = '' then
@@ -2832,6 +2841,15 @@ begin
                 strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned-aligned.apk');
                 strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned-aligned.apk');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-apksigner.sh');
+
+                strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
+                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+                strList.Add('export PATH='+linuxPathToAndroidSDK+'build-tools/'+sdkBuildTools+':$PATH');
+                strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+                strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.sh');
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
