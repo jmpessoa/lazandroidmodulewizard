@@ -743,7 +743,7 @@ begin
   if sdkManifMinApi <> '' then
     sdkManifMInApiNumber:= StrToInt(sdkManifMinApi)
   else
-    sdkManifMInApiNumber:= 0;
+    sdkManifMInApiNumber:= 0; //dummy
 
   sourcepath:=LamwGlobalSettings.PathToJavaTemplates+'androidmanifest.txt';
   targetpath:=FPathToAndroidProject+'AndroidManifest.xml';
@@ -1989,7 +1989,7 @@ var
   list, {listRequirements,} auxList, manifestList, gradleList: TStringList;
   p, p1, p2, i, minSdkManifest, minSdkControl: integer;
   aux, tempStr, auxStr: string;
-  insertRef: string;
+  insertRef, minSdkManifestStr: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
 begin
@@ -2061,7 +2061,13 @@ begin
    //updated manifest minAdkApi
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk') then
    begin
-     minSdkManifest:= StrToInt(GetMinSDKFromManifest());
+     minSdkManifestStr:= GetMinSDKFromManifest();
+
+     if  minSdkManifestStr <> '' then
+       minSdkManifest:= StrToInt(minSdkManifestStr)
+     else
+       minSdkManifest:= 14;
+
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk');
      minSdkControl:= StrToInt(auxList.Strings[0]);
      if minSdkControl > minSdkManifest then
