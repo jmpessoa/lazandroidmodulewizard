@@ -13,6 +13,12 @@ import android.speech.RecognizerIntent;
 /*jControl LAMW template*/
 
 //ref. https://stacktips.com/tutorials/android/speech-to-text-in-android
+
+//-------------------------------------------------------------------------
+// jSpeechToText
+// Reviewed by TR3E on 2020/05/05
+//-------------------------------------------------------------------------
+
 public class jSpeechToText /*extends ...*/ {
  
    private long pascalObj = 0;        //Pascal Object
@@ -45,21 +51,26 @@ public class jSpeechToText /*extends ...*/ {
 	   mExtraPrompt = _promptMessage;
    }
    
-   public void SpeakIn() {	   
+   public boolean SpeakIn() {	   
        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+       
+       if(intent == null) return false;
+       
        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, mLocale );
        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, mExtraPrompt);
+       
        try {
     	   controls.activity.startActivityForResult(intent, SPEECH_T0_TEXT_REQUEST_CODE);
+    	   return true;
        } catch (ActivityNotFoundException a) {
-          //
+           return false;
        }
    }
          
-   public void SpeakIn(String _promptMessage) {	   
+   public boolean SpeakIn(String _promptMessage) {	   
 	   mExtraPrompt = _promptMessage;	
-	   SpeakIn();
+	   return SpeakIn();
    }
 
    public void SetRequestCode(int _requestCode) {
@@ -90,7 +101,7 @@ public class jSpeechToText /*extends ...*/ {
 	      case 9: mLocale = Locale.KOREAN; break;	      
 	      case 10: mLocale = Locale.SIMPLIFIED_CHINESE; break;
 	      case 11: mLocale = Locale.TAIWAN; break;
-	      case 12:mLocale = Locale.TRADITIONAL_CHINESE; break;
+	      case 12: mLocale = Locale.TRADITIONAL_CHINESE; break;
 	      case 13: mLocale = Locale.UK; break;
 	      case 14: mLocale = Locale.US; break;	      
 	   }	     
