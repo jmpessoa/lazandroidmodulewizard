@@ -25,7 +25,6 @@ jImageFileManager = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate(): jObject;
     procedure jFree();
     function  SaveToSdCard(_image: jObject; _filename: string) : boolean;
     procedure ShowImagesFromGallery();
@@ -63,8 +62,6 @@ jImageFileManager = class(jControl)
 
 end;
 
-function jImageFileManager_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-
 implementation
 
 {---------  jImageFileManager  --------------}
@@ -94,14 +91,12 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject := jCreate(); if FjObject = nil then exit;
+
+  FjObject := jni_create(FjEnv, FjThis, Self, 'jImageFileManager_jCreate');
+
+  if FjObject = nil then exit;
+
   FInitialized:= True;
-end;
-
-
-function jImageFileManager.jCreate(): jObject;
-begin
-   Result:= jImageFileManager_jCreate(FjEnv, FjThis , int64(Self));
 end;
 
 procedure jImageFileManager.jFree();
@@ -283,7 +278,7 @@ function jImageFileManager.GetBitmapFromIntentResult(_intentData: jObject): jObj
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_n_out_bmp(FjEnv, FjObject, 'GetBitmapFromIntentResult', _intentData);
+   Result:= jni_func_int_out_bmp(FjEnv, FjObject, 'GetBitmapFromIntentResult', _intentData);
 end;
 
 
@@ -291,7 +286,7 @@ function jImageFileManager.GetBitmapThumbnailFromCamera(_intentData: jObject): j
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_n_out_bmp(FjEnv, FjObject, 'GetBitmapThumbnailFromCamera', _intentData);
+   Result:= jni_func_int_out_bmp(FjEnv, FjObject, 'GetBitmapThumbnailFromCamera', _intentData);
 end;
 
 function jImageFileManager.LoadFromUri(_uriAsString: string): jObject;
@@ -302,19 +297,6 @@ begin
 end;
 
 {-------- jImageFileManager_JNI_Bridge ----------}
-
-function jImageFileManager_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].j:= _Self;
-  jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jImageFileManager_jCreate', '(J)Ljava/lang/Object;');
-  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
-end;
 
 (*
 //Please, you need insert:
