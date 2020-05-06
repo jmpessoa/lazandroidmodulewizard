@@ -1,8 +1,9 @@
+package org.lamw.applearnlanguagesbylistening;
 
 import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Context;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.media.SoundPool.OnLoadCompleteListener;
@@ -33,15 +34,21 @@ public class jSoundPool implements SoundPool.OnLoadCompleteListener {
 	    pascalObj = _Self ;
 		controls  = _ctrls;
 		context   = _ctrls.activity;
-				
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-	        soundPool = new SoundPool.Builder()
+
+		if (android.os.Build.VERSION.SDK_INT < 21) {
+			soundPool = new SoundPool(maxStreams, AudioManager.STREAM_MUSIC, 0);
+		} else  {
+			//[ifdef_api21up]
+			AudioAttributes attributes = new AudioAttributes.Builder()
+					.setUsage(AudioAttributes.USAGE_MEDIA)  //USAGE_ASSISTANCE_SONIFICATION
+					.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC) //CONTENT_TYPE_SPEECH  CONTENT_TYPE_SONIFICATION
+					.build();
+			soundPool = new SoundPool.Builder()
 	                .setMaxStreams(maxStreams)
+					.setAudioAttributes(attributes)
 	                .build();
-	    } else {
-	        soundPool = new SoundPool(maxStreams, AudioManager.STREAM_MUSIC, 0);
+			//[endif_api21up]
 	    }
-		
         soundPool.setOnLoadCompleteListener(this);        
     }
     
