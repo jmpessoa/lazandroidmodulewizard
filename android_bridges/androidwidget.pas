@@ -1264,6 +1264,7 @@ type
 
     function GetScreenSize(): string;
     function GetScreenDensity(): string; overload;
+    function GetScreenDpi(): integer;
     function GetScreenDensity(strDensity: string): integer; overload;
     procedure SetDensityAssets(strDensity: string);
 
@@ -3928,6 +3929,13 @@ begin
   Result:= FScreenStyle;
   if FInitialized then
    Result:= TScreenStyle(jForm_GetScreenOrientation(FjEnv, FjObject));
+end;
+
+function jForm.GetScreenDpi(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenDpi');
 end;
 
 function jForm.GetScreenDensity(): string;
