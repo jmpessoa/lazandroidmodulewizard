@@ -1261,29 +1261,40 @@ class jForm {
 	       return r; 
 	}
 
+	public int GetScreenDpi() {
+	    String r= "";
+	    DisplayMetrics metrics = new DisplayMetrics();
+
+	    controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+	    return metrics.densityDpi;
+	}
+
 	public String GetScreenDensity() {
-		String r = "";
-		DisplayMetrics metrics = new DisplayMetrics();
-
-		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-		int density = metrics.densityDpi;
-
-//[ifdef_api16up]
-		if (density == DisplayMetrics.DENSITY_XXHIGH) {
-			r = "XXHIGH:" + String.valueOf(density);
-		} else
-//[endif_api16up]
-			if (density == DisplayMetrics.DENSITY_XHIGH) {
-				r = "XHIGH:" + String.valueOf(density);
-			} else if (density == DisplayMetrics.DENSITY_HIGH) {
-				r = "HIGH:" + String.valueOf(density);
-			} else if (density == DisplayMetrics.DENSITY_MEDIUM) {
-				r = "MEDIUM:" + String.valueOf(density);
-			} else if (density == DisplayMetrics.DENSITY_LOW) {
-				r = "LOW:" + String.valueOf(density);
-			}
-		return r;
+	    String r= "";
+	    
+	    int density = GetScreenDpi();
+	        
+	//[ifdef_api16up]
+	    if (density==DisplayMetrics.DENSITY_XXHIGH) {    	    	
+	        r= "XXHIGH:" + String.valueOf(density);
+	    }
+	    else
+	//[endif_api16up]
+	    if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
+	        r= "XHIGH:" + String.valueOf(density);
+	    }
+	    else if (density==DisplayMetrics.DENSITY_HIGH) {    	    	
+	        r= "HIGH:" + String.valueOf(density);
+	    }
+	    else if (density==DisplayMetrics.DENSITY_MEDIUM) {
+	        r= "MEDIUM:" + String.valueOf(density);
+	    }
+	    else if (density==DisplayMetrics.DENSITY_LOW) {
+	        r= "LOW:" + String.valueOf(density);
+	    }else
+	    	r= "CUSTOM:" + String.valueOf(density);
+	    return r;
 	}
 
 	public String GetScreenSize() {
