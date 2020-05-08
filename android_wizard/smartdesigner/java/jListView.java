@@ -2374,9 +2374,15 @@ public class jListView extends ListView {
 			 }
 		}					  
 	}
-			
+	
+	// Fix GetCheckedItemPosition [by TR3E]
 	public int GetCheckedItemPosition() {
-		return this.getCheckedItemPosition();
+		
+		for( int i = 0; i < alist.size(); i++ )
+			 if( alist.get(i).checked )
+				 return i;
+			
+		return -1;
 	}	
 
 	public void SetFitsSystemWindows(boolean _value) {
