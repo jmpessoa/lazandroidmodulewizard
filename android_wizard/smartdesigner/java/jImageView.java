@@ -278,7 +278,10 @@ public class jImageView extends ImageView {
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
-		if( d == null ) return;
+		if( d == null ) { 
+			this.setImageBitmap(null); 
+			return; 
+		}
 		
 		Bitmap b = ((BitmapDrawable)d).getBitmap();
 		
@@ -1049,9 +1052,15 @@ public class jImageView extends ImageView {
 	}
 
 	public void SetImageDrawable(AnimationDrawable _imageAnimation) {
-		if (_imageAnimation == null) return;
+		if (_imageAnimation == null) { 
+			this.setImageDrawable(null); 
+			return; 
+		}
+		
 		_imageAnimation.stop();
+		
         if(this.getDrawable() == null) this.setImageDrawable(_imageAnimation);
+        
 		_imageAnimation.setOneShot(false);
 		_imageAnimation.setVisible(true, true);
 		_imageAnimation.start();
