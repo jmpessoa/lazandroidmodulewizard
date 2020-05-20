@@ -387,7 +387,7 @@ public class jLocation /*extends ...*/ {
     	
     	if (mListening){
     		
-    	 if(mListener)
+    	 if(mlistener != null)
           mlistener.RemoveUpdates(mLocationManager);
     	 
          mListening = false;
