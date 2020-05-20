@@ -383,9 +383,15 @@ public class jLocation /*extends ...*/ {
         }
     }
 
-    public void StopTracker() {  // finalize ....        
-        mlistener.RemoveUpdates(mLocationManager);
-        mListening = false;
+    public void StopTracker() {  // finalize ....
+    	
+    	if (mListening){
+    		
+    	 if(mlistener != null)
+          mlistener.RemoveUpdates(mLocationManager);
+    	 
+         mListening = false;
+    	}
     }
 
     public void SetCriteriaAccuracy(int _accuracy) {
