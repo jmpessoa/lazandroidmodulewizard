@@ -115,8 +115,11 @@ public class jsAdMob extends FrameLayout {
    }
    
    public void AdMobInit(){
-	   MobileAds.initialize(controls.activity);
-	   admobInit = true;
+	  
+	   if( !admobInit ) { 
+	    MobileAds.initialize(controls.activity);
+	    admobInit = true;
+	   }
    }
    
    public void AdMobFree(){
