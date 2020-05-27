@@ -206,7 +206,7 @@ public class jCommons {
 		    			
 			r = aOwnerView.getMeasuredHeight();
 		}
-
+		
 		//Fix the "match_parent" error with an "anchor" and 
 		// within the component a "half_parent" is set
 		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {
@@ -228,9 +228,9 @@ public class jCommons {
 		   			
 			r = aOwnerView.getMeasuredWidth();		
 		}
-
+		
 		//Fix the "match_parent" error with an "anchor" and 
-		// within the component a "half_parent" is set
+		// within the component a "half_parent" is set		
 		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {  
 			if( aOwnerView.getWidth() > 0 ) r = aOwnerView.getWidth(); 
 		}
@@ -334,8 +334,15 @@ public class jCommons {
 	}
 	
 	public void setLayoutAll(int _idAnchor) {
+		if( lparams == null ) return;
+		
 		lparams.width  = lparamW;
-		lparams.height = lparamH;
+		
+		if( aOwnerView instanceof DrawerLayout )
+			lparams.height = android.view.ViewGroup.LayoutParams.MATCH_PARENT; // Only work in MATCH_PARENT
+		else
+		    lparams.height = lparamH;
+		
 		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom);
 		
 		if (lparams instanceof RelativeLayout.LayoutParams) {

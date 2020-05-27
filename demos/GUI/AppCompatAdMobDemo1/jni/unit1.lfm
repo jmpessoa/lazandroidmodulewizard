@@ -1,6 +1,6 @@
 object AndroidModule1: TAndroidModule1
-  Left = 331
-  Top = 130
+  Left = 333
+  Top = 154
   Width = 320
   Height = 400
   MarginLeft = 0
@@ -8,15 +8,25 @@ object AndroidModule1: TAndroidModule1
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
+  OnCreate = AndroidModule1Create
+  OnDestroy = AndroidModule1Destroy
   Text = 'AndroidModule1'
   ActivityMode = actMain
-  BackgroundColor = colbrDefault
+  BackgroundColor = colbrSilver
   ActionBarTitle = abtDefault
   AnimationDurationIn = 1500
   AnimationDurationOut = 1500
   AnimationMode = animNone
   OnRotate = AndroidModule1Rotate
+  OnActivityResult = AndroidModule1ActivityResult
+  OnBackButton = AndroidModule1BackButton
+  OnClose = AndroidModule1Close
+  OnShow = AndroidModule1Show
+  OnSpecialKeyDown = AndroidModule1SpecialKeyDown
+  OnPrepareOptionsMenu = AndroidModule1PrepareOptionsMenu
   OnActivityCreate = AndroidModule1ActivityCreate
+  OnActivityPause = AndroidModule1ActivityPause
+  OnActivityResume = AndroidModule1ActivityResume
   object jButton1: jButton
     Left = 53
     Top = 176
@@ -56,6 +66,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
+    AdMobBannerSize = admobSmartBanner
   end
   object jsAdMob2: jsAdMob
     Left = 0
@@ -73,6 +84,7 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
+    AdMobBannerSize = admobSmartBanner
   end
   object jButton2: jButton
     Left = 107
@@ -98,7 +110,7 @@ object AndroidModule1: TAndroidModule1
     GravityInParent = lgNone
     OnClick = jButton2Click
   end
-  object jTextView1: jTextView
+  object lbInfo: jTextView
     Left = 5
     Top = 234
     Width = 310
@@ -114,7 +126,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Try to rotate screen after load AdMob!!!'
+    Text = '---'
     Alignment = taCenter
     BackgroundColor = colbrDefault
     FontColor = colbrBlack

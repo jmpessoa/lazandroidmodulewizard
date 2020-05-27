@@ -17,9 +17,11 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdListener;
 
+
 //-------------------------------------------------------------------------
 // jsAdMob
-// Reviewed by TR3E on 2020-04-13
+// Developed by ADiV for LAMW on 2020-05-27
+// Updated for AdMob 17.2.1
 //-------------------------------------------------------------------------
 
 /* Banner sizes:
@@ -111,14 +113,10 @@ public class jsAdMob extends FrameLayout {
    public int AdMobGetBannerSize(){
       return admobBannerSize;
    }
-
-   public void AdMobInit(){	  
-           
-	   if( !admobInit ) {
-	       MobileAds.initialize(controls.activity, admobId);	      	    	     
-	       admobInit = true;
-	    }
-    
+   
+   public void AdMobInit(){
+	   MobileAds.initialize(controls.activity);
+	   admobInit = true;
    }
    
    public void AdMobFree(){

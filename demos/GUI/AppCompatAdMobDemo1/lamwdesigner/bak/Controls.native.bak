@@ -9,6 +9,7 @@ public native void pAppOnStart();
 public native void pAppOnStop();
 public native void pAppOnBackPressed();
 public native int pAppOnRotate(int rotate);
+public native void pAppOnUpdateLayout();
 public native void pAppOnConfigurationChanged();
 public native void pAppOnActivityResult(int requestCode, int resultCode, Intent data);
 public native void pAppOnCreateOptionsMenu(Menu menu);
