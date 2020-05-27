@@ -148,6 +148,9 @@ import android.provider.Settings.SettingNotFoundException;
 
 import android.app.KeyguardManager;
 import android.os.PowerManager;
+import android.os.BatteryManager;
+
+import android.content.IntentFilter;
 
 import java.text.Normalizer;
 
@@ -189,7 +192,7 @@ private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
 public  jForm(Controls ctrls, long pasobj) {
  PasObj   = pasobj;
  controls = ctrls;
- parent = controls.appLayout;
+ parent   = controls.appLayout;
  
  layout   = new RelativeLayout(controls.activity);
  
@@ -244,7 +247,8 @@ public  jForm(Controls ctrls, long pasobj) {
 }
 
 public void FormChangeSize(){
-	 controls.formChangeSize = true;
+	 controls.formChangeSize = true;	
+	 controls.appLayout.requestLayout();
 }
 
 public  RelativeLayout GetLayout() {
@@ -274,7 +278,7 @@ public void SetLayoutVisibility(boolean _value) {
 public  void SetVisible ( boolean visible ) {	
   if (visible) { 
 	  if (layout.getParent() == null) { 
-		   controls.appLayout.addView(layout);
+		   parent.addView(layout);
 		   layout.setVisibility(android.view.View.VISIBLE);
 		   mRemovedFromParent = false;
 	  } 
@@ -282,7 +286,7 @@ public  void SetVisible ( boolean visible ) {
   else { 
 	  if (layout.getParent() != null) { 
 		 layout.setVisibility(android.view.View.INVISIBLE);
-		 controls.appLayout.removeView(layout);
+		 parent.removeView(layout);
 		 mRemovedFromParent = true;
       }   
    }
@@ -366,8 +370,8 @@ public void SetViewParent( android.view.ViewGroup _viewgroup) {
 	private void slidefromRightToLeft(View view, long duration) {
 		TranslateAnimation animate;
 		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(controls.appLayout.getWidth(),
+			//parent.getHeight(); // parent layout
+			animate = new TranslateAnimation(parent.getWidth(),
 					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 		} else {
 			animate = new TranslateAnimation(view.getWidth(),0, 0, 0); // View for animation
@@ -382,9 +386,9 @@ public void SetViewParent( android.view.ViewGroup _viewgroup) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
+			//parent.getHeight(); // parent layout
 			animate = new TranslateAnimation(0,
-					controls.appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+					parent.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
 		} else {
 			animate = new TranslateAnimation(0,view.getWidth(), 0, 0); // View for animation
 		}
@@ -399,11 +403,11 @@ public void SetViewParent( android.view.ViewGroup _viewgroup) {
 private void slidefromRightToLeft3(View view, long duration) {
 	TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 	if (view.getHeight() == 0) {
-		//controls.appLayout.getHeight(); // parent layout
-		animate = new TranslateAnimation(0, -controls.appLayout.getWidth(),
+		//parent.getHeight(); // parent layout
+		animate = new TranslateAnimation(0, -parent.getWidth(),
 				                         0, 0); //(xFrom,xTo, yFrom,yTo)
 	} else {
-		animate = new TranslateAnimation(0,-controls.appLayout.getWidth(),
+		animate = new TranslateAnimation(0,-parent.getWidth(),
 				                         0, 0); // View for animation
 	}
 
@@ -417,11 +421,11 @@ private void slidefromRightToLeft3(View view, long duration) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(-controls.appLayout.getWidth(),
+			//parent.getHeight(); // parent layout
+			animate = new TranslateAnimation(-parent.getWidth(),
 					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 		} else {
-			animate = new TranslateAnimation(-controls.appLayout.getWidth(),0, 0, 0); // View for animation
+			animate = new TranslateAnimation(-parent.getWidth(),0, 0, 0); // View for animation
 		}
 
 		animate.setDuration(duration);
@@ -453,12 +457,13 @@ public void Show(int effect) {
 		}
 	}
 
-	controls.appLayout.addView(layout);
-    parent = controls.appLayout;
+	//controls.appLayout.addView(layout);
+    //parent = controls.appLayout;
+    parent.addView(layout);
 }
 
 public ViewGroup GetParent() {	
-  return controls.appLayout; //parent;
+  return parent; //parent;
 }
 
 public  void Close(int effect ) {
@@ -484,7 +489,7 @@ public  void Close2() {
 			}
 		}
 	}
-	controls.appLayout.removeView(layout);
+	parent.removeView(layout);
   controls.pOnClose(PasObj);
 }
 
@@ -597,9 +602,20 @@ public String GetDateTime() {
   return( formatter.format ( new Date () ) );	
 }
 
+// by TR3E
+public long GetTimeInMilliseconds(){
+	return controls.getTick();
+}
+
+//by TR3E
+public String GetTimeHHssSS( long millisTime ) {
+	  SimpleDateFormat formatter = new SimpleDateFormat ( "mm:ss:SS" );
+	  return( formatter.format ( new Date (millisTime) ) );	
+}
+
 //Free object except Self, Pascal Code Free the class.
  public void Free() {	
-   if (parent != null) { controls.appLayout.removeView(layout); }  
+   if (parent != null) { parent.removeView(layout); }  
    onClickListener = null;
    layout.setOnClickListener(null);
    layparam = null;
@@ -642,7 +658,7 @@ public  OnItemClickListener  GetOnListItemClickListener  () {
 	return this.onListItemClickListener; 
 }
 
-public int getSystemVersion()
+public int GetSystemVersion()
 {	
 	return controls.systemVersion;	
 }
@@ -990,6 +1006,33 @@ public ActionBar GetActionBar() {
 	} else return null;
 }
 
+public int GetBatteryPercent() {
+	
+	int ret = -1;
+
+    if (Build.VERSION.SDK_INT >= 21) {
+
+         BatteryManager bm = (BatteryManager) this.controls.activity.getSystemService(this.controls.activity.BATTERY_SERVICE);
+         
+         if( bm != null )
+          ret = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+
+    } else {
+
+         IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+         Intent batteryStatus = this.controls.activity.registerReceiver(null, iFilter);
+
+         int level = batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : -1;
+         int scale = batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1) : -1;
+
+         double batteryPct = level / (double) scale;
+
+         ret = (int) (batteryPct * 100);
+   }
+   
+   return ret;
+}
+
 /*
  * To disableAction-bar Icon and Title, you must do two things:
  setDisplayShowHomeEnabled(false);  // hides action bar icon
@@ -1132,27 +1175,33 @@ public void SetScreenOrientation(int _orientation) {
     }            
 }
 
+// ssPortrait  = 1, //Portrait
+// ssLandscape = 2, //LandScape
+// ssUnknown   = 3
+
 public int GetScreenOrientation() {
-	    int orientation = controls.activity.getResources().getConfiguration().orientation;
-	    int r = 0;       	    
-        switch(orientation) {
-           case Configuration.ORIENTATION_PORTRAIT:
-               r= 1;//setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-               break;
-           case Configuration.ORIENTATION_LANDSCAPE:
-               r = 2; //setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-               break;               
-       }
+	    
+	   int r = 3; // ssUnknown
+	    
+	   if( controls.screenWidth <= controls.screenHeight ) r = 1; // Portrait
+	   if( controls.screenWidth >  controls.screenHeight ) r = 2; // LandScape
+	  
        return r; 
 }
 
-public String GetScreenDensity() {
+public int GetScreenDpi() {
     String r= "";
     DisplayMetrics metrics = new DisplayMetrics();
 
     controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-    int density = metrics.densityDpi;
+    return metrics.densityDpi;
+}
+
+public String GetScreenDensity() {
+    String r= "";
+    
+    int density = GetScreenDpi();
         
 //[ifdef_api16up]
     if (density==DisplayMetrics.DENSITY_XXHIGH) {    	    	
@@ -1171,7 +1220,8 @@ public String GetScreenDensity() {
     }
     else if (density==DisplayMetrics.DENSITY_LOW) {
         r= "LOW:" + String.valueOf(density);
-    }
+    }else
+    	r= "CUSTOM:" + String.valueOf(density);
     return r;
 }
 
@@ -1671,15 +1721,25 @@ public String ParseHtmlFontAwesome(String _htmlString) {
 	}
 
 	//by TR3E
-	public int getScreenWidth( ){
-		return this.controls.activity.getResources().getDisplayMetrics().widthPixels;
+	public int GetScreenWidth( ){
+		int w = controls.appLayout.getWidth();
+		
+		if( w <= 0 )
+			w = controls.screenWidth;
+		
+		return w;
 	}
 	//by TR3E
-	public int getScreenHeight( ){
-		return this.controls.activity.getResources().getDisplayMetrics().heightPixels;
+	public int GetScreenHeight( ){
+		int h = controls.appLayout.getHeight();
+		
+		if( h <= 0 )
+			h = controls.screenHeight;
+		
+		return h;
 	}
 	//by TR3E
-	public String getSystemVersionString(){
+	public String GetSystemVersionString(){
 		return android.os.Build.VERSION.RELEASE;
 	}
 
@@ -1710,7 +1770,9 @@ public int systemVersion;
 
 public int screenWidth = 0;
 public int screenHeight = 0;
+
 public boolean formChangeSize = false;
+public boolean formNeedLayout = false;
 
 private int javaNewId = 100000;   // To assign java id from 100001 onwards [by TR3E]
 
@@ -1730,6 +1792,7 @@ public native void pAppOnStart();
 public native void pAppOnStop();
 public native void pAppOnBackPressed();
 public native int pAppOnRotate(int rotate);
+public native void pAppOnUpdateLayout();
 public native void pAppOnConfigurationChanged();
 public native void pAppOnActivityResult(int requestCode, int resultCode, Intent data);
 public native void pAppOnCreateOptionsMenu(Menu menu);
@@ -1774,7 +1837,7 @@ public  int  jAppOnScreenStyle()          { return(pAppOnScreenStyle());   }
 public  void jAppOnCreate(Context context,RelativeLayout layout, Intent intent) //android.os.Bundle;
                                           { pAppOnCreate(context,layout,intent); }
 
-public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent); }     
+public  void jAppOnNewIntent(Intent intent)            { pAppOnNewIntent(intent); } 
 public  void jAppOnDestroy()              { pAppOnDestroy();               }  
 public  void jAppOnPause()                { pAppOnPause();                 }  
 public  void jAppOnRestart()              { pAppOnRestart();               }    
@@ -1782,7 +1845,8 @@ public  void jAppOnResume()               { pAppOnResume();                }
 public  void jAppOnStart()                { pAppOnStart();                 }    
 public  void jAppOnStop()                 { pAppOnStop();                  }   
 public  void jAppOnBackPressed()          { pAppOnBackPressed();           }   
-public  int  jAppOnRotate(int rotate)     {  return(pAppOnRotate(rotate)); }
+public  int  jAppOnRotate(int rotate)     { return(pAppOnRotate(rotate)); }
+public  void jAppOnUpdateLayout()         { pAppOnUpdateLayout();          }
 
 //rotate=1 --> device on vertical/default position ; 2 --> device on horizontal position 
 public  void jAppOnConfigurationChanged() { pAppOnConfigurationChanged();  }
@@ -2027,19 +2091,6 @@ public  java.lang.Object jForm_Create(long pasobj ) {
 // -------------------------------------------------------------------------
 // Result : Width(16bit) : Height (16bit)
 public  int  getScreenWH(android.content.Context context) {
-  DisplayMetrics metrics = new DisplayMetrics();
-
-  //int h = context.getResources().getDisplayMetrics().heightPixels;
-  //int w = context.getResources().getDisplayMetrics().widthPixels;
-  //int h = appLayout.getHeight();
-  //int w = appLayout.getWidth();
-// proposed by renabor
-/* 
- float density  = context.getResources().getDisplayMetrics().density;
- int dpHeight = Math.round ( h / density );
- int dpWidth  = Math.round ( w / density );
- return ( dpWidth << 16 | dpHeight ); // dp screen size  
-*/
   return ( (screenWidth << 16)| screenHeight );
 }
 
