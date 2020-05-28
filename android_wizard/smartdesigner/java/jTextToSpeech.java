@@ -13,6 +13,8 @@ import java.util.Locale;
  * Created by Nilanchala
  * http://www.stacktips.com
  * http://stacktips.com/tutorials/android/android-texttospeech-example
+ * 
+ * Updated [by ADiV] on 2020/05/27
  */
 
 class TTSManager {
@@ -47,6 +49,23 @@ class TTSManager {
     public void shutDown() {
         mTts.shutdown();
     }
+    
+    public void Stop() {
+    	if (isLoaded) 
+         mTts.stop();
+    }
+    
+    public boolean IsLoaded(){
+    	return isLoaded;
+    }
+    
+    public boolean IsSpeaking(){
+    	
+    	 if (isLoaded)
+    		return mTts.isSpeaking();
+    	 else
+    		 return false;
+    }
 
     public void addQueue(String text) {
         if (isLoaded)
@@ -65,6 +84,13 @@ class TTSManager {
     
     public void setLanguage(Locale localeLang) {
     	mLocale = localeLang;
+    	
+    	if( isLoaded ){
+    	 int result = mTts.setLanguage(mLocale);        
+         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+            Log.e("error", "This Language is not supported");
+         }
+    	}
     }
 }
 
@@ -77,6 +103,8 @@ public class jTextToSpeech /*extends ...*/ {
    private long pascalObj = 0;        //Pascal Object
    private Controls controls  = null; //Java/Pascal [events] Interface ...
    private Context  context   = null;
+   
+   private MediaPlayer mediaPlayer = null;
    
    TTSManager ttsManager = null;
  
@@ -129,12 +157,43 @@ public class jTextToSpeech /*extends ...*/ {
 	      case 12: ttsManager.setLanguage(Locale.TRADITIONAL_CHINESE); break;
 	      case 13: ttsManager.setLanguage(Locale.UK); break;
 	      case 14: ttsManager.setLanguage(Locale.US); break;	     
-	   }
+	   }	   
 	     
+   }
+   
+   public void Stop(){
+	   
+	   if( mediaPlayer != null ){
+		   mediaPlayer.stop();
+		   mediaPlayer = null;
+	   }else{
+		   ttsManager.Stop();
+	   }
+	   
+   }
+   
+   public boolean IsSpeaking(){
+	   
+	   if( mediaPlayer != null ){
+		   return mediaPlayer.isPlaying();
+	   }else{
+		   return ttsManager.IsSpeaking();
+	   } 
+   }
+   
+   public boolean IsLoaded(){
+	   
+	   if( mediaPlayer != null ){
+		   return true;
+	   }else{
+		   return ttsManager.IsLoaded();
+	   } 
    }
    
    //https://stackoverflow.com/questions/33118121/android-tts-for-multiple-languages
    public void SpeakOnline(String _text, String _language) {
+	   
+	    if( mediaPlayer != null ) return;
 
 	    final String text = _text;
 	    final String lan = _language;
@@ -150,11 +209,12 @@ public class jTextToSpeech /*extends ...*/ {
 	            String fullUrl = Url + pronouce + language + web;
 
 	            Uri uri = Uri.parse(fullUrl);
-	            MediaPlayer mediaPlayer = new MediaPlayer();
+	            mediaPlayer = new MediaPlayer();
 	            try {
 	                mediaPlayer.setDataSource(controls.activity,uri);
 	                mediaPlayer.prepare();
 	                mediaPlayer.start();
+	                mediaPlayer = null;
 	            } catch (IOException e) {
 	                e.printStackTrace();
 	                //Log.i(TAG,"error");
