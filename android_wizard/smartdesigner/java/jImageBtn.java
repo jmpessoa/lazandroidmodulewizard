@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 
 //-------------------------------------------------------------------------
 // jImageBtn
-// Reviewed by TR3E on 17/10/2019
+// Reviewed by ADiV on 2020/05/28
 //-------------------------------------------------------------------------
 
 public class jImageBtn extends ImageView {
@@ -108,7 +108,7 @@ public class jImageBtn extends ImageView {
 		
 		BitmapFactory.Options bo = new BitmapFactory.Options();		
 		
-	    if( bo == null ) return;
+	    if( bo == null ) { this.setImageBitmap(null); return; };
 	    
 	    if( controls.GetDensityAssets() > 0 )
 	     bo.inDensity = controls.GetDensityAssets();
@@ -139,11 +139,11 @@ public class jImageBtn extends ImageView {
 			
         Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(resup));
 		
-		if( d == null ) return;
+		if( d == null ) { this.setImageBitmap(null); return; };
 		
 		Bitmap b = ((BitmapDrawable)d).getBitmap();
 		
-		if( b == null ) return;
+		if( b == null ) { this.setImageBitmap(null); return; };
 		
 		bmpUp = Bitmap.createScaledBitmap(b, b.getWidth(), b.getHeight(), true);
 				

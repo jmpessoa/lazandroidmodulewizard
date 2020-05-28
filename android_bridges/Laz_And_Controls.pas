@@ -11949,7 +11949,7 @@ procedure jImageBtn.SetImageDownByRes(imgResIdentifief: string);
 begin
    FImageDownName:= imgResIdentifief;
 
-   if FInitialized and (length(imgResIdentifief) > 0) then
+   if FInitialized then
      jImageBtn_setButtonDownByRes(FjEnv, FjObject , imgResIdentifief);
 end;
 
@@ -11957,7 +11957,7 @@ procedure jImageBtn.SetImageUpByRes(imgResIdentifief: string);
 begin
   FImageUpName:=  imgResIdentifief;
 
-  if FInitialized and (length(imgResIdentifief) > 0) then
+  if FInitialized then
     jImageBtn_setButtonUpByRes(FjEnv, FjObject , imgResIdentifief);
 end;
 
