@@ -104,11 +104,11 @@ public class jImageBtn extends ImageView {
 		
 		this.setImageResource(android.R.color.transparent);
 		
-		if (fileup.equals("null")) { this.setImageBitmap(null); return; };
+		if (fileup.equals("null")) { this.setImageBitmap(null); bmpUp = null; bmpDown = null; return; }
 		
 		BitmapFactory.Options bo = new BitmapFactory.Options();		
 		
-	    if( bo == null ) { this.setImageBitmap(null); return; };
+	    if( bo == null ) { this.setImageBitmap(null); bmpUp = null; bmpDown = null; return; }
 	    
 	    if( controls.GetDensityAssets() > 0 )
 	     bo.inDensity = controls.GetDensityAssets();
@@ -139,11 +139,11 @@ public class jImageBtn extends ImageView {
 			
         Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(resup));
 		
-		if( d == null ) { this.setImageBitmap(null); return; };
+		if( d == null ) { this.setImageBitmap(null); bmpUp = null; bmpDown = null; return; }
 		
 		Bitmap b = ((BitmapDrawable)d).getBitmap();
 		
-		if( b == null ) { this.setImageBitmap(null); return; };
+		if( b == null ) { this.setImageBitmap(null); bmpUp = null; bmpDown = null; return; }
 		
 		bmpUp = Bitmap.createScaledBitmap(b, b.getWidth(), b.getHeight(), true);
 				

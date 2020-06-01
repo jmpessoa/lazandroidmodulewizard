@@ -56,7 +56,8 @@ public class jsAdMob extends FrameLayout {
    private AdView     admobView    = null;
    private AdRequest  admobRequest = null;
    private Boolean    admobInit    = false;
-   private String     admobId      = "ca-app-pub-3940256099942544/6300978111";
+   private String     admobAppId     = "ca-app-pub-3940256099942544~3347511713";
+   private String     admobBannerId  = "ca-app-pub-3940256099942544/6300978111";
    private int        admobBannerSize = 0;  //LMB initialize banner size to SMART_BANNER (0)
    private Boolean    admobBStop      = false;
 
@@ -95,13 +96,21 @@ public class jsAdMob extends FrameLayout {
    public void RemoveFromViewParent() {
   	 LAMWCommon.removeFromViewParent();
    }
-
-   public void AdMobSetId( String _admobid ) {
-      admobId = _admobid;      
+   
+   public void AdMobSetAppId( String _appid ) {
+	   admobAppId = _appid;      
    }
 
-   public String AdMobGetId(){
-      return admobId;
+   public String AdMobGetAppId(){
+	   return admobAppId;
+   }
+
+   public void AdMobSetBannerId( String _bannerid ) {
+      admobBannerId = _bannerid;      
+   }
+
+   public String AdMobGetBannerId(){
+      return admobBannerId;
    }
    
    //LMB Call this BEFORE AdMobRun to set banner size
@@ -113,20 +122,13 @@ public class jsAdMob extends FrameLayout {
    public int AdMobGetBannerSize(){
       return admobBannerSize;
    }
-
-   /*public void AdMobInit(){	  
-           
-	   if( !admobInit ) {
-	       MobileAds.initialize(controls.activity, admobId);
-	                      
-	       admobInit = true;
-	    }
-    
-   }*/
    
    public void AdMobInit(){
-	   MobileAds.initialize(controls.activity);
-	   admobInit = true;
+	  
+	   if( !admobInit ) { 
+	    MobileAds.initialize(controls.activity, admobAppId);
+	    admobInit = true;
+	   }
    }
    
    public void AdMobFree(){
@@ -274,7 +276,7 @@ public class jsAdMob extends FrameLayout {
 		}
         
         
-        admobView.setAdUnitId(admobId);
+        admobView.setAdUnitId(admobBannerId);
 
         this.addView(admobView);
 
