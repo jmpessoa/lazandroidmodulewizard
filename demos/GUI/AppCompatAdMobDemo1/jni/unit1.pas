@@ -73,11 +73,10 @@ begin
  // AdMobInit should only be called once for the same id
  // This is the most time consuming when initializing AdMob
  // It is usually placed in the OnCreate event
- jsAdMob1.AdMobSetAppId('ca-app-pub-3940256099942544~3347511713');
  jsAdMob1.AdMobInit();
 
- jsAdMob1.AdMobSetBannerId('ca-app-pub-3940256099942544/6300978111');  //warning: just test key!!!!
- jsAdMob2.AdMobSetBannerId('ca-app-pub-3940256099942544/6300978111');
+ jsAdMob1.AdMobSetId('ca-app-pub-3940256099942544/6300978111');  //warning: just test key!!!!
+ jsAdMob2.AdMobSetId('ca-app-pub-3940256099942544/6300978111');
 end;
 
 procedure TAndroidModule1.AndroidModule1ActivityPause(Sender: TObject);

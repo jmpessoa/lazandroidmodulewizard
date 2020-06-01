@@ -62,10 +62,8 @@ jsAdMob = class(jVisualControl)
     procedure AdMobSetBannerSize(_whBannerSize: TAdMobBannerSize);
     function  AdMobGetBannerSize: TAdMobBannerSize;
 
-    procedure AdMobSetBannerId(_bannerid: string);
-    function  AdMobGetBannerId(): string;
-    procedure AdMobSetAppId(_appid: string);
-    function  AdMobGetAppId(): string;
+    procedure AdMobSetId(_admobid: string);
+    function  AdMobGetId(): string;
     procedure AdMobInit();
     procedure AdMobFree();
     procedure AdMobRun();
@@ -279,18 +277,11 @@ begin
     Result := TAdMobBannerSize(jni_func_out_i(FjEnv, FjObject, 'AdMobGetBannerSize'))
 end;
 
-procedure jsAdMob.AdMobSetBannerId(_bannerid: string);
+procedure jsAdMob.AdMobSetId(_admobid: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AdMobSetBannerId', _bannerid);
-end;
-
-procedure jsAdMob.AdMobSetAppId(_appid: string);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AdMobSetAppId', _appid);
+     jni_proc_t(FjEnv, FjObject, 'AdMobSetId', _admobid);
 end;
 
 function jsAdMob.AdMobIsLoading(): boolean;
@@ -300,18 +291,11 @@ begin
    Result:= jni_func_out_z(FjEnv, FjObject, 'AdMobIsLoading');
 end;
 
-function jsAdMob.AdMobGetBannerId(): string;
+function jsAdMob.AdMobGetId(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'AdMobGetBannerId');
-end;
-
-function jsAdMob.AdMobGetAppId(): string;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'AdMobGetAppId');
+   Result:= jni_func_out_t(FjEnv, FjObject, 'AdMobGetId');
 end;
 
 procedure jsAdMob.AdMobInit();
