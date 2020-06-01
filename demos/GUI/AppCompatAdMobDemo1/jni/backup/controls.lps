@@ -24,8 +24,8 @@
         </CustomData>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="118"/>
-        <CursorPos X="90" Y="140"/>
+        <TopLine Value="44"/>
+        <CursorPos X="67" Y="76"/>
         <UsageCount Value="55"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -51,6 +51,7 @@
         <TopLine Value="170"/>
         <CursorPos X="14" Y="198"/>
         <UsageCount Value="24"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\androidwidget.pas"/>
@@ -67,6 +68,7 @@
         <TopLine Value="2466"/>
         <CursorPos X="5" Y="2536"/>
         <UsageCount Value="21"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit5>
       <Unit6>
         <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\And_jni.pas"/>
@@ -74,6 +76,7 @@
         <TopLine Value="793"/>
         <CursorPos X="50" Y="808"/>
         <UsageCount Value="13"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit6>
       <Unit7>
         <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\sdrawerlayout.pas"/>
@@ -89,6 +92,7 @@
         <TopLine Value="426"/>
         <CursorPos X="5" Y="438"/>
         <UsageCount Value="9"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit8>
       <Unit9>
         <Filename Value="..\..\..\..\..\..\downloads\laz4android2.0\config\onlinepackagemanager\packages\LAMW\android_bridges\laz_and_controls_events.pas"/>
@@ -97,6 +101,7 @@
         <TopLine Value="31"/>
         <CursorPos X="4" Y="45"/>
         <UsageCount Value="9"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit9>
       <Unit10>
         <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_Controls.pas"/>

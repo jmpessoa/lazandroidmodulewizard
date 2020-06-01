@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="AppCompatAdMobDemo1" default="help">
-<property name="sdk.dir" location="c:\laztoapk\downloads\android-sdk-windows\"/>
+<property name="sdk.dir" location="C:\laztoapk\downloads\android-sdk-windows\"/>
 <property name="target" value="android-28"/>
 <property file="ant.properties"/>
 <fail message="sdk.dir is missing." unless="sdk.dir"/>

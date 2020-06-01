@@ -110,7 +110,7 @@ object AndroidModule1: TAndroidModule1
     GravityInParent = lgNone
     OnClick = jButton2Click
   end
-  object jTextView1: jTextView
+  object lbInfo: jTextView
     Left = 5
     Top = 234
     Width = 310
@@ -126,7 +126,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Try to rotate screen after load AdMob!!!'
+    Text = '---'
     Alignment = taCenter
     BackgroundColor = colbrDefault
     FontColor = colbrBlack

@@ -24,7 +24,7 @@ TOnAdMobOpened = procedure(Sender: TObject) of Object;
 TOnAdMobClosed = procedure(Sender: TObject) of Object;
 TOnAdMobLeftApplication = procedure(Sender: TObject) of Object;
 
-{Draft Component code by "Lazarus Android Module Wizard" [12/13/2017 17:22:00]}
+{Developed by ADiV for LAMW}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
 {jVisualControl template}
@@ -62,8 +62,10 @@ jsAdMob = class(jVisualControl)
     procedure AdMobSetBannerSize(_whBannerSize: TAdMobBannerSize);
     function  AdMobGetBannerSize: TAdMobBannerSize;
 
-    procedure AdMobSetId(_admobid: string);
-    function  AdMobGetId(): string;
+    procedure AdMobSetBannerId(_bannerid: string);
+    function  AdMobGetBannerId(): string;
+    procedure AdMobSetAppId(_appid: string);
+    function  AdMobGetAppId(): string;
     procedure AdMobInit();
     procedure AdMobFree();
     procedure AdMobRun();
@@ -277,11 +279,18 @@ begin
     Result := TAdMobBannerSize(jni_func_out_i(FjEnv, FjObject, 'AdMobGetBannerSize'))
 end;
 
-procedure jsAdMob.AdMobSetId(_admobid: string);
+procedure jsAdMob.AdMobSetBannerId(_bannerid: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AdMobSetId', _admobid);
+     jni_proc_t(FjEnv, FjObject, 'AdMobSetBannerId', _bannerid);
+end;
+
+procedure jsAdMob.AdMobSetAppId(_appid: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_t(FjEnv, FjObject, 'AdMobSetAppId', _appid);
 end;
 
 function jsAdMob.AdMobIsLoading(): boolean;
@@ -291,11 +300,18 @@ begin
    Result:= jni_func_out_z(FjEnv, FjObject, 'AdMobIsLoading');
 end;
 
-function jsAdMob.AdMobGetId(): string;
+function jsAdMob.AdMobGetBannerId(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'AdMobGetId');
+   Result:= jni_func_out_t(FjEnv, FjObject, 'AdMobGetBannerId');
+end;
+
+function jsAdMob.AdMobGetAppId(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_t(FjEnv, FjObject, 'AdMobGetAppId');
 end;
 
 procedure jsAdMob.AdMobInit();

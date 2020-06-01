@@ -19,7 +19,7 @@ type
     jButton3: jButton;
     jsAdMob1: jsAdMob;
     jsAdMob2: jsAdMob;
-    jTextView1: jTextView;
+    lbInfo: jTextView;
     procedure AndroidModule1ActivityCreate(Sender: TObject; intentData: jObject
       );
     procedure AndroidModule1ActivityPause(Sender: TObject);
@@ -135,6 +135,9 @@ end;
 procedure TAndroidModule1.AndroidModule1Show(Sender: TObject);
 begin
   showmessage('show');
+  lbInfo.Text := 'Try to rotate screen after load AdMob!!!' + #13#10 +
+                 'See "AndroidManifest.xml" to add id' + #13#10 +
+                 'Add to "build.gradle" com.google.android.gms:play-services-ads:17.2.1';
 end;
 
 procedure TAndroidModule1.AndroidModule1SpecialKeyDown(Sender: TObject;

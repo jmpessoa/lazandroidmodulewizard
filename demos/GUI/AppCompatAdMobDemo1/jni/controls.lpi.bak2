@@ -25,7 +25,7 @@
       <Item3 Name="NdkApi" Value="android-22"/>
       <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r20\"/>
       <Item5 Name="Package" Value="org.lamw.appcompatadmobdemo1"/>
-      <Item6 Name="SdkPath" Value="c:\laztoapk\downloads\android-sdk-windows\"/>
+      <Item6 Name="SdkPath" Value="C:\laztoapk\downloads\android-sdk-windows\"/>
       <Item7 Name="StartModule" Value="AndroidModule1"/>
       <Item8 Name="Theme" Value="AppCompat.Light.NoActionBar"/>
     </CustomData>
