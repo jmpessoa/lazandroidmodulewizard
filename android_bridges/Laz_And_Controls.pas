@@ -1330,8 +1330,6 @@ type
     Procedure SetProgress (Value : integer);
     function  GetMax: integer;   //by jmpessoa
     procedure SetMax (Value : integer);  //by jmpessoa
-
-    Procedure SetStyle(Value : TProgressBarStyle);
     
   protected
      //
@@ -1351,7 +1349,7 @@ type
     procedure RemoveFromViewParent;  override;
 
   published
-    property Style: TProgressBarStyle read FStyle write SetStyle;
+    property Style: TProgressBarStyle read FStyle write FStyle;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property Progress: integer read GetProgress write SetProgress;
     property Max: integer read GetMax write SetMax;
@@ -6213,11 +6211,6 @@ begin
   if not FInitialized then Exit;
   SetVisible(True);
   SetProgress(FProgress);
-end;
-
-Procedure jProgressBar.SetStyle(Value : TProgressBarStyle);
-begin
-  if csDesigning in ComponentState then FStyle:= Value;
 end;
 
 Procedure jProgressBar.SetColor(Value: TARGBColorBridge);
