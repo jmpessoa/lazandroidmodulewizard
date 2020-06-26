@@ -1969,6 +1969,9 @@ type
     procedure GoForward();
     procedure ScrollTo(_x, _y: integer);//by MB:
 
+    procedure ClearHistory();  // By ADiV
+    procedure ClearCache( _clearDiskFiles : boolean ); // By ADiV
+
     //LMB
     function  ScrollY: integer;//LMB
     procedure LoadDataWithBaseURL(s1,s2,s3,s4,s5: string);//LMB
@@ -9953,6 +9956,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jWebView_LoadFromHtmlString(FjEnv, FjObject, _htmlString);
+end;
+
+procedure jWebView.ClearHistory();  // By ADiV
+begin
+ //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'ClearHistory');
+end;
+
+procedure jWebView.ClearCache( _clearDiskFiles : boolean ); // By ADiV
+begin
+ //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_z(FjEnv, FjObject, 'ClearCache', _clearDiskFiles);
 end;
 
 function jWebView.CanGoBack(): boolean;

@@ -11,7 +11,7 @@ import android.webkit.WebView.FindListener; //LMB
 import android.webkit.WebViewClient;
 
 //-------------------------------------------------------------------------
-//WebView
+// WebView
 //-------------------------------------------------------------------------
 
 class WVConst {
@@ -183,7 +183,7 @@ public class jWebView extends WebView {
         };
         };
         setFindListener(findListener);
-
+               
     }
 
 
@@ -281,6 +281,16 @@ public class jWebView extends WebView {
 
     public void	GoForward(){
     	this.goForward();
+    }
+    
+    // By ADiV
+    public void ClearHistory(){
+    	this.clearHistory();
+    }
+    
+    // By ADiV
+    public void ClearCache( boolean _clearDiskFiles){
+    	this.clearCache(_clearDiskFiles);
     }
 
 	//LMB:
