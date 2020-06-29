@@ -258,9 +258,9 @@ object FrmCompCreate: TFrmCompCreate
     Height = 531
     Top = 50
     Width = 1019
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Align = alClient
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
@@ -1414,7 +1414,7 @@ object FrmCompCreate: TFrmCompCreate
           '                     //Log.i("s["+i+"]", ""+s[i]);     //do some use...'
           '                 }          '
           ' '
-          '    4.2.  write the native method signature to your [component] ".native" file    [study some LAMW code as example!]'
+          '    4.2.  write the native method signature to your [component] in  "*.native"  file    [study some LAMW code as example!]'
           '           ex1.    [from jSpinner.native]       '
           '              public native void pOnSpinnerItemSelected(long pasobj, int position, String caption);'
           ''
@@ -1427,11 +1427,12 @@ object FrmCompCreate: TFrmCompCreate
           '           ex4.    [fiction...]       '
           '              public native String[] pOnSpinnerItemSelected(long pasobj, int position, String caption);'
           ''
-          '    4.3.  In java tab write a draft java class code to wrapper the the native [one line!] method;'
+          '    4.3.  In java tab write a draft java class code to wrapper the  natives methods;'
           '         '
           '           class jMyComponent {'
           ''
           '                public native void pOnMyComponentItemSelected(long pasobj, int position, String caption); //MyComponent'
+          '                public native void pOnMyComponentItemRemoved(long pasobj, int position); //MyComponent'
           ''
           '          }                 '
           ''

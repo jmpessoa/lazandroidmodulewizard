@@ -1,77 +1,191 @@
-   "Lazarus Android Module Wizard"
-
-	!!Please, for complete [UPDATED !!] reference read "readme.txt"       
-    
-	Version 0.6 - rev. 09 - 20 December 2014 -				
-
-	Lazarus Android Module Wizard: Form Designer and Components development model! 		
-	"A wizard to create JNI Android loadable module (.so) in Lazarus/Free Pascal using 
-	[datamodule like] Form Designer and Components!" 
+"LAMW: Lazarus Android Module Wizard"
 
 	Author: Jose Marques Pessoa : jmpessoa__hotmail_com
 
 		https://github.com/jmpessoa/lazandroidmodulewizard
 		http://forum.lazarus.freepascal.org/index.php/topic,21919.0.html
 
-
-** Tutorial: JNI Bridge Component Create ** 
+:: How to Create JNI Bridge Component code: 
+	Go to Lazarus IDE: "Tools"  ---> "[LAMW] ......."   --->  "New jComponent...."   --->  [HELP]
   
+1. LAMW Component Model:  
 
-1. Component Model:  
+   ::  jControl: No GUI Control      
 
-   --- jControl: No GUI Control      
+       hint: you can use composition or inheritance model here....
 
-   --- jVisualControl: GUI Control
+   ::  jVisualControl: GUI Control
 
-2. Creating a new component 
+       warning:  you MUST use inheritance model here.....
 
-   2.1. Start a New [Eclipse/Ant] Project as usual;
-   
-   2.2. From [Right Top ShellTreeView] Double Clicked "Controls.java" as usual;
+2. Creating a new component: 
      
-   2.3. From [Java JNI Source Tab] Right Click the "Controls.java" code at some point before this line:
+   2.1. Right click Java tab: 
+
+   2.1. Insert a new [wrapper] java class  jControl/jVisualControl from template; 
+
+        hint1. Alternatively, you can paste you java code [template compatible] from clipboard!
+
+        hint2. Alternatively, you can import a "JAR" file and selec a class [at the moment, only for no visual  control]!
+
+        hint3: You can also use the demo AppTryCode3 to produce a complete [wrapper]  java class !
+
+       hint4. you do not need to build the "perfect" component now .... later you can add more methods, events and properties! [sections 3 e 4 bellow]
+
+        warning/important: All "imports" from "Controls.java" template  and new "imports" from you java class code
+                   will  be researched to try write the correct JNI methods signatures.....
+
+                      
+   2.2. Rename [and extends] the new class [and constructor], write some custom field, methods, etc... 
+        [for "JAR" imported class this task is automated! ]
+        
+        guideline: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
          
-        --------------------------------------------------------------------------------------------  
+        hint1: Only public methods will be translated to pascal [bridge] code.
+        hint2:  use the  mask  /*.*/   to make a public method invisible for the parse [ex.  /*.*/public myfunctio() {....} ]  
 
-        "public class Controls {"  // <<------------
+   2.3. Select all  the new java class code and right click it [java tab] .
+      
+       hint1:  if have only one java class code you do not need select it! just right click it!
+       hint2. save your java class source code in LAMW folder "......\android_wizard\smartdesigner\java" :
 
-        --------------------------------------------------------------------------------------------
+        warning:  the  LAMW java to pascal convert dont support complex/generic types like  "java.util.Map<,>" ,  "java.util.Set<>" etc..
+       So, we need re-write  the method signature [by hand] for primitives data/array type....
 
-   2.4. Insert a new jControl/jVisualControl wrapper class Template; 
+      But simple java Object param [or return]  is ok   [including array!!!]! 
+     
+      public void SetImage(Bitmap _image) {     //<<----  OK! 
+             this.setImage(_image);
+      }
+ 
+     public Bitmap GetImage(Bitmap _image) {     //<<---- OK!
+             return this.getImage();
+      }
 
-        warinng: You can also use [demo] AppTryCode3 to produce java class warapper!
+       warning/important: All "imports" from "Controls.java" template  and new "imports" from you java class code
+                   will  be researched to try write the correct JNI methods signatures.....
+      
+   2.4. Popup Menu: Select "Write [Draft] Pascal jControl/jVisualControl Interface".
+ 
+   2.5. Right click Pascal Tab  and select "Register Component..." from  Popup Menu;
 
-        Ref. image: https://jmpessoa.opendrive.com/files?Ml80ODAyNjQ4Ml9HVFl3Tg
+          warning: Mac users: please, you must copy the console app "lazres" [lazarus/tools] to the folder 
+          ".../LazAndroidWizard/ide_tools"; 
 
-        /* jControl template :: example: */ 
+   2.6. [Dialog]:  select a 16x16 PNG icon file;
 
-	class jMyControl /*extends ...*/ {
+   2.7.  [Dialog]:  open a "register_*.pas" file (ex. "register_extra.pas"); **
 
-	  private long     pascalObj = 0;      // Pascal Object
-    	  private Controls controls  = null;   // Control Class for events handles
-          private Context  context   = null;
+      hint: you can select "register_template.pas" to write a custom register file, 
+              but, then,  you must insert it into  "tfpandroidbridge_pack.lpk".
 
-          public jMyControl(Controls contrls, long Self) { //Add more params if needed [preferentially init your new param name with "_", ex: int _flag, String _hello]!
-            //super(contrls.activity);
-            context   = contrls.activity;
-            pascalObj = Self;
-            controls  = contrls;
-          }
+   2.8. Ok. You got you DRAFT pascal component JNI stuff! Please, look in the folder   "..../LazAndroidWizard/android_bridges" 
+         directory:
+         
+        :: *.pas           <--- open and fix/complete the pascal code with your others events/properties/methods/variables/overload! 
 
-          public void jFree() {
-            //free local objects...
-          }
+        :: *_icon.lrs    <--- new icon resource
+        :: register_extras.pas   <--- updated!  by default, the new component will be include there!
+
+   2.9. [Lazarus IDE Menu]: Package -> Open Package File (*.lpk) --> "tfpandroidbridge_pack.pas" in folder  
+         "....../LazAndroidWizard/android_bridges".
+
+   2.10. [Package Wizard]: Compile --->> Use ---> Install.
+
+            Warning: to compile/install/reinstall a LAMW package in  Lazarus/Laz4Android [windows],
+  	          please, open a "dummy" pure windows project.... you MUST always close the cross compile project! 
+   
+   2.11. Wait .... Lazarus re-building ...
+
+   2.12. The new component  is on "Android Bridges Extra" [or other...] palette!.
+   
+   3. Added more methods to your component   
+
+   3.1.  write new method to  your ".java" code
+           ex.
+                 public void SetFoo(int _foo) {
+                       mFoo = _foo;
+                 }
+                  public int GetFoo() {
+                        return mFoo;
+                  } 
+
+   3.1.  In java tab write a draft java class code to wrapper the [new] methods;
+
+           class jMyComponent {
+
+                 public void SetFoo(int _foo) {
+                       mFoo = _foo;
+                 }
+                  public int GetFoo() {
+                        return mFoo;
+                  } 
+          }                 
+           
+    3.2   Right click the Java tab and select "Write [draft] complementary Pascal Interface"
+
+    3.4   Copy the the pascal interface code to your component unit!!!
+        
+    4. Added "native" [events] methods to your component 
+
+    4.1.  write the native method "call" to to  your ".java" code    [study some LAMW code as example!]
+
+               ex1:   [from jSpinner.java] 
+ 
+                controls.pOnSpinnerItemSelected(pascalObj,position,caption);   //return void
+
+              ex2:   [fiction...] 
+                int  i = controls.pOnSpinnerItemSelected(pascalObj,position,caption);   //return int              
+ 
+              ex3:   [fiction...] 
+                int[] v;
+                 v = controls.pOnSpinnerItemSelected(pascalObj,position,caption);   //return int[]      
+                 for (int i = 0; i < v.length; i++) {
+                     //Log.i("v["+i+"]", ""+v[i]);     //do some use...
+                 }          
+                
+              ex4:   [fiction...] 
+                String[] s;
+                 s = controls.pOnSpinnerItemSelected(pascalObj,position,caption);   //return String[]                
+                for (int i = 0; i < s.length; i++) {
+                     //Log.i("s["+i+"]", ""+s[i]);     //do some use...
+                 }          
+ 
+    4.2.  write the native method signature to your [component] in  "*.native"  file    [study some LAMW code as example!]
+           ex1.    [from jSpinner.native]       
+              public native void pOnSpinnerItemSelected(long pasobj, int position, String caption);
+
+           ex2.    [fiction...]       
+              public native int pOnSpinnerItemSelected(long pasobj, int position, String caption);
+
+           ex3.    [fiction...]       
+              public native int[] pOnSpinnerItemSelected(long pasobj, int position, String caption);
+
+           ex4.    [fiction...]       
+              public native String[] pOnSpinnerItemSelected(long pasobj, int position, String caption);
+
+    4.3.  In java tab write a draft java class code to wrapper the natives methods;
+         
+           class jMyComponent {
+
+                public native void pOnMyComponentItemSelected(long pasobj, int position, String caption); //MyComponent
+                public native void pOnMyComponentItemRemoved(long pasobj, int position); //MyComponent
+          }                 
+
+         NOTE: the  "//MyComponent" signs the part of the method name that will be overshadowed in the nomination of the property.
+                            ex.  FOnItemSelected   [ not FOnMyComponentItemSelected  ]   
+
+    4.4   Right click the Java tab and select "Write [draft] complementary Native Method Pascal Interface" 
+
+    4.5   Copy the the pascal interface code [generated] to your component unit [mycomponent.pas] and to "Laz_And_Controls_Events.pas"!!!
+
+    Congratulations!!!      
+      
+Thank you!
 
 
-         //write others [public] methods code here......
-         //Please, preferentially init your new param name with "_", ex: int _flag, String _hello
 
-       }
-
-   2.5. Rename [extends] the new class, write some custom public java methods, etc... 
-
-        Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
-
+//simple java code example for simple test...:
 
         /* jControl template example: */ 
 
@@ -148,344 +262,4 @@
 
 
        }
- 
 
-   2.6. Select all the new class code and Right Click ... ;
-
-   2.7. From [Popup Menu] Select "Write [Draft] Pascal jControl/jVisualControl Interface": Select [jControl]. You got it!;
-        
-        Ref. image: https://jmpessoa.opendrive.com/files?Ml80ODkwNjk0Nl9xU0hDOA
-
-   2.8. From Dialog "Changing Controls.java": Yes [or... No] 
-        
-        Ref. image: https://jmpessoa.opendrive.com/files?Ml80ODAyNjU1OV9hd0FHWg   
-
-   2.9. From [Pascal JNI Interface Tab] Right Click Pascal code and from popup menu Select "Register Component...";
-
-        Ref. image: https://jmpessoa.opendrive.com/files?Ml80ODAyNjU4Nl9XM3hTOQ
-
-        WARNING: Mac users: Please, you must copy the console app "lazres" [lazarus/tools] to the folder /LazAndroidWizard; 
-                 Linux user: Thanks to  Stephano there is a "lazres" in /LazAndroidWizard 
-
-   2.10. From [Dialog]: Open a 16x16 PNG icon file;
-
-   2.11. From [Dialog]: Open a "register_*.pas" file (ex. "register_extra.pas"); **
-
-        ref image: https://jmpessoa.opendrive.com/files?Ml80ODAyNjY1M19EamR2bQ
-
-   2.12. Ok. You got you DRAFT pascal component stuff! Please, look in /LazAndroidWizard directory:
-
-         
-        :: myhello.pas           <--- open and fix/complete the pascal code with your others events/properties/methods/variables! [appendix below!]
-        :: jmyhello_icon.lrs     <--- new icon resource
-        :: register_extras.pas   <--- updated! The new component was included there!
-
-
-   2.13. From [Lazarus IDE Menu]: Package -> Open Package File (*.lpk) --> "tfpandroidbridge_pack.pas" [from /LazAndroidWizard folder];
-
-   2.14. From [Package Wizard]: "Compile" and after "Use->Install";
-   
-   2.15. Please, Wait Lazarus re-building...; 
-
-   2.16. Look for the NEW Component on "Android Bridges Extra" palette!;
-
-   ** You can select "register_template.pas" to write a custom register file, 
-      but so you must insert it to  "tfpandroidbridge_pack.lpk".
-
-
-Thank you!
-
-jmpessoa_at_hotmail.com
-
-
---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-appendix: myhello.pas
-
-
-
-unit myhello;
- 
-{$mode delphi}
- 
-interface
- 
-uses
-  Classes, SysUtils, And_jni, And_jni_Bridge, Laz_And_Controls;
- 
-type
- 
-{Draft Component code by "Lazarus Android Module Wizard" [4/14/2014 14:09:07]}
- 
- 
-{jControl template}
-
-jMyHello = class(jControl)
- private
-    Fflag: integer; Fhello: string;
- 
- protected
- 
- public
-    constructor Create(AOwner: TComponent); override;
-    destructor  Destroy; override;
-    procedure Init; override;
-    function jCreate( _flag: integer; _hello: string): jObject;
-    procedure jFree();
-    procedure SetFlag(_flag: integer);
-    function GetFlag(): integer;
-    procedure SetHello(_hello: string);
-    function GetHello(): string;
-    function GetSumIntArray(var _v1: TArrayOfInteger; var _v2: TArrayOfInteger; _size: integer): TArrayOfInteger;
-    procedure ShowHello();
-
- published
- 
-end;
- 
-function jMyHello_jCreate(env: PJNIEnv; this: JObject;Self: int64; _flag: integer; _hello: string): jObject;
-procedure jMyHello_jFree(env: PJNIEnv; this: JObject; _jmyhello: JObject);
-procedure jMyHello_SetFlag(env: PJNIEnv; this: JObject; _jmyhello: JObject; _flag: integer);
-function jMyHello_GetFlag(env: PJNIEnv; this: JObject; _jmyhello: JObject): integer;
-procedure jMyHello_SetHello(env: PJNIEnv; this: JObject; _jmyhello: JObject; _hello: string);
-function jMyHello_GetHello(env: PJNIEnv; this: JObject; _jmyhello: JObject): string;
-function jMyHello_GetSumIntArray(env: PJNIEnv; this: JObject; _jmyhello: JObject; var _v1: TArrayOfInteger; var _v2: TArrayOfInteger; _size: integer): TArrayOfInteger;
-procedure jMyHello_ShowHello(env: PJNIEnv; this: JObject; _jmyhello: JObject);
-
- 
-implementation
-  
-{---------  jMyHello  --------------}
- 
-constructor jMyHello.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  //your code here....
-end;
- 
-destructor jMyHello.Destroy;
-begin
-  if not (csDesigning in ComponentState) then
-  begin
-    if jForm(Owner).App <> nil then
-    begin
-      if jForm(Owner).App.Initialized then
-      begin
-        if FjObject <> nil then
-        begin
-           jFree();
-           FjObject:= nil;
-        end;
-      end;
-    end;
-  end;
-  //you others free code here...'
-  inherited Destroy;
-end;
- 
-procedure jMyHello.Init;
-begin
-  if FInitialized  then Exit;
-  inherited Init;
-  FjObject:= jCreate(Fflag ,Fhello);
-  FInitialized:= True;
-  //your code here
-end;
-  
- 
-function jMyHello.jCreate( _flag: integer; _hello: string): jObject;
-begin
-   Result:= jMyHello_jCreate(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis , int64(Self) ,_flag ,_hello);
-end;
- 
-procedure jMyHello.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jMyHello_jFree(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
-end;
- 
-procedure jMyHello.SetFlag(_flag: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jMyHello_SetFlag(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _flag);
-end;
- 
-function jMyHello.GetFlag(): integer;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jMyHello_GetFlag(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
-end;
- 
-procedure jMyHello.SetHello(_hello: string);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jMyHello_SetHello(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _hello);
-end;
- 
-function jMyHello.GetHello(): string;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jMyHello_GetHello(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
-end;
- 
-function jMyHello.GetSumIntArray(var _v1: TArrayOfInteger; var _v2: TArrayOfInteger; _size: integer): TArrayOfInteger;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jMyHello_GetSumIntArray(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject, _v1 ,_v2 ,_size);
-end;
- 
-procedure jMyHello.ShowHello();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jMyHello_ShowHello(jForm(Owner).App.Jni.jEnv, jForm(Owner).App.Jni.jThis, FjObject);
-end;
- 
-{-------- jMyHello_JNI_Bridge ----------}
- 
-function jMyHello_jCreate(env: PJNIEnv; this: JObject;Self: int64; _flag: integer; _hello: string): jObject;
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[1].j:= Self;
-  jParams[2].i:= _flag;
-  jParams[3].l:= env^.NewStringUTF(env, PChar(_hello));;
-  jCls:= Get_gjClass(env);
-  jMethod:= env^.GetMethodID(env, jCls, 'jMyHello_jCreate', '(JILjava/lang/String;)Ljava/lang/Object;'); 
-  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
-env^.DeleteLocalRef(env,jParams[3].l);
-end;
- 
-(*
-//Please, you need insert: 
-  
-   public java.lang.Object jMyHello_jCreate(long Self, int _flag, String _hello) {
-      return (java.lang.Object)(new jMyHello(this,Self,_flag,_hello));
-   }
-  
-//to end of "public class Controls" in "Controls.java"
-*)
- 
-
-procedure jMyHello_jFree(env: PJNIEnv; this: JObject; _jmyhello: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmyhello);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V'); 
-  env^.CallVoidMethod(env, _jmyhello, jMethod);
-end;
- 
-
-procedure jMyHello_SetFlag(env: PJNIEnv; this: JObject; _jmyhello: JObject; _flag: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _flag;
-  jCls:= env^.GetObjectClass(env, _jmyhello);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetFlag', '(I)V'); 
-  env^.CallVoidMethodA(env, _jmyhello, jMethod, @jParams);
-end;
- 
-
-function jMyHello_GetFlag(env: PJNIEnv; this: JObject; _jmyhello: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmyhello);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetFlag', '()I'); 
-  Result:= env^.CallIntMethod(env, _jmyhello, jMethod);
-end;
- 
-
-procedure jMyHello_SetHello(env: PJNIEnv; this: JObject; _jmyhello: JObject; _hello: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_hello));
-  jCls:= env^.GetObjectClass(env, _jmyhello);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetHello', '(Ljava/lang/String;)V'); 
-  env^.CallVoidMethodA(env, _jmyhello, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-end;
- 
-
-function jMyHello_GetHello(env: PJNIEnv; this: JObject; _jmyhello: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmyhello);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetHello', '()Ljava/lang/String;'); 
-  jStr:= env^.CallObjectMethod(env, _jmyhello, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-end;
- 
-
-function jMyHello_GetSumIntArray(env: PJNIEnv; this: JObject; _jmyhello: JObject; var _v1: TArrayOfInteger; var _v2: TArrayOfInteger; _size: integer): TArrayOfInteger;
-var
-  resultSize: integer;
-  jResultArray: jObject;
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-  newSize0: integer;
-  jNewArray0: jObject=nil;
-  newSize1: integer;
-  jNewArray1: jObject=nil;
-begin
-//newSize0:= ?
- jNewArray0:= env^.NewIntArray(env, newSize0);  // allocate
- env^.SetIntArrayRegion(env, jNewArray0, 0 , newSize0, @_v1[0] {source});
-  jParams[0].l:= jNewArray0;
-//newSize1:= ?
- jNewArray1:= env^.NewIntArray(env, newSize1);  // allocate
- env^.SetIntArrayRegion(env, jNewArray1, 0 , newSize1, @_v2[0] {source});
-  jParams[1].l:= jNewArray1;
-  jParams[2].i:= _size;
-  jCls:= env^.GetObjectClass(env, _jmyhello);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSumIntArray', '([I[II)[I'); 
-  jResultArray:= env^.CallObjectMethodA(env, _jmyhello, jMethod,  @jParams);
-  resultSize:= env^.GetArrayLength(env, jResultArray);
-  SetLength(Result, resultSize);
-  env^.GetIntArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-end;
- 
-
-procedure jMyHello_ShowHello(env: PJNIEnv; this: JObject; _jmyhello: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmyhello);
-  jMethod:= env^.GetMethodID(env, jCls, 'ShowHello', '()V'); 
-  env^.CallVoidMethod(env, _jmyhello, jMethod);
-end;
- 
-
-end.
