@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="11"/>
+    <Version Value="10"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -15,17 +15,16 @@
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
-    <CustomData Count="10">
+    <CustomData Count="9">
       <Item0 Name="BuildSystem" Value="Gradle"/>
       <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.5"/>
-      <Item3 Name="NdkApi" Value="android-22"/>
-      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r20\"/>
+      <Item2 Name="LamwVersion" Value="0.8.3"/>
+      <Item3 Name="NdkApi" Value="android-21"/>
+      <Item4 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
       <Item5 Name="Package" Value="org.lamw.appcompatrecyclerviewdemo1"/>
-      <Item6 Name="SdkPath" Value="c:\laztoapk\downloads\android-sdk-windows\"/>
+      <Item6 Name="SdkPath" Value="C:\adt32\sdk\"/>
       <Item7 Name="StartModule" Value="AndroidModule1"/>
-      <Item8 Name="Support" Value="FALSE"/>
-      <Item9 Name="Theme" Value="AppCompat.Light.DarkActionBar"/>
+      <Item8 Name="Theme" Value="AppCompat.Light.DarkActionBar"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -34,10 +33,9 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="1">
-        <Mode0 Name="default"/>
-      </Modes>
+      <local>
+        <FormatVersion Value="1"/>
+      </local>
     </RunParams>
     <RequiredPackages Count="1">
       <Item1>
@@ -55,7 +53,7 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jCheckBox;jImageView;jPanel;jRatingBar;jsRecyclerView;jSwitchButton;jTextView"/>
+          <Item0 Name="jControls" Value="jCheckBox;jForm;jImageView;jPanel;jRatingBar;jsRecyclerView;jSwitchButton;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>
@@ -67,12 +65,12 @@
       <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r20\platforms\android-22\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
+      <Libraries Value="C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <SyntaxMode Value="Delphi"/>
+        <SyntaxMode Value="delphi"/>
         <CStyleMacros Value="True"/>
       </SyntaxOptions>
     </Parsing>
@@ -96,7 +94,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

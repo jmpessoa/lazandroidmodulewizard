@@ -19,6 +19,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -124,6 +125,8 @@ class jArrayAdapter extends ArrayAdapter {
     boolean mEnableOnClickTextLeft   = false;
     boolean mEnableOnClickTextCenter = false;
     boolean mEnableOnClickTextRight  = false;
+    
+    boolean mWidgetOnTouch = false;
     
     int mItemImageWidgetSide = 0; // left, right, top, bottom
     
@@ -527,9 +530,9 @@ class jArrayAdapter extends ArrayAdapter {
 					   // tr3e fix change font size
 					   if (items.get(position).textSize != 0) 
 						   itemTextLeft.setTextSize(items.get(position).textSize);
-					   
+					   					   					  
 					   if( mEnableOnClickTextLeft )
-					       itemTextLeft.setOnClickListener( getOnClickTextLeft( itemTextLeft, position) );
+					       itemTextLeft.setOnClickListener( getOnClickText(position, 0) );					   					  
 					   else
 						   itemTextLeft.setClickable(false);
 				     }
@@ -573,10 +576,10 @@ class jArrayAdapter extends ArrayAdapter {
 				     
 				     // tr3e fix change font size
 					 if (items.get(position).textSize != 0)
-						 itemTextRight.setTextSize(items.get(position).textSize);
+						 itemTextRight.setTextSize(items.get(position).textSize);					 					 
 					 
 					 if( mEnableOnClickTextRight )
-					     itemTextRight.setOnClickListener( getOnClickTextRight( itemTextRight, position) );
+					     itemTextRight.setOnClickListener( getOnClickText(position, 2) );
 					 else
 						 itemTextRight.setClickable(false);
 				   }
@@ -603,26 +606,33 @@ class jArrayAdapter extends ArrayAdapter {
 		if (mDispatchOnDrawItemBitmap){  
 			Bitmap  imageBmp = (Bitmap)controls.pOnListViewDrawItemBitmap(PasObj, (int)position , items.get(position).label);
 			
-			if (imageBmp != null) {
+			if (imageBmp != null){
 				itemImage = new ImageView(ctx);
+				
+			    if(itemImage == null) return;
+				
 				itemImage.setId(controls.getJavaNewId());
 				itemImage.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
 				itemImage.setImageBitmap(imageBmp);
 				itemImage.setFocusable(false);
-				itemImage.setFocusableInTouchMode(false);					
-				itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e
+				itemImage.setFocusableInTouchMode(false);									
+				itemImage.setOnTouchListener(getOnTouchImage(position)); // by ADiV
+				
 				return;
 			}
 		}
 			
 	    if (items.get(position).bmp !=  null) {
 					itemImage = new ImageView(ctx);
-					itemImage.setId(controls.getJavaNewId());
-					itemImage.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-					itemImage.setImageBitmap(items.get(position).bmp);
-					itemImage.setFocusable(false);
-					itemImage.setFocusableInTouchMode(false);						
-					itemImage.setOnClickListener(getOnImageClick(itemImage, position)); // by tr3e					
+					
+					if(itemImage != null){
+					 itemImage.setId(controls.getJavaNewId());
+					 itemImage.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+					 itemImage.setImageBitmap(items.get(position).bmp);
+					 itemImage.setFocusable(false);
+					 itemImage.setFocusableInTouchMode(false);											 
+					 itemImage.setOnTouchListener(getOnTouchImage(position)); // by ADiV
+					}
 		}
 			
 		
@@ -744,10 +754,10 @@ class jArrayAdapter extends ArrayAdapter {
 				   itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);
 				
 				if (items.get(position).textAlign == 1)   //right  ***
-				   itemText[i].setGravity(Gravity.RIGHT);							
-				
+				   itemText[i].setGravity(Gravity.RIGHT);
+								
 				if( mEnableOnClickTextCenter )
-				    itemText[i].setOnClickListener( getOnClickTextCenter( itemText[i], position) );
+				    itemText[i].setOnClickListener( getOnClickText(position, 1) );
 				else
 					itemText[i].setClickable(false);
 																							
@@ -1000,7 +1010,11 @@ class jArrayAdapter extends ArrayAdapter {
 			if (itemWidget != null) {
 				itemWidget.setFocusable(false);
 				itemWidget.setFocusableInTouchMode(false);
-				itemWidget.setOnClickListener(getOnCheckItem(itemWidget, position));
+				
+				if( mWidgetOnTouch )
+				    itemWidget.setOnTouchListener(getOnTouchWidget(position));
+				else
+					itemWidget.setOnClickListener(getOnClickWidget(position));
 			}
 			
 		    LayoutParams txtParam = null;
@@ -1302,66 +1316,160 @@ class jArrayAdapter extends ArrayAdapter {
 
 	}
 	
+	View.OnTouchListener getOnTouchImage(final int position) {
+	  return new View.OnTouchListener() {
+		
+		boolean mRunning;
+    	
+    	final Handler handler = new Handler();
+    	
+        final Runnable runClick = new Runnable(){
+            @Override
+            public void run()
+            {            	
+                mRunning = false;
+            }
+        };
+        
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+             case MotionEvent.ACTION_DOWN:{
+            	handler.postDelayed(runClick, 1000);
+                mRunning = true;
+                
+                break;
+             }
+             case MotionEvent.ACTION_UP:{
+            	if (mRunning)
+            		controls.pOnClickImageItem(PasObj, position);
+            		
+                handler.removeCallbacks(runClick);
+                mRunning = false;
+                break;
+             }                       
+             case MotionEvent.ACTION_CANCEL:{
+                handler.removeCallbacks(runClick);
+                mRunning = false;
+                break;
+             }
+            }		                  
+            return true;
+        }
+     };
+	}
 	
-	// by tr3e
-	View.OnClickListener getOnImageClick(final View cb, final int position) {
+	// by ADiV
+	View.OnClickListener getOnClickText(final int position, final int id) {
 		return new View.OnClickListener() {
 			public void onClick(View v) {
-				if (cb.getClass().getName().equals("android.widget.ImageView")) {
-					controls.pOnClickImageItem(PasObj, position);
+				if (v.getClass().getName().equals("android.widget.TextView")) {
+				 switch (id){
+				  case 0 : controls.pOnClickItemTextLeft(PasObj, position, ((TextView)v).getText().toString()); break;
+				  case 1 : controls.pOnClickItemTextCenter(PasObj, position, ((TextView)v).getText().toString()); break;
+				  case 2 : controls.pOnClickItemTextRight(PasObj, position, ((TextView)v).getText().toString()); break;
+				 }
 				}				
 			}
 		};
 	}
 	
-	// by tr3e
-	View.OnClickListener getOnClickTextLeft(final View cb, final int position) {
-		return new View.OnClickListener() {
-			public void onClick(View v) {
-				if (cb.getClass().getName().equals("android.widget.TextView")) {
-					controls.pOnClickItemTextLeft(PasObj, position, ((TextView)cb).getText().toString());
-				}				
-			}
-		};
-	}
-	
-	// by tr3e
-	View.OnClickListener getOnClickTextCenter(final View cb, final int position) {
-			return new View.OnClickListener() {
-				public void onClick(View v) {
-					if (cb.getClass().getName().equals("android.widget.TextView")) {
-						
-						controls.pOnClickItemTextCenter(PasObj, position, ((TextView)cb).getText().toString());
-					}				
-				}
-			};
-	}
-		
-		
-	// by tr3e
-	View.OnClickListener getOnClickTextRight(final View cb, final int position) {
-			return new View.OnClickListener() {
-				public void onClick(View v) {
-					if (cb.getClass().getName().equals("android.widget.TextView")) {
-						controls.pOnClickItemTextRight(PasObj, position, ((TextView)cb).getText().toString());
-					}				
-				}
-			};
-	}
+	View.OnTouchListener getOnTouchWidget(final int position) {
+		  return new View.OnTouchListener() {
+			
+			boolean mRunning;
+	    	
+	    	final Handler handler = new Handler();
+	    	
+	        final Runnable runClick = new Runnable(){
+	            @Override
+	            public void run()
+	            {            	
+	                mRunning = false;
+	            }
+	        };
+	        
+	        @Override
+	        public boolean onTouch(View v, MotionEvent event) {
+	            switch (event.getAction()) {
+	             case MotionEvent.ACTION_DOWN:{
+	            	handler.postDelayed(runClick, 1000);
+	                mRunning = true;
+	                
+	                break;
+	             }
+	             case MotionEvent.ACTION_UP:{
+	            	if (mRunning){
+	            		if (v.getClass().getName().equals("android.widget.ImageView")) {
+	    					controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
+	    				}else if (v.getClass().getName().equals("android.widget.CheckBox")) {
+	    					items.get(position).checked = !((CheckBox)v).isChecked();
+	    					thisAdapter.notifyDataSetChanged();
+	    					controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)v).isChecked());
+	    				}else if (v.getClass().getName().equals("android.widget.RadioButton")) {
+	    					//new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
+	    					//boolean doCheck = ((RadioButton)v).isChecked(); //new code
+	    					
+	    					for (int i=0; i < items.size(); i++) {
+	    						RadioButton rb = (RadioButton)items.get(i).jWidget;
+	    						// by tr3e fix bug
+	    						if( rb != null ){
+	    						 rb.setChecked(false);
+	    						 items.get(i).checked = false;
+	    						}						
+	    					}
 
-	View.OnClickListener getOnCheckItem(final View cb, final int position) {
+	    					items.get(position).checked = true;
+	    					((RadioButton)v).setChecked(true);
+	    					// by tr3e, only one call is necessary
+	    					thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015
+	    					
+	    					controls.pOnClickWidgetItem(PasObj, position, true);
+
+	    				}else if (v.getClass().getName().equals("android.widget.Button")) { //button
+	    					controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
+	    				}else if (v.getClass().getName().equals("android.widget.TextView")) { //textview
+	    					controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
+	    				}else if (v.getClass().getName().equals("android.widget.EditText")) { //edittext
+
+	    					if (!v.isFocusable()) {
+	    						v.setFocusable(true);
+	    						v.setFocusableInTouchMode(true);
+	    					}
+
+	    					v.requestFocus();
+	    					controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
+	    				}
+	            	}	            	
+	            		
+	                handler.removeCallbacks(runClick);
+	                mRunning = false;
+	                break;
+	             }                       
+	             case MotionEvent.ACTION_CANCEL:{
+	                handler.removeCallbacks(runClick);
+	                mRunning = false;
+	                break;
+	             }
+	            }		                  
+	            return true;
+	        }
+	     };
+		}
+
+	View.OnClickListener getOnClickWidget(final int position) {
 		return new View.OnClickListener() {
 			public void onClick(View v) {
-				if (cb.getClass().getName().equals("android.widget.ImageView")) {
+				if (v.getClass().getName().equals("android.widget.ImageView")) {
 					controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
 				}
-				else if (cb.getClass().getName().equals("android.widget.CheckBox")) {
-					items.get(position).checked = ((CheckBox)cb).isChecked();
-					controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)cb).isChecked());
+				else if (v.getClass().getName().equals("android.widget.CheckBox")) {
+					items.get(position).checked = ((CheckBox)v).isChecked();
+					controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)v).isChecked());
 				}
-				else if (cb.getClass().getName().equals("android.widget.RadioButton")) {
+				else if (v.getClass().getName().equals("android.widget.RadioButton")) {
 					//new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
-					boolean doCheck = ((RadioButton)cb).isChecked(); //new code
+					boolean doCheck = ((RadioButton)v).isChecked(); //new code
 					
 					for (int i=0; i < items.size(); i++) {
 						RadioButton rb = (RadioButton)items.get(i).jWidget;
@@ -1380,20 +1488,20 @@ class jArrayAdapter extends ArrayAdapter {
 					controls.pOnClickWidgetItem(PasObj, position, doCheck);
 
 				}
-				else if (cb.getClass().getName().equals("android.widget.Button")) { //button
+				else if (v.getClass().getName().equals("android.widget.Button")) { //button
 					controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
 				}
-				else if (cb.getClass().getName().equals("android.widget.TextView")) { //textview
+				else if (v.getClass().getName().equals("android.widget.TextView")) { //textview
 					controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
 				}
-				else if (cb.getClass().getName().equals("android.widget.EditText")) { //edittext
+				else if (v.getClass().getName().equals("android.widget.EditText")) { //edittext
 
-					if (!cb.isFocusable()) {
-						cb.setFocusable(true);
-						cb.setFocusableInTouchMode(true);
+					if (!v.isFocusable()) {
+						v.setFocusable(true);
+						v.setFocusableInTouchMode(true);
 					}
 
-					cb.requestFocus();
+					v.requestFocus();
 					controls.pOnClickWidgetItem(PasObj, position, items.get(position).checked);
 				}
 			}
@@ -1457,6 +1565,8 @@ public class jListView extends ListView {
     int mCurrentFirstVisibleItem;
     int mCurrentVisibleItemCount;
     int mTotalItem;
+    
+    final ListView mListView = this;
 
 	//Constructor
 	public  jListView(android.content.Context context,
@@ -1536,7 +1646,7 @@ public class jListView extends ListView {
 			}
 		};
 
-		setOnItemClickListener(onItemClickListener);
+		setOnItemClickListener(onItemClickListener);		
 
 		this.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
@@ -2009,6 +2119,10 @@ public class jListView extends ListView {
 		
 		return alist.get(index).checked;
 	}
+	
+	public void SetWidgetOnTouch( boolean _ontouch ){
+		aadapter.mWidgetOnTouch = _ontouch;
+	}
 
 	public void setWidgetCheck(boolean _value, int _index){
 		if( (_index < 0) || (_index >= alist.size()) ) return;
@@ -2374,14 +2488,13 @@ public class jListView extends ListView {
 			 }
 		}					  
 	}
-	
-	// Fix GetCheckedItemPosition [by TR3E]
+			
 	public int GetCheckedItemPosition() {
 		
 		for( int i = 0; i < alist.size(); i++ )
-			 if( alist.get(i).checked )
-				 return i;
-			
+		 if( alist.get(i).checked )
+			 return i;
+		
 		return -1;
 	}	
 

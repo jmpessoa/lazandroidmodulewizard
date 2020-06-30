@@ -1,4 +1,4 @@
-set Path=%PATH%;C:\adt32\sdk\platform-tools
-set GRADLE_HOME=C:\adt32\gradle-4.4.1\
+set Path=%PATH%;c:\laztoapk\downloads\android-sdk-windows\platform-tools
+set GRADLE_HOME=c:\laztoapk\downloads\gradle-4.4.1\
 set PATH=%PATH%;%GRADLE_HOME%\bin
 gradle run

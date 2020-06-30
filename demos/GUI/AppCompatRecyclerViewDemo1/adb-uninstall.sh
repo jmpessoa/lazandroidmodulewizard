@@ -1,1 +1,1 @@
-/adt32/sdk/platform-tools/adb uninstall org.lamw.appcompatrecyclerviewdemo1
+/laztoapk/downloads/android-sdk-windows/platform-tools/adb uninstall org.lamw.appcompatrecyclerviewdemo1

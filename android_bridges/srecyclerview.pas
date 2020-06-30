@@ -8,18 +8,23 @@ uses
   Classes, SysUtils, And_jni, AndroidWidget, systryparent;
 
 Const
-  ItemContentFormatArray: array  [0..4] of string = ('TEXT','IMAGE', 'CHECK', 'RATING', 'SWITCH');
+  ItemContentFormatArray: array  [0..6] of string =
+    ('TEXT','IMAGE', 'CHECK', 'RATING', 'SWITCH', 'PANEL', 'PROGRESS');
 
 type
 
-  TItemContentFormat = (cfText, cfImage, cfCheck, cfRating, cfSwitch);
+  TItemContentFormat = (cfText, cfImage, cfCheck, cfRating, cfSwitch, cfPanel, cfProgress);
 
   TItemWidgetStatus = (wsNone, wsChecked);
 
-  TRecyclerViewOnItemClick = procedure(Sender: TObject; itemPosition: integer; itemArrayOfStringCount: integer) of object;
+
+  TRecyclerViewOnItemClick = procedure(Sender: TObject; itemPosition: integer) of object;
 
   TRecyclerViewOnItemWidgetClick = procedure(Sender: TObject; itemPosition: integer; widget: TItemContentFormat;
-                                               caption: string; status: TItemWidgetStatus) of object;
+                                               widgetId: integer; status: TItemWidgetStatus) of object;
+
+  TRecyclerViewOnItemWidgetTouch = procedure(Sender: TObject; itemPosition: integer; widget: TItemContentFormat;
+                                               widgetId: integer) of object;
 
   TLayoutModel = (lmLinear, lmGrid, lmStaggeredGrid);
   TLayoutOrientation = (loVertical, loHorizontal);
@@ -40,8 +45,18 @@ jsRecyclerView = class(jVisualControl)
     FLayoutOrientation: TLayoutOrientation;
     FColumns: integer;
     FFitsSystemWindows: boolean;
+
     FOnItemClick: TRecyclerViewOnItemClick;
+    FOnItemLongClick: TRecyclerViewOnItemClick;
+
+    FOnItemTouchUp: TRecyclerViewOnItemClick;
+    FOnItemTouchDown: TRecyclerViewOnItemClick;
+
     FOnItemWidgetClick: TRecyclerViewOnItemWidgetClick;
+    FOnItemWidgetLongClick: TRecyclerViewOnItemWidgetTouch;
+    FOnItemWidgetTouchUp: TRecyclerViewOnItemWidgetTouch;
+    FOnItemWidgetTouchDown: TRecyclerViewOnItemWidgetTouch;
+
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     
@@ -49,13 +64,24 @@ jsRecyclerView = class(jVisualControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    procedure Refresh;
+    procedure Refresh; overload;
+    procedure Refresh( position : integer ); overload;
     procedure UpdateLayout; override;
     
-    procedure GenEvent_OnRecyclerViewItemClick(Obj: TObject; itemIndex: integer; arrayContentCount: integer);
-    procedure GenEvent_OnRecyclerViewItemWidgetClick(Obj: TObject; itemIndex: integer;
-                                                     widget: TItemContentFormat; caption: string; status: TItemWidgetStatus);
+    procedure GenEvent_OnRecyclerViewItemClick(Obj: TObject; itemIndex: integer);
+    procedure GenEvent_OnRecyclerViewItemLongClick(Obj: TObject; itemIndex: integer);
 
+    procedure GenEvent_OnRecyclerViewItemTouchUp(Obj: TObject; itemIndex: integer);
+    procedure GenEvent_OnRecyclerViewItemTouchDown(Obj: TObject; itemIndex: integer);
+
+    procedure GenEvent_OnRecyclerViewItemWidgetClick(Obj: TObject; itemIndex: integer;
+                                                     widget: TItemContentFormat; widgetId: integer; status: TItemWidgetStatus);
+    procedure GenEvent_OnRecyclerViewItemWidgetLongClick(Obj: TObject; itemIndex: integer;
+                                                     widget: TItemContentFormat; widgetId: integer);
+    procedure GenEvent_OnRecyclerViewItemWidgetTouchUp(Obj: TObject; itemIndex: integer;
+                                                     widget: TItemContentFormat; widgetId: integer);
+    procedure GenEvent_OnRecyclerViewItemWidgetTouchDown(Obj: TObject; itemIndex: integer;
+                                                     widget: TItemContentFormat; widgetId: integer);
 
     function jCreate( _mode: integer; _direction: integer; _cols: integer): jObject;
     procedure jFree();
@@ -79,19 +105,43 @@ jsRecyclerView = class(jVisualControl)
     procedure SetItemContentFormat(); overload;
 
     procedure Add(_delimitedContent: string);
-    function GetSelectedContent(_contentIndex: integer): string;
+    procedure Moved( fromPosition, toPosition : integer );
     procedure SetItemContentLayout(_itemViewLayout: jObject); overload;
     procedure SetItemContentLayout(_itemViewLayout: jObject; _forceCardStyle: boolean);  overload;
-    procedure SetSeparatorDecorationColor(_color: TARGBColorBridge);
+    procedure SetItemSeparatorColorHeight(_color: TARGBColorBridge; _height : single );
     procedure SetAppBarLayoutScrollingViewBehavior();
+    procedure RemoveAll;
     procedure Remove(_position: integer);
-    function GetItemCount(): integer;
+    function  GetItemCount(): integer;
     procedure SetFitsSystemWindows(_value: boolean);
     procedure SetClipToPadding(_value: boolean);
     procedure AddItemContentFormat(cf: TItemContentFormat);
+    procedure ClearItemContentFormat;
 
     procedure SetItemContentDelimiter(_delimiter: string);
-    procedure SetAnchorGravity(_gravity: TLayoutGravity; _anchorId: integer);
+
+    procedure SetWidgetText( position : integer; widget : TItemContentFormat; widgetId : integer; strText : string );
+    function  GetWidgetText( position : integer; widget : TItemContentFormat; widgetId : integer ) : string;
+
+    procedure SetWidgetPanelRound( position, widgetId, round : integer );
+    procedure SetWidgetTextColor( position : integer; widget: TItemContentFormat; widgetId : integer; value: TARGBColorBridge );
+
+    procedure SetItemsRound(round : integer);
+    procedure SetItemBackgroundColor(position: integer; value: TARGBColorBridge; round : integer);
+    procedure SetCardBackgroundColor(value: TARGBColorBridge);
+
+    procedure SetItemSelect( position :integer; select: integer);
+    function  GetItemSelect( position :integer ) : integer;
+
+    procedure SetItemTag( position :integer; tagString: string);
+    function  GetItemTag( position :integer ) : string;
+    function  GetItemsSelect() : integer;
+    function  GetItemSelectFirst() : integer; overload;
+    function  GetItemSelectFirst( _int : integer ) : integer; overload;
+    procedure ClearItemsSelect( position :integer );
+
+    procedure ScrollToPosition( position :integer );
+    procedure SmoothScrollToPosition( position :integer );
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -101,41 +151,20 @@ jsRecyclerView = class(jVisualControl)
     property Columns: integer read FColumns write FColumns;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     property OnItemClick: TRecyclerViewOnItemClick read FOnItemClick write FOnItemClick;
+    property OnItemLongClick: TRecyclerViewOnItemClick read FOnItemLongClick write FOnItemLongClick; // By ADiV
+    property OnItemTouchUp: TRecyclerViewOnItemClick read FOnItemTouchUp write FOnItemTouchUp;  // By ADiV
+    property OnItemTouchDown: TRecyclerViewOnItemClick read FOnItemTouchDown write FOnItemTouchDown; // By ADiV
     property OnItemWidgetClick: TRecyclerViewOnItemWidgetClick read FOnItemWidgetClick write FOnItemWidgetClick;
+    property OnItemWidgetLongClick: TRecyclerViewOnItemWidgetTouch read FOnItemWidgetLongClick write FOnItemWidgetLongClick; // By ADiV
+    property OnItemWidgetTouchUp: TRecyclerViewOnItemWidgetTouch read FOnItemWidgetTouchUp write FOnItemWidgetTouchUp; // By ADiV
+    property OnItemWidgetTouchDown: TRecyclerViewOnItemWidgetTouch read FOnItemWidgetTouchDown write FOnItemWidgetTouchDown; // By ADiV
 
 end;
 
 //function jsRecyclerView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 function jsRecyclerView_jCreate(env: PJNIEnv;_Self: int64; _mode: integer; _direction: integer; _cols: integer; this: jObject): jObject;
-procedure jsRecyclerView_jFree(env: PJNIEnv; _jsrecyclerview: JObject);
-procedure jsRecyclerView_SetViewParent(env: PJNIEnv; _jsrecyclerview: JObject; _viewgroup: jObject);
-function jsRecyclerView_GetParent(env: PJNIEnv; _jsrecyclerview: JObject): jObject;
-procedure jsRecyclerView_RemoveFromViewParent(env: PJNIEnv; _jsrecyclerview: JObject);
-function jsRecyclerView_GetView(env: PJNIEnv; _jsrecyclerview: JObject): jObject;
-procedure jsRecyclerView_SetLParamWidth(env: PJNIEnv; _jsrecyclerview: JObject; _w: integer);
-procedure jsRecyclerView_SetLParamHeight(env: PJNIEnv; _jsrecyclerview: JObject; _h: integer);
-function jsRecyclerView_GetLParamWidth(env: PJNIEnv; _jsrecyclerview: JObject): integer;
-function jsRecyclerView_GetLParamHeight(env: PJNIEnv; _jsrecyclerview: JObject): integer;
-procedure jsRecyclerView_SetLGravity(env: PJNIEnv; _jsrecyclerview: JObject; _g: integer);
-procedure jsRecyclerView_SetLWeight(env: PJNIEnv; _jsrecyclerview: JObject; _w: single);
-procedure jsRecyclerView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jsrecyclerview: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jsRecyclerView_AddLParamsAnchorRule(env: PJNIEnv; _jsrecyclerview: JObject; _rule: integer);
-procedure jsRecyclerView_AddLParamsParentRule(env: PJNIEnv; _jsrecyclerview: JObject; _rule: integer);
-procedure jsRecyclerView_SetLayoutAll(env: PJNIEnv; _jsrecyclerview: JObject; _idAnchor: integer);
-procedure jsRecyclerView_ClearLayoutAll(env: PJNIEnv; _jsrecyclerview: JObject);
-procedure jsRecyclerView_SetId(env: PJNIEnv; _jsrecyclerview: JObject; _id: integer);
-procedure jsRecyclerView_SetItemContentDictionary(env: PJNIEnv; _jsrecyclerview: JObject; _delimitedContentDictionary: string; _delimiter: string);
-procedure jsRecyclerView_Add(env: PJNIEnv; _jsrecyclerview: JObject; _delimitedContent: string);
-function jsRecyclerView_GetSelectedContent(env: PJNIEnv; _jsrecyclerview: JObject; _contentIndex: integer): string;
 procedure jsRecyclerView_SetlayoutView(env: PJNIEnv; _jsrecyclerview: JObject; _itemViewLayout: jObject);
 procedure jsRecyclerView_SetItemViewLayout(env: PJNIEnv; _jsrecyclerview: JObject; _itemViewLayout: jObject; _forceCardStyle: boolean);
-procedure jsRecyclerView_SetSeparatorDecorationColor(env: PJNIEnv; _jsrecyclerview: JObject; _separatorColor: integer);
-procedure jsRecyclerView_SetAppBarLayoutScrollingViewBehavior(env: PJNIEnv; _jsrecyclerview: JObject);
-procedure jsRecyclerView_Remove(env: PJNIEnv; _jsrecyclerview: JObject; _position: integer);
-function jsRecyclerView_GetItemCount(env: PJNIEnv; _jsrecyclerview: JObject): integer;
-procedure jsRecyclerView_SetFitsSystemWindows(env: PJNIEnv; _jsrecyclerview: JObject; _value: boolean);
-procedure jsRecyclerView_SetClipToPadding(env: PJNIEnv; _jsrecyclerview: JObject; _value: boolean);
-procedure jsRecyclerView_SetAnchorGravity(env: PJNIEnv; _jsrecyclerview: JObject; _gravity: integer; _anchorId: integer);
 
 implementation
 
@@ -203,36 +232,29 @@ begin
 
 
    if FGravityInParent <> lgNone then
-     jsRecyclerView_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     SetLGravity(FGravityInParent);
 
-   jsRecyclerView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsRecyclerView_SetId(FjEnv, FjObject, Self.Id);
+   SetViewParent(FjPRLayout);
+   jni_proc_i(FjEnv, FjObject, 'setId', Self.Id);
   end;
 
-  jsRecyclerView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+  jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
+                  FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                  sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
+                  sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-      jsRecyclerView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
+      AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
+
   for rToP := rpBottom to rpCenterVertical do
-  begin
     if rToP in FPositionRelativeToParent then
-    begin
-      jsRecyclerView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
-    end;
-  end;
+      AddLParamsParentRule(GetPositionRelativeToParent(rToP));
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsRecyclerView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  SetLayoutAll(Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -272,20 +294,67 @@ end;
 procedure jsRecyclerView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    jni_proc(FjEnv, FjObject, 'Refresh');
+end;
+
+procedure jsRecyclerView.Refresh( position : integer );
+begin
+  if FInitialized then
+    jni_proc_i(FjEnv, FjObject, 'Refresh', position);
 end;
 
 //Event : Java -> Pascal
 
-procedure jsRecyclerView.GenEvent_OnRecyclerViewItemClick(Obj: TObject; itemIndex: integer; arrayContentCount: integer);
+// Updated by ADiV
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemClick(Obj: TObject; itemIndex: integer);
 begin
-  if Assigned(FOnItemClick) then FOnItemClick(Obj, itemIndex, arrayContentCount);
+  if Assigned(FOnItemClick) then FOnItemClick(Obj, itemIndex);
 end;
 
-procedure jsRecyclerView.GenEvent_OnRecyclerViewItemWidgetClick(Obj: TObject; itemIndex: integer;
-                                                 widget: TItemContentFormat; caption: string; status: TItemWidgetStatus);
+// By ADiV
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemLongClick(Obj: TObject; itemIndex: integer);
 begin
-  if Assigned(FOnItemWidgetClick) then FOnItemWidgetClick(Obj, itemIndex, widget, caption, status);
+  if Assigned(FOnItemLongClick) then FOnItemLongClick(Obj, itemIndex);
+end;
+
+// By ADiV
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemTouchUp(Obj: TObject; itemIndex: integer);
+begin
+  if Assigned(FOnItemTouchUp) then FOnItemTouchUp(Obj, itemIndex);
+end;
+
+// By ADiV
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemTouchDown(Obj: TObject; itemIndex: integer);
+begin
+  if Assigned(FOnItemTouchDown) then FOnItemTouchDown(Obj, itemIndex);
+end;
+
+// Updated by ADiV
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemWidgetClick(Obj: TObject; itemIndex: integer;
+                                                 widget: TItemContentFormat; widgetId: integer; status: TItemWidgetStatus);
+begin
+  if Assigned(FOnItemWidgetClick) then FOnItemWidgetClick(Obj, itemIndex, widget, widgetId, status);
+end;
+
+// By [ADiV]
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemWidgetLongClick(Obj: TObject; itemIndex: integer;
+                                                 widget: TItemContentFormat; widgetId: integer);
+begin
+  if Assigned(FOnItemWidgetLongClick) then FOnItemWidgetLongClick(Obj, itemIndex, widget, widgetId);
+end;
+
+// By [ADiV]
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemWidgetTouchUp(Obj: TObject; itemIndex: integer;
+                                                 widget: TItemContentFormat; widgetId: integer);
+begin
+  if Assigned(FOnItemWidgetTouchUp) then FOnItemWidgetTouchUp(Obj, itemIndex, widget, widgetId);
+end;
+
+// By [ADiV]
+procedure jsRecyclerView.GenEvent_OnRecyclerViewItemWidgetTouchDown(Obj: TObject; itemIndex: integer;
+                                                 widget: TItemContentFormat; widgetId: integer);
+begin
+  if Assigned(FOnItemWidgetTouchDown) then FOnItemWidgetTouchDown(Obj, itemIndex, widget, widgetId);
 end;
 
 {
@@ -303,106 +372,106 @@ procedure jsRecyclerView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jsRecyclerView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsRecyclerView_SetViewParent(FjEnv, FjObject, _viewgroup);
+  if FjObject <> nil then
+     jni_proc_vig(FjEnv, FjObject, 'SetViewParent', _viewgroup);
 end;
 
 function jsRecyclerView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsRecyclerView_GetParent(FjEnv, FjObject);
+   Result:= jni_func_out_vig(FjEnv, FjObject, 'GetParent');
 end;
 
 procedure jsRecyclerView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_RemoveFromViewParent(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
 end;
 
 function jsRecyclerView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsRecyclerView_GetView(FjEnv, FjObject);
+   Result:= jni_func_out_viw(FjEnv, FjObject, 'GetView');
 end;
 
 procedure jsRecyclerView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetLParamWidth(FjEnv, FjObject, _w);
+     jni_proc_i(FjEnv, FjObject, 'SetLParamWidth', _w);
 end;
 
 procedure jsRecyclerView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetLParamHeight(FjEnv, FjObject, _h);
+     jni_proc_i(FjEnv, FjObject, 'SetLParamHeight', _h);
 end;
 
 function jsRecyclerView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsRecyclerView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamWidth');
 end;
 
 function jsRecyclerView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsRecyclerView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamHeight');
 end;
 
 procedure jsRecyclerView.SetLGravity(_gravity: TLayoutGravity);
 begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
-  if FInitialized then
-     jsRecyclerView_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'SetLGravity', Ord(FGravityInParent));
 end;
 
 procedure jsRecyclerView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetLWeight(FjEnv, FjObject, _w);
+     jni_proc_f(FjEnv, FjObject, 'SetLWeight', _w);
 end;
 
 procedure jsRecyclerView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight', _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsRecyclerView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsRecyclerView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
 end;
 
 procedure jsRecyclerView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsRecyclerView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
 end;
 
 procedure jsRecyclerView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jsRecyclerView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
 end;
 
 procedure jsRecyclerView.ClearLayout();
@@ -413,15 +482,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsRecyclerView_clearLayoutAll(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ClearLayoutAll');
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsRecyclerView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          AddlParamsParentRule(GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsRecyclerView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -430,7 +499,7 @@ begin
   //in designing component state: set value here...
   FItemContentDelimiter:= _delimiter;
   if FInitialized then
-     jsRecyclerView_SetItemContentDictionary(FjEnv, FjObject, _delimitedContentFormat ,_delimiter);
+     jni_proc_tt(FjEnv, FjObject, 'SetItemContentDictionary', _delimitedContentFormat ,_delimiter);
 end;
 
 procedure jsRecyclerView.SetItemContentFormat(_contentFormat: string);
@@ -448,14 +517,7 @@ procedure jsRecyclerView.Add(_delimitedContent: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_Add(FjEnv, FjObject, _delimitedContent);
-end;
-
-function jsRecyclerView.GetSelectedContent(_contentIndex: integer): string;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jsRecyclerView_GetSelectedContent(FjEnv, FjObject, _contentIndex);
+     jni_proc_t(FjEnv, FjObject, 'Add', _delimitedContent);
 end;
 
 procedure jsRecyclerView.SetItemContentLayout(_itemViewLayout: jObject);
@@ -472,32 +534,46 @@ begin
      jsRecyclerView_SetItemViewLayout(FjEnv, FjObject, _itemViewLayout ,_forceCardStyle);
 end;
 
-procedure jsRecyclerView.SetSeparatorDecorationColor(_color: TARGBColorBridge);
+procedure jsRecyclerView.Moved( fromPosition, toPosition : integer );
+begin
+ //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_ii(FjEnv, FjObject, 'Moved', fromPosition, toPosition );
+end;
+
+procedure jsRecyclerView.SetItemSeparatorColorHeight(_color: TARGBColorBridge; _height : single );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetSeparatorDecorationColor(FjEnv, FjObject,  GetARGB(FCustomColor, _color) );
+     jni_proc_if(FjEnv, FjObject, 'SetItemSeparatorColorHeight', GetARGB(FCustomColor, _color), _height );
 end;
 
 procedure jsRecyclerView.SetAppBarLayoutScrollingViewBehavior();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetAppBarLayoutScrollingViewBehavior(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetAppBarLayoutScrollingViewBehavior');
+end;
+
+procedure jsRecyclerView.RemoveAll();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'RemoveAll');
 end;
 
 procedure jsRecyclerView.Remove(_position: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_Remove(FjEnv, FjObject, _position);
+     jni_proc_i(FjEnv, FjObject, 'Remove', _position);
 end;
 
 function jsRecyclerView.GetItemCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsRecyclerView_GetItemCount(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetItemCount');
 end;
 
 procedure jsRecyclerView.SetFitsSystemWindows(_value: boolean);
@@ -505,14 +581,141 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsRecyclerView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jsRecyclerView.SetClipToPadding(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetClipToPadding(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetClipToPadding', _value);
+end;
+
+procedure jsRecyclerView.SmoothScrollToPosition( position :integer );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SmoothScrollToPosition', position );
+end;
+
+procedure jsRecyclerView.ScrollToPosition( position :integer );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'ScrollToPosition', position );
+end;
+
+procedure jsRecyclerView.ClearItemsSelect( position :integer );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'ClearItemsSelect' );
+end;
+
+function jsRecyclerView.GetItemsSelect() : integer;
+begin
+ result := 0;
+ //in designing component state: set value here...
+ if FInitialized then
+  result := jni_func_out_i(FjEnv, FjObject, 'GetItemsSelect');
+end;
+
+function jsRecyclerView.GetItemSelectFirst( _int : integer ) : integer;
+begin
+ result := -1;
+ //in designing component state: set value here...
+ if FInitialized then
+  result := jni_func_i_out_i(FjEnv, FjObject, 'GetItemSelectFirst', _int);
+end;
+
+function jsRecyclerView.GetItemSelectFirst() : integer;
+begin
+ result := -1;
+ //in designing component state: set value here...
+ if FInitialized then
+  result := jni_func_out_i(FjEnv, FjObject, 'GetItemSelectFirst');
+end;
+
+procedure jsRecyclerView.SetItemSelect( position :integer; select: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_ii(FjEnv, FjObject, 'SetItemSelect', position, select);
+end;
+
+function jsRecyclerView.GetItemSelect( position :integer ) : integer;
+begin
+  result := 0;
+  //in designing component state: set value here...
+  if FInitialized then
+   result := jni_func_i_out_i(FjEnv, FjObject, 'GetItemSelect', position);
+end;
+
+procedure jsRecyclerView.SetItemTag( position :integer; tagString: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_it(FjEnv, FjObject, 'SetItemTag', position, tagString);
+end;
+
+function jsRecyclerView.GetItemTag( position :integer ) : string;
+begin
+  Result := '';
+  //in designing component state: set value here...
+  if FInitialized then
+   result := jni_func_i_out_t(FjEnv, FjObject, 'GetItemTag', position);
+end;
+
+procedure jsRecyclerView.SetCardBackgroundColor(value: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetCardBackgroundColor', GetARGB(FCustomColor, value));
+end;
+
+procedure jsRecyclerView.SetItemsRound(round : integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetItemsRound', round);
+end;
+
+procedure jsRecyclerView.SetItemBackgroundColor(position: integer; value: TARGBColorBridge; round : integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_iii(FjEnv, FjObject, 'SetItemBackgroundColor', position, GetARGB(FCustomColor, value), round);
+end;
+
+function jsRecyclerView.GetWidgetText( position : integer; widget : TItemContentFormat; widgetId : integer ) : string;
+begin
+  result := '';
+
+  if FInitialized then
+   result := jni_func_iii_out_t(FjEnv, FjObject, 'GetWidgetText', position, ord(widget), widgetId);
+end;
+
+procedure jsRecyclerView.SetWidgetText( position : integer; widget : TItemContentFormat; widgetId : integer; strText : string );
+begin
+  if FInitialized then
+     jni_proc_iiit(FjEnv, FjObject, 'SetWidgetText', position, ord(widget), widgetId, strText);
+end;
+
+procedure jsRecyclerView.SetWidgetPanelRound( position, widgetId, round : integer );
+begin
+  if FInitialized then
+     jni_proc_iii(FjEnv, FjObject, 'SetWidgetPanelRound', position, widgetId, round);
+end;
+
+procedure jsRecyclerView.SetWidgetTextColor( position : integer; widget: TItemContentFormat; widgetId : integer; value: TARGBColorBridge );
+begin
+  if FInitialized then
+     jni_proc_iiii(FjEnv, FjObject, 'SetWidgetTextColor', position, ord(widget), widgetId, GetARGB(FCustomColor, value));
+end;
+
+procedure jsRecyclerView.ClearItemContentFormat;
+begin
+  FItemContentFormat.Clear;
 end;
 
 procedure jsRecyclerView.AddItemContentFormat(cf: TItemContentFormat);
@@ -525,14 +728,6 @@ begin
    FItemContentDelimiter:= _delimiter;
    FItemContentFormat.Delimiter:= _delimiter[1];
 end;
-
-procedure jsRecyclerView.SetAnchorGravity(_gravity: TLayoutGravity; _anchorId: integer);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsRecyclerView_SetAnchorGravity(FjEnv, FjObject, Ord(_gravity) ,_anchorId);
-end;
-
 
 {-------- jsRecyclerView_JNI_Bridge ----------}
 
@@ -552,289 +747,6 @@ begin
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
-
-
-procedure jsRecyclerView_jFree(env: PJNIEnv; _jsrecyclerview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_SetViewParent(env: PJNIEnv; _jsrecyclerview: JObject; _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsRecyclerView_GetParent(env: PJNIEnv; _jsrecyclerview: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-  Result:= env^.CallObjectMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_RemoveFromViewParent(env: PJNIEnv; _jsrecyclerview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsRecyclerView_GetView(env: PJNIEnv; _jsrecyclerview: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_SetLParamWidth(env: PJNIEnv; _jsrecyclerview: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_SetLParamHeight(env: PJNIEnv; _jsrecyclerview: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsRecyclerView_GetLParamWidth(env: PJNIEnv; _jsrecyclerview: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsRecyclerView_GetLParamHeight(env: PJNIEnv; _jsrecyclerview: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_SetLGravity(env: PJNIEnv; _jsrecyclerview: JObject; _g: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _g;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_SetLWeight(env: PJNIEnv; _jsrecyclerview: JObject; _w: single);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _w;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLWeight', '(F)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jsrecyclerview: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_AddLParamsAnchorRule(env: PJNIEnv; _jsrecyclerview: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_AddLParamsParentRule(env: PJNIEnv; _jsrecyclerview: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_SetLayoutAll(env: PJNIEnv; _jsrecyclerview: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_ClearLayoutAll(env: PJNIEnv; _jsrecyclerview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_SetId(env: PJNIEnv; _jsrecyclerview: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsRecyclerView_SetItemContentDictionary(env: PJNIEnv; _jsrecyclerview: JObject; _delimitedContentDictionary: string; _delimiter: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_delimitedContentDictionary));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_delimiter));
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemContentDictionary', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsRecyclerView_Add(env: PJNIEnv; _jsrecyclerview: JObject; _delimitedContent: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_delimitedContent));
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsRecyclerView_GetSelectedContent(env: PJNIEnv; _jsrecyclerview: JObject; _contentIndex: integer): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _contentIndex;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSelectedContent', '(I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 procedure jsRecyclerView_SetlayoutView(env: PJNIEnv; _jsrecyclerview: JObject; _itemViewLayout: jObject);
 var
@@ -859,94 +771,6 @@ begin
   jParams[1].z:= JBool(_forceCardStyle);
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemViewLayout', '(Landroid/view/View;Z)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsRecyclerView_SetSeparatorDecorationColor(env: PJNIEnv; _jsrecyclerview: JObject; _separatorColor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _separatorColor;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetSeparatorDecorationColor', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsRecyclerView_SetAppBarLayoutScrollingViewBehavior(env: PJNIEnv; _jsrecyclerview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetAppBarLayoutScrollingViewBehavior', '()V');
-  env^.CallVoidMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsRecyclerView_Remove(env: PJNIEnv; _jsrecyclerview: JObject; _position: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _position;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'Remove', '(I)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jsRecyclerView_GetItemCount(env: PJNIEnv; _jsrecyclerview: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetItemCount', '()I');
-  Result:= env^.CallIntMethod(env, _jsrecyclerview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsRecyclerView_SetFitsSystemWindows(env: PJNIEnv; _jsrecyclerview: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsRecyclerView_SetClipToPadding(env: PJNIEnv; _jsrecyclerview: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetClipToPadding', '(Z)V');
-  env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsRecyclerView_SetAnchorGravity(env: PJNIEnv; _jsrecyclerview: JObject; _gravity: integer; _anchorId: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _gravity;
-  jParams[1].i:= _anchorId;
-  jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetAnchorGravity', '(II)V');
   env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -161,7 +161,12 @@ uses
                                            zoomScaleFactor: single);
 
    Procedure Java_Event_pOnGL2SurfaceDestroyed(env: PJNIEnv; this: jobject; Obj: TObject);
-   Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; arrayContentCount: integer);
+
+   Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
+   Procedure Java_Event_pOnRecyclerViewItemLongClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
+   Procedure Java_Event_pOnRecyclerViewItemTouchUp(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
+   Procedure Java_Event_pOnRecyclerViewItemTouchDown(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
+
    Procedure Java_Event_pOnClickNavigationViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
    Procedure Java_Event_pOnClickBottomNavigationViewItem(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; itemCaption: JString);
 
@@ -186,7 +191,18 @@ uses
 
    Procedure Java_Event_pOnRecyclerViewItemWidgetClick(env: PJNIEnv; this: jobject; Obj: TObject;
                                                        itemIndex: integer; widgetClass: integer;
-                                                        widgetCaption: JString; status: integer);
+                                                        widgetId: integer; status: integer);
+   Procedure Java_Event_pOnRecyclerViewItemWidgetLongClick(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                      itemIndex: integer; widgetClass: integer;
+                                                      widgetId: integer);
+
+   Procedure Java_Event_pOnRecyclerViewItemWidgetTouchUp(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                      itemIndex: integer; widgetClass: integer;
+                                                      widgetId: integer);
+
+   Procedure Java_Event_pOnRecyclerViewItemWidgetTouchDown(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                      itemIndex: integer; widgetClass: integer;
+                                                      widgetId: integer);
 
    Procedure Java_Event_pOnZBarcodeScannerViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
                                                        codedata: JString; codetype: integer);
@@ -2150,14 +2166,51 @@ begin
   end;
 end;
 
-Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer; arrayContentCount: integer);
+//Updated by ADiV
+Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
   if Obj is jsRecyclerView then
   begin
     jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
-    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemClick(Obj, itemIndex, arrayContentCount);
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemClick(Obj, itemIndex);
+  end;
+end;
+
+// By ADiV
+Procedure Java_Event_pOnRecyclerViewItemLongClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jsRecyclerView then
+  begin
+    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemLongClick(Obj, itemIndex);
+  end;
+end;
+
+// By ADiV
+Procedure Java_Event_pOnRecyclerViewItemTouchUp(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jsRecyclerView then
+  begin
+    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemTouchUp(Obj, itemIndex);
+  end;
+end;
+
+// By ADiV
+Procedure Java_Event_pOnRecyclerViewItemTouchDown(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Obj is jsRecyclerView then
+  begin
+    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemTouchDown(Obj, itemIndex);
   end;
 end;
 
@@ -2307,25 +2360,63 @@ begin
 end;
 
 
+// UPDATED by [ADiV]
 Procedure Java_Event_pOnRecyclerViewItemWidgetClick(env: PJNIEnv; this: jobject; Obj: TObject;
                                                     itemIndex: integer; widgetClass: integer;
-                                                    widgetCaption: JString; status: integer);
-var
-  _jBoolean: JBoolean;
-  paswidgetCaption: string;
+                                                    widgetId: integer; status: integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
   if Obj is jsRecyclerView then
   begin
     jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
-    paswidgetCaption := '';
-    if widgetCaption <> nil then
-    begin
-      _jBoolean:= JNI_False;
-      paswidgetCaption:= string( env^.GetStringUTFChars(env,widgetCaption,@_jBoolean) );
-    end;
-    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetClick(Obj,itemIndex, TItemContentFormat(widgetClass),paswidgetCaption, TItemWidgetStatus(status));
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetClick(Obj,itemIndex, TItemContentFormat(widgetClass),widgetId, TItemWidgetStatus(status));
+  end;
+end;
+
+// By [ADiV]
+Procedure Java_Event_pOnRecyclerViewItemWidgetLongClick(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                      itemIndex: integer; widgetClass: integer;
+                                                      widgetId: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jsRecyclerView then
+  begin
+    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetLongClick(Obj,itemIndex, TItemContentFormat(widgetClass),widgetId);
+  end;
+end;
+
+// By [ADiV]
+Procedure Java_Event_pOnRecyclerViewItemWidgetTouchUp(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                      itemIndex: integer; widgetClass: integer;
+                                                      widgetId: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jsRecyclerView then
+  begin
+    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetTouchUp(Obj,itemIndex, TItemContentFormat(widgetClass),widgetId);
+  end;
+end;
+
+// By [ADiV]
+Procedure Java_Event_pOnRecyclerViewItemWidgetTouchDown(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                      itemIndex: integer; widgetClass: integer;
+                                                      widgetId: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jsRecyclerView then
+  begin
+    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
+    jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetTouchDown(Obj,itemIndex, TItemContentFormat(widgetClass),widgetId);
   end;
 end;
 

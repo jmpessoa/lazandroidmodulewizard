@@ -1,5 +1,4 @@
 object AndroidModule1: TAndroidModule1
-  OnCreate = AndroidModule1Create
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0

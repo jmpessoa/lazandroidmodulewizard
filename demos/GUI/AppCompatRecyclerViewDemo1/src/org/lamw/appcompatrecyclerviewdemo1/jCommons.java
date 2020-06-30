@@ -3,12 +3,16 @@ package org.lamw.appcompatrecyclerviewdemo1;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.View.MeasureSpec;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -55,10 +59,12 @@ public class jCommons {
  /* //[endif_api14up]
  private int lgravity = Gravity.TOP | Gravity.LEFT;
  //[ifdef_api14up] */
-	private float lweight = 0;
+	private float lweight = 1.0f;
 	private boolean mRemovedFromParent = false;
 	private int algravity;
 	private int algravityAnchorId;
+	
+	private android.content.Context context;
 	
 	public jCommons(View _view, android.content.Context _context, long _pasobj) {
 		aOwnerView = _view;       // set owner
@@ -67,6 +73,8 @@ public class jCommons {
 		lgravity = Gravity.NO_GRAVITY;
 		algravity = Gravity.NO_GRAVITY;
 		algravityAnchorId = -1;
+		
+		context = _context;
 		
 		if (aOwnerView != null) {
 			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
@@ -84,8 +92,6 @@ public class jCommons {
 	}
 
 	public static  MarginLayoutParams newLayoutParams(ViewGroup aparent, ViewGroup.MarginLayoutParams baseparams) {
-		
-		//CollapsingToolbarLayout
 		
 		if (aparent instanceof NestedScrollView) {
 			return new NestedScrollView.LayoutParams(baseparams);
@@ -110,7 +116,7 @@ public class jCommons {
 		} else if (aparent == null) {
 			throw new NullPointerException("Parent is null");
 		} else {
-			throw new IllegalArgumentException("LAMW/jCommons: Parent is neither FrameLayout or RelativeLayout or LinearLayout: [ "
+			throw new IllegalArgumentException("LAMW/jCommons: Parent is UNKNOW!: [ "
 					+ aparent.getClass().getName() + " ]");
 		}
 	}
@@ -124,7 +130,6 @@ public class jCommons {
 		parent = _viewgroup;
 		if ( (parent != null) && (aOwnerView != null) ) {
 			parent.addView(aOwnerView, newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-			lparams = null;
 			lparams = (ViewGroup.MarginLayoutParams)aOwnerView.getLayoutParams();
             aOwnerView.setVisibility(android.view.View.VISIBLE);
 		}
@@ -178,7 +183,7 @@ public class jCommons {
 		lparamH = _h;
 		lparamW = _w;		
 	}
-	
+
 	public void setLParamWidth(int _w) {
 		lparamW = _w;
 		lparams.width  = lparamW;
@@ -190,18 +195,46 @@ public class jCommons {
 	}
 		
 	public int getLParamHeight() {
-		int r = lparamH;		
+		int r = lparamH;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getHeight();
-		}		
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;				
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		    			
+			r = aOwnerView.getMeasuredHeight();
+		}
+
+		//Fix the "match_parent" error with an "anchor" and 
+		// within the component a "half_parent" is set
+		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {
+			if( aOwnerView.getHeight() > 0 ) r = aOwnerView.getHeight();			
+		}
+		
 		return r;
 	}
 
 	public int getLParamWidth() {				
-		int r = lparamW;		
+		int r = lparamW;
+		
 		if (r == android.view.ViewGroup.LayoutParams.WRAP_CONTENT) {
-			r = aOwnerView.getWidth();		
-		}				
+			int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
+			
+			int widthMeasureSpec  = View.MeasureSpec.makeMeasureSpec(widthPixels, View.MeasureSpec.AT_MOST);
+		    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
+		   			
+			r = aOwnerView.getMeasuredWidth();		
+		}
+
+		//Fix the "match_parent" error with an "anchor" and 
+		// within the component a "half_parent" is set
+		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {  
+			if( aOwnerView.getWidth() > 0 ) r = aOwnerView.getWidth(); 
+		}
+		
 		return r;		
 	}	
 	
@@ -317,7 +350,7 @@ public class jCommons {
 		}  
 		
 		
- 		if (lparams instanceof CoordinatorLayout.LayoutParams) { 		
+ 		if (lparams instanceof CoordinatorLayout.LayoutParams) {
 			((CoordinatorLayout.LayoutParams)lparams).gravity = lgravity;
 			
 			/*
@@ -329,29 +362,31 @@ public class jCommons {
 			
 		}		
  		if (lparams instanceof DrawerLayout.LayoutParams) { 	
-			((DrawerLayout.LayoutParams)lparams).gravity = lgravity;
+ 			((DrawerLayout.LayoutParams)lparams).gravity = lgravity;
 		}		
  		
  		if (lparams instanceof CollapsingToolbarLayout.LayoutParams) {
-			((CollapsingToolbarLayout.LayoutParams)lparams).gravity = lgravity;						
+ 			((CollapsingToolbarLayout.LayoutParams)lparams).gravity = lgravity;
 		} 		
  		 		
  		if (lparams instanceof NestedScrollView.LayoutParams) {
-			((NestedScrollView.LayoutParams)lparams).gravity = lgravity;
+ 			((NestedScrollView.LayoutParams)lparams).gravity = lgravity;
 		}
  		
  		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
+ 			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
 		}
  		
  		
  		if (lparams instanceof TabLayout.LayoutParams) {
-			((TabLayout.LayoutParams)lparams).gravity = lgravity;
+ 			((TabLayout.LayoutParams)lparams).gravity = lgravity;
 		}
  						
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}		
+		if (lparams instanceof LinearLayout.LayoutParams) { //weight
+			((LinearLayout.LayoutParams)lparams).weight = lweight; //lweight = 1 <-- the trick!!
+			((LinearLayout.LayoutParams)lparams).gravity = lgravity; //lweight;
+		}
+
 		if (lparams instanceof AppBarLayout.LayoutParams) {
 			((AppBarLayout.LayoutParams)lparams).weight = lweight;
 		}
@@ -417,27 +452,27 @@ public class jCommons {
 	}
 
 	public void setCollapseMode(int _mode) {  //called on JNIPrompt
-		
-	      ViewGroup.LayoutParams params = aOwnerView.getLayoutParams();
-	      CollapsingToolbarLayout.LayoutParams newParams;
-	      	      
-	      if (params instanceof CollapsingToolbarLayout.LayoutParams) {
-	        newParams = (CollapsingToolbarLayout.LayoutParams)params;
-	      } else {
-	        newParams = new CollapsingToolbarLayout.LayoutParams(params);
-	      }
-	      
-		  int  collapsingMode = 0;
-		  switch(_mode) {
-		    case 0: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN; break;
-		    case 1: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX; break;//deafault - imageView
-		    case 2: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_OFF;break;
-		  }
-		  
+		ViewGroup.LayoutParams params;
+
+        if (lparams == null)  params = aOwnerView.getLayoutParams();
+        else params = lparams;
+
+		CollapsingToolbarLayout.LayoutParams newParams;
+		if (params instanceof CollapsingToolbarLayout.LayoutParams) {
+            newParams = (CollapsingToolbarLayout.LayoutParams)lparams;
+    	} else {
+	        newParams = new CollapsingToolbarLayout.LayoutParams(params); //bug???
+		}
+     	int collapsingMode = 0;
+    	switch(_mode) {
+			case 0: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_OFF;break;
+			case 1: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN; break;
+			case 2: collapsingMode = CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX; break;//default - imageView
+		}
 	      //CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX
-	      newParams.setCollapseMode(collapsingMode);  //COLLAPSE_MODE_OFF
-	      aOwnerView.setLayoutParams(newParams);
-	      aOwnerView.requestLayout();
+		newParams.setCollapseMode(collapsingMode);  //COLLAPSE_MODE_OFF
+		aOwnerView.setLayoutParams(newParams);
+		aOwnerView.requestLayout();
 	}
 	
 	
@@ -451,16 +486,18 @@ public class jCommons {
     
     
     public void setScrollFlag(int _collapsingScrollFlag) {   //called in OnJNIPrompt
-	       
-	      int scrflag = -1;
-	      
-	      ViewGroup.LayoutParams params1 = aOwnerView.getLayoutParams(); //to clear In order to clear flags params.setScrollFlags(0)
-	      AppBarLayout.LayoutParams newParams1;
-	      if (params1 instanceof AppBarLayout.LayoutParams) {
-	          newParams1 = (AppBarLayout.LayoutParams)params1;
+	    int scrflag = -1;
+        ViewGroup.LayoutParams params;
+        if (lparams == null)  params = aOwnerView.getLayoutParams();
+        else params = lparams;
+        //In order to clear flags params.setScrollFlags(0)
+	      AppBarLayout.LayoutParams newParams = null;
+	      if (params instanceof AppBarLayout.LayoutParams) {
+	          newParams = (AppBarLayout.LayoutParams)params;
 	      } else {
-	         newParams1 = new AppBarLayout.LayoutParams(params1);
-	      }                            	      
+	         newParams = new AppBarLayout.LayoutParams(params); //BUG ???
+	      }
+
 	      switch(_collapsingScrollFlag) {
 	        case 0: scrflag =  AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED; break;
 	        case 1: scrflag =  AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED; break;
@@ -469,10 +506,10 @@ public class jCommons {
 	        case 4: scrflag =  -1;	        
 	      }	 
 	      
-	      if (scrflag >= 0) { 
-	          newParams1.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | scrflag);  
-	          aOwnerView.setLayoutParams(newParams1);
-	          aOwnerView.requestLayout();
+	      if  (scrflag >= 0)  {
+	          newParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | scrflag);
+			  aOwnerView.setLayoutParams(newParams);
+			  aOwnerView.requestLayout();
 	      }
     }
     
@@ -532,57 +569,84 @@ public class jCommons {
 	}
 
 	public static boolean HasActionBar(Controls controls) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null) return true;
-		else return false;
+                if (controls.activity instanceof AppCompatActivity)
+                {
+  		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null) return true;
+		  else return false;
+                } else return false;
 	}
 
 	public static void SetActionBarSubTitle(Controls controls, String subtitle) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
-		  ((AppCompatActivity) controls.activity).getSupportActionBar().setSubtitle(subtitle);
+                if (controls.activity instanceof AppCompatActivity)
+                {
+		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
+		    ((AppCompatActivity) controls.activity).getSupportActionBar().setSubtitle(subtitle);
+                }
 	}
 
 	public static void SetActionBarTitle(Controls controls, String title) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+  		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().setTitle(title);
+                }
 	}
 
 	public static void ActionBarHide(Controls controls) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+  		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().hide();
+                }
 	}
 
 	public static void ActionBarShow(Controls controls) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().show();
+                }
 	}
 
 	public static void ActionBarShowTitle(Controls controls, boolean value) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayShowTitleEnabled(value);
+                }
 	}
 
 	public static void ActionBarShowLogo(Controls controls, boolean value) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+ 		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayUseLogoEnabled(value);
+                }
 	}
 
 	public static void ActionBarDisplayHomeAsUpEnabled(Controls controls, boolean value) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayHomeAsUpEnabled(value);
+                }
 	}
 
 	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
-			((AppCompatActivity) controls.activity).getSupportActionBar().setIcon(icon);;
+                if (controls.activity instanceof AppCompatActivity)
+                {
+		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
+			((AppCompatActivity) controls.activity).getSupportActionBar().setIcon(icon);
+                }
 
 	}
 
@@ -599,14 +663,17 @@ public class jCommons {
 	}
 
 	public static boolean ActionBarIsShowing(Controls controls) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			return actionBar.isShowing();
-		else return false;
+		  else return false;
+                } else return false;
 	}
 
-	public static boolean IsAppCompatProject() {
-		return true;
+	public static boolean IsAppCompatProject(Controls controls) {
+                if (controls.activity instanceof AppCompatActivity) return true;
+		  else return false;
 	}
-
 }
