@@ -182,10 +182,10 @@ type
      Procedure UpdateLayout; override;
      procedure Init(refApp: jApp);  override;
 
-     function GetTop: integer;    // By TR3E
-     function GetLeft: integer;   // By TR3E
-     function GetBottom: integer; // By TR3E
-     function GetRight: integer;  // By TR3E
+     function GetTop: integer;    // By ADiV
+     function GetLeft: integer;   // By ADiV
+     function GetBottom: integer; // By ADiV
+     function GetRight: integer;  // By ADiV
      function GetWidth: integer;  override;
      function GetHeight: integer; override;
 
@@ -615,7 +615,7 @@ type
     FNo: string;
     FParent     : jForm;
     FOnDialogYN : TOnClickYN;
-    FTitleAlign : TTextAlign; // by tr3e
+    FTitleAlign : TTextAlign; // by ADiV
   protected
     Procedure GenEvent_OnClick(Obj: TObject; Value: integer);
   public
@@ -628,8 +628,8 @@ type
     Procedure Show(titleText: string; msgText: string); overload;
     procedure ShowOK(titleText: string; msgText: string; _OkText: string);
 
-    Procedure SetFontSize( fontSize : integer ); // by tr3e
-    procedure SetTitleAlign( _titleAlign : TTextAlign ); // by tr3e
+    Procedure SetFontSize( fontSize : integer ); // by ADiV
+    procedure SetTitleAlign( _titleAlign : TTextAlign ); // by ADiV
 
     property Parent   : jForm     read FParent   write FParent;
   published
@@ -1019,7 +1019,7 @@ type
 
     FOnLostFocus: TOnEditLostFocus;
     FOnEnter  : TOnNotify;
-    FOnBackPressed : TOnNotify; // by tr3e
+    FOnBackPressed : TOnNotify; // by ADiV
     FOnChange : TOnChange;
     FOnChanged : TOnChange;
     FEditable: boolean;
@@ -1027,7 +1027,7 @@ type
     FTextAlignment: TTextAlignment;
     FCloseSoftInputOnEnter: boolean;
     FCapSentence: boolean;
-    FCaptureBackPressed: boolean; // by tr3e
+    FCaptureBackPressed: boolean; // by ADiV
 
     procedure AllCaps();
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -1059,7 +1059,7 @@ type
     procedure SetHintTextColor(Value: TARGBColorBridge);
 
     Procedure GenEvent_OnEnter (Obj: TObject);
-    Procedure GenEvent_OnBackPressed(Obj: TObject); // by tr3e
+    Procedure GenEvent_OnBackPressed(Obj: TObject); // by ADiV
     Procedure GenEvent_OnChange(Obj: TObject; txt: string; count : Integer);
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -1117,7 +1117,7 @@ type
     procedure RequestFocus();
     procedure SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
     procedure SetCapSentence(_capSentence: boolean);
-    procedure SetCaptureBackPressed(_capBackPressed: boolean); // by tr3e
+    procedure SetCaptureBackPressed(_capBackPressed: boolean); // by ADiV
 
     procedure LoadFromFile(_path: string; _filename: string);  overload;
     procedure LoadFromFile(_filename: string);  overload;
@@ -1159,12 +1159,12 @@ type
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property CloseSoftInputOnEnter: boolean read FCloseSoftInputOnEnter write SetCloseSoftInputOnEnter;
     property CapSentence: boolean read FCapSentence write SetCapSentence;
-    property CaptureBackPressed: boolean read FCaptureBackPressed write SetCaptureBackPressed; // by tr3e
+    property CaptureBackPressed: boolean read FCaptureBackPressed write SetCaptureBackPressed; // by ADiV
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     // Event
     property OnLostFocus: TOnEditLostFocus read FOnLostFocus write FOnLostFocus;
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
-    property OnBackPressed: TOnNotify  read FOnBackPressed write FOnBackPressed; // by tr3e
+    property OnBackPressed: TOnNotify  read FOnBackPressed write FOnBackPressed; // by ADiV
     property OnChange: TOnChange read FOnChange write FOnChange;
     property OnChanged: TOnChange read FOnChanged write FOnChanged;
     property OnClick : TOnNotify read FOnClick   write FOnClick;
@@ -1367,14 +1367,14 @@ type
     FFilePath: TFilePath;
     FImageScaleType: TImageScaleType;
 
-    //by tr3e
+    //by ADiV
     FMouches     : TMouches;
     FOnTouchDown : TOnTouchEvent;
     FOnTouchMove : TOnTouchEvent;
     FOnTouchUp   : TOnTouchEvent;
 
     FAlpha       : integer;
-    //end tr3e
+    //end ADiV
     FRoundedShape: boolean;
     FOnPopupItemSelected: TOnImageViewPopupItemSelected;
 
@@ -1394,7 +1394,7 @@ type
     procedure SetParamHeight(Value: TLayoutParams); override;
     Procedure GenEvent_OnClick(Obj: TObject);
 
-    //by tr3e
+    //by ADiV
     Procedure GenEvent_OnTouch(Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: Single);
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -1406,7 +1406,7 @@ type
     function GetHeight: integer;   override;
     function GetWidth: integer;     override;
 
-    procedure ClearLayout; //by TR3E
+    procedure ClearLayout; //by ADiV
 
     Procedure UpdateLayout(); override;
     procedure Init(refApp: jApp); override;
@@ -1421,12 +1421,12 @@ type
     function GetBitmapHeight: integer;
     function GetBitmapWidth: integer;
 
-    procedure SetAlpha( value: integer ); //by TR3E
-    procedure SetSaturation(Value: single); // by TR3E
+    procedure SetAlpha( value: integer ); //by ADiV
+    procedure SetSaturation(Value: single); // by ADiV
 
-    procedure SetScale(_scaleX: single; _scaleY: single); //by TR3E
-    procedure SetMatrix(_scaleX, _scaleY, _angle, _dx, _dy, _px, _py : single); //by TR3E
-    procedure SetMatrixScaleCenter( _scaleX, _scaleY : single ); //by TR3E
+    procedure SetScale(_scaleX: single; _scaleY: single); //by ADiV
+    procedure SetMatrix(_scaleX, _scaleY, _angle, _dx, _dy, _px, _py : single); //by ADiV
+    procedure SetMatrixScaleCenter( _scaleX, _scaleY : single ); //by ADiV
 
     procedure SetScaleType(_scaleType: TImageScaleType);
 
@@ -1503,14 +1503,14 @@ type
   jListView = class(jVisualControl)
   private
     FOnClickItem  : TOnClickCaptionItem;
-    FOnClickTextLeft : TOnClickCaptionItem; // by tr3e
-    FOnClickTextCenter : TOnClickCaptionItem; // by tr3e
-    FOnClickTextRight : TOnClickCaptionItem; // by tr3e
+    FOnClickTextLeft : TOnClickCaptionItem; // by ADiV
+    FOnClickTextCenter : TOnClickCaptionItem; // by ADiV
+    FOnClickTextRight : TOnClickCaptionItem; // by ADiV
     FOnClickWidgetItem: TOnClickWidgetItem;
-    FOnClickImageItem: TOnClickImageItem; // by tr3e
+    FOnClickImageItem: TOnClickImageItem; // by ADiV
     FOnLongClickItem:  TOnClickCaptionItem;
     FOnDrawItemTextColor: TOnDrawItemTextColor;
-    FOnDrawItemBackColor: TOnDrawItemBackColor; // by tr3e
+    FOnDrawItemBackColor: TOnDrawItemBackColor; // by ADiV
     FOnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor;
     FOnDrawItemWidgetText: TOnDrawItemWidgetText;
     FOnDrawItemBitmap: TOnDrawItemBitmap;
@@ -1523,7 +1523,7 @@ type
     FWidgetText   : string;
     FDelimiter    : string;
     FImageItem    : jBitmap;
-    FTextColorInfo: TARGBColorBridge; // by tr3e
+    FTextColorInfo: TARGBColorBridge; // by ADiV
     FTextDecorated: TTextDecorated;
     FTextSizeDecorated: TTextSizeDecorated;
     FItemLayout   : TItemLayout;
@@ -1535,17 +1535,17 @@ type
 
     FItemPaddingTop : integer;
     FItemPaddingBottom : integer;
-    FItemPaddingLeft: integer;  // by tr3e
-    FItemPaddingRight: integer; // by tr3e
+    FItemPaddingLeft: integer;  // by ADiV
+    FItemPaddingRight: integer; // by ADiV
 
-    FTextMarginLeft  : integer; // by tr3e
-    FTextMarginRight : integer; // by tr3e
-    FTextMarginInner : integer; // by tr3e
+    FTextMarginLeft  : integer; // by ADiV
+    FTextMarginRight : integer; // by ADiV
+    FTextMarginInner : integer; // by ADiV
 
-    FTextWordWrap : boolean; // by tr3e
-    FEnableOnClickTextLeft : boolean; // by tr3e
-    FEnableOnClickTextCenter : boolean; // by tr3e
-    FEnableOnClickTextRight : boolean; // by tr3e
+    FTextWordWrap : boolean; // by ADiV
+    FEnableOnClickTextLeft : boolean; // by ADiV
+    FEnableOnClickTextCenter : boolean; // by ADiV
+    FEnableOnClickTextRight : boolean; // by ADiV
 
     FWidgetTextColor: TARGBColorBridge;
 
@@ -1567,17 +1567,17 @@ type
 
   protected
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
-    procedure GenEvent_OnClickImageItem(Obj: TObject; index: integer ); // by tr3e
+    procedure GenEvent_OnClickImageItem(Obj: TObject; index: integer ); // by ADiV
 
     procedure GenEvent_OnClickCaptionItem(Obj: TObject; index: integer; caption: string);
-    procedure GenEvent_OnClickTextLeft(Obj: TObject; index: integer; caption: string); // by tr3e
-    procedure GenEvent_OnClickTextCenter(Obj: TObject; index: integer; caption: string); // by tr3e
-    procedure GenEvent_OnClickTextRight(Obj: TObject; index: integer; caption: string); // by tr3e
+    procedure GenEvent_OnClickTextLeft(Obj: TObject; index: integer; caption: string); // by ADiV
+    procedure GenEvent_OnClickTextCenter(Obj: TObject; index: integer; caption: string); // by ADiV
+    procedure GenEvent_OnClickTextRight(Obj: TObject; index: integer; caption: string); // by ADiV
 
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
 
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
-    procedure GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword); // by tr3e
+    procedure GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword); // by ADiV
 
     procedure GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnDrawItemWidgetText(Obj: TObject; index: integer; caption: string;  out newtext: string);
@@ -1610,11 +1610,11 @@ type
                   fontSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
     Procedure Delete(index: Integer);
     function  GetItemText(index: integer): string;
-    procedure SetItemText( txt: string; index: integer); // by tr3e
+    procedure SetItemText( txt: string; index: integer); // by ADiV
     Procedure Clear;
     Procedure SetFontColorByIndex(Value : TARGBColorBridge; index: integer);
     Procedure SetFontSizeByIndex(Value : DWord; index: integer  );
-    function  GetFontSizeByIndex(index: integer  ) : integer; // by tr3e
+    function  GetFontSizeByIndex(index: integer  ) : integer; // by ADiV
 
     procedure SetWidgetByIndex(Value: TWidgetItem; index: integer); overload;
     procedure SetWidgetByIndex(Value: TWidgetItem; txt: string; index: integer); overload;
@@ -1624,17 +1624,17 @@ type
 
     procedure SetImageByIndex(imgResIdentifier: string; index: integer);  overload; // ..res/drawable
 
-    procedure SetTextColorInfo(_color: TARGBColorBridge); // by tr3e
-    procedure SetTextColorInfoByIndex(Value: TARGBColorBridge; index: integer); // by tr3e
+    procedure SetTextColorInfo(_color: TARGBColorBridge); // by ADiV
+    procedure SetTextColorInfoByIndex(Value: TARGBColorBridge; index: integer); // by ADiV
 
     procedure SetTextDecoratedByIndex(Value: TTextDecorated; index: integer);
     procedure SetTextSizeDecoratedByIndex(value: TTextSizeDecorated; index: integer);
     procedure SetTextAlignByIndex(Value: TTextAlign; index: integer);
-    procedure SetTextPositionByIndex(Value: TTextPosition; index: integer); // by tr3e
-    procedure SetTextWordWrap(_value: boolean); // by tr3e
-    procedure SetEnableOnClickTextLeft(_value: boolean); // by tr3e
-    procedure SetEnableOnClickTextCenter(_value: boolean); // by tr3e
-    procedure SetEnableOnClickTextRight(_value: boolean); // by tr3e
+    procedure SetTextPositionByIndex(Value: TTextPosition; index: integer); // by ADiV
+    procedure SetTextWordWrap(_value: boolean); // by ADiV
+    procedure SetEnableOnClickTextLeft(_value: boolean); // by ADiV
+    procedure SetEnableOnClickTextCenter(_value: boolean); // by ADiV
+    procedure SetEnableOnClickTextRight(_value: boolean); // by ADiV
 
     procedure SetLayoutByIndex(Value: TItemLayout; index: integer);
 
@@ -1647,8 +1647,9 @@ type
     procedure DispatchOnDrawItemBitmap(_value: boolean);
     function GetWidgetText(_index: integer): string;
 
+    procedure SetWidgetOnTouch( _ontouch : boolean ); // by ADiV
     procedure SetWidgetCheck(_value: boolean; _index: integer);
-    function  GetWidgetCheck(_index: integer) : boolean; //by tr3e
+    function  GetWidgetCheck(_index: integer) : boolean; //by ADiV
     procedure SetItemTagString(_tagString: string; _index: integer);
     function GetItemTagString(_index: integer): string;
     procedure SetImageByResIdentifier(_imageResIdentifier: string);
@@ -1662,12 +1663,12 @@ type
     procedure SetAllPartsOnDrawItemTextColor(_value: boolean);
     procedure SetItemPaddingTop(_ItemPaddingTop: integer);
     procedure SetItemPaddingBottom(_itemPaddingBottom: integer);
-    procedure SetItemPaddingLeft(_itemPaddingLeft: integer); // by tr3e
-    procedure SetItemPaddingRight(_itemPaddingRight: integer); // by tr3e
-    procedure SetTextMarginLeft(_left: integer); // by tr3e
-    procedure SetTextMarginRight(_right: integer); // by tr3e
-    procedure SetTextMarginInner(_inner: integer); // by tr3e
-    procedure SetWidgetImageSide(_side: integer); // by tr3e
+    procedure SetItemPaddingLeft(_itemPaddingLeft: integer); // by ADiV
+    procedure SetItemPaddingRight(_itemPaddingRight: integer); // by ADiV
+    procedure SetTextMarginLeft(_left: integer); // by ADiV
+    procedure SetTextMarginRight(_right: integer); // by ADiV
+    procedure SetTextMarginInner(_inner: integer); // by ADiV
+    procedure SetWidgetImageSide(_side: integer); // by ADiV
     procedure SetWidgetTextColor(_textcolor: TARGBColorBridge);
     procedure SetDispatchOnDrawItemWidgetTextColor(_value: boolean);
     procedure SetDispatchOnDrawItemWidgetText(_value: boolean);
@@ -1678,9 +1679,9 @@ type
     function SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
     procedure SetSelection(_index: integer);
     procedure SmoothScrollToPosition(_index: integer);
-    procedure SetDrawAlphaBackground(_alpha: integer); // by tr3e
-    procedure ClearChecked(); // by tr3e
-    function  GetItemsChecked(): integer; // by tr3e
+    procedure SetDrawAlphaBackground(_alpha: integer); // by ADiV
+    procedure ClearChecked(); // by ADiV
+    function  GetItemsChecked(): integer; // by ADiV
     procedure SetItemChecked(_index: integer; _value: boolean);
     function GetCheckedItemPosition(): integer;
     procedure SetViewParent(Value: jObject);  override;
@@ -1713,16 +1714,16 @@ type
     property WidgetText: string read FWidgetText write FWidgetText;
     property ImageItem: jBitmap read FImageItem write SetImage;
     property Delimiter: string read FDelimiter write FDelimiter;
-    property TextColorInfo: TARGBColorBridge read FTextColorInfo write SetTextColorInfo; // by tr3e
+    property TextColorInfo: TARGBColorBridge read FTextColorInfo write SetTextColorInfo; // by ADiV
     property TextDecorated: TTextDecorated read FTextDecorated write FTextDecorated;
     property ItemLayout: TItemLayout read FItemLayout write FItemLayout;
     property TextSizeDecorated: TTextSizeDecorated read FTextSizeDecorated write FTextSizeDecorated;
     property TextAlign: TTextAlign read FTextAlign write FTextAlign;
-    property TextPosition: TTextPosition read FTextPosition write FTextPosition; // by tr3e
-    property TextWordWrap: boolean read FTextWordWrap write SetTextWordWrap; // by tr3e
-    property EnableOnClickTextLeft: boolean read FEnableOnClickTextLeft write SetEnableOnClickTextLeft; // by tr3e
-    property EnableOnClickTextCenter: boolean read FEnableOnClickTextCenter write SetEnableOnClickTextCenter; // by tr3e
-    property EnableOnClickTextRight: boolean read FEnableOnClickTextRight write SetEnableOnClickTextRight; // by tr3e
+    property TextPosition: TTextPosition read FTextPosition write FTextPosition; // by ADiV
+    property TextWordWrap: boolean read FTextWordWrap write SetTextWordWrap; // by ADiV
+    property EnableOnClickTextLeft: boolean read FEnableOnClickTextLeft write SetEnableOnClickTextLeft; // by ADiV
+    property EnableOnClickTextCenter: boolean read FEnableOnClickTextCenter write SetEnableOnClickTextCenter; // by ADiV
+    property EnableOnClickTextRight: boolean read FEnableOnClickTextRight write SetEnableOnClickTextRight; // by ADiV
     property HighLightSelectedItemColor: TARGBColorBridge read FHighLightSelectedItemColor write SetHighLightSelectedItemColor;
     property FontSizeUnit: TFontSizeUnit read FFontSizeUnit write SetFontSizeUnit;
     property FontFace: TFontFace read FFontFace write SetFontFace default ffNormal;
@@ -1730,26 +1731,26 @@ type
     property ImageItemIdentifier: string read FImageItemIdentifier write SetImageByResIdentifier;
     property ItemPaddingTop: integer read FItemPaddingTop write SetItemPaddingTop;
     property ItemPaddingBottom: integer read FItemPaddingBottom write SetItemPaddingBottom;
-    property ItemPaddingLeft: integer read FItemPaddingLeft write SetItemPaddingLeft; // by tr3e
+    property ItemPaddingLeft: integer read FItemPaddingLeft write SetItemPaddingLeft; // by ADiV
     property ItemPaddingRight: integer read FItemPaddingRight write SetItemPaddingRight;
 
-    property TextMarginLeft: integer read FTextMarginLeft write SetTextMarginLeft; // by tr3e
-    property TextMarginRight: integer read FTextMarginRight write SetTextMarginRight; // by tr3e
-    property TextMarginInner: integer read FTextMarginInner write SetTextMarginInner; // by tr3e
+    property TextMarginLeft: integer read FTextMarginLeft write SetTextMarginLeft; // by ADiV
+    property TextMarginRight: integer read FTextMarginRight write SetTextMarginRight; // by ADiV
+    property TextMarginInner: integer read FTextMarginInner write SetTextMarginInner; // by ADiV
     
     property WidgetTextColor: TARGBColorBridge read FWidgetTextColor write SetWidgetTextColor;
 
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
-    property OnClickItemTextLeft : TOnClickCaptionItem read FOnClickTextLeft write FOnClickTextLeft; // by tr3e
-    property OnClickItemTextCenter : TOnClickCaptionItem read FOnClickTextCenter write FOnClickTextCenter; // by tr3e
-    property OnClickItemTextRight : TOnClickCaptionItem read FOnClickTextRight write FOnClickTextRight; // by tr3e
+    property OnClickItemTextLeft : TOnClickCaptionItem read FOnClickTextLeft write FOnClickTextLeft; // by ADiV
+    property OnClickItemTextCenter : TOnClickCaptionItem read FOnClickTextCenter write FOnClickTextCenter; // by ADiV
+    property OnClickItemTextRight : TOnClickCaptionItem read FOnClickTextRight write FOnClickTextRight; // by ADiV
     
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
     property OnClickImageItem: TOnClickImageItem read FOnClickImageItem write FOnClickImageItem;
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
-    property OnDrawItemBackColor: TOnDrawItemBackColor read FOnDrawItemBackColor write FOnDrawItemBackColor; // by tr3e
+    property OnDrawItemBackColor: TOnDrawItemBackColor read FOnDrawItemBackColor write FOnDrawItemBackColor; // by ADiV
     property OnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor read FOnDrawItemWidgetTextColor write FOnDrawItemWidgetTextColor;
     property OnDrawItemWidgetText: TOnDrawItemWidgetText read FOnDrawItemWidgetText write FOnDrawItemWidgetText;
     property OnDrawItemBitmap: TOnDrawItemBitmap  read FOnDrawItemBitmap write FOnDrawItemBitmap;
@@ -2055,7 +2056,7 @@ type
     procedure DrawTextAligned(_text: string; _left, _top, _right, _bottom: single; _alignHorizontal: TTextAlignHorizontal; _alignVertical: TTextAlignVertical);
 
     function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;overload;
-    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject; overload; //by tr3e
+    function CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject; overload; //by ADiV
     function GetBitmap(): jObject;
     procedure SetBitmap(_bitmap: jObject); overload;
     procedure SetBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
@@ -2067,7 +2068,7 @@ type
     procedure DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
     procedure DrawRect(var _box: TDynArrayOfSingle); overload;
     procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
-    procedure Clear( _color : TARGBColorBridge ); overload; //by tr3e
+    procedure Clear( _color : TARGBColorBridge ); overload; //by ADiV
     procedure Clear(_color: integer); overload;
     function GetJInstance(): jObject;
     procedure SaveBitmapJPG(_fullPathFileName: string);
@@ -2146,7 +2147,7 @@ type
 
   jImageBtn = class(jVisualControl)
   private
-    FOnDown : TOnNotify; // by TR3E
+    FOnDown : TOnNotify; // by ADiV
     FImageUpName: string;
     FImageDownName: string;
     FImageUpIndex: TImageListIndex;
@@ -2163,8 +2164,8 @@ type
     procedure SetImageDownByIndex(Value: integer);
     procedure SetImageUpByIndex(Value: integer);
 
-    procedure SetImageUpIndex(Value: TImageListIndex); // by TR3E
-    procedure SetImageDownIndex(Value: TImageListIndex); // by TR3E
+    procedure SetImageUpIndex(Value: TImageListIndex); // by ADiV
+    procedure SetImageDownIndex(Value: TImageListIndex); // by ADiV
 
     procedure SetImageDownByRes(imgResIdentifief: string); //  ../res/drawable
     procedure SetImageUpByRes(imgResIdentifief: string);   //  ../res/drawable
@@ -2181,7 +2182,7 @@ type
     procedure ClearLayout;
     Procedure UpdateLayout(); override;
 
-    procedure GenEvent_OnDown(Obj: TObject); // by TR3E
+    procedure GenEvent_OnDown(Obj: TObject); // by ADiV
     
     procedure Init(refApp: jApp); override;
     procedure SetLGravity(_value: TLayoutGravity);
@@ -2189,18 +2190,18 @@ type
     procedure RemoveFromViewParent;  override;
     procedure SetSleepDown(_sleepMiliSeconds: integer);
 
-    procedure SetImageDownScale(Value: single); // by TR3E
-    procedure SetAlpha( Value : integer ); // by TR3E
-    procedure SetSaturation(Value: single); // by TR3E
+    procedure SetImageDownScale(Value: single); // by ADiV
+    procedure SetAlpha( Value : integer ); // by ADiV
+    procedure SetSaturation(Value: single); // by ADiV
 
   published
-    property OnDown : TOnNotify read FOnDown write FOnDown; // by TR3E
+    property OnDown : TOnNotify read FOnDown write FOnDown; // by ADiV
 
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
     property Images    : jImageList read FImageList write SetImages;
-    property IndexImageUp: TImageListIndex read FImageUpIndex write SetImageUpIndex; // Fix by TR3E
-    property IndexImageDown: TImageListIndex read FImageDownIndex write SetImageDownIndex; // Fix by TR3E
+    property IndexImageUp: TImageListIndex read FImageUpIndex write SetImageUpIndex; // Fix by ADiV
+    property IndexImageDown: TImageListIndex read FImageDownIndex write SetImageDownIndex; // Fix by ADiV
 
     property ImageUpIdentifier: string read FImageUpName write SetImageUpByRes;
     property ImageDownIdentifier: string read FImageDownName write SetImageDownByRes;
@@ -2308,16 +2309,16 @@ type
   //by jmpessoa
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);  overload;
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);  overload; //deprecated
-  //by tr3e
-  procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer); //by tr3e
-  Procedure Java_Event_pOnClickItemTextLeft(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by tr3e
-  Procedure Java_Event_pOnClickItemTextCenter(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by tr3e
-  Procedure Java_Event_pOnClickItemTextRight(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by tr3e
+  //by ADiV
+  procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer); //by ADiV
+  Procedure Java_Event_pOnClickItemTextLeft(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by ADiV
+  Procedure Java_Event_pOnClickItemTextCenter(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by ADiV
+  Procedure Java_Event_pOnClickItemTextRight(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString); //by ADiV
 
   Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
-  function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt; // by tr3e
+  function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt; // by ADiV
   function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function Java_Event_pOnListViewDrawItemWidgetText(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JString;
   function  Java_Event_pOnListViewDrawItemBitmap(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JObject;
@@ -2334,7 +2335,7 @@ type
   Procedure Java_Event_pOnChanged(env: PJNIEnv; this: jobject; Obj: TObject; txt: JString; count : integer);
 
   Procedure Java_Event_pOnEnter                  (env: PJNIEnv; this: jobject; Obj: TObject);
-  Procedure Java_Event_pOnBackPressed            (env: PJNIEnv; this: jobject; Obj: TObject); // by tr3e
+  Procedure Java_Event_pOnBackPressed            (env: PJNIEnv; this: jobject; Obj: TObject); // by ADiV
   Procedure Java_Event_pOnTimer                  (env: PJNIEnv; this: jobject; Obj: TObject);
   Procedure Java_Event_pOnTouch                  (env: PJNIEnv; this: jobject; Obj: TObject;act,cnt: integer; x1,y1,x2,y2: single);
 
@@ -3073,7 +3074,7 @@ begin
   end;
 end;
 
-// by tr3e
+// by ADiV
 procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer);
 begin
   gApp.Jni.jEnv:= env;
@@ -3194,7 +3195,7 @@ begin
   end;
 end;
 
-// by tr3e
+// by ADiV
 Procedure Java_Event_pOnClickItemTextLeft(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
 var
    pasCaption: string;
@@ -3216,7 +3217,7 @@ begin
   end;
 end;
 
-// by tr3e
+// by ADiV
 Procedure Java_Event_pOnClickItemTextCenter(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
 var
    pasCaption: string;
@@ -3238,7 +3239,7 @@ begin
   end;
 end;
 
-// by tr3e
+// by ADiV
 Procedure Java_Event_pOnClickItemTextRight(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
 var
    pasCaption: string;
@@ -3351,7 +3352,7 @@ begin
   Result:= Get_jString(outText);
 end;
 
-//by tr3e
+//by ADiV
 function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt;
 var
   outColor: dword;
@@ -3518,7 +3519,7 @@ begin
 
 end;
 
-// by tr3e
+// by ADiV
 Procedure Java_Event_pOnBackPressed(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
@@ -4876,7 +4877,7 @@ begin
   if Assigned(FOnEnter) then FOnEnter(Obj);
 end;
 
-// by tr3e
+// by ADiV
 Procedure jEditText.GenEvent_OnBackPressed(Obj: TObject);
 begin
   if Assigned(FOnBackPressed) then FOnBackPressed(Obj);
@@ -5010,7 +5011,7 @@ begin
      jEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
 end;
 
-// by TR3E
+// by ADiV
 procedure jEditText.SetSelection(_value: integer);
 begin
   //in designing component state: set value here...
@@ -5136,7 +5137,7 @@ begin
   SetInputTypeEx(FInputTypeEx);
 end;
 
-// by tr3e
+// by ADiV
 procedure jEditText.SetCaptureBackPressed(_capBackPressed: boolean);
 begin
   //in designing component state: set value here...
@@ -6713,7 +6714,7 @@ begin
      jni_proc_ff(FjEnv, FjObject, 'SetScale', _scaleX ,_scaleY);
 end;
 
-// by TR3E
+// by ADiV
 procedure jImageView.SetAlpha( value: integer );
 begin
  FAlpha := value;
@@ -6723,7 +6724,7 @@ begin
  jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
 end;
 
-// by TR3E
+// by ADiV
 procedure jImageView.SetSaturation(Value: single);
 begin
 
@@ -7970,19 +7971,19 @@ begin
     if FItemPaddingBottom <> 10 then
       jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
 
-    if FItemPaddingLeft <> 10 then // by tr3e
+    if FItemPaddingLeft <> 10 then // by ADiV
       jListView_SetItemPaddingLeft(FjEnv, FjObject, FItemPaddingLeft);
 
     if FItemPaddingRight <> 10 then
       jListView_SetItemPaddingRight(FjEnv, FjObject, FItemPaddingRight);
 
-    if FTextMarginLeft <> 10 then // by tr3e
+    if FTextMarginLeft <> 10 then // by ADiV
       jListView_SetTextMarginLeft(FjEnv, FjObject, FTextMarginLeft);
 
-    if FTextMarginRight <> 10 then // by tr3e
+    if FTextMarginRight <> 10 then // by ADiV
       jListView_SetTextMarginRight(FjEnv, FjObject, FTextMarginRight);
 
-    if FTextMarginInner <> 10 then // by tr3e
+    if FTextMarginInner <> 10 then // by ADiV
       jListView_SetTextMarginInner(FjEnv, FjObject, FTextMarginInner);
 
     for i:= 0 to FItems.Count-1 do
@@ -8028,19 +8029,19 @@ begin
     if FItemPaddingBottom <> 10 then
       jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
 
-    if FItemPaddingLeft <> 10 then // by tr3e
+    if FItemPaddingLeft <> 10 then // by ADiV
       jListView_SetItemPaddingLeft(FjEnv, FjObject, FItemPaddingLeft);
 
     if FItemPaddingRight <> 10 then
       jListView_SetItemPaddingRight(FjEnv, FjObject, FItemPaddingRight);
 
-    if FTextMarginLeft <> 10 then // by tr3e
+    if FTextMarginLeft <> 10 then // by ADiV
       jListView_SetTextMarginLeft(FjEnv, FjObject, FTextMarginLeft);
 
-    if FTextMarginRight <> 10 then // by tr3e
+    if FTextMarginRight <> 10 then // by ADiV
       jListView_SetTextMarginRight(FjEnv, FjObject, FTextMarginRight);
 
-    if FTextMarginInner <> 10 then // by tr3e
+    if FTextMarginInner <> 10 then // by ADiV
       jListView_SetTextMarginInner(FjEnv, FjObject, FTextMarginInner);
 
     for i:= 0 to FItems.Count-1 do
@@ -8172,21 +8173,21 @@ begin
     jListView_setTextAlign(FjEnv, FjObject , ord(Value), index);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetTextPositionByIndex(Value: TTextPosition; index: integer);
 begin
   if FInitialized then
     jListView_setTextPosition(FjEnv, FjObject , ord(Value), index);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.ClearChecked;
 begin
   if FInitialized then
     jListView_ClearChecked(FjEnv, FjObject );
 end;
 
-// by tr3e
+// by ADiV
 function jListView.GetItemsChecked(): integer;
 begin
   Result:= 0;
@@ -8232,7 +8233,7 @@ Procedure jListView.Refresh;
 begin
   if FInitialized then
   begin
-     jListView_Refresh(FjEnv, FjObject ); // by tr3e
+     jListView_Refresh(FjEnv, FjObject ); // by ADiV
      //View_Invalidate(FjEnv, FjObject );
   end;
 end;
@@ -8266,14 +8267,14 @@ begin
      jListView_setTextSize2(FjEnv, FjObject , Value, index);
 end;
 
-// by tr3e
+// by ADiV
 function jListView.GetFontSizeByIndex(index: Integer): integer;
 begin
   if FInitialized then
     Result:= jListView_GetFontSizeByIndex(FjEnv, FjObject, index);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetDrawAlphaBackground(_alpha: integer);
 begin
   //in designing component state: set value here...
@@ -8465,19 +8466,19 @@ begin
   if Assigned(FOnClickItem) then FOnClickItem(Obj,index, caption);
 end;
 
-//by tr3e
+//by ADiV
 procedure jListView.GenEvent_OnClickTextLeft(Obj: TObject; index: integer;  caption: string);
 begin
   if Assigned(FOnClickTextLeft) then FOnClickTextLeft(Obj,index, caption);
 end;
 
-//by tr3e
+//by ADiV
 procedure jListView.GenEvent_OnClickTextCenter(Obj: TObject; index: integer;  caption: string);
 begin
   if Assigned(FOnClickTextCenter) then FOnClickTextCenter(Obj,index, caption);
 end;
 
-//by tr3e
+//by ADiV
 procedure jListView.GenEvent_OnClickTextRight(Obj: TObject; index: integer;  caption: string);
 begin
   if Assigned(FOnClickTextRight) then FOnClickTextRight(Obj,index, caption);
@@ -8503,7 +8504,7 @@ begin
   if Assigned(FOnClickWidgetItem) then FOnClickWidgetItem(Obj,index,checked);
 end;
 
-//by tr3e
+//by ADiV
 procedure jListView.GenEvent_OnClickImageItem(Obj: TObject; index: integer);
 begin
   if Assigned(FOnClickImageItem) then FOnClickImageItem(Obj,index);
@@ -8527,7 +8528,7 @@ begin
       color:= GetARGB(FCustomColor, outColor);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword);
 var
   outColor: TARGBColorBridge;
@@ -8579,7 +8580,7 @@ begin
   if Assigned(FOnScrollStateChanged) then FOnScrollStateChanged(Obj, firstVisibleItem, visibleItemCount, totalItemCount, lastItemReached);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetTextColorInfo(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
@@ -8588,7 +8589,7 @@ begin
      jni_proc_i(FjEnv, FjObject, 'SetTextColorInfo', GetARGB(FCustomColor, _color));
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetTextColorInfoByIndex(Value: TARGBColorBridge; index: integer);
 begin
   //FFontColor:= Value;
@@ -8798,7 +8799,7 @@ begin
      jListView_SetItemPaddingBottom(FjEnv, FjObject, _itemPaddingBottom);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetItemPaddingLeft(_itemPaddingLeft: integer);
 begin
   //in designing component state: set value here...
@@ -8854,7 +8855,7 @@ begin
      jListView_SetWordWrap(FjEnv, FjObject, _value);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetEnableOnClickTextLeft(_value: boolean);
 begin
   //in designing component state: set value here...
@@ -8863,7 +8864,7 @@ begin
      jListView_SetEnableOnClickTextLeft(FjEnv, FjObject, _value);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetEnableOnClickTextCenter(_value: boolean);
 begin
   //in designing component state: set value here...
@@ -8872,7 +8873,7 @@ begin
      jListView_SetEnableOnClickTextCenter(FjEnv, FjObject, _value);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetEnableOnClickTextRight(_value: boolean);
 begin
   //in designing component state: set value here...
@@ -8881,11 +8882,19 @@ begin
      jListView_SetEnableOnClickTextRight(FjEnv, FjObject, _value);
 end;
 
-// by tr3e
+// by ADiV
 procedure jListView.SetItemText(txt: string; index: integer);
 begin
   if FInitialized then
      jListView_SetItemText(FjEnv, FjObject , txt, index);
+end;
+
+// by ADiV
+procedure jListView.SetWidgetOnTouch( _ontouch : boolean );
+begin
+ //in designing component state: result value here...
+ if FInitialized then
+  jni_proc_z(FjEnv, FjObject, 'SetWidgetOnTouch', _ontouch);
 end;
 
 procedure jListView.SetWidgetTextColor(_textcolor: TARGBColorBridge);
@@ -11588,7 +11597,7 @@ begin
      jDialogYN_ShowOK(FjEnv, FjObject, titleText ,msgText ,_OkText);
 end;
 
-// by tr3e
+// by ADiV
 Procedure jDialogYN.SetFontSize( fontSize : integer );
 begin
   if FInitialized then
@@ -11721,7 +11730,7 @@ end;
 // jImageBtn
 //------------------------------------------------------------------------------
 
-// Event : Java -> Pascal by TR3E
+// Event : Java -> Pascal by ADiV
 procedure jImageBtn.GenEvent_OnDown(Obj: TObject);
 begin
   if Assigned(FOnDown) then FOnDown(Obj);
@@ -11865,7 +11874,7 @@ begin
    jImageBtn_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
-// by TR3E
+// by ADiV
 procedure jImageBtn.SetAlpha(Value: integer);
 begin
   FAlpha := value;
@@ -11875,7 +11884,7 @@ begin
   jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
 end;
 
-// by TR3E
+// by ADiV
 procedure jImageBtn.SetSaturation(Value: single);
 begin
 
@@ -11905,7 +11914,7 @@ begin
      View_Invalidate(FjEnv, FjObject );
 end;
 
-// by TR3E
+// by ADiV
 Procedure jImageBtn.SetImageDownScale(Value: single);
 begin
 
@@ -11971,7 +11980,7 @@ begin
     jImageBtn_setButtonUpByRes(FjEnv, FjObject , imgResIdentifief);
 end;
 
-// by TR3E
+// by ADiV
 procedure jImageBtn.SetImageUpIndex(Value: TImageListIndex);
 begin
 
@@ -11984,7 +11993,7 @@ begin
 
 end;
 
-// by TR3E
+// by ADiV
 procedure jImageBtn.SetImageDownIndex(Value: TImageListIndex);
 begin
 
@@ -13102,7 +13111,7 @@ begin
    end;
 end;
 
-// By TR3E
+// By ADiV
 function jPanel.GetTop: integer;
 begin
   Result:= 0;
@@ -13111,7 +13120,7 @@ begin
   Result:= jni_func_out_i(FjEnv, FjObject, 'getTop' );
 end;
 
-// By TR3E
+// By ADiV
 function jPanel.GetLeft: integer;
 begin
   Result:= 0;
@@ -13120,7 +13129,7 @@ begin
   Result:= jni_func_out_i(FjEnv, FjObject, 'getLeft' );
 end;
 
-// By TR3E
+// By ADiV
 function jPanel.GetBottom: integer;
 begin
   Result:= 0;
@@ -13129,7 +13138,7 @@ begin
   Result:= jni_func_out_i(FjEnv, FjObject, 'getBottom' );
 end;
 
-// By TR3E
+// By ADiV
 function jPanel.GetRight: integer;
 begin
   Result:= 0;

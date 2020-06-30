@@ -23,7 +23,6 @@ type
     jTextView1: jTextView;
     jTextView2: jTextView;
     jTextView3: jTextView;
-    procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jsRecyclerView1ItemClick(Sender: TObject; itemPosition: integer);
     procedure jsRecyclerView1ItemWidgetClick(Sender: TObject;
@@ -83,11 +82,6 @@ begin
    .Switch: OFF:ON@0 --> set slide text ("OFF" or "ON" by state) and:  0=unchecked/Off  --initial state
    .Switch: Sound@1 --> set caption=Sound  and: 1=checked/On    --initial state
   *)
-
-end;
-
-procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
-begin
 
 end;
 
