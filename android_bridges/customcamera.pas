@@ -75,7 +75,7 @@ jCustomCamera = class(jVisualControl)
     procedure SaveToMediaStore(_title: string; _description: string);
     function GetImage(_width: integer; _height: integer): jObject; overload;
     function GetImage(): jObject; overload;
-
+    procedure SetFlashlight(_flashlightMode: boolean);
 
  published
     property AutoFocusOnShot: boolean read FAutoFocusOnShot write SetAutoFocusOnShot;
@@ -117,7 +117,7 @@ procedure jCustomCamera_surfaceUpdate(env: PJNIEnv; _jcustomcamera: JObject);
 
 procedure jCustomCamera_AutoFocus(env: PJNIEnv; _jcustomcamera: JObject); // by tr3e
 procedure jCustomCamera_SetAutoFocusOnShot(env: PJNIEnv; _jcustomcamera: JObject; _value: boolean); // by tr3e
-
+procedure jCustomCamera_SetFlashlight(env: PJNIEnv; _jcustomcamera: JObject; _flashlightMode: boolean);
 implementation
 
 {---------  jCustomCamera  --------------}
@@ -466,6 +466,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCustomCamera_GetImage(FjEnv, FjObject);
+end;
+
+procedure jCustomCamera.SetFlashlight(_flashlightMode: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCustomCamera_SetFlashlight(FjEnv, FjObject, _flashlightMode);
 end;
 
 {-------- jCustomCamera_JNI_Bridge ----------}
@@ -847,5 +854,20 @@ begin
   Result:= env^.CallObjectMethod(env, _jcustomcamera, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jCustomCamera_SetFlashlight(env: PJNIEnv; _jcustomcamera: JObject; _flashlightMode: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_flashlightMode);
+  jCls:= env^.GetObjectClass(env, _jcustomcamera);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFlashlight', '(Z)V');
+  env^.CallVoidMethodA(env, _jcustomcamera, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 
 end.

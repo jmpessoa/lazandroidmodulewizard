@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -56,6 +58,9 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
     private boolean mFlashModeOn = false;
     private boolean mAutoFocusOnShot = false;
     private boolean mOnlyAutoFocus = false;
+
+    //flag to detect flash is on or off
+    private boolean isLighOn = false;
 
     public jCustomCamera(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
         super(_ctrls.activity);
@@ -503,6 +508,7 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
      };
     
     // by tr3e
+    @SuppressLint("WrongThread")
     private void saveBitmapToJpg(Bitmap bitmap, String bmpPath) {
         
            OutputStream outStream = null;
@@ -594,8 +600,35 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
         return decodeSampleImage(fileBmp, _width, _height);
     }
 
+
     public Bitmap GetImage() {
         return mPicture;
+    }
+
+    //https://mkyong.com/android/how-to-turn-onoff-camera-ledflashlight-in-android/
+    public void SetFlashlight(boolean _flashlightMode){
+
+        if (this.camera != null) {
+
+                Camera.Parameters p = camera.getParameters();
+
+                if (_flashlightMode) {
+                    if (!isLighOn) {
+                        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                        camera.setParameters(p);
+                        camera.startPreview();
+                        isLighOn = true;
+                    }
+                }
+                else  {
+                    if (isLighOn) {
+                        p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                        camera.setParameters(p);
+                        camera.startPreview();
+                        isLighOn = false;
+                    }
+            }
+        }
     }
 
 }
