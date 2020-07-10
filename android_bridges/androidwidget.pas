@@ -1588,6 +1588,10 @@ end;
   Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
   function SplitStr(var theString: string; delimiter: string): string;
   function GetARGB(customColor: Dword; colbrColor: TARGBColorBridge): DWord;
+  function GetARGBJava(customColor: DWord; colbrColor: TARGBColorBridge): integer; // By ADiV
+  function ARGBToCustomColor( conv_clr: TColorRGBA ): DWORD;  overload;  // By ADiV
+  function ARGBToCustomColor( _a, _r, _g, _b : byte ): DWORD; overload;  // By ADiV
+  function CustomColorToARGB( cColor : DWORD ): TColorRGBA;  // By ADiV
   function GetProgressBarStyle(cjProgressBarStyle: TProgressBarStyle ): DWord;
   function GetScrollBarStyle(scrlBarStyle: TScrollBarStyle ): integer;
   function GetPositionRelativeToAnchor(posRelativeToAnchorID: TPositionRelativeToAnchorID): DWord;
@@ -6875,10 +6879,33 @@ begin
 
   A := color shr 24; color := (color - (A shl 24));
   R := color shr 16; color := (color - (R shl 16));
-  G := color shr 8;  color := (color - (R shl 8));
+  G := color shr 8;  color := (color - (G shl 8));
   B := color;
 
   result := (A shl 24) + (R shl 16) + (G shl 8) + B;
+end;
+
+// by ADiV
+function ARGBToCustomColor( conv_clr: TColorRGBA ): DWORD;
+begin
+  Result := (conv_clr.A shl 24) + (conv_clr.R shl 16) + (conv_clr.G shl 8) + conv_clr.B;
+end;
+
+// by ADiV
+function ARGBToCustomColor( _a, _r, _g, _b : byte ): DWORD;
+begin
+  Result := (_a shl 24) + (_r shl 16) + (_g shl 8) + _b;
+end;
+
+// by ADiV
+function CustomColorToARGB( cColor : DWORD ): TColorRGBA;
+var
+  temp : DWORD;
+begin
+  Result.A := cColor shr 24; temp := (cColor - (Result.A shl 24));
+  Result.R := temp   shr 16; temp := (cColor - (Result.A shl 24) - (Result.R shl 16));
+  Result.G := temp   shr  8; temp := (cColor - (Result.A shl 24) - (Result.R shl 16) - (Result.G shl 8));
+  Result.B := temp;
 end;
 
 function GetProgressBarStyle(cjProgressBarStyle: TProgressBarStyle): DWord;
