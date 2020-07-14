@@ -93,6 +93,9 @@ begin
 
   if FjObject = nil then exit;
 
+  if FSpeechLanguage <> slDefault then
+     jCustomSpeechToText_SetLanguage(FjEnv, FjObject, Ord(FSpeechLanguage));
+
   FInitialized:= True;
 end;
 
