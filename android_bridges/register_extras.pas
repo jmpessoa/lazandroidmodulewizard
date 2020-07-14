@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  customspeechtotext,
   selectdirectorydialog,
   ftpclient,
   sftpclient,
@@ -82,6 +83,7 @@ begin
   {$I jsmswidgetprovider_icon.lrs}
   {$I jspeechtotext_icon.lrs}
   {$I jtexttospeech_icon.lrs}
+  {$I jcustomspeechtotext_icon.lrs}
   {$I jmaps_icon.lrs}
   {$I jwindowmanager_icon.lrs}
   {$I jselectdirectorydialog_icon.lrs}
@@ -145,6 +147,7 @@ begin
       jSMSWidgetProvider,
       jSpeechToText,
       jTextToSpeech,
+      jCustomSpeechToText,
       jMaps,
       jWindowManager,
       jSelectDirectoryDialog,

@@ -258,11 +258,6 @@ uses
    procedure Java_Event_pOnMsSqlJDBCConnectionOpenAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
    procedure Java_Event_pOnMsSqlJDBCConnectionExecuteUpdateAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
 
-   procedure Java_Event_pOnBeginOfSpeech(env:PJNIEnv;this:JObject;Sender:TObject);
-   procedure Java_Event_pOnSpeechBufferReceived(env:PJNIEnv;this:JObject;Sender:TObject;txtBytes:jbyteArray);
-   procedure Java_Event_pOnEndOfSpeech(env:PJNIEnv;this:JObject;Sender:TObject);
-   procedure Java_Event_pOnSpeechResults(env:PJNIEnv;this:JObject;Sender:TObject;txt:jString);
-
 implementation
 
 uses
@@ -276,7 +271,7 @@ uses
    stablayout, treelistview, customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
-   ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext;
+   ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2921,48 +2916,6 @@ begin
   begin
     jForm(jMsSqlJDBCConnection(Sender).Owner).UpdateJNI(gApp);
     jMsSqlJDBCConnection(Sender).GenEvent_OnMsSqlJDBCConnectionExecuteUpdateAsync(Sender,GetString(env,messageStatus));
-  end;
-end;
-
-//jCustomSpeechToText
-procedure Java_Event_pOnBeginOfSpeech(env:PJNIEnv;this:JObject;Sender:TObject);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Sender is jCustomSpeechToText then
-  begin
-    jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
-    jCustomSpeechToText(Sender).GenEvent_OnBeginOfSpeech(Sender);
-  end;
-end;
-procedure Java_Event_pOnSpeechBufferReceived(env:PJNIEnv;this:JObject;Sender:TObject;txtBytes:jbyteArray);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Sender is jCustomSpeechToText then
-  begin
-    jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
-    jCustomSpeechToText(Sender).GenEvent_OnSpeechBufferReceived(Sender,GetDynArrayOfJByte(env,txtBytes));
-  end;
-end;
-procedure Java_Event_pOnEndOfSpeech(env:PJNIEnv;this:JObject;Sender:TObject);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Sender is jCustomSpeechToText then
-  begin
-    jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
-    jCustomSpeechToText(Sender).GenEvent_OnEndOfSpeech(Sender);
-  end;
-end;
-procedure Java_Event_pOnSpeechResults(env:PJNIEnv;this:JObject;Sender:TObject;txt:jString);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Sender is jCustomSpeechToText then
-  begin
-    jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
-    jCustomSpeechToText(Sender).GenEvent_OnSpeechResults(Sender,GetString(env,txt));
   end;
 end;
 

@@ -178,11 +178,10 @@ object FormAddComplements: TFormAddComplements
     Top = 528
     Width = 94
     Anchors = [akRight, akBottom]
-    Cancel = True
     DefaultCaption = True
     GlyphShowMode = gsmAlways
-    Kind = bkCancel
-    ModalResult = 2
+    Kind = bkNoToAll
+    ModalResult = 9
     TabOrder = 4
   end
   object BitBtn2: TBitBtn
@@ -295,6 +294,7 @@ object FormAddComplements: TFormAddComplements
       'android.permission.READ_PHONE_STATE'
       'android.permission.READ_SMS'
       'android.permission.RECEIVE_SMS'
+      'android.permission.RECORD_AUDIO'
       'android.permission.SEND_SMS'
       'android.permission.VIBRATE'
       'android.permission.WAKE_LOCK'

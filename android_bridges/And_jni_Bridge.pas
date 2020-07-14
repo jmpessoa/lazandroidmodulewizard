@@ -187,6 +187,7 @@ procedure jTextView_SetFrameGravity(env: PJNIEnv; _jtextview: JObject; _value: i
 procedure jTextView_RemoveFromViewParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetAllCaps(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetTextAsHtml(env: PJNIEnv; _jtextview: JObject; _htmlText: string);
+procedure jTextView_BringToFront(env: PJNIEnv; _jtextview: JObject);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -1040,6 +1041,7 @@ Procedure jImageBtn_setLayoutAll(env:PJNIEnv; ImageBtn : jObject;  idAnchor: DWo
 procedure jImageBtn_SetFrameGravity(env: PJNIEnv; ImageBtn: JObject; _value: integer);
 procedure jImageBtn_RemoveFromViewParent(env: PJNIEnv; ImageBtn: JObject);
 procedure jImageBtn_SetSleepDown(env: PJNIEnv; _jimagebtn: JObject; _sleepMiliSeconds: integer);
+procedure jImageBtn_SetImageState(env: PJNIEnv; _jimagebtn: JObject; _state: integer);
 
  { AsyncTask }
 function jAsyncTask_Create             (env: PJNIEnv;    this:jobject; SelfObj: TObject): jObject;
@@ -2116,6 +2118,17 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetTextAsHtml', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTextView_BringToFront(env: PJNIEnv; _jtextview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  jMethod:= env^.GetMethodID(env, jCls, 'BringToFront', '()V');
+  env^.CallVoidMethod(env, _jtextview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -11338,6 +11351,20 @@ begin
   env^.CallVoidMethodA(env, _jimagebtn, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jImageBtn_SetImageState(env: PJNIEnv; _jimagebtn: JObject; _state: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _state;
+  jCls:= env^.GetObjectClass(env, _jimagebtn);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImageState', '(I)V');
+  env^.CallVoidMethodA(env, _jimagebtn, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //------------------------------------------------------------------------------
 // jAsyncTask

@@ -2145,9 +2145,13 @@ type
     property OnTouchUp   : TOnTouchEvent read FOnTouchUp   write FOnTouchUp;
   end;
 
+  TImageBtnState = (imUp, imDown);
+
   jImageBtn = class(jVisualControl)
   private
     FOnDown : TOnNotify; // by ADiV
+    FOnUp : TOnNotify; // by ADiV
+
     FImageUpName: string;
     FImageDownName: string;
     FImageUpIndex: TImageListIndex;
@@ -2183,6 +2187,7 @@ type
     Procedure UpdateLayout(); override;
 
     procedure GenEvent_OnDown(Obj: TObject); // by ADiV
+    procedure GenEvent_OnUp(Obj: TObject);
     
     procedure Init(refApp: jApp); override;
     procedure SetLGravity(_value: TLayoutGravity);
@@ -2193,9 +2198,11 @@ type
     procedure SetImageDownScale(Value: single); // by ADiV
     procedure SetAlpha( Value : integer ); // by ADiV
     procedure SetSaturation(Value: single); // by ADiV
+    procedure SetImageState(_imageState: TImageBtnState);
 
   published
     property OnDown : TOnNotify read FOnDown write FOnDown; // by ADiV
+    property OnUp : TOnNotify read FOnUp write FOnUp;
 
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
@@ -2302,6 +2309,8 @@ type
   Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject; Obj: TObject);
 
   procedure Java_Event_pOnDown(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  procedure Java_Event_pOnUp(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+
   procedure Java_Event_pOnDoubleClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
   Procedure Java_Event_pOnClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
   Procedure Java_Event_pOnLongClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
@@ -2934,6 +2943,22 @@ begin
   begin
     jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnDown(Obj);
+    exit;
+  end;
+
+end;
+
+procedure Java_Event_pOnUp(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+begin
+
+  //----update global "gApp": to whom it may concern------
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+
+  if Obj is jImageBtn then
+  begin
+    jForm(jImageBtn(Obj).Owner).UpdateJNI(gApp);
+    jImageBtn(Obj).GenEvent_OnUp(Obj);
     exit;
   end;
 
@@ -11736,6 +11761,11 @@ begin
   if Assigned(FOnDown) then FOnDown(Obj);
 end;
 
+procedure jImageBtn.GenEvent_OnUp(Obj: TObject);
+begin
+  if Assigned(FOnUp) then FOnUp(Obj);
+end;
+
 Constructor jImageBtn.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -12093,6 +12123,13 @@ begin
      jImageBtn_SetSleepDown(FjEnv, FjObject, _sleepMiliSeconds);
 end;
 
+
+procedure jImageBtn.SetImageState(_imageState: TImageBtnState);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageBtn_SetImageState(FjEnv, FjObject, Ord(_imageState));
+end;
 
 //------------------------------------------------------------------------------
 // jAsyncTask

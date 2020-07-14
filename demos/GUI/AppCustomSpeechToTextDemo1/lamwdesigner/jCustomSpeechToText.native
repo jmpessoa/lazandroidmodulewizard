@@ -1,0 +1,4 @@
+public native void pOnBeginOfSpeech(long pasobj);
+public native void pOnSpeechBufferReceived(long pasobj, byte[] txtBytes);
+public native void pOnEndOfSpeech(long pasobj);
+public native void pOnSpeechResults(long pasobj, String txt);
