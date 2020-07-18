@@ -1,0 +1,5 @@
+<resources>
+   <string name="app_name">AppUSSDServiceDemo1</string>
+   <string name="hello_world">Hello world!</string>
+<string name="lamw_ussd_service">LAMW USSD Service</string>
+</resources>
