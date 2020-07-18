@@ -37,6 +37,7 @@ uses
 
 type
 
+  TFlashlightMode = (fmOFF, fmON);
 
   PAlphaColor = ^TAlphaColor; //by Kordal
   TAlphaColor = 0..$FFFFFFFF; // ARGB

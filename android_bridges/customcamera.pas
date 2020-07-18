@@ -29,6 +29,7 @@ jCustomCamera = class(jVisualControl)
     FOnPictureTaken: TCustomCameraPictureTaken;
 
     FAutoFocusOnShot : boolean;
+    FFlashlightMode: TFlashlightMode;
 
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
@@ -76,6 +77,7 @@ jCustomCamera = class(jVisualControl)
     function GetImage(_width: integer; _height: integer): jObject; overload;
     function GetImage(): jObject; overload;
     procedure SetFlashlight(_flashlightMode: boolean);
+    procedure SetFlashlightMode(_flashlightMode: TFlashlightMode);
 
  published
     property AutoFocusOnShot: boolean read FAutoFocusOnShot write SetAutoFocusOnShot;
@@ -85,6 +87,7 @@ jCustomCamera = class(jVisualControl)
     //property OnSurfaceCreated: TCustomCameraSurfaceCreated read FOnSurfaceCreated write FOnSurfaceCreated;
     property OnSurfaceChanged: TCustomCameraSurfaceChanged read FOnSurfaceChanged write FOnSurfaceChanged;
     property OnPictureTaken: TCustomCameraPictureTaken read FOnPictureTaken write FOnPictureTaken;
+    property FlashlightMode: TFlashlightMode read FFlashlightMode write SetFlashlightMode;
 
 end;
 
@@ -138,6 +141,7 @@ begin
   FLParamHeight := lpWrapContent; //lpMatchParent
 
   FAutoFocusOnShot := False; // by tr3e
+  FFlashlightMode:= fmOFF;
 
   FAcceptChildrenAtDesignTime:= False;
 //your code here....
@@ -212,6 +216,11 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    View_SetVisible(FjEnv, FjObject, FVisible);
+
+   if FFlashlightMode = fmON then
+      jCustomCamera_SetFlashlight(FjEnv, FjObject, True);
+
+
   end;
 end;
 
@@ -473,6 +482,19 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jCustomCamera_SetFlashlight(FjEnv, FjObject, _flashlightMode);
+end;
+
+procedure jCustomCamera.SetFlashlightMode(_flashlightMode: TFlashlightMode);
+begin
+  //in designing component state: set value here...
+  FFlashlightMode:= _flashlightMode;
+  if FInitialized then
+  begin
+     if FFlashlightMode = fmON then
+       jCustomCamera_SetFlashlight(FjEnv, FjObject, True)
+     else
+       jCustomCamera_SetFlashlight(FjEnv, FjObject, False);
+  end;
 end;
 
 {-------- jCustomCamera_JNI_Bridge ----------}

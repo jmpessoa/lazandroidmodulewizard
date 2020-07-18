@@ -122,16 +122,18 @@ end;
 function jTextToSpeech.IsSpeaking() : boolean;
 begin
  //in designing component state: set value here...
+  Result:= False;
   if FInitialized then
-     jni_func_out_z(FjEnv, FjObject, 'IsSpeaking');
+     Result:= jni_func_out_z(FjEnv, FjObject, 'IsSpeaking');
 end;
 
 // by ADiV
 function jTextToSpeech.IsLoaded() : boolean;
 begin
  //in designing component state: set value here...
+  Result:= False;
   if FInitialized then
-     jni_func_out_z(FjEnv, FjObject, 'IsLoaded');
+     Result:= jni_func_out_z(FjEnv, FjObject, 'IsLoaded');
 end;
 
 {-------- jTextToSpeech_JNI_Bridge ----------}
