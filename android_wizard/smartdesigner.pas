@@ -306,7 +306,7 @@ var
   ManifestXML: TXMLDocument;
   n: TDOMNode;
 begin
-  Result := '';
+  Result := '28';
   if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
   try
     ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
@@ -327,7 +327,7 @@ var
   ManifestXML: TXMLDocument;
   n: TDOMNode;
 begin
-  Result := '';
+  Result := '14';
   if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
   try
     ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
@@ -1839,12 +1839,10 @@ begin
   contentList := FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.native', False);
   for i:= 0 to contentList.Count-1 do
   begin
-
     { //dont backup anymore...
     CopyFile(contentList.Strings[i],
          FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
     }
-
     DeleteFile(contentList.Strings[i]);
   end;
   contentList.Free;
@@ -1986,7 +1984,7 @@ end;
 function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
-  list, {listRequirements,} auxList, manifestList, gradleList: TStringList;
+  list, {listRequirements,} auxList, stringList, manifestList, gradleList: TStringList;
   p, p1, p2, i, minSdkManifest, minSdkControl: integer;
   aux, tempStr, auxStr: string;
   insertRef, minSdkManifestStr: string;
@@ -2312,6 +2310,25 @@ begin
      auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+LowerCase(jclassname)+'_info.xml');
    end;
 
+   //<string name="lamw_ussd_service">LAMW USSD Service</string>
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.strings') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.strings');
+     list.LoadFromFile(FPathToAndroidProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
+     for i:= 0 to auxList.Count-1 do
+     begin
+       if auxList.Strings[i] <> '' then
+       begin
+         if Pos(auxList.Strings[i], list.Text) <= 0 then
+         begin
+            list.Strings[list.Count-1]:= auxList.Strings[i];  //replace </resources>  tag
+            list.Add('</resources>'); //re-introduce tag
+         end;
+       end;
+     end;
+     list.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
+   end;
+
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.jpg') then
    begin
      CopyFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.jpg',
@@ -2339,6 +2356,7 @@ begin
             FPathToAndroidProject+'libs'+DirectorySeparator+auxList.Strings[i]);
      end;
    end;
+
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.libso') then //jBarcodeScannerView.libso
    begin
      //libiconv.so

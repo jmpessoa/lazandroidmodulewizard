@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  ussdservice,
   customspeechtotext,
   selectdirectorydialog,
   ftpclient,
@@ -71,6 +72,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jussdservice_icon.lrs}
   {$I jftpclient_icon.lrs}
   {$I jsftpclient_icon.lrs}
   {$I jbrightness_icon.lrs}
@@ -135,6 +137,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jUSSDService,
       jFTPClient,
       jSFTPClient,
       jBrightness,
