@@ -38,6 +38,8 @@ TOnScannerResult = procedure(Sender: TObject; codedata: string; codeformat: TBar
 jZBarcodeScannerView = class(jVisualControl)
  private
     FOnScannerResult: TOnScannerResult;
+    FFlashlightMode: TFlashlightMode;
+
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
 
@@ -69,11 +71,15 @@ jZBarcodeScannerView = class(jVisualControl)
     procedure ClearLayoutAll();
     procedure Scan(); overload;
     procedure Scan(_barcodeBmp: jObject); overload;
+    procedure SetFlashlight(_flashlightMode: boolean);
+    procedure SetFlashlightMode(_flashlightMode: TFlashlightMode);
 
     procedure GenEvent_OnZBarcodeScannerViewResult(Obj: TObject; pascodedata: string; codetype: integer);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
+    property FlashlightMode: TFlashlightMode read FFlashlightMode write SetFlashlightMode;
+
     property OnClick: TOnNotify read FOnClick write FOnClick;
     property OnScannerResult: TOnScannerResult read FOnScannerResult write FOnScannerResult;
 
@@ -99,6 +105,7 @@ procedure jZBarcodeScannerView_ClearLayoutAll(env: PJNIEnv; _jbarcodescannerview
 procedure jZBarcodeScannerView_SetId(env: PJNIEnv; _jbarcodescannerview: JObject; _id: integer);
 procedure jZBarcodeScannerView_Scan(env: PJNIEnv; _jbarcodescannerview: JObject); overload;
 procedure jZBarcodeScannerView_Scan(env: PJNIEnv; _jzbarcodescannerview: JObject; _barcodeBmp: jObject); overload;
+procedure jZBarcodeScannerView_SetFlashlight(env: PJNIEnv; _jzbarcodescannerview: JObject; _flashlightMode: boolean);
 
 
 implementation
@@ -121,6 +128,7 @@ begin
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= False;
 //your code here....
+  FFlashlightMode:= fmOFF;
 end;
 
 destructor jZBarcodeScannerView.Destroy;
@@ -190,6 +198,10 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
   View_SetVisible(FjEnv, FjObject, FVisible);
+
+  if FFlashlightMode = fmON then
+       jZBarcodeScannerView_SetFlashlight(FjEnv, FjObject, True);
+
  end;
 end;
 
@@ -381,6 +393,25 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jZBarcodeScannerView_Scan(FjEnv, FjObject, _barcodeBmp);
+end;
+
+procedure jZBarcodeScannerView.SetFlashlight(_flashlightMode: boolean);
+begin
+  //in designing component state: set value here...  if FInitialized then
+     jZBarcodeScannerView_SetFlashlight(FjEnv, FjObject, _flashlightMode);
+end;
+
+procedure jZBarcodeScannerView.SetFlashlightMode(_flashlightMode: TFlashlightMode);
+begin
+  //in designing component state: set value here...
+  FFlashlightMode:= _flashlightMode;
+  if FInitialized then
+  begin
+     if FFlashlightMode = fmOFF then
+       jZBarcodeScannerView_SetFlashlight(FjEnv, FjObject, False)
+     else
+       jZBarcodeScannerView_SetFlashlight(FjEnv, FjObject, True);
+  end;
 end;
 
 procedure jZBarcodeScannerView.GenEvent_OnZBarcodeScannerViewResult(Obj: TObject; pascodedata: string; codetype: integer);
@@ -653,6 +684,19 @@ begin
   jParams[0].l:= _barcodeBmp;
   jCls:= env^.GetObjectClass(env, _jzbarcodescannerview);
   jMethod:= env^.GetMethodID(env, jCls, 'Scan', '(Landroid/graphics/Bitmap;)V');
+  env^.CallVoidMethodA(env, _jzbarcodescannerview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jZBarcodeScannerView_SetFlashlight(env: PJNIEnv; _jzbarcodescannerview: JObject; _flashlightMode: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_flashlightMode);
+  jCls:= env^.GetObjectClass(env, _jzbarcodescannerview);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFlashlight', '(Z)V');
   env^.CallVoidMethodA(env, _jzbarcodescannerview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

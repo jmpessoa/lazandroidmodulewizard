@@ -306,7 +306,7 @@ var
   ManifestXML: TXMLDocument;
   n: TDOMNode;
 begin
-  Result := '28';
+  Result := '';
   if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
   try
     ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
@@ -327,7 +327,7 @@ var
   ManifestXML: TXMLDocument;
   n: TDOMNode;
 begin
-  Result := '14';
+  Result := '';
   if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
   try
     ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
@@ -691,6 +691,9 @@ var
   sourcepath,targetpath:string;
   includeList: TStringList;
   universalApk: boolean;
+  insertRef, manifestApis: string;
+  p1, p2: integer;
+  c: char;
 begin
 
   strList:= TStringList.Create;
@@ -765,8 +768,28 @@ begin
   begin
     strList.Clear;
     strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-    tempStr:= strList.Text;
-    tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+sdkManifMinApi+'"' , 'android:minSdkVersion="'+IntToStr(minsdkApi)+'"', [rfReplaceAll,rfIgnoreCase]);
+    tempStr:= strList.Text;  //manifest
+    if Pos('android:minSdkVersion=', tempStr) > 0 then
+    begin
+      tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+sdkManifMinApi+'"' , 'android:minSdkVersion="'+IntToStr(minsdkApi)+'"', [rfReplaceAll,rfIgnoreCase]);
+    end
+    else //re-introduce it!
+    begin
+       manifestApis:= '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="'+IntToStr(targetApi)+'"/>';
+       insertRef:= 'android:versionName='; //insert reference point
+       p1:= Pos(insertRef, tempStr);
+       p2:= p1 + Length(insertRef);
+       c:= tempStr[p2];
+       while c <> '>' do
+       begin
+          Inc(p2);
+          c:= tempStr[p2];
+       end;
+       Inc(p2);
+       insertRef:= Trim(Copy(tempStr, p1, p2-p1));
+       p1:= Pos(insertRef, tempStr);
+       Insert(sLineBreak + manifestApis, tempStr, p1+Length(insertRef) );
+    end;
     strList.Text:= tempStr;
     strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
   end;

@@ -1,4 +1,4 @@
-package org.lamw.appbarcodescannerview;
+package org.lamw.appzbarcodescannerviewdemo1;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -143,6 +143,10 @@ public class jZBarcodeScannerView extends FrameLayout {
     private boolean previewing = true;
 
     boolean initialized = false;
+
+    boolean isLighOn = false;
+
+    ///
     /*
     static {
         System.loadLibrary("iconv");
@@ -348,12 +352,44 @@ public class jZBarcodeScannerView extends FrameLayout {
     public void Scan() {
         if (!initialized) {
             initialized =  true;
-            mCamera = getCameraInstance();
+
+            if (mCamera == null)
+                mCamera = getCameraInstance();
+
             mPreview = new ZBarCameraPreview(controls.activity, mCamera, previewCb, autoFocusCB);
             mPreview.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
             this.addView(mPreview);
         }
         else ReScan();
+    }
+
+    //https://mkyong.com/android/how-to-turn-onoff-camera-ledflashlight-in-android/
+    public void SetFlashlight(boolean _flashlightMode){
+
+        if (mCamera == null)
+            mCamera = getCameraInstance();
+
+        if (this.mCamera != null) {
+
+            Camera.Parameters p = mCamera.getParameters();
+
+            if (_flashlightMode) {
+                if (!isLighOn) {
+                    p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                    mCamera.setParameters(p);
+                    mCamera.startPreview();
+                    isLighOn = true;
+                }
+            }
+            else  {
+                if (isLighOn) {
+                    p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                    mCamera.setParameters(p);
+                    mCamera.startPreview();
+                    isLighOn = false;
+                }
+            }
+        }
     }
 
 }
