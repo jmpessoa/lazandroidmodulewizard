@@ -6,6 +6,7 @@ interface
   
 uses
   Classes,
+  cqrgen,
   cbluetoothspp,
   cmail,
   csignaturepad,
@@ -22,6 +23,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jcqrgen_icon.lrs}
   {$I jcbluetoothspp_icon.lrs}
   {$I jcmail_icon.lrs}
   {$I jcsignaturepad_icon.lrs}
@@ -31,6 +33,7 @@ begin
   {$I jcmikrotikrouteros_icon.lrs}
   RegisterComponents('Android Bridges jCenter',
     [
+      jcQRGen,
       jcBluetoothSPP,
       jcMail,
       jcSignaturePad,
