@@ -44,7 +44,8 @@ begin
   end
   else
   begin
-     AndroidModule2.Show(False);   // Assim, o evento nao será executado!
+     AndroidModule2.Show(False);   //False [to keep checkbox status...] 
+                                   //prevent the event "OnJNIPrompt" [in form 2] to be executed again and again...
   end;
 end;
 

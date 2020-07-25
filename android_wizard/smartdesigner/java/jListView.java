@@ -1,4 +1,4 @@
-package org.lamw.applistviewdemo5;
+package org.lamw.applistviewdemo6;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -934,7 +934,7 @@ class jArrayAdapter extends ArrayAdapter {
 					((EditText)itemWidget).setMinLines(1);
 					//((EditText)itemWidget).setPadding(15,4,15,4);
 					
-					((EditText)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);										
+					((EditText)itemWidget).setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
 
 					if (mWidgetInputTypeIsCurrency) {
 						((EditText) itemWidget).setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
@@ -971,15 +971,19 @@ class jArrayAdapter extends ArrayAdapter {
 							int tempId = v.getId();
 							int index = -1; // = temp - 6666; //dummy
 							final EditText caption = (EditText)v;
-							
+							EditText temp = null;
+
 							if (!hasFocus){
-								
-								for( int i = 0; i < items.size(); i++)
-								 if( items.get(i).jWidget.getId() == tempId ){
-									 index = i;
-									 break;
-								 }
-																								
+								for( int i = 0; i < items.size(); i++) {
+									temp = (EditText) items.get(i).jWidget;
+									if (temp != null) {
+										if (temp.getId() == tempId) { //items.get(i).jWidget
+											index = i;
+											break;
+										}
+									}
+								}
+
 								if (index >= 0){
 									items.get(index).widgetText = caption.getText().toString();								
 									items.get(index).jWidget.setFocusable(false);
