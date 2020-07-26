@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  barcodegen,
   ussdservice,
   customspeechtotext,
   selectdirectorydialog,
@@ -72,6 +73,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jbarcodegen_icon.lrs}
   {$I jussdservice_icon.lrs}
   {$I jftpclient_icon.lrs}
   {$I jsftpclient_icon.lrs}
@@ -137,6 +139,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jBarcodeGen,
       jUSSDService,
       jFTPClient,
       jSFTPClient,
