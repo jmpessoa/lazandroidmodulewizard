@@ -12,6 +12,8 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.Arrays;
 
 /*Draft java code by "Lazarus Android Module Wizard" [7/25/2020 0:50:10]*/
@@ -103,8 +105,81 @@ public class jBarcodeGen /*extends ...*/ {
     QR_CODE,
      */
 
-    //ref. https://stackoverflow.com/questions/1136642/ean-8-how-to-calculate-checksum-digit
+    //ref. https://stackoverflow.com/questions/10143547/how-do-i-validate-a-upc-or-ean-code
+    //UPC-A encodes 11 digits
+    //http://www.barcodeisland.com/upca.phtml
+    /*
+    UPC-A has the following structure:  http://www.barcodelib.com/java_barcode/barcode_symbologies/upca.html
+    1 digit for Number System (0: regular UPC codes, 1: reserved, 2: random weight items marked at the store, 3: National Drug Code and National Health Related Items code, 4: no format restrictions, for in-store use on non-food items, 5: for use on coupons, 6: reserved, 7: regular UPC codes, 8: reserved, 9: reserved).
+    5 digits for Manufacturer (Company) Code or prefix. This number is assigned by the Uniform Code Council (UCC).
+    5 digits for Product Code which is assigned by the manufacturer.
+    1 digit for checksum.
+     */
+    //UPC-E 0463783-7 //https://www.barcodesinc.com/articles/upce.htm
+    //http://www.keepautomation.com/upce/
+    public String GetUPCAChecksum(String _data11digits) { //01234567890-5 //04210000526-4   //12345678901-2
+        long num = Long.valueOf(_data11digits);
+        int odd_sum = 0, even_sum = 0;
+        boolean odd = true;
+        while (num != 0) {
+            if (odd) {
+                odd_sum += num%10;
+                odd = false;
+            } else {
+                even_sum += num%10;
+                odd = true;
+            }
+            num = (num - num%10)/10; // reduce number
+        }
+        int calcCheckDigit = (10 - ((even_sum  + 3 * odd_sum) % 10)) % 10;
+        return String.valueOf(calcCheckDigit);
+    }
 
+    /*
+    UPC-E barcode image has the following structure: http://www.barcodelib.com/java_barcode/barcode_symbologies/upce.html
+    1 digit for Number System (0), set by library automatically.
+    6 digits for UPCE data set through Data property
+    1 digit for checksum, calculated automatically by barcode library.
+     */
+    //TODO
+    //public String GetUPCEChecksum(String _data6digits) {  //123450 or[7] 0123450 ??
+    public String GetUPCEChecksum(String _data7digits) { //01234567890-5 //04210000526-4   //12345678901-2
+        long num = Long.valueOf(_data7digits);
+        int odd_sum = 0, even_sum = 0;
+        boolean odd = true;
+        while (num != 0) {
+            if (odd) {
+                odd_sum += num%10;
+                odd = false;
+            } else {
+                even_sum += num%10;
+                odd = true;
+            }
+            num = (num - num%10)/10; // reduce number
+        }
+        int calcCheckDigit = (10 - ((even_sum  + 3 * odd_sum) % 10)) % 10;
+        return String.valueOf(calcCheckDigit);
+    }
+    //}
+
+    // ref. http://www.acordex.com/consulting/BarCode39.html
+    public String GetCode39Checksum(String _dataCode) throws Exception {
+            String charSet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%";
+            int total = 0;
+            CharacterIterator it = new StringCharacterIterator(_dataCode);
+            for (char ch = it.current(); ch != CharacterIterator.DONE; ch = it.next()) {
+                int charValue = charSet.indexOf(ch);
+                if (charValue == -1) {
+                    // Invalid character.
+                    throw new Exception("Input String '" +_dataCode+ "' contains characters that are invalid in a Code39 barcode.");
+                }
+                total += charValue;
+            }
+            int checksum = total % 43;
+            return Character.toString(charSet.charAt(checksum));
+    }
+
+    //ref. https://stackoverflow.com/questions/1136642/ean-8-how-to-calculate-checksum-digit
     public String GetEAN13Checksum(String _data12digits) {
         int first = 0;
         int second = 0;

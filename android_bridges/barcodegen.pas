@@ -33,6 +33,9 @@ jBarcodeGen = class(jControl)
 
     function GetEAN8Checksum(_data7digits: string): string;
     function GetEAN13Checksum(_data12digits: string): string;
+    function GetCode39Checksum(_dataDigits: string): string;
+    function GetUPCAChecksum(_data11digits: string): string;
+    function GetUPCEChecksum(_data7digits: string): string;
 
  published
 
@@ -46,6 +49,9 @@ function jBarcodeGen_GetBar1D(env: PJNIEnv; _jbarcodegen: JObject; _format: inte
 
 function jBarcodeGen_GetEAN8Checksum(env: PJNIEnv; _jbarcodegen: JObject; _data7digits: string): string;
 function jBarcodeGen_GetEAN13Checksum(env: PJNIEnv; _jbarcodegen: JObject; _data12digits: string): string;
+function jBarcodeGen_GetCode39Checksum(env: PJNIEnv; _jbarcodegen: JObject; _dataDigits: string): string;
+function jBarcodeGen_GetUPCAChecksum(env: PJNIEnv; _jbarcodegen: JObject; _data11digits: string): string;
+function jBarcodeGen_GetUPCEChecksum(env: PJNIEnv; _jbarcodegen: JObject; _data7digits: string): string;
 
 implementation
 
@@ -123,6 +129,27 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBarcodeGen_GetEAN13Checksum(FjEnv, FjObject, _data12digits);
+end;
+
+function jBarcodeGen.GetCode39Checksum(_dataDigits: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBarcodeGen_GetCode39Checksum(FjEnv, FjObject, _dataDigits);
+end;
+
+function jBarcodeGen.GetUPCAChecksum(_data11digits: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBarcodeGen_GetUPCAChecksum(FjEnv, FjObject, _data11digits);
+end;
+
+function jBarcodeGen.GetUPCEChecksum(_data7digits: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jBarcodeGen_GetUPCEChecksum(FjEnv, FjObject, _data7digits);
 end;
 
 {-------- jBarcodeGen_JNI_Bridge ----------}
@@ -231,5 +258,73 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jBarcodeGen_GetCode39Checksum(env: PJNIEnv; _jbarcodegen: JObject; _dataDigits: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_dataDigits));
+  jCls:= env^.GetObjectClass(env, _jbarcodegen);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCode39Checksum', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jbarcodegen, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBarcodeGen_GetUPCAChecksum(env: PJNIEnv; _jbarcodegen: JObject; _data11digits: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_data11digits));
+  jCls:= env^.GetObjectClass(env, _jbarcodegen);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetUPCAChecksum', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jbarcodegen, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jBarcodeGen_GetUPCEChecksum(env: PJNIEnv; _jbarcodegen: JObject; _data7digits: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_data7digits));
+  jCls:= env^.GetObjectClass(env, _jbarcodegen);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetUPCEChecksum', '(Ljava/lang/String;)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jbarcodegen, jMethod, @jParams);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

@@ -69,7 +69,7 @@ begin
   checksum_1digit:= jBarcodeGen1.GetEAN13Checksum(data_12Digits);
   jImageView2.SetImage(jBarcodeGen1.GetBar1D(fmEAN_13, data_12Digits + checksum_1digit, 150,150));
 
-  data_7Digits:= '5512345';  //12 digits [data] ref. http://www.barcodeisland.com/ean8.phtml
+  data_7Digits:= '5512345';  //7 digits [data] ref. http://www.barcodeisland.com/ean8.phtml
   checksum_1digit:= jBarcodeGen1.GetEAN8Checksum(data_7Digits);
   jImageView3.SetImage(jBarcodeGen1.GetBar1D(fmEAN_8, data_7Digits + checksum_1digit, 150,150));
 end;
