@@ -38,7 +38,7 @@ uses
 type
 
   TFlashlightMode = (fmOFF, fmON);
-
+  
   PAlphaColor = ^TAlphaColor; //by Kordal
   TAlphaColor = 0..$FFFFFFFF; // ARGB
   TLayerType = (ltNONE, ltSOFTWARE, ltHARDWARE);
@@ -1238,6 +1238,11 @@ type
     procedure ShowLogoActionBar(_value: boolean);
     procedure SetTitleActionBar(_title: string);
     procedure SetSubTitleActionBar(_subtitle: string);
+
+    procedure SetActionBarShowHome( showHome : boolean );   // By ADiV
+    procedure SetActionBarColor( color : TARGBColorBridge); // By ADiV
+    procedure SetNavigationColor(color : TARGBColorBridge); // By ADiV
+    procedure SetStatusColor( color : TARGBColorBridge);    // By ADiV
 
     procedure SetIconActionBar(_iconIdentifier: string);
     procedure SetTabNavigationModeActionBar;
@@ -3823,6 +3828,44 @@ begin
   begin
      if FActionBarTitle <> abtNone then
        jForm_SetTitleActionBar(FjEnv, FjObject, _title);
+  end;
+end;
+
+procedure jForm.SetActionBarShowHome( showHome : boolean );
+begin
+ if FInitialized then
+  begin
+     if FActionBarTitle <> abtNone then
+       jni_proc_z(FjEnv, FjObject, 'SetActionBarShowHome', showHome);
+  end;
+end;
+
+procedure jForm.SetActionBarColor(color : TARGBColorBridge);
+begin
+  if FInitialized then
+  begin
+     if FActionBarTitle <> abtNone then
+       jni_proc_i(FjEnv, FjObject, 'SetActionBarColor', GetARGB(FCustomColor, color));
+  end;
+end;
+
+procedure jForm.SetNavigationColor(color : TARGBColorBridge);
+begin
+  if FInitialized then
+  begin
+     if FActionBarTitle <> abtNone then
+       jni_proc_i(FjEnv, FjObject, 'SetNavigationColor', GetARGB(FCustomColor, color));
+  end;
+end;
+
+procedure jForm.SetStatusColor(color : TARGBColorBridge);
+begin
+  if FInitialized then
+  begin
+    FColor:= color;
+
+     if FActionBarTitle <> abtNone then
+       jni_proc_i(FjEnv, FjObject, 'SetStatusColor', GetARGB(FCustomColor, FColor));
   end;
 end;
 

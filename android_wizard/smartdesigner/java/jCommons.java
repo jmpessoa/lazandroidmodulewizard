@@ -3,6 +3,7 @@ package com.example.appmediarecorderdemo1;
 import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ColorDrawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -486,10 +487,50 @@ public class jCommons {
 	}
 
 	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
+        ActionBar actionBar = (controls.activity).getActionBar();
+		
+		if (actionBar != null){		
+			if( icon != null ){
+				actionBar.setDisplayShowHomeEnabled(true);	       
+				actionBar.setIcon(icon);
+			} else {
+				actionBar.setDisplayShowHomeEnabled(false);
+				actionBar.setIcon(null);
+			}
+		}
+	}
+	
+	public static void ActionBarShowHome(Controls controls, boolean showHome){
 		ActionBar actionBar = (controls.activity).getActionBar();
-		if (actionBar != null)
-			( controls.activity).getActionBar().setIcon(icon);;
-
+		
+		if (actionBar != null){
+			actionBar.setDisplayHomeAsUpEnabled(showHome);
+			actionBar.setDisplayShowHomeEnabled(showHome);	        						
+		}
+	}
+	
+	public static void ActionBarSetColor(Controls controls, int color){
+		ActionBar actionBar = (controls.activity).getActionBar();
+		
+		if (actionBar != null){									
+				 actionBar.setBackgroundDrawable(new ColorDrawable(color));						
+		}
+	}
+	
+	public static void NavigationSetColor(Controls controls, int color){
+			
+			if (Build.VERSION.SDK_INT >= 21) {								
+					controls.activity.getWindow().setNavigationBarColor(color);								
+		    }
+			
+	}
+	
+	public static void StatusSetColor(Controls controls, int color){
+			
+			if (Build.VERSION.SDK_INT >= 21) {								
+					controls.activity.getWindow().setStatusBarColor(color);								
+		    }
+					
 	}
 
 	public static void ActionBarSetTabNavigationMode(Controls controls) {

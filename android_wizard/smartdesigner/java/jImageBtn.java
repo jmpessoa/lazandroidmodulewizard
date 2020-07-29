@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 
 //-------------------------------------------------------------------------
 // jImageBtn
-// Reviewed by ADiV on 2020/05/28
+// Reviewed by ADiV on 2020/07/29
 //-------------------------------------------------------------------------
 
 public class jImageBtn extends ImageView {
@@ -259,6 +259,20 @@ public class jImageBtn extends ImageView {
 
 	public  void setEnabled(boolean value) {
 		enabled = value;
+	}
+	
+	public void BringToFront() {
+		 ViewGroup parent = LAMWCommon.getParent();
+
+		 this.bringToFront();
+
+		 if (Build.VERSION.SDK_INT < 19 ) {
+
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+	     }		
 	}
 
 	public  void Free() {

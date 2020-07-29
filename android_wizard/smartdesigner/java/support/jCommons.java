@@ -2,6 +2,7 @@ package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.ContextCompat;
@@ -643,12 +644,59 @@ public class jCommons {
 	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
                 if (controls.activity instanceof AppCompatActivity)
                 {
-		  android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		  if (actionBar != null)
-			((AppCompatActivity) controls.activity).getSupportActionBar().setIcon(icon);
+                	android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+            		
+            		if (actionBar != null){
+            			
+            			if( icon != null ){
+            				actionBar.setDisplayShowHomeEnabled(true);	       
+            				actionBar.setIcon(icon);
+            			} else {
+            				actionBar.setDisplayShowHomeEnabled(false);
+            				actionBar.setIcon(null);
+            			}
+            		}
                 }
 
 	}
+	
+	public static void ActionBarShowHome(Controls controls, boolean showHome){
+		if (controls.activity instanceof AppCompatActivity)
+        {
+		 android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		
+		 if (actionBar != null){
+			actionBar.setDisplayHomeAsUpEnabled(showHome);
+			actionBar.setDisplayShowHomeEnabled(showHome);	        								 
+		 }
+        }
+	}
+	
+	public static void ActionBarSetColor(Controls controls, int color){
+		if (controls.activity instanceof AppCompatActivity)
+        {
+         android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		
+		 if (actionBar != null)						
+		     actionBar.setBackgroundDrawable(new ColorDrawable(color));
+        }				    		
+	}
+	
+	public static void NavigationSetColor(Controls controls, int color){        		
+		if (controls.activity instanceof AppCompatActivity)
+        {	
+			if (Build.VERSION.SDK_INT >= 21)				
+				((AppCompatActivity) controls.activity).getWindow().setNavigationBarColor(color);							
+        }    				
+	}
+	
+	public static void StatusSetColor(Controls controls, int color){
+		if (controls.activity instanceof AppCompatActivity)
+        {	
+			if (Build.VERSION.SDK_INT >= 21)				
+				((AppCompatActivity) controls.activity).getWindow().setStatusBarColor(color);										    
+        }	
+	}		
 
 	public static void ActionBarSetTabNavigationMode(Controls controls) {
       //not AppCompat ..
