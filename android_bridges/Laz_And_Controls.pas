@@ -2188,6 +2188,8 @@ type
 
     procedure GenEvent_OnDown(Obj: TObject); // by ADiV
     procedure GenEvent_OnUp(Obj: TObject);
+
+    procedure BringToFront(); // By ADiV
     
     procedure Init(refApp: jApp); override;
     procedure SetLGravity(_value: TLayoutGravity);
@@ -12034,6 +12036,12 @@ begin
   if FInitialized then
    SetImageDownByIndex(Value);
 
+end;
+
+procedure jImageBtn.BringToFront();
+begin
+  if FInitialized then
+   jni_proc(FjEnv, FjObject, 'BringToFront');
 end;
 
 procedure jImageBtn.ClearLayout();
