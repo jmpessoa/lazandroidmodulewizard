@@ -1142,9 +1142,29 @@ class jForm {
 //[ifdef_api14up]
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
 
-		if (d != null) // by tr3e
-			jCommons.ActionBarSetIcon(controls, d);
+		
+		jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
+	}
+	
+	//By ADiV
+	public void SetActionBarShowHome(boolean showHome) {
+			   jCommons.ActionBarShowHome(controls, showHome);
+	}
+
+	//By ADiV
+	public void SetActionBarColor(int color) {
+		   jCommons.ActionBarSetColor(controls, color);
+	}
+
+	//By ADiV
+	public void SetNavigationColor(int color) {
+		   jCommons.NavigationSetColor(controls, color);
+	}
+
+	//By ADiV
+	public void SetStatusColor(int color) {
+			   jCommons.StatusSetColor(controls, color);
 	}
 
 	public void SetTabNavigationModeActionBar() {
