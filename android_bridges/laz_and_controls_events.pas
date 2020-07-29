@@ -263,6 +263,8 @@ uses
    procedure Java_Event_pOnEndOfSpeech(env:PJNIEnv;this:JObject;Sender:TObject);
    procedure Java_Event_pOnSpeechResults(env:PJNIEnv;this:JObject;Sender:TObject;txt:jString);
 
+   //by Marco Bramardi
+   procedure Java_Event_pOnBillingClientEvent(env:PJNIEnv; this:JObject; Obj: TObject; xml: JString);
 implementation
 
 uses
@@ -276,7 +278,7 @@ uses
    stablayout, treelistview, customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
-   ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext;
+   ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext, cbillingclient;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -2964,6 +2966,22 @@ begin
     jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
     jCustomSpeechToText(Sender).GenEvent_OnSpeechResults(Sender,GetString(env,txt));
   end;
+end;
+
+procedure Java_Event_pOnBillingClientEvent(env:PJNIEnv; this:JObject; Obj: TObject; xml: JString);
+var
+  pasStr: string;
+  _jBoolean: JBoolean;
+begin
+  pasStr := '';
+  if xml <> nil then begin
+    _jBoolean := JNI_False;
+    pasStr    := String( env^.GetStringUTFChars(Env,xml,@_jBoolean) );
+  end;
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  jForm(jcBillingClient(Obj).Owner).UpdateJNI(gApp);
+  jcBillingClient(Obj).GenEvent_OnBillingClientEvent(pasStr);
 end;
 
 end.

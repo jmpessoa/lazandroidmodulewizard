@@ -1,0 +1,2 @@
+<uses-permission android:name="com.android.vending.BILLING"/>
+implementation 'com.android.billingclient:billing:2.0.3'

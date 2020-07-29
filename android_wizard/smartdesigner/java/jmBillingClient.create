@@ -1,0 +1,3 @@
+public java.lang.Object jmBillingClient_jCreate(long _Self) {
+  return (java.lang.Object)(new jmBillingClient(this,_Self));
+}

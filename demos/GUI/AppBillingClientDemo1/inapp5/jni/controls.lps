@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="12">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="23" Y="151"/>
+        <UsageCount Value="202"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jcBillingClient;jForm;jWebView"/>
+        </CustomData>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="15" Y="8"/>
+        <UsageCount Value="202"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\..\_common\AppAndroid.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="775"/>
+        <CursorPos Y="789"/>
+        <UsageCount Value="7"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\_common\AppAdmin.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3552"/>
+        <CursorPos X="15" Y="3571"/>
+        <UsageCount Value="8"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\..\..\lazandroidmodulewizard\trunk\android_bridges\billingclient.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2114"/>
+        <CursorPos X="40" Y="2133"/>
+        <UsageCount Value="57"/>
+        <Bookmarks Count="2">
+          <Item0 Y="713" ID="2"/>
+          <Item1 X="50" Y="1541" ID="1"/>
+        </Bookmarks>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\_common\billing\jBillingClient.java"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="334"/>
+        <CursorPos X="81" Y="342"/>
+        <UsageCount Value="99"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\_common\billing\billingclient.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="134"/>
+        <CursorPos X="25" Y="154"/>
+        <UsageCount Value="49"/>
+        <Bookmarks Count="2">
+          <Item0 X="3" Y="1272" ID="2"/>
+          <Item1 X="31" Y="543" ID="1"/>
+        </Bookmarks>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\..\..\lazandroidmodulewizard\trunk\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="741"/>
+        <CursorPos Y="748"/>
+        <UsageCount Value="3"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\_common\AppUtils.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1743"/>
+        <CursorPos X="15" Y="1761"/>
+        <UsageCount Value="15"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1451"/>
+        <CursorPos X="33" Y="1454"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1260"/>
+        <CursorPos X="39" Y="1275"/>
+        <UsageCount Value="10"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="C:\laz4android2.0.0\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1864"/>
+        <CursorPos X="14" Y="1873"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+    </Units>
+    <OtherDefines Count="2">
+      <Define0 Value="billing"/>
+      <Define1 Value="test_billing"/>
+    </OtherDefines>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="5" Column="49"/>
+      </Position1>
+      <Position2>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="448" Column="30" TopLine="431"/>
+      </Position2>
+      <Position3>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="4" Column="67"/>
+      </Position3>
+      <Position4>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="441" Column="21" TopLine="425"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="284" Column="33" TopLine="284"/>
+      </Position5>
+      <Position6>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="3" Column="64"/>
+      </Position6>
+      <Position7>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="570" Column="23" TopLine="554"/>
+      </Position7>
+      <Position8>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1645" Column="18" TopLine="1629"/>
+      </Position8>
+      <Position9>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="318" Column="44" TopLine="308"/>
+      </Position9>
+      <Position10>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1650" Column="35" TopLine="1642"/>
+      </Position10>
+      <Position11>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="570" Column="23" TopLine="562"/>
+      </Position11>
+      <Position12>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1645" Column="18" TopLine="1629"/>
+      </Position12>
+      <Position13>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1650" Column="35" TopLine="1634"/>
+      </Position13>
+      <Position14>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="282" Column="18" TopLine="272"/>
+      </Position14>
+      <Position15>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="2" Column="65"/>
+      </Position15>
+      <Position16>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="562" Column="27" TopLine="546"/>
+      </Position16>
+      <Position17>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1491" Column="17" TopLine="1475"/>
+      </Position17>
+      <Position18>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1570" Column="19" TopLine="1554"/>
+      </Position18>
+      <Position19>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1646" Column="22" TopLine="1630"/>
+      </Position19>
+      <Position20>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="3" Column="50"/>
+      </Position20>
+      <Position21>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="335" Column="25" TopLine="321"/>
+      </Position21>
+      <Position22>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1865" Column="13" TopLine="1849"/>
+      </Position22>
+      <Position23>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1521" Column="29" TopLine="1508"/>
+      </Position23>
+      <Position24>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="531" Column="20" TopLine="523"/>
+      </Position24>
+      <Position25>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="532" Column="20" TopLine="523"/>
+      </Position25>
+      <Position26>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1493" Column="47" TopLine="1475"/>
+      </Position26>
+      <Position27>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1581" Column="31" TopLine="1563"/>
+      </Position27>
+      <Position28>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1879" Column="12" TopLine="1862"/>
+      </Position28>
+      <Position29>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="531" Column="20" TopLine="523"/>
+      </Position29>
+      <Position30>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\cbillingclient.pas"/>
+        <Caret Line="532" Column="20" TopLine="523"/>
+      </Position30>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode="default"/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

@@ -1,0 +1,47 @@
+object AndroidModule1: TAndroidModule1
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Left = 450
+  Top = 119
+  Width = 320
+  Height = 400
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object jWebView1: jWebView
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Left = 0
+    Top = 0
+    Width = 320
+    Height = 400
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpMatchParent
+    JavaScript = True
+    BackgroundColor = colbrDefault
+    ZoomControl = False
+    OnStatus = jWebView1Status
+  end
+  object jcBillingClient1: jcBillingClient
+    AutoAcknowledge = True
+    OnBillingEvent = jcBillingClient1BillingEvent
+    OnConsumedData = jcBillingClient1ConsumedData
+    OnDeveloperPayload = jcBillingClient1DeveloperPayload
+    left = 76
+    top = 103
+  end
+end

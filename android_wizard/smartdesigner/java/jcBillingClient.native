@@ -1,0 +1,1 @@
+public native void pOnBillingClientEvent(long pasobj, String xml);

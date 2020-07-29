@@ -6,6 +6,7 @@ interface
   
 uses
   Classes,
+  cbillingclient,
   cqrgen,
   cbluetoothspp,
   cmail,
@@ -23,6 +24,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jcbillingclient_icon.lrs}
   {$I jcqrgen_icon.lrs}
   {$I jcbluetoothspp_icon.lrs}
   {$I jcmail_icon.lrs}
@@ -33,6 +35,7 @@ begin
   {$I jcmikrotikrouteros_icon.lrs}
   RegisterComponents('Android Bridges jCenter',
     [
+      jcBillingClient,
       jcQRGen,
       jcBluetoothSPP,
       jcMail,

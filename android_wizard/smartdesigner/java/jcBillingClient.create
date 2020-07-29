@@ -1,0 +1,4 @@
+public java.lang.Object jcBillingClient_Create(long _Self) {
+   return (java.lang.Object)(new jcBillingClient(this,_Self));
+}
+

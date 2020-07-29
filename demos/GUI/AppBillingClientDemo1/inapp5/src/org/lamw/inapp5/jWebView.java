@@ -1,0 +1,326 @@
+package org.lamw.inapp5;
+
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.util.Log;
+import android.view.View;
+import android.webkit.HttpAuthHandler;
+import android.webkit.WebView;
+import android.webkit.WebView.FindListener; //LMB
+import android.webkit.WebViewClient;
+
+//-------------------------------------------------------------------------
+// WebView
+//-------------------------------------------------------------------------
+
+class WVConst {
+    public static final int WebView_Act_Continue        =  0;
+    public static final int WebView_Act_Break           =  1;
+    public static final int WebView_OnUnknown           =  0;
+    public static final int WebView_OnBefore            =  1;
+    public static final int WebView_OnFinish            =  2;
+    public static final int WebView_OnError             =  3;
+}
+
+//http://developer.android.com/reference/android/webkit/WebViewClient.html
+class jWebClient extends WebViewClient {
+    //Java-Pascal Interface
+    public  long            PasObj   = 0;      // Pascal Obj
+    public  Controls        controls = null;   // Control Class for Event
+
+    public String mUsername = "";
+    public String mPassword = "";
+
+    public jWebClient(){
+        //
+    }
+
+
+    @Override
+    public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+        handler.proceed(mUsername, mPassword);
+    }
+
+    /*@Override
+    public  boolean shouldOverrideUrlLoading(WebView view, String url) {
+        int rtn = controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnBefore,url);
+        if (rtn == WVConst.WebView_Act_Continue)
+        { view.loadUrl(url);
+            return true; }
+        else { return true; }
+    }*/
+    
+    @Override
+    public  boolean shouldOverrideUrlLoading(WebView view, String url) {
+    	    	
+        int rtn = controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnBefore,url);
+        
+        if (rtn == WVConst.WebView_Act_Continue)
+        { 
+        	
+        	if (url.startsWith("intent://")) {
+                try {
+                    
+                    Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+
+                    if (intent != null) {
+                        view.stopLoading();                                                                    
+
+                        PackageManager packageManager = controls.activity.getPackageManager();
+                        ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                        
+                        if (info != null) {
+                        	 controls.activity.startActivity(intent);
+                        	 
+                        	 if(view.canGoBack())
+                             	view.goBack();   
+                        } else {                        	
+                            String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                            view.loadUrl(fallbackUrl);                            
+                        }
+
+                        return true;
+                    }
+                } catch (Throwable e) {
+                   //if (GeneralData.DEBUG) {
+                   //     Log.e(TAG, "Can't resolve intent://", e);
+                    
+                }
+        		
+            }else{
+            	view.loadUrl(url);	
+            }                
+        	         
+        }  
+         
+        return true; 
+        
+    }
+
+    @Override
+    public  void onLoadResource(WebView view, String url) {
+        //
+    }
+
+    @Override
+    public  void onPageFinished(WebView view, String url) {
+        controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnFinish,url);
+    }
+
+    @Override
+    public  void onReceivedError(WebView view, int errorCode, String description, String failingUrl)  {
+        super.onReceivedError(view, errorCode, description, failingUrl);
+        if (errorCode == 401) {
+            // alert to username and password
+            // set it through the setHttpAuthUsernamePassword(...)
+            controls.pOnWebViewStatus(PasObj, 401 , "login/password");
+        }
+        else{
+            controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnError, description);
+        }
+
+    }
+
+}
+
+public class jWebView extends WebView {
+    //Java-Pascal Interface
+    private long             PasObj   = 0;      // Pascal Obj
+    private Controls        controls = null;   // Control Class for Event
+    private jCommons LAMWCommon;
+    //
+    private jWebClient      webclient;
+    
+    private OnLongClickListener onClickListener;   
+    private Boolean         enabled  = true;    
+
+	//LMB:
+  	private FindListener findListener;
+    private int findIndex = 0;
+  	private int findCount = 0;
+    
+    //Constructor
+    public  jWebView(android.content.Context context,
+                     Controls ctrls,long pasobj ) {
+        super(context);
+
+        //Connect Pascal I/F
+        PasObj   = pasobj;
+        controls = ctrls;
+        LAMWCommon = new jCommons(this,context,pasobj);
+        
+        webclient = new jWebClient();
+        webclient.PasObj   = pasobj;
+        webclient.controls = ctrls;
+
+        setWebViewClient(webclient); // Prevent to run External Browser
+        this.getSettings().setJavaScriptEnabled(true);
+        
+        onClickListener = new OnLongClickListener() {        	
+		@Override
+		public boolean onLongClick(View arg0) {
+			// TODO Auto-generated method stub
+            if (enabled) {
+                controls.pOnLongClick(PasObj,Const.Click_Default);
+            }			
+			return false;
+		};
+        };                       
+        setOnLongClickListener(onClickListener);
+
+        //LMB:
+        findListener = new FindListener() {
+        @Override
+        public void onFindResultReceived(int activeMatchOrdinal, 
+            int numberOfMatches, boolean isDoneCounting) {
+            if (isDoneCounting) {
+                findIndex = activeMatchOrdinal;
+                findCount = numberOfMatches;
+                controls.pOnWebViewFindResultReceived(PasObj,activeMatchOrdinal,numberOfMatches);
+            }
+            return;
+        };
+        };
+        setFindListener(findListener);
+               
+    }
+
+
+    public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
+    }
+
+
+    public  void setParent( android.view.ViewGroup _viewgroup ) {
+    	LAMWCommon.setParent(_viewgroup);
+    }
+
+    //Free object except Self, Pascal Code Free the class.
+    public  void Free() {
+    	this.setOnLongClickListener(null);
+        this.setFindListener(null); //LMB
+        setWebViewClient(null);
+        webclient = null;
+    	LAMWCommon.free();
+    }
+
+    //by jmpessoa
+    public void setLParamWidth(int _w) {
+    	LAMWCommon.setLParamWidth(_w); 
+    }
+
+    public void setLParamHeight(int _h) {
+    	LAMWCommon.setLParamHeight(_h);
+    }
+
+    public void setLGravity(int _g) {
+    	LAMWCommon.setLGravity(_g);
+    }
+
+    public void setLWeight(float _w) {
+    	LAMWCommon.setLWeight(_w);
+    }
+
+    public void addLParamsAnchorRule(int rule) {
+    	LAMWCommon.addLParamsAnchorRule(rule);
+    }
+
+    public void addLParamsParentRule(int rule) {
+    	LAMWCommon.addLParamsParentRule(rule);
+    }
+
+    public void setLayoutAll(int idAnchor) {
+    	LAMWCommon.setLayoutAll(idAnchor);
+    }
+
+    public void clearLayoutAll() {
+    	LAMWCommon.clearLayoutAll();
+    }
+
+    public  void setJavaScript(boolean javascript) {
+        this.getSettings().setJavaScriptEnabled(javascript);
+    }
+
+    // Fatih - ZoomControl
+    public  void setZoomControl(boolean zoomControl) {
+        this.getSettings().setBuiltInZoomControls(zoomControl);
+    }
+
+    //TODO: http://www.learn2crack.com/2014/01/android-oauth2-webview.html
+    //Stores HTTP authentication credentials for a given host and realm. This method is intended to be used with
+    public void SetHttpAuthUsernamePassword(String _hostName, String  _hostDomain, String _username, String _password) {
+        this.setHttpAuthUsernamePassword(_hostName, _hostDomain, _username, _password);
+        webclient.mUsername = _username;
+        webclient.mPassword = _password;
+    }
+               
+    public void LoadFromHtmlString(String _htmlString) {  //thanks to Anton!
+       loadDataWithBaseURL(null, _htmlString, null, null, null);
+    }
+    
+    public boolean CanGoBack(){
+    	return this.canGoBack();
+    }
+    
+    public boolean CanGoBackOrForward(int _steps){
+    	return this.canGoBackOrForward(_steps);
+    }    
+
+    public boolean CanGoForward(){
+    	return this.canGoForward();
+    }
+    
+    public void GoBack(){
+        this.goBack();	
+    }    
+
+    public void	GoBackOrForward(int steps){
+    	this.goBackOrForward(steps);
+    }    
+
+    public void	GoForward(){
+    	this.goForward();
+    }
+    
+    // By ADiV
+    public void ClearHistory(){
+    	this.clearHistory();
+    }
+    
+    // By ADiV
+    public void ClearCache( boolean _clearDiskFiles){
+    	this.clearCache(_clearDiskFiles);
+    }
+
+	//LMB:
+	public void FindAllAsync(String _s) {
+		this.findAllAsync(_s);
+	} 
+	
+	//LMB 
+	public int getFindIndex() {
+		return findIndex;
+	}
+
+	//LMB
+	public int getFindCount() {
+		return findCount;
+	}
+
+	//LMB
+	public void FindNext(boolean _forward) {
+		this.findNext(_forward);
+	} // smartdesigner
+	
+	public void ClearMatches() {
+		this.clearMatches();
+		findCount = 0;
+		findIndex = 0;
+	}
+
+	//LMB
+	public void callLoadDataWithBaseURL(String s1, String s2, String s3, String s4, String s5) {  //thanks to Anton!
+		loadDataWithBaseURL(s1,s2,s3,s4,s5); // experimental...
+	}
+}
