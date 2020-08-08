@@ -33,8 +33,12 @@ import java.util.StringTokenizer;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.PowerManager;
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 
 /*Draft java code by "Lazarus Android Module Wizard" [2/16/2015 20:17:59]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -127,7 +131,13 @@ public class jHttpClient /*extends ...*/ {
 
     public void GetAsync(String _stringUrl) {
         mUrlString = _stringUrl;
+        
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+        new AsyncHttpClientGet().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,_stringUrl);
+    else
         new AsyncHttpClientGet().execute(_stringUrl);
+        
+
     }
 
     public void SetCharSet(String _charSet) {
@@ -158,7 +168,8 @@ public class jHttpClient /*extends ...*/ {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 String inputLine;
                 while ((inputLine = reader.readLine()) != null) {
-                    sb.append(inputLine);
+                       sb.append(inputLine + "\n");
+
                 }
                 inputStream.close();
             } else {
@@ -1062,7 +1073,7 @@ public class jHttpClient /*extends ...*/ {
 
         @Override
         protected void onPostExecute(String content) {
-            controls.pOnHttpClientContentResult(pascalObj, content);
+	      controls.pOnHttpClientContentResult(pascalObj, content.getBytes());
         }
 
         @Override
@@ -1072,12 +1083,11 @@ public class jHttpClient /*extends ...*/ {
         }
     }
 
-    class AsyncHttpClientGet extends AsyncTask<String, Integer, String> {
-
+		class AsyncHttpClientGet extends AsyncTask<String,Integer,byte[]> {
         @Override
-        protected String doInBackground(String... stringUrl) {
+	    protected byte[] doInBackground(String... stringUrl) {
             int status = HttpURLConnection.HTTP_NOT_FOUND;
-            StringBuffer sb = new StringBuffer();
+	        ByteArrayOutputStream bufferOutput = new ByteArrayOutputStream();
             try {
                 URL url = new URL(stringUrl[0]);
                 mResponseCode = HttpURLConnection.HTTP_CREATED;
@@ -1101,26 +1111,32 @@ public class jHttpClient /*extends ...*/ {
 
                 if (status == HttpURLConnection.HTTP_OK) {    //OK
                     InputStream inputStream = client3.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    String inputLine;
-                    while ((inputLine = reader.readLine()) != null) {
-                        sb.append(inputLine);
-                    }
+
+						BufferedInputStream mBufferInput = new BufferedInputStream(inputStream);
+						byte[] inputBuffer = new byte[1024];
+						int bytes_read = 0;
+						
+                        while (bytes_read != -1) {
+							bytes_read =  mBufferInput.read(inputBuffer, 0, inputBuffer.length);
+							if (bytes_read > 0) {
+								bufferOutput.write(inputBuffer, 0, bytes_read);
+							}
+                        }
+
                     inputStream.close();
                 } else {
-                    sb.append(String.valueOf(status));
+						bufferOutput.write(String.valueOf(status).getBytes());
                 }
                 client3.disconnect();
 
             } catch (Exception e) {
-                return "";
+	            return null;
             }
-
-            return sb.toString();
+			return bufferOutput.toByteArray();
         }
 
         @Override
-        protected void onPostExecute(String content) {
+		protected void onPostExecute(byte[] content) {
             controls.pOnHttpClientContentResult(pascalObj, content);
         }
 

@@ -113,17 +113,92 @@ public class jBitmap {
             bmp.setDensity(controls.GetDensityAssets());
     }
 
+
+	//by Tomash
+	public int[] GetBitmapSizeFromFile(String _fullFilename) {
+	    BitmapFactory.Options bo = new BitmapFactory.Options();
+	    bo.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(_fullFilename, bo);
+        int[] wh = new int[2];
+		wh[1] = bo.outHeight;
+		wh[0] = bo.outWidth;
+		return wh;
+	}
+
+	//by Tomash
+	private Bitmap SafeLoadFromFile(String _fullFilename) {
+		Bitmap bm = null;
+	    BitmapFactory.Options bo = new BitmapFactory.Options();
+
+		int[] wh = GetBitmapSizeFromFile(_fullFilename); 
+		int width = wh[0];
+		int height = wh[1];
+		
+		// empiric...
+		// TODO - depending on the capabilities of device?
+		int maxWidth = 2048;
+		int maxHeight = 2048;
+		
+		int inSampleSize = 1;
+
+		if (height > maxHeight || width > maxWidth) {
+			int halfHeight = height / 2;
+			int halfWidth = width / 2;
+			while ((halfHeight / inSampleSize) >= maxHeight && (halfWidth / inSampleSize) >= maxWidth) {
+				inSampleSize *= 2;
+			}
+		}
+
+		bo.inSampleSize = inSampleSize;
+    
+		try {
+			bm = BitmapFactory.decodeFile(_fullFilename, bo);
+		} catch (OutOfMemoryError e) {
+			bm = SafeLoadFromFile2(_fullFilename);
+		}
+		     
+		return bm;
+	}
+	
+	//by Tomash
+	private Bitmap SafeLoadFromFile2(String _fullFilename) {
+		Bitmap bm = null;
+	    BitmapFactory.Options bo = new BitmapFactory.Options();
+		for (bo.inSampleSize = 1; bo.inSampleSize <= 32; bo.inSampleSize++) {
+			try {
+				bm = BitmapFactory.decodeFile(_fullFilename, bo);
+				break;
+			} catch (OutOfMemoryError outOfMemoryError) {
+				//Log.e("BitmapSateLoadFromFile", "outOfMemoryError, sampleSize: " + bo.inSampleSize);
+			}
+		}
+		return bm;		
+	}	
+
     public Bitmap LoadFromFile(String _fullFilename) {  //pascal  "GetImageFromFile"
+        Bitmap bm = null;
         BitmapFactory.Options bo = new BitmapFactory.Options();
 
         if (bo != null) {
             if (controls.GetDensityAssets() > 0)
                 bo.inDensity = controls.GetDensityAssets();
-
-            return BitmapFactory.decodeFile(_fullFilename, bo);
-        } else
-            return null;
+			try {
+				bm = BitmapFactory.decodeFile(_fullFilename, bo);
+            } catch (OutOfMemoryError e2) {
+            	bm = SafeLoadFromFile(_fullFilename);
+            }
+            
+		} else {
+			try {
+				bm = BitmapFactory.decodeFile(_fullFilename);        
+            } catch (OutOfMemoryError e) {
+            	bm = SafeLoadFromFile(_fullFilename);
+            }            
+		}
+		
+		return bm;
     }
+
 
     public int[] getWH() {
         int[] wh = new int[2];
@@ -168,6 +243,11 @@ public class jBitmap {
 
     public Bitmap GetJInstance() {
         return this.bmp;
+    }
+
+    public  Canvas GetCanvas() {
+        Canvas c = new Canvas(this.bmp);
+        return c;
     }
 
     public byte[] GetByteArrayFromBitmap() {

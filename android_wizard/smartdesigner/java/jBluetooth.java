@@ -124,9 +124,13 @@ public class jBluetooth /*extends ...*/ {
     public void Enabled(){
     	
     	if (mBA != null) {   //real device... 
-    	   Toast.makeText(controls.activity.getApplicationContext(),"Adapter: "+mBA.getName() ,Toast.LENGTH_LONG).show();    	
+    	   //Toast.makeText(controls.activity.getApplicationContext(),"Adapter: "+mBA.getName() ,Toast.LENGTH_LONG).show();    	
            if (!mBA.isEnabled()) {
-             controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 999);
+             try {
+			    mBA.enable();
+			  } catch (Exception e) {
+                controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 999);
+			 }
              //Toast.makeText(controls.activity.getApplicationContext(),"Bluetooth turned On" ,Toast.LENGTH_LONG).show();
              controls.pOnBluetoothEnabled(pascalObj);
            }          
@@ -216,7 +220,7 @@ public class jBluetooth /*extends ...*/ {
     //This method returns the current state of the Bluetooth Adapter.
     public int GetState() {
       if (mBA != null) {
-        return mBA.getState();  //STATE_OFF, STATE_TURNING_ON, STATE_ON, STATE_TURNING_OFF.
+        return mBA.getState();  //STATE_OFF=10, STATE_TURNING_ON=11, STATE_ON=12, STATE_TURNING_OFF=13.
       } else { 
     	  return -1;
       }
@@ -269,11 +273,11 @@ public class jBluetooth /*extends ...*/ {
     }
  
     public BluetoothDevice GetRemoteDeviceByAddress(String _deviceAddress){
-    	
-       if (IsReachablePairedDevice(_deviceAddress))	
+	    try {
           return mBA.getRemoteDevice(_deviceAddress);
-       else
+      	} catch (Exception e) {
     	  return null;
+	    }
     }
 
     public BluetoothDevice GetRemoteDevice(String _deviceAddress){

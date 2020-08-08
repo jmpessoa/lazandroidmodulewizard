@@ -486,7 +486,6 @@ end;
 function jBluetoothServerSocket_ByteArrayToString(env: PJNIEnv; _jbluetoothserversocket: JObject; var _byteArray: TDynArrayOfJByte): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -500,13 +499,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothserversocket);
   jMethod:= env^.GetMethodID(env, jCls, 'ByteArrayToString', '([B)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jbluetoothserversocket, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;

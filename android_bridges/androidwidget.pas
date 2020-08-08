@@ -1216,6 +1216,7 @@ type
     function GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
     function GetInternalAppStoragePath: string;
     function CopyFile(srcFullFilename: string; destFullFilename: string): boolean;
+    function CopyFileFromUri(srcUri: jObject; destDir: string): string;
     function LoadFromAssets(fileName: string): string;
     function IsSdCardMounted: boolean;
 
@@ -1401,6 +1402,8 @@ type
 
 
     function ToSignedByte(b: byte): shortint;
+
+    procedure StartDefaultActivityForFile(_filePath, _mimeType: string); //by Tomash
 
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
@@ -1708,6 +1711,7 @@ end;
   function jForm_GetDeviceWifiIPAddress(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetWifiBroadcastIPAddress(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetRealPathFromURI(env: PJNIEnv; _jform: JObject; _Uri: jObject): string;
+  procedure jForm_StartDefaultActivityForFile(env: PJNIEnv; _jform: JObject; _filePath, _mimeType: string);
 
 //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -1819,6 +1823,8 @@ function jForm_IsConnectedWifi              (env: PJNIEnv;  _jform: JObject): bo
 function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv;  _jform: JObject; _directory: integer): string;
 function jForm_GetInternalAppStoragePath(env: PJNIEnv;  _jform: JObject): string;
 function jForm_CopyFile(env: PJNIEnv;  _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
+function jForm_CopyFileFromUri(env: PJNIEnv;  _jform: JObject; _srcUri : JObject; _destDir: string): string;
+
 function jForm_LoadFromAssets(env: PJNIEnv;  _jform: JObject; _fileName: string): string;
 function jForm_IsSdCardMounted(env: PJNIEnv;  _jform: JObject): boolean;
 function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
@@ -1962,6 +1968,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function sysIsWidthExactToParent(widget: jVisualControl) : boolean;
   function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
   function GetPString(env: PJNIEnv; jstr: JString): string;
+  function GetPStringAndDeleteLocalRef(env: PJNIEnv; jStr: jString): string;
 
   (*
    Abbreviation for variable types for "jni_func" or "jni_proc"
@@ -2079,6 +2086,28 @@ begin
       _jBoolean:= JNI_False;
       Result:= string(env^.GetStringUTFChars(env,jstr,@_jBoolean) );
     end;
+end;
+
+//by Tomash
+function GetPStringAndDeleteLocalRef(env: PJNIEnv; jStr: jString): string;
+var
+ jBoo: jBoolean;
+ pch: pchar;
+begin
+ if jStr = nil then
+   Result:= ''
+ else
+         begin
+              jBoo := JNI_False;
+              pch := env^.GetStringUTFChars(env, jStr, @jBoo);
+              Result := string(pch);
+
+              //IMPORTANT if function is executed more than 512 times in one call - App crash with error:
+			  //JNI ERROR (app bug): local reference table overflow (max=512)
+              //In single calls java garbage collector it does
+              env^.ReleaseStringUTFChars(env, jStr, pch);
+              env^.DeleteLocalRef(env, jStr);
+         end;
 end;
 
 function sysIsHeightExactToParent(widget: jVisualControl) : boolean;
@@ -3709,6 +3738,14 @@ begin
     Result:= jForm_CopyFile(FjEnv, FjObject, srcFullFilename, destFullFilename);
 end;
 
+//by Tomash
+function jForm.CopyFileFromUri(srcUri: jObject; destDir: string): string; //tk+
+begin
+ Result:= '';
+ if FInitialized then
+   Result:= jForm_CopyFileFromUri(FjEnv, FjObject, srcUri, destDir);
+end;
+
 function jForm.LoadFromAssets(fileName: string): string;
 begin
   Result:= '';
@@ -4153,6 +4190,13 @@ end;
 function jForm.ToSignedByte(b: byte): shortint;
 begin
   Result:= shortint(b);
+end;
+
+//by Tomash
+procedure jForm.StartDefaultActivityForFile(_filePath, _mimeType: string);
+begin
+  if FInitialized then
+     jForm_StartDefaultActivityForFile(FjEnv, FjObject, _filePath, _mimeType);
 end;
 
 function jForm.ActionBarIsShowing(): boolean;
@@ -4732,49 +4776,13 @@ end;
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetStripAccents(env: PJNIEnv; _jform: JObject; _str: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetStripAccents', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'GetStripAccents', _str);
 end;
 
 function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_assetsFileName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetPathFromAssetsFile', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'GetPathFromAssetsFile', _assetsFileName);
 end;
 
 
@@ -4825,7 +4833,6 @@ end;
 function jForm_GetStringExtra(env: PJNIEnv; _jform: JObject; intentData: jObject; extraName: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -4835,13 +4842,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetStringExtra', '(Landroid/content/Intent;Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -4928,33 +4929,14 @@ end;
 
 
 function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _dirName: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_dirName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'CreateDir', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'CreateDir', _dirName);
 end;
 
 
 function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _dirName: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -4964,13 +4946,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'CreateDir', '(ILjava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -4989,13 +4965,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'CreateDir', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
@@ -5030,23 +5000,8 @@ begin
 end;
 
 function jForm_GetjFormVersionFeatures(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetjFormVersionFeatures', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetjFormVersionFeatures');
 end;
 
 
@@ -5190,25 +5145,8 @@ end;
 
 
 function jForm_GetStringResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].i:= _resID;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetStringResourceById', '(I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_i_out_t(env, _jform, 'GetStringResourceById', _resID);
 end;
 
 function jForm_GetDrawableResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
@@ -5242,7 +5180,6 @@ end;
 function jForm_GetQuantityStringByName(env: PJNIEnv; _jform: JObject; _resName: string; _quantity: integer): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -5252,39 +5189,15 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetQuantityStringByName', '(Ljava/lang/String;I)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
 
 function jForm_GetStringResourceByName(env: PJNIEnv; _jform: JObject; _resName: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_resName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetStringResourceByName', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'GetStringResourceByName', _resName);
 end;
 
 function jForm_IsPackageInstalled(env: PJNIEnv; _jform: JObject; _packagename: string): boolean;
@@ -5328,43 +5241,13 @@ begin
 end;
 
 function jForm_GetScreenDensity(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetScreenDensity', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetScreenDensity');
 end;
 
 function jForm_GetScreenSize(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetScreenSize', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetScreenSize');
 end;
 
 procedure jForm_LogDebug(env: PJNIEnv; _jform: JObject; _tag: string; _msg: string);
@@ -5434,68 +5317,20 @@ begin
 end;
 
 function jForm_GetTitleActionBar(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetTitleActionBar', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetTitleActionBar');
 end;
 
 
 function jForm_GetSubTitleActionBar(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSubTitleActionBar', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetSubTitleActionBar');
 end;
 
 
 function jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'CopyFromAssetsToInternalAppStorage', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'CopyFromAssetsToInternalAppStorage', _filename);
 end;
 
 
@@ -5570,43 +5405,13 @@ begin
 end;
 
 function jForm_GetDeviceModel(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceModel', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetDeviceModel');
 end;
 
 function jForm_GetDeviceManufacturer(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceManufacturer', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetDeviceManufacturer');
 end;
 
 procedure jForm_SetKeepScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
@@ -5681,7 +5486,6 @@ end;
 function jForm_UriToString(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -5690,13 +5494,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'UriToString', '(Landroid/net/Uri;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5764,64 +5562,19 @@ begin
 end;
 
 function jForm_GetDeviceDataMobileIPAddress(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceDataMobileIPAddress', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetDeviceDataMobileIPAddress');
 end;
 
 
 function jForm_GetDeviceWifiIPAddress(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceWifiIPAddress', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetDeviceWifiIPAddress');
 end;
 
 function jForm_GetWifiBroadcastIPAddress(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetWifiBroadcastIPAddress', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jform, 'GetWifiBroadcastIPAddress');
 end;
 
 function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string): TDynArrayOfString;
@@ -6035,49 +5788,13 @@ begin
 end;
 
 function jForm_UriEncode(env: PJNIEnv; _jform: JObject; _message: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_message));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'UriEncode', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'UriEncode', _message);
 end;
 
 function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_htmlString));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'ParseHtmlFontAwesome', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'ParseHtmlFontAwesome', _htmlString);
 end;
 
 procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject);
@@ -6190,26 +5907,8 @@ begin
 end;
 
 function jForm_GetSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemString', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'GetSettingsSystemString', _strKey);
 end;
 
 
@@ -6559,7 +6258,6 @@ end;
 function jForm_GetRealPathFromURI(env: PJNIEnv; _jform: JObject; _Uri: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -6568,13 +6266,23 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetRealPathFromURI', '(Landroid/net/Uri;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_StartDefaultActivityForFile(env: PJNIEnv; _jform: JObject; _filePath, _mimeType: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_filePath));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_mimeType));
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'StartDefaultActivityForFile', '(Ljava/lang/String;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -7614,23 +7322,8 @@ end;
 //please, use the  jForm_GetDateTime!!
 //return GetControlsVersionFeatures ... "6$4=GetControlsVersionInfo;6$4=getLocale"
 function jApp_GetControlsVersionFeatures(env:PJNIEnv;this:jobject): string;
-var
- _cls: jClass;
- _jMethod : jMethodID = nil;
- _jString : jstring;
- _jBoolean: jBoolean;
 begin
-  _cls := env^.GetObjectClass(env, this);
-  _jMethod:= env^.GetMethodID(env, _cls, 'getStrDateTime', '()Ljava/lang/String;');
-  _jString:= env^.CallObjectMethod(env,this,_jMethod);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
-  env^.DeleteLocalRef(env, _cls);
+  Result:= jni_func_out_t(env, this, 'getStrDateTime');
 end;
 
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString; 
@@ -7837,23 +7530,8 @@ begin
 end;
 
 function jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
-var
- _cls: jClass;
- _jMethod : jMethodID = nil;
- _jString : jstring;
- _jBoolean: jBoolean;
 begin
-  _cls := env^.GetObjectClass(env, this);
-  _jMethod:= env^.GetMethodID(env, _cls, 'GetControlsVersionInfo', '()Ljava/lang/String;');
-  _jString:= env^.CallObjectMethod(env,this,_jMethod);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
-  env^.DeleteLocalRef(env, _cls);
+  Result:= jni_func_out_t(env, this, 'GetControlsVersionInfo');
 end;
 
 function  jForm_GetOnViewClickListener(env:PJNIEnv; Form: jObject): jObject;
@@ -7926,48 +7604,13 @@ begin
 end;
 
 function  jApp_GetStringResourceById(env:PJNIEnv;this:jobject; _resId: integer ): string;
-var
- _cls: jClass;
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- _jString : jString;
- _jBoolean: jBoolean;
 begin
-  _cls := env^.GetObjectClass(env, this);
-  _jMethod:= env^.GetMethodID(env, _cls, 'GetStringResourceById', '(I)Ljava/lang/String;');
-  _jParams[0].i := _resId;
-  _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
-  env^.DeleteLocalRef(env, _cls);
+  Result:= jni_func_i_out_t(env, this, 'GetStringResourceById', _resId);
 end;
 
 function  jApp_GetStringResourceByName(env:PJNIEnv;this:jobject; _resName: string): string;
-var
- _cls: jClass;
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- _jString : jstring;
- _jBoolean: jBoolean;
 begin
-  _cls := env^.GetObjectClass(env, this);
-  _jMethod:= env^.GetMethodID(env, _cls, 'getStringResourceByName', '(Ljava/lang/String;)Ljava/lang/String;');
-  _jParams[0].l := env^.NewStringUTF(env, pchar(_resName) );
-  _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
-   env^.DeleteLocalRef(env,_jParams[0].l); //added ...
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
-  env^.DeleteLocalRef(env, _cls);
+  Result:= jni_func_t_out_t(env, this, 'getStringResourceByName', _resName);
 end;
 
 // thierrydijoux - get a resource quantity string by name
@@ -7985,13 +7628,7 @@ begin
   _jParams[1].i:= _Quantity;
   _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
    env^.DeleteLocalRef(env,_jParams[0].l); //added..
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
+   Result:= GetPStringAndDeleteLocalRef(env, _jString);
   env^.DeleteLocalRef(env, _cls);
 end;
 
@@ -8174,23 +7811,8 @@ end;
 
 //by jmpessoa
 function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
-var
-  _jString: jString;
-  _jBoolean: jBoolean;
-  cls: jClass;
-  method: jmethodID;
 begin
-  cls:= env^.GetObjectClass(env, Form);
-  method:= env^.GetMethodID(env, cls, 'GetDateTime', '()Ljava/lang/String;');
-  _jString  := env^.CallObjectMethod(env,Form,method);
-  case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := string( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
-          end;
-  end;
-  env^.DeleteLocalRef(env, cls);
+  Result:= jni_func_out_t(env, Form, 'GetjFormVersionFeatures');
 end;
 
 function jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean): boolean;
@@ -8276,45 +7898,13 @@ begin
 end;
 
 function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; _jform: JObject; _directory: integer): string;
-var
-  _jParams: array[0..0] of jValue;
- _cls: jClass;
- _jMethod : jMethodID = nil;
- _jString : jstring;
- _jBoolean: jBoolean;
 begin
-  _cls := env^.GetObjectClass(env, _jform);
-  _jMethod:= env^.GetMethodID(env, _cls, 'GetEnvironmentDirectoryPath', '(I)Ljava/lang/String;');
-  _jParams[0].i:= _directory;
-  _jString:= env^.CallObjectMethodA(env,_jform,_jMethod, @_jParams);
-  case _jString = nil of
-     True : Result    := '';
-     False: begin
-             _jBoolean := JNI_False;
-             Result:= String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-           end;
-  end;
-  env^.DeleteLocalRef(env, _cls);
+  Result:= jni_func_i_out_t(env, _jform, 'GetEnvironmentDirectoryPath', _directory);
 end;
 
 function jForm_GetInternalAppStoragePath(env: PJNIEnv; _jform: JObject): string;
-var
- _cls: jClass;
- _jMethod : jMethodID = nil;
- _jString : jstring;
- _jBoolean: jBoolean;
 begin
-  _cls := env^.GetObjectClass(env, _jform);
-  _jMethod:= env^.GetMethodID(env, _cls, 'GetInternalAppStoragePath', '()Ljava/lang/String;');
-  _jString:= env^.CallObjectMethod(env,_jform,_jMethod);
-  case _jString = nil of
-     True : Result    := '';
-     False: begin
-             _jBoolean := JNI_False;
-             Result:= String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-           end;
-  end;
-  env^.DeleteLocalRef(env, _cls);
+  Result:= jni_func_out_t(env, _jform, 'GetInternalAppStoragePath');
 end;
 
 function jForm_CopyFile(env: PJNIEnv; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
@@ -8335,27 +7925,27 @@ begin
   env^.DeleteLocalRef(env, _jCls);
 end;
 
-function jForm_LoadFromAssets(env: PJNIEnv; _jform: JObject; _fileName: string): string;
+function jForm_CopyFileFromUri(env: PJNIEnv;  _jform: JObject; _srcUri : JObject; _destDir: string): string;
 var
-   _jString: jString;
-   _jBoolean: JBoolean;
    _jCls: jClass;
    _jMethod: jmethodID;
-   _jParams : Array[0..0] of jValue;
+   _jString : jstring;
+   _jBoolean: jBoolean;
+   _jParams : Array[0..1] of jValue;
 begin
- _jParams[0].l:= env^.NewStringUTF(env, pchar(_fileName) );
+ _jParams[0].l:= _srcUri;
+ _jParams[1].l:= env^.NewStringUTF(env, pchar(_destDir) );
   _jCls := env^.GetObjectClass(env, _jform);
-  _jMethod:= env^.GetMethodID(env, _jCls, 'LoadFromAssets', '(Ljava/lang/String;)Ljava/lang/String;');
+  _jMethod:= env^.GetMethodID(env, _jCls, 'CopyFileFromUri', '(Landroid/net/Uri;Ljava/lang/String;)Ljava/lang/String;');
   _jString:= env^.CallObjectMethodA(env, _jform, _jMethod,@_jParams);
-  case _jString = nil of
-     True : Result    := '';
-     False: begin
-             _jBoolean := JNI_False;
-             Result:= String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-           end;
-  end;
-  env^.DeleteLocalRef(env,_jParams[0].l);
+  Result:= GetPStringAndDeleteLocalRef(env, _jString);
+  env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env, _jCls);
+end;
+
+function jForm_LoadFromAssets(env: PJNIEnv; _jform: JObject; _fileName: string): string;
+begin
+  Result:= jni_func_t_out_t(env, _jform, 'LoadFromAssets', _fileName);
 end;
 
 function jForm_IsSdCardMounted(env: PJNIEnv; _jform: JObject): boolean;
@@ -8372,26 +7962,8 @@ begin
 end;
 
 function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssetsTextContent', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jform, 'LoadFromAssetsTextContent', _fileName);
 end;
 
 //------------------------------------------------------------------------------
@@ -8588,13 +8160,8 @@ Function  jSysInfo_PathApp(env:PJNIEnv; this:jobject; context : jObject; AppName
   _jParams[1].l := env^.NewStringUTF(env, pchar(AppName) );
   _jString      := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
   env^.DeleteLocalRef(env,_jParams[1].l);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, _jString);
+
  end;
 
 // "/data/data/com.kredix/files"
@@ -8606,18 +8173,12 @@ Function  jSysInfo_PathDat  (env:PJNIEnv; this:jobject; context : jObject) : Str
   _jMethod : jMethodID = nil;
   _jParam  : jValue;
   _jString : jString;
-  _jBoolean: jBoolean;
+
  begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
   _jParam.l := context;
   _jString  := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, _jString);
  end;
 
 //by jmpessoa
@@ -8629,124 +8190,42 @@ Var
  _jMethod : jMethodID = nil;
  _jParam  : jValue;
  _jString : jString;
- _jBoolean: jBoolean;
+
 begin
  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
  _jParam.l := context;
  _jString  := env^.CallObjectMethodA(env,this,_jMethod,@_jParam);
- Case _jString = nil of
-  True : Result    := '';
-  False: begin
-          _jBoolean := JNI_False;
-          Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-         end;
- end;
+ Result:= GetPStringAndDeleteLocalRef(env, _jString);
 end;
 
 Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
- Const
-  _cFuncName = 'getPathExt';
-  _cFuncSig  = '()Ljava/lang/String;';
- Var
-  _jMethod : jMethodID = nil;
-  _jString : jString;
-  _jBoolean: jBoolean;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jString  := env^.CallObjectMethod(env,this,_jMethod);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
- end;
+begin
+  Result:= jni_func_out_t(env, this, 'getPathExt');
+end;
 
 Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
- Const
-  _cFuncName = 'getPathDCIM';
-  _cFuncSig  = '()Ljava/lang/String;';
- Var
-  _jMethod : jMethodID = nil;
-  _jString : jString;
-  _jBoolean: jBoolean;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jString  := env^.CallObjectMethod(env,this,_jMethod);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
- end;
+begin
+  Result:= jni_func_out_t(env, this, 'getPathDCIM');
+end;
 
 //by thierrydijoux
 Function jSysInfo_Language (env:PJNIEnv; this: jObject; localeType: TLocaleType): String;
-Var
- _jCls: jClass;
- _jMethod : jMethodID;
- _jParams : Array[0..0] of jValue;
- _jString : jString;
- _jBoolean: jBoolean;
 begin
- _jCls:= env^.GetObjectClass(env, this);
- _jMethod:= env^.GetMethodID(env, _jCls, 'getLocale', '(I)Ljava/lang/String;');
- _jParams[0].i := Ord(localeType);
- _jString  := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- Case _jString = nil of
-  True : Result    := '';
-  False: begin
-          _jBoolean := JNI_False;
-          Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-         end;
- end;
+ Result:= jni_func_i_out_t(env, this, 'getLocale', Ord(localeType));
 end;
 
 //------------------------------------------------------------------------------
 // Device Info
 //------------------------------------------------------------------------------
 Function  jSysInfo_DevicePhoneNumber(env:PJNIEnv;this:jobject) : String;
- Const
-  _cFuncName = 'getDevPhoneNumber';
-  _cFuncSig  = '()Ljava/lang/String;';
- Var
-  _jMethod : jMethodID = nil;
-  _jString : jString;
-  _jBoolean: jBoolean;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jString  := env^.CallObjectMethod(env,this,_jMethod);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;  //0
-           Result    := string( env^.GetStringUTFChars(Env,_jString, @_jBoolean) );
-          end;
-  end;
- end;
+begin
+   Result:= jni_func_out_t(env, this, 'getDevPhoneNumber');
+end;
 
 Function  jSysInfo_DeviceID(env:PJNIEnv;this:jobject) : String;
- Const
-  _cFuncName = 'getDevDeviceID';
-  _cFuncSig  = '()Ljava/lang/String;';
- Var
-  _jMethod : jMethodID = nil;
-  _jString : jString;
-  _jBoolean: jBoolean;
- begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  _jString  := env^.CallObjectMethod(env,this,_jMethod);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := String( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-          end;
-  end;
- end;
+begin
+   Result:= jni_func_out_t(env, this, 'getDevDeviceID');
+end;
 
 Procedure jSystem_SetOrientation(env:PJNIEnv; this:jobject; orientation : Integer);
 const
@@ -9290,20 +8769,13 @@ end;
 function jni_func_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Ljava/lang/String;');
   jStr:= env^.CallObjectMethod(env, _jobject, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9395,7 +8867,6 @@ function jni_func_dd_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string
                             _double1, _double2: double): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9407,13 +8878,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(DD)Ljava/lang/String;');
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9538,7 +9003,6 @@ function jni_func_int_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : strin
                             _intent: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9547,13 +9011,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/content/Intent;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9576,7 +9034,6 @@ function jni_func_i_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                           _int: integer): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9587,13 +9044,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)Ljava/lang/String;');
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9601,7 +9052,6 @@ function jni_func_ii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string
                           _int0, _int1: integer): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9613,13 +9063,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(II)Ljava/lang/String;');
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9627,7 +9071,6 @@ function jni_func_iii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : strin
                           _int0, _int1, _int2: integer): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9640,13 +9083,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(III)Ljava/lang/String;');
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9654,7 +9091,6 @@ function jni_func_j_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                           _long: longint): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9665,13 +9101,7 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(J)Ljava/lang/String;');
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9861,7 +9291,6 @@ function jni_func_ffz_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : strin
                              _float1, _float2: double; _bool: boolean): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9873,13 +9302,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(DDZ)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -9920,7 +9343,6 @@ function jni_func_t_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string
                           _str: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9930,13 +9352,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;

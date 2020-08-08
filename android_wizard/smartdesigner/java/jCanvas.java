@@ -102,6 +102,11 @@ public class jCanvas {
 		mTextPaint.setTextSize(scale*textsize);
 	}
 
+	//by Tomash
+    public void rotate(float rotation) {
+		mCanvas.rotate(rotation);
+	}
+
 	public  void setTypeface(int _typeface) {
 		Typeface t = null;
 		switch (_typeface) {

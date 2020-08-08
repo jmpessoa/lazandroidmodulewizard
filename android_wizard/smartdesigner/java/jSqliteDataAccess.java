@@ -76,16 +76,16 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
     public static String ASSET_DB_PATH = "databases";
 
     private final Context mContext;
-    private String mName;
+
     private final CursorFactory mFactory;
     private final int mNewVersion;
-    private String DATABASE_NAME;
+    public static String DATABASE_NAME;
+    public static String DB_PATH;
+
     private int DATABASE_VERSION;
 
     private SQLiteDatabase mDatabase = null;
     private boolean mIsInitializing = false;
-
-    private String mDatabasePath;
 
     private String mAssetPath;
 
@@ -117,19 +117,27 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
     
     public SQLiteAssetHelper(Context context, String name, String storageDirectory, CursorFactory factory, int version) {
         super(context, name, factory, version);
-        
-	    DATABASE_NAME = name;
-	    DATABASE_VERSION = version;
+	    
+
+        if (storageDirectory != null) {
+            DB_PATH = storageDirectory;
+        } else {
+            DB_PATH = context.getApplicationInfo().dataDir + "/databases";  //internal app database path
+        }
+
+   DATABASE_NAME = name;
+   DATABASE_VERSION = version;
+
 
         if (version < 1) throw new IllegalArgumentException("Version must be >= 1, was " + version);
         if (name == null) throw new IllegalArgumentException("Database name cannot be null");
 
         mContext = context;
-        mName = name;
+        
         mFactory = factory;
         mNewVersion = version;
         
-        if (IsFileInRootAssets(mName)) {
+        if (IsFileInRootAssets(DATABASE_NAME)) {
         	ASSET_DB_PATH = "";
         }
              	
@@ -138,11 +146,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
         else
         	mAssetPath =  name;
                      	        
-        if (storageDirectory != null) {
-            mDatabasePath = storageDirectory;
-        } else {
-            mDatabasePath = context.getApplicationInfo().dataDir + "/databases";  //internal app database path
-        }
+
                 
         if ( !ASSET_DB_PATH.equals("") )
            mUpgradePathFormat = ASSET_DB_PATH + "/" + name + "_upgrade_%s-%s.sql";
@@ -213,10 +217,10 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = null;
         //if (mDatabase != null) mDatabase.lock();
         try {        	
-            //if (mName == null) {
+            //if (DATABASE_NAME == null) {
             //    db = SQLiteDatabase.create(null);
             //} else {
-            //    db = mContext.openOrCreateDatabase(mName, 0, mFactory);
+            //    db = mContext.openOrCreateDatabase(DATABASE_NAME, 0, mFactory);
             //}
         	if (mDatabase != null) {
                 try { mDatabase.close(); } catch (Exception e) { }                
@@ -312,16 +316,16 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
         try {
             return getWritableDatabase();
         } catch (SQLiteException e) {
-            //if (mName == null) throw e;  // Can't open a temp database read-only!
-            if (mName == null) return null;  // Can't open a temp database read-only!
-            //Log.e(TAG, "Couldn't open " + mName + " for writing (will try read-only):", e);
+            //if (DATABASE_NAME == null) throw e;  // Can't open a temp database read-only!
+            if (DATABASE_NAME == null) return null;  // Can't open a temp database read-only!
+            //Log.e(TAG, "Couldn't open " + DATABASE_NAME + " for writing (will try read-only):", e);
         }
 
         mIsInitializing = true;
         SQLiteDatabase db = null;
         
         try {            
-            String path = mContext.getDatabasePath(mName).getPath();
+            String path = mContext.getDatabasePath(DATABASE_NAME).getPath();
             
             if (mDatabase != null) {
              try { mDatabase.close(); } catch (Exception e) { }                
@@ -340,7 +344,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
             }
 
             onOpen(db);// borsa.db_upgrade_1-2.sql
-            Log.w(TAG, "Opened " + mName + " in read-only mode");
+            Log.w(TAG, "Opened " + DATABASE_NAME + " in read-only mode");
             mDatabase = db;            
         } finally {
         	
@@ -380,7 +384,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        Log.w(TAG, "Upgrading database " + mName + " from version " + oldVersion + " to " + newVersion + "...");
+        Log.w(TAG, "Upgrading database " + DATABASE_NAME + " from version " + oldVersion + " to " + newVersion + "...");
 
         ArrayList<String> paths = new ArrayList<String>();
         getUpgradeFilePaths(oldVersion, newVersion-1, newVersion, paths);
@@ -411,7 +415,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
 		db.setVersion(newVersion);
 	    }	
         }
-        Log.w(TAG, "Successfully upgraded database " + mName + " from version " + oldVersion + " to " + db.getVersion());
+        Log.w(TAG, "Successfully upgraded database " + DATABASE_NAME + " from version " + oldVersion + " to " + db.getVersion());
 
     }
 
@@ -460,9 +464,9 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
         // to prevent the error trace in log on API 14+
 //	Log.w(TAG, "createOrOpenDatabase");
         SQLiteDatabase db = null;
-        File file = new File (mDatabasePath + "/" + mName);  //internal app database path
+        File file = new File (DB_PATH + "/" + DATABASE_NAME);  //internal app database path
         if (file.exists()) {
-//	    Log.w(TAG, "createOrOpenDatabase file.exist "+mDatabasePath+"/"+mName);
+//	    Log.w(TAG, "createOrOpenDatabase file.exist "+DB_PATH+"/"+DATABASE_NAME);
             db = returnDatabase();
         }
         //SQLiteDatabase db = returnDatabase();
@@ -485,31 +489,33 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
     }
     
     public SQLiteDatabase returnDatabase(String dbPath,  String dbName) throws IOException { //by jmpessoa    	
-    	mDatabasePath = dbPath;   //app internal database path 	    
-    	mName = dbName;
-    	DATABASE_NAME = mName;    	
+    	DB_PATH = dbPath;   //app internal database path 	    
+    	DATABASE_NAME = dbName;
         try {
-        	File file1 = new File(mDatabasePath);
+        	File file1 = new File(DB_PATH);
         	if(!file1.exists()){
         		file1.mkdir();
         	}
         	
-        	File file = new File(mDatabasePath + "/" + mName);
+        	File file = new File(DB_PATH + "/" + DATABASE_NAME);
         	if (!file.exists()) { 
-        		file.createNewFile();
-                                            	  
+                try {
+                 	file.createNewFile();
+                } catch (IOException e2) {
+                   Log.w(TAG, "could not create database " + DB_PATH + "/" +DATABASE_NAME + " - " + e2.getMessage());        	
+                }
             }
         	
         	if(file.exists()){
-        	  	mDatabase = SQLiteDatabase.openOrCreateDatabase(mDatabasePath + "/" + mName, mFactory);        	        	
-                Log.i(TAG, "successfully opened database " + mName);  
+        	  	mDatabase = SQLiteDatabase.openOrCreateDatabase(DB_PATH + "/" + DATABASE_NAME, mFactory);        	        	
+                Log.i(TAG, "successfully opened database " + DATABASE_NAME);  
         	}
         	else {
-            	 Log.i(TAG, "fail to open database, file not exists! " + mName);
+            	 Log.i(TAG, "fail to open database, file not exists! " + DB_PATH + "/" +DATABASE_NAME);
             }
         	
         } catch (SQLiteException e) {
-            Log.w(TAG, "could not open database " + mName + " - " + e.getMessage());
+            Log.w(TAG, "could not open database " + DB_PATH + "/" +DATABASE_NAME + " - " + e.getMessage());
             return null;
         }
 		return mDatabase;
@@ -517,11 +523,11 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
   
     private SQLiteDatabase returnDatabase(){
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(mDatabasePath + "/" + mName, mFactory, (SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS));
-//            Log.i(TAG, "successfully opened database " + mName);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH + "/" + DATABASE_NAME, mFactory, (SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS));
+//            Log.i(TAG, "successfully opened database " + DATABASE_NAME);
             return db;
         } catch (SQLiteException e) {
-//            Log.w(TAG, "could not open database " + mName + " - " + e.getMessage());
+//            Log.w(TAG, "could not open database " + DATABASE_NAME + " - " + e.getMessage());
             return null;
         }
     }
@@ -530,7 +536,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
         Log.w(TAG, "copying database from assets...");
 
         String path = mAssetPath;
-        String dest = mDatabasePath + "/" + mName;
+        String dest = DB_PATH + "/" + DATABASE_NAME;
         InputStream is;
         boolean isZip = false;
 
@@ -555,7 +561,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
         }
 
         try {
-            File f = new File(mDatabasePath + "/");
+            File f = new File(DB_PATH + "/");
             if (!f.exists()) { f.mkdir(); }
             if (isZip) {
                 ZipInputStream zis = Utils.getFileFromZip(is);
@@ -663,8 +669,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
  
  public Bitmap bufBmp = null;
 
- private static String DATABASE_NAME;
- private static String DB_PATH;
+ //private static String DATABASE_NAME;
+ //private static String DB_PATH;
  private static final int DATABASE_VERSION = 1;
 
  char selectColDelimiter;
@@ -725,14 +731,27 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   controls = ctrls;
   selectColDelimiter = colDelim;
   selectRowDelimiter = rowDelim;
-  DATABASE_NAME = dbName;
-  DB_PATH = controls.activity.getDatabasePath(dbName).getPath();
+
  }
 
  //by jmpessoa
  public void OpenOrCreate(String dataBaseName) throws IOException { 
-   String DATABASE_NAME = dataBaseName;  
-   DB_PATH = controls.activity.getApplicationInfo().dataDir + "/databases"; 
+   //by Tomash
+   File file = new File(dataBaseName);
+   String path = file.getParent();
+   File dir =  new File(path);
+   if (dir.exists())
+   {
+      DATABASE_NAME = file.getName();
+      DB_PATH = path;
+   }
+   else
+   //---
+   {
+   DATABASE_NAME = dataBaseName;
+   DB_PATH = controls.activity.getApplicationInfo().dataDir + "/databases";
+   }
+
    mydb = returnDatabase(DB_PATH, DATABASE_NAME);  
  }
 

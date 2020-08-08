@@ -53,6 +53,7 @@ this.controls.activitypackage com.sohit.sohitmachinelogger;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.provider.DocumentsContract;
+import android.provider.Settings.Secure;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -72,6 +73,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.ContentResolver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -1142,8 +1144,8 @@ class jForm {
 //[ifdef_api14up]
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
 
-		
-		jCommons.ActionBarSetIcon(controls, d);
+		if (d != null) // by tr3e
+			jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
 	}
 	
@@ -1306,7 +1308,8 @@ class jForm {
 				r = "MEDIUM:" + String.valueOf(density);
 			} else if (density == DisplayMetrics.DENSITY_LOW) {
 				r = "LOW:" + String.valueOf(density);
-			}
+			} else
+	    	   r= "CUSTOM:" + String.valueOf(density);
 		return r;
 	}
 
@@ -1384,28 +1387,29 @@ class jForm {
 	//https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
 	public String CopyFromAssetsToInternalAppStorage(String _filename) {
 		InputStream is = null;
-		FileOutputStream fos = null;
+		FileOutputStream fos = null;			
 		String PathDat = controls.activity.getFilesDir().getAbsolutePath();
-		try {
-			File outfile = new File(PathDat + "/" + _filename);
+		String _filename2 = _filename.substring(_filename.lastIndexOf("/")+1); //by Tomash - add support for folders in assets
+		try {		   		     			
+			File outfile = new File(PathDat+"/"+_filename2);								
 			// if file doesnt exists, then create it
 			if (!outfile.exists()) {
-				outfile.createNewFile();
-			}
+				outfile.createNewFile();			
+			}												
 			fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name														
-			is = controls.activity.getAssets().open(_filename);
-			int size = is.available();
-			byte[] buffer = new byte[size];
-			for (int c = is.read(buffer); c != -1; c = is.read(buffer)) {
-				fos.write(buffer, 0, c);
-			}
-			is.close();
-			fos.close();
-		} catch (IOException e) {
+			is = controls.activity.getAssets().open(_filename);																				
+			int size = is.available();	     
+			byte[] buffer = new byte[size];												
+			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+		      fos.write(buffer, 0, c);
+			}																
+			is.close();								
+			fos.close();															
+		}catch (IOException e) {
 			// Log.i("ShareFromAssets","fail!!");
-			e.printStackTrace();
+		     e.printStackTrace();			     
 		}
-		return PathDat + "/" + _filename;
+		return PathDat + "/" +_filename2;
 	}
 
 	//by TR3E
@@ -1435,7 +1439,8 @@ class jForm {
 
 	public void CopyFromAssetsToEnvironmentDir(String _filename, String _environmentDir) {
 		CopyFromAssetsToInternalAppStorage(_filename);
-		CopyFromInternalAppStorageToEnvironmentDir(_filename, _environmentDir);
+		String _filename2 = _filename.substring(_filename.lastIndexOf("/")+1); //by Tomash - add support for folders in assets
+		CopyFromInternalAppStorageToEnvironmentDir(_filename2,_environmentDir);
 	}
 
 	public void ToggleSoftInput() {
@@ -1893,6 +1898,65 @@ class jForm {
 
 		   return path;
 	}
+	
+	
+//by Tomash
+    public void StartDefaultActivityForFile(String _filePath, String _mimeType) {
+      File file = new File(_filePath);
+      Intent intent = new Intent(Intent.ACTION_VIEW);
+      Uri newUri;
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        newUri = FileProvider.getUriForFile(controls.GetContext(), controls.GetContext().getApplicationContext().getPackageName() + ".provider", file);
+        intent.setDataAndType(newUri,_mimeType);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      }
+      else
+      {
+        newUri = Uri.fromFile(file);
+        intent.setDataAndType(Uri.parse("file://" + file),_mimeType);
+      }
+
+      controls.activity.startActivity(intent);
+    }
+    
+	public String CopyFileFromUri(Uri _srcUri, String _outputDir) {
+	
+		String fileName = "";
+		ContentResolver cr = controls.activity.getContentResolver();
+    	String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
+    	Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);
+    	if (metaCursor != null) {
+            try {
+                if (metaCursor.moveToFirst()) {
+                    fileName = metaCursor.getString(0);
+                }
+            } finally {
+                metaCursor.close();
+            }
+    	}	
+	
+		if (fileName != "") {
+		 try {	
+ 			InputStream input = cr.openInputStream(_srcUri);
+ 			OutputStream output = new FileOutputStream(new File(_outputDir + "/" + fileName));
+			byte[] buf = new byte[1024];
+			int bytesRead;
+			while ((bytesRead = input.read(buf)) > 0) {
+				output.write(buf, 0, bytesRead);
+				}
+  	    	input.close();
+   	    	output.close();
+	        return fileName;
+		 } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		 }
+		} else {
+		 return "";	
+		}	
+	}    
 
 }
 //**class entrypoint**//please, do not remove/change this line!
@@ -2433,28 +2497,45 @@ public  String getDevPhoneNumber() {
 
 // Result: Device ID - LORDMAN
 // Remarks : Nexus7 (no moblie device) -> Crash : fixed code - Simon
-public  String getDevDeviceID() {
-	String f = "";
-  TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-	if (telephony!=null) {
-		try {
-			f = telephony.getDeviceId();
-		} catch (SecurityException ex) {
-			Log.e("getDevDeviceID", ex.getMessage());
-		}
-	}
-  return f;
+// ANDROID_ID - Added by Tomash
+@SuppressLint("NewApi")
+public String getDevDeviceID() {
+  String devid = "";
+
+  try {
+
+    TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
+    if (telephony != null) {
+        devid = telephony.getDeviceId();
+    	
+    	if (devid==null) {   //tk+
+    		devid="";    		
+    	}
+    } else {
+    	devid="";
+    }	
+
+    if (devid=="") {	
+        devid = Secure.getString(activity.getContentResolver(),Secure.ANDROID_ID);
+    }    	
+  }
+  catch (Exception e)
+      { e.printStackTrace(); }
+
+  return devid;
 }
 // -------------------------------------------------------------------------
 //  Bitmap
 // -------------------------------------------------------------------------
 // Get Image Width,Height without Decoding
+/* Tomash: unused? See jBitmap.java GetBitmapSizeFromFile
 public  int Image_getWH (String filename ) {
   BitmapFactory.Options options = new BitmapFactory.Options();
   options.inJustDecodeBounds = true;
   BitmapFactory.decodeFile(filename, options);
   return ( (options.outWidth << 16) | (options.outHeight) );
 }
+*/
 
 //
 public  Bitmap Image_resample(String infile,int size) {

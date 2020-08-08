@@ -611,7 +611,7 @@ Sending Data: Extras vs. URI Parameters
 	   	case 11: mIntent.addCategory(Intent.CATEGORY_APP_MAPS);	   	
 	   	case 12: mIntent.addCategory(Intent.CATEGORY_APP_MESSAGING);
 	   	case 13: mIntent.addCategory(Intent.CATEGORY_APP_MUSIC);
-
+	   	case 14: mIntent.addCategory(Intent.CATEGORY_OPENABLE); //by Tomash
 	  }		
    }
    

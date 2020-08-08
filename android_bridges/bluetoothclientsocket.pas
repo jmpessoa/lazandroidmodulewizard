@@ -36,6 +36,7 @@ jBluetoothClientSocket = class(jControl)
     procedure jFree();
     procedure SetDevice(_device: jObject);
     procedure SetUUID(_strUUID: string);
+    procedure SetSecureConnection(IsSecureConnection: Boolean); //by Tomash
     procedure Connect();  overload;
 
 
@@ -185,6 +186,12 @@ begin
   FUUID:= _strUUID;
   if FInitialized then
      jBluetoothClientSocket_SetUUID(FjEnv, FjObject, _strUUID);
+end;
+
+procedure jBluetoothClientSocket.SetSecureConnection(IsSecureConnection: Boolean); //by Tomash
+begin
+  if FInitialized then
+    jni_proc_z(FjEnv, FjObject, 'SetSecureConnection' , IsSecureConnection);
 end;
 
 function jBluetoothClientSocket.IsConnected(): boolean;
@@ -457,7 +464,6 @@ end;
 function jBluetoothClientSocket_ByteArrayToString(env: PJNIEnv; _jbluetoothclientsocket: JObject; var _byteArray: TDynArrayOfJByte): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -471,13 +477,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbluetoothclientsocket);
   jMethod:= env^.GetMethodID(env, jCls, 'ByteArrayToString', '([B)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jbluetoothclientsocket, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
