@@ -496,11 +496,30 @@ public void SetTimeout(int _milliseconds) {
           	  if (bytes_read > 0) {	
                   bufferOutput.write(inputBuffer, 0, bytes_read);
                   publishProgress(bufferOutput);
+
+                try {                	 
+           	   		bufferOutput.close();    		
+  			     } catch (IOException e) {
+  					// TODO Auto-generated catch block
+  					e.printStackTrace();
+  			    }                
+                bufferOutput=null;       
+                  
+                  
           	  }
           	}
           }
                                   	                         
-        }// main loop            
+        }// main loop
+        
+            try {
+          	  if (bufferOutput != null)
+          	      bufferOutput.close();	
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+			  } 
+			             
         return null;
       }
       
@@ -512,7 +531,7 @@ public void SetTimeout(int _milliseconds) {
 		//http://examples.javacodegeeks.com/core-java/nio/bytebuffer/convert-between-bytebuffer-and-byte-array/
       @Override
       protected void onProgressUpdate(ByteArrayOutputStream...buffers) {
-         super.onProgressUpdate(buffers[0]);            
+         super.onProgressUpdate(buffers);            
 		   if (!flagAceept) {
 			   flagAceept = true;
 		       boolean keep = controls.pOnBluetoothServerSocketConnected(pascalObj,mConnectedSocket.getRemoteDevice().getName(),mConnectedSocket.getRemoteDevice().getAddress());
@@ -521,7 +540,6 @@ public void SetTimeout(int _milliseconds) {
 		    	    
 		    	    mBufferInput = null;
 					mBufferOutput = null;
-		  			mConnectedSocket = null;
 		  			
 		    		while (mConnectedSocket.isConnected()) {
 		    			try {
@@ -531,19 +549,15 @@ public void SetTimeout(int _milliseconds) {
 						e.printStackTrace();
 					    }   
 		    		}		    																	              		
+		    		
+		  			mConnectedSocket = null;
+		  			
 		       }	
 		   }  	
 		   
 		   if (IsFirstsByteHeader) { 			   
 		      if (buffers[0].toByteArray().length == lenContent) { 		    	  
                mConnected = controls.pOnBluetoothServerSocketIncomingData(pascalObj, buffers[0].toByteArray(), headerBuffer);
-               try {
-              	 if (bufferOutput != null) 
-              	   bufferOutput.close();                	   
-				 } catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				 }                 
 		      }  
             //TODO
             /*
@@ -552,13 +566,6 @@ public void SetTimeout(int _milliseconds) {
 		   }        
          else {
       	  mConnected = controls.pOnBluetoothServerSocketIncomingData(pascalObj, buffers[0].toByteArray(), headerBuffer);
-            try {
-          	  if (bufferOutput != null)
-          	      bufferOutput.close();	
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-			  }              
          } 		    		   
       }
       

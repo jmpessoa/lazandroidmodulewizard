@@ -264,7 +264,7 @@ type
   end;
 
   THttpClientAuthenticationMode = (autNone, autBasic{, autOAuth}); //TODO: autOAuth
-  TOnHttpClientContentResult = procedure(Sender: TObject; content: string) of Object;
+  TOnHttpClientContentResult = procedure(Sender: TObject; content: RawByteString) of Object;
   TOnHttpClientCodeResult = procedure(Sender: TObject; code: integer) of Object;
 
   TOnHttpClientUploadProgress = procedure(Sender: TObject; progress: int64) of Object;
@@ -375,7 +375,7 @@ type
     procedure SetEncodeValueData(_value: boolean);
     procedure PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
 
-    procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
+    procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: RawByteString);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
 
     procedure GenEvent_OnHttpClientUploadProgress(Obj: TObject; progress: int64);
@@ -542,6 +542,8 @@ type
     Procedure CreateJavaBitmap(w,h : Integer);
     Function  GetJavaBitmap: jObject;  //deprecated ..
     Function  GetImage(): jObject;
+    Function  GetCanvas(): jObject; //by Tomash
+    procedure GetBitmapSizeFromFile(_fullPathFile: string; var w, h :integer); //by Tomash
 
     function BitmapToArrayOfJByte(var bufferImage: TDynArrayOfJByte): integer;  //local/self
 
@@ -649,6 +651,7 @@ type
     // Java
     //FjObject    : jObject; //Self
     FParent     : jForm;
+    FOnBackPressed: TOnNotify;
   protected
   public
     constructor Create(AOwner: TComponent); override;
@@ -671,6 +674,7 @@ type
   published
     property Title: string read FTitle write SetTitle;
     property Msg: string read FMsg write SetMessage;
+    property OnBackPressed: TOnNotify read FOnBackPressed write FOnBackPressed;
   end;
 
   jAsyncTask = class(jControl)
@@ -2005,6 +2009,7 @@ type
     FPaintStrokeWidth: single;
     FPaintStyle: TPaintStyle;
     FPaintTextSize: single;
+    FPaintRotation: single;
     FPaintColor: TARGBColorBridge;
     FTypeface: TFontFace;
 
@@ -2073,6 +2078,9 @@ type
     function GetJInstance(): jObject;
     procedure SaveBitmapJPG(_fullPathFileName: string);
 
+    //by Tomash
+    procedure SetRotation(Value : single );
+    
     //by Kordal
     function GetDensity(): single;
     procedure ClipRect(Left, Top, Right, Bottom: single);
@@ -2374,7 +2382,8 @@ type
 
   Procedure Java_Event_pOnFlingGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; direction: integer);
   Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
-  procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: jString);
+
+  procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: JByteArray);
   procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
   procedure Java_Event_pOnHttpClientUploadFinished(env: PJNIEnv; this: jobject; Obj: TObject; code: integer; response: JString; fullFileName: JString );
   procedure Java_Event_pOnHttpClientUploadProgress(env: PJNIEnv; this: jobject; Obj: TObject; progress: int64);
@@ -3561,6 +3570,16 @@ begin
     Exit;
   end;
 
+  //by Tomash
+  if Obj is jDialogProgress then
+  begin
+    //jForm(jDialogProgress(Obj).Owner).UpdateJNI(gApp);
+    with jDialogProgress(Obj) do if Assigned(FOnBackPressed) then FOnBackPressed(Obj);
+    Exit;
+  end;
+
+
+
   (*if Obj is jComboEditText then
   begin
     jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
@@ -3802,14 +3821,16 @@ begin
   end
 end;
 
-procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: jString);
+procedure Java_Event_pOnHttpClientContentResult(env: PJNIEnv; this: jobject; Obj: TObject; content: JByteArray);
 var
-  pascontent    : String;
-  _jBoolean  : jBoolean;
+  sizeArray: integer;
+  arrayResult: TDynArrayOfJByte;
+  pascontent    : RawByteString;
+  i:integer;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
-  //
+
   if not Assigned(Obj) then Exit;
 
   if Obj is jHttpClient then
@@ -3817,8 +3838,11 @@ begin
     pascontent := '';
     if content <> nil then
     begin
-      _jBoolean := JNI_False;
-      pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
+      sizeArray:=  env^.GetArrayLength(env, content);
+      SetLength(arrayResult, sizeArray);
+      env^.GetByteArrayRegion(env, content, 0, sizeArray, @arrayResult[0]);
+      SetLength(pascontent,sizeArray);
+      for i:=1 to sizeArray do pascontent[i]:=Chr(arrayResult[i-1]);
     end;
     jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
     jHttpClient(Obj).GenEvent_OnHttpClientContentResult(Obj, pascontent);
@@ -7441,7 +7465,7 @@ begin
    Result:= jHttpClient_DeleteStateful(FjEnv, FjObject, _url, _value);
 end;
 
-procedure jHttpClient.GenEvent_OnHttpClientContentResult(Obj: TObject; content: string);
+procedure jHttpClient.GenEvent_OnHttpClientContentResult(Obj: TObject; content: RawByteString);
 begin
    if Assigned(FOnContentResult) then FOnContentResult(Obj, content);
 end;
@@ -10254,7 +10278,7 @@ begin
      begin
        path:='';
 
-       if TryPath(gApp.Path.Dat,fullFileName) then begin path:= gApp.Path.Dat; FFilePath:= fpathApp end
+       if TryPath(gApp.Path.App,fullFileName) then begin path:= gApp.Path.App; FFilePath:= fpathApp end
        else if TryPath(gApp.Path.Dat,fullFileName) then begin path:= gApp.Path.Dat; FFilePath:= fpathData  end
        else if TryPath(gApp.Path.DCIM,fullFileName) then begin path:= gApp.Path.DCIM; FFilePath:= fpathDCIM end
        else if TryPath(gApp.Path.Ext,fullFileName) then begin path:= gApp.Path.Ext; FFilePath:= fpathExt end;
@@ -10308,6 +10332,19 @@ begin
   end;
 end;
 
+//by Tomash
+function jBitmap.GetCanvas: jObject;
+begin
+  if FInitialized then
+  begin
+     Result:= jBitmap_GetCanvas(FjEnv, FjObject );
+  end;
+end;
+
+procedure jBitmap.GetBitmapSizeFromFile(_fullPathFile: string; var w, h :integer);
+begin
+  jBitmap_GetBitmapSizeFromFile(FjEnv, FjObject, _fullPathFile, w, h);
+end;
 
 function jBitmap.BitmapToArrayOfJByte(var bufferImage: TDynArrayOfJByte): integer; //local/self
 var
@@ -10896,6 +10933,16 @@ begin
     if Value <> nil then  // re- add free notification...
        Value.FreeNotification(Self);
   end;
+end;
+
+Procedure jCanvas.SetRotation(Value: single);
+var
+   OldRotation:single;
+begin
+  OldRotation:=FPaintRotation;
+  FPaintRotation:= Value;
+  if FInitialized then
+     jCanvas_rotate(FjEnv, FjObject ,FPaintRotation-OldRotation);
 end;
 
 procedure jCanvas.Notification(AComponent: TComponent; Operation: TOperation);

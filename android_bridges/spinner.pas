@@ -860,23 +860,8 @@ end;
 
 
 function jSpinner_getSelectedItem(env: PJNIEnv; _jspinner: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSelectedItem', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jspinner, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jspinner, 'GetSelectedItem');
 end;
 
 procedure jSpinner_Clear(env: PJNIEnv; _JSpinner: JObject); 
@@ -1053,23 +1038,8 @@ begin
 end;
 
 function jSpinner_GetText(env: PJNIEnv; _jspinner: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetText', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jspinner, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jspinner, 'GetText');
 end;
 
 procedure jSpinner_SetText(env: PJNIEnv; _jspinner: JObject; _index: integer);
@@ -1128,25 +1098,8 @@ env^.DeleteLocalRef(env,jParams[1].l);
 end;
 
 function jSpinner_GetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].i:= _index;
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetItemTagString', '(I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jspinner, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_i_out_t(env, _jspinner, 'GetItemTagString', _index);
 end;
 
 procedure jSpinner_SetItemTagString(env: PJNIEnv; _jspinner: JObject; _index: integer; _strTag: string);

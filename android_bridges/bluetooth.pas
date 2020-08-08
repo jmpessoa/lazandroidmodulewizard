@@ -53,7 +53,7 @@ jBluetooth = class(jControl)
     function GetReachablePairedDevices(): TDynArrayOfString;
     procedure Disable();
     function IsEnable(): boolean;
-    function GetState(): integer;
+    function GetState(): integer; //STATE_OFF=10, STATE_TURNING_ON=11, STATE_ON=12, STATE_TURNING_OFF=13
 
     function GetReachablePairedDeviceByName(_deviceName: string): jObject;
     function GetReachablePairedDeviceByAddress(_deviceAddress: string): jObject;

@@ -587,6 +587,7 @@ var
  _jBoolean: JBoolean;
  keepConnected: boolean;
 begin
+  keepConnected := true;
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
@@ -620,6 +621,7 @@ var
 
   keepConnected: boolean;
 begin
+  keepConnected := true;
   if byteArrayData <> nil then
   begin
      sizeArray:=  env^.GetArrayLength(env, byteArrayData);

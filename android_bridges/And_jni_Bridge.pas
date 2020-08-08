@@ -820,6 +820,9 @@ Procedure jCanvas_drawBackground       (env:PJNIEnv;
                                         Canv : jObject; _color : DWord);
 Procedure jCanvas_setTextSize          (env:PJNIEnv;
                                         Canv : jObject; textsize : single);
+
+Procedure jCanvas_rotate                (env:PJNIEnv; Canv : jObject; rotation : single); //by Tomash
+
 Procedure jCanvas_SetTypeface          (env:PJNIEnv;
                                         Canv : jObject; _typeface: integer);
 Procedure jCanvas_drawText             (env:PJNIEnv;
@@ -893,6 +896,8 @@ Procedure jBitmap_getWH                (env:PJNIEnv;
 function jBitmap_GetWidth(env: PJNIEnv; bmap: JObject): integer;
 function jBitmap_GetHeight(env: PJNIEnv; bmap: JObject): integer;
 Function  jBitmap_jInstance(env:PJNIEnv;  bmap: jObject): jObject;
+Function  jBitmap_GetCanvas(env:PJNIEnv; bmap: jObject): jObject;//by Tomash
+procedure jBitmap_GetBitmapSizeFromFile(env:PJNIEnv; bmap: jObject; _fullPathFile: string; var w, h :integer);//by Tomash
 function jBitmap_LoadFromAssets(env: PJNIEnv; _jbitmap: JObject; strName: string): jObject;
 procedure jBitmap_LoadFromBuffer(env: PJNIEnv; _jbitmap: JObject; buffer: PJByte; size: Integer);overload;//by Kordal
 function jBitmap_LoadFromBuffer(env: PJNIEnv; _jbitmap: JObject; var buffer: TDynArrayOfJByte): jObject;overload;
@@ -2196,23 +2201,8 @@ Procedure jEditText_setParent(env:PJNIEnv;
 
 //by jmpessoa
 Function jEditText_getText(env:PJNIEnv; EditText : jObject) : String;
-var
-  _jMethod : jMethodID = nil;
-  _jString : jString;
-  _jBoolean: jBoolean;
-  cls: jClass;
 begin
-  cls := env^.GetObjectClass(env, EditText);
-  _jMethod:= env^.GetMethodID(env, cls, 'GetText', '()Ljava/lang/String;');
-  _jString   := env^.CallObjectMethod(env,EditText,_jMethod);
-  case _jString = nil of
-   True : Result    := '';
-   False: begin
-           _jBoolean := JNI_False;
-           Result    := string(env^.GetStringUTFChars(env,_jString,@_jBoolean));
-          end;
-  end;
-  env^.DeleteLocalRef(env, cls);
+  Result:= jni_func_out_t(env, EditText, 'GetText');
 end;
 
 Procedure jEditText_setText(env:PJNIEnv;  EditText: jObject; Str: String);
@@ -5763,25 +5753,8 @@ begin
 end;
 
 function jListView_GetItemText(env:PJNIEnv; ListView : jObject; index: integer): String;
-var
-  _jMethod : jMethodID = nil;
-  _jString : jString;
-  _jBoolean: jBoolean;
-  cls: jClass;
-   _jParams : array[0..0] of jValue;
 begin
-   _jParams[0].i:= index;
-  cls := env^.GetObjectClass(env, ListView);
-  _jMethod:= env^.GetMethodID(env, cls, 'getItemText', '(I)Ljava/lang/String;');
-  _jString   := env^.CallObjectMethodA(env,ListView,_jMethod, @_jParams);
-  Case _jString = nil of
-   True : Result    := '';
-   False: begin
-            _jBoolean := JNI_False;
-            Result    := String( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
-          end;
-  end;
-  env^.DeleteLocalRef(env, cls);
+  Result:= jni_func_i_out_t(env, ListView, 'getItemText', index);
 end;
 
 function jListView_GetCount(env:PJNIEnv;  ListView : jObject): integer;
@@ -5900,23 +5873,8 @@ end;
 
 
 function jListView_GetItemCaption(env: PJNIEnv; _jlistview: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetItemCaption', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jlistview, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jlistview, 'GetItemCaption');
 end;
 
 procedure jListView_SetDispatchOnDrawItemTextColor(env: PJNIEnv; _jlistview: JObject; _value: boolean);
@@ -5972,25 +5930,8 @@ begin
 end;
 
 function jListView_GetWidgetText(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].i:= _index;
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetWidgetText', '(I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_i_out_t(env, _jlistview, 'GetWidgetText', _index);
 end;
 
 procedure jListView_setWidgetCheck(env: PJNIEnv; _jlistview: JObject; _value: boolean; _index: integer);
@@ -6066,25 +6007,8 @@ env^.DeleteLocalRef(env,jParams[0].l);
 end;
 
 function jListView_getItemTagString(env: PJNIEnv; _jlistview: JObject; _index: integer): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].i:= _index;
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'getItemTagString', '(I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_i_out_t(env, _jlistview, 'getItemTagString', _index);
 end;
 
 
@@ -6178,73 +6102,19 @@ begin
 end;
 
 function jListView_GetCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullItemCaption));
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCenterItemCaption', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jlistview, 'GetCenterItemCaption', _fullItemCaption);
 end;
 
 
 function jListView_GetLeftItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullItemCaption));
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLeftItemCaption', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jlistview, 'GetLeftItemCaption', _fullItemCaption);
 end;
 
 function jListView_GetRightItemCaption(env: PJNIEnv; _jlistview: JObject; _fullItemCaption: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullItemCaption));
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetRightItemCaption', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jlistview, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jlistview, 'GetRightItemCaption', _fullItemCaption);
 end;
 
 function jListView_GetLongPressSelectedItem(env: PJNIEnv; _jlistview: JObject): integer;
@@ -9571,6 +9441,20 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
+//by Tomash
+Procedure jCanvas_rotate(env:PJNIEnv; Canv : jObject; rotation : single );
+Var
+ _jMethod : jMethodID = nil;
+ _jParams : Array[0..0] of jValue;
+    cls: jClass;
+begin
+ _jParams[0].f := rotation;
+ cls := env^.GetObjectClass(env, Canv);
+_jMethod:= env^.GetMethodID(env, cls, 'rotate', '(F)V');
+ env^.CallVoidMethodA(env,Canv,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
 //------------------------------------------------------------------------------
 // Bitmap
 //------------------------------------------------------------------------------
@@ -9696,6 +9580,44 @@ begin
   cls := env^.GetObjectClass(env, bmap);
   _jMethod:= env^.GetMethodID(env, cls,'jInstance', '()Landroid/graphics/Bitmap;');
   Result := env^.CallObjectMethod(env,bmap,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+//by Tomash
+Function  jBitmap_GetCanvas(env:PJNIEnv; bmap: jObject): jObject;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, bmap);
+  _jMethod:= env^.GetMethodID(env, cls,'GetCanvas', '()Landroid/graphics/Canvas;');
+  Result := env^.CallObjectMethod(env,bmap,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+//by Tomash
+procedure jBitmap_GetBitmapSizeFromFile(env:PJNIEnv; bmap: jObject; _fullPathFile: string; var w, h :integer);
+var
+  jParams: array[0..0] of jValue;
+  _jMethod   : jMethodID = nil;
+  _jIntArray : jintArray;
+  _jBoolean  : jBoolean;
+  PInt       : PInteger;
+  PIntSav    : PInteger;
+  cls: jClass;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPathFile));
+  cls := env^.GetObjectClass(env, bmap);
+
+  _jMethod:= env^.GetMethodID(env, cls, 'GetBitmapSizeFromFile', '(Ljava/lang/String;)[I');
+  _jIntArray:= env^.CallObjectMethodA(env,bmap,_jMethod, @jParams);
+  _jBoolean  := JNI_False;
+  PInt       := env^.GetIntArrayElements(env,_jIntArray,_jBoolean);
+  PIntSav    := PInt;
+  w          := PInt^; Inc(PInt);
+  h          := PInt^; Inc(PInt);
+  env^.ReleaseIntArrayElements(env,_jIntArray,PIntSav,0);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
 
@@ -10132,7 +10054,6 @@ end;
 function jBitmap_GetBase64StringFromImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jObject; _compressFormat: integer): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -10142,13 +10063,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jbitmap);
   jMethod:= env^.GetMethodID(env, jCls, 'GetBase64StringFromImage', '(Landroid/graphics/Bitmap;I)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -10167,26 +10082,8 @@ begin
 end;
 
 function jBitmap_GetBase64StringFromImageFile(env: PJNIEnv; _jbitmap: JObject; _fullPathToImageFile: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPathToImageFile));
-  jCls:= env^.GetObjectClass(env, _jbitmap);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetBase64StringFromImageFile', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jbitmap, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jbitmap, 'GetBase64StringFromImageFile', _fullPathToImageFile);
 end;
 
 
@@ -11537,25 +11434,8 @@ begin
 end;
 
 Function jSqliteCursor_GetColumName(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
- _jParam: array[0..0] of jValue;
- _jString  : jString;
- _jBoolean : jBoolean;
 begin
-  _jParam[0].i := columnIndex;
-  cls := env^.GetObjectClass(env, SqliteCursor);
-  _jMethod:= env^.GetMethodID(env, cls, 'GetColumName', '(I)Ljava/lang/String;');
-  _jString   := env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
-  case _jString = nil of
-    True : Result    := '';
-    False: begin
-            _jBoolean := JNI_False;
-            Result    := String( env^.GetStringUTFChars(env,_jString,@_jBoolean) );
-           end;
-  end;
-  env^.DeleteLocalRef(env, cls);
+  Result:= jni_func_i_out_t(env, SqliteCursor, 'GetColumName', columnIndex);
 end;
 
 Function jSqliteCursor_GetColumnIndex(env:PJNIEnv;  SqliteCursor: jObject; colName: string): integer;
@@ -11588,29 +11468,8 @@ end;
 //fixed by Martin Lowry
 
 Function jSqliteCursor_GetValueAsString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
- _jParam: array[0..0] of jValue;
-  _jString  : jString;
- _jBoolean : jBoolean;
- tmp:pchar;
 begin
-  _jParam[0].i := columnIndex;
-  cls := env^.GetObjectClass(env, SqliteCursor);
-  _jMethod:= env^.GetMethodID(env, cls, 'GetValueAsString', '(I)Ljava/lang/String;');
-  _jString   := env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
-  case _jString = nil of
-    True : Result    := '';
-    False: begin
-            _jBoolean := JNI_False;
-            tmp    := env^.GetStringUTFChars(Env, _jString, @_jBoolean);
-            Result := AnsiString( tmp );
-            env^.ReleaseStringUTFChars(env, _jString, tmp);
-            env^.DeleteLocalRef(env, _jString);
-          end;
-  end;
-  env^.DeleteLocalRef(env, cls);
+  Result:= jni_func_i_out_t(env, SqliteCursor, 'GetValueAsString', columnIndex);
 end;
 
 
@@ -11667,29 +11526,8 @@ begin
 end;
 
 Function jSqliteCursor_GetValueToString(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): string;
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
- _jParam: array[0..0] of jValue;
-  _jString  : jString;
- _jBoolean : jBoolean;
- tmp:pchar;
 begin
-  _jParam[0].i := columnIndex;
-  cls := env^.GetObjectClass(env, SqliteCursor);
-  _jMethod:= env^.GetMethodID(env, cls, 'GetValueToString', '(I)Ljava/lang/String;');
-  _jString   := env^.CallObjectMethodA(env,SqliteCursor,_jMethod,@_jParam);
-  case _jString = nil of
-    True : Result    := '';
-    False: begin
-            _jBoolean := JNI_False;
-            tmp    := env^.GetStringUTFChars(Env, _jString, @_jBoolean);
-            Result := AnsiString( tmp );
-            env^.ReleaseStringUTFChars(env, _jString, tmp);
-            env^.DeleteLocalRef(env, _jString);
-          end;
-  end;
-  env^.DeleteLocalRef(env, cls);
+  Result:= jni_func_i_out_t(env, SqliteCursor, 'GetValueToString', columnIndex);
 end;
 
 function jSqliteCursor_GetPosition(env: PJNIEnv; SqliteCursor: JObject): integer;
@@ -11853,26 +11691,8 @@ begin
 end;
 
 function jSqliteDataAccess_Select(env: PJNIEnv; _jsqlitedataaccess: JObject; selectQuery: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(selectQuery));
-  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
-  jMethod:= env^.GetMethodID(env, jCls, 'Select', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jsqlitedataaccess, 'Select', selectQuery);
 end;
 
 
@@ -12684,24 +12504,8 @@ end;
 
 
    function jDBListView_GetItemCaption(env: PJNIEnv; _jdblistview: JObject): string;
-   var
-     jStr: JString;
-     jBoo: JBoolean;
-     jMethod: jMethodID = nil;
-     jCls: jClass = nil;
    begin
-     jCls := env^.GetObjectClass(env, _jdblistview);
-     jMethod := env^.GetMethodID(env, jCls, 'GetItemCaption', '()Ljava/lang/String;');
-     jStr := env^.CallObjectMethod(env, _jdblistview, jMethod);
-     case jStr = nil of
-       True: Result := '';
-       False:
-       begin
-         jBoo := JNI_False;
-         Result := string(env^.GetStringUTFChars(env, jStr, @jBoo));
-       end;
-     end;
-     env^.DeleteLocalRef(env, jCls);
+     Result:= jni_func_out_t(env, _jdblistview, 'GetItemCaption');
    end;
 
 
@@ -12907,27 +12711,8 @@ begin
 end;
 
 function jHTTPClient_Get(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
-  var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-  jStr: jString;
-  jBool: jBoolean;
 begin
-  jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
-  jCls := env^.GetObjectClass(env, _jHTTPClient);
-  jMethod := env^.GetMethodID(env, jCls, 'Get', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr := env^.CallObjectMethodA(env, _jHTTPClient, jMethod, @jParams);
-  case jStr = nil of
-    True: Result := '';
-    False:
-    begin
-      jBool := JNI_False;
-      Result := string(env^.GetStringUTFChars(env, jStr, @jBool));
-    end;
-  end;
-  env^.DeleteLocalRef(env, jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jHTTPClient, 'Get', _Link);
 end;
 
 procedure jHttpClient_SetAuthenticationUser(env: PJNIEnv; _jhttpclient: JObject; _userName: string; _password: string);
@@ -13049,27 +12834,8 @@ begin
 end;
 
 function jHTTPClient_Post(env: PJNIEnv; _jHTTPClient: JObject; _Link: string): string;
-  var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-  jStr: jString;
-  jBool: jBoolean;
 begin
-  jParams[0].l := env^.NewStringUTF(env, PChar(_Link));
-  jCls := env^.GetObjectClass(env, _jHTTPClient);
-  jMethod := env^.GetMethodID(env, jCls, 'Post', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr := env^.CallObjectMethodA(env, _jHTTPClient, jMethod, @jParams);
-  case jStr = nil of
-    True: Result := '';
-    False:
-    begin
-      jBool := JNI_False;
-      Result := string(env^.GetStringUTFChars(env, jStr, @jBool));
-    end;
-  end;
-  env^.DeleteLocalRef(env, jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jHTTPClient, 'Post', _Link);
 end;
 
 function jHttpClient_GetCookiesCount(env: PJNIEnv; _jhttpclient: JObject): integer;
@@ -13100,7 +12866,6 @@ end;
 function jHttpClient_GetCookieAttributeValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject; _attribute: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -13110,13 +12875,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetCookieAttributeValue', '(Ljava/net/HttpCookie;Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -13164,49 +12923,13 @@ begin
 end;
 
 function jHttpClient_GetStateful(env: PJNIEnv; _jhttpclient: JObject; _url: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_url));
-  jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetStateful', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jHTTPClient, 'GetStateful', _url);
 end;
 
 function jHttpClient_PostStateful(env: PJNIEnv; _jhttpclient: JObject; _url: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_url));
-  jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'PostStateful', '(Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_t_out_t(env, _jHTTPClient, 'PostStateful', _url);
 end;
 
 function jHttpClient_IsCookiePersistent(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): boolean;
@@ -13282,13 +13005,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetCookieValue', '(Ljava/net/HttpCookie;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -13304,13 +13021,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetCookieName', '(Ljava/net/HttpCookie;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -13386,7 +13097,6 @@ end;
 function jHttpClient_DeleteStateful(env: PJNIEnv; _jhttpclient: JObject; _url, _value: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -13396,13 +13106,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'DeleteStateful', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
@@ -13514,7 +13218,6 @@ end;
 function jHttpClient_GetHeaderField(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -13524,13 +13227,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetHeaderField', '(Ljava/net/HttpURLConnection;Ljava/lang/String;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
 env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -13587,7 +13284,6 @@ end;
 function jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -13596,13 +13292,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'Get', '(Ljava/net/HttpURLConnection;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -13626,7 +13316,6 @@ end;
 function jHttpClient_Post(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -13635,13 +13324,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'Post', '(Ljava/net/HttpURLConnection;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -13927,7 +13610,6 @@ function jRead_SMS(env:PJNIEnv; this:jobject; intentReceiver: jObject; addressBo
 var
  _jMethod  : jMethodID = nil;
  _jString  : jString;
- _jBoolean : jBoolean;
  _jParams : array[0..1] of jValue;
  jCls: jClass=nil;
 begin
@@ -13936,13 +13618,7 @@ begin
  _jParams[0].l :=  intentReceiver;
  _jParams[1].l := env^.NewStringUTF(env, pchar(addressBodyDelimiter) );
  _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- case _jString = nil of
-  True : Result:= '';
-  False: begin
-          _jBoolean := JNI_False;
-          Result    := string( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-         end;
- end;
+ Result:= GetPStringAndDeleteLocalRef(env, _jString);
  env^.DeleteLocalRef(env,_jParams[1].l);
 end;
 
@@ -13950,25 +13626,8 @@ end;
 //by jmpessoa
 function jContact_getMobileNumberByDisplayName(env:PJNIEnv; this:jobject;
                                                contactName: string): string;
-var
- _jMethod  : jMethodID = nil;
- _jString  : jString;
- _jBoolean : jBoolean;
- _jParams : array[0..0] of jValue;
- jCls: jClass=nil;
 begin
- jCls:= Get_gjClass(env);
- _jMethod:= env^.GetMethodID(env, jCls, 'jContact_getMobileNumberByDisplayName', '(Ljava/lang/String;)Ljava/lang/String;');
- _jParams[0].l := env^.NewStringUTF(env, pchar(contactName) );
- _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- case _jString = nil of
-  True : Result    := '';
-  False: begin
-          _jBoolean := JNI_False;
-          Result    := string( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-         end;
- end;
- env^.DeleteLocalRef(env,_jParams[0].l);
+ Result:= jni_func_t_out_t(env, this, 'jContact_getMobileNumberByDisplayName', contactName);
 end;
 
 //by jmpessoa
@@ -13984,13 +13643,7 @@ begin
  _jMethod:= env^.GetMethodID(env, jCls, 'jContact_getDisplayNameList', '(C)Ljava/lang/String;');
  _jParams[0].c := jChar(delimiter);
  _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- case _jString = nil of
-  True : Result    := '';
-  False: begin
-          _jBoolean := JNI_False;
-          Result    := string( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-         end;
- end;
+ Result:= GetPStringAndDeleteLocalRef(env, _jString);
 end;
 
 //------------------------------------------------------------------------------
@@ -14016,7 +13669,6 @@ var
  _jMethod  : jMethodID = nil;
  _jParams : array[0..1] of jValue;
  _jString  : jString;
- _jBoolean : jBoolean;
   jCls: jClass=nil;
 begin
  jCls:= Get_gjClass(env);
@@ -14024,13 +13676,7 @@ begin
  _jParams[0].l := env^.NewStringUTF(env, pchar(path) );
  _jParams[1].l := env^.NewStringUTF(env, pchar(filename) );
  _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- case _jString = nil of
-  True : Result    := '';
-  False: begin
-          _jBoolean := JNI_False;
-          Result    := string( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-         end;
- end;
+ Result:= GetPStringAndDeleteLocalRef(env, _jString);
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env,_jParams[1].l);
 end;
@@ -14040,7 +13686,6 @@ var
  _jMethod  : jMethodID = nil;
  _jParams : array[0..2] of jValue;
  _jString  : jString;
- _jBoolean : jBoolean;
   jCls: jClass=nil;
 begin
  jCls:= Get_gjClass(env);
@@ -14049,13 +13694,7 @@ begin
  _jParams[1].l := env^.NewStringUTF(env, pchar(filename) );
  _jParams[2].i := requestCode;
  _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- case _jString = nil of
-  True : Result    := '';
-  False: begin
-          _jBoolean := JNI_False;
-          Result    := string( env^.GetStringUTFChars(Env,_jString,@_jBoolean) );
-         end;
- end;
+ Result:= GetPStringAndDeleteLocalRef(env, _jString);
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env,_jParams[1].l);
 end;

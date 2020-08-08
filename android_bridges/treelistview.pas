@@ -770,29 +770,8 @@ begin
 end;
 
 function jTreeListView_GetNodeData(env: PJNIEnv; _jtreelistview: JObject; id: integer): string;
-var
-  jParams: array[0..0] of jValue;
-  _jString : jString;
-  //_jBoolean: jBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-  tmp: PChar;
 begin
-  jParams[0].i:= id;
-  jCls:= env^.GetObjectClass(env, _jtreelistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetNodeData', '(I)Ljava/lang/String;');
-  _jString := env^.CallObjectMethodA(env, _jtreelistview, jMethod, @jParams);
-  case _jString = nil of
-   True : Result    := '';
-   False: begin
-           //_jBoolean := JNI_False;
-           tmp    := env^.GetStringUTFChars(env, _jString, nil);
-           Result := AnsiString( tmp );                       // Hopefully this creates a copy!
-           env^.ReleaseStringUTFChars(env, _jString, tmp);    // So now we can discard tmp   (see dalvik/vm/Jni.c)
-           env^.DeleteLocalRef(env, _jString);                // and then the java.lang.String
-          end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_i_out_t(env, _jtreelistview, 'GetNodeData', id);
 end;
 
 function jTreeListView_GetFirstChild(env: PJNIEnv; _jtreelistview: JObject; parent_id: integer): integer;

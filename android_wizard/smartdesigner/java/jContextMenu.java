@@ -107,6 +107,11 @@ public class jContextMenu /*extends ...*/ {
     public void UnRegisterForContextMenu(View _view){ 
       controls.activity.unregisterForContextMenu(_view); 
    }        
+
+	//by Tomash
+    public void OpenContextMenu(View _view){ 
+      controls.activity.openContextMenu(_view); 
+    }
  
     //_itemType --> 0:Default, 1:Checkable
     public MenuItem AddItem(ContextMenu _menu, int _itemID, String _caption, int _itemType){    	     	
