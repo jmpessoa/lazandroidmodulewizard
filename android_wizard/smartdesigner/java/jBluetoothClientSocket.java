@@ -43,6 +43,12 @@ public class jBluetoothClientSocket {
   BufferedOutputStream mBufferOutput;
 	
   BluetoothAdapter mmBAdapter;
+  
+  //by Tomash
+  private ConnectThread mConnectThread = null;
+  boolean executeOnThreadPoolExecutor = false;
+  boolean IsSecureConnection = true;
+  
 	
   int mBuffer = 1024;
   
@@ -81,6 +87,11 @@ public class jBluetoothClientSocket {
 			mmUUIDString = _strUUID;
 		}   
 	}
+
+    //by Tomash
+	public void SetSecureConnection(boolean _IsSecureConnection) {
+      IsSecureConnection = _IsSecureConnection;
+    }
 				         
   //write others [public] methods code here......
   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
@@ -92,16 +103,25 @@ public class jBluetoothClientSocket {
 	}
 		
 	public void Disconnect() {
+  		// Cancel the thread that completed the connection
+		if (mConnectThread != null) {
+			mConnectThread.cancel();
+			mConnectThread = null;
+		}
+
 		mmConnected = false;
+
 		try {
-			if (mmSocket != null)
+			if (mmSocket != null) {
 				while (mmSocket.isConnected()) {
 					mmSocket.close();	
 				}
+			}
 			    
 		} catch (IOException e2) {			
 
 		}	
+		mmSocket = null;
 	}
 		
 	//talk to server
@@ -292,96 +312,109 @@ public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) thr
   }
 			
   public void Connect() {
-	  
+      Connect(false);
+  }
+
+  public void Connect(boolean _executeOnThreadPoolExecutor) {
+      executeOnThreadPoolExecutor = _executeOnThreadPoolExecutor;
 	  if (!mmBAdapter.isEnabled()) {
           controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1000);
       }  	    
-	    
+
 	  if (mmBAdapter.isDiscovering()) mmBAdapter.cancelDiscovery(); //must cancel to connect!
-	    
-      if (mmSocket != null) {
-      	  try {        		  
-				mmSocket.close();
-				mmSocket = null;
-			  } catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			  }
-      }
-        
-      try {
-      	  mmConnected = false;
-			  mmSocket = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(mmUUIDString));
-			  
-			  // This is a blocking call and will only return on a successful connection or an exception			  
-		      mmSocket.connect();
-		      
-		} catch (IOException e) {
-				 mmConnected = false;									
-				mmSocket = null;				
-		}          	
-       
-      if (mmSocket != null) {
-  		try {
-  			mBufferInput = new BufferedInputStream(mmSocket.getInputStream());
-				mBufferOutput = new  BufferedOutputStream(mmSocket.getOutputStream());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				mBufferInput = null;
-				mBufferOutput = null;
-				e.printStackTrace();
-			}  		
-		    new ASocketClientTask().execute(); 
-      }  
+    
+		Disconnect();
+	  
+		mConnectThread = new ConnectThread();
+		mConnectThread.start();
   }	
 
-  
-  public void Connect(boolean _executeOnThreadPoolExecutor) {  //thanks to Tomash
- 
-	  if (!mmBAdapter.isEnabled()) {
-          controls.activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1000);
-      }  	    
-	    
-	  if (mmBAdapter.isDiscovering()) mmBAdapter.cancelDiscovery(); //must cancel to connect!
-	    
-      if (mmSocket != null) {
-      	  try {        		  
-				mmSocket.close();
+
+
+    class ConnectThread extends Thread {
+        public ConnectThread() {
+            // create ConnectThread
+        }
+
+        public void run() {
+
+            try {
+				if (IsSecureConnection == true) {
+					mmSocket = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(mmUUIDString));
+				} else {
+                	mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(UUID.fromString(mmUUIDString));
+				}
+
+            } catch (IOException e) {
 				mmSocket = null;
-			  } catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			  }
-      }
-        
-      try {
-      	  mmConnected = false;
-			  mmSocket = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(mmUUIDString));
-			  
-			  // This is a blocking call and will only return on a successful connection or an exception			  
-		      mmSocket.connect();
-		      
-		} catch (IOException e) {
-				 mmConnected = false;									
-				mmSocket = null;				
-		}          	
-       
+            }
+
+            if (mmSocket == null) {
+                //connection failed
+                return;
+            }
+            
+            try {
+                // This is a blocking call and will only return on a
+                // successful connection or an exception                
+                mmSocket.connect();
+            } catch (IOException e2) {
+				//trying fallback
+				try {
+                    mmSocket =(BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice,1);
+                    mmSocket.connect();
+ 	            }
+  				catch (Exception e3) {				
+	                //connection failed
+					mmSocket = null;
+				}
+            }
+            
+            // Reset the ConnectThread because we're done
+            synchronized (jBluetoothClientSocket.this) { mConnectThread = null;}
+
+			controls.activity.runOnUiThread(new Runnable() {
+				public void run() {
+					OnConnectResult();
+				};
+   	        });
+        }
+
+        public void cancel() {
+
+            if (mmSocket == null) {
+                return;
+            }
+            try {
+                mmSocket.close();
+            } catch (IOException e) {
+
+            }
+        }
+    }
+
+	private void OnConnectResult() {       
       if (mmSocket != null) {
   		try {
   			mBufferInput = new BufferedInputStream(mmSocket.getInputStream());
-				mBufferOutput = new  BufferedOutputStream(mmSocket.getOutputStream());
+			mBufferOutput = new  BufferedOutputStream(mmSocket.getOutputStream());
+
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				mBufferInput = null;
 				mBufferOutput = null;
 				e.printStackTrace();
+				mmConnected = false;
+				return;
 			}
   		
-  		    if (_executeOnThreadPoolExecutor) 
+  		    if (executeOnThreadPoolExecutor) 
   		       new ASocketClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);  //thanks to Tomash
   		    else
   		       new ASocketClientTask().execute();
-      }	  
+  	  }
+	  //else TODO: OnConnectFailed
 	  
   }
    
@@ -506,6 +539,15 @@ public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) thr
             	    }                    
                 }                  
                                   
+	            if (bufferOutputHeader!= null) {
+		            try {                	 
+               	   		bufferOutputHeader.close();    		
+  					 } catch (IOException e) {
+  						// TODO Auto-generated catch block
+  						e.printStackTrace();
+  					}                
+      				bufferOutputHeader=null;
+      			}	
              }               
              else {
                  mmConnected = false;
@@ -517,6 +559,13 @@ public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) thr
                    bufferOutput.write(inputBuffer, 0, bytes_read);
                    publishProgress(bufferOutput);
                 }
+                try {                	 
+           	   		bufferOutput.close();    		
+  			     } catch (IOException e) {
+  					// TODO Auto-generated catch block
+  					e.printStackTrace();
+  			    }                
+                bufferOutput=null; 
           	}
           }
                                                  	                                								                         	                      			                                                      
@@ -537,15 +586,7 @@ public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) thr
          if (IsFirstsByteHeader) {
             if (values[0].toByteArray().length == lenContent ) {
                controls.pOnBluetoothClientSocketIncomingData(pascalObj, values[0].toByteArray(), headerBuffer);
-               try {                	 
-              	if (bufferOutput != null) 
-              	   bufferOutput.close();    		
-              	if (bufferOutputHeader!= null)
-              	   bufferOutputHeader.close();                	
-  			  } catch (IOException e) {
-  					// TODO Auto-generated catch block
-  					e.printStackTrace();
-  			 }
+
                //TODO
                /*
                else controls.pOnBluetoothClientSocketProgress(pascalObj, values[0].toByteArray().length);
@@ -555,13 +596,6 @@ public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) thr
          }
          else {
       	  controls.pOnBluetoothClientSocketIncomingData(pascalObj, values[0].toByteArray(), headerBuffer);
-            try {
-          	  if (bufferOutput != null)
-          	       bufferOutput.close();
-			  } catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-			  }
          }
       }
       
@@ -569,13 +603,32 @@ public void SendFile(String _filePath, String _fileName, byte[] _dataHeader) thr
       protected void onPostExecute(String values) {    	  
         super.onPostExecute(values);          
         controls.pOnBluetoothClientSocketDisconnected(pascalObj);
+
+   		mmConnected = false;
         try {
-      	 mmConnected = false;
-      	 mBufferOutput = null;         	 
-      	 if (mmSocket != null) mmSocket.close();   	  	        	  	
- 	       } catch (IOException e) {
+
+
+			if (mBufferInput != null) {
+				mBufferInput.close(); 
+				mBufferInput = null;
+			}	
+
+			if (mBufferOutput != null) {
+				mBufferOutput.close(); 
+				mBufferOutput = null;
+			}	
+
+			if (mmSocket != null) {
+				while (mmSocket.isConnected()) {
+					mmSocket.close();	
+				}
+				mmSocket = null;
+			}
+
+ 	      } catch (IOException e) {
  		    
- 	       }          
+ 	    }
+
       }
       
     }	

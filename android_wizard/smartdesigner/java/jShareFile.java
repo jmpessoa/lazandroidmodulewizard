@@ -183,7 +183,7 @@ public class jShareFile /*extends ...*/ {
   }
 	
 }
-
+/* Tomash: WTF?
 //by jmpessoa
 class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 	
@@ -286,6 +286,6 @@ public View getDropDownView(int position, View convertView, ViewGroup parent)
 	    	mTextFontSize = txtFontSize;	
 	    }
 	
-}
+}*/
 
 

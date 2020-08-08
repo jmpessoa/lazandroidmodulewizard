@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,12 +30,33 @@ public class jView extends View {
 		//this.setWillNotDraw(false);  //fire onDraw ... thanks to tintinux
 	}
 
+	/* deprecated
 	public Bitmap getBitmap(){
 		this.setDrawingCacheEnabled(true);  //thanks to tintinux
 		Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
 		this.setDrawingCacheEnabled(false);
 		return b;
 	}
+	*/
+
+	//updated by Tomash
+	public Bitmap getBitmap(){
+		try {
+ 	    	Bitmap bitmap = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
+  	    	Canvas canvas = new Canvas(bitmap);
+   			Drawable background = this.getBackground();
+    		if (background != null) {
+				background.draw(canvas);
+			}
+			this.draw(canvas);
+			return bitmap;
+		}
+		catch (Exception e) 
+		{
+			//Log.e("jView_getBitmap", "Exception: "+ e.toString() );
+			return null;
+		}			
+    }	
 
 	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);

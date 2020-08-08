@@ -1611,6 +1611,8 @@ public class jListView extends ListView {
 		setAdapter(aadapter);
 
 		setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		
+		setFastScrollEnabled(true); //by Tomash
 
 //fixed! thanks to @renabor
 		onItemClickListener = new OnItemClickListener() {

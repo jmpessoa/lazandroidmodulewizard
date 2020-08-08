@@ -849,24 +849,8 @@ end;
 
 
 function jDBListView_GetItemCaption(env: PJNIEnv; _jdblistview: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
 begin
-  jCls := env^.GetObjectClass(env, _jdblistview);
-  jMethod := env^.GetMethodID(env, jCls, 'GetItemCaption', '()Ljava/lang/String;');
-  jStr := env^.CallObjectMethod(env, _jdblistview, jMethod);
-  case jStr = nil of
-    True: Result := '';
-    False:
-    begin
-      jBoo := JNI_False;
-      Result := string(env^.GetStringUTFChars(env, jStr, @jBoo));
-    end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
+  Result:= jni_func_out_t(env, _jdblistview, 'GetItemCaption');
 end;
 
 

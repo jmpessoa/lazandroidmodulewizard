@@ -17,7 +17,7 @@ TIntentAction = (iaView, iaPick, iaSendto, idDial, iaCallbutton, iaCall, iaImage
 
 TIntentCategory = (icDefault, icLauncher, icHome, icInfo, icPreference, icAppBrowser,
                    icAppCalculator, icAppCalendar, icAppContacts, icAppEmail,
-                   icAppGallery, icAppMaps, icAppMessaging, icAppMusic);
+                   icAppGallery, icAppMaps, icAppMessaging, icAppMusic, icOpenable);
 
 TIntentFlag = (ifActivityNewTask, ifActivityBroughtToFront, ifActivityTaskOnHome,
                ifActivityForwardResult, ifActivityClearWhenTaskReset,

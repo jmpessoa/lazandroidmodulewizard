@@ -23,6 +23,7 @@ import java.io.DataInputStream;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 import android.widget.Toast;
@@ -113,55 +114,21 @@ public class jTCPSocketClient {
     	  if( (connected) && (mServerIP == _serverIP) && (mServerPort == _serverPort) ) return true;
     	  
     	  CloseConnection();
+    	  mClientGetAllTask = null;
     	 
-    	  //Wait for close connection
-          /*
-    	  while( !isCloseConnection() ){  //inner to CloseConnection();
-    		  try {
-    		      Thread.sleep(10);    		      
-    		    } catch(Exception e) {
-    		    }
-    	  }
-          */
 
     	  if ((mClientGetAllTask != null) || (mClientSendFileTask != null)) return false;
     	  
           mServerIP         = _serverIP;    //IP address
           mServerPort       = _serverPort;  //port number;
           mServerTimeOut    = _timeOut;     //timeout          
-          
-          try {                  
-                   mSocket = new Socket();
-                   mSocket.connect( new InetSocketAddress(mServerIP, mServerPort), mServerTimeOut );
-                                      
-                   mSockOutput = mSocket.getOutputStream();               
-                   mSockInput  = mSocket.getInputStream();                
-                                                           
-                   connected = true;
-		  } catch (IOException e) {
-			  // TODO Auto-generated catch block
-		      //e.printStackTrace();
-		      CloseConnection();
-		      return false;
-		  }
-          
-          if((mSockOutput == null) || (mSockInput == null)){
-        	  CloseConnection();
-        	  return false;
-          }
 
-          if( connected && (mClientGetAllTask == null) && (mClientSendFileTask == null) ){                                                              
-              if( mDataType < 3 )               	  
-               mClientGetAllTask = new TCPSocketClientGetAllTask().execute();                                            
-             
-              /*if( connected )*/ controls.pOnTCPSocketClientConnected(pascalObj);
-              
-              return true;
-          } else{
-        	  CloseConnection();
-        	  return false;
-          }
-        	           
+	    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+			mClientGetAllTask = new TCPSocketClientGetAllTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		else
+			mClientGetAllTask = new TCPSocketClientGetAllTask().execute();
+         
+         return true;	           
     }
     
     public boolean isConnected(){
@@ -291,14 +258,7 @@ public class jTCPSocketClient {
       	  mSocket = null;
         }
 
-      	//NEW code!!!
-        while( !isCloseConnection() ){
-            try {
-                Thread.sleep(10);
-            } catch (Exception e) {
-            }
-        }
-        controls.pOnTCPSocketClientDisConnected(pascalObj); //NEW!
+
 
     }
     
@@ -317,33 +277,45 @@ public class jTCPSocketClient {
     	
     	int fileSize    = 0;
         String fileName = "";        
-        
-        boolean mIsCreated       = false;
-        
-        TCPSocketClientGetAllTask(){
-        	
-        	mIsCreated        = false;
-        	
-        	if (mSocket == null) return;                                	
-        	if ( mSocket.isClosed() || !mSocket.isConnected() ) return;
-        	if ( (mSockInput == null) || (mSockOutput == null) ) return; 
+
+
+        @Override
+        protected String doInBackground(String... message) {
+            
+          try {                  
+                   mSocket = new Socket();
+                   mSocket.connect( new InetSocketAddress(mServerIP, mServerPort), mServerTimeOut );
+                                      
+                   mSockOutput = mSocket.getOutputStream();               
+                   mSockInput  = mSocket.getInputStream();                
+
+		  } catch (IOException e) {
+			  // TODO Auto-generated catch block
+		      e.printStackTrace();
+		      return null;
+		  }
+                     
+          if((mSockOutput == null) || (mSockInput == null)
+          ||  mSocket.isClosed() || !mSocket.isConnected() )
+          {
+        	  return null;
+          }
+          
+                               	
         	
         	mByteBufferInput = new BufferedInputStream(mSockInput);       	                
        	    
-       	    if( mByteBufferInput == null) return;
+       	    if( mByteBufferInput == null)        
+          {
+        	  return null;
+          }          
+
+          publishProgress(null);    
             
-            mIsCreated = true;        	
-        }
-               
-        @Override
-        protected String doInBackground(String... message) {
-        	
-        	if( !mIsCreated ){ 
-        		mClientGetAllTask = null;
-        	    return null;
-        	}
+            
+            
                         
-            mServerBytes   = new byte[1024];
+            mServerBytes   = new byte[4096];
             ByteArrayOutputStream mBufferOutput = null;
             
             //in this while the client listens for the messages sent by the server
@@ -433,14 +405,17 @@ public class jTCPSocketClient {
               	publishProgress(mBufferOutput);              	
             }           
             
-            mClientGetAllTask = null;
-            CloseConnection();
-            return null;
+
+            return "ok";
         }
 
         @Override
         protected void onProgressUpdate( ByteArrayOutputStream... values) {
             super.onProgressUpdate(values);
+
+            if (values == null) {
+             	controls.pOnTCPSocketClientConnected(pascalObj);
+			} else {
             
             switch (mDataType)
             {
@@ -469,12 +444,30 @@ public class jTCPSocketClient {
                   	controls.pOnTCPSocketClientFileGetFinished(pascalObj, fileName, fileGetSize);
                 	 
              break;
-            }
+            }}
+            
+            
+            
         }
 
         @Override
         protected void onPostExecute(String values) {
-            super.onPostExecute(values);                                    
+            super.onPostExecute(values);
+            
+			//by Tomash
+            mClientGetAllTask = null;
+            CloseConnection();
+            // TODO events needed
+            if (values == "ok") {
+				String msg = "#DISCONNECTED#" ;
+				controls.pOnTCPSocketClientMessageReceived(pascalObj, msg );
+            } else {	
+				String msg = "#CONNECTION_FAIL#" ;
+				controls.pOnTCPSocketClientMessageReceived(pascalObj, msg );
+			}	
+				
+			controls.pOnTCPSocketClientDisConnected(pascalObj);
+    
         }
     }
                    

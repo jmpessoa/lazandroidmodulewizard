@@ -264,12 +264,12 @@ private Controls       controls;
    public boolean onKeyDown(int keyCode, KeyEvent event) {
 	   
 	  char c = event.getDisplayLabel();	        
-	  //boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));  //TODO
-      //if (mute) return false;	  
+	  boolean mute = false;
+	  
       switch(keyCode) {
             
       case KeyEvent.KEYCODE_BACK:
-    	 boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));    	  
+    	 mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));    	  
          if (!mute) { //continue ...
         	 onBackPressed();
              return true;
@@ -278,20 +278,20 @@ private Controls       controls;
          }
          
       case KeyEvent.KEYCODE_MENU:     	     	      	          
-    	 controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+    	 mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
          break;
               
         case KeyEvent.KEYCODE_SEARCH:
-          controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+          mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
           break;
                     
         case KeyEvent.KEYCODE_VOLUME_UP:
           //event.startTracking();  //TODO
-          controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+          mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
           break;
           
         case KeyEvent.KEYCODE_VOLUME_DOWN:
-          controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
+          mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
           break;
           
           /*commented! need SDK API >= 18 [Android 4.3] to compile!*/
@@ -319,8 +319,15 @@ private Controls       controls;
         case KeyEvent.KEYCODE_NUM_LOCK:
             controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));
             break;            
-        //default:  controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));         	
+
+        default:  mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));         	
       }      
-      return super.onKeyDown(keyCode, event);      
+
+      if (mute) 
+      {
+        	 return true;
+      } else {
+        	 return super.onKeyDown(keyCode, event);        	 
+      }       
    }        
 }
