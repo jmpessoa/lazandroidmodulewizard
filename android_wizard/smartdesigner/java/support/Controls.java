@@ -2031,7 +2031,7 @@ public native void pAppOnRequestPermissionResult(int requestCode, String permiss
 //Load Pascal Library - Please, do not edit the static content commented in the template file
 // -------------------------------------------------------------------------------------------
 static {
-try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
+/*libsmartload*/
 }
 // -------------------------------------------------------------------------
 //  Activity Event
