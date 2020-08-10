@@ -1,6 +1,6 @@
-package org.lamw.appscrollingimages;
+package org.lamw.appsupportdemo5;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.4.6  - 10 November - 2019
+//LAMW: Lazarus Android Module Wizard - version 0.8.4.7 [unified!!] - 10 August - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -140,6 +140,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.lang.Object;
 
+//need by GDXGme framework...
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
@@ -148,13 +149,11 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
-
 import android.app.KeyguardManager;
 import android.os.PowerManager;
 import android.os.BatteryManager;
-
 import android.content.IntentFilter;
-
+import android.media.MediaScannerConnection;
 import java.text.Normalizer;
 
 //-------------------------------------------------------------------------
@@ -1047,7 +1046,6 @@ class jForm {
 		SetBackgroundImage(_imageIdentifier, 6); // FIT_XY for default
 	}
 
-
 	//by  thierrydijoux
 	public String GetQuantityStringByName(String _resName, int _quantity) {
 		int id = this.controls.activity.getResources().getIdentifier(_resName, "plurals", this.controls.activity.getPackageName());
@@ -1063,7 +1061,7 @@ class jForm {
 	}
 
 	public ActionBar GetActionBar() {
-		if (!jCommons.IsAppCompatProject()) {
+		if (!jCommons.IsAppCompatProject(controls)) {
 			return (controls.activity).getActionBar();
 		} else return null;
 	}
@@ -1147,7 +1145,7 @@ class jForm {
 	
 	//By ADiV
 	public void SetActionBarShowHome(boolean showHome) {
-		   jCommons.ActionBarShowHome(controls, showHome);
+			   jCommons.ActionBarShowHome(controls, showHome);
 	}
 
 	//By ADiV
@@ -1162,7 +1160,7 @@ class jForm {
 
 	//By ADiV
 	public void SetStatusColor(int color) {
-		   jCommons.StatusSetColor(controls, color);
+			   jCommons.StatusSetColor(controls, color);
 	}
 
 	public void SetTabNavigationModeActionBar() {
@@ -1189,7 +1187,7 @@ class jForm {
 	}
 
 	public boolean IsAppCompatProject() {
-		return jCommons.IsAppCompatProject();
+		return jCommons.IsAppCompatProject(controls);
 	}
 
 	public boolean IsPackageInstalled(String _packagename) {
@@ -1284,39 +1282,33 @@ class jForm {
 	}
 
 	public int GetScreenDpi() {
-	    String r= "";
-	    DisplayMetrics metrics = new DisplayMetrics();
-
-	    controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-	    return metrics.densityDpi;
+		String r= "";
+		DisplayMetrics metrics = new DisplayMetrics();
+		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		return metrics.densityDpi;
 	}
 
 	public String GetScreenDensity() {
-	    String r= "";
-	    
-	    int density = GetScreenDpi();
-	        
-	//[ifdef_api16up]
-	    if (density==DisplayMetrics.DENSITY_XXHIGH) {    	    	
-	        r= "XXHIGH:" + String.valueOf(density);
-	    }
-	    else
-	//[endif_api16up]
-	    if (density==DisplayMetrics.DENSITY_XHIGH) {    	    	
-	        r= "XHIGH:" + String.valueOf(density);
-	    }
-	    else if (density==DisplayMetrics.DENSITY_HIGH) {    	    	
-	        r= "HIGH:" + String.valueOf(density);
-	    }
-	    else if (density==DisplayMetrics.DENSITY_MEDIUM) {
-	        r= "MEDIUM:" + String.valueOf(density);
-	    }
-	    else if (density==DisplayMetrics.DENSITY_LOW) {
-	        r= "LOW:" + String.valueOf(density);
-	    }else
-	    	r= "CUSTOM:" + String.valueOf(density);
-	    return r;
+		String r = "";
+		DisplayMetrics metrics = new DisplayMetrics();
+		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		int density = metrics.densityDpi;
+//[ifdef_api16up]
+		if (density == DisplayMetrics.DENSITY_XXHIGH) {
+			r = "XXHIGH:" + String.valueOf(density);
+		} else
+//[endif_api16up]
+			if (density == DisplayMetrics.DENSITY_XHIGH) {
+				r = "XHIGH:" + String.valueOf(density);
+			} else if (density == DisplayMetrics.DENSITY_HIGH) {
+				r = "HIGH:" + String.valueOf(density);
+			} else if (density == DisplayMetrics.DENSITY_MEDIUM) {
+				r = "MEDIUM:" + String.valueOf(density);
+			} else if (density == DisplayMetrics.DENSITY_LOW) {
+				r = "LOW:" + String.valueOf(density);
+			} else
+	    	   r= "CUSTOM:" + String.valueOf(density);
+		return r;
 	}
 
 	public String GetScreenSize() {
@@ -1393,7 +1385,7 @@ class jForm {
 	//https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
 	public String CopyFromAssetsToInternalAppStorage(String _filename) {
 		InputStream is = null;
-		FileOutputStream fos = null;
+		FileOutputStream fos = null;			
 		String PathDat = controls.activity.getFilesDir().getAbsolutePath();
 		String _filename2 = _filename.substring(_filename.lastIndexOf("/")+1); //by Tomash - add support for folders in assets
 		try {		   		     			
@@ -1904,19 +1896,25 @@ class jForm {
 
 		   return path;
 	}
-	
-//by Tomash
-    public void StartDefaultActivityForFile(String _filePath, String _mimeType) {
-      File file = new File(_filePath);
-      Intent intent = new Intent(Intent.ACTION_VIEW);
-      Uri newUri;
 
-        newUri = Uri.fromFile(file);
-        intent.setDataAndType(Uri.parse("file://" + file),_mimeType);
+   //by Tomash
+   //refactored by jmpessoa
+   public void StartDefaultActivityForFile(String _filePath, String _mimeType) {
+	   File file = new File(_filePath);
+	   Intent intent = new Intent(Intent.ACTION_VIEW);
+	   Uri newUri = jSupported.FileProviderGetUriForFile(controls, file);
+	   if  (jSupported.IsAppSupportedProject()) {
+		   intent.setDataAndType(newUri, _mimeType);
+		   intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+				   Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET |
+				   Intent.FLAG_GRANT_READ_URI_PERMISSION);
+	   }
+	   else {
+		   intent.setDataAndType(Uri.parse("file://" + file),_mimeType);
+	   }
+	   controls.activity.startActivity(intent);
+   }
 
-      controls.activity.startActivity(intent);
-    }
-    
 	public String CopyFileFromUri(Uri _srcUri, String _outputDir) {
 	
 		String fileName = "";
@@ -1953,7 +1951,7 @@ class jForm {
 		} else {
 		 return "";	
 		}	
-	}      	
+	}    
 
 }
 //**class entrypoint**//please, do not remove/change this line!
@@ -2181,7 +2179,7 @@ public  void classChkNull (Class<?> object) {
    if (object != null) { Log.i("JAVA","checkNull-Not Null"); };
 }
 
-public Context GetContext() {   
+public Context GetContext() {
    return this.activity; 
 }
 
@@ -2498,9 +2496,7 @@ public  String getDevPhoneNumber() {
 @SuppressLint("NewApi")
 public String getDevDeviceID() {
   String devid = "";
-
   try {
-
     TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
     if (telephony != null) {
         devid = telephony.getDeviceId();
@@ -2510,15 +2506,13 @@ public String getDevDeviceID() {
     	}
     } else {
     	devid="";
-    }	
-
+    }
     if (devid=="") {	
         devid = Secure.getString(activity.getContentResolver(),Secure.ANDROID_ID);
     }    	
   }
-  catch (Exception e)
+  catch (SecurityException e) //ExceptionExceptionException
       { e.printStackTrace(); }
-
   return devid;
 }
 // -------------------------------------------------------------------------
@@ -2751,70 +2745,97 @@ public  int[] getBmpArray(String file) {
   pixels[length+1] = bmp.getHeight();
   return ( pixels );
 }
+
+private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = this.GetContext().getContentResolver().query(contentURI, null,
+                null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            try {
+                int idx = cursor
+                        .getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                result = cursor.getString(idx);
+            } catch (Exception e) {
+                result = "";
+            }
+            cursor.close();
+        }
+        return result;
+}
+
 // -------------------------------------------------------------------------
 //  Camera
 // -------------------------------------------------------------------------
-private File createImageFile() throws IOException {
-    // Create an image file name
-    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-    String imageFileName = "JPEG_" + timeStamp + "_";
-    File storageDir = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES);
-    File image = File.createTempFile(
-            imageFileName,  // prefix
-            ".jpg",         // suffix
-            storageDir      // directory
-    );
-
-    return image;
-}
-
-
-
-  public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
-	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);	
-	  Uri mImageCaptureUri = Uri.fromFile(new File("", filename));	  
-	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	  intent.putExtra("return-data", true);
-	  activity.startActivityForResult(intent, 12345);
-  }
   /*
    * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
-   */ 
-public String jCamera_takePhoto(String path, String filename) {
-  	     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	     Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
-	     intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	     intent.putExtra("return-data", true);
-	  this.activity.startActivityForResult(intent, 12345); //12345 = requestCode
-	  return (path+'/'+filename);
+   */
+private void galleryAddPic(File image_uri) {
+          if (Build.VERSION.SDK_INT < 19) {
+             this.activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(image_uri)));
+          }
+          else
+          {
+             MediaScannerConnection.scanFile(
+               this.activity,
+               new String[] {image_uri.getAbsolutePath()},
+               new String[] {"image/jpg"},
+               new MediaScannerConnection.OnScanCompletedListener() {
+                   @Override
+                        public void onScanCompleted(String path, Uri uri) {
+                              Log.e("Camera","File " + path + " was scanned successfully: " + uri);
+                        }
+               });
+          }
 }
 
 public String jCamera_takePhoto(String path, String filename, int requestCode) {
-	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	  
-    File photoFile = null;
-    try {
-        photoFile = createImageFile();
-    } catch (IOException ex) {
-        // Error occurred while creating the File
-        Log.i("Camera", "IOException"); 
-    }
-    // Continue only if the File was successfully created
-    if (photoFile != null) {
-      intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-	  
-	  this.activity.startActivityForResult(intent, requestCode); //12345 = requestCode
-	  return (photoFile.getAbsolutePath());
-	  
-    }
-    else
-    {
-    	return "";
-    }
+          Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+          //String  image_path = (path+File.separator+filename);
+          File newfile = new File(path, File.separator+filename);
+          File dirAsFile = newfile.getParentFile();
+
+          if (!dirAsFile.exists()) {
+            dirAsFile.mkdirs();
+          }
+          try {
+              newfile.createNewFile();
+          }
+          catch (IOException e) {
+            Log.e("File creation error",newfile.getPath());
+          }
+          Uri uri = jSupported.FileProviderGetUriForFile(this.GetContext(), newfile);
+          if (jSupported.IsAppSupportedProject()) {
+             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri); //outputFileUri
+             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+          }
+          else {
+	        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri); //mImageCaptureUri
+	        intent.putExtra("return-data", true);
+          }
+
+          if (intent.resolveActivity(this.GetContext().getPackageManager()) != null) {
+            this.activity.startActivityForResult(intent, requestCode);
+          }
+          galleryAddPic(newfile);
+          return newfile.toString();
 }
+
+	public String jCamera_takePhoto(String path, String filename) {
+		return jCamera_takePhoto(path, filename, 12345);
+	}
+
+	public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		Uri mImageCaptureUri = Uri.fromFile(new File("", filename));
+		intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+		intent.putExtra("return-data", true);
+		activity.startActivityForResult(intent, 12345);
+	}
 
 //-------------------------------------------------------------------------------------------------------
 //SMART LAMW DESIGNER

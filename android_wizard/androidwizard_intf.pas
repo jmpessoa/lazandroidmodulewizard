@@ -748,11 +748,34 @@ begin
         try
           strPack := FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
 
+          if FSupport then  // refactored by jmpessoa: UNIQUE "Controls.java" !!!
+          begin
+            if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java') then
+            begin
+              LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java');
+              Strings[0] := 'package ' + strPack + ';';  //replace dummy
+              SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jSupported.java');
+            end;
+          end
+          else
+          begin
+            if FileExists(FPathToJavaTemplates+DirectorySeparator+ 'jSupported.java') then
+            begin
+              LoadFromFile(FPathToJavaTemplates+DirectorySeparator+ 'jSupported.java');
+              Strings[0] := 'package ' + strPack + ';';  //replace dummy
+              SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jSupported.java');
+            end;
+          end;
+
+          (* commented/refactored by jmpessoa
           if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) AND FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java') then
             LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java')
           else
             LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
+          *)
 
+          //UNIQUE "Controls.java" !!!
+          LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
           Strings[0] := 'package ' + strPack + ';';  //replace dummy - Controls.java
           aux:=  StringReplace(Text, '/*libsmartload*/' ,
                  'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
@@ -799,7 +822,7 @@ begin
               FAndroidProjectName+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.native');
           end;
 
-          if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) then
+          if Pos('AppCompat', FAndroidTheme) > 0 then
           begin
             if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jCommons.java') then
             begin
@@ -817,7 +840,6 @@ begin
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
             end;
           end;
-
       finally
           Free;
       end;
@@ -1410,6 +1432,8 @@ var
   frm: TFormWorkspace;
   strList: TStringList;
   aSupportLib:TSupportLib;
+  aAppCompatLib:TAppCompatLib;
+  innerSupported: boolean;
   i, intTargetApi, intMinApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
@@ -2413,7 +2437,7 @@ begin
 
                 if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) then
                 begin
-                  if compileSdkVersion = '29'  then compileSdkVersion:= '28';
+                  if compileSdkVersion = '29'  then compileSdkVersion:= '28';  //LAMW dont support [yet] AndroidX libraries
                 end;
 
                 if Pos('AppCompat', FAndroidTheme) > 0 then
@@ -2454,8 +2478,13 @@ begin
                 end
                 else
                 begin
-                     strList.Add('            minSdkVersion '+FMinApi);
-                     strList.Add('            targetSdkVersion '+ FTargetApi);  //compileSdkVersion
+                  strList.Add('            minSdkVersion '+FMinApi);
+
+                  if StrToInt(FTargetApi) <= StrToInt(compileSdkVersion)  then
+                    strList.Add('            targetSdkVersion '+ FTargetApi)  //compileSdkVersion
+                  else
+                    strList.Add('            targetSdkVersion '+compileSdkVersion);
+
                 end;
 
                 strList.Add('            versionCode 1');
@@ -2486,7 +2515,20 @@ begin
 
                 strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-                if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) then
+                innerSupported:= False;
+
+                if Pos('AppCompat', FAndroidTheme) > 0 then
+                begin
+                   innerSupported:= True;
+                   for aAppCompatLib in AppCompatLibs do
+                   begin
+                     if aAppCompatLib.MinAPI<=StrToInt(compileSdkVersion) then
+                       strList.Add('    '+directive+' '''+aAppCompatLib.Name+compileSdkVersion+'.+''');
+                   end;
+                   //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
+                end;
+
+                if FSupport and (not innerSupported) then
                 begin
                    for aSupportLib in SupportLibs do
                    begin
@@ -2496,7 +2538,7 @@ begin
                    //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
                 end;
 
-                if Pos('GDXGame', FAndroidTheme) > 0 then
+                if Pos('GDXGame', FAndroidTheme) > 0 then     //just a conceptual project....
                 begin
                    if androidPluginNumber >=  3000 then directive:= 'api';
                    strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx:1.9.10''');

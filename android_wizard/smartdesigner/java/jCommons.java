@@ -1,9 +1,10 @@
-package com.example.appmediarecorderdemo1;
+package org.lamw.applistviewdemo6;
 
 import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import android.widget.LinearLayout;
 import android.content.Context;
 import android.os.Build;
 import android.view.Gravity;
+
+import java.io.File;
 //import android.util.Log;
 
 public class jCommons {
@@ -573,6 +576,18 @@ public class jCommons {
 
 	public static boolean IsAppCompatProject() {
 		return false;
+	}
+
+
+        public static boolean IsAppCompatProject(Controls controls) {
+                //if (controls.activity instanceof AppCompatActivity) return true;
+		  //else return false;
+                return false;
+	}
+
+
+	public static Uri FileProviderGetUriForFile(Controls controls, File file) {
+			return jSupported.FileProviderGetUriForFile(controls, file);
 	}
 
 }

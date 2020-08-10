@@ -12,7 +12,14 @@ type
     MinAPI:integer;
     Name:string;
   end;
-  TSupportLibs = array[0..4] of TSupportLib;
+
+  TAppCompatLib = record
+    MinAPI:integer;
+    Name:string;
+  end;
+
+  TSupportLibs = array[0..0] of TSupportLib;
+  TAppCompatLibs = array[0..4] of TAppCompatLib;
 
   { TLamwGlobalSettings }
 
@@ -91,12 +98,17 @@ type
   end;
 
 const
-  SupportLibs: TSupportLibs = (
-    (MinAPI:18;Name:'com.android.support:support-v4:'),
+
+  AppCompatLibs: TAppCompatLibs = (    //renamed by jmpessoa
+    (MinAPI:18;Name:'com.android.support:support-v4:'),  //innerSupported!
     (MinAPI:18;Name:'com.android.support:appcompat-v7:'),
     (MinAPI:21;Name:'com.android.support:design:'),
     (MinAPI:21;Name:'com.android.support:cardview-v7:'),
     (MinAPI:21;Name:'com.android.support:recyclerview-v7:')
+  );
+
+  SupportLibs: TSupportLibs = (  //refactored by jmpessoa
+    (MinAPI:18;Name:'com.android.support:support-v4:')
   );
 
 var

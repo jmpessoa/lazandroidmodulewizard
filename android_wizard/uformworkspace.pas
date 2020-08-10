@@ -406,7 +406,8 @@ end;
 
 procedure TFormWorkspace.ListBoxTargetAPICloseUp(Sender: TObject);
 begin
-  ShowMessage('AppCompat theme need Target Api = 28'+ sLineBreak + '[android-sdk/platforms/android-28]');
+  if (Pos('AppCompat', ComboBoxTheme.Text) > 0) and (ListBoxTargetAPI.Text <> '28') then
+     ShowMessage('AppCompat theme need Target Api = 28'+ sLineBreak + '[android-sdk/platforms/android-28]');
 end;
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
@@ -1190,6 +1191,9 @@ begin
 
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then
   begin
+
+    CheckBoxSupport.Checked:= True; //inner Supported!!!
+
     if (FMaxSdkPlatform < 28) or (FPathToGradle = '')   then
     begin
       ShowMessage('Warning/Recomendation:'+
@@ -1255,6 +1259,15 @@ end;
 procedure TFormWorkspace.CheckBoxSupportClick(Sender: TObject);
 begin
   FSupport:=TCheckBox(Sender).Checked;
+  if FSupport then
+  begin
+     ListBoxTargetAPI.Text:= '28';
+     if (cbBuildSystem.Text <> 'Gradle') then
+     begin
+       cbBuildSystem.Text:= 'Gradle';
+       ShowMessage('Warning: Support Library need Gradle and Target API = 28');
+     end
+  end
 end;
 
 procedure TFormWorkspace.CheckBoxLibraryClick(Sender: TObject);

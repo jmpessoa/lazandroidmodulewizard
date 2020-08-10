@@ -2859,6 +2859,8 @@ var
   nativeMethodList, tempList: TStringList;
   FSupport:boolean;
   aSupportLib:TSupportLib;
+  aAppCompatLib:TAppCompatLib;
+  innerSupported: boolean;
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
@@ -2919,10 +2921,35 @@ begin
 
     //re-add all [updated] java code ...
 
+    if FSupport then  // refactored by jmpessoa: UNIQUE "Controls.java" !!!
+     begin
+       if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java') then
+       begin
+         auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java');
+         auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
+         auxList.SaveToFile(FPathToJavaSource + DirectorySeparator + 'jSupported.java');
+       end;
+     end
+     else
+     begin
+       if FileExists(PathToJavaTemplates+DirectorySeparator+ 'jSupported.java') then
+       begin
+         auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+ 'jSupported.java');
+         auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
+         auxList.SaveToFile(FPathToJavaSource + DirectorySeparator + 'jSupported.java');
+       end;
+     end;
+
+     auxList.Clear;
+
+    (* commented/refactored by jmpessoa
     if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) AND FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java') then
       ControlsJava.LoadFromFile(PathToJavaTemplates +'support'+DirectorySeparator+'Controls.java')
     else
-      ControlsJava.LoadFromFile(PathToJavaTemplates + 'Controls.java');
+    *)
+
+    //UNIQUE "Controls.java" !!!
+    ControlsJava.LoadFromFile(PathToJavaTemplates + 'Controls.java');
 
     ControlsJava.Strings[0]:= 'package '+FPackageName+';';
 
@@ -3110,7 +3137,9 @@ begin
       tempList.LoadFromFile(FPathToAndroidProject+'build.gradle');
 
       aux:='';
+
       k:=-1;
+
       for i:=(tempList.Count-1) downto 0 do
       begin
         //get the dependencies denominator
@@ -3131,9 +3160,9 @@ begin
         begin
           if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('com.android.support:', tempList.Strings[i])>0)) then
           begin
-            for aSupportLib in SupportLibs do
+            for aAppCompatLib in AppCompatLibs do
             begin
-              if Pos(aSupportLib.Name,tempList.Strings[i])>0 then
+              if Pos(aAppCompatLib.Name,tempList.Strings[i])>0 then
               begin
                 tempList.Delete(i);
                 break;
@@ -3141,8 +3170,12 @@ begin
             end;
           end;
         end;
-        if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) then
+
+        innerSupported:= False;
+
+        if Pos('AppCompat', AndroidTheme) > 0 then
         begin
+          innerSupported:= True; //that is, AppCompat has inner "Support" Libraries
           //get the compileSdkVersion
           compileSdkVersion:='';
           for i:=(tempList.Count-1) downto 0 do
@@ -3158,17 +3191,50 @@ begin
           end;
           if (Length(compileSdkVersion)>0) then
           begin
-            for aSupportLib in SupportLibs do
-            begin
-              if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
+              for aAppCompatLib in AppCompatLibs do
               begin
-                tempList.Insert((k+1),'    '+aux+' '''+aSupportLib.Name+compileSdkVersion+'.+''');
-                Inc(k);
+                if aAppCompatLib.MinAPI<=StrToInt(compileSdkVersion) then
+                begin
+                  tempList.Insert((k+1),'    '+aux+' '''+aAppCompatLib.Name+compileSdkVersion+'.+''');
+                  Inc(k);
+                end;
               end;
+          end;
+
+        end; //AppCompat
+
+        if FSupport and (not innerSupported) then
+        begin
+          //get the compileSdkVersion
+          compileSdkVersion:='';
+          for i:=(tempList.Count-1) downto 0 do
+          begin
+            if (Pos('compileSdkVersion ', tempList.Strings[i])>0) then
+            begin
+              compileSdkVersion:=Trim(tempList.Strings[i]);
+              p:=Pos(' ',compileSdkVersion);
+              if (p>0) then Delete(compileSdkVersion,1,p);
+              compileSdkVersion:=Trim(compileSdkVersion);
+              break;
             end;
           end;
-        end;
+
+          if (Length(compileSdkVersion)>0) then
+          begin
+              for aSupportLib in SupportLibs do
+              begin
+                if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
+                begin
+                  tempList.Insert((k+1),'    '+aux+' '''+aSupportLib.Name+compileSdkVersion+'.+''');
+                  Inc(k);
+                end;
+              end;
+          end;
+
+        end; //Supported
+
       end;
+
       tempList.SaveToFile(FPathToAndroidProject+'build.gradle');
     finally
       tempList.Free;

@@ -1,6 +1,6 @@
-this.controls.activitypackage com.sohit.sohitmachinelogger;
+package org.lamw.appsupportdemo5;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.4.6  - 10 November - 2019
+//LAMW: Lazarus Android Module Wizard - version 0.8.4.7 [unified!!] - 10 August - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -50,8 +50,6 @@ this.controls.activitypackage com.sohit.sohitmachinelogger;
 //                              rename example Name
 //			12.2013 LAMW Started by jmpessoa
 
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.provider.DocumentsContract;
 import android.provider.Settings.Secure;
 import android.view.animation.AccelerateInterpolator;
@@ -142,6 +140,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.lang.Object;
 
+//need by GDXGme framework...
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
@@ -150,15 +149,11 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
-
 import android.app.KeyguardManager;
 import android.os.PowerManager;
 import android.os.BatteryManager;
-
 import android.content.IntentFilter;
-
 import android.media.MediaScannerConnection;
-
 import java.text.Normalizer;
 
 //-------------------------------------------------------------------------
@@ -598,7 +593,7 @@ class jForm {
 		Toast toast = Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT);
 
 		if (toast != null) {
-			toast.setGravity(Gravity.BOTTOM, 0, 0);
+			//toast.setGravity(Gravity.BOTTOM, 0, 0);
 			toast.show();
 		}
 	}
@@ -1051,7 +1046,6 @@ class jForm {
 		SetBackgroundImage(_imageIdentifier, 6); // FIT_XY for default
 	}
 
-
 	//by  thierrydijoux
 	public String GetQuantityStringByName(String _resName, int _quantity) {
 		int id = this.controls.activity.getResources().getIdentifier(_resName, "plurals", this.controls.activity.getPackageName());
@@ -1287,14 +1281,18 @@ class jForm {
 	       return r; 
 	}
 
+	public int GetScreenDpi() {
+		String r= "";
+		DisplayMetrics metrics = new DisplayMetrics();
+		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		return metrics.densityDpi;
+	}
+
 	public String GetScreenDensity() {
 		String r = "";
 		DisplayMetrics metrics = new DisplayMetrics();
-
 		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
 		int density = metrics.densityDpi;
-
 //[ifdef_api16up]
 		if (density == DisplayMetrics.DENSITY_XXHIGH) {
 			r = "XXHIGH:" + String.valueOf(density);
@@ -1898,28 +1896,25 @@ class jForm {
 
 		   return path;
 	}
-	
-	
-//by Tomash
-    public void StartDefaultActivityForFile(String _filePath, String _mimeType) {
-      File file = new File(_filePath);
-      Intent intent = new Intent(Intent.ACTION_VIEW);
-      Uri newUri;
 
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        newUri = FileProvider.getUriForFile(controls.GetContext(), controls.GetContext().getApplicationContext().getPackageName() + ".provider", file);
-        intent.setDataAndType(newUri,_mimeType);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-      }
-      else
-      {
-        newUri = Uri.fromFile(file);
-        intent.setDataAndType(Uri.parse("file://" + file),_mimeType);
-      }
+   //by Tomash
+   //refactored by jmpessoa
+   public void StartDefaultActivityForFile(String _filePath, String _mimeType) {
+	   File file = new File(_filePath);
+	   Intent intent = new Intent(Intent.ACTION_VIEW);
+	   Uri newUri = jSupported.FileProviderGetUriForFile(controls, file);
+	   if  (jSupported.IsAppSupportedProject()) {
+		   intent.setDataAndType(newUri, _mimeType);
+		   intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+				   Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET |
+				   Intent.FLAG_GRANT_READ_URI_PERMISSION);
+	   }
+	   else {
+		   intent.setDataAndType(Uri.parse("file://" + file),_mimeType);
+	   }
+	   controls.activity.startActivity(intent);
+   }
 
-      controls.activity.startActivity(intent);
-    }
-    
 	public String CopyFileFromUri(Uri _srcUri, String _outputDir) {
 	
 		String fileName = "";
@@ -2501,9 +2496,7 @@ public  String getDevPhoneNumber() {
 @SuppressLint("NewApi")
 public String getDevDeviceID() {
   String devid = "";
-
   try {
-
     TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
     if (telephony != null) {
         devid = telephony.getDeviceId();
@@ -2513,15 +2506,13 @@ public String getDevDeviceID() {
     	}
     } else {
     	devid="";
-    }	
-
+    }
     if (devid=="") {	
         devid = Secure.getString(activity.getContentResolver(),Secure.ANDROID_ID);
     }    	
   }
-  catch (Exception e)
+  catch (SecurityException e) //ExceptionExceptionException
       { e.printStackTrace(); }
-
   return devid;
 }
 // -------------------------------------------------------------------------
@@ -2804,58 +2795,47 @@ private void galleryAddPic(File image_uri) {
 
 public String jCamera_takePhoto(String path, String filename, int requestCode) {
           Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-          String image_path;
-          Uri image_uri;
-
-          image_path = (path+File.separator+filename);
-
+          //String  image_path = (path+File.separator+filename);
           File newfile = new File(path, File.separator+filename);
           File dirAsFile = newfile.getParentFile();
+
           if (!dirAsFile.exists()) {
             dirAsFile.mkdirs();
           }
-
           try {
               newfile.createNewFile();
           }
           catch (IOException e) {
             Log.e("File creation error",newfile.getPath());
           }
-
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
-             Uri outputFileUri = FileProvider.getUriForFile(this.GetContext(), this.GetContext().getApplicationContext().getPackageName() + ".provider", newfile);
-             intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+          Uri uri = jSupported.FileProviderGetUriForFile(this.GetContext(), newfile);
+          if (jSupported.IsAppSupportedProject()) {
+             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri); //outputFileUri
              intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-             image_uri = outputFileUri;
           }
-          else
-          {
-	     Uri mImageCaptureUri = Uri.fromFile(newfile);
-	     intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	     intent.putExtra("return-data", true);
-             image_uri = mImageCaptureUri;
+          else {
+	        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri); //mImageCaptureUri
+	        intent.putExtra("return-data", true);
           }
 
           if (intent.resolveActivity(this.GetContext().getPackageManager()) != null) {
             this.activity.startActivityForResult(intent, requestCode);
           }
-
           galleryAddPic(newfile);
           return newfile.toString();
 }
-public String jCamera_takePhoto(String path, String filename) {
-	  return jCamera_takePhoto(path, filename, 12345);
-}
 
-public void takePhoto(String filename) {
-	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);	
-	  Uri mImageCaptureUri = Uri.fromFile(new File("", filename));	  
-	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	  intent.putExtra("return-data", true);
-	  activity.startActivityForResult(intent, 12345);
-  }
-  
+	public String jCamera_takePhoto(String path, String filename) {
+		return jCamera_takePhoto(path, filename, 12345);
+	}
+
+	public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		Uri mImageCaptureUri = Uri.fromFile(new File("", filename));
+		intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+		intent.putExtra("return-data", true);
+		activity.startActivityForResult(intent, 12345);
+	}
 
 //-------------------------------------------------------------------------------------------------------
 //SMART LAMW DESIGNER
