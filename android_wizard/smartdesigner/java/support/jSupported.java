@@ -1,23 +1,43 @@
-package org.lamw.applistviewdemo6;
+package org.lamw.appsupportdemo5;
 
-import android.net.Uri;
-import java.io.File;
 import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
+import java.io.File;
 
-public class jSupported {	//dummy:   app supported!]
+
+public class jSupported {	
 
 	public static Uri FileProviderGetUriForFile(Controls controls, File file) {
-	  return Uri.fromFile(file);
+		Uri r = null;
+		if (Build.VERSION.SDK_INT >= 24) {
+			//[ifdef_api24up]
+			r = FileProvider.getUriForFile(controls.GetContext(), controls.GetContext().getApplicationContext().getPackageName() + ".provider", file);
+			//[endif_api24up]
+		}
+		else {
+			r = Uri.fromFile(file);
+		}
+		return r;
 	}
-
 
 	public static Uri FileProviderGetUriForFile(Context context, File file) {
-		return Uri.fromFile(file);
+		Uri r = null;
+
+		if (Build.VERSION.SDK_INT >= 24) {
+			//[ifdef_api24up]
+			r = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
+			//[endif_api24up]
+		}
+		else {
+			r = Uri.fromFile(file);
+		}
+		return r;
 	}
 
-
-        public static boolean IsAppSupportedProject() {
-		return false;
+	public static boolean IsAppSupportedProject() {
+		return true;
 	}
 
 }
