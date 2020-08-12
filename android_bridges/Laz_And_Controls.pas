@@ -988,6 +988,8 @@ type
     procedure SetAllCaps(_value: boolean);
     procedure SetTextAsHtml(_htmlText: string);
 
+    procedure SetUnderline( _on : boolean ); // by ADiV
+
   published
     property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
@@ -4512,6 +4514,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jTextView_SetTextAsHtml(FjEnv, FjObject, _htmlText);
+end;
+
+procedure jTextView.SetUnderline( _on : boolean );
+begin
+ //in designing component state: set value here...
+ if FInitialized then
+  jni_proc_z( FjEnv, FjObject, 'SetUnderline', _on);
 end;
 
 //------------------------------------------------------------------------------

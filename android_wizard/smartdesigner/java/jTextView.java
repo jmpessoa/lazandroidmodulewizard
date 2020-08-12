@@ -217,6 +217,13 @@ public class jTextView extends TextView {
     public void SetTextTypeFace(int _typeface) {
         this.setTypeface(null, _typeface);
     }
+    
+    public void SetUnderline(boolean _on){
+        if( _on )
+      	  this.setPaintFlags(this.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        else
+      	  this.setPaintFlags(0);
+    }
 
     public void Append(String _txt) {
         this.append( _txt);
