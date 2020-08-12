@@ -220,10 +220,10 @@ public class jTextView extends TextView {
     
     public void SetUnderline(boolean _on){
         if( _on )
-      	  this.setPaintFlags(this.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+      	  this.setPaintFlags(this.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
         else
-      	  this.setPaintFlags(0);
-    }
+      	  this.setPaintFlags(Paint.ANTI_ALIAS_FLAG);
+      }
 
     public void Append(String _txt) {
         this.append( _txt);
