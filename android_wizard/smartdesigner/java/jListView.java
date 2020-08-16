@@ -1,4 +1,4 @@
-package org.lamw.applistviewdemo6;
+package org.lamw.appsearchviewdemo1;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -2625,6 +2625,7 @@ public class jListView extends ListView {
 	}
 
 	public void SetFilterQuery(String _query) {
+		ClearFilterQuery();//added/fixed [thanks to vags15]!!!
 		orig_alist.clear();
 		for (jListItemRow p : alist) {
 			orig_alist.add(p);
