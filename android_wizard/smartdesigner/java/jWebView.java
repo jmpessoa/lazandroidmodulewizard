@@ -1,11 +1,12 @@
-package com.example.appdemo1;
+package org.lamw.appwebviewdemoevaluatejavascript;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.util.Log;
+import android.os.Build;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebView.FindListener; //LMB
 import android.webkit.WebViewClient;
@@ -139,6 +140,9 @@ public class jWebView extends WebView {
   	private FindListener findListener;
     private int findIndex = 0;
   	private int findCount = 0;
+
+  	public jWebView MyWebView;
+  	public String MyJSCode;
     
     //Constructor
     public  jWebView(android.content.Context context,
@@ -153,6 +157,8 @@ public class jWebView extends WebView {
         webclient = new jWebClient();
         webclient.PasObj   = pasobj;
         webclient.controls = ctrls;
+
+        MyWebView =  this;
 
         setWebViewClient(webclient); // Prevent to run External Browser
         this.getSettings().setJavaScriptEnabled(true);
@@ -169,21 +175,24 @@ public class jWebView extends WebView {
         };                       
         setOnLongClickListener(onClickListener);
 
-        //LMB:
-        findListener = new FindListener() {
-        @Override
-        public void onFindResultReceived(int activeMatchOrdinal, 
-            int numberOfMatches, boolean isDoneCounting) {
-            if (isDoneCounting) {
-                findIndex = activeMatchOrdinal;
-                findCount = numberOfMatches;
-                controls.pOnWebViewFindResultReceived(PasObj,activeMatchOrdinal,numberOfMatches);
-            }
-            return;
-        };
-        };
-        setFindListener(findListener);
-               
+        //[ifdef_api16up]
+        if (Build.VERSION.SDK_INT >= 16) {
+            //LMB:
+            findListener = new FindListener() {
+                @Override
+                public void onFindResultReceived(int activeMatchOrdinal,
+                                                 int numberOfMatches, boolean isDoneCounting) {
+                    if (isDoneCounting) {
+                        findIndex = activeMatchOrdinal;
+                        findCount = numberOfMatches;
+                        controls.pOnWebViewFindResultReceived(PasObj,activeMatchOrdinal,numberOfMatches);
+                    }
+                    return;
+                };
+            };
+            setFindListener(findListener);
+        } //[endif_api16up]
+
     }
 
 
@@ -198,8 +207,12 @@ public class jWebView extends WebView {
 
     //Free object except Self, Pascal Code Free the class.
     public  void Free() {
-    	this.setOnLongClickListener(null);
-        this.setFindListener(null); //LMB
+        this.setOnLongClickListener(null);
+        if (Build.VERSION.SDK_INT >= 16) {
+            //[ifdef_api16up]
+            this.setFindListener(null); //LMB
+            //[endif_api16up]
+        }
         setWebViewClient(null);
         webclient = null;
     	LAMWCommon.free();
@@ -294,10 +307,15 @@ public class jWebView extends WebView {
     }
 
 	//LMB:
-	public void FindAllAsync(String _s) {
-		this.findAllAsync(_s);
-	} 
-	
+
+    public void FindAllAsync(String _s) {
+            //[ifdef_api16up]
+            if (Build.VERSION.SDK_INT >= 16) {
+                this.findAllAsync(_s);
+            } //[endif_api16up]
+    }
+
+
 	//LMB 
 	public int getFindIndex() {
 		return findIndex;
@@ -323,4 +341,38 @@ public class jWebView extends WebView {
 	public void callLoadDataWithBaseURL(String s1, String s2, String s3, String s4, String s5) {  //thanks to Anton!
 		loadDataWithBaseURL(s1,s2,s3,s4,s5); // experimental...
 	}
+
+    //Segator
+   public void CallEvaluateJavascript(String _jscode){
+
+        //https://stackoverflow.com/questions/8200945/how-to-get-html-content-from-a-webview
+        //https://stackoverflow.com/questions/19788294/how-does-evaluatejavascript-work
+
+       MyJSCode = _jscode;
+       if (Build.VERSION.SDK_INT >= 19) {
+           //[ifdef_api19up]
+           this.post(new Runnable() {
+               @Override
+               public void run() {
+                   MyWebView.evaluateJavascript(MyJSCode, new ValueCallback<String>() {
+                       @Override
+                       public void onReceiveValue(String s) {
+                           if ("null".equals(s)) {
+                               controls.pOnWebViewEvaluateJavascriptResult(PasObj, "null object");  // <<---- fire native method/event here!
+                           }
+                           else {
+                               controls.pOnWebViewEvaluateJavascriptResult(PasObj, s);  // <<---- fire native method/event here!
+                           }
+                       }
+                   });
+               }
+           });
+           //[endif_api19up]
+       }
+       else {
+           controls.pOnWebViewEvaluateJavascriptResult(PasObj, "Sorry... device Api ["+Build.VERSION.SDK_INT+"] but the requirement is Api >= 19");  // <<---- fire native method/event here!
+       }
+
+    }
+
 }

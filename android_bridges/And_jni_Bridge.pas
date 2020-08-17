@@ -805,6 +805,7 @@ function  jWebView_GetFindCount(env: PJNIEnv; _jwebview: JObject): integer;//LMB
 procedure jWebView_LoadDataWithBaseURL(env: PJNIEnv; _jwebview: JObject; _s1,_s2,_s3,_s4,_s5: string);//LMB
 function  jWebView_getWidth(env:PJNIEnv; _jwebview : jObject): integer; //LMB
 function  jWebView_getHeight(env:PJNIEnv; _jwebview : jObject ): integer; //LMB
+procedure jWebView_CallEvaluateJavascript(env: PJNIEnv; _jwebview: JObject; _jsInnerCode: string);
 
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
@@ -8680,6 +8681,21 @@ begin
   _jMethod:= env^.GetMethodID(env, cls, 'getHeight', '()I');
   Result:= env^.CallIntMethod(env,_jwebview,_jMethod);
   env^.DeleteLocalRef(env, cls);
+end;
+
+//by segator
+procedure jWebView_CallEvaluateJavascript(env: PJNIEnv; _jwebview: JObject; _jsInnerCode: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_jsInnerCode));
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  jMethod:= env^.GetMethodID(env, jCls, 'CallEvaluateJavascript', '(Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

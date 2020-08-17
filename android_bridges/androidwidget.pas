@@ -751,6 +751,9 @@ type
   //LMB:
   TOnWebViewFindResult = Procedure(Sender: TObject; findIndex, findCount: integer) of object;
 
+  //by segator
+  TOnWebViewEvaluateJavascriptResult=procedure(Sender:TObject;data:string) of object;
+
   TAsyncTaskState = (atsBefore, atsProgress, atsPost, atsInBackground);
   TOnAsyncEvent = Procedure(Sender: TObject; eventType, progress: integer) of object;
   TOnAsyncEventDoInBackground = Procedure(Sender: TObject; progress: integer; out keepInBackground: boolean) of object;

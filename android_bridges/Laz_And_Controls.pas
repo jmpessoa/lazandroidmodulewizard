@@ -1944,6 +1944,10 @@ type
     //LMB
     fOnFindResult: TOnWebViewFindResult;
 
+    //segator
+    FOnEvaluateJavascriptResult: TOnWebViewEvaluateJavascriptResult;
+
+
     Procedure SetColor     (Value : TARGBColorBridge);
     Procedure SetZoomControl(Value : Boolean);
     Procedure SetJavaScript(Value : Boolean);
@@ -1990,6 +1994,9 @@ type
     function GetWidth: integer;  override;//LMB
     function GetHeight: integer; override;//LMB
 
+    procedure CallEvaluateJavascript(_jsInnerCode: string); //segator
+    procedure GenEvent_OnEvaluateJavascriptResult(Sender:TObject;data:string); //segator
+
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
     property BackgroundColor     : TARGBColorBridge read FColor      write SetColor;
@@ -1999,6 +2006,7 @@ type
     property OnStatus  : TOnWebViewStatus read FOnStatus   write FOnStatus;
     property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
     property OnFindResult: TOnWebViewFindResult read FOnFindResult write FOnFindResult;
+    property OnEvaluateJavascriptResult: TOnWebViewEvaluateJavascriptResult read FOnEvaluateJavascriptResult write FOnEvaluateJavascriptResult;
 
   end;
 
@@ -2371,6 +2379,9 @@ type
   Procedure Java_Event_pOnWebViewFindResultReceived(env: PJNIEnv; this: jobject;
              webview: TObject; findIndex, findCount: integer);
 
+  //by segator
+  procedure Java_Event_pOnWebViewEvaluateJavascriptResult(env:PJNIEnv;this:JObject;Sender:TObject;data:jString);
+
   // AsyncTask Event & Task
  // procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject; Obj : TObject; EventType,Progress: integer);
   function Java_Event_pOnAsyncEventDoInBackground(env: PJNIEnv; this: jobject; Obj: TObject; Progress: integer): JBoolean;
@@ -2429,6 +2440,19 @@ implementation
 uses
   {And_log_h,}  //for debug
   autocompletetextview, viewflipper, comboedittext, radiogroup;
+
+//helper
+function GetPascalString(env: PJNIEnv; jstr: JString): string;
+var
+ _jBoolean: JBoolean;
+begin
+    Result := '';
+    if jstr <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      Result:= string(env^.GetStringUTFChars(env,jstr,@_jBoolean) );
+    end;
+end;
 
 //-----------------------------------------------------------------------------
 // Asset
@@ -3730,6 +3754,19 @@ begin
   if not Assigned(pasWebView.OnFindResult) then Exit;
   pasWebView.OnFindResult(pasWebView,findIndex,findCount);
 end;
+
+//segator
+procedure Java_Event_pOnWebViewEvaluateJavascriptResult(env:PJNIEnv;this:JObject;Sender:TObject;data:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jWebView then
+  begin
+    jForm(jWebView(Sender).Owner).UpdateJNI(gApp);
+    jWebView(Sender).GenEvent_OnEvaluateJavascriptResult(Sender,GetPascalString(env,data));
+  end;
+end;
+
 
 {
 procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject;
@@ -10213,6 +10250,20 @@ begin
    Result := sysGetHeightOfParent(FParent)
   else
    Result:= jWebView_getHeight(FjEnv, FjObject );
+end;
+
+//by segator
+procedure jWebView.CallEvaluateJavascript(_jsInnerCode: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_CallEvaluateJavascript(FjEnv, FjObject, _jsInnerCode);
+end;
+
+//by segator
+procedure jWebView.GenEvent_OnEvaluateJavascriptResult(Sender:TObject;data:string);
+begin
+  if Assigned(FOnEvaluateJavascriptResult) then FOnEvaluateJavascriptResult(Sender,data);
 end;
 
 //------------------------------------------------------------------------------
