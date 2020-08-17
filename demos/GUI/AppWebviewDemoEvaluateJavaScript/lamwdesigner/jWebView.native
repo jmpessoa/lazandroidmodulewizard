@@ -1,0 +1,3 @@
+public native int pOnWebViewStatus(long pasobj, int EventType, String url);
+public native void pOnWebViewFindResultReceived(long pasobj, int findIndex, int findCount);
+public native void pOnWebViewEvaluateJavascriptResult(long pasobj, String data);

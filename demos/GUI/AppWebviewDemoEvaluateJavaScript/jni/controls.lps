@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="7">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos Y="700"/>
+        <UsageCount Value="29"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jForm;jTextView;jWebView"/>
+        </CustomData>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="42"/>
+        <CursorPos X="3" Y="51"/>
+        <UsageCount Value="29"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2370"/>
+        <CursorPos X="3" Y="2386"/>
+        <UsageCount Value="9"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\And_jni_Bridge.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="811"/>
+        <CursorPos X="13" Y="816"/>
+        <UsageCount Value="14"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="749"/>
+        <CursorPos X="18" Y="755"/>
+        <UsageCount Value="9"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\laz_and_controls_events.pas"/>
+        <UnitName Value="Laz_And_Controls_Events"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="24" Y="14"/>
+        <UsageCount Value="9"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\And_jni.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="543"/>
+        <CursorPos X="20" Y="559"/>
+        <UsageCount Value="9"/>
+      </Unit6>
+    </Units>
+    <JumpHistory Count="5" HistoryIndex="4">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="22" Column="15" TopLine="11"/>
+      </Position1>
+      <Position2>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="50" Column="22" TopLine="41"/>
+      </Position2>
+      <Position3>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="44" Column="134" TopLine="41"/>
+      </Position3>
+      <Position4>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="43" Column="24" TopLine="36"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="50" Column="18" TopLine="43"/>
+      </Position5>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
