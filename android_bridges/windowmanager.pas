@@ -30,6 +30,7 @@ jWindowManager = class(jControl)
     function GetViewPositionY(): integer;
     procedure SetViewRoundCorner();
     procedure SetRadiusRoundCorner(_radius: integer);
+    procedure SetViewFocusable(_value:boolean);//Segator
 
  published
 
@@ -44,6 +45,7 @@ function jWindowManager_GetViewPositionX(env: PJNIEnv; _jwindowmanager: JObject)
 function jWindowManager_GetViewPositionY(env: PJNIEnv; _jwindowmanager: JObject): integer;
 procedure jWindowManager_SetViewRoundCorner(env: PJNIEnv; _jwindowmanager: JObject);
 procedure jWindowManager_SetRadiusRoundCorner(env: PJNIEnv; _jwindowmanager: JObject; _radius: integer);
+procedure jWindowManager_SetViewFocusable(env: PJNIEnv; _jwindowmanager: JObject;value:boolean);//Segator
 
 
 implementation
@@ -140,6 +142,14 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jWindowManager_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+end;
+
+//Segator
+procedure jWindowManager.SetViewFocusable(_value:boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWindowManager_SetViewFocusable(FjEnv, FjObject, _value);
 end;
 
 {-------- jWindowManager_JNI_Bridge ----------}
@@ -264,6 +274,21 @@ begin
   jCls:= env^.GetObjectClass(env, _jwindowmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'SetRadiusRoundCorner', '(I)V');
   env^.CallVoidMethodA(env, _jwindowmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+//Segator
+procedure jWindowManager_SetViewFocusable(env: PJNIEnv; _jwindowmanager: JObject;value:boolean);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwindowmanager);
+  if value then
+    jMethod:= env^.GetMethodID(env, jCls, 'SetViewFocusable', '()V')
+  else
+    jMethod:= env^.GetMethodID(env, jCls, 'SetViewNotFocusable', '()V');
+  env^.CallVoidMethod(env, _jwindowmanager, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
