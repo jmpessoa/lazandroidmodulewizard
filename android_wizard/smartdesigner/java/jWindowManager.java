@@ -113,6 +113,7 @@ public class jWindowManager /*extends ...*/ {
 	   
 	   mFloatingView.setVisibility(View.VISIBLE);
 
+
 	   mLayout = new RelativeLayout(controls.activity){
 		   
 	          @Override
@@ -172,16 +173,17 @@ public class jWindowManager /*extends ...*/ {
    public int GetViewPositionY() {
 	   return mParams.y;
    } 
-   	
-   public void SetViewFocusable(boolean _value) {
-	   
-	   if (!_value) 
-          mParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE  | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH; 
-       else
-          mParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH; 
-	   
-	   if (mLayout != null) 
-	          mWindowManager.updateViewLayout(mLayout, mParams);	   
+   //Segator	
+   public void SetViewNotFocusable() {
+          mParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE  | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+	  if (mLayout != null)
+	    mWindowManager.updateViewLayout(mLayout, mParams);
+   }
+
+   public void SetViewFocusable() {
+          mParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+	  if (mLayout != null)
+	    mWindowManager.updateViewLayout(mLayout, mParams);
    }
    
    public void SetViewRoundCorner() {
