@@ -529,6 +529,11 @@ begin
         list.SaveToFile(pathToJavaSrc+DirectorySeparator+'jCommons.java');
 
         list.Clear;
+        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator+'support'+DirectorySeparator+'jSupported.java');
+        list.Strings[0]:= 'package '+packageName+';';
+        list.SaveToFile(pathToJavaSrc+DirectorySeparator+'jSupported.java');
+
+        list.Clear;
         list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'values'+DirectorySeparator+paramTheme+'.xml');
         list.SaveToFile(pathToProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
 
