@@ -13,7 +13,7 @@ TIntentAction = (iaView, iaPick, iaSendto, idDial, iaCallbutton, iaCall, iaImage
                  iaDataRoaming,iaQuickLaunch, iaDate,iaSystem, iaWireless, iaDeviceInfo,
                  iaSend, iaSendMultiple, iaPickActivity, iaEdit, iaGetContent,
                  iaTimePick, iaVoiceCommand, iaWebSearch, iaMain, iaAppWidgetUpdate,
-                 iaInstalPackage, iaDelete, iaManagerUnknownAppSources,  iaNone);
+                 iaInstalPackage, iaDelete, iaManagerUnknownAppSources, iaManageOverlayPermission,  iaNone);
 
 TIntentCategory = (icDefault, icLauncher, icHome, icInfo, icPreference, icAppBrowser,
                    icAppCalculator, icAppCalendar, icAppContacts, icAppEmail,
