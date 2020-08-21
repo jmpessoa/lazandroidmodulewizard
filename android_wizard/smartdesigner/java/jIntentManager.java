@@ -443,6 +443,7 @@ Sending Data: Extras vs. URI Parameters
           case 23: mIntent.setAction("android.intent.ACTION_INSTALL_PACKAGE"); //
           case 24: mIntent.setAction("android.intent.action.DELETE");  //
           case 25: mIntent.setAction("Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES");
+          case 26: mIntent.setAction(Settings.ACTION_MANAGE_OVERLAY_PERMISSION); break;//by Segator
 	  }
 	  
    }
@@ -746,4 +747,3 @@ Sending Data: Extras vs. URI Parameters
         return str;
     }
 }
-
