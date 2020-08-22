@@ -5,6 +5,9 @@ import java.lang.reflect.Field;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.Typeface;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -13,6 +16,7 @@ import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -33,6 +37,8 @@ public class jButton extends Button {
 	int mSavedBackgroundColor;
 	
 	int mRadius = 20;
+	
+	boolean mEnable = true;
 
 	//Constructor
 	public  jButton(android.content.Context context, Controls ctrls,long pasobj ) {
@@ -68,12 +74,15 @@ public class jButton extends Button {
 				    }
 			     }, 150);
 			  	 
-			   }  			
-			   controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+			   }  		
+			   
+			   if (mEnable) {
+			      controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+			   }
 												 				 
 			}
 		};		
-		setOnClickListener(onClickListener);
+		setOnClickListener(onClickListener);		
 	}
 	 
 	//Free object except Self, Pascal Code Free the class.
@@ -139,7 +148,7 @@ public class jButton extends Button {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 	
-	public void ClearLayoutAll() {		
+	public void ClearLayoutAll() {   //TODO Pascal		
 		LAMWCommon.clearLayoutAll();
 	}
 
@@ -181,11 +190,10 @@ public class jButton extends Button {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; 
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;			
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
@@ -200,28 +208,17 @@ public class jButton extends Button {
 		this.performLongClick();
 	}
 
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-
-	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));			
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource( controls.GetDrawableResourceId(_imgResIdentifier) );			
 	}	
 	
-	public  void SetBackgroundByImage(Bitmap _image) {	
+	public  void SetBackgroundByImage(Bitmap _image) {
+	  if(_image == null) return;
+	  
 	  Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+	  
+	  if( d == null ) return;
+	  
       //[ifdef_api16up]
 	  if(Build.VERSION.SDK_INT >= 16) 
           this.setBackground(d);
@@ -234,12 +231,21 @@ public class jButton extends Button {
 		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
 	    super.dispatchDraw(canvas);	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side
+	    
+	    if (!mEnable) this.setEnabled(false);
 	}
 	
 	//http://www.android--tutorials.com/2016/03/android-set-button-drawableleft.html
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -253,8 +259,15 @@ public class jButton extends Button {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -326,6 +339,84 @@ public class jButton extends Button {
 		if  (this != null) {
 		   //mBackgroundColor = _color;
 	  	   this.setBackgroundColor(_color);
+	  	   //this.setAlpha(0.5f);
 		}   
 	}
+	
+	//ref. http://www.41post.com/5094/programming/android-change-color-of-the-standard-button-inside-activity#more-5094
+	public void SetBackgroundColor(int _color,  int _mode) {  //0xFFBBAA00
+	//Changing the background color of the Button using PorterDuff Mode - Multiply  
+    this.getBackground().setColorFilter(_color, android.graphics.PorterDuff.Mode.MULTIPLY);  
+    //Set the color of the text displayed inside the button  
+    //this.setTextColor(0xFF0000FF);  
+    //Render this Button again 
+    //this.setAlpha(0.5f);
+    this.invalidate();  
+	}
+	
+	
+	public void SetBackgroundColor(int _color,  int _lightingMultColor, int _lightingAddColor) { 
+      //Changing the background color of the Button using a LightingColorFilter  
+      this.getBackground().setColorFilter(new LightingColorFilter(_lightingMultColor, _lightingAddColor));   //0xFFBBAA00, 0x00000000
+      //Set the color of the text displayed inside the button  
+      //bt_exButton.setTextColor(0xFF0000FF);  
+      //Render this Button again  
+      this.invalidate();  
+	}
+    
+	public void SetBackgroundColorByMatrixColorFilter(int _multColor) {
+	   //Set the color that the button background will be multiplied with  
+    int bgColor = _multColor; //0xFFBBAA00;  
+    /*Separate each hexadecimal value pair from the bgColor integer and store 
+     * each one of them on a separated variable.*/  
+    int a = (bgColor >> 24) & 0xFF;  
+    int r = (bgColor >> 16) & 0xFF;  
+    int g = (bgColor >> 8) & 0xFF;  
+    int b = (bgColor >> 0) & 0xFF;  
+    /*Create a new ColorMatrixColorFilter passing each individual component 
+    of the ColorMatrix this filter uses as a float array.*/  
+    ColorMatrixColorFilter cmFilter =   
+            new ColorMatrixColorFilter(  
+            new float[]{r/255f,0,0,0,0,  
+                        0,g/255f,0,0,0,  
+                        0,0,b/255f,0,0,  
+                        0,0,0,a/255f,0});  
+    //Set the cmFilter as the color filter  
+    this.getBackground().setColorFilter(cmFilter);  
+    //Set the color of the text displayed inside the button  
+    //bt_exButton.setTextColor(0xFF0000FF);  
+    //Render this Button again  
+      this.invalidate();  
+	}
+	
+	public void SetFontFromAssets(String _fontName) {   //   "fonts/font1.ttf"  or "font1.ttf"
+        Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
+        this.setTypeface(customfont);
+    }
+	
+	public void SetEnabled(boolean _value) {
+		mEnable = _value;
+		this.setEnabled(_value);		
+	}
+
+  /* Pascal:
+     TFrameGravity = (fgNone,
+                   fgTopLeft, fgTopCenter, fgTopRight,
+                   fgBottomLeft, fgBottomCenter, fgBottomRight,
+                   fgCenter,
+                   fgCenterVerticalLeft, fgCenterVerticalRight
+                   );     
+   */
+   public void SetFrameGravity(int _value) {	   
+      LAMWCommon.setLGravity(_value);
+   }
+   
+   public void SetAllCaps(boolean allCaps)
+   {
+	   this.setAllCaps(allCaps);
+   }
+
+   public void SetFocus() {
+   	  this.requestFocus();
+   }
 }

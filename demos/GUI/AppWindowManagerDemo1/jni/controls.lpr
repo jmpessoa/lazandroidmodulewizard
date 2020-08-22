@@ -11,12 +11,12 @@ uses
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
   Method:    pAppOnCreate
-  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;)V }
+  Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;Landroid/content/Intent;)V }
 procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
-  layout: JObject); cdecl;
+  layout: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnCreate(PEnv, this, context, layout); AndroidModule1.Init(gApp
-    );
+  Java_Event_pAppOnCreate(PEnv, this, context, layout, intent);
+    AndroidModule1.ReInit(gApp);
 end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
@@ -29,10 +29,10 @@ end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
   Method:    pAppOnNewIntent
-  Signature: ()V }
-procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject); cdecl;
+  Signature: (Landroid/content/Intent;)V }
+procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject; intent: JObject); cdecl;
 begin
-  Java_Event_pAppOnNewIntent(PEnv, this);
+  Java_Event_pAppOnNewIntent(PEnv, this, intent);
 end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
@@ -97,6 +97,14 @@ end;
 function pAppOnRotate(PEnv: PJNIEnv; this: JObject; rotate: JInt): JInt; cdecl;
 begin
   Result:=Java_Event_pAppOnRotate(PEnv, this, rotate);
+end;
+
+{ Class:     com_example_appwindowmanagerdemo1_Controls
+  Method:    pAppOnUpdateLayout
+  Signature: ()V }
+procedure pAppOnUpdateLayout(PEnv: PJNIEnv; this: JObject); cdecl;
+begin
+  Java_Event_pAppOnUpdateLayout(PEnv, this);
 end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
@@ -177,11 +185,10 @@ end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
   Method:    pOnDraw
-  Signature: (JLandroid/graphics/Canvas;)V }
-procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong; canvas: JObject
-  ); cdecl;
+  Signature: (J)V }
+procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnDraw(PEnv, this, TObject(pasobj), canvas);
+  Java_Event_pOnDraw(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
@@ -213,12 +220,39 @@ begin
 end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
+  Method:    pOnDown
+  Signature: (JI)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
+  cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     com_example_appwindowmanagerdemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
   cdecl;
 begin
   Java_Event_pOnClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     com_example_appwindowmanagerdemo1_Controls
+  Method:    pOnLongClick
+  Signature: (JI)V }
+procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
+  ); cdecl;
+begin
+  Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     com_example_appwindowmanagerdemo1_Controls
+  Method:    pOnDoubleClick
+  Signature: (JI)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  value: JInt); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
 end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
@@ -245,6 +279,14 @@ end;
 procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnEnter(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appwindowmanagerdemo1_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     com_example_appwindowmanagerdemo1_Controls
@@ -319,15 +361,45 @@ begin
   Java_Event_pOnAfterDispatchDraw(PEnv, this, TObject(pasobj), canvas, tag);
 end;
 
-const NativeMethods: array[0..34] of JNINativeMethod = (
+{ Class:     com_example_appwindowmanagerdemo1_Controls
+  Method:    pOnLayouting
+  Signature: (JZ)V }
+procedure pOnLayouting(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  changed: JBoolean); cdecl;
+begin
+  Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
+end;
+
+{ Class:     com_example_appwindowmanagerdemo1_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     com_example_appwindowmanagerdemo1_Controls
+  Method:    pOnImageViewPopupItemSelected
+  Signature: (JLjava/lang/String;)V }
+procedure pOnImageViewPopupItemSelected(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; caption: JString); cdecl;
+begin
+  Java_Event_pOnImageViewPopupItemSelected(PEnv, this, TObject(pasobj), caption
+    );
+end;
+
+const NativeMethods: array[0..42] of JNINativeMethod = (
    (name: 'pAppOnCreate';
-    signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;)V';
+    signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
+      +'Landroid/content/Intent;)V';
     fnPtr: @pAppOnCreate; ),
    (name: 'pAppOnScreenStyle';
     signature: '()I';
     fnPtr: @pAppOnScreenStyle; ),
    (name: 'pAppOnNewIntent';
-    signature: '()V';
+    signature: '(Landroid/content/Intent;)V';
     fnPtr: @pAppOnNewIntent; ),
    (name: 'pAppOnDestroy';
     signature: '()V';
@@ -353,6 +425,9 @@ const NativeMethods: array[0..34] of JNINativeMethod = (
    (name: 'pAppOnRotate';
     signature: '(I)I';
     fnPtr: @pAppOnRotate; ),
+   (name: 'pAppOnUpdateLayout';
+    signature: '()V';
+    fnPtr: @pAppOnUpdateLayout; ),
    (name: 'pAppOnConfigurationChanged';
     signature: '()V';
     fnPtr: @pAppOnConfigurationChanged; ),
@@ -378,7 +453,7 @@ const NativeMethods: array[0..34] of JNINativeMethod = (
     signature: '(Landroid/view/MenuItem;ILjava/lang/String;Z)V';
     fnPtr: @pAppOnClickContextMenuItem; ),
    (name: 'pOnDraw';
-    signature: '(JLandroid/graphics/Canvas;)V';
+    signature: '(J)V';
     fnPtr: @pOnDraw; ),
    (name: 'pOnTouch';
     signature: '(JIIFFFF)V';
@@ -389,9 +464,18 @@ const NativeMethods: array[0..34] of JNINativeMethod = (
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(JI)V';
+    fnPtr: @pOnDown; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
+   (name: 'pOnLongClick';
+    signature: '(JI)V';
+    fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(JI)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -401,6 +485,9 @@ const NativeMethods: array[0..34] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -424,7 +511,16 @@ const NativeMethods: array[0..34] of JNINativeMethod = (
     fnPtr: @pOnBeforeDispatchDraw; ),
    (name: 'pOnAfterDispatchDraw';
     signature: '(JLandroid/graphics/Canvas;I)V';
-    fnPtr: @pOnAfterDispatchDraw; )
+    fnPtr: @pOnAfterDispatchDraw; ),
+   (name: 'pOnLayouting';
+    signature: '(JZ)V';
+    fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
+   (name: 'pOnImageViewPopupItemSelected';
+    signature: '(JLjava/lang/String;)V';
+    fnPtr: @pOnImageViewPopupItemSelected; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
@@ -506,6 +602,8 @@ exports
     +'pAppOnBackPressed',
   pAppOnRotate name 'Java_com_example_appwindowmanagerdemo1_Controls_'
     +'pAppOnRotate',
+  pAppOnUpdateLayout name 'Java_com_example_appwindowmanagerdemo1_Controls_'
+    +'pAppOnUpdateLayout',
   pAppOnConfigurationChanged name 'Java_com_example_appwindowmanagerdemo1_'
     +'Controls_pAppOnConfigurationChanged',
   pAppOnActivityResult name 'Java_com_example_appwindowmanagerdemo1_Controls_'
@@ -528,10 +626,17 @@ exports
     +'pOnClickGeneric',
   pAppOnSpecialKeyDown name 'Java_com_example_appwindowmanagerdemo1_Controls_'
     +'pAppOnSpecialKeyDown',
+  pOnDown name 'Java_com_example_appwindowmanagerdemo1_Controls_pOnDown',
   pOnClick name 'Java_com_example_appwindowmanagerdemo1_Controls_pOnClick',
+  pOnLongClick name 'Java_com_example_appwindowmanagerdemo1_Controls_'
+    +'pOnLongClick',
+  pOnDoubleClick name 'Java_com_example_appwindowmanagerdemo1_Controls_'
+    +'pOnDoubleClick',
   pOnChange name 'Java_com_example_appwindowmanagerdemo1_Controls_pOnChange',
   pOnChanged name 'Java_com_example_appwindowmanagerdemo1_Controls_pOnChanged',
   pOnEnter name 'Java_com_example_appwindowmanagerdemo1_Controls_pOnEnter',
+  pOnBackPressed name 'Java_com_example_appwindowmanagerdemo1_Controls_'
+    +'pOnBackPressed',
   pOnClose name 'Java_com_example_appwindowmanagerdemo1_Controls_pOnClose',
   pAppOnViewClick name 'Java_com_example_appwindowmanagerdemo1_Controls_'
     +'pAppOnViewClick',
@@ -546,7 +651,13 @@ exports
   pOnBeforeDispatchDraw name 'Java_com_example_appwindowmanagerdemo1_Controls_'
     +'pOnBeforeDispatchDraw',
   pOnAfterDispatchDraw name 'Java_com_example_appwindowmanagerdemo1_Controls_'
-    +'pOnAfterDispatchDraw';
+    +'pOnAfterDispatchDraw',
+  pOnLayouting name 'Java_com_example_appwindowmanagerdemo1_Controls_'
+    +'pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_com_example_appwindowmanagerdemo1_'
+    +'Controls_pAppOnRequestPermissionResult',
+  pOnImageViewPopupItemSelected name 'Java_com_example_appwindowmanagerdemo1_'
+    +'Controls_pOnImageViewPopupItemSelected';
 
 {%endregion}
   

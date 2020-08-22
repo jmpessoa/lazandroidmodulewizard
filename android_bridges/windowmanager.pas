@@ -32,6 +32,11 @@ jWindowManager = class(jControl)
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetViewFocusable(_value:boolean);//Segator
 
+    procedure RequestDrawOverlayRuntimePermission(_packageName: string; _requestCode: integer);
+    function IsDrawOverlaysRuntimePermissionNeed(): boolean;
+    function CanDrawOverlays(): boolean;
+
+
  published
 
 end;
@@ -47,6 +52,9 @@ procedure jWindowManager_SetViewRoundCorner(env: PJNIEnv; _jwindowmanager: JObje
 procedure jWindowManager_SetRadiusRoundCorner(env: PJNIEnv; _jwindowmanager: JObject; _radius: integer);
 procedure jWindowManager_SetViewFocusable(env: PJNIEnv; _jwindowmanager: JObject;value:boolean);//Segator
 
+procedure jWindowManager_RequestDrawOverlayRuntimePermission(env: PJNIEnv; _jwindowmanager: JObject; _packageName: string; _requestCode: integer);
+function jWindowManager_IsDrawOverlaysRuntimePermissionNeed(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+function jWindowManager_CanDrawOverlays(env: PJNIEnv; _jwindowmanager: JObject): boolean;
 
 implementation
 
@@ -150,6 +158,27 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jWindowManager_SetViewFocusable(FjEnv, FjObject, _value);
+end;
+
+procedure jWindowManager.RequestDrawOverlayRuntimePermission(_packageName: string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWindowManager_RequestDrawOverlayRuntimePermission(FjEnv, FjObject, _packageName ,_requestCode);
+end;
+
+function jWindowManager.IsDrawOverlaysRuntimePermissionNeed(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWindowManager_IsDrawOverlaysRuntimePermissionNeed(FjEnv, FjObject);
+end;
+
+function jWindowManager.CanDrawOverlays(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWindowManager_CanDrawOverlays(FjEnv, FjObject);
 end;
 
 {-------- jWindowManager_JNI_Bridge ----------}
@@ -292,5 +321,45 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jWindowManager_RequestDrawOverlayRuntimePermission(env: PJNIEnv; _jwindowmanager: JObject; _packageName: string; _requestCode: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packageName));
+  jParams[1].i:= _requestCode;
+  jCls:= env^.GetObjectClass(env, _jwindowmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestDrawOverlayRuntimePermission', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jwindowmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jWindowManager_IsDrawOverlaysRuntimePermissionNeed(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwindowmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsDrawOverlaysRuntimePermissionNeed', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jwindowmanager, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jWindowManager_CanDrawOverlays(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwindowmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'CanDrawOverlays', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jwindowmanager, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

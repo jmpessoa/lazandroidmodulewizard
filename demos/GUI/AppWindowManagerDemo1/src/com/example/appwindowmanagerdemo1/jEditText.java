@@ -1,5 +1,14 @@
 package com.example.appwindowmanagerdemo1;
 
+import java.io.BufferedReader;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 
 import android.content.ClipData;
@@ -16,6 +25,7 @@ import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
@@ -25,6 +35,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
 import android.view.Gravity;
+import android.widget.TextView;
+
+//Reviewed by TR3E on 08/20/2019
 
 public class jEditText extends EditText {
 	//Pascal Interface
@@ -41,13 +54,17 @@ public class jEditText extends EditText {
 	private boolean canDispatchChangeEvent = false;
 	private boolean canDispatchChangedEvent = false;
 	private boolean mFlagSuggestion = false;
+	private boolean mFlagCapSentence = false;
+	private boolean mFlagCaptureBackPressed = false; // by tr3e
 
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
 
-	float mTextSize = 0; //default
-	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+	private float mTextSize = 0; //default
+	private int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
+	private boolean mCloseSoftInputOnEnter = true;
+	
 	//Constructor
 	public  jEditText(android.content.Context context,
 					  Controls ctrls,long pasobj ) {
@@ -81,25 +98,62 @@ public class jEditText extends EditText {
 			};
 		};
 		setOnClickListener(onClickListener);
-
-		//Init Event : http://socome.tistory.com/15
+		
+		// Fixed "Go / Next / Done / Ok" command capture [by TR3E]
+		setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			        @Override
+			        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+			            if (actionId != 0) {
+			            	final EditText caption = (EditText)v;
+						    
+			            	if (mCloseSoftInputOnEnter) {
+								InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+								imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							}
+						    
+							if (!caption.getText().toString().equals("")){  //try fix program logic...
+								controls.pOnEnter(LAMWCommon.getPasObj());							
+							}
+											    
+			                return true;
+			            } else {
+			                return false;
+			            }
+			        }
+	     });
+		
 		onKeyListener = new OnKeyListener() {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
-				if (event.getAction() == KeyEvent.ACTION_UP) {
-					if (keyCode == KeyEvent.KEYCODE_ENTER) {
-						InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+				
+				    final EditText caption = (EditText)v;
+				    
+				    // by tr3e fix back_key close app
+				    if( mFlagCaptureBackPressed && (event.getAction() == KeyEvent.ACTION_DOWN) &&
+					   	(KeyEvent.KEYCODE_BACK == keyCode) )
+				    {			            
+				    	InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-						//Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
-						// LoadMan
-						controls.pOnEnter(LAMWCommon.getPasObj());  //just Enter/Done/Next/backbutton ....!
+						controls.pOnBackPressed(LAMWCommon.getPasObj());
 						return true;
+			        }
+				    					
+				    if( (event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+						if (mCloseSoftInputOnEnter) {
+							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						}
+						if (! caption.getText().toString().equals("")){  //try fix program logic...
+						 controls.pOnEnter(LAMWCommon.getPasObj());
+						}
+						return mCloseSoftInputOnEnter;
 					}
-				}
+				
 				return false;
 			}
 		};
 
 		setOnKeyListener(onKeyListener);
+		
 		//Event
 		textwatcher = new TextWatcher() {
 			@Override
@@ -128,9 +182,7 @@ public class jEditText extends EditText {
 		removeTextChangedListener(textwatcher);
 		textwatcher = null;
 		setOnKeyListener(null);	
-		setText("");
 		LAMWCommon.free();
-	
 	}
 	
 	public long GetPasObj() {
@@ -206,31 +258,31 @@ public class jEditText extends EditText {
 			this.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED);
 		}
 		else if (str.equals("CAPCHARACTERS")) {
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 		}
 		else if (str.equals("TEXT")) {
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 		}
 		else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
 		else if (str.equals("PASSNUMBER"))  {this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-		else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+		else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 
 		else if (str.equals("TEXTMULTILINE")){
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		}
-
+		else if (str.equals("NULL")){
+			this.setInputType(InputType.TYPE_NULL);
+		}
 		else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
+
+		if (!mFlagSuggestion) {
+		  this.setInputType(this.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                }
+		if (mFlagCapSentence) {
+		  this.setInputType(this.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+                }
 
 	}
 
@@ -241,22 +293,23 @@ public class jEditText extends EditText {
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END               ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             case 0 : { setGravity( Gravity.LEFT              ); }; break;
             case 1 : { setGravity( Gravity.RIGHT             ); }; break;
  //[ifdef_api14up] */
-            case 2 : { setGravity( Gravity.TOP               ); }; break;
-            case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
-            case 4 : { setGravity( Gravity.CENTER            ); }; break;
-            case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
-            case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
+            
+            case 2 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+            
  //[ifdef_api14up]
             default : { setGravity( Gravity.START            ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             default : { setGravity( Gravity.LEFT             ); }; break;
  //[ifdef_api14up] */
-        };
+            
+        }
     }
 
 	//by jmpessoa
@@ -270,7 +323,9 @@ public class jEditText extends EditText {
 
 	public  void InputMethodShow() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+		//Repaired forever show the "softInput" by TR3E
+		this.requestFocus();
+		imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
 	}
 
 
@@ -391,6 +446,15 @@ public class jEditText extends EditText {
 		mFlagSuggestion = _value;
 	}
 
+	public void SetCapSentence(boolean _value) {
+		mFlagCapSentence = _value;
+	}
+	
+	// by tr3e
+	public void SetCaptureBackPressed(boolean _value) {
+		mFlagCaptureBackPressed = _value;
+	}
+
 	public void CopyToClipboard() {
 		mClipData = ClipData.newPlainText("text", this.getText().toString());
 		mClipBoard.setPrimaryClip(mClipData);
@@ -413,20 +477,24 @@ public class jEditText extends EditText {
 		this.setText(t);
 	}
 
-	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitInches, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
+	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
 	public void SetFontSizeUnit(int _unit) {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
+	}
+	
+	//by TR3E
+	public void SetSelection(int _value){
+		this.setSelection(_value);
 	}
 
 	public void SetSelectAllOnFocus(boolean _value){
@@ -435,33 +503,21 @@ public class jEditText extends EditText {
 
 	public void SelectAll() {
 		this.selectAll();
-	}
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
 	}	
 	
-	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));
+	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource(controls.GetDrawableResourceId(_imgResIdentifier));
 	}		
 
-	public void SetBackgroundByImage(Bitmap _image) {	
+	public void SetBackgroundByImage(Bitmap _image) {
+		if( _image == null ) return;
+		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		if( d == null ) return;
 //[ifdef_api16up]
-		//if(Build.VERSION.SDK_INT >= 16) 
-  this.setBackground(d);
+	if(Build.VERSION.SDK_INT >= 16) 
+             this.setBackground(d);
 //[endif_api16up]
 	}	
 		
@@ -476,6 +532,13 @@ public class jEditText extends EditText {
 	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+				
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -489,8 +552,15 @@ public class jEditText extends EditText {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -502,6 +572,124 @@ public class jEditText extends EditText {
 		  case 3: this.setCompoundDrawables(null, null, null, d); 		
 		}				
 	}
+		
+	// https://blog.stylingandroid.com/gradient-text/
+	@Override
+    protected void onLayout( boolean changed, int left, int top, int right, int bottom ) {
+        super.onLayout( changed, left, top, right, bottom );        
+        controls.pOnLayouting(LAMWCommon.getPasObj(), changed);	 //event handle by pascal side                                            
+    }
 	
+	/* https://mobikul.com/just-few-steps-to-make-your-app-rtl-supportable/
+	 * add android:supportsRtl="true" to the <application>element in manifest file.
+	 */
+	public void SetTextDirection(int _textDirection) {		
+		//[ifdef_api17up]
+		 if(Build.VERSION.SDK_INT >= 17) {
+				switch  (_textDirection) {
+				case 0: this.setTextDirection(View.TEXT_DIRECTION_INHERIT);	 break; 
+				case 1: this.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG); break; 	 
+				case 2: this.setTextDirection(View.TEXT_DIRECTION_ANY_RTL);	  break; 
+				case 3: this.setTextDirection(View.TEXT_DIRECTION_LTR); break;  
+				case 4: this.setTextDirection(View.TEXT_DIRECTION_RTL); 
+					 		  		  		   
+				}			
+				//Log.i("SetTextDirection", "SetTextDirection");
+		 }	
+       //[endif_api17up]				
+	}
+	
+	public void SetFontFromAssets(String _fontName) {   //   "font/font.ttf"
+        Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
+        this.setTypeface(customfont);
+    }
+	
+	public void RequestFocus() {
+		this.requestFocus();
+	}
+
+	public void SetCloseSoftInputOnEnter(boolean _closeSoftInput) {
+		mCloseSoftInputOnEnter = _closeSoftInput;
+	}
+	
+	public void LoadFromFile(String _path, String _filename) {
+		
+		File file = new File(_path, _filename);
+		StringBuilder content = new StringBuilder();
+		
+		try {
+		    BufferedReader br = new BufferedReader(new FileReader(file));
+		    String line;
+
+		    while ((line = br.readLine()) != null) {
+		    	content.append(line);
+		    	content.append('\n');
+		    }
+		    br.close();
+		}
+		catch (IOException e) {
+			//
+		}
+		this.setText(content.toString());
+	}
+	
+	
+	public void LoadFromFile(String _filename) {
+
+		     String retStr = "";
+
+		     try {
+		         InputStream inputStream = controls.activity.openFileInput(_filename);
+
+		         if ( inputStream != null ) {
+		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		             String receiveString = "";
+		             StringBuilder stringBuilder = new StringBuilder();
+		             while ( (receiveString = bufferedReader.readLine()) != null ) {
+		                 stringBuilder.append(receiveString);
+		             }
+
+		             inputStream.close();
+		             retStr = stringBuilder.toString();
+		         }
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
+		     }
+		     this.setText(retStr);
+    }
+	
+	public void SaveToFile(String _path, String _filename){
+		     FileWriter fWriter;     
+		     try{ // Environment.getExternalStorageDirectory().getPath()
+		          fWriter = new FileWriter(_path +"/"+ _filename);
+		          fWriter.write(this.getText().toString());
+		          fWriter.flush();
+		          fWriter.close();
+		      }catch(Exception e){
+		          e.printStackTrace();
+		      }
+	}
+	
+	public void SaveToFile(String _filename) {	  	 
+		     try {
+		         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(controls.activity.openFileOutput(_filename, Context.MODE_PRIVATE));
+		         //outputStreamWriter.write("_header");
+		         outputStreamWriter.write(this.getText().toString());
+		         //outputStreamWriter.write("_footer");
+		         outputStreamWriter.close();
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
+		     }
+    }
+
+    public void SetSoftInputShownOnFocus(boolean _show) {
+		//[ifdef_api21up]
+		if (Build.VERSION.SDK_INT >= 21) {
+			this.setShowSoftInputOnFocus(_show);
+		} //[endif_api21up]
+	}
 }
 

@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, AndroidWidget, Laz_And_Controls, windowmanager,
-  preferences, radiogroup{, inifiles};
+  preferences, radiogroup{, inifiles}, And_jni;
   
 type
 
@@ -25,6 +25,8 @@ type
     jTextView2: jTextView;
     jTextView3: jTextView;
     jWindowManager1: jWindowManager;
+    procedure AndroidModule1ActivityResult(Sender: TObject;
+      requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
     procedure AndroidModule1Close(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
@@ -33,6 +35,7 @@ type
     procedure jImageView1Click(Sender: TObject);
   private
     {private declarations}
+    pX, pY: integer;
   public
     {public declarations}
   end;
@@ -49,21 +52,55 @@ implementation
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-   jWindowManager1.AddView(jPanel1.View);  //at the moment just one view per jWindowManager
-   jWindowManager1.SetViewRoundCorner();
-   Self.Minimize();
+   if jWindowManager1.CanDrawOverlays() then
+   begin
+     if (pX <> -1) and (pY <> -1) then
+       jWindowManager1.SetViewPosition(pX, pY);
+
+     jWindowManager1.AddView(jPanel1.View);  //at the moment just one view per jWindowManager
+     jWindowManager1.SetViewRoundCorner();
+     Self.Minimize();
+   end
+   else ShowMessage('Sorry... DrawOverlay Permission denied...')
+end;
+
+procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
+  requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
+begin
+  if requestCode =  1123 then
+  begin
+    (*
+     if resultCode = RESULT_OK then
+     begin
+       ShowMessage('Success! DrawOverlays PERMISSION_GRANTED');
+       if (pX <> -1) and (pY <> -1) then jWindowManager1.SetViewPosition(pX, pY);
+     end
+     else
+     begin
+       FOverlayPermission:= False;
+       ShowMessage('Sorry...DrawOverlays PERMISSION_DENIED... ' );
+     end;
+     *)
+     if jWindowManager1.CanDrawOverlays() then
+     begin
+       ShowMessage('Success! DrawOverlays PERMISSION_GRANTED');
+       if (pX <> -1) and (pY <> -1) then jWindowManager1.SetViewPosition(pX, pY);
+     end
+     else
+     begin
+        ShowMessage('Sorry...DrawOverlays PERMISSION_DENIED... ' );
+     end;
+
+  end;
 end;
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
-var
-   pX, pY: integer;
+//var
   //inifiles: TInifile;
 begin
+
   pX:= jPreferences1.GetIntData('X', -1);  //  -1 = dummy
   pY:= jPreferences1.GetIntData('Y', -1);
-
-  if (pX <> -1) and (pY <> -1) then
-     jWindowManager1.SetViewPosition(pX, pY);
 
   (*
   //USING INI File
@@ -83,12 +120,17 @@ begin
   jTextView3.SetCompoundDrawables('ic_happy', cdsRight);
   jTextView3.Text:= 'LAMW: floating and draggable View!';
 
+  if jWindowManager1.IsDrawOverlaysRuntimePermissionNeed() then   // that is, target API >= 23
+  begin
+     ShowMessage('Wait... Requesting Permission....');
+     jWindowManager1.RequestDrawOverlayRuntimePermission(gApp.PackageName, 1123);
+  end;
+
 end;
 
 procedure TAndroidModule1.AndroidModule1Close(Sender: TObject);
-var
+//var
   //inifiles: TInifile;
-  pX, pY: integer;
 begin
 
   pX:= jWindowManager1.GetViewPositionX();
@@ -106,6 +148,7 @@ begin
   *)
 
 end;
+
 
 procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
