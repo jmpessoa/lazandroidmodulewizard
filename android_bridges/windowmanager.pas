@@ -50,7 +50,7 @@ function jWindowManager_GetViewPositionX(env: PJNIEnv; _jwindowmanager: JObject)
 function jWindowManager_GetViewPositionY(env: PJNIEnv; _jwindowmanager: JObject): integer;
 procedure jWindowManager_SetViewRoundCorner(env: PJNIEnv; _jwindowmanager: JObject);
 procedure jWindowManager_SetRadiusRoundCorner(env: PJNIEnv; _jwindowmanager: JObject; _radius: integer);
-procedure jWindowManager_SetViewFocusable(env: PJNIEnv; _jwindowmanager: JObject;value:boolean);//Segator
+procedure jWindowManager_SetViewFocusable(env: PJNIEnv; _jwindowmanager: JObject; _value: boolean);
 
 procedure jWindowManager_RequestDrawOverlayRuntimePermission(env: PJNIEnv; _jwindowmanager: JObject; _packageName: string; _requestCode: integer);
 function jWindowManager_IsDrawOverlaysRuntimePermissionNeed(env: PJNIEnv; _jwindowmanager: JObject): boolean;
@@ -307,17 +307,16 @@ begin
 end;
 
 //Segator
-procedure jWindowManager_SetViewFocusable(env: PJNIEnv; _jwindowmanager: JObject;value:boolean);
+procedure jWindowManager_SetViewFocusable(env: PJNIEnv; _jwindowmanager: JObject; _value: boolean);
 var
+  jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  jParams[0].z:= JBool(_value);
   jCls:= env^.GetObjectClass(env, _jwindowmanager);
-  if value then
-    jMethod:= env^.GetMethodID(env, jCls, 'SetViewFocusable', '()V')
-  else
-    jMethod:= env^.GetMethodID(env, jCls, 'SetViewNotFocusable', '()V');
-  env^.CallVoidMethod(env, _jwindowmanager, jMethod);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetViewFocusable', '(Z)V');
+  env^.CallVoidMethodA(env, _jwindowmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
