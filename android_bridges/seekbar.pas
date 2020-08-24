@@ -56,6 +56,8 @@ jSeekBar = class(jVisualControl)
     procedure SetRotation(_rotation: single);
     procedure SetLGravity(_value: TLayoutGravity);
 
+    procedure SetColors( colorBar, colorFinger : TARGBColorBridge );
+
     procedure GenEvent_OnSeekBarProgressChanged(Obj: TObject; progress: integer; fromUser: boolean);
     procedure GenEvent_OnSeekBarStartTrackingTouch(Obj: TObject; progress: integer);
     procedure GenEvent_OnSeekBarStopTrackingTouch(Obj: TObject; progress: integer);
@@ -81,7 +83,6 @@ procedure jSeekBar_RemoveFromViewParent(env: PJNIEnv; _jseekbar: JObject);
 function jSeekBar_GetView(env: PJNIEnv; _jseekbar: JObject): jObject;
 procedure jSeekBar_SetLParamWidth(env: PJNIEnv; _jseekbar: JObject; _w: integer);
 procedure jSeekBar_SetLParamHeight(env: PJNIEnv; _jseekbar: JObject; _h: integer);
-procedure jSeekBar_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jseekbar: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 procedure jSeekBar_AddLParamsAnchorRule(env: PJNIEnv; _jseekbar: JObject; _rule: integer);
 procedure jSeekBar_AddLParamsParentRule(env: PJNIEnv; _jseekbar: JObject; _rule: integer);
 procedure jSeekBar_SetLayoutAll(env: PJNIEnv; _jseekbar: JObject; _idAnchor: integer);
@@ -156,10 +157,10 @@ begin
    jSeekBar_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  jSeekBar_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
-                                           FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                                           sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                                           sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
+  jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
+                  FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
+                  sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
+                  sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -200,6 +201,15 @@ begin
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
+
+procedure jSeekBar.SetColors( colorBar, colorFinger : TARGBColorBridge );
+begin
+
+  if (FInitialized = True) then
+    jni_proc_ii(FjEnv, FjObject, 'SetColor', GetARGB(FCustomColor, colorBar), GetARGB(FCustomColor, colorFinger));
+
+end;
+
 procedure jSeekBar.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
@@ -283,7 +293,7 @@ procedure jSeekBar.SetLeftTopRightBottomWidthHeight(_left: integer; _top: intege
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSeekBar_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight', _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jSeekBar.AddLParamsAnchorRule(_rule: integer);
@@ -483,26 +493,6 @@ begin
   env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
-
-
-procedure jSeekBar_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jseekbar: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 
 procedure jSeekBar_AddLParamsAnchorRule(env: PJNIEnv; _jseekbar: JObject; _rule: integer);
 var
