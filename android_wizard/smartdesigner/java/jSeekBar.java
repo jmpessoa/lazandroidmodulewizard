@@ -9,6 +9,8 @@ import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.view.Gravity;
+import android.graphics.PorterDuff.Mode.*;
+//import android.graphics.BlendMode;
 
 /*Draft java code by "Lazarus Android Module Wizard" [7/8/2015 22:55:27]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -49,7 +51,7 @@ public class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object 
                 }
             };
         };
-
+        
         setOnClickListener(onClickListener);
 
         onSeekBarChangeListener = new OnSeekBarChangeListener() {
@@ -93,6 +95,12 @@ public class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object 
 	
     public void RemoveFromViewParent() {
     	LAMWCommon.removeFromViewParent();
+    }
+    
+    public void SetColor(int colorBar, int colorFinger) {
+    	
+        this.getProgressDrawable().setColorFilter(colorBar, android.graphics.PorterDuff.Mode.MULTIPLY);        
+        this.getThumb().setColorFilter(colorFinger, android.graphics.PorterDuff.Mode.SRC_ATOP);
     }
 
     public View GetView() {
