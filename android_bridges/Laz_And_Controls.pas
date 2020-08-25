@@ -1354,6 +1354,8 @@ type
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
 
+    procedure BringToFront();
+
   published
     property Style: TProgressBarStyle read FStyle write FStyle;
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -6312,6 +6314,13 @@ begin
   if not FInitialized then Exit;
   SetVisible(True);
   SetProgress(FProgress);
+end;
+
+procedure jProgressBar.BringToFront();
+begin
+ if not FInitialized then Exit;
+
+ jni_proc(FjEnv, FjObject, 'BringToFront');
 end;
 
 Procedure jProgressBar.SetColor(Value: TARGBColorBridge);
