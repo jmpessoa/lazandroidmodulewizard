@@ -343,6 +343,12 @@ public class jImageFileManager /*extends ...*/ {
 	  
       return selectedImage;
  }
+ 
+ public Bitmap LoadFromUri(String _uriAsString) {
+	Uri imageUri =  Uri.parse(_uriAsString);
+     
+    return LoadFromUri(imageUri);
+ }
        
  public  Bitmap LoadFromFile(String _filename, int _scale) {
 	   BitmapFactory.Options bo = new BitmapFactory.Options();
@@ -409,11 +415,19 @@ public class jImageFileManager /*extends ...*/ {
 	}
 
 	public Bitmap ClockWise(Bitmap _bitmap){
+		return GetBitmapOrientation(_bitmap, 90);
+	} 
+
+	public Bitmap AntiClockWise(Bitmap _bitmap){
+		return GetBitmapOrientation(_bitmap, -90);    
+	}
+	
+	public Bitmap GetBitmapOrientation(Bitmap _bitmap, int _orientation){
 		 if(_bitmap == null) return null; // by tr3e
 		 
 		 Matrix matrix = new Matrix();
 			
-		 matrix.postRotate(90);
+		 matrix.postRotate(_orientation);
 		 
 	     Bitmap bmpRotate = Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);
 	     
@@ -421,21 +435,6 @@ public class jImageFileManager /*extends ...*/ {
 	    	 bmpRotate.setDensity( _bitmap.getDensity() );
 	     
 	     return bmpRotate;
-	} 
-
-	public Bitmap AntiClockWise(Bitmap _bitmap){
-		if(_bitmap == null) return null; // by tr3e
-		
-		Matrix matrix = new Matrix();
-		
-		matrix.postRotate(-90);
-	    
-		Bitmap bmpRotate = Bitmap.createBitmap(_bitmap , 0, 0, _bitmap.getWidth(), _bitmap.getHeight(), matrix, true);
-	     
-	    if(bmpRotate != null)
-	     bmpRotate.setDensity( _bitmap.getDensity() );
-	     
-	    return bmpRotate;    
 	}
 	
 	public Bitmap SetScale(Bitmap _bmp, float _scaleX, float _scaleY ) {      
@@ -491,6 +490,30 @@ public class jImageFileManager /*extends ...*/ {
 	    return BitmapFactory.decodeFile(picturePath, bo);    
 	}
 	
+	//https://stackoverflow.com/questions/12726860/android-how-to-detect-the-image-orientation-portrait-or-landscape-picked-fro
+	
+	public int GetOrientation(Uri photoUri) 
+	{
+	    Cursor cursor = context.getContentResolver().query(photoUri,
+	            new String[]{MediaStore.Images.ImageColumns.ORIENTATION}, null, null, null);
+
+	    if (cursor.getCount() != 1) {
+	        cursor.close();
+	        return -1;
+	    }
+
+	    cursor.moveToFirst();
+	    int orientation = cursor.getInt(0);
+	    cursor.close();
+	    cursor = null;
+	    return orientation;
+	}
+	
+	public int GetOrientation(String _uriAsString) {
+		Uri imageUri =  Uri.parse(_uriAsString);
+	     
+	    return GetOrientation(imageUri);
+	}	
 	
 	public Bitmap GetBitmapThumbnailFromCamera(Intent _intentData) {
 		Bundle extras = _intentData.getExtras();
@@ -524,27 +547,5 @@ public class jImageFileManager /*extends ...*/ {
 	    // String path contains the path of selected Image  
 	}
 
-	public Bitmap LoadFromUri(String _uriAsString) {
-		    Uri imageUri =  Uri.parse(_uriAsString);
-	        InputStream imageStream;
-	        Bitmap selectedImage= null;
-	       
-	        BitmapFactory.Options bo = new BitmapFactory.Options();
-		     
-			if( bo == null ) return null;
-				     
-			if( controls.GetDensityAssets() > 0 )
-			    bo.inDensity = controls.GetDensityAssets();
-			
-			try {
-				imageStream = controls.activity.getContentResolver().openInputStream(imageUri);
-				selectedImage = BitmapFactory.decodeStream(imageStream, null, bo);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
-			}        
-	       return selectedImage;
-	}
 }
 

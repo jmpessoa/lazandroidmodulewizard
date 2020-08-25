@@ -90,6 +90,17 @@ public class jProgressBar extends ProgressBar {
 	public void ClearLayoutAll() {
 		LAMWCommon.clearLayoutAll(); //TODO Pascal
 	}
+	
+	public void BringToFront() {
+		this.bringToFront();	
+		if (android.os.Build.VERSION.SDK_INT < 19 ) {			
+			ViewGroup parent = LAMWCommon.getParent();
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+		}
+	}
 
   /* Pascal:
      TFrameGravity = (fgNone,

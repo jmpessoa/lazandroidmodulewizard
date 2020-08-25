@@ -58,6 +58,10 @@ jImageFileManager = class(jControl)
     function GetBitmapThumbnailFromCamera(_intentData: jObject): jObject;
     function LoadFromUri(_uriAsString: string): jObject; overload;
 
+    function GetOrientation( _imageUri: jObject   ): integer; overload;
+    function GetOrientation( _uriAsString: string ): integer; overload;
+    function GetBitmapOrientation(_bitmap: jObject; _orientation : integer ): jObject;
+
  published
 
 end;
@@ -199,9 +203,28 @@ end;
 
 function jImageFileManager.LoadFromUri(_imageUri: jObject): jObject;
 begin
+  Result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_uri_out_bmp(FjEnv, FjObject, 'LoadFromUri', _imageUri);
+end;
+
+function jImageFileManager.GetOrientation( _imageUri: jObject ) : integer;
+begin
+ Result := 0;
+ //in designing component state: result value here...
+ if FInitialized then
+   Result:= jni_func_uri_out_i(FjEnv, FjObject, 'GetOrientation', _imageUri);
+end;
+
+function jImageFileManager.GetOrientation(_uriAsString: string): integer;
+begin
+  Result := 0;
+
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetOrientation', _uriAsString);
 end;
 
 function jImageFileManager.LoadFromFile(_filename: string; _scale: integer): jObject;
@@ -246,8 +269,19 @@ begin
    Result:= jni_func_dab_out_bmp(FjEnv, FjObject, 'SetByteArrayToBitmap', _imageArray);
 end;
 
+function jImageFileManager.GetBitmapOrientation(_bitmap: jObject; _orientation : integer ): jObject;
+begin
+  Result := nil;
+
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_bmp_i_out_bmp(FjEnv, FjObject, 'GetBitmapOrientation', _bitmap, _orientation);
+end;
+
 function jImageFileManager.ClockWise(_bitmap: jObject ): jObject;
 begin
+  Result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'ClockWise', _bitmap);
@@ -255,6 +289,8 @@ end;
 
 function jImageFileManager.AntiClockWise(_bitmap: jObject ): jObject;
 begin
+  Result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'AntiClockWise', _bitmap );

@@ -1981,7 +1981,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
    c:jchar);
    s:jshort);
    i:jint);
-   j:jlong); -> int64
+   j:jlong);
    f:jfloat);
    d:jdouble);
    l:jobject);
@@ -2033,6 +2033,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_out_vig(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
 
   function jni_func_bmp_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject): jObject;
+  function jni_func_bmp_i_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject; _int : integer): jObject;
   function jni_func_bmp_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject): integer;
   function jni_func_int_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _intent: jObject): jObject;
   function jni_func_t_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): jObject;
@@ -2040,6 +2041,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_t_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): string;
   function jni_func_t_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _str: string): boolean;
   function jni_func_uri_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): jObject;
+  function jni_func_uri_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): integer;
   function jni_func_dab_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte): jObject;
   function jni_func_dab_z_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte; _bool1: boolean): boolean;
   function jni_func_dd_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _double1, _double2: double): string;
@@ -2065,7 +2067,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
   function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): boolean;
   function jni_func_tii_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int1, _int2: integer): boolean;
-  
+      
 var
   gApp:       jApp;       //global App !
   gVM         : PJavaVM;
@@ -2106,7 +2108,7 @@ begin
               Result := string(pch);
 
               //IMPORTANT if function is executed more than 512 times in one call - App crash with error:
-			  //JNI ERROR (app bug): local reference table overflow (max=512)
+			        //JNI ERROR (app bug): local reference table overflow (max=512)
               //In single calls java garbage collector it does
               env^.ReleaseStringUTFChars(env, jStr, pch);
               env^.DeleteLocalRef(env, jStr);
@@ -8956,6 +8958,24 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jni_func_bmp_i_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                                 _bitmap: JObject; _int : integer): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _int;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;I)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
 function jni_func_t_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                             _str: string): jObject;
 var
@@ -8984,6 +9004,21 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/net/Uri;)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_uri_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                              _uri: jObject): integer;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _uri;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/net/Uri;)I');
+  Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
