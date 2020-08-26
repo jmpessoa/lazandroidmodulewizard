@@ -4,18 +4,23 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.view.Gravity;
 
+import android.content.res.ColorStateList;
+import android.graphics.PorterDuff.Mode.*;
+import android.graphics.drawable.Drawable;
+
 //Ref.
 //Style : http://developer.android.com/reference/android/R.attr.html
 //          android.R.attr
 //          ------------------------------------------------
-//          progressBarStyle              0x01010077 Default
-//          progressBarStyleHorizontal    0x01010078
-//          progressBarStyleInverse       0x01010287
-//          progressBarStyleLarge         0x0101007a
-//          progressBarStyleLargeInverse  0x01010289
-//          progressBarStyleSmall         0x01010079
-//          progressBarStyleSmallTitle    0x0101020f
-//          progressDrawable              0x0101013c
+//          progressBarStyle              16842871 (0x01010077) Default
+//          progressBarStyleHorizontal    16842872 (0x01010078)
+//          progressBarStyleInverse       16843399 (0x01010287)
+//          progressBarStyleLarge         16842874 (0x0101007a)
+//          progressBarStyleLargeInverse  16843401 (0x01010289)
+//          progressBarStyleSmall         16842873 (0x01010079)
+//			progressBarStyleSmallInverse  16843400 (0x01010288)
+//          progressBarStyleSmallTitle    16843279 (0x0101020f)
+//          progressDrawable              16843068 (0x0101013c)
 //
 //-------------------------------------------------------------------------
 
@@ -28,8 +33,9 @@ public class jProgressBar extends ProgressBar {
 	//Constructor
 	public  jProgressBar(android.content.Context context,
 						 Controls ctrls,long pasobj,int style ) {
+		
 		super(context,null,style);
-
+				
 		//Connect Pascal I/F
 		PasObj   = pasobj;
 		controls = ctrls;
@@ -100,6 +106,29 @@ public class jProgressBar extends ProgressBar {
 	       		parent.invalidate();	
 	       	}
 		}
+	}
+	
+	public void SetColors(int _color, int _colorBack){		
+		
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+			this.setProgressTintList(ColorStateList.valueOf(_color));		    
+		    this.setProgressBackgroundTintList(ColorStateList.valueOf(_colorBack));
+		    
+		    if (this.isIndeterminate()) 
+		    	this.setIndeterminateTintList(ColorStateList.valueOf(_color));
+		    
+		  } else {
+			  android.graphics.PorterDuff.Mode mode = android.graphics.PorterDuff.Mode.SRC_IN;
+		    
+		    if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.GINGERBREAD_MR1)
+		      mode = android.graphics.PorterDuff.Mode.MULTIPLY;
+		    
+		    if (this.isIndeterminate())
+		    	this.getIndeterminateDrawable().setColorFilter(_color, mode);
+		    else		    
+		    	this.getProgressDrawable().setColorFilter(_color, mode);
+		    
+		  }
 	}
 
   /* Pascal:
