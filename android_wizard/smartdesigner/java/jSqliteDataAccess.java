@@ -1,4 +1,4 @@
-package com.example.appsqlitedemo1;
+package com.example.appwindowmanagerdemo1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -734,24 +734,30 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
  }
 
- //by jmpessoa
  public void OpenOrCreate(String dataBaseName) throws IOException { 
-   //by Tomash
-   File file = new File(dataBaseName);
-   String path = file.getParent();
-   File dir =  new File(path);
-   if (dir.exists())
-   {
-      DATABASE_NAME = file.getName();
-      DB_PATH = path;
-   }
-   else
-   //---
-   {
+
+   //default
    DATABASE_NAME = dataBaseName;
    DB_PATH = controls.activity.getApplicationInfo().dataDir + "/databases";
-   }
 
+   //by Tomash
+   File file = new File(dataBaseName);
+   if (file != null) {
+     String path = file.getParent();
+     if (path != null) {
+       File dir =  new File(path);
+       if (dir != null) {
+         if (dir.exists()) {
+            String filename = file.getName();
+            if (!filename.equals("")) {
+                DATABASE_NAME = filename;
+                DB_PATH = path;
+            }
+         }
+       }  
+     }
+   } 
+ 
    mydb = returnDatabase(DB_PATH, DATABASE_NAME);  
  }
 
@@ -1250,7 +1256,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 	
 	//ex. 'tablebook|FIGURE|_ID|ic_t1|1'
     private void SplitUpdateImageData(String _imageResIdentifierData, String _delimiter) {
-    	String[] tokens = _imageResIdentifierData.split("\\"+_delimiter);  //ex. "|"
+    	//String[] tokens = _imageResIdentifierData.split("\\"+_delimiter);  //ex. "|"
+        String[] tokens = _imageResIdentifierData.split(Pattern.quote(_delimiter));  //ex. "|"
     	String _tabName = tokens[0];
     	String _imageFieldName = tokens[1]; 
     	String _keyFieldName = tokens[2];

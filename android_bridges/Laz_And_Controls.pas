@@ -12850,7 +12850,8 @@ end;
 procedure jSqliteDataAccess.OpenOrCreate(dataBaseName: string);
 begin
   if not FInitialized then Exit;
-  if dataBaseName <> '' then FDataBaseName:= dataBaseName;
+  FDataBaseName:= dataBaseName;
+  if dataBaseName = '' then Exit;
   jSqliteDataAccess_OpenOrCreate(FjEnv, FjObject , FDataBaseName);
 end;
 
