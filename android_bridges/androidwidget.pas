@@ -386,7 +386,7 @@ type
 
  TOnClickToggleButton = procedure (Sender: TObject; state: boolean) of Object;
 
- TWidgetItem = (wgNone,wgCheckBox,wgRadioButton,wgButton,wgTextView, wgEditText);
+ TWidgetItem = (wgNone,wgCheckBox,wgRadioButton,wgButton,wgTextView, wgEditText, wgSwitch);
 
   // thierrydijoux - locale type def
  TLocaleType = (ltCountry = 0, ltDisplayCountry = 1, ltDisplayLanguage = 2,
