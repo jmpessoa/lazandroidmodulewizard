@@ -1,4 +1,4 @@
-package org.lamw.appsearchviewdemo1;
+package org.lamw.applistviewdemo5;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,6 +36,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Switch;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -922,92 +923,132 @@ class jArrayAdapter extends ArrayAdapter {
 					break;
 
 				case 5:  itemWidget = new EditText(ctx);
-					((EditText)itemWidget).setId(controls.getJavaNewId());
-					((EditText)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+				 ((EditText)itemWidget).setId(controls.getJavaNewId());
+				 ((EditText)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
 
-					if (items.get(position).widgetTextColor != 0) {
-						((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
+				 if (items.get(position).widgetTextColor != 0) {
+					((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
+				 }
+
+				 ((EditText)itemWidget).setLines(1);
+				 ((EditText)itemWidget).setMaxLines(1);
+				 ((EditText)itemWidget).setMinLines(1);
+				 //((EditText)itemWidget).setPadding(15,4,15,4);
+				
+				 ((EditText)itemWidget).setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
+
+				 if (mWidgetInputTypeIsCurrency) {
+					((EditText) itemWidget).setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+				 }
+
+				 if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
+					int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
+					if (drawWidgetTxtColor != 0)
+					   ((EditText)itemWidget).setTextColor(drawWidgetTxtColor);
+				 }
+
+				 itemDrawImage( position, mItemImageWidgetSide );
+				
+				 if (items.get(position).textSize != 0)
+				   ((EditText)itemWidget).setTextSize(items.get(position).textSize);					
+				
+				 if (mWidgetCustomFont != null)  
+				  	   ((EditText)itemWidget).setTypeface(mWidgetCustomFont);
+				
+				 ((EditText)itemWidget).setText(items.get(position).widgetText);
+
+				 if (mDispatchOnDrawItemWidgetText)  {  // +++
+					String drawWidgetTxt = controls.pOnListViewDrawItemWidgetText(PasObj, (int)position, items.get(position).widgetText);
+					if (!drawWidgetTxt.equals("")) {
+						((EditText) itemWidget).setText(drawWidgetTxt); //drawWidgetTxtColor
+						items.get(position).widgetText = drawWidgetTxt;
 					}
+				 }
 
-					((EditText)itemWidget).setLines(1);
-					((EditText)itemWidget).setMaxLines(1);
-					((EditText)itemWidget).setMinLines(1);
-					//((EditText)itemWidget).setPadding(15,4,15,4);
-					
-					((EditText)itemWidget).setPadding(20, mItemPaddingTop, 20, mItemPaddingBottom);
+				 items.get(position).jWidget = (EditText)itemWidget;
 
-					if (mWidgetInputTypeIsCurrency) {
-						((EditText) itemWidget).setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
-					}
+				 ((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {
+					public void onFocusChange(View v, boolean hasFocus) {
+						int tempId = v.getId();
+						int index = -1; // = temp - 6666; //dummy
+						final EditText caption = (EditText)v;
+						EditText temp = null;
 
-					if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
-						int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
-						if (drawWidgetTxtColor != 0)
-						   ((EditText)itemWidget).setTextColor(drawWidgetTxtColor);
-					}
-
-					itemDrawImage( position, mItemImageWidgetSide );
-					
-					if (items.get(position).textSize != 0)
-					   ((EditText)itemWidget).setTextSize(items.get(position).textSize);					
-					
-					if (mWidgetCustomFont != null)  
-					  	   ((EditText)itemWidget).setTypeface(mWidgetCustomFont);
-					
-					((EditText)itemWidget).setText(items.get(position).widgetText);
-
-					if (mDispatchOnDrawItemWidgetText)  {  // +++
-						String drawWidgetTxt = controls.pOnListViewDrawItemWidgetText(PasObj, (int)position, items.get(position).widgetText);
-						if (!drawWidgetTxt.equals("")) {
-							((EditText) itemWidget).setText(drawWidgetTxt); //drawWidgetTxtColor
-							items.get(position).widgetText = drawWidgetTxt;
-						}
-					}
-
-					items.get(position).jWidget = (EditText)itemWidget;
-
-					((EditText)itemWidget).setOnFocusChangeListener(new OnFocusChangeListener() {
-						public void onFocusChange(View v, boolean hasFocus) {
-							int tempId = v.getId();
-							int index = -1; // = temp - 6666; //dummy
-							final EditText caption = (EditText)v;
-							EditText temp = null;
-
-							if (!hasFocus){
-								for( int i = 0; i < items.size(); i++) {
-									temp = (EditText) items.get(i).jWidget;
-									if (temp != null) {
-										if (temp.getId() == tempId) { //items.get(i).jWidget
-											index = i;
-											break;
-										}
+						if (!hasFocus){
+							for( int i = 0; i < items.size(); i++) {
+								temp = (EditText) items.get(i).jWidget;
+								if (temp != null) {
+									if (temp.getId() == tempId) { //items.get(i).jWidget
+										index = i;
+										break;
 									}
 								}
+							}
 
-								if (index >= 0){
-									items.get(index).widgetText = caption.getText().toString();								
-									items.get(index).jWidget.setFocusable(false);
-									items.get(index).jWidget.setFocusableInTouchMode(false);
-								    controls.pOnWidgeItemLostFocus(PasObj, index, caption.getText().toString());
-								}
+							if (index >= 0){
+								items.get(index).widgetText = caption.getText().toString();								
+								items.get(index).jWidget.setFocusable(false);
+								items.get(index).jWidget.setFocusableInTouchMode(false);
+							    controls.pOnWidgeItemLostFocus(PasObj, index, caption.getText().toString());
 							}
 						}
-					});
+					}
+				 });
 
-					((EditText)itemWidget).addTextChangedListener(new TextWatcher() {
-						@Override
-						public  void beforeTextChanged(CharSequence s, int start, int count, int after) {
-						}
-						@Override
-						public  void onTextChanged(CharSequence s, int start, int before, int count) {
-						}
-						@Override
-						public  void afterTextChanged(Editable s) {
-							items.get(curPosition).widgetText = s.toString();
-						}
-					});
+				 ((EditText)itemWidget).addTextChangedListener(new TextWatcher() {
+					@Override
+					public  void beforeTextChanged(CharSequence s, int start, int count, int after) {
+					}
+					@Override
+					public  void onTextChanged(CharSequence s, int start, int before, int count) {
+					}
+					@Override
+					public  void afterTextChanged(Editable s) {
+						items.get(curPosition).widgetText = s.toString();
+					}
+				 });
 
-					break;
+				 break;
+					
+				case 6:  itemWidget = new Switch(ctx);
+				 ((Switch)itemWidget).setId(controls.getJavaNewId());
+
+				 ((Switch)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+				
+				 ((Switch)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
+
+				 if (items.get(position).widgetTextColor != 0)
+					((Switch)itemWidget).setTextColor(items.get(position).widgetTextColor);					
+
+				 if (mDispatchOnDrawItemWidgetTextColor)  {  // +++
+					int drawWidgetTxtColor = controls.pOnListViewDrawItemWidgetTextColor(PasObj, (int)position, items.get(position).widgetText);
+					if (drawWidgetTxtColor != 0)
+					  ((Switch)itemWidget).setTextColor(drawWidgetTxtColor); //drawWidgetTxtColor
+				 }
+ 
+				 itemDrawImage( position, mItemImageWidgetSide );					
+				
+				 if (mWidgetCustomFont != null)  
+				  	   ((Switch)itemWidget).setTypeface(mWidgetCustomFont);
+				
+				 if (items.get(position).textSize != 0)
+				   ((Switch)itemWidget).setTextSize(items.get(position).textSize);					
+
+				 ((Switch)itemWidget).setText(items.get(position).widgetText);
+
+				 if (mDispatchOnDrawItemWidgetText)  {  // +++
+					String drawWidgetTxt = controls.pOnListViewDrawItemWidgetText(PasObj, (int)position, items.get(position).widgetText);
+					if (!drawWidgetTxt.equals("")) {
+						((Switch) itemWidget).setText(drawWidgetTxt); //drawWidgetTxt
+						items.get(position).widgetText = drawWidgetTxt;
+					}
+				 }
+
+				 ((Switch)itemWidget).setChecked(items.get(position).checked);
+
+				 items.get(position).jWidget = (Switch)itemWidget;
+
+				break;
 															
 			}
 				
@@ -1410,6 +1451,10 @@ class jArrayAdapter extends ArrayAdapter {
 	    					items.get(position).checked = !((CheckBox)v).isChecked();
 	    					thisAdapter.notifyDataSetChanged();
 	    					controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)v).isChecked());
+	    				}else if (v.getClass().getName().equals("android.widget.Switch")) {
+	    					items.get(position).checked = !((Switch)v).isChecked();
+	    					thisAdapter.notifyDataSetChanged();
+	    					controls.pOnClickWidgetItem(PasObj, position, ((Switch)v).isChecked());
 	    				}else if (v.getClass().getName().equals("android.widget.RadioButton")) {
 	    					//new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
 	    					//boolean doCheck = ((RadioButton)v).isChecked(); //new code
@@ -1470,6 +1515,10 @@ class jArrayAdapter extends ArrayAdapter {
 				else if (v.getClass().getName().equals("android.widget.CheckBox")) {
 					items.get(position).checked = ((CheckBox)v).isChecked();
 					controls.pOnClickWidgetItem(PasObj, position, ((CheckBox)v).isChecked());
+				}
+				else if (v.getClass().getName().equals("android.widget.Switch")) {
+					items.get(position).checked = ((Switch)v).isChecked();
+					controls.pOnClickWidgetItem(PasObj, position, ((Switch)v).isChecked());
 				}
 				else if (v.getClass().getName().equals("android.widget.RadioButton")) {
 					//new code: fix to RadioButton Group  default behavior: thanks to Leledumbo.
@@ -1569,6 +1618,8 @@ public class jListView extends ListView {
     int mCurrentFirstVisibleItem;
     int mCurrentVisibleItemCount;
     int mTotalItem;
+    
+    boolean mDisableScroll = false;
     
     final ListView mListView = this;
 
@@ -1690,6 +1741,22 @@ public class jListView extends ListView {
 
 		});
 					
+	}
+	
+	// by ADiV
+	public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		if( mDisableScroll ){
+         int heightMeasureSpec_custom = MeasureSpec.makeMeasureSpec(
+                Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
+         super.onMeasure(widthMeasureSpec, heightMeasureSpec_custom);
+         ViewGroup.LayoutParams params = getLayoutParams();
+         params.height = getMeasuredHeight();
+		}else
+			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+   }
+	
+	public void DisableScroll( boolean _disable ){
+		mDisableScroll = _disable;
 	}
 
 	//thanks to @renabor
@@ -2625,7 +2692,9 @@ public class jListView extends ListView {
 	}
 
 	public void SetFilterQuery(String _query) {
+		
 		ClearFilterQuery();//added/fixed [thanks to vags15]!!!
+		
 		orig_alist.clear();
 		for (jListItemRow p : alist) {
 			orig_alist.add(p);

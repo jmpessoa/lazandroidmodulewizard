@@ -1709,6 +1709,8 @@ type
     procedure ClearFilterQuery();
     procedure SetDrawItemBackColorAlpha(_alpha: integer);
 
+    procedure DisableScroll(_disable : boolean); // by ADiV
+
     //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
@@ -9102,6 +9104,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jListView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+end;
+
+procedure jListView.DisableScroll(_disable : boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_z(FjEnv, FjObject, 'DisableScroll', _disable);
 end;
 
 procedure jListView.SaveToFile(_appInternalFileName: string);
