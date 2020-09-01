@@ -2005,6 +2005,7 @@ public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, f
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
 public native void pOnDown(long pasobj, int value);
+public native void pOnUp(long pasobj, int value);
 public native void pOnClick(long pasobj, int value);
 public native void pOnLongClick(long pasobj, int value);
 public native void pOnDoubleClick(long pasobj, int value);
