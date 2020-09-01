@@ -1478,10 +1478,16 @@ class jForm {
 	}
 
 	public void SetTurnScreenOn(boolean _value) {
-		if (_value)
-			controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-		else
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+			controls.activity.setTurnScreenOn(_value);
+	    } else {
+		 if (_value)
+		   controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+		 else
 			controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+	    }
+		
 	}
 
 	public void SetAllowLockWhileScreenOn(boolean _value) {
@@ -1492,10 +1498,15 @@ class jForm {
 	}
 
 	public void SetShowWhenLocked(boolean _value) {
-		if (_value)
-			controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-		else
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+			controls.activity.setShowWhenLocked(_value);		
+	    } else {
+		 if (_value)
+		    controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+		 else
 			controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+	    }
 	}
 
 	public Uri ParseUri(String _uriAsString) {
