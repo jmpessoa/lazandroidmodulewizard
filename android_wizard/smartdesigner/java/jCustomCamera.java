@@ -520,6 +520,8 @@ public class jCustomCamera  extends SurfaceView implements SurfaceHolder.Callbac
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
             outStream.flush();
             outStream.close();
+            bitmap.recycle(); //thanks to Guser979
+
 
             //Toast.makeText(context, "Saved", Toast.LENGTH_LONG).show();
 
