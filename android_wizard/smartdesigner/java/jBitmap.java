@@ -1,4 +1,4 @@
-package org.lamw.appzoomableimageviewdemo1;
+package com.example.appcamerademo;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -51,7 +51,7 @@ public class jBitmap {
     }
 
     public void loadFile(String fullFilename) {  //full file name!
-
+        if (bmp!=null)  bmp.recycle();
         if (controls.GetDensityAssets() > 0) {
             BitmapFactory.Options bo = new BitmapFactory.Options();
             if (bo != null) {
@@ -74,6 +74,7 @@ public class jBitmap {
 
         if (b == null) return;
 
+        if (bmp!=null)  bmp.recycle();
         bmp = Bitmap.createScaledBitmap(b, b.getWidth(), b.getHeight(), true);
         // Drawable not need set density
     }
@@ -89,6 +90,7 @@ public class jBitmap {
                 bo.inDensity = controls.GetDensityAssets();
 
             bo.inSampleSize = 4; // --> 1/4
+            if (bmp!=null)  bmp.recycle();
             bmp = BitmapFactory.decodeFile(fullFilename, bo);
         }
     }
@@ -102,11 +104,13 @@ public class jBitmap {
                 bo.inDensity = controls.GetDensityAssets();
 
             bo.inSampleSize = _shrinkFactor; // 4 --> 1/4
+            if (bmp!=null)  bmp.recycle();
             bmp = BitmapFactory.decodeFile(_fullFilename, bo);
         }
     }
 
     public void createBitmap(int w, int h) {
+        if (bmp!=null)  bmp.recycle();
         bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 
         if ((bmp != null) && (controls.GetDensityAssets() > 0))
@@ -234,6 +238,7 @@ public class jBitmap {
 
     public void Free() {
 //bmp.recycle();
+        if (bmp!=null)  bmp.recycle();
         bmp = null;
     }
 
@@ -270,6 +275,7 @@ public class jBitmap {
         if (controls.GetDensityAssets() > 0)
             bo.inDensity = controls.GetDensityAssets();
 
+        if (bmp!=null)  bmp.recycle();
         this.bmp = BitmapFactory.decodeByteArray(image, 0, image.length, bo);
         //Log.i("SetByteArrayToBitmap","size="+ image.length);
     }
@@ -350,6 +356,7 @@ public class jBitmap {
             return null;
         }
 
+        if (bmp!=null)  bmp.recycle();
         if (controls.GetDensityAssets() > 0) {
             BitmapFactory.Options bo = new BitmapFactory.Options();
             if (bo != null) {
@@ -452,6 +459,7 @@ public class jBitmap {
         if ((_byteBuffer == null) || (bmp == null)) return null;
 
         _byteBuffer.rewind();  //reset position
+        if (bmp!=null)  bmp.recycle();
         bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);
         bmp.copyPixelsFromBuffer(_byteBuffer);
 
@@ -464,6 +472,7 @@ public class jBitmap {
     public Bitmap GetBitmapFromByteArray(byte[] _image) {
         if (_image == null) return null;
 
+        if (bmp!=null)  bmp.recycle();
         if (controls.GetDensityAssets() > 0) {
             BitmapFactory.Options bo = new BitmapFactory.Options();
             if (bo != null) {
@@ -565,7 +574,9 @@ public class jBitmap {
         textPaint.setTextSize(_fontSize * unit); //
         canvas.drawText(_text, _left, _top, textPaint);
 
+        if (bmp!=null)  bmp.recycle();
         bmp = mutableBitmap;
+
         return bmp;
     }
 
@@ -581,6 +592,7 @@ public class jBitmap {
         //float unit = controls.activity.getResources().getDisplayMetrics().density;
         canvas.drawBitmap(_bitmapImageIn, _left, _top, paint);
 
+        if (bmp!=null)  bmp.recycle();
         bmp = mutableBitmap;
 
         return bmp;
@@ -611,10 +623,12 @@ public class jBitmap {
     }
 
     public void SetImage(Bitmap _bitmapImage) {
+        if (bmp!=null)  bmp.recycle();
         bmp = _bitmapImage;
     }
 
     public Bitmap CreateBitmap(int _width, int _height, int _backgroundColor) {
+        if (bmp!=null)  bmp.recycle();
         bmp = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);
 
         if ((bmp != null) && (controls.GetDensityAssets() > 0))
@@ -633,7 +647,7 @@ public class jBitmap {
         if (buffer == null) return;
 
         ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
-
+        if (bmp!=null)  bmp.recycle();
         if (controls.GetDensityAssets() > 0) {
             BitmapFactory.Options bo = new BitmapFactory.Options();
             if (bo != null) {
@@ -651,6 +665,7 @@ public class jBitmap {
 
         ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
 
+        if (bmp!=null)  bmp.recycle();
         if (controls.GetDensityAssets() > 0) {
             BitmapFactory.Options bo = new BitmapFactory.Options();
             if (bo != null) {
