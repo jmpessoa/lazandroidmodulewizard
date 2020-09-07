@@ -279,6 +279,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 
     @Override
     public void onBindViewHolder(RecyclerViewHolders holderView, final int position) {
+    	if( (position < 0) || (position >= itemList.size()) ) return;
     	    	    	    	
 		int countlabel = itemList.get(position).countlabel;
     	int countimage = itemList.get(position).countimage;
@@ -702,6 +703,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     }
     
     public void SetItemBackgroundColor( int position, int color, int round ){
+    	if( (position < 0) || (position >= itemList.size()) ) return;
+    	
     	int countpanel = itemList.get(position).countpanel;
     	
     	if( countpanel > 0 )
@@ -751,6 +754,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     }
     
     public void Refresh(int position){
+    	if( (position < 0) || (position >= itemList.size()) ) return;
+    	
     	notifyItemChanged(position);
     }
     
@@ -1964,7 +1969,7 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
 	   rcAdapter.setItemContentDictionary(_delimitedContentDictionary, _delimiter);
    }
    
-   public void ScrollToPosition( int position ){
+   public void ScrollToPosition( int position ){	   
        int posScroll = 0;
 	   
 	   if( position >= rcAdapter.getItemCount() ) 
