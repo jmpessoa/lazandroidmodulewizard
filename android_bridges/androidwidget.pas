@@ -1362,6 +1362,9 @@ type
     function IsAppCompatProject(): boolean;
 
     //by TR3E
+    function  GetVersionCode() : integer;
+    function  GetVersionName() : string;
+    
     function  GetDateTimeDecode( var day : integer; var month : integer; var year : integer;
                                  var hours : integer; var minutes: integer; var seconds : integer ) : boolean;
     function  GetScreenWidth(): integer;
@@ -2001,6 +2004,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function  jni_create_i(env: PJNIEnv; this: jObject; _self: TObject; javaFuncion: string; _int: integer): jObject;
 
   procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string);
+  procedure jni_proc_bmp_iiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject; _int0, _int1, _int2, _int3: integer);
   procedure jni_proc_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float: single);
   procedure jni_proc_ff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single);
   procedure jni_proc_ffff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2, _float3, _float4: single);
@@ -4659,8 +4663,25 @@ begin
    Result:= jForm_IsAppCompatProject(FjEnv, FjObject);
 end;
 
+function jForm.GetVersionCode() : integer;
+begin
+  Result := 0;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetVersionCode');
+end;
+
+function jForm.GetVersionName() : string;
+begin
+  Result := '';
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetVersionName');
+end;
+
 function jForm.GetScreenWidth(): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenWidth');
@@ -4668,6 +4689,7 @@ end;
 
 function jForm.GetScreenHeight(): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenHeight');
@@ -4675,6 +4697,7 @@ end;
 
 function jForm.GetSystemVersionString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetSystemVersionString');
@@ -4711,7 +4734,7 @@ begin
      jForm_SetBackgroundImage(FjEnv, FjObject, _imageIdentifier);
 end;
 
-// BY TR3E
+// BY ADiV
 procedure jForm.SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer);
 begin
   //in designing component state: set value here...
@@ -4720,7 +4743,7 @@ begin
      jForm_SetBackgroundImage(FjEnv, FjObject, _imageIdentifier, _scaleType);
 end;
 
-// BY TR3E
+// BY ADiV
 procedure jForm.SetBackgroundImageMatrix(_scaleX, _scaleY, _degress,
                                          _dx, _dy, _centerX, _centerY : real);
 begin
@@ -6155,7 +6178,7 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
-// BY TR3E
+// BY ADiV
 procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string; _scaleType : integer);
 var
   jParams: array[0..1] of jValue;
@@ -6171,7 +6194,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-// BY TR3E
+// BY ADiV
 procedure jForm_SetBackgroundImageMatrix(env: PJNIEnv; _jform: JObject;
                                               _scaleX, _scaleY, _degress,
                                               _dx, _dy, _centerX, _centerY : real);
@@ -6337,26 +6360,26 @@ begin
   inherited Destroy;
 end;
 
-// To automatically enter id from 1 to the limit set by "Controls.java" [by TR3E]
+// To automatically enter id from 1 to the limit set by "Controls.java" [by ADiV]
 function jApp.GetNewId() : integer;
 begin
  FNewId := FNewId + 1;
  result := FNewId;
 end;
 
-//by TR3E
+//by ADiV
 function jApp.GetLastId() : integer;
 begin
  result := FNewId;
 end;
 
-//by TR3E
+//by ADiV
 function jApp.GetJavaLastId(): integer;
 begin
    Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'GetJavaLastId');
 end;
 
-//by TR3E
+//by ADiV
 procedure jApp.SetDensityAssets( _value : TDensityAssets );
 begin
   jni_proc_i(Self.Jni.jEnv, Self.Jni.jThis, 'SetDensityAssets', ord(_value));
@@ -8503,6 +8526,27 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(II)V');
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jni_proc_bmp_iiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                                 _bitmap: JObject; _int0, _int1, _int2, _int3: integer);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].i:= _int0;
+  jParams[2].i:= _int1;
+  jParams[3].i:= _int2;
+  jParams[4].i:= _int3;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;IIII)V');
+
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

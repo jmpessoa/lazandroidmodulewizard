@@ -68,6 +68,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -1198,6 +1199,30 @@ class jForm {
 		} catch (NameNotFoundException e) {
 			return false;
 		}
+	}
+	
+	// By ADiV
+	public int GetVersionCode(){
+		PackageManager pm = controls.activity.getPackageManager();
+		
+	    try {
+	    	PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
+	        return pinfo.versionCode;
+	    } catch (NameNotFoundException e) {
+	        return 0;
+	    }
+	}
+
+	//By ADiV
+	public String GetVersionName(){
+		PackageManager pm = controls.activity.getPackageManager();
+		
+	    try {
+	    	PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
+	        return pinfo.versionName;
+	    } catch (NameNotFoundException e) {
+	        return "";
+	    }
 	}
 
 	//android.view.View
