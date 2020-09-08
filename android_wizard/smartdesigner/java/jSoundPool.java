@@ -1,10 +1,10 @@
-package org.lamw.applearnlanguagesbylistening;
 
 import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Context;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.media.SoundPool.OnLoadCompleteListener;
 import android.os.Environment;
@@ -14,7 +14,7 @@ import android.content.res.AssetFileDescriptor;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl template*/
 
-/* --- Created by TR3E Software 13/08/2019 --- */
+/* --- Created by ADiV Software 08/09/2020 --- */
 
 /* The SoundPool class manages and plays audio resources for applications.
  * 
@@ -34,21 +34,23 @@ public class jSoundPool implements SoundPool.OnLoadCompleteListener {
 	    pascalObj = _Self ;
 		controls  = _ctrls;
 		context   = _ctrls.activity;
-
+		
 		if (android.os.Build.VERSION.SDK_INT < 21) {
 			soundPool = new SoundPool(maxStreams, AudioManager.STREAM_MUSIC, 0);
 		} else  {
-			//[ifdef_api21up]
+		  //[ifdef_api21up]
 			AudioAttributes attributes = new AudioAttributes.Builder()
 					.setUsage(AudioAttributes.USAGE_MEDIA)  //USAGE_ASSISTANCE_SONIFICATION
 					.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC) //CONTENT_TYPE_SPEECH  CONTENT_TYPE_SONIFICATION
 					.build();
+			
 			soundPool = new SoundPool.Builder()
-	                .setMaxStreams(maxStreams)
-					.setAudioAttributes(attributes)
-	                .build();
-			//[endif_api21up]
-	    }
+			    .setMaxStreams(maxStreams)
+				.setAudioAttributes(attributes)
+				.build();
+	      //[endif_api21up]
+		}						
+		
         soundPool.setOnLoadCompleteListener(this);        
     }
     
@@ -133,15 +135,37 @@ public class jSoundPool implements SoundPool.OnLoadCompleteListener {
     public int SoundPlay(int soundId, float _leftVolume, float _rightVolume, int _priority, int _loop, float _rate){
     	
     	if(soundPool == null) return 0;
+    	
+    	float leftVolume = _leftVolume;
+    	float rightVolume = _rightVolume;
+    	float rate = _rate;
+    	
+    	if( leftVolume > 1) leftVolume = 1;
+    	if( leftVolume < 0) leftVolume = 0;
+    	
+    	if( rightVolume > 1) rightVolume = 1;
+    	if( rightVolume < 0) rightVolume = 0;
+    	
+    	if( rate > 2) rate = 2;
+    	if( rate < 0.5f) rate = 0.5f;
     	    	    
-    	return soundPool.play(soundId, _leftVolume, _rightVolume, _priority, _loop, _rate);
+    	return soundPool.play(soundId, leftVolume, rightVolume, _priority, _loop, rate);
     	
     }
     
     public void StreamSetVolume(int streamId, float _leftVolume, float _rightVolume){
     	if(soundPool == null) return;
     	
-    	soundPool.setVolume(streamId, _leftVolume, _leftVolume);    	
+    	float leftVolume = _leftVolume;
+    	float rightVolume = _rightVolume;
+    	
+    	if( leftVolume > 1) leftVolume = 1;
+    	if( leftVolume < 0) leftVolume = 0;
+    	
+    	if( rightVolume > 1) rightVolume = 1;
+    	if( rightVolume < 0) rightVolume = 0;
+    	
+    	soundPool.setVolume(streamId, leftVolume, rightVolume);    	
     }
     
     public void StreamSetPriority(int streamId, int _priority){
@@ -159,7 +183,12 @@ public class jSoundPool implements SoundPool.OnLoadCompleteListener {
     public void StreamSetRate(int streamId, float _rate){
     	if(soundPool == null) return;
     	
-    	soundPool.setRate(streamId, _rate);    	
+    	float rate = _rate;
+    	    	
+    	if( rate > 2) rate = 2;
+    	if( rate < 0.5f) rate = 0.5f;
+    	
+    	soundPool.setRate(streamId, rate);    	
     }
     
     public void StreamPause(int streamId){
