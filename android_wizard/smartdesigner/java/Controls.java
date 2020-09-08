@@ -1,4 +1,4 @@
-package org.lamw.appsupportdemo5;
+package com.example.appcamerademo;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.4.7 [unified!!] - 10 August - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -2809,32 +2809,41 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
           Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
           //String  image_path = (path+File.separator+filename);
           File newfile = new File(path, File.separator+filename);
-          File dirAsFile = newfile.getParentFile();
+	      File dirAsFile;
 
-          if (!dirAsFile.exists()) {
-            dirAsFile.mkdirs();
-          }
-          try {
-              newfile.createNewFile();
-          }
-          catch (IOException e) {
-            Log.e("File creation error",newfile.getPath());
-          }
-          Uri uri = jSupported.FileProviderGetUriForFile(this.GetContext(), newfile);
-          if (jSupported.IsAppSupportedProject()) {
-             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri); //outputFileUri
-             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-          }
-          else {
-	        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri); //mImageCaptureUri
-	        intent.putExtra("return-data", true);
-          }
+          if (newfile!=null) {
+			  dirAsFile = newfile.getParentFile();
+			  if (dirAsFile!= null) {
+				  if (!dirAsFile.exists()) {
+					  dirAsFile.mkdirs();
+				  }
+				  try {
+					  newfile.createNewFile();
+				  } catch (IOException e) {
+					  Log.e("File creation error", newfile.getPath());
+				  }
+			  }
+		  }
 
-          if (intent.resolveActivity(this.GetContext().getPackageManager()) != null) {
-            this.activity.startActivityForResult(intent, requestCode);
+          if (newfile!=null) {
+		     Uri uri = jSupported.FileProviderGetUriForFile(this.GetContext(), newfile);
+             if (jSupported.IsAppSupportedProject()) {
+               intent.putExtra(MediaStore.EXTRA_OUTPUT, uri); //outputFileUri
+               intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+             }
+             else {
+	           intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri); //mImageCaptureUri
+	           intent.putExtra("return-data", true);
+             }
+
+             if (intent.resolveActivity(this.GetContext().getPackageManager()) != null) {
+               this.activity.startActivityForResult(intent, requestCode);
+             }
+
+             galleryAddPic(newfile);
+             return newfile.toString();
           }
-          galleryAddPic(newfile);
-          return newfile.toString();
+          else return "";
 }
 
 	public String jCamera_takePhoto(String path, String filename) {

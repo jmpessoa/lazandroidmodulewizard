@@ -45,7 +45,7 @@ type
      FSyntaxMode: TSyntaxMode;   {}
 
      FPieChecked: boolean;
-     FLibraryChecked: boolean;
+     FLibraryChecked: boolean; //raw .so
 
      FPathToJavaJDK: string;
      FPathToAndroidSDK: string;  //Included TrailingPathDelimiter

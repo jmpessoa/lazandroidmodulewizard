@@ -111,7 +111,7 @@ type
     FJavaClassName: string;
     FAndroidTheme: string;
     FPieChecked: boolean;
-    FLibraryChecked: boolean;
+    FLibraryChecked: boolean;  //raw .so
     FGradleVersion: string;
 
     FMaxSdkPlatform: integer;
@@ -180,7 +180,7 @@ type
     property SmallProjName: string read FSmallProjName write FSmallProjName;
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
     property PieChecked: boolean read FPieChecked write FPieChecked;
-    property LibraryChecked: boolean read FLibraryChecked write FLibraryChecked;
+    property LibraryChecked: boolean read FLibraryChecked write FLibraryChecked; //raw .so
     property BuildSystem: string read GetBuildSystem;
     property MaxSdkPlatform: integer read FMaxSdkPlatform write FMaxSdkPlatform;
     property GradleVersion: string read FGradleVersion write FGradleVersion;
@@ -1280,11 +1280,16 @@ var
   s: string;
 begin
 
+  if (cbBuildSystem.Text = 'Gradle') then
+     CheckBoxSupport.Checked:= True //inner Supported!!!
+  else
+     CheckBoxSupport.Checked:= False; //Ant don't support extern libraries...
+
   if (cbBuildSystem.Text = 'Gradle') and ( Pos('AppCompat', ComboBoxTheme.Text) > 0) then
   begin
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then
-      MessageDlg('[LAMW 0.8.4] "AppCompat" [material] theme need JDK 1.8 + Gradle 4.4.1!', mtWarning, [mbOk], 0);
+      MessageDlg('[LAMW 0.8.5] "AppCompat" [material] theme need JDK 1.8 + Gradle 4.4.1 [or up]!', mtWarning, [mbOk], 0);
   end;
 
 end;
@@ -1339,7 +1344,7 @@ begin
            sLineBreak+
            sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
-           sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
+           sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin] or up' +
            sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
@@ -1410,7 +1415,7 @@ end;
 
 function TFormWorkspace.GetBuildSystem: string;
 begin
-  Result := cbBuildSystem.Text;
+  Result:= cbBuildSystem.Text;
 end;
 
 function TFormWorkspace.GetGradleVersion(out tagVersion: integer): string;
