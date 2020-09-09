@@ -506,7 +506,7 @@ type
   TTextSizeDecorated = (sdNone, sdDecreasing, sdIncreasing);
 
   TTextAlign = (alLeft, alRight, alCenter);       //jListView
-  TTextPosition = (posTop, posCenter, posBottom); //jListView by tr3e
+  TTextPosition = (posTop, posCenter, posBottom); //jListView by ADiV
 
   TTextAlignment = (taLeft, taRight, taCenter);  //others...
 
@@ -727,7 +727,7 @@ type
   TOnClickItem       = Procedure(Sender: TObject; itemIndex: Integer) of object;
 
   TOnClickWidgetItem = Procedure(Sender: TObject; itemIndex: integer; checked: boolean) of object;
-  TOnClickImageItem = Procedure(Sender: TObject; itemIndex: integer) of object; // by tr3e
+  TOnClickImageItem = Procedure(Sender: TObject; itemIndex: integer) of object; // by ADiV
 
   TOnClickCaptionItem = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
 
@@ -738,7 +738,7 @@ type
   TOnEditLostFocus = Procedure(Sender: TObject; textContent: string) of object;
 
   TOnDrawItemTextColor = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out textColor: TARGBColorBridge) of Object;
-  TOnDrawItemBackColor = Procedure(Sender: TObject; itemIndex: integer; out backColor: TARGBColorBridge) of Object; //by tr3e
+  TOnDrawItemBackColor = Procedure(Sender: TObject; itemIndex: integer; out backColor: TARGBColorBridge) of Object; //by ADiV
   TOnDrawItemWidgetTextColor = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out textColor: TARGBColorBridge) of Object;
   TOnDrawItemWidgetText = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out newWidgetText: string) of Object;
 
@@ -885,11 +885,11 @@ type
     procedure CreateForm(InstanceClass: TComponentClass; out Reference);
     procedure Init(env: PJNIEnv; this: jObject; activity: jObject; layout: jObject; intent: jobject);
 
-    function GetNewId(): integer; // by TR3E
-    function GetLastId(): integer; // by TR3E
+    function GetNewId(): integer; // by ADiV
+    function GetLastId(): integer; // by ADiV
 
-    function  GetJavaLastId(): integer; // by TR3E
-    procedure SetDensityAssets( _value : TDensityAssets ); // by TR3E
+    function  GetJavaLastId(): integer; // by ADiV
+    procedure SetDensityAssets( _value : TDensityAssets ); // by ADiV
 
     procedure Finish();
     Procedure Recreate();
@@ -1124,9 +1124,9 @@ type
     //FOnNewIntent: TOnNewIntent;
     FCloseCallback : TjCallBack; // Close Call Back Event
 
-    FOnShow       : TOnNotify;    // by TR3E
-    FOnLayoutDraw : TOnNotify;    // by TR3E
-    FOnInit       : TNotifyEvent; // by TR3E
+    FOnShow       : TOnNotify;    // by ADiV
+    FOnLayoutDraw : TOnNotify;    // by ADiV
+    FOnInit       : TNotifyEvent; // by ADiV
 
     //FActionBarHeight: integer;
     FOnOptionMenuCreate: TOnOptionMenuItemCreate;
@@ -1182,7 +1182,7 @@ type
     procedure Show(refApp: jApp); overload; //call ReInit to force the form to recreate the layout...
 
     Procedure DoJNIPrompt;
-    procedure DoOnShow; //by TR3E
+    procedure DoOnShow; //by ADiV
     procedure FormChangeSize;
 
     Procedure GenEvent_OnClick(Obj: TObject);
@@ -1193,7 +1193,7 @@ type
     procedure ShowMessage(_msg: string; _gravity: TGravity; _timeLength: TShowLength); overload;
     
     function GetDateTime: String;
-    function GetBatteryPercent : integer; // BY TR3E
+    function GetBatteryPercent : integer; // BY ADiV
 
     function GetStringExtra(intentData: jObject; extraName: string): string;
     function GetIntExtra(intentData: jObject; extraName: string; defaultValue: integer): integer;
@@ -1213,8 +1213,8 @@ type
     function IsWifiEnabled(): boolean;
     function IsConnected(): boolean; // by renabor
     function IsConnectedWifi(): boolean; // by renabor
-    function IsScreenLocked(): boolean; // by TR3E
-    function IsSleepMode(): boolean; // by TR3E
+    function IsScreenLocked(): boolean; // by ADiV
+    function IsSleepMode(): boolean; // by ADiV
 
     function GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
     function GetInternalAppStoragePath: string;
@@ -1361,9 +1361,11 @@ type
     function HasActionBar(): boolean;
     function IsAppCompatProject(): boolean;
 
-    //by TR3E
+    //by ADiV
     function  GetVersionCode() : integer;
     function  GetVersionName() : string;
+
+    function  GetVersionPlayStore( appUrlString : string ) : string;
     
     function  GetDateTimeDecode( var day : integer; var month : integer; var year : integer;
                                  var hours : integer; var minutes: integer; var seconds : integer ) : boolean;
@@ -1375,10 +1377,10 @@ type
     function  GetTimeHHssSS( millisTime : longint ) : string;
 
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string); overload;
-    procedure SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer); overload; // by TR3E
+    procedure SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer); overload; // by ADiV
     procedure SetBackgroundImageMatrix( _scaleX, _scaleY, _degress,
-                                        _dx, _dy, _centerX, _centerY : real ); // by TR3E
-    //end TR3E
+                                        _dx, _dy, _centerX, _centerY : real ); // by ADiV
+    //end ADiV
 
     function GetJByteBuffer(_width: integer; _height: integer): jObject;
     function GetJByteBufferFromImage(_bitmap: jObject): jObject;
@@ -1460,7 +1462,7 @@ type
     property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
 
     // Event
-    property OnInit: TNotifyEvent read FOnInit write FOnInit; // by TR3E
+    property OnInit: TNotifyEvent read FOnInit write FOnInit; // by ADiV
     property OnCloseQuery : TOnCloseQuery  read FOnCloseQuery  write FOnCloseQuery;
     property OnRotate     : TOnRotate      read FOnRotate      write FOnRotate;
     property OnClick      : TOnNotify      read FOnClick       write FOnClick;
@@ -1468,8 +1470,8 @@ type
     property OnJNIPrompt  : TOnNotify read FOnJNIPrompt write FOnJNIPrompt;
     property OnBackButton : TOnNotify read FOnBackButton write FOnBackButton;
     property OnClose      : TOnNotify read FOnClose write FOnClose;
-    property OnShow       : TOnNotify read FOnShow write FOnShow; //by TR3E
-    property OnLayoutDraw : TOnNotify read FOnLayoutDraw write FOnLayoutDraw; //by TR3E
+    property OnShow       : TOnNotify read FOnShow write FOnShow; //by ADiV
+    property OnLayoutDraw : TOnNotify read FOnLayoutDraw write FOnLayoutDraw; //by ADiV
     property OnSpecialKeyDown    :TOnKeyDown read FOnSpecialKeyDown write FOnSpecialKeyDown;
     property OnCreateOptionMenu: TOnOptionMenuItemCreate read FOnOptionMenuCreate write FOnOptionMenuCreate;
     property OnClickOptionMenuItem: TOnClickOptionMenuItem read FOnClickOptionMenuItem write FOnClickOptionMenuItem;
@@ -2932,12 +2934,12 @@ end;
 procedure jVisualControl.UpdateLayout();
 begin
   //dummy...
-  // tr3e
+  // ADiV
   if Self.Anchor <> nil then
     Self.AnchorId:= Self.Anchor.Id
   else
     Self.AnchorId:= -1;
-  // end tr3e
+  // end ADiV
 end;
 
 procedure jVisualControl.SetParamWidth(Value: TLayoutParams);
@@ -3121,7 +3123,7 @@ begin
   if refApp = nil then Exit;
   if not refApp.Initialized then Exit;
 
-  // For Reinit if calling 2 times or more [need split-screen] by TR3E
+  // For Reinit if calling 2 times or more [need split-screen] by ADiV
   if FInitialized then begin Reinit(refApp); Exit; end;
 
   Inherited Init(refApp);
@@ -3240,7 +3242,7 @@ begin
     begin
        gApp.TopIndex:= FormIndex;
        jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
-       DoOnShow; //by TR3E
+       DoOnShow; //by ADiV
     end;
 
     if DoJNIPromptOnInit then
@@ -3369,21 +3371,21 @@ begin
   Result:= jForm_GetDateTime(FjEnv,FjObject);
 end;
 
-// BY TR3E
+// BY ADiV
 function jForm.GetBatteryPercent: integer;
 begin
   if not FInitialized then Exit;
   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBatteryPercent');
 end;
 
-// BY TR3E
+// BY ADiV
 function jForm.GetTimeInMilliseconds: int64;
 begin
   if not FInitialized then Exit;
   Result:= jni_func_out_j(FjEnv,FjObject, 'GetTimeInMilliseconds');
 end;
 
-// BY TR3E
+// BY ADiV
 function jForm.GetTimeHHssSS( millisTime : longint ) : string;
 begin
   if not FInitialized then Exit;
@@ -3433,9 +3435,9 @@ begin
   if FActivityMode = actEasel then Exit;
   if FVisible then Exit;
 
-  if not FInitialized then Exit; //by TR3E
+  if not FInitialized then Exit; //by ADiV
 
-  //If AppRecreateActivity [by TR3E]
+  //If AppRecreateActivity [by ADiV]
   if FormIndex = -1 then
   begin
     ReInit(gapp);
@@ -3453,7 +3455,7 @@ begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
 
-  DoOnShow; //by TR3E
+  DoOnShow; //by ADiV
 end;
 
 procedure jForm.Show(jniPrompt: boolean);
@@ -3462,7 +3464,7 @@ begin
   if FVisible then Exit;
   if not FInitialized then Exit;
 
-  // If AppRecreateActivity [by TR3E]
+  // If AppRecreateActivity [by ADiV]
   if FormIndex = -1 then
   begin
     ReInit(gapp);
@@ -3479,7 +3481,7 @@ begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
   end;
 
-  DoOnShow; //by TR3E
+  DoOnShow; //by ADiV
 
 end;
 
@@ -3489,7 +3491,7 @@ begin
   if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
 end;
 
-//by TR3E
+//by ADiV
 procedure jForm.DoOnShow;
 begin
 
@@ -3550,7 +3552,7 @@ begin
 
   Inx:= jForm(Form).FormIndex;
 
-  // Prevents the error that is called close before it has been show [by TR3E]
+  // Prevents the error that is called close before it has been show [by ADiV]
   if Inx = gapp.TopIndex then
   begin
     formBaseInx:= jForm(Form).FormBaseIndex;
@@ -3574,7 +3576,7 @@ begin
         if jForm(gApp.Forms.Stack[formBaseInx].Form).PromptOnBackKey then
             jForm(gApp.Forms.Stack[formBaseInx].Form).DoJNIPrompt; //<<--- thanks to @arenabor
 
-        jForm(gApp.Forms.Stack[formBaseInx].Form).DoOnShow; // by TR3E
+        jForm(gApp.Forms.Stack[formBaseInx].Form).DoOnShow; // by ADiV
       end;
 
       //LORDMAN - 2013-08-01 // Call Back event
@@ -3594,7 +3596,7 @@ begin
       //BacktrackOnClose
       if jForm(Form).TryBacktrackOnClose then
       begin
-        // Prevents the error that is called close before it has been show [by TR3E]
+        // Prevents the error that is called close before it has been show [by ADiV]
         if formBaseInx > 0 then
            jForm(gApp.Forms.Stack[formBaseInx].Form).Close;
       end;
@@ -4677,6 +4679,14 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetVersionName');
+end;
+
+function jForm.GetVersionPlayStore( appUrlString : string ) : string;
+begin
+  Result := '';
+
+  if FInitialized then
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetVersionPlayStore', appUrlString);
 end;
 
 function jForm.GetScreenWidth(): integer;

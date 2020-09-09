@@ -157,6 +157,14 @@ import android.content.IntentFilter;
 import android.media.MediaScannerConnection;
 import java.text.Normalizer;
 
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.MalformedURLException;
+import java.io.BufferedReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 //-------------------------------------------------------------------------
 //Constants
 //-------------------------------------------------------------------------
@@ -1223,6 +1231,78 @@ class jForm {
 	    } catch (NameNotFoundException e) {
 	        return "";
 	    }
+	}
+	
+	// by ADiV
+	private String GetAppVersion(String patternString, String inputString) {
+	    try{
+	        //Create a pattern
+	        Pattern pattern = Pattern.compile(patternString);
+	        if (null == pattern) {
+	            return null;
+	        }
+
+	        //Match the pattern string in provided string
+	        Matcher matcher = pattern.matcher(inputString);
+	        if (null != matcher && matcher.find()) {
+	            return matcher.group(1);
+	        }
+
+	    }catch (PatternSyntaxException ex) {
+
+	        ex.printStackTrace();
+	    }
+
+	    return null;
+	}
+
+	// by ADiV
+	public String GetVersionPlayStore(String appUrlString) {
+	    final String currentVersion_PatternSeq = "<div[^>]*?>Current\\sVersion</div><span[^>]*?>(.*?)><div[^>]*?>(.*?)><span[^>]*?>(.*?)</span>";
+	    final String appVersion_PatternSeq = "htlgb\">([^<]*)</s";
+	    String playStoreAppVersion = null;
+
+	    BufferedReader inReader = null;
+	    URLConnection uc = null;
+	    StringBuilder urlData = new StringBuilder();
+	    
+	    URL url;
+	   
+	    try{
+	     url = new URL(appUrlString);
+	    } catch (MalformedURLException e) {
+	     return null;
+	    }
+	    
+	    try{
+	     uc = url.openConnection();
+	     if(uc == null) {
+	       return null;
+	     }
+	     uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+	     inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
+	     if (null != inReader) {
+	        String str = "";
+	        while ((str = inReader.readLine()) != null) {
+	                       urlData.append(str);
+	        }
+	     }
+	    
+	    } catch (IOException e) {
+	     return null;	
+	    }
+	    
+
+	    // Get the current version pattern sequence 
+	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
+	    if(null == versionString){ 
+	        return null;
+	    }else{
+	        // get version from "htlgb">X.X.X</span>
+	        playStoreAppVersion = GetAppVersion(appVersion_PatternSeq, versionString);
+	    }
+
+	    return playStoreAppVersion;
 	}
 
 	//android.view.View
