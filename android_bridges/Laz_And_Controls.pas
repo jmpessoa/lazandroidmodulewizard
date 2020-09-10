@@ -308,6 +308,8 @@ type
     procedure GetAsync(_stringUrl: string); overload;
     procedure GetAsync; overload;
 
+    procedure GetAsyncGooglePlayVersion(_stringUrl: string); // by ADiV
+
     //thanks to Fatih KILIÇ
     function Get(_stringUrl: string): string;  overload;
     function Get(): string;   overload;
@@ -626,8 +628,10 @@ type
     procedure Init(refApp: jApp)  override;
 
     Procedure Show;   overload;
-    Procedure Show(titleText: string; msgText: string; yesText: string; noText: string); overload;
-    Procedure Show(titleText: string; msgText: string); overload;
+
+    Procedure Show(titleText, msgText, yesText, noText, neutralText: string); overload;
+    Procedure Show(titleText, msgText, yesText, noText: string); overload;
+    Procedure Show(titleText, msgText: string); overload;
     procedure ShowOK(titleText: string; msgText: string; _OkText: string);
 
     Procedure SetFontSize( fontSize : integer ); // by ADiV
@@ -7343,6 +7347,14 @@ begin
       jHttpClient_GetAsync(FjEnv, FjObject, _stringUrl);
 end;
 
+procedure jHttpClient.GetAsyncGooglePlayVersion(_stringUrl: string);
+begin
+
+ //in designing component state: result value here...
+  if FInitialized then
+      jni_proc_t(FjEnv, FjObject, 'GetAsyncGooglePlayVersion', _stringUrl);
+end;
+
 function jHttpClient.Get(_stringUrl: string): string;
 begin
 
@@ -11738,13 +11750,19 @@ begin
      jDialogYN_Show(FjEnv, FjObject, FTitle, FMsg, FYes, FNo );
 end;
 
-Procedure jDialogYN.Show(titleText: string; msgText: string; yesText: string; noText: string);
+Procedure jDialogYN.Show(titleText, msgText, yesText, noText, neutralText: string);
+begin
+  if FInitialized then
+     jni_proc_ttttt(FjEnv, FjObject, 'show', titleText, msgText, yesText, noText, neutralText);
+end;
+
+Procedure jDialogYN.Show(titleText, msgText, yesText, noText: string);
 begin
   if FInitialized then
      jDialogYN_Show(FjEnv, FjObject, titleText, msgText, yesText, noText);
 end;
 
-Procedure jDialogYN.Show(titleText: string; msgText: string);
+Procedure jDialogYN.Show(titleText, msgText: string);
 begin
   //Fixed to show text if it is changed, when "Show" is called
   if FInitialized then

@@ -8,12 +8,7 @@ import android.view.Gravity;
 import android.graphics.Typeface;
 import android.graphics.Color;
 
-class YNConst {
-  public static final int Click_Yes = -1;
-  public static final int Click_No  = -2;
-}
-
-//Revised 08/27/2019 [by TR3E]
+//--- Revised 2020/09/09 [by ADiV] ---//
 
 public class jDialogYN {
  //Java-Pascal Interface
@@ -22,8 +17,9 @@ public class jDialogYN {
  //
  private String          dlgTitle;
  private String          dlgMsg;
- private String          dlgY;
- private String          dlgN;
+ private String          dlgYes;
+ private String          dlgNo;
+ private String          dlgNeutral;
  
  private int 			 mFontSize;   // by tr3e
  private int			 mTitleAlign; // by tr3e
@@ -34,7 +30,7 @@ public class jDialogYN {
  //Constructor
  public  jDialogYN(android.content.Context context,
               Controls ctrls, long pasobj,
-              String title, String msg, String y, String n ) {
+              String title, String msg, String _strYes, String _strNo ) {
   //Connect Pascal I/F
   PasObj   = pasobj;
   controls = ctrls;
@@ -42,16 +38,16 @@ public class jDialogYN {
   //
   dlgTitle = title;
   dlgMsg   = msg;
-  dlgY     = y;
-  dlgN     = n;
+  dlgYes   = _strYes;
+  dlgNo    = _strNo;
+  dlgNeutral = "Cancel";
   
   mFontSize = 0;
 
   //Init Event
   onClickListener = new DialogInterface.OnClickListener() {
    public  void onClick(DialogInterface dialog, int id) {
-    if  ( id == YNConst.Click_Yes) { controls.pOnClick(PasObj,YNConst.Click_Yes);}
-                          else { controls.pOnClick(PasObj,YNConst.Click_No );}
+    controls.pOnClick(PasObj, id );
    };
   };
 }
@@ -60,11 +56,11 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 	   //Log.i("java","DlgYN_Show");
 	dlgTitle = titleText;
 	dlgMsg   = msgText;
-	dlgY     = yesText;
-	dlgN     = noText;
+	dlgYes   = yesText;
+	dlgNo    = noText;
 
-	if (dlgY.equals("")) dlgY ="Yes";
-	if (dlgN.equals("")) dlgN ="No";
+	if (dlgYes.equals("")) dlgYes ="Yes";
+	if (dlgNo.equals("")) dlgNo ="No";
 	
 	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
 		
@@ -94,8 +90,8 @@ public  void show(String titleText, String msgText, String yesText, String noTex
     	
 	builder.setMessage       (dlgMsg  )
 	       .setCancelable    (false)
-	       .setPositiveButton(dlgY,onClickListener)
-	       .setNegativeButton(dlgN,onClickListener);
+	       .setPositiveButton(dlgYes,onClickListener)
+	       .setNegativeButton(dlgNo,onClickListener);
 	dialog = builder.create();	
 
 	dialog.show();
@@ -119,6 +115,81 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 		  
 		  if( btPositive != null )
 		   btPositive.setTextSize(mFontSize);
+		 }
+}
+
+public  void show(String titleText, String msgText, String yesText, String noText, String neutralText) {
+	   //Log.i("java","DlgYN_Show");
+	dlgTitle = titleText;
+	dlgMsg   = msgText;
+	dlgYes     = yesText;
+	dlgNo      = noText;
+	dlgNeutral = neutralText;
+
+	if (dlgYes.equals("")) dlgYes ="Yes";
+	if (dlgNo.equals("")) dlgNo ="No";
+	if (dlgNeutral.equals("")) dlgNeutral ="Cancel";
+	
+	AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);
+		
+	TextView title = new TextView(controls.activity);
+	
+	if( title != null ){
+     title.setText(dlgTitle);
+     title.setPadding(30, 10, 30, 10);
+     title.setTextColor(Color.BLACK);
+     title.setTypeface(null, Typeface.BOLD);
+ 
+     //title.setBackgroundResource(R.drawable.gradient);
+     //title.setTextColor(0xFF0000FF);
+ 
+     switch( mTitleAlign ){ 
+      case 0 : title.setGravity(Gravity.LEFT); break;
+      case 1 : title.setGravity(Gravity.RIGHT); break;
+      case 2 : title.setGravity(Gravity.CENTER); break;
+     }
+ 
+     if( mFontSize != 0)
+      title.setTextSize(mFontSize);
+  
+     builder.setCustomTitle(title);
+	} else
+     builder.setTitle(dlgTitle);
+ 	
+	builder.setMessage       (dlgMsg  )
+	       .setCancelable    (false)
+	       .setPositiveButton(dlgYes,onClickListener)	       
+	       .setNegativeButton(dlgNo,onClickListener)
+	       .setNeutralButton(dlgNeutral,onClickListener);
+	
+	dialog = builder.create();	
+
+	dialog.show();
+	
+	if( mFontSize != 0){
+		  dialog.getWindow().getAttributes();		  
+			 
+		  TextView tvMessage = (TextView) dialog.findViewById(android.R.id.message);
+		  
+		  if( tvMessage != null ){
+		   tvMessage.setPadding(30, 10, 30, 10);
+		   tvMessage.setTextSize(mFontSize);
+		  }
+		 
+		  Button btNegative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		  
+		  if( btNegative != null )
+		   btNegative.setTextSize(mFontSize);
+		 
+		  Button btPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+		  
+		  if( btPositive != null )
+		   btPositive.setTextSize(mFontSize);
+		  
+          Button btNeutral = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+		  
+		  if( btNeutral != null )
+			  btNeutral.setTextSize(mFontSize);
 		 }
 }
 
