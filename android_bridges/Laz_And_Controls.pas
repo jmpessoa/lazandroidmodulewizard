@@ -308,6 +308,8 @@ type
     procedure GetAsync(_stringUrl: string); overload;
     procedure GetAsync; overload;
 
+    procedure GetAsyncGooglePlayVersion(_stringUrl: string); // by ADiV
+
     //thanks to Fatih KILIÇ
     function Get(_stringUrl: string): string;  overload;
     function Get(): string;   overload;
@@ -7343,6 +7345,14 @@ begin
   //in designing component state: result value here...
   if FInitialized then
       jHttpClient_GetAsync(FjEnv, FjObject, _stringUrl);
+end;
+
+procedure jHttpClient.GetAsyncGooglePlayVersion(_stringUrl: string);
+begin
+
+ //in designing component state: result value here...
+  if FInitialized then
+      jni_proc_t(FjEnv, FjObject, 'GetAsyncGooglePlayVersion', _stringUrl);
 end;
 
 function jHttpClient.Get(_stringUrl: string): string;
