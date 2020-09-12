@@ -1,4 +1,4 @@
-package com.example.appcamerademo;
+package org.lamw.applistviewdemo7;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.4.7 [unified!!] - 10 August - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -1083,11 +1083,10 @@ class jForm {
 		int ret = -1;
 
 	    if (Build.VERSION.SDK_INT >= 21) {
-
+             //[ifdef_api21up]
 	         BatteryManager bm = (BatteryManager) this.controls.activity.getSystemService(this.controls.activity.BATTERY_SERVICE);
-	         
-	         if( bm != null )
-	          ret = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+	         if( bm != null ) ret = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+			//[endif_api21up]
 
 	    } else {
 
@@ -1586,8 +1585,10 @@ class jForm {
 
 	public void SetTurnScreenOn(boolean _value) {
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+		if (Build.VERSION.SDK_INT >= 27) {
+			//[ifdef_api27up]
 			controls.activity.setTurnScreenOn(_value);
+			//[endif_api27up]
 	    } else {
 		 if (_value)
 		   controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
@@ -1606,8 +1607,10 @@ class jForm {
 
 	public void SetShowWhenLocked(boolean _value) {
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-			controls.activity.setShowWhenLocked(_value);		
+		if (Build.VERSION.SDK_INT >= 27) {
+			//[ifdef_api27up]
+			controls.activity.setShowWhenLocked(_value);
+			//[endif_api27up]
 	    } else {
 		 if (_value)
 		    controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
