@@ -1,4 +1,4 @@
-package com.example.apphttpclientdemo2;
+package org.lamw.apptestsupportproviderdemo4;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -1235,8 +1235,10 @@ public class jHttpClient /*extends ...*/ {
 	        }
 
 	        @Override
-	        protected void onPostExecute(String content) {
-	            controls.pOnHttpClientContentResult(pascalObj, content);
+	        protected void onPostExecute(String content) { //content --> playStoreAppVersion
+	            //public native void pOnHttpClientContentResult(long pasobj, byte[] content);
+                byte[] b = content.getBytes();
+	            controls.pOnHttpClientContentResult(pascalObj, b);
 	        }
 
 	    }
