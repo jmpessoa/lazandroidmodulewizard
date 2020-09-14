@@ -165,7 +165,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
+//import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
 //-------------------------------------------------------------------------
 //Constants
@@ -2917,8 +2917,8 @@ private void galleryAddPic(File image_uri) {
 
 public String jCamera_takePhoto(String path, String filename, int requestCode) {
 
-	      StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder(); //by Guser97
-	      StrictMode.setVmPolicy(builder.build()); //by Guser97
+	      //StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder(); //by Guser97
+	      //StrictMode.setVmPolicy(builder.build()); //by Guser97
 
           Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
           //String  image_path = (path+File.separator+filename);

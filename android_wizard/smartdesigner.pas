@@ -23,7 +23,7 @@ type
     FStartModuleVarName: string;
     // all Paths have trailing PathDelim
     FPathToJavaSource: string;
-    FPathToAndroidProject: string;
+    FPathToAndroidProject: string;  //Included Path Delimiter!
 
     FPathToAndroidSDK: string;  //Included Path Delimiter!
     FPathToAndroidNDK: string;  //Included Path Delimiter!
@@ -672,7 +672,7 @@ end;
 //https://community.oracle.com/blogs/schaefa/2005/01/20/how-do-conditional-compilation-java
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
-  strList, {listRequirements,} requiredList: TStringList;
+  strList, providerList: TStringList;
   i, p, k, minsdkApi, sdkManifMInApiNumber: integer;
   strTargetApi, auxStr, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
   aSupportLib:TSupportLib;
@@ -691,15 +691,12 @@ var
   sourcepath,targetpath:string;
   includeList: TStringList;
   universalApk: boolean;
-  insertRef, manifestApis: string;
+  insertRef, manifestApis, supportProvider: string;
   p1, p2: integer;
   c: char;
 begin
 
   strList:= TStringList.Create;
-  //listRequirements:= TStringList.Create;
-  //listRequirements.Sorted:= True;
-  //listRequirements.Duplicates:= dupIgnore;
 
   targetpath:=ConcatPaths([FPathToAndroidProject,'res','values']);
   ForceDirectories(targetpath);
@@ -762,6 +759,37 @@ begin
     Clear;
     Text:= tempStr;
     SaveToFile(targetpath);
+  end;
+
+  if FSupport then
+  begin
+     if FileExists(LamwGlobalSettings.PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') then
+     begin
+       strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'support'+DirectorySeparator+'support_provider_paths.xml');
+       strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
+     end;
+
+     if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt') then
+     begin
+       providerList:= TStringList.Create;
+       providerList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt');
+       supportProvider  := StringReplace(providerList.Text, 'dummyPackage',FPackageName, [rfReplaceAll, rfIgnoreCase]);
+       providerList.Free;
+
+       strList.Clear;
+       strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       tempStr:= strList.Text;  //manifest
+       if Pos('android.support.v4.content.FileProvider', tempStr) <= 0 then
+       begin
+         insertRef:= '</activity>'; //insert reference point
+         p1:= Pos(insertRef, tempStr);
+         Insert(sLineBreak + supportProvider, tempStr, p1+Length(insertRef) );
+         strList.Clear;
+         strList.Text:= tempStr;
+         strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+       end;
+
+     end;
   end;
 
   if sdkManifMInApiNumber < minsdkApi  then
@@ -1054,7 +1082,7 @@ begin
          strList.Add('    }');
          end;
 
-         if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) then
+         if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) then    //
          begin
            if buildToolApi = '29'  then buildToolApi:= '28';
          end;
@@ -1259,7 +1287,6 @@ begin
 
   end;
 
-  //listRequirements.Free;
   strList.Free;
 end;
 
@@ -2007,7 +2034,7 @@ end;
 function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
-  list, {listRequirements,} auxList, stringList, manifestList, gradleList: TStringList;
+  list, auxList, stringList, manifestList, gradleList: TStringList;
   p, p1, p2, i, minSdkManifest, minSdkControl: integer;
   aux, tempStr, auxStr: string;
   insertRef, minSdkManifestStr: string;
@@ -2023,7 +2050,6 @@ begin
 
    list:= TStringList.Create;
    manifestList:= TStringList.Create;
-   //listRequirements:= TStringList.Create;  //android maninfest Requirements
    auxList:= TStringList.Create;
 
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java') then
@@ -2131,7 +2157,6 @@ begin
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
-       //listRequirements.Add(Trim(auxList.Text));  //Add permissions
        list.Clear;
        for i:= 0 to auxList.Count-1 do
        begin
@@ -2209,8 +2234,6 @@ begin
        insertRef:= '<intent-filter>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-
-       //listRequirements.Add(Trim(auxList.Text));  //Add intentfilters
 
        list.Clear;
        for i:= 0 to auxList.Count-1 do
@@ -2303,7 +2326,6 @@ begin
        insertRef:= '</activity>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-       //listRequirements.Add(tempStr);  //Add receiver
        if Pos(tempStr , aux) <= 0 then
        begin
          p1:= Pos(insertRef, aux);
@@ -2444,7 +2466,6 @@ begin
         for i:= 0 to auxList.Count-1 do
         begin
            auxStr:=auxList.Strings[i];
-           //listRequirements.Add(auxStr); // implementation 'com.android.support:design:25.3.1'
            SplitStr(auxStr, ' ');
            p:= LastDelimiter(':',auxStr);
            tempStr:= Copy(auxStr, 2, p - 2);
@@ -2922,25 +2943,33 @@ begin
     //re-add all [updated] java code ...
 
     if FSupport then  // refactored by jmpessoa: UNIQUE "Controls.java" !!!
-     begin
+    begin
+
        if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java') then
        begin
          auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java');
          auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
          auxList.SaveToFile(FPathToJavaSource + DirectorySeparator + 'jSupported.java');
        end;
-     end
-     else
-     begin
+       if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') then
+       begin
+         ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'drawable');
+         auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml');
+         auxList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
+       end;
+
+    end
+    else
+    begin
        if FileExists(PathToJavaTemplates+DirectorySeparator+ 'jSupported.java') then
        begin
          auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+ 'jSupported.java');
          auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
          auxList.SaveToFile(FPathToJavaSource + DirectorySeparator + 'jSupported.java');
        end;
-     end;
+    end;
 
-     auxList.Clear;
+    auxList.Clear;
 
     (* commented/refactored by jmpessoa
     if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) AND FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java') then

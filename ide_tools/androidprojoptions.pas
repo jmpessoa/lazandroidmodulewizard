@@ -1855,6 +1855,12 @@ begin
   if cbBuildSystem.Text <> '' then
     LazarusIDE.ActiveProject.CustomData['BuildSystem'] := cbBuildSystem.Text;
 
+  if LazarusIDE.ActiveProject.CustomData['Support'] ='TRUE' then
+  begin
+     if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
+       ShowMessage('Warning: Support Library[v4] need "Gradle" builder ...');
+  end;
+
   TryUpdateStyleXML();
 end;
 

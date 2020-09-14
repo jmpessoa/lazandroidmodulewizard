@@ -279,7 +279,7 @@ end;
 
 function TAndroidGdxProjectDescriptor.DoInitDescriptor: TModalResult;
 var
-  strAfterReplace, strPack, aux: string;
+  strAfterReplace, strPackName, aux: string;
   auxList, ControlsJava: TStringList;
   outTag, i: integer;
 begin
@@ -293,12 +293,11 @@ begin
     FPathToClassName := '';
     if GetWorkSpaceFromForm(-1, outTag) then //Gdx
     begin
+      strPackName := FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
       with TStringList.Create do
         try
-          strPack := FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
-
           LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
-          Strings[0] := 'package ' + strPack + ';';  //replace dummy - Controls.java
+          Strings[0] := 'package ' + strPackName + ';';  //replace dummy - Controls.java
           aux:=  StringReplace(Text, '/*libsmartload*/' ,
                  'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
                  [rfReplaceAll,rfIgnoreCase]);
@@ -310,21 +309,21 @@ begin
           if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java') then
           begin
               LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java');
-              Strings[0] := 'package ' + strPack + ';'; //replace dummy App.java
+              Strings[0] := 'package ' + strPackName + ';'; //replace dummy App.java
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'App.java');
           end;
 
           if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java') then
           begin
             LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java');
-            Strings[0] := 'package ' + strPack + ';'; //replace dummy
+            Strings[0] := 'package ' + strPackName + ';'; //replace dummy
             SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'MyGdxGame.java');
           end;
 
           if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.java') then
           begin
             LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.java');
-            Strings[0] := 'package ' + strPack + ';'; //replace dummy
+            Strings[0] := 'package ' + strPackName + ';'; //replace dummy
             SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jGdxForm.java');
 
             ControlsJava:= TStringList.Create;
@@ -354,7 +353,7 @@ begin
           if FileExists(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java') then
           begin
             LoadFromFile(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java');
-            Strings[0] := 'package ' + strPack + ';';  //replace dummy
+            Strings[0] := 'package ' + strPackName + ';';  //replace dummy
             SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
           end;
 
@@ -493,11 +492,9 @@ begin
       try
 
         LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'androidmanifest.txt');
-
-        strAfterReplace  := StringReplace(Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
-
-        strPack:= strPack+'.'+FMainActivity; {gApp}
-        strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
+        strAfterReplace  := StringReplace(Text, 'dummyPackage',strPackName, [rfReplaceAll, rfIgnoreCase]);
+        strPackName:= strPackName+'.'+FMainActivity; {gApp}
+        strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPackName, [rfReplaceAll, rfIgnoreCase]);
 
         strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
         strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
@@ -505,6 +502,7 @@ begin
         Clear;
         Text:= strAfterReplace;
         SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+
       finally
         Free;
       end;
@@ -734,27 +732,36 @@ end;
 
 function TAndroidGUIProjectDescriptor.DoInitDescriptor: TModalResult;    //GUI
 var
-  strAfterReplace, strPack, aux: string;
-  auxList: TStringList;
+  strAfterReplace, strPackName, aux, strMainActivity: string;
+  auxList, providerList: TStringList;
   outTag: integer;
+  supportProvider, tempStr, insertRef: string;
+  c: char;
+  p1, p2: integer;
 begin
   try
     FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
     FJavaClassName := 'Controls';
     FPathToClassName := '';
+
     if GetWorkSpaceFromForm(0, outTag) then //GUI
     begin
+     strPackName:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
+
       with TStringList.Create do
         try
-          strPack := FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
-
           if FSupport then  // refactored by jmpessoa: UNIQUE "Controls.java" !!!
           begin
             if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java') then
             begin
               LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java');
-              Strings[0] := 'package ' + strPack + ';';  //replace dummy
+              Strings[0] := 'package ' + strPackName + ';';  //replace dummy
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jSupported.java');
+            end;
+            if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') then
+            begin
+              LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml');
+              SaveToFile(FAndroidProjectName + DirectorySeparator +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
             end;
           end
           else
@@ -762,21 +769,14 @@ begin
             if FileExists(FPathToJavaTemplates+DirectorySeparator+ 'jSupported.java') then
             begin
               LoadFromFile(FPathToJavaTemplates+DirectorySeparator+ 'jSupported.java');
-              Strings[0] := 'package ' + strPack + ';';  //replace dummy
+              Strings[0] := 'package ' + strPackName + ';';  //replace dummy
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jSupported.java');
             end;
           end;
 
-          (* commented/refactored by jmpessoa
-          if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) AND FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java') then
-            LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java')
-          else
-            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
-          *)
-
           //UNIQUE "Controls.java" !!!
           LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
-          Strings[0] := 'package ' + strPack + ';';  //replace dummy - Controls.java
+          Strings[0] := 'package ' + strPackName + ';';  //replace dummy - Controls.java
           aux:=  StringReplace(Text, '/*libsmartload*/' ,
                  'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
                  [rfReplaceAll,rfIgnoreCase]);
@@ -789,31 +789,14 @@ begin
              if FileExists(FPathToJavaTemplates + DirectorySeparator + 'support'+DirectorySeparator+'App.java') then
                LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'support'+DirectorySeparator+'App.java');
           end
-          {else if Pos('GDXGame', FAndroidTheme) > 0 then
-          begin
-             if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java') then
-               LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java');
-          end }
           else
           begin
              if FileExists(FPathToJavaTemplates + DirectorySeparator + 'App.java') then
                LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'App.java');
           end;
 
-          Strings[0] := 'package ' + strPack + ';'; //replace dummy App.java
+          Strings[0] := 'package ' + strPackName + ';'; //replace dummy App.java
           SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'App.java');
-
-          (*
-          if Pos('GDXGame', FAndroidTheme) > 0 then
-          begin
-             if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java') then
-             begin
-               LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java');
-               Strings[0] := 'package ' + strPack + ';'; //replace dummy App.java
-               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'MyGdxGame.java');
-             end;
-          end;
-          *)
 
           CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
           if FileExists(FPathToJavaTemplates+DirectorySeparator + 'Controls.native') then
@@ -827,7 +810,7 @@ begin
             if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jCommons.java') then
             begin
               LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jCommons.java');
-              Strings[0] := 'package ' + strPack + ';';  //replace dummy
+              Strings[0] := 'package ' + strPackName + ';';  //replace dummy
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
             end;
           end
@@ -836,7 +819,7 @@ begin
             if FileExists(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java') then
             begin
               LoadFromFile(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java');
-              Strings[0] := 'package ' + strPack + ';';  //replace dummy
+              Strings[0] := 'package ' + strPackName + ';';  //replace dummy
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
             end;
           end;
@@ -869,9 +852,10 @@ begin
       if  FModuleType < 2 then
         CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
+      auxList:= TStringList.Create;
+
       if FProjectModel = 'Ant' then
       begin
-        auxList:= TStringList.Create;
         //eclipe compatibility [Neon!]
         CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
         auxList.Add('eclipse.preferences.version=1');
@@ -976,34 +960,53 @@ begin
            auxList.Add('target=android-'+FTargetApi);
         end;
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
-        auxList.Free;
       end;
 
       //AndroidManifest.xml creation:
-      with TStringList.Create do
-      try
 
-        //if Pos('GDXGame', FAndroidTheme) > 0 then
-          //LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'androidmanifest.txt')
-        //else
-        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'androidmanifest.txt');
+      auxList.Clear;
+      auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'androidmanifest.txt');
 
-        strAfterReplace  := StringReplace(Text, 'dummyPackage',strPack, [rfReplaceAll, rfIgnoreCase]);
+      strAfterReplace  := StringReplace(auxList.Text, 'dummyPackage',strPackName, [rfReplaceAll, rfIgnoreCase]);
 
-        strPack:= strPack+'.'+FMainActivity; {gApp}
-        strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPack, [rfReplaceAll, rfIgnoreCase]);
+      strMainActivity:= strPackName+'.'+FMainActivity; {gApp}
 
-        strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
-        strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
+      strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strMainActivity, [rfReplaceAll, rfIgnoreCase]);
 
-        Clear;
-        Text:= strAfterReplace;
-        SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
-      finally
-        Free;
+      strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
+      strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
+
+      auxList.Clear;
+      auxList.Text:= strAfterReplace;
+
+      if FSupport then
+      begin
+         if FileExists(FPathToJavaTemplates +DirectorySeparator +'support'+DirectorySeparator+'manifest_support_provider.txt') then
+         begin
+           providerList:= TStringList.Create;
+           providerList.LoadFromFile(FPathToJavaTemplates +DirectorySeparator+'support'+DirectorySeparator+'manifest_support_provider.txt');
+
+           supportProvider:= StringReplace(providerList.Text, 'dummyPackage',strPackName, [rfReplaceAll, rfIgnoreCase]);
+           tempStr:= auxList.Text;  //manifest
+
+           if Pos('android.support.v4.content.FileProvider', tempStr) <= 0 then
+           begin
+             insertRef:= '</activity>'; //insert reference point
+             p1:= Pos(insertRef, tempStr);
+             Insert(sLineBreak + supportProvider, tempStr, p1+Length(insertRef));
+             auxList.Clear;
+             auxList.Text:= tempStr;
+           end;
+           providerList.Free;
+
+         end;
       end;
 
+      auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+      auxList.Free;
+
       Result := mrOK
+
     end else
       Result := mrAbort;
   except
@@ -1013,6 +1016,8 @@ begin
       Result := mrAbort;
     end;
   end;
+
+
 end;
 
 {TAndroidProjectDescriptor}
@@ -1623,6 +1628,7 @@ begin
             CreateDir(FAndroidProjectName+DirectorySeparator+'res');
 
             ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'drawable');
+            ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'xml');
 
             ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'drawable-hdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png',

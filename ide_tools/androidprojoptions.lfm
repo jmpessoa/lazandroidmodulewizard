@@ -1,27 +1,30 @@
 object LamwProjectOptions: TLamwProjectOptions
   Left = 0
-  Height = 486
+  Height = 375
   Top = 0
-  Width = 467
-  ClientHeight = 486
-  ClientWidth = 467
+  Width = 614
+  ClientHeight = 375
+  ClientWidth = 614
+  DesignTimePPI = 120
   ParentFont = False
   TabOrder = 0
   DesignLeft = 623
   DesignTop = 228
   object PageControl1: TPageControl
     Left = 0
-    Height = 486
+    Height = 375
     Top = 0
-    Width = 467
+    Width = 614
     ActivePage = tsManifest
     Align = alClient
+    ParentFont = False
     TabIndex = 0
     TabOrder = 0
     object tsManifest: TTabSheet
       Caption = 'Android Manifest'
-      ClientHeight = 458
-      ClientWidth = 459
+      ClientHeight = 342
+      ClientWidth = 606
+      ParentFont = False
       object PermissonGrid: TStringGrid
         AnchorSideLeft.Control = tsManifest
         AnchorSideTop.Control = seMinSdkVersion
@@ -30,33 +33,30 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Control = tsManifest
         AnchorSideBottom.Side = asrBottom
-        Left = 5
-        Height = 330
-        Top = 123
-        Width = 449
+        Left = 6
+        Height = 185
+        Top = 151
+        Width = 594
         Anchors = [akTop, akLeft, akRight, akBottom]
         AutoFillColumns = True
-        BorderSpacing.Around = 5
+        BorderSpacing.Around = 6
         ColCount = 2
         Columns = <        
           item
-            MinSize = 8
-            MaxSize = 160
             ReadOnly = True
             Title.Caption = 'Permissions'
-            Width = 394
+            Width = 526
           end        
           item
             ButtonStyle = cbsCheckboxColumn
-            MinSize = 8
-            MaxSize = 160
             SizePriority = 0
             Title.Alignment = taRightJustify
             Title.Caption = 'Enabled'
-            Width = 51
+            Width = 64
           end>
         FixedCols = 0
         Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goThumbTracking, goSmoothScroll]
+        ParentFont = False
         RowCount = 1
         TabOrder = 0
         TitleImageList = ImageList1
@@ -65,8 +65,8 @@ object LamwProjectOptions: TLamwProjectOptions
         OnMouseDown = PermissonGridMouseDown
         OnMouseMove = PermissonGridMouseMove
         ColWidths = (
-          394
-          51
+          526
+          64
         )
       end
       object ErrorPanel: TPanel
@@ -74,15 +74,16 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideTop.Control = tsManifest
         AnchorSideRight.Control = tsManifest
         AnchorSideRight.Side = asrBottom
-        Left = 5
-        Height = 27
-        Top = 5
-        Width = 449
+        Left = 6
+        Height = 34
+        Top = 6
+        Width = 594
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
-        BorderSpacing.Around = 5
-        ClientHeight = 27
-        ClientWidth = 449
+        BorderSpacing.Around = 6
+        ClientHeight = 34
+        ClientWidth = 594
+        ParentFont = False
         TabOrder = 1
         Visible = False
         object lblErrorMessage: TLabel
@@ -90,12 +91,12 @@ object LamwProjectOptions: TLamwProjectOptions
           AnchorSideTop.Control = ErrorPanel
           AnchorSideRight.Control = ErrorPanel
           AnchorSideRight.Side = asrBottom
-          Left = 6
-          Height = 15
-          Top = 6
-          Width = 437
+          Left = 7
+          Height = 20
+          Top = 7
+          Width = 580
           Anchors = [akTop, akLeft, akRight]
-          BorderSpacing.Around = 5
+          BorderSpacing.Around = 6
           Caption = 'lblErrorMessage'
           Font.Color = clMaroon
           Font.Style = [fsBold]
@@ -108,24 +109,26 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Control = tsManifest
         AnchorSideTop.Control = seMinSdkVersion
         AnchorSideTop.Side = asrCenter
-        Left = 5
-        Height = 15
-        Top = 99
-        Width = 89
-        BorderSpacing.Around = 5
+        Left = 6
+        Height = 20
+        Top = 121
+        Width = 111
+        BorderSpacing.Around = 6
         Caption = 'Min SDK version:'
         ParentColor = False
+        ParentFont = False
       end
       object seMinSdkVersion: TSpinEdit
         AnchorSideLeft.Control = Label1
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = gbVersion
         AnchorSideTop.Side = asrBottom
-        Left = 99
-        Height = 23
-        Top = 95
-        Width = 40
-        BorderSpacing.Around = 5
+        Left = 123
+        Height = 28
+        Top = 117
+        Width = 50
+        BorderSpacing.Around = 6
+        ParentFont = False
         TabOrder = 2
         Value = 14
       end
@@ -134,14 +137,15 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = seTargetSdkVersion
         AnchorSideTop.Side = asrCenter
-        Left = 154
-        Height = 15
-        Top = 99
-        Width = 100
-        BorderSpacing.Left = 10
-        BorderSpacing.Around = 5
+        Left = 191
+        Height = 20
+        Top = 121
+        Width = 127
+        BorderSpacing.Left = 12
+        BorderSpacing.Around = 6
         Caption = 'Target SDK version:'
         ParentColor = False
+        ParentFont = False
       end
       object gbVersion: TGroupBox
         AnchorSideLeft.Control = tsManifest
@@ -149,39 +153,42 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideTop.Side = asrBottom
         AnchorSideRight.Control = tsManifest
         AnchorSideRight.Side = asrBottom
-        Left = 5
-        Height = 53
-        Top = 37
-        Width = 449
+        Left = 6
+        Height = 65
+        Top = 46
+        Width = 594
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
-        BorderSpacing.Around = 5
+        BorderSpacing.Around = 6
         Caption = 'Version'
-        ClientHeight = 33
-        ClientWidth = 445
+        ClientHeight = 40
+        ClientWidth = 590
+        ParentFont = False
         TabOrder = 3
         object Label3: TLabel
           AnchorSideLeft.Control = gbVersion
           AnchorSideTop.Control = seVersionCode
           AnchorSideTop.Side = asrCenter
-          Left = 5
-          Height = 15
-          Top = 9
-          Width = 28
-          BorderSpacing.Around = 5
+          Left = 6
+          Height = 20
+          Top = 10
+          Width = 35
+          BorderSpacing.Around = 6
           Caption = 'Code'
           ParentColor = False
+          ParentFont = False
         end
         object seVersionCode: TSpinEdit
           AnchorSideLeft.Control = Label3
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = gbVersion
-          Left = 38
-          Height = 23
-          Top = 5
-          Width = 43
-          BorderSpacing.Around = 5
+          Left = 47
+          Height = 28
+          Top = 6
+          Width = 54
+          BorderSpacing.Around = 6
           MinValue = 1
+          ParentFont = False
           TabOrder = 0
           Value = 1
         end
@@ -190,24 +197,26 @@ object LamwProjectOptions: TLamwProjectOptions
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = edVersionName
           AnchorSideTop.Side = asrCenter
-          Left = 96
-          Height = 15
-          Top = 9
-          Width = 32
-          BorderSpacing.Left = 10
-          BorderSpacing.Around = 5
+          Left = 119
+          Height = 20
+          Top = 10
+          Width = 40
+          BorderSpacing.Left = 12
+          BorderSpacing.Around = 6
           Caption = 'Name'
           ParentColor = False
+          ParentFont = False
         end
         object edVersionName: TEdit
           AnchorSideLeft.Control = Label4
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = gbVersion
-          Left = 133
-          Height = 23
-          Top = 5
-          Width = 96
-          BorderSpacing.Around = 5
+          Left = 165
+          Height = 28
+          Top = 6
+          Width = 120
+          BorderSpacing.Around = 6
+          ParentFont = False
           TabOrder = 1
         end
       end
@@ -216,12 +225,13 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = gbVersion
         AnchorSideTop.Side = asrBottom
-        Left = 259
-        Height = 23
-        Top = 95
-        Width = 40
-        BorderSpacing.Around = 5
-        ItemHeight = 15
+        Left = 324
+        Height = 28
+        Top = 117
+        Width = 50
+        BorderSpacing.Around = 6
+        ItemHeight = 20
+        ParentFont = False
         TabOrder = 4
       end
       object LabelSupport: TLabel
@@ -229,129 +239,139 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = seTargetSdkVersion
         AnchorSideTop.Side = asrCenter
-        Left = 324
-        Height = 15
-        Top = 99
-        Width = 104
-        BorderSpacing.Left = 20
-        BorderSpacing.Around = 5
-        Caption = 'Add v4+v7 support:'
+        Left = 405
+        Height = 20
+        Top = 121
+        Width = 162
+        BorderSpacing.Left = 25
+        BorderSpacing.Around = 6
+        Caption = 'Add Support Library[v4]:'
         ParentColor = False
+        ParentFont = False
       end
       object CheckBoxSupport: TCheckBox
         AnchorSideLeft.Control = LabelSupport
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = seTargetSdkVersion
         AnchorSideTop.Side = asrCenter
-        Left = 433
-        Height = 19
-        Top = 97
-        Width = 20
-        BorderSpacing.Around = 5
+        Left = 573
+        Height = 23
+        Top = 120
+        Width = 24
+        BorderSpacing.Around = 6
+        ParentFont = False
         TabOrder = 5
       end
     end
     object tsAppl: TTabSheet
       Caption = 'Application'
-      ClientHeight = 458
-      ClientWidth = 459
+      ClientHeight = 575
+      ClientWidth = 576
+      ParentFont = False
       object Label5: TLabel
         AnchorSideLeft.Control = tsAppl
         AnchorSideTop.Control = edLabel
         AnchorSideTop.Side = asrCenter
-        Left = 6
-        Height = 15
-        Top = 9
-        Width = 22
-        BorderSpacing.Left = 6
+        Left = 8
+        Height = 20
+        Top = 10
+        Width = 29
+        BorderSpacing.Left = 8
         Caption = 'Title'
         ParentColor = False
+        ParentFont = False
       end
       object Label6: TLabel
         AnchorSideLeft.Control = tsAppl
         AnchorSideTop.Control = cbTheme
         AnchorSideTop.Side = asrCenter
-        Left = 6
-        Height = 15
-        Top = 37
-        Width = 36
-        BorderSpacing.Left = 6
+        Left = 8
+        Height = 20
+        Top = 44
+        Width = 45
+        BorderSpacing.Left = 8
         Caption = 'Theme'
         ParentColor = False
+        ParentFont = False
       end
       object cbTheme: TComboBox
         AnchorSideLeft.Control = Label6
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = edLabel
         AnchorSideTop.Side = asrBottom
-        Left = 47
-        Height = 23
-        Top = 33
-        Width = 280
-        BorderSpacing.Around = 5
-        ItemHeight = 15
+        Left = 59
+        Height = 28
+        Top = 40
+        Width = 350
+        BorderSpacing.Around = 6
+        ItemHeight = 20
         Items.Strings = (
           ''
         )
         OnChange = cbThemeChange
+        ParentFont = False
         Style = csDropDownList
         TabOrder = 0
       end
       object Label7: TLabel
-        Left = 6
+        Left = 8
         Height = 1
-        Top = 49
+        Top = 61
         Width = 1
         ParentColor = False
+        ParentFont = False
       end
       object edLabel: TEdit
         AnchorSideLeft.Control = cbTheme
         AnchorSideTop.Control = tsAppl
-        Left = 47
-        Height = 23
-        Top = 5
-        Width = 280
-        BorderSpacing.Top = 5
+        Left = 59
+        Height = 28
+        Top = 6
+        Width = 350
+        BorderSpacing.Top = 6
+        ParentFont = False
         TabOrder = 1
       end
       object GroupBox1: TGroupBox
         AnchorSideLeft.Control = tsAppl
         AnchorSideTop.Control = rbOrientation
         AnchorSideTop.Side = asrBottom
-        Left = 5
-        Height = 148
-        Top = 153
-        Width = 178
+        Left = 6
+        Height = 161
+        Top = 189
+        Width = 217
         AutoSize = True
-        BorderSpacing.Left = 5
+        BorderSpacing.Left = 6
         Caption = 'Launcher icon'
-        ClientHeight = 128
-        ClientWidth = 174
+        ClientHeight = 136
+        ClientWidth = 213
+        ParentFont = False
         TabOrder = 2
         object Label8: TLabel
           AnchorSideLeft.Control = GroupBox1
           AnchorSideTop.Control = cbLaunchIconSize
           AnchorSideTop.Side = asrCenter
-          Left = 5
-          Height = 15
-          Top = 9
-          Width = 20
-          BorderSpacing.Around = 5
+          Left = 6
+          Height = 20
+          Top = 10
+          Width = 27
+          BorderSpacing.Around = 6
           Caption = 'Size'
           ParentColor = False
+          ParentFont = False
         end
         object SpeedButton1: TSpeedButton
           AnchorSideLeft.Control = cbLaunchIconSize
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = cbLaunchIconSize
           AnchorSideTop.Side = asrCenter
-          Left = 149
+          Left = 187
           Height = 20
           Hint = 'Load from file...'
-          Top = 6
+          Top = 10
           Width = 20
           AutoSize = True
-          BorderSpacing.Around = 5
+          BorderSpacing.Around = 6
           Glyph.Data = {
             36040000424D3604000000000000360000002800000010000000100000000100
             20000000000000040000640000006400000000000000000000002C86D8D12D88
@@ -390,19 +410,20 @@ object LamwProjectOptions: TLamwProjectOptions
           }
           OnClick = SpeedButton1Click
           ShowHint = True
+          ParentFont = False
           ParentShowHint = False
         end
         object cbLaunchIconSize: TComboBox
           AnchorSideLeft.Control = Label8
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = GroupBox1
-          Left = 30
-          Height = 23
-          Top = 5
-          Width = 114
+          Left = 39
+          Height = 28
+          Top = 6
+          Width = 142
           AutoSize = False
-          BorderSpacing.Around = 5
-          ItemHeight = 15
+          BorderSpacing.Around = 6
+          ItemHeight = 20
           ItemIndex = 0
           Items.Strings = (
             '36x36 ldpi'
@@ -412,6 +433,7 @@ object LamwProjectOptions: TLamwProjectOptions
             '144x144 xxhdpi'
           )
           OnSelect = cbLaunchIconSizeSelect
+          ParentFont = False
           Style = csDropDownList
           TabOrder = 0
           Text = '36x36 ldpi'
@@ -421,12 +443,12 @@ object LamwProjectOptions: TLamwProjectOptions
           AnchorSideLeft.Side = asrCenter
           AnchorSideTop.Control = cbLaunchIconSize
           AnchorSideTop.Side = asrBottom
-          Left = 42
+          Left = 61
           Height = 90
-          Top = 33
+          Top = 40
           Width = 90
           AutoSize = True
-          BorderSpacing.Around = 5
+          BorderSpacing.Around = 6
         end
       end
       object SpeedButtonHintTheme: TSpeedButton
@@ -434,9 +456,9 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = cbTheme
         AnchorSideTop.Side = asrCenter
-        Left = 332
+        Left = 415
         Height = 20
-        Top = 34
+        Top = 44
         Width = 20
         AutoSize = True
         Glyph.Data = {
@@ -476,19 +498,20 @@ object LamwProjectOptions: TLamwProjectOptions
           FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
         }
         OnClick = SpeedButtonHintThemeClick
+        ParentFont = False
       end
       object rbOrientation: TRadioGroup
         AnchorSideLeft.Control = tsAppl
         AnchorSideTop.Control = cbTheme
         AnchorSideTop.Side = asrBottom
-        Left = 5
-        Height = 87
-        Top = 61
-        Width = 178
+        Left = 6
+        Height = 109
+        Top = 74
+        Width = 219
         AutoFill = True
         AutoSize = True
-        BorderSpacing.Around = 5
-        BorderSpacing.InnerBorder = 5
+        BorderSpacing.Around = 6
+        BorderSpacing.InnerBorder = 6
         Caption = 'Orientation'
         ChildSizing.LeftRightSpacing = 6
         ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
@@ -497,43 +520,46 @@ object LamwProjectOptions: TLamwProjectOptions
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 67
-        ClientWidth = 174
+        ClientHeight = 84
+        ClientWidth = 215
         ItemIndex = 0
         Items.Strings = (
           'Sensor (by Device Status)'
           'Force Portrait'
           'Force LandScape'
         )
+        ParentFont = False
         TabOrder = 3
       end
     end
     object tsMiscellaneous: TTabSheet
       Caption = 'Build'
-      ClientHeight = 458
-      ClientWidth = 459
+      ClientHeight = 575
+      ClientWidth = 576
+      ParentFont = False
       object Label9: TLabel
         AnchorSideLeft.Control = tsMiscellaneous
         AnchorSideTop.Control = cbBuildSystem
         AnchorSideTop.Side = asrCenter
-        Left = 5
-        Height = 15
-        Top = 9
-        Width = 64
-        BorderSpacing.Around = 5
+        Left = 6
+        Height = 20
+        Top = 10
+        Width = 80
+        BorderSpacing.Around = 6
         Caption = 'Apk Builder:'
         ParentColor = False
+        ParentFont = False
       end
       object cbBuildSystem: TComboBox
         AnchorSideLeft.Control = Label9
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = tsMiscellaneous
-        Left = 74
-        Height = 23
-        Top = 5
-        Width = 112
-        BorderSpacing.Around = 5
-        ItemHeight = 15
+        Left = 92
+        Height = 28
+        Top = 6
+        Width = 140
+        BorderSpacing.Around = 6
+        ItemHeight = 20
         ItemIndex = 0
         Items.Strings = (
           'Ant'
@@ -541,6 +567,7 @@ object LamwProjectOptions: TLamwProjectOptions
         )
         OnChange = cbBuildSystemChange
         OnSelect = cbBuildSystemSelect
+        ParentFont = False
         Style = csDropDownList
         TabOrder = 0
         Text = 'Ant'
@@ -550,29 +577,31 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = cbBuildSystem
         AnchorSideTop.Side = asrCenter
-        Left = 191
-        Height = 15
-        Top = 9
-        Width = 93
+        Left = 238
+        Height = 20
+        Top = 10
+        Width = 119
         Caption = '(require JDK 1.8+)'
         ParentColor = False
+        ParentFont = False
         Visible = False
       end
       object Label10: TLabel
         Left = 2
-        Height = 15
-        Top = 47
-        Width = 43
-        BorderSpacing.Around = 5
+        Height = 20
+        Top = 59
+        Width = 52
+        BorderSpacing.Around = 6
         Caption = 'Chipset:'
         ParentColor = False
+        ParentFont = False
       end
       object cbChipset: TComboBox
-        Left = 74
-        Height = 23
-        Top = 45
-        Width = 112
-        ItemHeight = 15
+        Left = 92
+        Height = 28
+        Top = 56
+        Width = 140
+        ItemHeight = 20
         ItemIndex = 1
         Items.Strings = (
           'ARMv6             '
@@ -584,15 +613,16 @@ object LamwProjectOptions: TLamwProjectOptions
           'x86_64'
         )
         OnChange = cbChipsetChange
+        ParentFont = False
         Style = csDropDownList
         TabOrder = 1
         Text = 'ARMv7a+Soft'
       end
       object SpeedButton2: TSpeedButton
-        Left = 198
-        Height = 22
-        Top = 45
-        Width = 23
+        Left = 248
+        Height = 28
+        Top = 56
+        Width = 29
         Glyph.Data = {
           36040000424D3604000000000000360000002800000010000000100000000100
           2000000000000004000064000000640000000000000000000000000000000000
@@ -630,11 +660,12 @@ object LamwProjectOptions: TLamwProjectOptions
           0FE9683400984E27004800000000000000000000000000000000
         }
         OnClick = SpeedButton2Click
+        ParentFont = False
       end
     end
   end
   object ImageList1: TImageList
-    Left = 120
-    Top = 208
+    left = 150
+    top = 260
   end
 end
