@@ -1218,7 +1218,6 @@ type
 
     function GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
     function GetInternalAppStoragePath: string;
-    function GetExternalCacheDir : string; // by ADiV
     function CopyFile(srcFullFilename: string; destFullFilename: string): boolean;
     function CopyFileFromUri(srcUri: jObject; destDir: string): string;
     function LoadFromAssets(fileName: string): string;
@@ -3742,13 +3741,6 @@ begin
   Result:='';
   if FInitialized then
     Result:= jForm_GetInternalAppStoragePath(FjEnv, FjObject);
-end;
-
-function jForm.GetExternalCacheDir : string;
-begin
-  Result:='';
-  if FInitialized then
-    Result:= jni_func_out_t(FjEnv, FjObject, 'GetExternalCacheDir');
 end;
 
 function jForm.CopyFile(srcFullFilename: string; destFullFilename: string): boolean;

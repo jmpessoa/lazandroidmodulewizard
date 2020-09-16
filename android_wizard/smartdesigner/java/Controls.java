@@ -798,11 +798,6 @@ class jForm {
 		return absPath;
 	}
 	
-	public String GetExternalCacheDir(){
-		String PathDat = this.controls.activity.getExternalCacheDir().getPath();      
-		return PathDat;
-	}
-
 	public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath
 		String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
 		return PathDat;
