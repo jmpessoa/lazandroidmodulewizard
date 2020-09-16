@@ -75,6 +75,7 @@ jIntentManager = class(jControl)
     function GetDataUri(_intent: jObject): jObject;
     function GetDataUriAsString(_intent: jObject): string;
     procedure PutExtraFile(_environmentDirectoryPath: string; _fileName: string);  overload;
+    procedure PutExtraImage( _bmp : jObject; _title : string ); // by ADiV
     procedure PutExtraMailSubject(_mailSubject: string);
     procedure PutExtraMailBody(_mailBody: string);
     procedure PutExtraMailCCs(var _mailCCs: TDynArrayOfString);
@@ -729,6 +730,13 @@ begin
   if FInitialized then
      jIntentManager_PutExtraFile(FjEnv, FjObject, _uri);
 end;
+
+procedure jIntentManager.PutExtraImage( _bmp : jObject; _title : string );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_bmp_t(FjEnv, FjObject, 'PutExtraImage', _bmp, _title);
+end; 
 
 function jIntentManager.GetActionCallAsString(): string;
 begin

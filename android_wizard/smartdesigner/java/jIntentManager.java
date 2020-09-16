@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.graphics.Bitmap;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 3:49:46]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -300,6 +301,16 @@ Sending Data: Extras vs. URI Parameters
       
    public void PutExtraFile(String _environmentDirectoryPath, String _fileName) { //Environment.DIRECTORY_DOWNLOADS
       mIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+_environmentDirectoryPath+"/"+ _fileName)); //android.intent.extra.STREAM
+   }
+   
+   public void PutExtraImage(Bitmap _bmp, String _title) {
+	   if( _bmp == null ) return;
+	   
+	   String path = MediaStore.Images.Media.insertImage(controls.activity.getContentResolver(), _bmp, _title, null);
+	   Uri uri = Uri.parse(path);
+
+	   mIntent.setType("image/*");	   
+	   mIntent.putExtra(Intent.EXTRA_STREAM, uri); //android.intent.extra.STREAM
    }
       
    public void PutExtraMailSubject(String  _mailSubject) {
