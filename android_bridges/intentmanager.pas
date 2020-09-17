@@ -238,6 +238,8 @@ function jIntentManager_GetExtraSMS(env: PJNIEnv; _jintentmanager: JObject; _int
 function jIntentManager_GetActionInstallPackageAsString(env: PJNIEnv; _jintentmanager: JObject): string;
 function jIntentManager_GetActionDeleteAsString(env: PJNIEnv; _jintentmanager: JObject): string;
 
+procedure jIntentManager_PutExtraImage(env: PJNIEnv; _jintentmanager: JObject; _bmp: jObject; _title: string);
+
 implementation
 
 
@@ -731,12 +733,12 @@ begin
      jIntentManager_PutExtraFile(FjEnv, FjObject, _uri);
 end;
 
-procedure jIntentManager.PutExtraImage( _bmp : jObject; _title : string );
+procedure jIntentManager.PutExtraImage(_bmp: jObject; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_t(FjEnv, FjObject, 'PutExtraImage', _bmp, _title);
-end; 
+     jIntentManager_PutExtraImage(FjEnv, FjObject, _bmp ,_title);
+end;
 
 function jIntentManager.GetActionCallAsString(): string;
 begin
@@ -2539,5 +2541,21 @@ begin
   end;
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jIntentManager_PutExtraImage(env: PJNIEnv; _jintentmanager: JObject; _bmp: jObject; _title: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bmp;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_title));
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'PutExtraImage', '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 end.
