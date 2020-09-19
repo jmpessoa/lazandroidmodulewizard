@@ -3096,7 +3096,7 @@ begin
 
     auxList.Clear;
 
-    if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) then
+    if Pos('AppCompat', AndroidTheme) > 0  then
     begin
       if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'jCommons.java') then
         auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'support'+DirectorySeparator+'jCommons.java');
