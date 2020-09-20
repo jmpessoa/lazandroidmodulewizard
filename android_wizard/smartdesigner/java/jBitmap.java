@@ -1,4 +1,4 @@
-package com.example.appcamerademo;
+package lamw.org.appcustomcamerademo1;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -614,6 +614,30 @@ public class jBitmap {
         try {
             FileOutputStream out = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void SaveToFileJPG(Bitmap _bitmapImage, String _Path) {
+        if (_bitmapImage == null) return;
+        File file;
+
+        String f = _Path.toLowerCase();
+        if (f.contains(".jpg"))
+            file = new File(_Path);
+        else
+            file = new File(_Path + ".jpg");
+
+        if (file.exists()) file.delete();
+
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            _bitmapImage.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
         } catch (Exception e) {

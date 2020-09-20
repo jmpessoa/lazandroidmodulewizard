@@ -586,7 +586,10 @@ type
     function DrawText(_bitmapImage: jObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;overload;
     function DrawText(_text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;overload;
     function DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
-    procedure SaveToFileJPG(_fullPathFile: string);
+
+    procedure SaveToFileJPG(_fullPathFile: string); overload;
+    procedure SaveToFileJPG(_bitmapImage: jObject; _Path: string); overload;
+
     procedure SetImage(_bitmapImage: jObject);
     function CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
     function GetThumbnailImage(_fullPathFile: string; _thumbnailSize: integer): jObject; overload;
@@ -2591,9 +2594,16 @@ end;
 
 //The activity is about to become visible.....
 Procedure Java_Event_pAppOnStart(env: PJNIEnv; this: jObject);
+var
+  Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  if gApp.TopIndex < 0 then Exit;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnActivityStart) then Form.OnActivityStart(Form);
 end;
 
 {
@@ -2605,9 +2615,16 @@ However, it is no longer visible to the user and it can be killed by the system 
 }
 
 Procedure Java_Event_pAppOnStop(env: PJNIEnv; this: jobject);
+var
+  Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+  if gApp.TopIndex < 0 then Exit;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
+  if not Assigned(Form) then Exit;
+  Form.UpdateJNI(gApp);
+  if Assigned(Form.OnActivityStop) then Form.OnActivityStop(Form);
 end;
 
 //Event : OnBackPressed -> Form OnClose
@@ -10834,6 +10851,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jBitmap_SaveToFileJPG(FjEnv, FjObject, _fullPathFile);
+end;
+
+procedure jBitmap.SaveToFileJPG(_bitmapImage: jObject; _Path: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jBitmap_SaveToFileJPG(FjEnv, FjObject, _bitmapImage ,_Path);
 end;
 
 procedure jBitmap.SetImage(_bitmapImage: jObject);

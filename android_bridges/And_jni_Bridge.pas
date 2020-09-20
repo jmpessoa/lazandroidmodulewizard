@@ -920,7 +920,8 @@ function jBitmap_DrawText(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject
 procedure jBitmap_SetImage(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject);
 function jBitmap_DrawText(env: PJNIEnv; _jbitmap: JObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: integer): jObject;overload;
 function jBitmap_DrawBitmap(env: PJNIEnv; _jbitmap: JObject; _bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
-procedure jBitmap_SaveToFileJPG(env: PJNIEnv; _jbitmap: JObject; _fullPathFileName: string);
+procedure jBitmap_SaveToFileJPG(env: PJNIEnv; _jbitmap: JObject; _fullPathFileName: string); overload;
+procedure jBitmap_SaveToFileJPG(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject; _Path: string);overload;
 function jBitmap_CreateBitmap(env: PJNIEnv; _jbitmap: JObject; _width: integer; _height: integer; _backgroundColor: integer): jObject; overload;
 function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _fullPathFile: string; _thumbnailSize: integer): jObject; overload;
 function jBitmap_GetThumbnailImage(env: PJNIEnv; _jbitmap: JObject; _bitmap: jObject; _thumbnailSize: integer): jObject; overload;
@@ -1253,6 +1254,7 @@ function jContact_getDisplayNameList(env:PJNIEnv; this:jobject; delimiter: char)
  {Camera}
 
 Procedure jTakePhoto(env:PJNIEnv;  this:jobject; filename : String);
+
 function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String): string; overload;
 function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String; requestCode: integer): string; overload;
 
@@ -9912,6 +9914,22 @@ begin
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
+
+procedure jBitmap_SaveToFileJPG(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject; _Path: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmapImage;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_Path));
+  jCls:= env^.GetObjectClass(env, _jbitmap);
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveToFileJPG', '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
+  env^.CallVoidMethodA(env, _jbitmap, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 procedure jBitmap_SetImage(env: PJNIEnv; _jbitmap: JObject; _bitmapImage: jObject);
 var

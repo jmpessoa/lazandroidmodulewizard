@@ -54,7 +54,7 @@
         <HasResources Value="True"/>
         <CustomData Count="2">
           <Item0 Name="fclControls"/>
-          <Item1 Name="jControls" Value="jBitmap;jButton;jCamera;jForm;jImageView;jLocation;jTextView"/>
+          <Item1 Name="jControls" Value="jBitmap;jButton;jForm;jImageView;jLocation;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>
