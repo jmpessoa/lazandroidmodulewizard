@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  netapi,
   barcodegen,
   ussdservice,
   customspeechtotext,
@@ -73,6 +74,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jnetapi_icon.lrs}
   {$I jbarcodegen_icon.lrs}
   {$I jussdservice_icon.lrs}
   {$I jftpclient_icon.lrs}
@@ -139,6 +141,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jNetApi,
       jBarcodeGen,
       jUSSDService,
       jFTPClient,
