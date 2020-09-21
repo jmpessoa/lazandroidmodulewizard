@@ -716,6 +716,8 @@ type
 
   TOnActivityPause = Procedure(Sender: TObject) of Object;
   TOnActivityResume = Procedure(Sender: TObject) of Object;
+  TOnActivityStart = Procedure(Sender: TObject) of Object;
+  TOnActivityStop = Procedure(Sender: TObject) of Object;
 
   TOnNewIntent = Procedure(Sender: TObject; intentData: jObject) of Object;
 
@@ -1140,6 +1142,8 @@ type
     FOnActivityReCreate: TOnNotify;
     FOnActivityPause: TOnActivityPause;
     FOnActivityResume: TOnActivityResume;
+    FOnActivityStart: TOnActivityStart;
+    FOnActivityStop: TOnActivityStop;
     FOnRequestPermissionResult: TOnRequestPermissionResult;
     FLayoutVisibility: boolean;
     FBackgroundImageIdentifier: string;
@@ -1489,6 +1493,9 @@ type
     property OnActivityResume: TOnActivityResume read FOnActivityResume write FOnActivityResume;
     property OnRequestPermissionResult: TOnRequestPermissionResult read FOnRequestPermissionResult write FOnRequestPermissionResult;
     //property OnNewIntent: TOnNewIntent read FOnNewIntent write FOnNewIntent;
+
+    property OnActivityStart: TOnActivityStart read FOnActivityStart write FOnActivityStart;
+    property OnActivityStop: TOnActivityStop read FOnActivityStop write FOnActivityStop;
   end;
 
 
