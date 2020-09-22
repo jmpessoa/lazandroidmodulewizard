@@ -2140,6 +2140,7 @@ public native void pAppOnListItemClick(AdapterView adapter, View view, int posit
 public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state);
 public native void pOnLostFocus(long pasobj, String text);
+public native void pOnFocus(long pasobj, String text);
 public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
