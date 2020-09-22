@@ -81,10 +81,12 @@ public class jEditText extends EditText {
 			public void onFocusChange(View v, boolean hasFocus) {
 				final int p = v.getId();
 				final EditText Caption = (EditText)v;
-				if (!hasFocus){
-					if (p >= 0) {
-						controls.pOnLostFocus(LAMWCommon.getPasObj(), Caption.getText().toString());
-					}
+				
+				if (p >= 0){
+				 if (!hasFocus)
+					controls.pOnLostFocus(LAMWCommon.getPasObj(), Caption.getText().toString());
+				 else
+					controls.pOnFocus(LAMWCommon.getPasObj(), Caption.getText().toString());					
 				}
 			}
 		});

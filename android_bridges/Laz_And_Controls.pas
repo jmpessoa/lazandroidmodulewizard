@@ -1031,6 +1031,7 @@ type
     FWrappingLine: boolean;
 
     FOnLostFocus: TOnEditLostFocus;
+    FOnFocus: TOnEditLostFocus; // by ADiV
     FOnEnter  : TOnNotify;
     FOnBackPressed : TOnNotify; // by ADiV
     FOnChange : TOnChange;
@@ -1077,6 +1078,7 @@ type
     Procedure GenEvent_OnChanged(Obj: TObject; txt : string; count: integer);
     Procedure GenEvent_OnClick(Obj: TObject);
     Procedure GenEvent_OnOnLostFocus(Obj: TObject; txt: string);
+    Procedure GenEvent_OnOnFocus(Obj: TObject; txt: string); // By ADiV
 
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
@@ -1176,6 +1178,7 @@ type
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     // Event
     property OnLostFocus: TOnEditLostFocus read FOnLostFocus write FOnLostFocus;
+    property OnFocus: TOnEditLostFocus read FOnFocus write FOnFocus;   // by ADiV
     property OnEnter: TOnNotify  read FOnEnter write FOnEnter;
     property OnBackPressed: TOnNotify  read FOnBackPressed write FOnBackPressed; // by ADiV
     property OnChange: TOnChange read FOnChange write FOnChange;
@@ -2414,7 +2417,8 @@ type
   procedure Java_Event_pOnHttpClientUploadProgress(env: PJNIEnv; this: jobject; Obj: TObject; progress: int64);
 
 
-  Procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
+  procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
+  Procedure Java_Event_pOnFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
 
   procedure Java_Event_pOnScrollViewChanged(env: PJNIEnv; this: jobject; Obj: TObject;  currenthorizontal: integer;
                                                                                       currentVertical: integer;
@@ -3958,6 +3962,29 @@ begin
   end;
 end;
 
+Procedure Java_Event_pOnFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
+var
+  pascontent    : String;
+  _jBoolean  : jBoolean;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  //
+  if not Assigned(Obj) then Exit;
+
+  if Obj is jEditText then
+  begin
+    pascontent := '';
+    if content <> nil then
+    begin
+      _jBoolean := JNI_False;
+      pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
+    end;
+    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
+    jEditText(Obj).GenEvent_OnOnFocus(Obj, pascontent);
+  end;
+end;
+
 Procedure Java_Event_pOnLostFocus(env: PJNIEnv; this: jobject; Obj: TObject; content: JString);
 var
   pascontent    : String;
@@ -5027,6 +5054,11 @@ end;
 Procedure jEditText.GenEvent_OnOnLostFocus(Obj: TObject; txt: string);
 begin
   if Assigned(FOnLostFocus) then FOnLostFocus(Obj, txt);
+end;
+
+Procedure jEditText.GenEvent_OnOnFocus(Obj: TObject; txt: string);
+begin
+  if Assigned(FOnFocus) then FOnFocus(Obj, txt);
 end;
 
 procedure jEditText.UpdateLayout();
