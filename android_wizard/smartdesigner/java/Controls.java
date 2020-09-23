@@ -870,8 +870,11 @@ class jForm {
 		return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
 	}
 
-	public void DeleteFile(String _filename) {
-		this.controls.activity.deleteFile(_filename);
+	public void DeleteFile(String _fileFull) {
+		   File file = new File(_fileFull);
+		   
+		   if( file.isFile() )
+		    file.delete();
 	}
 
 	public void DeleteFile(String _fullPath, String _filename) {
