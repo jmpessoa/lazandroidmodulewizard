@@ -21,7 +21,7 @@ TIntentCategory = (icDefault, icLauncher, icHome, icInfo, icPreference, icAppBro
 
 TIntentFlag = (ifActivityNewTask, ifActivityBroughtToFront, ifActivityTaskOnHome,
                ifActivityForwardResult, ifActivityClearWhenTaskReset,
-               ifActivityClearTop, ifGrantReadUriPermission);
+               ifActivityClearTop, ifGrantReadUriPermission, ifGrantWriteUriPermission);
 
 {Draft Component code by "Lazarus Android Module Wizard" [1/27/2015 0:43:07]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -117,6 +117,7 @@ jIntentManager = class(jControl)
 
     procedure AddCategory(_intentCategory: TIntentCategory);
     procedure SetFlag(_intentFlag: TIntentFlag);
+    procedure AddFlag(_intentFlag: TIntentFlag); // By ADiV
     procedure SetComponent(_packageName: string; _javaClassName: string);
 
     procedure SetClassName(_packageName: string; _javaClassName: string);
@@ -135,6 +136,13 @@ jIntentManager = class(jControl)
     function GetActionInstallPackageAsString(): string;
     function GetActionDeleteAsString(): string;
 
+    // Functions to customize sharing apps By ADiV
+    procedure GetShareItemsClear;
+    procedure SetShareItemClass( _pos : integer );
+    function  GetShareItemsCount() : integer;
+    function  GetShareItemLabel(_pos: integer) : String;
+    function  GetShareItemPackageName(_pos: integer) : String;
+    function  GetShareItemBitmap( _pos : integer ) : jObject;
  published
     property IntentAction: TIntentAction read FIntentAction write SetAction;
 
@@ -237,8 +245,6 @@ function jIntentManager_HasLaunchIntentForPackage(env: PJNIEnv; _jintentmanager:
 function jIntentManager_GetExtraSMS(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _addressBodyDelimiter: string): string;
 function jIntentManager_GetActionInstallPackageAsString(env: PJNIEnv; _jintentmanager: JObject): string;
 function jIntentManager_GetActionDeleteAsString(env: PJNIEnv; _jintentmanager: JObject): string;
-
-procedure jIntentManager_PutExtraImage(env: PJNIEnv; _jintentmanager: JObject; _bmp: jObject; _title: string);
 
 implementation
 
@@ -733,11 +739,55 @@ begin
      jIntentManager_PutExtraFile(FjEnv, FjObject, _uri);
 end;
 
-procedure jIntentManager.PutExtraImage(_bmp: jObject; _title: string);
+procedure jIntentManager.PutExtraImage( _bmp : jObject; _title : string );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraImage(FjEnv, FjObject, _bmp ,_title);
+     jni_proc_bmp_t(FjEnv, FjObject, 'PutExtraImage', _bmp, _title);
+end;
+
+function jIntentManager.GetShareItemsCount() : integer;
+begin
+  Result := 0;
+
+  if FInitialized then
+   Result := jni_func_out_i(FjEnv, FjObject, 'GetShareItemsCount');
+end;
+
+function jIntentManager.GetShareItemLabel(_pos: integer) : String;
+begin
+  Result := '';
+
+  if FInitialized then
+   Result := jni_func_i_out_t(FjEnv, FjObject, 'GetShareItemLabel', _pos);
+end;
+
+function jIntentManager.GetShareItemPackageName(_pos: integer) : String;
+begin
+  Result := '';
+
+  if FInitialized then
+   Result := jni_func_i_out_t(FjEnv, FjObject, 'GetShareItemPackageName', _pos);
+end;
+
+function jIntentManager.GetShareItemBitmap( _pos : integer ) : jObject;
+begin
+ Result := nil;
+
+  if FInitialized then
+   Result := jni_func_i_out_bmp(FjEnv, FjObject, 'GetShareItemBitmap', _pos);
+end;
+
+procedure jIntentManager.GetShareItemsClear;
+begin
+ if FInitialized then
+   jni_proc(FjEnv, FjObject, 'GetShareItemsClear');
+end;
+
+procedure jIntentManager.SetShareItemClass( _pos : integer );
+begin
+ if FInitialized then
+   jni_proc_i(FjEnv, FjObject, 'SetShareItemClass', _pos);
 end;
 
 function jIntentManager.GetActionCallAsString(): string;
@@ -815,6 +865,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jIntentManager_SetFlag(FjEnv, FjObject, Ord(_intentFlag));
+end;
+
+procedure jIntentManager.AddFlag(_intentFlag: TIntentFlag);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'AddFlag', Ord(_intentFlag));
 end;
 
 procedure jIntentManager.SetComponent(_packageName: string; _javaClassName: string);
@@ -2539,21 +2596,6 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jIntentManager_PutExtraImage(env: PJNIEnv; _jintentmanager: JObject; _bmp: jObject; _title: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _bmp;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_title));
-  jCls:= env^.GetObjectClass(env, _jintentmanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'PutExtraImage', '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 

@@ -2013,6 +2013,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function  jni_create_i(env: PJNIEnv; this: jObject; _self: TObject; javaFuncion: string; _int: integer): jObject;
 
   procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string);
+  procedure jni_proc_bmp_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject; _str: string);
   procedure jni_proc_bmp_iiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject; _int0, _int1, _int2, _int3: integer);
   procedure jni_proc_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float: single);
   procedure jni_proc_ff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single);
@@ -2066,6 +2067,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_i_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): integer;
   function jni_func_i_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): boolean;
   function jni_func_i_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): string;
+  function jni_func_i_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int : integer): jObject;
   function jni_func_ii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1: integer): string;
   function jni_func_iii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1, _int2: integer): string;
   function jni_func_int_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _intent: jObject): string;
@@ -8568,6 +8570,25 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jni_proc_bmp_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                         _bitmap: JObject; _str: string);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _bitmap;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
+
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 procedure jni_proc_it(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                        _int0: integer; _str: string);
 var
@@ -9170,6 +9191,21 @@ begin
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_i_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                             _int : integer): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _int;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)Landroid/graphics/Bitmap;');
+  Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
