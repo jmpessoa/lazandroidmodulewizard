@@ -21,6 +21,10 @@ import android.util.Log;
 
 import android.graphics.Bitmap;
 import android.content.ContentValues;
+import android.app.SearchManager;
+
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 3:49:46]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -33,6 +37,8 @@ public class jIntentManager  {
    private Context  context   = null;
    
    private Intent mIntent;
+   
+   private List mActivities = null;
    
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
  
@@ -318,6 +324,86 @@ Sending Data: Extras vs. URI Parameters
 	    mIntent.setType("image/*");	   
 	    mIntent.putExtra(Intent.EXTRA_STREAM, uri); //android.intent.extra.STREAM
 	   }
+   }
+   
+   private void initListActivities(){
+	   if( mActivities != null ) return;
+	   
+	   mActivities = controls.activity.getPackageManager().queryIntentActivities(mIntent, 0);
+   }
+   
+   public void GetShareItemsClear(){
+	   if( mActivities == null ) return;
+	   
+	   mActivities.clear();
+	   mActivities = null;
+   }
+   
+   public int GetShareItemsCount(){
+		  if( mActivities == null ) initListActivities();
+		  
+		  if( mActivities == null ) return 0;
+		  
+		  return mActivities.size();
+   }
+   
+   public String GetShareItemLabel(int pos){
+	      if( mActivities == null ) initListActivities();
+		  
+		  if( mActivities == null ) return "";
+		  if( (pos < 0) || (pos >= mActivities.size()) ) return "";
+		  
+		  ResolveInfo info = (ResolveInfo) mActivities.get(pos);
+			
+		  if(info == null) return "";
+		  
+		  //return info.activityInfo.applicationInfo.loadLabel(controls.activity.getPackageManager()).toString();	
+		  
+		  return info.loadLabel(controls.activity.getPackageManager()).toString();	
+   }
+   
+   public void SetShareItemClass(int pos){
+	   if( mActivities == null ) initListActivities();
+		  
+	   if( mActivities == null ) return;
+	   if( (pos < 0) || (pos >= mActivities.size()) ) return;
+		     
+	   
+       ResolveInfo info = (ResolveInfo) mActivities.get(pos);
+	
+	   if(info == null) return;
+	   
+	   mIntent.setClassName(info.activityInfo.packageName, info.activityInfo.name);
+   }
+   
+   public String GetShareItemPackageName(int pos){
+	   if( mActivities == null ) initListActivities();
+		  
+	   if( mActivities == null ) return "";
+	   if( (pos < 0) || (pos >= mActivities.size()) ) return "";			    
+		   
+	   ResolveInfo info = (ResolveInfo) mActivities.get(pos);
+		
+	   if(info == null) return "";
+		
+	   return info.activityInfo.packageName;
+   }
+   
+   public Bitmap GetShareItemBitmap( int pos ){
+	    if( mActivities == null ) initListActivities();
+		  
+	    if( mActivities == null ) return null;
+	    if( (pos < 0) || (pos >= mActivities.size()) ) return null;			    
+		   
+	    ResolveInfo info = (ResolveInfo) mActivities.get(pos);
+		
+		if(info == null) return null;
+		
+		Drawable icon = info.activityInfo.applicationInfo.loadIcon(context.getPackageManager());
+			
+		if( icon == null ) return null;
+		    
+		return ((BitmapDrawable) icon).getBitmap();		
    }
       
    public void PutExtraMailSubject(String  _mailSubject) {
@@ -641,8 +727,22 @@ Sending Data: Extras vs. URI Parameters
 	   	 case 2: mIntent.setFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
 	   	 case 3: mIntent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 	  	 case 4: mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-           case 5: mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-           case 6: mIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+         case 5: mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+         case 6: mIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+         case 7: mIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);         
+	  }
+   }
+   
+   public void AddFlag(int _intentFlag) {	   
+	   switch(_intentFlag) {
+	   	 case 0: mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	   	 case 1: mIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+	   	 case 2: mIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+	   	 case 3: mIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+	  	 case 4: mIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+         case 5: mIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+         case 6: mIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+         case 7: mIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 	  }
    }
    
