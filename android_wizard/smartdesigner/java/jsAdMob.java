@@ -17,10 +17,9 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdListener;
 
-
 //-------------------------------------------------------------------------
 // jsAdMob
-// Developed by ADiV for LAMW on 2020-05-27
+// Developed by ADiV for LAMW on 2020-09-29
 // Updated for AdMob 17.2.1
 //-------------------------------------------------------------------------
 
@@ -114,6 +113,30 @@ public class jsAdMob extends FrameLayout {
       return admobBannerSize;
    }
    
+   public int AdMobGetHeight() {
+	    if (admobView == null) return 0;
+
+	    switch (admobBannerSize) {		 
+        case 1: // 320x50	Banner	Phones and Tablets	BANNER
+		 	  return AdSize.BANNER.getHeightInPixels(context);
+			 
+		 case 2: // 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
+			  return AdSize.LARGE_BANNER.getHeightInPixels(context);
+			  
+		 case 3: // 300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
+			  return AdSize.MEDIUM_RECTANGLE.getHeightInPixels(context);
+			  		 
+		 case 4: // 468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
+			  return AdSize.FULL_BANNER.getHeightInPixels(context);
+			  		 
+		 case 5: // 728x90	IAB Leaderboard	Tablets	LEADERBOARD
+			  return AdSize.LEADERBOARD.getHeightInPixels(context);
+			 
+		 default: // screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
+			return AdSize.SMART_BANNER.getHeightInPixels(context);
+		}
+	}
+   
    public void AdMobInit(){
 	  
 	   if( !admobInit ) { 
@@ -178,7 +201,7 @@ public class jsAdMob extends FrameLayout {
 	            /*private void showToast(String message) {            	
 	                Toast.makeText(controls.activity, message, Toast.LENGTH_SHORT).show();
 	            }*/
-	                        
+        	        		          
 	            
 	            @Override
 	            public void onAdLoaded() {
@@ -248,7 +271,7 @@ public class jsAdMob extends FrameLayout {
                 
         switch (admobBannerSize) {		 
          case 1: // 320x50	Banner	Phones and Tablets	BANNER
-		 	   admobView.setAdSize(AdSize.SMART_BANNER);
+		 	   admobView.setAdSize(AdSize.BANNER);
 			  break;
 		 case 2: // 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
 			   admobView.setAdSize(AdSize.LARGE_BANNER);

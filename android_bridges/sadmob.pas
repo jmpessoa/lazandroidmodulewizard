@@ -70,6 +70,7 @@ jsAdMob = class(jVisualControl)
     procedure AdMobStop();
     procedure AdMobUpdate();
     function  AdMobIsLoading(): boolean;
+    function  AdMobGetHeight(): integer;
 
     function GetView(): jObject;  override;
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -286,9 +287,20 @@ end;
 
 function jsAdMob.AdMobIsLoading(): boolean;
 begin
+ result := false;
+
  //in designing component state: result value here...
  if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'AdMobIsLoading');
+end;
+
+function jsAdMob.AdMobGetHeight(): integer;
+begin
+ Result := 0;
+
+ //in designing component state: result value here...
+ if FInitialized then
+   Result:= jni_func_out_i(FjEnv, FjObject, 'AdMobGetHeight');
 end;
 
 function jsAdMob.AdMobGetId(): string;
