@@ -13,6 +13,7 @@ uses
    procedure Java_Event_pOnAdMobOpened(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnAdMobLeftApplication(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnAdMobClicked(env: PJNIEnv; this: jobject; Obj: TObject);
 
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -694,6 +695,18 @@ begin
   begin
      jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobLoaded(Obj);
+  end;
+end;
+
+procedure Java_Event_pOnAdMobClicked(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jsAdMob then
+  begin
+     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
+     jsAdMob(Obj).GenEvent_OnAdMobClicked(Obj);
   end;
 end;
 

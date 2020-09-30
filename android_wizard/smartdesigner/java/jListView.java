@@ -1663,7 +1663,7 @@ public class jListView extends ListView {
 
 		setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		
-		setFastScrollEnabled(true); //by Tomash
+		setFastScrollEnabled(false); //by Tomash
 
 //fixed! thanks to @renabor
 		onItemClickListener = new OnItemClickListener() {
@@ -1755,8 +1755,14 @@ public class jListView extends ListView {
 			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
    }
 	
+	// by ADiV
 	public void DisableScroll( boolean _disable ){
 		mDisableScroll = _disable;
+	}
+	
+	// by ADiV
+	public void SetFastScrollEnabled(boolean _enable){
+		this.setFastScrollEnabled(_enable); 
 	}
 
 	//thanks to @renabor

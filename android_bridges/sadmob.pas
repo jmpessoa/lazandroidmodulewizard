@@ -23,6 +23,7 @@ TOnAdMobFailedToLoad = procedure(Sender: TObject;  errorCode: integer) of Object
 TOnAdMobOpened = procedure(Sender: TObject) of Object;
 TOnAdMobClosed = procedure(Sender: TObject) of Object;
 TOnAdMobLeftApplication = procedure(Sender: TObject) of Object;
+TOnAdMobClicked = procedure(Sender: TObject) of Object;
 
 {Developed by ADiV for LAMW}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -36,6 +37,7 @@ jsAdMob = class(jVisualControl)
     FOnAdMobOpened:          TOnAdMobOpened;
     FOnAdMobClosed:          TOnAdMobClosed;
     FOnAdMobLeftApplication: TOnAdMobLeftApplication;
+    FOnAdMobClicked:         TOnAdMobClicked;
     FAdMobBannerSize:        TAdMobBannerSize;
 
     procedure SetVisible(Value: Boolean);
@@ -53,6 +55,7 @@ jsAdMob = class(jVisualControl)
     procedure GenEvent_OnAdMobOpened(Obj: TObject);
     procedure GenEvent_OnAdMobClosed(Obj: TObject);
     procedure GenEvent_OnAdMobLeftApplication(Obj: TObject);
+    procedure GenEvent_OnAdMobClicked(Obj: TObject);
 
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetViewParent(): jObject;  override;
@@ -89,7 +92,7 @@ jsAdMob = class(jVisualControl)
     property OnAdMobOpened      :   TOnAdMobOpened read FOnAdMobOpened write FOnAdMobOpened;
     property OnAdMobClosed      :   TOnAdMobClosed read FOnAdMobClosed write FOnAdMobClosed;
     property OnAdMobLeftApplication  :   TOnAdMobLeftApplication read FOnAdMobLeftApplication write FOnAdMobLeftApplication;
-
+    property OnAdMobClicked      :   TOnAdMobClicked read FOnAdMobClicked write FOnAdMobClicked;
 
 end;
 
@@ -221,6 +224,11 @@ end;
 procedure jsAdMob.GenEvent_OnAdMobLoaded(Obj: TObject);
 begin
   if Assigned(FOnAdMobLoaded) then FOnAdMobLoaded(Obj);
+end;
+
+procedure jsAdMob.GenEvent_OnAdMobClicked(Obj: TObject);
+begin
+  if Assigned(FOnAdMobClicked) then FOnAdMobClicked(Obj);
 end;
 
 procedure jsAdMob.GenEvent_OnAdMobFailedToLoad(Obj: TObject; errorCode: integer);

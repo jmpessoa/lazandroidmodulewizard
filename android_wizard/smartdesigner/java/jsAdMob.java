@@ -19,7 +19,7 @@ import com.google.android.gms.ads.AdListener;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Developed by ADiV for LAMW on 2020-09-29
+// Developed by ADiV for LAMW on 2020-09-30
 // Updated for AdMob 17.2.1
 //-------------------------------------------------------------------------
 
@@ -243,6 +243,13 @@ public class jsAdMob extends FrameLayout {
 	                //showToast("Ad opened.");
 	            	controls.pOnAdMobOpened(pascalObj);
 	            }
+	            
+	            @Override
+	            public void onAdClicked() {
+	                // Code to be executed when the user clicks on an ad.
+	            	controls.pOnAdMobClicked(pascalObj);
+	            }
+
 
 	            @Override
 	            public void onAdClosed() {

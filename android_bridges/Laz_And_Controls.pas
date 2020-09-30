@@ -1720,6 +1720,7 @@ type
     procedure SetDrawItemBackColorAlpha(_alpha: integer);
 
     procedure DisableScroll(_disable : boolean); // by ADiV
+    procedure SetFastScrollEnabled(_enable : boolean); // by ADiV
 
     //Property
     property setItemIndex: TXY write SetItemPosition;
@@ -9172,6 +9173,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_z(FjEnv, FjObject, 'DisableScroll', _disable);
+end;
+
+procedure jListView.SetFastScrollEnabled(_enable : boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_z(FjEnv, FjObject, 'SetFastScrollEnabled', _enable);
 end;
 
 procedure jListView.SaveToFile(_appInternalFileName: string);
