@@ -39,6 +39,7 @@ jIntentManager = class(jControl)
     procedure Init(refApp: jApp); override;
     function jCreate(): jObject;
     procedure jFree();
+    procedure NewIntent(); // by ADiV
     function GetIntent(): jObject;
     function GetActivityStartedIntent(): jObject;
     procedure SetAction(_intentAction: string); overload;
@@ -788,6 +789,12 @@ procedure jIntentManager.SetShareItemClass( _pos : integer );
 begin
  if FInitialized then
    jni_proc_i(FjEnv, FjObject, 'SetShareItemClass', _pos);
+end;
+
+procedure jIntentManager.NewIntent();
+begin
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'NewIntent');
 end;
 
 function jIntentManager.GetActionCallAsString(): string;
