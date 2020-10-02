@@ -297,6 +297,9 @@ public class jLocation /*extends ...*/ {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         double[] d;
         d = new double[]{0, 0};
+        
+        if(geocoder == null) return d;
+        
         // Create a list to contain the result address
         List<Address> addresses = null;
         try {
@@ -310,7 +313,7 @@ public class jLocation /*extends ...*/ {
             return d;
         }
         // If the reverse geocode returned an address
-        if (addresses != null && addresses.size() > 0) {
+        if ((addresses != null) && (addresses.size() > 0)) {
             // Get the first address
             Address address = addresses.get(0);
             d[0] = address.getLatitude();
@@ -343,6 +346,9 @@ public class jLocation /*extends ...*/ {
 
     public void ShowLocationSourceSettings() {
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        
+        if(intent == null) return;
+        
         context.startActivity(intent);
     }
 
@@ -446,11 +452,17 @@ public class jLocation /*extends ...*/ {
 
     public boolean IsWifiEnabled() {
        WifiManager wifiManager = (WifiManager)this.context.getSystemService(Context.WIFI_SERVICE);
+       
+       if(wifiManager == null) return false;
+       
        return  wifiManager.isWifiEnabled();	
     }
     
     public void SetWifiEnabled(boolean _status) {
-       WifiManager wifiManager = (WifiManager)this.context.getSystemService(Context.WIFI_SERVICE);             
+       WifiManager wifiManager = (WifiManager)this.context.getSystemService(Context.WIFI_SERVICE);
+       
+       if(wifiManager == null) return;
+    		   
        wifiManager.setWifiEnabled(_status);
     }
         
@@ -605,6 +617,9 @@ public class jLocation /*extends ...*/ {
    public String GetAddress(double _latitude, double _longitude) {
   	 
            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+           
+           if(geocoder == null) return "Not avaible Geocoder!";
+           
            // Create a list to contain the result address
            List<Address> addresses = null;
            try {
@@ -623,7 +638,7 @@ public class jLocation /*extends ...*/ {
            }
            
            // If the reverse geocode returned an address
-           if (addresses != null && addresses.size() > 0) {
+           if ((addresses != null) && (addresses.size() > 0)) {
                // Get the first address
                Address address = addresses.get(0);
                /*
@@ -657,7 +672,10 @@ public class jLocation /*extends ...*/ {
    public float GetDistanceTo(double _latitude, double _longitude) {
 	 float r = 0;  
 	 if (mLocation != null) {
-	   Location loc = new Location(mLocation); //or new Location(String provider)   
+	   Location loc = new Location(mLocation); //or new Location(String provider)
+	   
+	   if(loc == null) return r;
+	   
 	   loc.reset();
 	   loc.setLatitude(_latitude);
 	   loc.setLongitude(_longitude);	   
