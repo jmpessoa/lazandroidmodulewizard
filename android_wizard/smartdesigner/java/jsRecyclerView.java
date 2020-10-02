@@ -1969,26 +1969,16 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
 	   rcAdapter.setItemContentDictionary(_delimitedContentDictionary, _delimiter);
    }
    
-   public void ScrollToPosition( int position ){	   
-       int posScroll = 0;
+   public void ScrollToPosition( int position ){
+	   if( (position < 0) || (position >= rcAdapter.getItemCount()) ) return;
 	   
-	   if( position >= rcAdapter.getItemCount() ) 
-		   posScroll = rcAdapter.getItemCount() - 1;
-	   else if ( position > 0 )
-		   posScroll = rcAdapter.getItemCount();
-	   
-	   this.scrollToPosition(posScroll);
+	   this.scrollToPosition(position);
    }
    
-   public void SmoothScrollToPosition(int position){
-	   int posScroll = 0;
+   public void SmoothScrollToPosition(int position){	   
+	   if( (position < 0) || (position >= rcAdapter.getItemCount()) ) return;	   
 	   
-	   if( position >= rcAdapter.getItemCount() ) 
-		   posScroll = rcAdapter.getItemCount() - 1;
-	   else if ( position > 0 )
-		   posScroll = rcAdapter.getItemCount();
-	   
-	   this.smoothScrollToPosition(posScroll);
+	   this.smoothScrollToPosition(position);
    }
    
    public void Add(String _delimitedContent) {	   
