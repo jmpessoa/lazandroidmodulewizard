@@ -62,6 +62,10 @@ public class jIntentManager  {
 	 return mIntent;
    }
    
+   public void NewIntent(){
+	 mIntent = new Intent();  
+   }
+   
    public Intent GetActivityStartedIntent() {
      return controls.activity.getIntent();   //Return the intent that started this activity. 
    }
