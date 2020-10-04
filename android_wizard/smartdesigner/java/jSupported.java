@@ -1,8 +1,9 @@
-package org.lamw.applistviewdemo6;
+package com.example.appcamerademo;
 
 import android.net.Uri;
 import java.io.File;
 import android.content.Context;
+import android.os.StrictMode;
 
 public class jSupported {	//dummy:   app supported!]
 
@@ -16,8 +17,13 @@ public class jSupported {	//dummy:   app supported!]
 	}
 
 
-        public static boolean IsAppSupportedProject() {
+	public static boolean IsAppSupportedProject() {
 		return false;
+	}
+
+	public static void SetStrictMode() {
+		StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+		StrictMode.setVmPolicy(builder.build());
 	}
 
 }

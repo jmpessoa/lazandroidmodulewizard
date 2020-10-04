@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
 import java.io.File;
+//import android.os.StrictMode;
 
 
 public class jSupported {	
@@ -38,6 +39,12 @@ public class jSupported {
 
 	public static boolean IsAppSupportedProject() {
 		return true;
+	}
+
+
+	public static void SetStrictMode() { //dummy
+		//StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+		//StrictMode.setVmPolicy(builder.build());
 	}
 
 }

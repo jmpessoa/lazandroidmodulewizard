@@ -63,6 +63,7 @@ begin
       IsRuntimePermissionGranted('android.permission.WRITE_EXTERNAL_STORAGE') then
    begin
        jCamera1.RequestCode := 12345;
+       //jCamera1.AddToGallery:= False;
        jCamera1.TakePhoto;
    end
    else  ShowMessage('Sorry... Some Runtime Permission NOT Granted ...');

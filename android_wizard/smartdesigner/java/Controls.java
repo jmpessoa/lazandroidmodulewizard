@@ -2919,7 +2919,7 @@ private void galleryAddPic(File image_uri) {
           }
 }
 
-public String jCamera_takePhoto(String path, String filename, int requestCode) {
+public String jCamera_takePhoto(String path, String filename, int requestCode, boolean addToGallery) {
 
 	      //StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder(); //by Guser97
 	      //StrictMode.setVmPolicy(builder.build()); //by Guser97
@@ -2950,6 +2950,7 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
              }
              else {
+                   jSupported.SetStrictMode(); //by Guser97
 	           intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri); //mImageCaptureUri
 	           intent.putExtra("return-data", true);
              }
@@ -2958,11 +2959,17 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
                this.activity.startActivityForResult(intent, requestCode);
              }
 
-             galleryAddPic(newfile);
+             if (addToGallery) galleryAddPic(newfile);
+
              return newfile.toString();
           }
           else return "";
 }
+
+public String jCamera_takePhoto(String path, String filename, int requestCode) {
+       return jCamera_takePhoto(path, filename, requestCode, true);
+}
+
 
 	public String jCamera_takePhoto(String path, String filename) {
 		return jCamera_takePhoto(path, filename, 12345);

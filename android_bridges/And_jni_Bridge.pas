@@ -1257,6 +1257,7 @@ Procedure jTakePhoto(env:PJNIEnv;  this:jobject; filename : String);
 
 function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String): string; overload;
 function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String; requestCode: integer): string; overload;
+function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String; requestCode: integer; addToGallery: boolean): string; overload;
 
 // BenchMark
 Procedure jBenchMark1_Java             (env:PJNIEnv; this:jobject; var mSec : Integer;var value : single);
@@ -13700,38 +13701,46 @@ end;
                   //     filename = '/test.jpg'
 function jCamera_takePhoto(env:PJNIEnv;  this:jobject; path: string; filename : String): string;
 var
- _jMethod  : jMethodID = nil;
- _jParams : array[0..1] of jValue;
- _jString  : jString;
+ _jMethod: jMethodID = nil;
+ _jParams: array[0..1] of jValue;
+ _jString: jString;
   jCls: jClass=nil;
 begin
  jCls:= Get_gjClass(env);
  _jMethod:= env^.GetMethodID(env, jCls, 'jCamera_takePhoto', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
+ _jParams[0].l:= env^.NewStringUTF(env, pchar(path) );
+ _jParams[1].l:= env^.NewStringUTF(env, pchar(filename) );
+ _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+ Result:= GetPStringAndDeleteLocalRef(env, _jString);
+ env^.DeleteLocalRef(env,_jParams[0].l);
+ env^.DeleteLocalRef(env,_jParams[1].l);
+end;
+
+
+function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String; requestCode: integer; addToGallery: boolean): string; overload;
+var
+ _jMethod: jMethodID = nil;
+ _jParams: array[0..3] of jValue;
+ _jString: jString;
+  jCls: jClass=nil;
+begin
+ jCls:= Get_gjClass(env);
+ _jMethod:= env^.GetMethodID(env, jCls, 'jCamera_takePhoto', '(Ljava/lang/String;Ljava/lang/String;IZ)Ljava/lang/String;');
  _jParams[0].l := env^.NewStringUTF(env, pchar(path) );
  _jParams[1].l := env^.NewStringUTF(env, pchar(filename) );
- _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
+ _jParams[2].i := requestCode;
+ _jParams[3].z := JBool(addToGallery);
+ _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
  Result:= GetPStringAndDeleteLocalRef(env, _jString);
  env^.DeleteLocalRef(env,_jParams[0].l);
  env^.DeleteLocalRef(env,_jParams[1].l);
 end;
 
 function jCamera_takePhoto(env:PJNIEnv; this:jobject;  path: string;  filename : String; requestCode: integer): string;
-var
- _jMethod  : jMethodID = nil;
- _jParams : array[0..2] of jValue;
- _jString  : jString;
-  jCls: jClass=nil;
 begin
- jCls:= Get_gjClass(env);
- _jMethod:= env^.GetMethodID(env, jCls, 'jCamera_takePhoto', '(Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;');
- _jParams[0].l := env^.NewStringUTF(env, pchar(path) );
- _jParams[1].l := env^.NewStringUTF(env, pchar(filename) );
- _jParams[2].i := requestCode;
- _jString   := env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
- Result:= GetPStringAndDeleteLocalRef(env, _jString);
- env^.DeleteLocalRef(env,_jParams[0].l);
- env^.DeleteLocalRef(env,_jParams[1].l);
+  Result:= jCamera_takePhoto(env, this, path, filename, requestCode, True);
 end;
+
 //------------------------------------------------------------------------------
 // jBenchMark
 //------------------------------------------------------------------------------

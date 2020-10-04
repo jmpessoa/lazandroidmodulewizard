@@ -467,16 +467,20 @@ type
    FFilename : string;
    FFilePath: TFilePath;
    FRequestCode: integer;
+   FAddToGallery: boolean;
   public
    FullPathToBitmapFile: string;
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
    procedure Init(refApp: jApp) override;
+
    procedure TakePhoto; overload;
    procedure TakePhoto(_filename: string ; _requestCode: integer); overload;
 
    // Property
    property RequestCode: integer read FRequestCode write FRequestCode;
+   property AddToGallery: boolean read FAddToGallery write FAddToGallery;
+
   published
     property Filename: string read FFilename write FFilename;
     property FilePath: TFilePath read FFilePath write FFilePath;
@@ -7983,6 +7987,7 @@ begin
   FFilePath:= fpathDCIM;
   FFilename:= 'photo1.jpg';
   FRequestCode:= 12345;
+  FAddToGallery:= True;
 end;
 
 destructor jCamera.Destroy;
@@ -8019,7 +8024,7 @@ begin
      end;
      Self.UpdateJNI(gApp);
      Self.FullPathToBitmapFile:= jCamera_takePhoto(FjEnv, FjThis,
-                                                   GetFilePath(FFilePath), FFileName, FRequestCode);
+                                                   GetFilePath(FFilePath), FFileName, FRequestCode, FAddToGallery);
   end;
 end;
 
@@ -8041,7 +8046,7 @@ begin
      end;
      Self.UpdateJNI(gApp);
      Self.FullPathToBitmapFile:= jCamera_takePhoto(FjEnv, FjThis,
-                                                   GetFilePath(FFilePath), _filename, _requestCode);
+                                                   GetFilePath(FFilePath), _filename, _requestCode, FAddToGallery);
   end;
 end;
 
