@@ -1,3 +1,0 @@
-# view AndroidManifest.xml #generated:56
--keep class org.lamw.appftpclientdemo1.App { <init>(...); }
-

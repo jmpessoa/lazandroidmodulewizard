@@ -1,3 +1,0 @@
-# view AndroidManifest.xml #generated:26
--keep class com.example.appdemo1.App { <init>(...); }
-
