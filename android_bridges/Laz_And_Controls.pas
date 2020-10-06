@@ -418,6 +418,8 @@ type
    procedure Init(refApp: jApp) override;
    procedure Send; overload;
    procedure Send(mTo: string; subject: string; msg: string); overload;
+
+   function  IsEmailValid(_email : string) : boolean; // by ADiV
    // Property
   published
    property MailTo: string read FMailTo write FMailTo;
@@ -7857,6 +7859,14 @@ begin
                 FMailBcc,             //bcc
                 FMailSubject,         //subject
                 FMailMessage.Text);   //message
+end;
+
+function jSMTPClient.IsEmailValid(_email : string) : boolean;
+begin
+ Result := false;
+
+ if FInitialized then
+  Result := jni_func_t_out_z( gApp.Jni.jEnv, gApp.Jni.jThis, 'IsEmailValid', _email);
 end;
 
 procedure jSMTPClient.Send(mTo: string; subject: string; msg: string);
