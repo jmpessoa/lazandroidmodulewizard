@@ -2702,6 +2702,12 @@ public  void jToast( String str ) {
    Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
 }
 
+boolean IsEmailValid(String email) {
+	if(email == null) return false;
+	
+	return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+}
+
 //by jmpessoa
 //you need a real android device (not emulator!)
 //http://www.androidaspect.com/2013/09/how-to-send-email-from-android.html
