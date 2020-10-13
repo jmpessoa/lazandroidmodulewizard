@@ -29,6 +29,8 @@ import android.graphics.drawable.Drawable;
 
 import java.util.ArrayList;
 
+import android.content.ActivityNotFoundException; 
+
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 3:49:46]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -148,9 +150,14 @@ Sending Data: Extras vs. URI Parameters
 	    */
    }
       
-   public void StartActivityForResult(int _requestCode) {
+   public boolean StartActivityForResult(int _requestCode) {
+	  try{
 	   controls.activity.startActivityForResult(mIntent,_requestCode);
-	   // //startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+      } catch (ActivityNotFoundException e) {
+		  return false;
+	  }
+	  
+	  return true;
    }
       
    /*
@@ -160,17 +167,37 @@ Sending Data: Extras vs. URI Parameters
       startActivity(i); 
    */
       
-   public void StartActivity() {
+   public boolean StartActivity() {
 	   //intent.putExtras .... etc
-	  controls.activity.startActivity(mIntent);
+	  	  
+	  try {
+		  controls.activity.startActivity(mIntent);
+	  } catch (ActivityNotFoundException e) {
+		  return false;
+	  }
+	  
+	  return true;
    }
    
-   public void StartActivity(String _chooserTitle) {	  
-	   controls.activity.startActivity(Intent.createChooser(mIntent, _chooserTitle));
+   public boolean StartActivity(String _chooserTitle) {
+	   
+	  try{
+   		controls.activity.startActivity(Intent.createChooser(mIntent, _chooserTitle));
+      } catch (ActivityNotFoundException e) {
+		  return false;
+	  }
+	  
+	  return true;
    }
    
-   public void StartActivityForResult(int _requestCode, String _chooserTitle) {	  
+   public boolean StartActivityForResult(int _requestCode, String _chooserTitle) {
+	  try{ 
 	   controls.activity.startActivityForResult(Intent.createChooser(mIntent, _chooserTitle),_requestCode);
+      } catch (ActivityNotFoundException e) {
+		  return false;
+	  }
+	  
+	  return true;
    }
             
    /*
@@ -261,6 +288,10 @@ Sending Data: Extras vs. URI Parameters
   
    public void PutExtraInt(String _dataName, int _value) {
 	  mIntent.putExtra(_dataName, _value);
+   }
+   
+   public void PutExtraLong(String _dataName, long _value) {
+		  mIntent.putExtra(_dataName, _value);
    }
    
    public String[] GetExtraStringArray(Intent _intent, String _dataName) {	  
