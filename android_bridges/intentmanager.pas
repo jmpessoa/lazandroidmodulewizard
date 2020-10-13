@@ -46,10 +46,10 @@ jIntentManager = class(jControl)
     procedure SetAction(_intentAction: TIntentAction); overload;
     procedure SetMimeType(_mimeType: string);
     procedure SetDataUriAsString(_uriAsString: string);
-    procedure StartActivityForResult(_requestCode: integer); overload;
-    procedure StartActivity(); overload;
-    procedure StartActivity(_chooserTitle: string); overload;
-    procedure StartActivityForResult(_requestCode: integer; _chooserTitle: string);  overload;
+    function  StartActivityForResult(_requestCode: integer) : boolean; overload;
+    function  StartActivity() : boolean; overload;
+    function  StartActivity(_chooserTitle: string) : boolean; overload;
+    function  StartActivityForResult(_requestCode: integer; _chooserTitle: string) : boolean;  overload;
     procedure SendBroadcast();
     function GetAction(_intent: jObject): string;
     function HasExtra(_intent: jObject; _dataName: string): boolean;
@@ -68,6 +68,7 @@ jIntentManager = class(jControl)
     procedure PutExtraIntArray(_dataName: string; var _values: TDynArrayOfInteger);
     function GetExtraInt(_intent: jObject; _dataName: string): integer;
     procedure PutExtraInt(_dataName: string; _value: integer);
+    procedure PutExtraLong(_dataName: string; _value: int64);
     procedure PutExtraBool(_dataName: string; _value: boolean);
     function GetExtraStringArray(_intent: jObject; _dataName: string): TDynArrayOfString;
     procedure PutExtraStringArray(_dataName: string; var _values: TDynArrayOfString);
@@ -285,32 +286,36 @@ begin
      jni_proc_t(FjEnv, FjObject, 'SetDataUriAsString', _uriAsString);
 end;
 
-procedure jIntentManager.StartActivityForResult(_requestCode: integer);
+function jIntentManager.StartActivityForResult(_requestCode: integer) : boolean;
 begin
+  Result := false;
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'StartActivityForResult', _requestCode);
+   Result := jni_func_i_out_z(FjEnv, FjObject, 'StartActivityForResult', _requestCode);
 end;
 
-procedure jIntentManager.StartActivity();
+function jIntentManager.StartActivity() : boolean;
 begin
+  Result := false;
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'StartActivity');
+   Result := jni_func_out_z(FjEnv, FjObject, 'StartActivity');
 end;
 
-procedure jIntentManager.StartActivity(_chooserTitle: string);
+function jIntentManager.StartActivity(_chooserTitle: string) : boolean;
 begin
+  Result := false;
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'StartActivity', _chooserTitle);
+   Result := jni_func_t_out_z(FjEnv, FjObject, 'StartActivity', _chooserTitle);
 end;
 
-procedure jIntentManager.StartActivityForResult(_requestCode: integer; _chooserTitle: string);
+function jIntentManager.StartActivityForResult(_requestCode: integer; _chooserTitle: string) : boolean;
 begin
+  Result := false;
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_it(FjEnv, FjObject, 'StartActivityForResult', _requestCode ,_chooserTitle);
+   Result := jni_func_it_out_z(FjEnv, FjObject, 'StartActivityForResult', _requestCode ,_chooserTitle);
 end;
 
 procedure jIntentManager.SendBroadcast();
@@ -444,6 +449,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_ti(FjEnv, FjObject, 'PutExtraInt', _dataName, _value);
+end;
+
+procedure jIntentManager.PutExtraLong(_dataName: string; _value: int64);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_tj(FjEnv, FjObject, 'PutExtraLong', _dataName, _value);
 end;
 
 
