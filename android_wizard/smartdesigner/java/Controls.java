@@ -165,6 +165,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import java.text.ParseException;
+import java.text.DateFormat;
+import java.util.Calendar; 
+
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
 //-------------------------------------------------------------------------
@@ -636,15 +640,48 @@ class jForm {
 		return (formatter.format(new Date()));
 	}
 	
-	// by TR3E
+	// by ADiV
 	public long GetTimeInMilliseconds(){
 		return controls.getTick();
 	}
 
-	//by TR3E
+	//by ADiV
 	public String GetTimeHHssSS( long millisTime ) {
 		  SimpleDateFormat formatter = new SimpleDateFormat ( "mm:ss:SS" );
 		  return( formatter.format ( new Date (millisTime) ) );	
+	}
+	
+	//by ADiV
+	public long GetDateTimeToMillis( String _dateTime, boolean _zone ){
+		String     sPattern  = "yyyy-MM-dd HH:mm:ss";
+	    
+	    long offset = 0;
+	    
+	    if(_zone){
+	     Calendar calendar = Calendar.getInstance(Locale.getDefault());
+	     
+	     if( calendar != null )
+	      offset = -(calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET));// / (60 * 1000);
+	    }
+	    
+	    DateFormat formatter = new SimpleDateFormat(sPattern);
+	        
+	    if( formatter == null ) return 0;
+			
+		long lnsTime = 0;
+		
+	    try{
+	    
+	     Date dateObject = formatter.parse(_dateTime);
+
+	     if( dateObject != null )
+	      lnsTime = dateObject.getTime();
+	    
+	    }catch (java.text.ParseException e){        
+	            e.printStackTrace();            
+	    }
+	    
+	    return (lnsTime - offset);
 	}
 
 	//Free object except Self, Pascal Code Free the class.

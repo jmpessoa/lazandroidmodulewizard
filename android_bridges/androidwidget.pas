@@ -1378,7 +1378,8 @@ type
     function  GetSystemVersionString(): string;
 
     function  GetTimeInMilliseconds : int64;
-    function  GetTimeHHssSS( millisTime : longint ) : string;
+    function  GetTimeHHssSS( millisTime : int64 ) : string;
+    function  GetDateTimeToMillis( _dateTime: string; _zone: boolean ) : int64;
 
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string); overload;
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer); overload; // by ADiV
@@ -2033,6 +2034,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure jni_proc_iiiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2, _int3, _int4, _int5, _int6: integer);
   procedure jni_proc_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string);
   procedure jni_proc_ti(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0: integer);
+  procedure jni_proc_tj(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64);
   procedure jni_proc_tz(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool : boolean);
   procedure jni_proc_tt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string);
   procedure jni_proc_ttttt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2, _str3, _str4, _str5: string);
@@ -2042,7 +2044,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
 
   function jni_func_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string): single;
   function jni_func_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string): integer;
-  function jni_func_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string): longint;
+  function jni_func_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string): int64;
   function jni_func_out_d(env: PJNIEnv; _jobject: JObject; javaFuncion : string): double;
   function jni_func_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string): string;
   function jni_func_out_viw(env: PJNIEnv; _jobject: JObject; javaFuncion : string): jObject;
@@ -2074,7 +2076,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_ii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1: integer): string;
   function jni_func_iii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1, _int2: integer): string;
   function jni_func_int_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _intent: jObject): string;
-  function jni_func_j_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: longint): string;
+  function jni_func_j_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: int64): string;
   function jni_func_ii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2: integer): jObject;
   function jni_func_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single): jObject;
   function jni_func_ffz_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: double; _bool: boolean): string;function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
@@ -2083,6 +2085,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_bmp_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str1, _str2: string) : boolean;
   function jni_func_tt_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string): jObject;
   function jni_func_tt_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string): integer;
+  function jni_func_tz_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool: boolean): int64;
   function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
   function jni_func_tiii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0, _int1, _int2: integer): jObject;
   function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): boolean;
@@ -3381,6 +3384,7 @@ end;
 
 function jForm.GetDateTime: String;
 begin
+  Result := '';
   if not FInitialized then Exit;
   Result:= jForm_GetDateTime(FjEnv,FjObject);
 end;
@@ -3388,6 +3392,7 @@ end;
 // BY ADiV
 function jForm.GetBatteryPercent: integer;
 begin
+  Result := 0;
   if not FInitialized then Exit;
   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBatteryPercent');
 end;
@@ -3395,15 +3400,25 @@ end;
 // BY ADiV
 function jForm.GetTimeInMilliseconds: int64;
 begin
+  Result := 0;
   if not FInitialized then Exit;
   Result:= jni_func_out_j(FjEnv,FjObject, 'GetTimeInMilliseconds');
 end;
 
 // BY ADiV
-function jForm.GetTimeHHssSS( millisTime : longint ) : string;
+function jForm.GetTimeHHssSS( millisTime : int64 ) : string;
 begin
+  Result := '';
   if not FInitialized then Exit;
   Result:= jni_func_j_out_t(FjEnv,FjObject, 'GetTimeHHssSS', millisTime);
+end;
+
+// BY ADiV
+function jForm.GetDateTimeToMillis( _dateTime: string; _zone: boolean ) : int64;
+begin
+ Result := 0;
+ if not FInitialized then Exit;
+ Result:= jni_func_tz_out_j(FjEnv, FjObject, 'GetDateTimeToMillis', _dateTime, _zone);
 end;
 
 procedure jForm.SetEnabled(Value: Boolean);
@@ -8627,6 +8642,22 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jni_proc_tj(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].j:= _long;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;J)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 procedure jni_proc_iit(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                        _int0, _int1: integer; _str: string);
 var
@@ -8917,7 +8948,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): longint;
+function jni_func_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string ): int64;
 var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -9283,7 +9314,7 @@ begin
 end;
 
 function jni_func_j_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                          _long: longint): string;
+                          _long: int64): string;
 var
   jStr: JString;
   jParams: array[0..0] of jValue;
@@ -9381,6 +9412,23 @@ begin
   Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_tz_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str: string; _bool: boolean): int64;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].z:= JBool(_bool);
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Z)J');
+  Result:= env^.CallLongMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
