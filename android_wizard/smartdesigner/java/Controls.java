@@ -642,8 +642,8 @@ class jForm {
 	
 	// by ADiV
 	public String GetDateTime(long millisDateTime) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", millisDateTime);
-		return (formatter.format(new Date()));
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return (formatter.format(millisDateTime));
 	}
 	
 	// by ADiV
