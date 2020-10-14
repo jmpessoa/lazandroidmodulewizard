@@ -507,13 +507,14 @@ class jArrayAdapter extends ArrayAdapter {
 			
 			itemTextLeft  = null;
 			
+			int leftSize  = items.get(position).leftDelimiter.length();
 			int pos1 = -1;
 			pos1     = line.indexOf(items.get(position).leftDelimiter);  //"("			
 			
 			if (pos1 >= 0) {							   											    
 				   if ( pos1  !=  0) { 
 				     txt1   = line.substring(0, pos1);	
-				     line1  = line.substring(pos1+1, line.length());
+				     line1  = line.substring(pos1+leftSize, line.length());
 				     result = line1;
 				     
 				     if ( txt1.length() > 0) {
@@ -539,7 +540,7 @@ class jArrayAdapter extends ArrayAdapter {
 				     }
 				   }			 
 				   else {
-					 result =  line.substring(1, line.length());	
+					   result =  line.substring(leftSize, line.length());		
 				   }
 			}
 			
@@ -554,13 +555,13 @@ class jArrayAdapter extends ArrayAdapter {
 			
 			itemTextRight = null;
 			
-			int pos2 = -1;
-			
+			int rightSize = items.get(position).rightDelimiter.length();
+			int pos2 = -1;			
 			pos2 = line.lastIndexOf(items.get(position).rightDelimiter);  //searches right-to-left instead  //rightDelimiter ")"
 			
 			if (pos2 > 0 ) {				
 				if ( pos2 < line.length() ) { 
-			   	   txt2   = line.substring(pos2+1, line.length());
+				   txt2   = line.substring(pos2+rightSize, line.length());
 				   line2  = line.substring(0, pos2);				
 				   result = line2;
 				   
@@ -2324,7 +2325,7 @@ public class jListView extends ListView {
 	  rightDelimiter = _rightDelimiter; //")";
 	}
 	
-	public String GetCenterItemCaption(String _fullItemCaption) {
+public String GetCenterItemCaption(String _fullItemCaption) {
 		
 		String line = _fullItemCaption;
 		String txt1 = "";
@@ -2333,18 +2334,18 @@ public class jListView extends ListView {
 		if (pos1 >= 0) {							   											    
 		    if ( pos1  !=  0) { 
 		     txt1 = line.substring(0, pos1);	
-		     String line1 =  line.substring(pos1+1, line.length());
+		     String line1 =  line.substring(pos1+leftDelimiter.length(), line.length());
 		     line = line1;
 		   }			 
 		   else {
-			 line =  line.substring(1, line.length());	
+			 line =  line.substring(leftDelimiter.length(), line.length());	
 		   }
 		}
 		                                   
 		int pos2 = line.lastIndexOf(rightDelimiter);  //searches right-to-left instead  //rightDelimiter ")"
 		if (pos2 > 0 ) {				
 			if (pos2 < line.length()) { 
-		   	   txt2 = line.substring(pos2+1, line.length());
+		   	   txt2 = line.substring(pos2+rightDelimiter.length(), line.length());
 			   String line2 = line.substring(0, pos2);				
 			   line = line2;				
 			}
@@ -2359,7 +2360,7 @@ public class jListView extends ListView {
 		return lines;
 	}	
 	
-	public String GetLeftItemCaption(String _fullItemCaption) {
+public String GetLeftItemCaption(String _fullItemCaption) {
 		
 		String line = _fullItemCaption;
 		String txt1 = "";
@@ -2369,18 +2370,18 @@ public class jListView extends ListView {
 		if (pos1 >= 0) {							   											    
 		    if ( pos1  !=  0) { 
 		     txt1 = line.substring(0, pos1);	
-		     String line1 =  line.substring(pos1+1, line.length());
+		     String line1 =  line.substring(pos1+leftDelimiter.length(), line.length());
 		     line = line1;
 		   }			 
 		   else {
-			 line =  line.substring(1, line.length());	
+			 line =  line.substring(leftDelimiter.length(), line.length());	
 		   }
 		}
 		                                   
 		int pos2 = line.lastIndexOf(rightDelimiter);  //searches right-to-left instead  //rightDelimiter ")"
 		if (pos2 > 0 ) {				
 			if (pos2 < line.length()) { 
-		   	   txt2 = line.substring(pos2+1, line.length());
+		   	   txt2 = line.substring(pos2+rightDelimiter.length(), line.length());
 			   String line2 = line.substring(0, pos2);				
 			   line = line2;				
 			}
@@ -2397,18 +2398,18 @@ public class jListView extends ListView {
 		if (pos1 >= 0) {							   											    
 		    if ( pos1  !=  0) { 
 		     txt1 = line.substring(0, pos1);	
-		     String line1 =  line.substring(pos1+1, line.length());
+		     String line1 =  line.substring(pos1+leftDelimiter.length(), line.length());
 		     line = line1;
 		   }			 
 		   else {
-			 line =  line.substring(1, line.length());	
+			 line =  line.substring(leftDelimiter.length(), line.length());	
 		   }
 		}
 		                                   
 		int pos2 = line.lastIndexOf(rightDelimiter);  //searches right-to-left instead  //rightDelimiter ")"
 		if (pos2 > 0 ) {				
 			if (pos2 < line.length()) { 
-		   	   txt2 = line.substring(pos2+1, line.length());
+		   	   txt2 = line.substring(pos2+rightDelimiter.length(), line.length());
 			   String line2 = line.substring(0, pos2);				
 			   line = line2;				
 			}
