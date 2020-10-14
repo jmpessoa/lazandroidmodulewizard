@@ -1196,7 +1196,8 @@ type
     procedure ShowMessage(msg: string); overload;
     procedure ShowMessage(_msg: string; _gravity: TGravity; _timeLength: TShowLength); overload;
     
-    function GetDateTime: String;
+    function GetDateTime: string; overload;
+    function GetDateTime( millisDateTime : int64 ) : string; overload; // By ADiV
     function GetBatteryPercent : integer; // BY ADiV
 
     function GetStringExtra(intentData: jObject; extraName: string): string;
@@ -3388,6 +3389,13 @@ begin
   Result := '';
   if not FInitialized then Exit;
   Result:= jForm_GetDateTime(FjEnv,FjObject);
+end;
+
+function jForm.GetDateTime( millisDateTime : int64 ) : string;
+begin
+  Result := '';
+  if not FInitialized then Exit;
+  Result := jni_func_j_out_t( FjEnv, FjObject, 'GetDateTime', millisDateTime);
 end;
 
 // BY ADiV
