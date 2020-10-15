@@ -1393,10 +1393,10 @@ begin
    if FjObject = nil then exit;
 
    jGLSurfaceView_setParent(FjEnv, FjObject , FjPRLayout);
-   jGLSurfaceView_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jGLSurfaceView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));

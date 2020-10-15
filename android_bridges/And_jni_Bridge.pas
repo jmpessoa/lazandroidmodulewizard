@@ -150,10 +150,6 @@ Procedure jTextView_addLParamsAnchorRule(env:PJNIEnv; TextView : jObject; rule: 
 
 Procedure jTextView_setLayoutAll(env:PJNIEnv; TextView : jObject; idAnchor: DWord);
 
-Procedure jTextView_setId(env:PJNIEnv; TextView : jObject; id: DWord);
-
-Procedure jTextView_setLeftTopRightBottomWidthHeight(env:PJNIEnv; TextView : jObject; ml,mt,mr,mb,w,h: integer);
-
 procedure jTextView_Append(env: PJNIEnv; _jtextview: JObject; _txt: string);
 procedure jTextView_AppendLn(env: PJNIEnv; _jtextview: JObject; _txt: string);
 
@@ -232,10 +228,6 @@ Procedure jEditText_setLParamHeight(env:PJNIEnv; EditText : jObject; h: DWord);
 Procedure jEditText_addLParamsParentRule(env:PJNIEnv; EditText : jObject; rule: DWord);
 Procedure jEditText_addLParamsAnchorRule(env:PJNIEnv; EditText : jObject; rule: DWord);
 Procedure jEditText_setLayoutAll(env:PJNIEnv; EditText : jObject; idAnchor: DWord);
-Procedure jEditText_setId(env:PJNIEnv; EditText : jObject; id: DWord);
-
-Procedure jEditText_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        EditText : jObject; ml,mt,mr,mb,w,h: integer);
 
 Procedure jEditText_setSingleLine(env:PJNIEnv; EditText : jObject; isSingle  : boolean);
 
@@ -297,8 +289,6 @@ procedure jEditText_SetSoftInputShownOnFocus(env: PJNIEnv; _jedittext: JObject; 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 Procedure jButton_Free(env:PJNIEnv; Button : jObject);
-Procedure jButton_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        Button : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jButton_setParent(env:PJNIEnv; Button : jObject;ViewGroup : jObject);
 Procedure jButton_setText(env:PJNIEnv; Button : jObject; Str : String);
 Function jButton_getText(env:PJNIEnv; Button : jObject) : String;
@@ -309,7 +299,6 @@ Procedure jButton_addLParamsAnchorRule(env:PJNIEnv; Button : jObject; rule: DWor
 Procedure jButton_setLayoutAll(env:PJNIEnv; Button : jObject;  idAnchor: DWord);
 Procedure jButton_setLParamWidth(env:PJNIEnv; Button : jObject; w: DWord);
 Procedure jButton_setLParamHeight(env:PJNIEnv; Button : jObject; h: DWord);
-Procedure jButton_setId(env:PJNIEnv; Button : jObject; id: DWord);
 Procedure jButton_setFocusable(env:PJNIEnv; Button : jObject; enabled: boolean);
 procedure jButton_SetFontSizeUnit(env: PJNIEnv; _jbutton: JObject; _unit: integer);
 procedure jButton_PerformClick(env: PJNIEnv; _jbutton: JObject);
@@ -342,11 +331,8 @@ Procedure jCheckBox_setTextSize(env:PJNIEnv; CheckBox : jObject; size : DWord);
 Function  jCheckBox_isChecked(env:PJNIEnv; CheckBox : jObject) : Boolean;
 Procedure jCheckBox_setChecked(env:PJNIEnv; CheckBox : jObject; value : Boolean);
 
-Procedure jCheckBox_setId(env:PJNIEnv;  CheckBox : jObject; id: DWord);
 Procedure jCheckBox_setLParamWidth(env:PJNIEnv; CheckBox : jObject; w: DWord);
 Procedure jCheckBox_setLParamHeight(env:PJNIEnv; CheckBox : jObject; h: DWord);
-Procedure jCheckBox_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        CheckBox : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jCheckBox_addLParamsParentRule(env:PJNIEnv; CheckBox : jObject; rule: DWord);
 Procedure jCheckBox_addLParamsAnchorRule(env:PJNIEnv; CheckBox : jObject; rule: DWord);
 Procedure jCheckBox_setLayoutAll(env:PJNIEnv; CheckBox : jObject;  idAnchor: DWord);
@@ -375,13 +361,8 @@ Procedure jRadioButton_setTextSize(env:PJNIEnv; RadioButton : jObject; size  : D
 Function  jRadioButton_isChecked(env:PJNIEnv; RadioButton : jObject) : Boolean;
 Procedure jRadioButton_setChecked(env:PJNIEnv; RadioButton : jObject; value : Boolean);
 
-Procedure jRadioButton_setId(env:PJNIEnv; RadioButton : jObject; id: DWord);
-
 Procedure jRadioButton_setLParamWidth(env:PJNIEnv; RadioButton : jObject; w: DWord);
 Procedure jRadioButton_setLParamHeight(env:PJNIEnv; RadioButton : jObject; h: DWord);
-
-Procedure jRadioButton_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        RadioButton : jObject; ml,mt,mr,mb,w,h: integer);
 
 Procedure jRadioButton_addLParamsParentRule(env:PJNIEnv; RadioButton : jObject; rule: DWord);
 Procedure jRadioButton_addLParamsAnchorRule(env:PJNIEnv; RadioButton : jObject; rule: DWord);
@@ -405,11 +386,8 @@ Function  jProgressBar_getProgress     (env:PJNIEnv; ProgressBar : jObject) : In
 Procedure jProgressBar_setProgress     (env:PJNIEnv; ProgressBar : jObject; value : integer);
 Procedure jProgressBar_setMax          (env:PJNIEnv; ProgressBar : jObject; value : integer);
 Function  jProgressBar_getMax          (env:PJNIEnv; ProgressBar : jObject) : Integer;
-Procedure jProgressBar_setId(env:PJNIEnv; ProgressBar : jObject; id: DWord);
 Procedure jProgressBar_setLParamWidth(env:PJNIEnv; ProgressBar : jObject; w: DWord);
 Procedure jProgressBar_setLParamHeight(env:PJNIEnv; ProgressBar : jObject; h: DWord);
-Procedure jProgressBar_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ProgressBar : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jProgressBar_addLParamsParentRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 Procedure jProgressBar_addLParamsAnchorRule(env:PJNIEnv; ProgressBar : jObject; rule: DWord);
 procedure jProgressBar_ClearLayoutAll(env: PJNIEnv; ProgressBar: JObject);
@@ -429,8 +407,6 @@ Procedure jImageView_setBitmapImage(env:PJNIEnv;
 Procedure jImageView_SetImageByResIdentifier(env:PJNIEnv; ImageView : jObject; _imageResIdentifier: string);
 Procedure jImageView_setLParamWidth(env:PJNIEnv; ImageView : jObject; w: DWord);
 Procedure jImageView_setLParamHeight(env:PJNIEnv; ImageView : jObject; h: DWord);
-Procedure jImageView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ImageView : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jImageView_addLParamsParentRule(env:PJNIEnv; ImageView : jObject; rule: DWord);
 Procedure jImageView_addLParamsAnchorRule(env:PJNIEnv; ImageView : jObject; rule: DWord);
 Procedure jImageView_setLayoutAll(env:PJNIEnv; ImageView : jObject;  idAnchor: DWord);
@@ -438,7 +414,6 @@ function jImageView_getLParamHeight(env:PJNIEnv; ImageView : jObject ): integer;
 function jImageView_getLParamWidth(env:PJNIEnv; ImageView : jObject): integer;
 function jImageView_GetBitmapHeight(env:PJNIEnv; ImageView : jObject ): integer;
 function jImageView_GetBitmapWidth(env:PJNIEnv; ImageView : jObject): integer;
-Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
 procedure jImageView_SetScaleType(env: PJNIEnv; _jimageview: JObject; _scaleType: integer);
 function jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
 procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
@@ -522,7 +497,6 @@ procedure jListView_SetEnableOnClickTextLeft(env:PJNIEnv; _jlistview : jObject; 
 procedure jListView_SetEnableOnClickTextCenter(env:PJNIEnv; _jlistview : jObject; _value : Boolean); // ty tr3e
 procedure jListView_SetEnableOnClickTextRight(env:PJNIEnv; _jlistview : jObject; _value : Boolean); // ty tr3e
 
-Procedure jListView_setId(env:PJNIEnv; ListView : jObject; id: DWord);
 Procedure jListView_setWidgetItem(env:PJNIEnv; ListView : jObject; value: integer);
 Procedure jListView_setWidgetItem2(env:PJNIEnv; ListView : jObject; value: integer; index: integer);
 Procedure jListView_setWidgetItem3(env:PJNIEnv; ListView : jObject; value: integer; txt: string; index: integer);
@@ -542,8 +516,6 @@ function jListView_GetItemText(env:PJNIEnv; ListView : jObject; index: integer):
 function jListView_GetCount(env:PJNIEnv; ListView : jObject): integer;
 Procedure jListView_setLParamWidth(env:PJNIEnv; ListView : jObject; w: DWord);
 Procedure jListView_setLParamHeight(env:PJNIEnv; ListView : jObject; h: DWord);
-Procedure jListView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ListView : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jListView_addLParamsParentRule(env:PJNIEnv; ListView : jObject; rule: DWord);
 Procedure jListView_addLParamsAnchorRule(env:PJNIEnv; ListView : jObject; rule: DWord);
 procedure jListView_ClearLayoutAll(env: PJNIEnv; ListView: JObject);
@@ -627,13 +599,8 @@ Procedure jScrollView_setScrollSize    (env:PJNIEnv;
 Function  jScrollView_getView          (env:PJNIEnv;
                                         ScrollView : jObject) : jObject;
 
-Procedure jScrollView_setId(env:PJNIEnv; ScrollView : jObject; id: DWord);
-
 Procedure jScrollView_setLParamWidth(env:PJNIEnv; ScrollView : jObject; w: DWord);
 Procedure jScrollView_setLParamHeight(env:PJNIEnv; ScrollView : jObject; h: DWord);
-
-Procedure jScrollView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ScrollView : jObject; ml,mt,mr,mb,w,h: integer);
 
 Procedure jScrollView_addLParamsParentRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jScrollView_addLParamsAnchorRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
@@ -676,11 +643,8 @@ Procedure jPanel_setParent        (env:PJNIEnv;
                                         Panel : jObject;ViewGroup : jObject);
 Function  jPanel_getView          (env:PJNIEnv;
                                         Panel : jObject) : jObject;
-Procedure jPanel_setId(env:PJNIEnv; Panel : jObject; id: DWord);
 Procedure jPanel_setLParamWidth(env:PJNIEnv; Panel : jObject; w: DWord);
 Procedure jPanel_setLParamHeight(env:PJNIEnv; Panel : jObject; h: DWord);
-Procedure jPanel_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        Panel : jObject; left,top,right,bottom,w,h: integer);
 Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject); //clearLayoutAll !!
 Procedure jPanel_addLParamsParentRule(env:PJNIEnv; Panel : jObject; rule: DWord);
 Procedure jPanel_addLParamsAnchorRule(env:PJNIEnv; Panel : jObject; rule: DWord);
@@ -724,13 +688,8 @@ Procedure jHorizontalScrollView_setScrollSize (env:PJNIEnv;
 Function  jHorizontalScrollView_getView       (env:PJNIEnv;
                                                ScrollView : jObject) : jObject;
 
-Procedure jHorizontalScrollView_setId(env:PJNIEnv; ScrollView : jObject; id: DWord);
-
 Procedure jHorizontalScrollView_setLParamWidth(env:PJNIEnv; ScrollView : jObject; w: DWord);
 Procedure jHorizontalScrollView_setLParamHeight(env:PJNIEnv; ScrollView : jObject; h: DWord);
-
-Procedure jHorizontalScrollView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ScrollView : jObject; ml,mt,mr,mb,w,h: integer);
 
 Procedure jHorizontalScrollView_addLParamsParentRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
 Procedure jHorizontalScrollView_addLParamsAnchorRule(env:PJNIEnv; ScrollView : jObject; rule: DWord);
@@ -776,11 +735,8 @@ Procedure jWebView_setJavaScript       (env:PJNIEnv;
                                         WebView : jObject; javascript : boolean);
 procedure jWebView_SetZoomControl(env: PJNIEnv; WebView: jObject; ZoomControl: Boolean);
 Procedure jWebView_loadURL(env:PJNIEnv; WebView : jObject; Str : String);
-Procedure jWebView_setId(env:PJNIEnv; WebView : jObject; id: DWord);
 Procedure jWebView_setLParamWidth(env:PJNIEnv; WebView : jObject; w: DWord);
 Procedure jWebView_setLParamHeight(env:PJNIEnv; WebView : jObject; h: DWord);
-Procedure jWebView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        WebView: jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jWebView_addLParamsParentRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 Procedure jWebView_addLParamsAnchorRule(env:PJNIEnv; WebView : jObject; rule: DWord);
 procedure jWebView_clearLayoutAll(env: PJNIEnv; WebView: JObject);
@@ -945,13 +901,10 @@ Procedure jGLSurfaceView_Refresh       (env:PJNIEnv; glView : jObject);
 Procedure jGLSurfaceView_deleteTexture (env:PJNIEnv; glView : jObject; id : Integer);
 Procedure jGLSurfaceView_getBmpArray   (env:PJNIEnv; this:jobject;filename: String);
 Procedure jGLSurfaceView_requestGLThread(env:PJNIEnv; glView : jObject);
-Procedure jGLSurfaceView_setId(env:PJNIEnv; GLSurfaceView : jObject; id: DWord);
 Procedure jGLSurfaceView_setLParamWidth(env:PJNIEnv; GLSurfaceView : jObject; w: DWord);
 Procedure jGLSurfaceView_setLParamHeight(env:PJNIEnv; GLSurfaceView : jObject; h: DWord);
 function jGLSurfaceView_getLParamHeight(env:PJNIEnv; GLSurfaceView : jObject): integer;
 function jGLSurfaceView_getLParamWidth(env:PJNIEnv; GLSurfaceView : jObject): integer;
-Procedure jGLSurfaceView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        GLSurfaceView : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jGLSurfaceView_addLParamsParentRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
 Procedure jGLSurfaceView_addLParamsAnchorRule(env:PJNIEnv; GLSurfaceView : jObject; rule: DWord);
 procedure jGLSurfaceView_ClearLayoutAll(env: PJNIEnv; GLSurfaceView: JObject);
@@ -972,11 +925,8 @@ Procedure jView_setjCanvas             (env:PJNIEnv;
                                         View : jObject;jCanv   : jObject);
 Procedure jView_viewSave               (env:PJNIEnv;
                                         View : jObject; Filename: String );
-Procedure jView_setId(env:PJNIEnv; View : jObject; id: DWord);
 Procedure jView_setLParamWidth(env:PJNIEnv; View : jObject; w: DWord);
 Procedure jView_setLParamHeight(env:PJNIEnv; View : jObject; h: DWord);
-Procedure jView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        View : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jView_addLParamsParentRule(env:PJNIEnv; View : jObject; rule: DWord);
 Procedure jView_addLParamsAnchorRule(env:PJNIEnv; View : jObject; rule: DWord);
 Procedure jView_setLayoutAll(env:PJNIEnv; View : jObject;  idAnchor: DWord);
@@ -1036,11 +986,8 @@ Procedure jImageBtn_setButtonUpByRes       (env:PJNIEnv;
                                         ImageBtn : jObject; imgResIdentifief: String);
 Procedure jImageBtn_SetEnabled         (env:PJNIEnv;
                                         ImageBtn : jObject; Active : Boolean);
-Procedure jImageBtn_setId(env:PJNIEnv; ImageBtn : jObject; id: DWord);
 Procedure jImageBtn_setLParamWidth(env:PJNIEnv; ImageBtn : jObject; w: DWord);
 Procedure jImageBtn_setLParamHeight(env:PJNIEnv; ImageBtn : jObject; h: DWord);
-Procedure jImageBtn_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ImageBtn : jObject; ml,mt,mr,mb,w,h: integer);
 Procedure jImageBtn_addLParamsParentRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 Procedure jImageBtn_addLParamsAnchorRule(env:PJNIEnv; ImageBtn : jObject; rule: DWord);
 procedure jImageBtn_ClearLayoutAll(env: PJNIEnv; _imagebtn: JObject);
@@ -1139,16 +1086,12 @@ procedure jDBListView_SetLParamWidth(env: PJNIEnv; _jdblistview: JObject; _w: in
 procedure jDBListView_SetLParamHeight(env: PJNIEnv; _jdblistview: JObject; _h: integer);
 procedure jDBListView_setLGravity(env: PJNIEnv; _jdblistview: JObject; _g: integer);
 procedure jDBListView_setLWeight(env: PJNIEnv; _jdblistview: JObject; _w: single);
-procedure jDBListView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv;
- _jdblistview: JObject; _left: integer; _top: integer; _right: integer;
- _bottom: integer; _w: integer; _h: integer);
 procedure jDBListView_AddLParamsAnchorRule(env: PJNIEnv; _jdblistview: JObject;
  _rule: integer);
 procedure jDBListView_AddLParamsParentRule(env: PJNIEnv; _jdblistview: JObject;
  _rule: integer);
 procedure jDBListView_SetLayoutAll(env: PJNIEnv; _jdblistview: JObject; _idAnchor: integer);
 procedure jDBListView_ClearLayoutAll(env: PJNIEnv; _jdblistview: JObject);
-procedure jDBListView_setId(env: PJNIEnv; _jdblistview: JObject; _id: integer);
 function jDBListView_GetItemIndex(env: PJNIEnv; _jdblistview: JObject): integer;
 function jDBListView_GetItemCaption(env: PJNIEnv; _jdblistview: JObject): string;
 procedure jDBListView_SetSelection(env: PJNIEnv; _jdblistview: JObject; _index: integer);
@@ -1529,24 +1472,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jTextView_setLeftTopRightBottomWidthHeight(env:PJNIEnv; TextView : jObject; ml,mt,mr,mb,w,h: integer);
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
-  cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, TextView);
- _jMethod:= env^.GetMethodID(env, cls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jTextView_setParent(env:PJNIEnv; TextView: jObject; ViewGroup : jObject);
  var
     cls: jClass;
@@ -1736,19 +1661,6 @@ begin
  _jParams[0].i := h;
  cls := env^.GetObjectClass(env, TextView);
   _jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
- env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jTextView_setId(env:PJNIEnv; TextView : jObject; id: DWord);
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, TextView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V'); //direct jni api
  env^.CallVoidMethodA(env,TextView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -2170,25 +2082,6 @@ begin
    env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jEditText_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        EditText : jObject; ml,mt,mr,mb,w,h: integer);
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
-  cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, EditText);
- _jMethod:= env^.GetMethodID(env, cls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env, EditText, _jMethod, @_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jEditText_setParent(env:PJNIEnv;
                               EditText : jObject;ViewGroup : jObject);
  var
@@ -2516,19 +2409,6 @@ begin
  _jParams[0].i := h;
   cls := env^.GetObjectClass(env, EditText);
 _jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
- env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jEditText_setId(env:PJNIEnv; EditText : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, EditText);
-_jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');  //direct jni api
  env^.CallVoidMethodA(env,EditText,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -3146,25 +3026,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jButton_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        Button : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
-  cls:= env^.GetObjectClass(env, Button);
- _jMethod:= env^.GetMethodID(env, cls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jButton_setParent(env:PJNIEnv;
                             Button : jObject;ViewGroup : jObject);
 var
@@ -3310,19 +3171,6 @@ begin
  _jParams[0].i := h;
   cls := env^.GetObjectClass(env, Button);
 _jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
- env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jButton_setId(env:PJNIEnv; Button : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := id;
- cls := env^.GetObjectClass(env, Button);
-  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');  //direct jni api
  env^.CallVoidMethodA(env,Button,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -3595,25 +3443,6 @@ begin
    env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jCheckBox_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        CheckBox : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
- begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, CheckBox);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,CheckBox,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jCheckBox_setParent(env:PJNIEnv;
                               CheckBox : jObject;ViewGroup : jObject);
  var
@@ -3716,19 +3545,6 @@ begin
   _jParams[0].f := size;
   cls := env^.GetObjectClass(env, CheckBox);
  _jMethod:= env^.GetMethodID(env, cls, 'SetTextSize', '(F)V');
- env^.CallVoidMethodA(env,CheckBox,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jCheckBox_setId(env:PJNIEnv;  CheckBox : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
-  _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, CheckBox);
- _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
  env^.CallVoidMethodA(env,CheckBox,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -3918,25 +3734,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jRadioButton_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        RadioButton : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
- _jParams[0].i:= ml;
- _jParams[1].i:= mt;
- _jParams[2].i:= mr;
- _jParams[3].i:= mb;
- _jParams[4].i:= w;
- _jParams[5].i:= h;
- cls := env^.GetObjectClass(env, RadioButton);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,RadioButton,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jRadioButton_setParent(env:PJNIEnv;
                               RadioButton : jObject;ViewGroup : jObject);
 var
@@ -4052,19 +3849,6 @@ begin
   _jParams[0].f := size;
   cls := env^.GetObjectClass(env, RadioButton);
   _jMethod:= env^.GetMethodID(env, cls, 'SetTextSize', '(F)V');
-  env^.CallVoidMethodA(env,RadioButton,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jRadioButton_setId(env:PJNIEnv; RadioButton : jObject; id: DWord);
-var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
-  cls: jClass;
-begin
-  _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, RadioButton);
-  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
   env^.CallVoidMethodA(env,RadioButton,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
 end;
@@ -4257,26 +4041,6 @@ begin
    env^.DeleteLocalRef(env, cls);
 end;
 
-
-Procedure jProgressBar_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ProgressBar : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
-  cls: jClass;
-begin
-  _jParams[0].i := ml;
-  _jParams[1].i := mt;
-  _jParams[2].i := mr;
-  _jParams[3].i := mb;
-  _jParams[4].i := w;
-  _jParams[5].i := h;
-  cls := env^.GetObjectClass(env, ProgressBar);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env,ProgressBar,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jProgressBar_setParent(env:PJNIEnv;
                                  ProgressBar : jObject;ViewGroup : jObject);
  var
@@ -4339,19 +4103,6 @@ begin
  cls:= env^.GetObjectClass(env, ProgressBar);
   _jMethod:= env^.GetMethodID(env, cls, 'getMax', '()I');
  Result:= env^.CallIntMethod(env,ProgressBar,_jMethod);
- env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jProgressBar_setId(env:PJNIEnv; ProgressBar : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
-  cls: jClass;
-begin
- _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, ProgressBar);
- _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
- env^.CallVoidMethodA(env,ProgressBar,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
 
@@ -4473,25 +4224,6 @@ begin
    env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jImageView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ImageView : jObject; ml,mt,mr,mb,w,h: integer);
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
-  cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls:= env^.GetObjectClass(env, ImageView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jImageView_setParent(env:PJNIEnv;
                                ImageView : jObject;ViewGroup : jObject);
 var
@@ -4548,19 +4280,6 @@ begin
   env^.DeleteLocalRef(env,_jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 end;
-
-Procedure jImageView_setId(env:PJNIEnv; ImageView : jObject; id: DWord);
- var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
-  cls: jClass;
- begin
-  _jParams[0].i := id;
-   cls := env^.GetObjectClass(env, ImageView);
- _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env,ImageView,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
- end;
 
 procedure jImageView_SetRotation(env: PJNIEnv; _jimageview: JObject; angle: integer);
 var
@@ -5217,25 +4936,6 @@ begin
    env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jListView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ListView : jObject; ml,mt,mr,mb,w,h: integer);
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls:= env^.GetObjectClass(env, ListView);
- _jMethod:= env^.GetMethodID(env, cls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jListView_setParent(env:PJNIEnv;
                               ListView : jObject;ViewGroup : jObject);
 var
@@ -5592,20 +5292,6 @@ begin
  cls := env^.GetObjectClass(env, ListView);
  _jMethod:= env^.GetMethodID(env, cls, 'GetFontSizeByIndex', '(I)I');
  Result:= env^.CallIntMethodA(env, ListView,_jMethod, @_jParams);
- env^.DeleteLocalRef(env, cls);
-end; 
-
-//by jmpessoa
-Procedure jListView_setId(env:PJNIEnv; ListView : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
-  cls: jClass;
-begin
- _jParams[0].i := id;
- cls := env^.GetObjectClass(env, ListView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
- env^.CallVoidMethodA(env,ListView,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
 
@@ -6679,25 +6365,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jScrollView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ScrollView : jObject; ml,mt,mr,mb,w,h: integer);
-Var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
-  cls := env^.GetObjectClass(env, ScrollView);
-_jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env,ScrollView,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jScrollView_setParent(env:PJNIEnv;
                                 ScrollView : jObject;ViewGroup : jObject);
  var
@@ -6737,20 +6404,6 @@ Function jScrollView_getView(env:PJNIEnv;
    cls := env^.GetObjectClass(env, ScrollView);
  _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/view/ViewGroup;'); //Landroid/widget/RelativeLayout;
   Result := env^.CallObjectMethod(env,ScrollView,_jMethod);
-  env^.DeleteLocalRef(env, cls);
- end;
-
-//by jmpessoa
-Procedure jScrollView_setId(env:PJNIEnv; ScrollView : jObject; id: DWord);
- var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
-  cls: jClass;
- begin
-  _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, ScrollView);
-   _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env,ScrollView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
  end;
 
@@ -7241,26 +6894,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-//by jmpessoa
-Procedure jPanel_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        Panel : jObject; left,top,right,bottom,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := left;
- _jParams[1].i := top;
- _jParams[2].i := right;
- _jParams[3].i := bottom;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, Panel);
-_jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,Panel,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jPanel_setParent(env:PJNIEnv;
                                 Panel : jObject;ViewGroup : jObject);
 var
@@ -7287,20 +6920,6 @@ var
   Result := env^.CallObjectMethod(env,Panel,_jMethod);
   env^.DeleteLocalRef(env, cls);
  end;
-
-//by jmpessoa
-Procedure jPanel_setId(env:PJNIEnv; Panel : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := id;
- cls := env^.GetObjectClass(env, Panel);
-_jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
- env^.CallVoidMethodA(env,Panel,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
 
 //by jmpessoa
 Procedure jPanel_setLParamWidth(env:PJNIEnv; Panel : jObject; w: DWord);
@@ -7711,26 +7330,6 @@ begin
    env^.DeleteGlobalRef(env,ScrollView);
    env^.DeleteLocalRef(env, cls);
 end;
-//
-
-Procedure jHorizontalScrollView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ScrollView : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, ScrollView);
-_jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,ScrollView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
 
 //
 Procedure jHorizontalScrollView_setParent(env:PJNIEnv;
@@ -7772,20 +7371,6 @@ var
   cls := env^.GetObjectClass(env, ScrollView);
  _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/view/ViewGroup;'); //Landroid/widget/RelativeLayout;
   Result := env^.CallObjectMethod(env,ScrollView,_jMethod);
-  env^.DeleteLocalRef(env, cls);
- end;
-
-//by jmpessoa
-Procedure jHorizontalScrollView_setId(env:PJNIEnv; ScrollView : jObject; id: DWord);
-var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
-  cls: jClass;
- begin
-  _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, ScrollView);
- _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env,ScrollView,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
  end;
 
@@ -8269,25 +7854,6 @@ begin
    env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jWebView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        WebView : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, WebView);
-_jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,WebView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jWebView_setParent(env:PJNIEnv;
                              WebView : jObject;ViewGroup : jObject);
 var
@@ -8422,20 +7988,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GoForward', '()V');
   env^.CallVoidMethod(env, _jwebview, jMethod);
   env^.DeleteLocalRef(env, jCls);
-end;
-
-//by jmpessoa
-Procedure jWebView_setId(env:PJNIEnv; WebView : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := id;
- cls := env^.GetObjectClass(env, WebView);
-_jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
- env^.CallVoidMethodA(env,WebView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
 end;
 
 Procedure jWebView_setLParamWidth(env:PJNIEnv; WebView : jObject; w: DWord);
@@ -10169,25 +9721,6 @@ begin
   end;
 end;
 
-Procedure jGLSurfaceView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        GLSurfaceView : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
-   cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, GLSurfaceView);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,GLSurfaceView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jGLSurfaceView_setParent(env:PJNIEnv;
                                    GLSurfaceView : jObject;ViewGroup : jObject);
  var
@@ -10282,19 +9815,6 @@ begin
    _jMethod:= env^.GetMethodID(env, cls, 'glThread', '()V');
   env^.CallVoidMethod(env,glView,_jMethod);
   env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jGLSurfaceView_setId(env:PJNIEnv; GLSurfaceView : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := id;
- cls := env^.GetObjectClass(env, GLSurfaceView);
-  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
- env^.CallVoidMethodA(env,GLSurfaceView,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
 end;
 
 Procedure jGLSurfaceView_setLParamWidth(env:PJNIEnv; GLSurfaceView : jObject; w: DWord);
@@ -10511,24 +10031,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'getLParamWidth', '()I');
  env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jView_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        View : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := ml;
- _jParams[1].i := mt;
- _jParams[2].i := mr;
- _jParams[3].i := mb;
- _jParams[4].i := w;
- _jParams[5].i := h;
- cls := env^.GetObjectClass(env, View);
- _jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
 //
 Procedure jView_setParent(env:PJNIEnv;
                           View : jObject;ViewGroup : jObject);
@@ -10571,19 +10073,6 @@ begin
  _jMethod:= env^.GetMethodID(env, cls, 'saveView', '(Ljava/lang/String;)V');
  env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
  env^.DeleteLocalRef(env,_jParams[0].l);
- env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jView_setId(env:PJNIEnv; View : jObject; id: DWord);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
- cls: jClass;
-begin
- _jParams[0].i := id;
- cls := env^.GetObjectClass(env, View);
-  _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
- env^.CallVoidMethodA(env,View,_jMethod,@_jParams);
  env^.DeleteLocalRef(env, cls);
 end;
 
@@ -11033,25 +10522,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jImageBtn_setLeftTopRightBottomWidthHeight(env:PJNIEnv;
-                                        ImageBtn : jObject; ml,mt,mr,mb,w,h: integer);
-var
- _jMethod : jMethodID = nil;
- _jParams : array[0..5] of jValue;
- cls: jClass;
-begin
-  _jParams[0].i := ml;
-  _jParams[1].i := mt;
-  _jParams[2].i := mr;
-  _jParams[3].i := mb;
-  _jParams[4].i := w;
-  _jParams[5].i := h;
- cls := env^.GetObjectClass(env, ImageBtn);
-_jMethod:= env^.GetMethodID(env, cls, 'setLeftTopRightBottomWidthHeight', '(IIIIII)V');
- env^.CallVoidMethodA(env,ImageBtn,_jMethod,@_jParams);
- env^.DeleteLocalRef(env, cls);
-end;
-
 Procedure jImageBtn_setParent(env:PJNIEnv;
                                ImageBtn : jObject;ViewGroup : jObject);
 var
@@ -11154,19 +10624,6 @@ var
   _jParams[0].z := JBool(Active);
   cls := env^.GetObjectClass(env, ImageBtn);
  _jMethod:= env^.GetMethodID(env, cls, 'setEnabled', '(Z)V');
-  env^.CallVoidMethodA(env,ImageBtn,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
- end; 
-
-Procedure jImageBtn_setId(env:PJNIEnv; ImageBtn : jObject; id: DWord);
- var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
-  cls: jClass;
- begin
-  _jParams[0].i := id;
-  cls := env^.GetObjectClass(env, ImageBtn);
- _jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
   env^.CallVoidMethodA(env,ImageBtn,_jMethod,@_jParams);
   env^.DeleteLocalRef(env, cls);
  end;
@@ -12381,27 +11838,6 @@ end;
    end;
 
 
-   procedure jDBListView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv;
-     _jdblistview: JObject; _left: integer; _top: integer; _right: integer;
-     _bottom: integer; _w: integer; _h: integer);
-   var
-     jParams: array[0..5] of jValue;
-     jMethod: jMethodID = nil;
-     jCls: jClass = nil;
-   begin
-     jParams[0].i := _left;
-     jParams[1].i := _top;
-     jParams[2].i := _right;
-     jParams[3].i := _bottom;
-     jParams[4].i := _w;
-     jParams[5].i := _h;
-     jCls := env^.GetObjectClass(env, _jdblistview);
-     jMethod := env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
-     env^.DeleteLocalRef(env, jCls);
-   end;
-
-
    procedure jDBListView_AddLParamsAnchorRule(env: PJNIEnv; _jdblistview: JObject;
      _rule: integer);
    var
@@ -12454,20 +11890,6 @@ end;
      jCls := env^.GetObjectClass(env, _jdblistview);
      jMethod := env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
      env^.CallVoidMethod(env, _jdblistview, jMethod);
-     env^.DeleteLocalRef(env, jCls);
-   end;
-
-
-   procedure jDBListView_setId(env: PJNIEnv; _jdblistview: JObject; _id: integer);
-   var
-     jParams: array[0..0] of jValue;
-     jMethod: jMethodID = nil;
-     jCls: jClass = nil;
-   begin
-     jParams[0].i := _id;
-     jCls := env^.GetObjectClass(env, _jdblistview);
-     jMethod := env^.GetMethodID(env, jCls, 'setId', '(I)V');
-     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
      env^.DeleteLocalRef(env, jCls);
    end;
 

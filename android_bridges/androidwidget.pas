@@ -1908,8 +1908,9 @@ Procedure View_SetVisible             (env:PJNIEnv;this:jobject; view : jObject;
 Procedure View_SetVisible             (env:PJNIEnv; view: jObject; visible : Boolean); overload;
 function  View_GetVisible             (env:PJNIEnv; view: jObject): boolean;
 
-Procedure View_SetId                  (env:PJNIEnv;this:jobject; view : jObject; Id: DWord); overload;
-Procedure View_SetId                  (env:PJNIEnv; view : jObject; Id :DWord); overload;
+procedure View_SetId                  (env:PJNIEnv; view : jObject; Id :DWord);
+
+procedure View_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jobject: JObject; _left, _top, _right, _bottom, _width, _height: integer);
 
 Procedure View_SetBackGroundColor     (env:PJNIEnv;this:jobject; view : jObject; color : DWord);  overload;
 Procedure View_SetBackGroundColor     (env:PJNIEnv;view : jObject; color : DWord);  overload;
@@ -2032,7 +2033,6 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure jni_proc_if(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer; _float:single);
   procedure jni_proc_iff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer; _float0, _float1:single);
   procedure jni_proc_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: int64);
-  procedure jni_proc_iiiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2, _int3, _int4, _int5, _int6: integer);
   procedure jni_proc_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string);
   procedure jni_proc_ti(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0: integer);
   procedure jni_proc_tj(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64);
@@ -8059,18 +8059,23 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-
-Procedure View_SetId(env:PJNIEnv; this:jobject; view : jObject; Id : DWord);
+procedure View_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jobject: JObject;
+                          _left, _top, _right, _bottom, _width, _height: integer);
 var
-  method: jmethodID;
-  _jParams : array[0..1] of jValue;
-    cls: jClass;
+  jParams: array[0..5] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
-  _jParams[0].l := view;
- _jParams[1].i := Id;
-  cls:= Get_gjClass(env);
-  method:= env^.GetMethodID(env, cls, 'view_SetId', '(Landroid/view/View;I)V');
-  env^.CallVoidMethodA(env, this, method, @_jParams);
+  jParams[0].i:= _left;
+  jParams[1].i:= _top;
+  jParams[2].i:= _right;
+  jParams[3].i:= _bottom;
+  jParams[4].i:= _width;
+  jParams[5].i:= _height;
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 
@@ -8783,25 +8788,6 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(J)V');
 
-  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jni_proc_iiiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
-                          _int1, _int2, _int3, _int4, _int5, _int6: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _int1;
-  jParams[1].i:= _int2;
-  jParams[2].i:= _int3;
-  jParams[3].i:= _int4;
-  jParams[4].i:= _int5;
-  jParams[5].i:= _int6;
-  jCls:= env^.GetObjectClass(env, _jobject);
-  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IIIIII)V');
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
