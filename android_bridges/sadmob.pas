@@ -156,7 +156,7 @@ begin
    jni_proc_i(FjEnv, FjObject, 'setId', FId);
   end;
 
-  jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
                     FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                     sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
                     sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
@@ -364,7 +364,7 @@ procedure jsAdMob.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight', _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsAdMob.AddLParamsAnchorRule(_rule: integer);

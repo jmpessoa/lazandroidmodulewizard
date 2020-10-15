@@ -1590,6 +1590,8 @@ type
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetFontFace(AValue: TFontFace);
 
+    procedure SetItemLayout( _itemLayout : TItemLayout); // by ADiV
+    procedure SetTextAlign( _textAlign : TTextAlign);    // by ADiV
   protected
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickImageItem(Obj: TObject; index: integer ); // by ADiV
@@ -1744,9 +1746,9 @@ type
     property Delimiter: string read FDelimiter write FDelimiter;
     property TextColorInfo: TARGBColorBridge read FTextColorInfo write SetTextColorInfo; // by ADiV
     property TextDecorated: TTextDecorated read FTextDecorated write FTextDecorated;
-    property ItemLayout: TItemLayout read FItemLayout write FItemLayout;
+    property ItemLayout: TItemLayout read FItemLayout write SetItemLayout;
     property TextSizeDecorated: TTextSizeDecorated read FTextSizeDecorated write FTextSizeDecorated;
-    property TextAlign: TTextAlign read FTextAlign write FTextAlign;
+    property TextAlign: TTextAlign read FTextAlign write SetTextAlign;
     property TextPosition: TTextPosition read FTextPosition write FTextPosition; // by ADiV
     property TextWordWrap: boolean read FTextWordWrap write SetTextWordWrap; // by ADiV
     property EnableOnClickTextLeft: boolean read FEnableOnClickTextLeft write SetEnableOnClickTextLeft; // by ADiV
@@ -4201,10 +4203,10 @@ begin
 
    jTextView_setParent(FjEnv, FjObject , FjPRLayout);
 
-   jTextView_setId(FjEnv, FjObject, Self.Id);
+   View_setId(FjEnv, FjObject, Self.Id);
   end;
 
-  jTextView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -4698,10 +4700,10 @@ begin
 
    jEditText_setParent(FjEnv, FjObject , FjPRLayout);
 
-   jEditText_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jEditText_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -5433,11 +5435,11 @@ begin
 
    jButton_setParent(FjEnv, FjObject , FjPRLayout);
 
-   jButton_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
 
-  jButton_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -5784,10 +5786,10 @@ begin
      jCheckBox_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
    jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
-   jCheckBox_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jCheckBox_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -6051,10 +6053,10 @@ begin
     jRadioButton_setParent2(FjEnv, FjObject , FjPRLayout);
    end;
 
-   jRadioButton_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jRadioButton_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -6309,10 +6311,10 @@ begin
      jProgressBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
    jProgressBar_setParent(FjEnv, FjObject , FjPRLayout);
-   jProgressBar_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jProgressBar_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -6547,10 +6549,10 @@ begin
      jImageView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
    jImageView_setParent(FjEnv,FjObject , FjPRLayout);
-   jImageView_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jImageView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -8258,10 +8260,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    jListView_setParent(FjEnv, FjObject , FjPRLayout);
-   jListView_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -8842,6 +8844,22 @@ begin
    jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
 end;
 
+procedure jListView.SetItemLayout( _itemLayout : TItemLayout);
+begin
+ FItemLayout := _itemLayout;
+
+ if FInitialized then
+  jni_proc_i( FjEnv, FjObject, 'SetItemLayout', Ord(FItemLayout));
+end;
+
+procedure jListView.SetTextAlign( _textAlign : TTextAlign);
+begin
+ FTextAlign := _textAlign;
+
+ if FInitialized then
+  jni_proc_i( FjEnv, FjObject, 'SetTextAlign', Ord(FTextAlign));
+end;
+
 function jListView.GetWidgetText(_index: integer): string;
 begin
   //in designing component state: result value here...
@@ -9300,10 +9318,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
-   jScrollView_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jScrollView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -9693,10 +9711,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
-   jHorizontalScrollView_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jHorizontalScrollView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -10072,10 +10090,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    jWebView_setParent(FjEnv, FjObject , FjPRLayout);
-   jWebView_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jWebView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -11519,10 +11537,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
    jView_setParent(FjEnv,FjObject , FjPRLayout);
 
-   jView_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -12058,10 +12076,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
-   jImageBtn_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jImageBtn_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -13301,14 +13319,14 @@ begin
 
     FjPRLayoutHome:= FjPRLayout;
     jPanel_setParent(FjEnv, FjObject , FjPRLayout);
-    jPanel_setId(FjEnv, FjObject, Self.Id);
+    View_setId(FjEnv, FjObject, Self.Id);
 
   end;
 
   FWidth  := sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight );
   FHeight := sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom );
 
-  jPanel_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            FWidth, FHeight);
 
@@ -13802,10 +13820,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jDBListView_setId(FjEnv, FjObject, Self.Id);
+   View_setId(FjEnv, FjObject, Self.Id);
   end;
 
-  jDBListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -14043,8 +14061,7 @@ procedure jDBListView.SetLeftTopRightBottomWidthHeight(_left: integer;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
-      _left, _top, _right, _bottom, _w, _h);
+    View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left, _top, _right, _bottom, _w, _h);
 end;
 
 procedure jDBListView.AddLParamsAnchorRule(_rule: integer);

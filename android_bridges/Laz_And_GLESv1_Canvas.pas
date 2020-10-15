@@ -778,10 +778,10 @@ begin
    inherited Init(refApp);
    FjObject  := jGLSurfaceView_Create1(FjEnv, FjThis, Self, cjOpenGLESv1);
    jGLSurfaceView_setParent(FjEnv, FjObject , FjPRLayout);
-   jGLSurfaceView_setId(FjEnv, FjObject , Self.Id);
+   View_setId(FjEnv, FjObject , Self.Id);
   end;
 
-  jni_proc_iiiiii(FjEnv, FjObject, 'setLeftTopRightBottomWidthHeight',
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
                   FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                   sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
                   sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));

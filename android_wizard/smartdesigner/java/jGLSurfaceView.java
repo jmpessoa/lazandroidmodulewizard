@@ -88,7 +88,7 @@ public class jGLSurfaceView extends GLSurfaceView {
 	}
 
 
-	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		marginLeft = _left;
 		marginTop = _top;
 		marginRight = _right;

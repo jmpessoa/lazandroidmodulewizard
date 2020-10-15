@@ -305,7 +305,7 @@ public class jImageBtn extends ImageView {
 		LAMWCommon.removeFromViewParent();
 	}
 
-	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 		

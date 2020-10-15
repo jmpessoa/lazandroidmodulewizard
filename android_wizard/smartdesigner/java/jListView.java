@@ -1757,6 +1757,18 @@ public class jListView extends ListView {
    }
 	
 	// by ADiV
+	public void SetItemLayout( int _itemlayout ){
+		itemLayout = _itemlayout;
+		aadapter.notifyDataSetChanged();
+	}
+	
+	// by ADiV
+	public void SetTextAlign( int _textAlign ){
+		textAlign = _textAlign;
+		aadapter.notifyDataSetChanged();
+	}
+	
+	// by ADiV
 	public void DisableScroll( boolean _disable ){
 		mDisableScroll = _disable;
 	}

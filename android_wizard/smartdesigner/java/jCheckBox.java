@@ -39,7 +39,7 @@ public class jCheckBox extends CheckBox {
 		setOnClickListener(onClickListener);
 	}
 
-	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		String tag = ""+left+"|"+top+"|"+right+"|"+bottom;
 		this.setTag(tag); //nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);

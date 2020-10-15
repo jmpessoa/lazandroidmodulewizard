@@ -141,7 +141,7 @@ begin
    jni_proc_i(FjEnv, FjObject, 'setId', Self.Id);
   end;
 
-  jni_proc_iiiiii(FjEnv, FjObject, 'SetLeftTopRightBottomWidthHeight',
+  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
                   FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                   sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                   sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
