@@ -1590,6 +1590,8 @@ type
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetFontFace(AValue: TFontFace);
 
+    procedure SetItemLayout( _itemLayout : TItemLayout); // by ADiV
+    procedure SetTextAlign( _textAlign : TTextAlign);    // by ADiV
   protected
     procedure GenEvent_OnClickWidgetItem(Obj: TObject; index: integer; checked: boolean);
     procedure GenEvent_OnClickImageItem(Obj: TObject; index: integer ); // by ADiV
@@ -1744,9 +1746,9 @@ type
     property Delimiter: string read FDelimiter write FDelimiter;
     property TextColorInfo: TARGBColorBridge read FTextColorInfo write SetTextColorInfo; // by ADiV
     property TextDecorated: TTextDecorated read FTextDecorated write FTextDecorated;
-    property ItemLayout: TItemLayout read FItemLayout write FItemLayout;
+    property ItemLayout: TItemLayout read FItemLayout write SetItemLayout;
     property TextSizeDecorated: TTextSizeDecorated read FTextSizeDecorated write FTextSizeDecorated;
-    property TextAlign: TTextAlign read FTextAlign write FTextAlign;
+    property TextAlign: TTextAlign read FTextAlign write SetTextAlign;
     property TextPosition: TTextPosition read FTextPosition write FTextPosition; // by ADiV
     property TextWordWrap: boolean read FTextWordWrap write SetTextWordWrap; // by ADiV
     property EnableOnClickTextLeft: boolean read FEnableOnClickTextLeft write SetEnableOnClickTextLeft; // by ADiV
@@ -8840,6 +8842,22 @@ begin
  FFontFace:= AValue;
  if(FInitialized) then
    jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
+end;
+
+procedure jListView.SetItemLayout( _itemLayout : TItemLayout);
+begin
+ FItemLayout := _itemLayout;
+
+ if FInitialized then
+  jni_proc_i( FjEnv, FjObject, 'SetItemLayout', Ord(FItemLayout));
+end;
+
+procedure jListView.SetTextAlign( _textAlign : TTextAlign);
+begin
+ FTextAlign := _textAlign;
+
+ if FInitialized then
+  jni_proc_i( FjEnv, FjObject, 'SetTextAlign', Ord(FTextAlign));
 end;
 
 function jListView.GetWidgetText(_index: integer): string;
