@@ -56,7 +56,13 @@ jSeekBar = class(jVisualControl)
     procedure SetRotation(_rotation: single);
     procedure SetLGravity(_value: TLayoutGravity);
 
-    procedure SetColors( colorBar, colorFinger : TARGBColorBridge );
+    procedure SetScale( _scaleX, _scaleY : single ); // by ADiV
+    procedure SetThumbDrawable( _strDrawable : String ); // by ADiV
+    procedure SetThumbBitmap( _bitmap : jObject; _width, _height : integer ); overload; // by ADiV
+    procedure SetThumbBitmap( _bitmap : jObject ); overload; // by ADiV
+    procedure SetThumbBitmapByRes( _strBitmap : String; _width, _height : integer ); overload; // by ADiV
+    procedure SetThumbBitmapByRes( _strBitmap : String ); overload; // by ADiV
+    procedure SetColors( colorBar, colorFinger : TARGBColorBridge ); // by ADiV
 
     procedure GenEvent_OnSeekBarProgressChanged(Obj: TObject; progress: integer; fromUser: boolean);
     procedure GenEvent_OnSeekBarStartTrackingTouch(Obj: TObject; progress: integer);
@@ -77,23 +83,8 @@ jSeekBar = class(jVisualControl)
 end;
 
 function jSeekBar_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jSeekBar_jFree(env: PJNIEnv; _jseekbar: JObject);
 procedure jSeekBar_SetViewParent(env: PJNIEnv; _jseekbar: JObject; _viewgroup: jObject);
-procedure jSeekBar_RemoveFromViewParent(env: PJNIEnv; _jseekbar: JObject);
 function jSeekBar_GetView(env: PJNIEnv; _jseekbar: JObject): jObject;
-procedure jSeekBar_SetLParamWidth(env: PJNIEnv; _jseekbar: JObject; _w: integer);
-procedure jSeekBar_SetLParamHeight(env: PJNIEnv; _jseekbar: JObject; _h: integer);
-procedure jSeekBar_AddLParamsAnchorRule(env: PJNIEnv; _jseekbar: JObject; _rule: integer);
-procedure jSeekBar_AddLParamsParentRule(env: PJNIEnv; _jseekbar: JObject; _rule: integer);
-procedure jSeekBar_SetLayoutAll(env: PJNIEnv; _jseekbar: JObject; _idAnchor: integer);
-procedure jSeekBar_ClearLayoutAll(env: PJNIEnv; _jseekbar: JObject);
-procedure jSeekBar_SetId(env: PJNIEnv; _jseekbar: JObject; _id: integer);
-procedure jSeekBar_SetMax(env: PJNIEnv; _jseekbar: JObject; _maxProgress: integer);
-procedure jSeekBar_SetProgress(env: PJNIEnv; _jseekbar: JObject; _progress: integer);
-function jSeekBar_GetProgress(env: PJNIEnv; _jseekbar: JObject): integer;
-procedure jSeekBar_SetRotation(env: PJNIEnv; _jseekbar: JObject; _rotation: single);
-procedure jSeekBar_SetFrameGravity(env: PJNIEnv; _jseekbar: JObject; _value: integer);
-
 
 implementation
 
@@ -151,10 +142,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jSeekBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    SetLGravity(FGravityInParent);
 
    jSeekBar_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jSeekBar_SetId(FjEnv, FjObject, Self.Id);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
@@ -163,24 +154,18 @@ begin
                   sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-      jSeekBar_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
+      AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
+
   for rToP := rpBottom to rpCenterVertical do
-  begin
     if rToP in FPositionRelativeToParent then
-    begin
-      jSeekBar_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
-    end;
-  end;
+      AddLParamsParentRule(GetPositionRelativeToParent(rToP));
+
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jSeekBar_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  SetLayoutAll(Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -189,7 +174,7 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FMax <> 100  then
-     jSeekBar_SetMax(FjEnv, FjObject, FMax);
+     SetMax(FMax);
 
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
@@ -251,7 +236,7 @@ procedure jSeekBar.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSeekBar_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jSeekBar.SetViewParent(_viewgroup: jObject);
@@ -265,7 +250,7 @@ procedure jSeekBar.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSeekBar_RemoveFromViewParent(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
 end;
 
 function jSeekBar.GetView(): jObject;
@@ -279,14 +264,14 @@ procedure jSeekBar.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSeekBar_SetLParamWidth(FjEnv, FjObject, _w);
+     jni_proc_i(FjEnv, FjObject, 'SetLParamWidth', _w);
 end;
 
 procedure jSeekBar.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSeekBar_SetLParamHeight(FjEnv, FjObject, _h);
+     jni_proc_i(FjEnv, FjObject, 'SetLParamHeight', _h);
 end;
 
 procedure jSeekBar.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -299,22 +284,22 @@ end;
 procedure jSeekBar.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jSeekBar_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
 end;
 
 procedure jSeekBar.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jSeekBar_AddLParamsParentRule(FjEnv, FjObject, _rule);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
 end;
 
 procedure jSeekBar.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jSeekBar_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
 end;
 
 procedure jSeekBar.ClearLayout();
@@ -325,15 +310,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jSeekBar_clearLayoutAll(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ClearLayoutAll');
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jSeekBar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          AddLParamsParentRule(GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jSeekBar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -342,7 +327,7 @@ begin
   //in designing component state: set value here...
   FMax:= _maxProgress;
   if FInitialized then
-     jSeekBar_SetMax(FjEnv, FjObject, _maxProgress);
+     jni_proc_i(FjEnv, FjObject, 'SetMax', _maxProgress);
 end;
 
 procedure jSeekBar.SetProgress(_progress: integer);
@@ -350,7 +335,7 @@ begin
   //in designing component state: set value here...
   FProgress:=  _progress;
   if FInitialized then
-     jSeekBar_SetProgress(FjEnv, FjObject, _progress);
+     jni_proc_i(FjEnv, FjObject, 'SetProgress', _progress);
 end;
 
 function jSeekBar.GetProgress(): integer;
@@ -358,22 +343,58 @@ begin
   //in designing component state: result value here...
   Result:= FProgress;
   if FInitialized then
-    Result:= jSeekBar_GetProgress(FjEnv, FjObject);
+    Result:= jni_func_out_i(FjEnv, FjObject, 'GetProgress');
 end;
 
 procedure jSeekBar.SetRotation(_rotation: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSeekBar_SetRotation(FjEnv, FjObject, _rotation);
+     jni_proc_f(FjEnv, FjObject, 'SetRotation', _rotation);
 end;
 
 procedure jSeekBar.SetLGravity(_value: TLayoutGravity);
 begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
+  if FjObject <> nil then
+     jni_proc_i(FjEnv, FjObject, 'SetLGravity', Ord(FGravityInParent));
+end;
+
+procedure jSeekBar.SetScale( _scaleX, _scaleY : single ); // by ADiV
+begin
   if FInitialized then
-     jSeekBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+   jni_proc_ff( FjEnv, FjObject, 'SetScale', _scaleX, _scaleY);
+end;
+
+procedure jSeekBar.SetThumbDrawable( _strDrawable : String ); // by ADiV
+begin
+  if FInitialized then
+   jni_proc_t( FjEnv, FjObject, 'SetThumbDrawable', _strDrawable);
+end;
+
+procedure jSeekBar.SetThumbBitmap( _bitmap : jObject; _width, _height : integer ); // by ADiV
+begin
+  if FInitialized then
+   jni_proc_bmp_ii( FjEnv, FjObject, 'SetThumbBitmap', _bitmap, _width, _height);
+end;
+
+procedure jSeekBar.SetThumbBitmap( _bitmap : jObject ); // by ADiV
+begin
+  if FInitialized then
+   jni_proc_bmp( FjEnv, FjObject, 'SetThumbBitmap', _bitmap);
+end;
+
+procedure jSeekBar.SetThumbBitmapByRes( _strBitmap : String; _width, _height : integer ); // by ADiV
+begin
+ if FInitialized then
+   jni_proc_tii( FjEnv, FjObject, 'SetThumbBitmapByRes', _strBitmap, _width, _height);
+end;
+
+procedure jSeekBar.SetThumbBitmapByRes( _strBitmap : String ); // by ADiV
+begin
+  if FInitialized then
+   jni_proc_t( FjEnv, FjObject, 'SetThumbBitmapByRes', _strBitmap);
 end;
 
 procedure jSeekBar.GenEvent_OnSeekBarProgressChanged(Obj: TObject; progress: integer; fromUser: boolean);
@@ -417,18 +438,6 @@ end;
 *)
 
 
-procedure jSeekBar_jFree(env: PJNIEnv; _jseekbar: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jseekbar, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
 procedure jSeekBar_SetViewParent(env: PJNIEnv; _jseekbar: JObject; _viewgroup: jObject);
 var
   jParams: array[0..0] of jValue;
@@ -443,18 +452,6 @@ begin
 end;
 
 
-procedure jSeekBar_RemoveFromViewParent(env: PJNIEnv; _jseekbar: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jseekbar, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
 function jSeekBar_GetView(env: PJNIEnv; _jseekbar: JObject): jObject;
 var
   jMethod: jMethodID=nil;
@@ -463,167 +460,6 @@ begin
   jCls:= env^.GetObjectClass(env, _jseekbar);
   jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
   Result:= env^.CallObjectMethod(env, _jseekbar, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSeekBar_SetLParamWidth(env: PJNIEnv; _jseekbar: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSeekBar_SetLParamHeight(env: PJNIEnv; _jseekbar: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jSeekBar_AddLParamsAnchorRule(env: PJNIEnv; _jseekbar: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSeekBar_AddLParamsParentRule(env: PJNIEnv; _jseekbar: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSeekBar_SetLayoutAll(env: PJNIEnv; _jseekbar: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSeekBar_ClearLayoutAll(env: PJNIEnv; _jseekbar: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jseekbar, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSeekBar_SetId(env: PJNIEnv; _jseekbar: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSeekBar_SetMax(env: PJNIEnv; _jseekbar: JObject; _maxProgress: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _maxProgress;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetMax', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSeekBar_SetProgress(env: PJNIEnv; _jseekbar: JObject; _progress: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _progress;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetProgress', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jSeekBar_GetProgress(env: PJNIEnv; _jseekbar: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetProgress', '()I');
-  Result:= env^.CallIntMethod(env, _jseekbar, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jSeekBar_SetRotation(env: PJNIEnv; _jseekbar: JObject; _rotation: single);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _rotation;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetRotation', '(F)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jSeekBar_SetFrameGravity(env: PJNIEnv; _jseekbar: JObject; _value: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _value;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
