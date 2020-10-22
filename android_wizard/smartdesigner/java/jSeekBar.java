@@ -10,6 +10,14 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.view.Gravity;
 import android.graphics.PorterDuff.Mode.*;
+
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
+
 //import android.graphics.BlendMode;
 
 /*Draft java code by "Lazarus Android Module Wizard" [7/8/2015 22:55:27]*/
@@ -73,8 +81,9 @@ public class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object 
         };
 
         setOnSeekBarChangeListener(onSeekBarChangeListener);
+        
     } //end constructor
-
+    
     public void jFree() {
         //free local objects...
         setOnClickListener(null);
@@ -95,6 +104,63 @@ public class jSeekBar extends SeekBar /*dummy*/ { //please, fix what GUI object 
 	
     public void RemoveFromViewParent() {
     	LAMWCommon.removeFromViewParent();
+    }
+    
+    public void SetScale( float _x, float _y ){
+    	setScaleX(_x);
+    	setScaleY(_y);
+    }
+    
+    public void SetThumbDrawable( String _strDrawable ){
+    	int id = controls.GetDrawableResourceId(_strDrawable);
+    	
+    	Drawable drawable = controls.GetDrawableResourceById(id);
+        
+    	setThumb(drawable);
+    }
+    
+    public void SetThumbBitmap( Bitmap _bitmap, int _width, int _height ){
+    	
+    	if( _bitmap == null ) { setThumb(null); return; }
+        
+        //Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.thumb);
+        Bitmap thumb = Bitmap.createBitmap(_width, _height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(thumb);
+        
+        if( canvas == null ) { setThumb(null); return; }
+        
+        canvas.drawBitmap(_bitmap, new Rect(0, 0, _bitmap.getWidth(), _bitmap.getHeight()),
+        	                       new Rect(0, 0, thumb.getWidth(), thumb.getHeight()), null);
+        
+        Drawable drawable = new BitmapDrawable(context.getResources(), thumb);
+        setThumb(drawable);
+    }
+    
+    public void SetThumbBitmap( Bitmap _bitmap ){
+    	
+    	if( _bitmap == null ) { setThumb(null); return; }
+        
+    	SetThumbBitmap( _bitmap, _bitmap.getWidth(), _bitmap.getHeight() );
+    }
+    
+    public void SetThumbBitmapByRes( String _strBitmap, int _width, int _height ){
+    	int id = controls.GetDrawableResourceId(_strBitmap);	
+        BitmapFactory.Options bo = new BitmapFactory.Options();
+        bo.inScaled = false; //false; 
+        
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), id, bo);
+        
+        SetThumbBitmap( bitmap, bitmap.getWidth(), bitmap.getHeight() );
+    }
+    
+    public void SetThumbBitmapByRes( String _strBitmap ){
+    	int id = controls.GetDrawableResourceId(_strBitmap);	
+        BitmapFactory.Options bo = new BitmapFactory.Options();
+        bo.inScaled = false; //false; 
+        
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), id, bo);
+        
+        SetThumbBitmap( bitmap, bitmap.getWidth(), bitmap.getHeight() );
     }
     
     public void SetColor(int colorBar, int colorFinger) {
