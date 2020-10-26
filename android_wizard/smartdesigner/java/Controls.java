@@ -253,7 +253,7 @@ class jForm {
 
 		layout.setOnClickListener(onClickListener);
 
-		// To ensure that the image is always in the background by TR3E
+		// To ensure that the image is always in the background by ADiV
 		mImageBackground = new ImageView(controls.activity);
 
 		if (mImageBackground != null) {
@@ -521,7 +521,7 @@ class jForm {
 		controls.pOnClose(PasObj);
 	}
 
-	//by TR3E
+	//by ADiV
 	public boolean IsScreenLocked() {
 		KeyguardManager myKM = (KeyguardManager) controls.activity.getSystemService(Context.KEYGUARD_SERVICE);
 
@@ -530,7 +530,7 @@ class jForm {
 		return myKM.inKeyguardRestrictedInputMode();
 	}
 
-	//by TR3E
+	//by ADiV
 	public boolean IsSleepMode() {
 		PowerManager powerManager = (PowerManager) controls.activity.getSystemService(Context.POWER_SERVICE);
 
@@ -541,7 +541,7 @@ class jForm {
 		return !isScreenAwake;
 	}
 
-	public boolean IsConnected() { //by TR3E
+	public boolean IsConnected() { //by ADiV
 
 		ConnectivityManager cm = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -555,7 +555,7 @@ class jForm {
 		return false;
 	}
 
-	public boolean IsConnectedWifi() { // by TR3E
+	public boolean IsConnectedWifi() { // by ADiV
 
 		ConnectivityManager cm = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -569,7 +569,7 @@ class jForm {
 		return false;
 	}
 
-	public boolean IsConnectedTo(int _connectionType) { // by TR3E
+	public boolean IsConnectedTo(int _connectionType) { // by ADiV
 
 		ConnectivityManager cm = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -1027,7 +1027,7 @@ class jForm {
 	}
 
 	public Drawable GetDrawableResourceById(int _resID) {
-		if (_resID == 0) return null; // by tr3e
+		if (_resID == 0) return null; // by ADiV
 
 		Drawable res = null;
 
@@ -1043,7 +1043,7 @@ class jForm {
 		return res;
 	}
 
-	//BY TR3E
+	//BY ADiV
 	public void SetBackgroundImage(String _imageIdentifier, int _scaleType) {
 
 		if (mImageBackground == null) return;
@@ -1080,7 +1080,7 @@ class jForm {
 		mImageBackground.setImageDrawable(d);
 	}
 
-	//BY TR3E
+	//BY ADiV
 	public void SetBackgroundImageMatrix(float _scaleX, float _scaleY, float _degress, float _dx, float _dy, float _centerX, float _centerY) {
 
 		if (mImageBackground == null) return;
@@ -1098,7 +1098,7 @@ class jForm {
 		//mImageBackground.invalidate();
 	}
 
-	// BY TR3E
+	// BY ADiV
 	public void SetBackgroundImage(String _imageIdentifier) {
 		SetBackgroundImage(_imageIdentifier, 6); // FIT_XY for default
 	}
@@ -1123,7 +1123,7 @@ class jForm {
 		} else return null;
 	}
 	
-	// BY TR3E
+	// BY ADiV
 	public int GetBatteryPercent() {
 		
 		int ret = -1;
@@ -1194,7 +1194,7 @@ class jForm {
 //[ifdef_api14up]
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
 
-		if (d != null) // by tr3e
+		if (d != null) // by ADiV
 			jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
 	}
@@ -1562,7 +1562,7 @@ class jForm {
 		return PathDat + "/" +_filename2;
 	}
 
-	//by TR3E
+	//by ADiV
 	public String GetStripAccents(String _str) {
 		_str = Normalizer.normalize(_str, Normalizer.Form.NFD);
 		_str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
@@ -1971,7 +1971,7 @@ class jForm {
 		jCommons.RequestRuntimePermission(controls, _androidPermissions, _requestCode);
 	}
 
-	//by TR3E
+	//by ADiV
 	public int GetScreenWidth( ){
 			int w = controls.appLayout.getWidth();
 			
@@ -1981,17 +1981,46 @@ class jForm {
 			return w;
 	}
 		
-	//by TR3E
+	//by ADiV
 	public int GetScreenHeight( ){
 			int h = controls.appLayout.getHeight();
 			
 			if( h <= 0 )
 				h = controls.screenHeight;
-			
+					
 			return h;
 	}
+	
+	//by ADiV
+	public boolean IsInMultiWindowMode(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)	    
+	        if ( ((Activity)controls.activity).isInMultiWindowMode() )	       
+	        	return true;
+		
+		return false;
+	}
+	
+	//by ADiV
+	public int GetRealScreenWidth(){
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		
+		if(displaymetrics == null) return 0;
+		
+		controls.activity.getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+        return displaymetrics.widthPixels;
+	}
+	
+	//by ADiV
+	public int GetRealScreenHeight(){
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		
+		if(displaymetrics == null) return 0;
+		
+		controls.activity.getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+        return displaymetrics.heightPixels;
+	}
 
-	//by TR3E
+	//by ADiV
 	public String GetSystemVersionString() {
 		return android.os.Build.VERSION.RELEASE;
 	}
@@ -2134,10 +2163,10 @@ public int systemVersion;
 public int screenWidth = 0;
 public int screenHeight = 0;
 
-public boolean formChangeSize = false; // OnRotate if change size or show form with rotate [by TR3E]
-public boolean formNeedLayout = false; // Automatic updatelayout [by TR3E]
+public boolean formChangeSize = false; // OnRotate if change size or show form with rotate [by ADiV]
+public boolean formNeedLayout = false; // Automatic updatelayout [by ADiV]
 
-private int javaNewId = 100000;   // To assign java id from 100001 onwards [by TR3E]
+private int javaNewId = 100000;   // To assign java id from 100001 onwards [by ADiV]
 
 public boolean isGDXGame = false; //prepare to LAMW GDXGame		
 public Object GDXGame = null;	//prepare to LAMW GDXGame
@@ -2352,7 +2381,7 @@ public Context GetContext() {
    return this.activity; 
 }
 
-//by TR3E Software
+//by ADiV Software
 public int getContextTop(){
  ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
  
@@ -2363,9 +2392,19 @@ public int getContextTop(){
 	
 }
 
-//by  TR3E Software
+//by  ADiV
 public int getStatusBarHeight() {
 	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+	
+	if ( resourceId > 0 )
+		return this.activity.getResources().getDimensionPixelSize(resourceId);
+	else
+		return 0;
+}
+
+//by  ADiV
+public int GetNavigationHeight() {
+	int resourceId = this.activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
 	
 	if ( resourceId > 0 )
 		return this.activity.getResources().getDimensionPixelSize(resourceId);
