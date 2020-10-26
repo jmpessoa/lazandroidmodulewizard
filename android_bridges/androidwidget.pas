@@ -897,8 +897,9 @@ type
     Procedure Recreate();
     function  GetContext(): jObject;
     function  GetContextTop: integer;
-    function  GetStatusBarHeight : integer;
-    function  GetActionBarHeight : integer;
+    function  GetStatusBarHeight : integer;  // by ADiV
+    function  GetActionBarHeight : integer;  // by ADiV
+    function  GetNavigationHeight : integer; // by ADiV
     function GetControlsVersionInfo: string;
     function GetControlsVersionFeatures: string; //sorry!
 
@@ -1374,9 +1375,12 @@ type
     
     function  GetDateTimeDecode( var day : integer; var month : integer; var year : integer;
                                  var hours : integer; var minutes: integer; var seconds : integer ) : boolean;
-    function  GetScreenWidth(): integer;
-    function  GetScreenHeight(): integer;
-    function  GetSystemVersionString(): string;
+    function  GetScreenWidth(): integer;      // by ADiV
+    function  GetScreenHeight(): integer;     // by ADiV
+    function  GetRealScreenWidth(): integer;  // by ADiV
+    function  GetRealScreenHeight(): integer; // by ADiV
+    function  IsInMultiWindowMode(): boolean; // by ADiV
+    function  GetSystemVersionString(): string; // by ADiV
 
     function  GetTimeInMilliseconds : int64;
     function  GetTimeHHssSS( millisTime : int64 ) : string;
@@ -4746,6 +4750,30 @@ begin
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenHeight');
 end;
 
+function jForm.GetRealScreenWidth(): integer;
+begin
+  Result := 0;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRealScreenWidth');
+end;
+
+function jForm.GetRealScreenHeight(): integer;
+begin
+  Result := 0;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRealScreenHeight');
+end;
+
+function jForm.IsInMultiWindowMode(): boolean;
+begin
+  Result := false;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsInMultiWindowMode');
+end;
+
 function jForm.GetSystemVersionString(): string;
 begin
   Result := '';
@@ -6598,6 +6626,11 @@ end;
 function jApp.GetActionBarHeight: integer;
 begin
   Result := GetContextTop - GetStatusBarHeight;
+end;
+
+function jApp.GetNavigationHeight : integer;
+begin
+  Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'GetNavigationHeight');
 end;
 
 function jApp.GetControlsVersionInfo: string;
