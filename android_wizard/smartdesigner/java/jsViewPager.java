@@ -6,12 +6,12 @@ import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.PagerTabStrip;
-import android.support.v4.view.PagerTitleStrip;
-import android.support.v4.view.ViewPager;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.PagerTabStrip;
+import androidx.viewpager.widget.PagerTitleStrip;
+import androidx.viewpager.widget.ViewPager;
 
 class CustomPagerAdapter extends PagerAdapter {
 

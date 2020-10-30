@@ -606,7 +606,7 @@ begin
       for aSupportLib in SupportLibs do
       begin
         if (Pos(aSupportLib.Name,tempStr)>0) then
-          tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+          tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name(*+IntToStr(FTargetSdkVersion)*), [rfIgnoreCase]);
       end;
 
       strList.Text := tempStr;
@@ -1858,7 +1858,7 @@ begin
   if LazarusIDE.ActiveProject.CustomData['Support'] ='TRUE' then
   begin
      if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
-       ShowMessage('Warning: Support Library[v4] need "Gradle" builder ...');
+       ShowMessage('Warning: Support Library need "Gradle" builder ...');
   end;
 
   TryUpdateStyleXML();

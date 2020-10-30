@@ -7,9 +7,9 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.TextInputLayout;
+import com.google.android.material.textfield.TextInputLayout;
 import android.util.TypedValue;
-import android.support.design.widget.TextInputEditText;
+import com.google.android.material.textfield.TextInputEditText;
 
 
 /*Draft java code by "Lazarus Android Module Wizard" [12/30/2017 3:44:48]*/

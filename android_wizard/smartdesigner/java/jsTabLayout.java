@@ -4,8 +4,8 @@ package org.lamw.appcompattablayoutdemo2;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
+import com.google.android.material.tabs.TabLayout;
+import androidx.viewpager.widget.ViewPager;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/3/2018 18:45:40]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/

@@ -8,7 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.BottomNavigationView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
