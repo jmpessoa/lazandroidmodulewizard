@@ -286,6 +286,12 @@ procedure jEditText_SetFrameGravity(env: PJNIEnv; _jedittext: JObject; _value: i
 procedure jEditText_RemoveFromViewParent(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetSoftInputShownOnFocus(env: PJNIEnv; _jedittext: JObject; _show: boolean);
 
+procedure jEditText_SetRoundCorner(env: PJNIEnv; _jedittext: JObject);
+procedure jEditText_SetRoundRadiusCorner(env: PJNIEnv; _jedittext: JObject; _radius: integer);
+procedure jEditText_SetRoundBorderColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+procedure jEditText_SetRoundBorderWidth(env: PJNIEnv; _jedittext: JObject; _strokeWidth: integer);
+procedure jEditText_SetRoundBackgroundColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 Procedure jButton_Free(env:PJNIEnv; Button : jObject);
@@ -2990,6 +2996,74 @@ begin
   jParams[0].z:= JBool(_show);
   jCls:= env^.GetObjectClass(env, _jedittext);
   jMethod:= env^.GetMethodID(env, jCls, 'SetSoftInputShownOnFocus', '(Z)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jEditText_SetRoundCorner(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundCorner', '()V');
+  env^.CallVoidMethod(env, _jedittext, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jEditText_SetRoundRadiusCorner(env: PJNIEnv; _jedittext: JObject; _radius: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _radius;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundRadiusCorner', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jEditText_SetRoundBorderColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundBorderColor', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jEditText_SetRoundBorderWidth(env: PJNIEnv; _jedittext: JObject; _strokeWidth: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _strokeWidth;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundBorderWidth', '(I)V');
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+procedure jEditText_SetRoundBackgroundColor(env: PJNIEnv; _jedittext: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _color;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundBackgroundColor', '(I)V');
   env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

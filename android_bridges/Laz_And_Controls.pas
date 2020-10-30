@@ -1152,6 +1152,13 @@ type
     procedure ResetViewParent();  override;
     procedure SetSoftInputShownOnFocus(_show: boolean);
 
+
+    procedure SetRoundCorner();
+    procedure SetRoundRadiusCorner(_radius: integer);
+    procedure SetRoundBorderColor(_color: TARGBColorBridge);
+    procedure SetRoundBorderWidth(_strokeWidth: integer);
+    procedure SetRoundBackgroundColor(_color: TARGBColorBridge);
+
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
@@ -5375,6 +5382,41 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jEditText_SetSoftInputShownOnFocus(FjEnv, FjObject, _show);
+end;
+
+procedure jEditText.SetRoundCorner();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetRoundCorner(FjEnv, FjObject);
+end;
+
+procedure jEditText.SetRoundRadiusCorner(_radius: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetRoundRadiusCorner(FjEnv, FjObject, _radius);
+end;
+
+procedure jEditText.SetRoundBorderColor(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetRoundBorderColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+end;
+
+procedure jEditText.SetRoundBorderWidth(_strokeWidth: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetRoundBorderWidth(FjEnv, FjObject, _strokeWidth);
+end;
+
+procedure jEditText.SetRoundBackgroundColor(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetRoundBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 //------------------------------------------------------------------------------

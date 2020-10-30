@@ -1,4 +1,4 @@
-package org.lamw.appselectdirectorydialogdemo1;
+package org.lamw.applistviewdemo7;
 
 import java.io.BufferedReader;
 
@@ -16,9 +16,14 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -64,7 +69,15 @@ public class jEditText extends EditText {
 	private int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
 	private boolean mCloseSoftInputOnEnter = true;
-	
+
+	boolean mIsRounded = false;
+	int mBackgroundColor = Color.TRANSPARENT;
+
+	int mRoundRadius = 8;
+	int mRoundBorderColor = Color.CYAN;
+	int mRoundBorderWidth = 3;
+	int mRoundBackgroundColor= Color.TRANSPARENT;
+
 	//Constructor
 	public  jEditText(android.content.Context context,
 					  Controls ctrls,long pasobj ) {
@@ -177,6 +190,7 @@ public class jEditText extends EditText {
 		};
 
 		addTextChangedListener(textwatcher);
+
 	}
 
 	//Free object except Self, Pascal Code Free the class.
@@ -693,5 +707,48 @@ public class jEditText extends EditText {
 			this.setShowSoftInputOnFocus(_show);
 		} //[endif_api21up]
 	}
+
+	//https://stackoverflow.com/questions/44071755/android-how-to-set-corner-radius-programmatically
+	public void SetRoundCorner() {
+		if (this != null) {
+			GradientDrawable shape =  new GradientDrawable();
+			shape.setCornerRadius(mRoundRadius);
+			shape.setStroke(mRoundBorderWidth, mRoundBorderColor);
+			shape.setColor(mRoundBackgroundColor); //
+
+			int color;
+			Drawable background = this.getBackground();
+			if (background instanceof ColorDrawable) {
+				color = ((ColorDrawable)this.getBackground()).getColor();
+				shape.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			}
+
+			if(Build.VERSION.SDK_INT >= 16) {
+				//[ifdef_api16up]
+				this.setBackground(shape); //(Drawable)
+				//[endif_api16up]
+			}
+			else {
+				this.setBackgroundDrawable(shape);
+			}
+		}
+	}
+
+	public void SetRoundRadiusCorner(int _radius) {
+		mRoundRadius =  _radius;  //8
+	}
+
+	public void SetRoundBorderColor(int _color) {
+		mRoundBorderColor =  _color; //Color.CYAN
+	}
+
+	public void SetRoundBorderWidth(int _strokeWidth) {
+		mRoundBorderWidth =  _strokeWidth;  //3
+	}
+
+	public void SetRoundBackgroundColor(int _color) {
+		mRoundBackgroundColor =  _color;
+	}
+
 }
 
