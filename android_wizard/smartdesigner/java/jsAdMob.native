@@ -4,3 +4,4 @@ public native void pOnAdMobOpened(long pasobj);
 public native void pOnAdMobClosed(long pasobj);
 public native void pOnAdMobLeftApplication(long pasobj);
 public native void pOnAdMobClicked(long pasobj);
+public native void pOnAdMobInitializationComplete(long pasobj);

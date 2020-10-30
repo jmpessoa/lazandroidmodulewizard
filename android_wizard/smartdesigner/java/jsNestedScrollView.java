@@ -4,10 +4,10 @@ package org.lamw.appcompattablayoutdemo2;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.NestedScrollView;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.ViewCompat;
+import androidx.core.widget.NestedScrollView;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/17/2018 1:38:38]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/

@@ -5,7 +5,8 @@ unit SmartDesigner;
 interface
 
 uses
-  Classes, SysUtils, Controls, ProjectIntf, Forms, AndroidWidget, process, math, SourceChanger, propedits;
+  Classes, SysUtils, Controls, ProjectIntf, Forms, AndroidWidget,
+  process, math, SourceChanger, propedits;
 
 // tk min and max API versions for build.xml
 const
@@ -694,6 +695,9 @@ var
   insertRef, manifestApis, supportProvider: string;
   p1, p2: integer;
   c: char;
+  FVersionCode : integer;
+  FVersionName : string;
+  xmlAndroidManifest: TXMLDocument;
 begin
 
   strList:= TStringList.Create;
@@ -779,7 +783,7 @@ begin
        strList.Clear;
        strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        tempStr:= strList.Text;  //manifest
-       if Pos('android.support.v4.content.FileProvider', tempStr) <= 0 then
+       if Pos('androidx.core.content.FileProvider', tempStr) <= 0 then
        begin
          insertRef:= '</activity>'; //insert reference point
          p1:= Pos(insertRef, tempStr);
@@ -1117,8 +1121,25 @@ begin
          else
             strList.Add('            targetSdkVersion '+buildToolApi);
 
-         strList.Add('            versionCode 1');
-         strList.Add('            versionName "1.0"');
+         if fileExists(FPathToAndroidProject+'AndroidManifest.xml') then
+         begin
+          ReadXMLFile(xmlAndroidManifest, FPathToAndroidProject+'AndroidManifest.xml');
+
+          if (xmlAndroidManifest = nil) or (xmlAndroidManifest.DocumentElement = nil) then
+             Exit;
+          with xmlAndroidManifest.DocumentElement do
+          begin
+                      FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
+                      FVersionName := AttribStrings['android:versionName'];
+          end;
+         end else
+         begin
+          FVersionCode := 1;
+          FVersionName := '1.0';
+         end;
+
+         strList.Add('            versionCode ' + intToStr(FVersionCode));
+         strList.Add('            versionName "'+FVersionName+'"');
          strList.Add('    }');
          strList.Add('    sourceSets {');
          strList.Add('        main {');
@@ -1146,12 +1167,12 @@ begin
 
          strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-         if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) then
+         if ((Pos('AppCompat', AndroidTheme) <= 0) and (FSupport)) then
          begin
            for aSupportLib in SupportLibs do
            begin
              if aSupportLib.MinAPI<=StrToInt(buildToolApi) then
-               strList.Add('    '+directive+' '''+aSupportLib.Name+buildToolApi+'.+''');
+               strList.Add('    '+directive+' '''+aSupportLib.Name+'''');//buildToolApi+'.+''');
            end;
            //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
 
@@ -3187,7 +3208,8 @@ begin
         //remove our own support libs if any
         for i:=(tempList.Count-1) downto (k-1) do
         begin
-          if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('com.android.support:', tempList.Strings[i])>0)) then
+          if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('androidx.appcompat:appcompat:', tempList.Strings[i])>0)) or
+             ((Pos(aux, tempList.Strings[i])>0) AND (Pos('com.google.android.material:material:', tempList.Strings[i])>0)) then
           begin
             for aAppCompatLib in AppCompatLibs do
             begin
@@ -3224,15 +3246,14 @@ begin
               begin
                 if aAppCompatLib.MinAPI<=StrToInt(compileSdkVersion) then
                 begin
-                  tempList.Insert((k+1),'    '+aux+' '''+aAppCompatLib.Name+compileSdkVersion+'.+''');
+                  tempList.Insert((k+1),'    '+aux+' '''+aAppCompatLib.Name+'''');//compileSdkVersion+'.+''');
                   Inc(k);
                 end;
               end;
           end;
 
-        end; //AppCompat
-
-        if FSupport and (not innerSupported) then
+        end //AppCompat
+        else if FSupport and (not innerSupported) then
         begin
           //get the compileSdkVersion
           compileSdkVersion:='';
@@ -3254,7 +3275,7 @@ begin
               begin
                 if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
                 begin
-                  tempList.Insert((k+1),'    '+aux+' '''+aSupportLib.Name+compileSdkVersion+'.+''');
+                  tempList.Insert((k+1),'    '+aux+' '''+aSupportLib.Name + '''');//+compileSdkVersion+'.+''');
                   Inc(k);
                 end;
               end;

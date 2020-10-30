@@ -21,7 +21,7 @@ package org.lamw.appadmoddemo1;
 
 import java.lang.Override;
 //import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 

@@ -4,7 +4,7 @@ package org.lamw.appfloatingactionbuttondemo1;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v7.widget.CardView;
+import androidx.cardview.widget.CardView;
 
 /*Draft java code by "Lazarus Android Module Wizard" [12/20/2017 21:37:19]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/

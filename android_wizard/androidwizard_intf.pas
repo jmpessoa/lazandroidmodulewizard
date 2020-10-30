@@ -5,7 +5,7 @@ unit AndroidWizard_intf;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Controls, Forms, Dialogs, Graphics,
+  Classes, SysUtils, FileUtil, Controls, Forms, Dialogs, Graphics, laz2_XMLRead, Laz2_DOM,
   LCLProc, LCLType, LCLIntf, LazIDEIntf, ProjectIntf, FormEditingIntf,
   uFormAndroidProject, uformworkspace, FPimage, AndroidWidget, gdxform;
 
@@ -1458,6 +1458,9 @@ var
   gradleCompatible, outgradleCompatible: string;
   gradleCompatibleAsNumber: integer;
   directive: string;
+  FVersionCode : integer;
+  FVersionName : string;
+  xmlAndroidManifest: TXMLDocument;
 begin
   Result:= False;
   FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
@@ -1842,6 +1845,20 @@ begin
                strList.Add('    </application>');
                strList.Add('</manifest>');
                strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+
+               FVersionCode := 1;
+               FVersionName := '1.0';
+             end else
+             begin
+              ReadXMLFile(xmlAndroidManifest, FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+
+              if (xmlAndroidManifest = nil) or (xmlAndroidManifest.DocumentElement = nil) then
+                 Exit;
+              with xmlAndroidManifest.DocumentElement do
+              begin
+                      FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
+                      FVersionName := AttribStrings['android:versionName'];
+              end;
              end;
 
              strList.Clear;
@@ -2493,8 +2510,10 @@ begin
 
                 end;
 
-                strList.Add('            versionCode 1');
-                strList.Add('            versionName "1.0"');
+                //strList.Add('            versionCode 1');
+                //strList.Add('            versionName "1.0"');
+                strList.Add('            versionCode ' + intToStr(FVersionCode));
+                strList.Add('            versionName "' + FVersionName + '"');
                 strList.Add('    }');
                 strList.Add('    sourceSets {');
                 strList.Add('        main {');
@@ -2529,20 +2548,19 @@ begin
                    for aAppCompatLib in AppCompatLibs do
                    begin
                      if aAppCompatLib.MinAPI<=StrToInt(compileSdkVersion) then
-                       strList.Add('    '+directive+' '''+aAppCompatLib.Name+compileSdkVersion+'.+''');
+                       strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');//compileSdkVersion+'.+''');
                    end;
                    //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
-                end;
-
-                if FSupport and (not innerSupported) then
-                begin
+                end else
+                 if FSupport and (not innerSupported) then
+                 begin
                    for aSupportLib in SupportLibs do
                    begin
                      if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
-                       strList.Add('    '+directive+' '''+aSupportLib.Name+compileSdkVersion+'.+''');
+                       strList.Add('    '+directive+' '''+aSupportLib.Name+'''');//compileSdkVersion+'.+''');
                    end;
                    //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
-                end;
+                 end;
 
                 if Pos('GDXGame', FAndroidTheme) > 0 then     //just a conceptual project....
                 begin

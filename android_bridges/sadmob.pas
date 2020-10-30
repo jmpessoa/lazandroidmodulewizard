@@ -15,7 +15,8 @@ TAdMobBannerSize = (
    admobLargeBanner,       //2 - 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
    admobMediumRectangle,   //3 - 300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
    admobFullBanner,        //4 - 468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
-   admobLeaderBoard        //5 - 728x90	IAB Leaderboard	Tablets	LEADERBOARD
+   admobLeaderBoard,       //5 - 728x90	IAB Leaderboard	Tablets	LEADERBOARD
+   admobAdaptive           //6 - Adaptive ad size on the ad view
   );
 
 TOnAdMobLoaded = procedure(Sender: TObject) of Object;
@@ -24,6 +25,7 @@ TOnAdMobOpened = procedure(Sender: TObject) of Object;
 TOnAdMobClosed = procedure(Sender: TObject) of Object;
 TOnAdMobLeftApplication = procedure(Sender: TObject) of Object;
 TOnAdMobClicked = procedure(Sender: TObject) of Object;
+TOnAdMobInitializationComplete = procedure(Sender: TObject) of Object;
 
 {Developed by ADiV for LAMW}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -38,6 +40,7 @@ jsAdMob = class(jVisualControl)
     FOnAdMobClosed:          TOnAdMobClosed;
     FOnAdMobLeftApplication: TOnAdMobLeftApplication;
     FOnAdMobClicked:         TOnAdMobClicked;
+    FOnAdMobInitializationComplete:  TOnAdMobInitializationComplete;
     FAdMobBannerSize:        TAdMobBannerSize;
 
     procedure SetVisible(Value: Boolean);
@@ -56,6 +59,7 @@ jsAdMob = class(jVisualControl)
     procedure GenEvent_OnAdMobClosed(Obj: TObject);
     procedure GenEvent_OnAdMobLeftApplication(Obj: TObject);
     procedure GenEvent_OnAdMobClicked(Obj: TObject);
+    procedure GenEvent_OnAdMobInitializationComplete(Obj: TObject);
 
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetViewParent(): jObject;  override;
@@ -74,6 +78,7 @@ jsAdMob = class(jVisualControl)
     procedure AdMobUpdate();
     function  AdMobIsLoading(): boolean;
     function  AdMobGetHeight(): integer;
+    procedure AdMobSetAdativeWidth( _aWidth : integer );
 
     function GetView(): jObject;  override;
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -93,6 +98,7 @@ jsAdMob = class(jVisualControl)
     property OnAdMobClosed      :   TOnAdMobClosed read FOnAdMobClosed write FOnAdMobClosed;
     property OnAdMobLeftApplication  :   TOnAdMobLeftApplication read FOnAdMobLeftApplication write FOnAdMobLeftApplication;
     property OnAdMobClicked      :   TOnAdMobClicked read FOnAdMobClicked write FOnAdMobClicked;
+    property OnAdMobInitializationComplete :   TOnAdMobInitializationComplete read FOnAdMobInitializationComplete write FOnAdMobInitializationComplete;
 
 end;
 
@@ -226,6 +232,11 @@ begin
   if Assigned(FOnAdMobLoaded) then FOnAdMobLoaded(Obj);
 end;
 
+procedure jsAdMob.GenEvent_OnAdMobInitializationComplete(Obj: TObject);
+begin
+  if Assigned(FOnAdMobInitializationComplete) then FOnAdMobInitializationComplete(Obj);
+end;
+
 procedure jsAdMob.GenEvent_OnAdMobClicked(Obj: TObject);
 begin
   if Assigned(FOnAdMobClicked) then FOnAdMobClicked(Obj);
@@ -291,6 +302,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_t(FjEnv, FjObject, 'AdMobSetId', _admobid);
+end;
+
+procedure jsAdMob.AdMobSetAdativeWidth( _aWidth : integer );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetAdativeWidth', _aWidth);
 end;
 
 function jsAdMob.AdMobIsLoading(): boolean;
