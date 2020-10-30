@@ -48,8 +48,8 @@ I. Infrastructure
 		2)run the command  ">android update sdk"   to open a GUI "SDK Manager"
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
-		6)check "Android SDK Build-Tools 26.0.2"  	
-		8)go to "Android 8.0.0 (API 26)" and check only "SDK Platform"
+		6)check "Android SDK Build-Tools 28.0.3"  	
+		8)go to "Android 9.0.0 (API 28)" and check only "SDK Platform"
 		9)go to "Extras" and check: 
 				"Android Support Repository"				
 				"Android Support Library"				
@@ -75,9 +75,11 @@ I. Infrastructure
 			warning: Laz4Android2.0.0 don't support android-aarch64
 			
 	.Option 2) Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
-		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases		
+		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases
 
-	.Option 3) Lazarus + FPC 3.2.0 [canonical/windows] "Do It Yourself"			
+	.Option 3) New! LAMW Manager https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html		
+
+	.Option 4) Lazarus + FPC 3.2.0 [canonical/windows] "Do It Yourself"			
 
 		win64:  [need FPC 3.2.0 to support android-64 bits]
 		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2064/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593-win64.exe/download
@@ -136,20 +138,20 @@ I. Infrastructure
 	http://ant.apache.org/bindownload.cgi 
 	Simply extract the zip file to a convenient location...
 
-.Gradle 4.4.1 [ "must have" to build Apk with "AppCompat" material theme]
-	https://gradle.org/next-steps/?version=4.4.1&format=bin
+.Gradle 6.6.1 [ "must have" to build Apk with AndroidX AppCompat/Material theme]
+	https://gradle.org/next-steps/?version=6.6.1&format=bin	
 
-	Simply extract the zip file to a convenient location...
+	Simply "extract here" the zip file to produce the folder "gradle-6.6.1" in a convenient location...
 
 	warning: Gradle build process need internet connection!!!
 
 .Hint [Lazarus Docked Desktop. Nice!]
 	https://github.com/FlKo/LazarusDockedDesktops
 
-.[LAMW 0.8.4] "AppCompat" [material design] theme need:'+
+.[LAMW 0.8.6] "AppCompat" [material design] theme need:'+
 		1. Java JDK 1.8   
-		2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]
-		3. Android SDK "plataforms" 26 + "build-tools" 26.0.2 
+		2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]
+		3. Android SDK "plataforms" 28 + "build-tools" 28.0.3 
 		4. Android SDK/Extra	"Support Repository"
 		5. Android SDK/Extra	"Support Library"
 		6. Android SDK/Extra	"Google Repository"
@@ -204,7 +206,7 @@ III. USING LAMW
 
 	2.6-[MinNkd] Select the  Min. NDK api:
 
-		example: 22         [warning ndkpi > 22 will not run on old 4.x devices]
+		example: 22         [warning: ndkApi > 22 will not run on old 4.x devices]
 
 	2.7-[MinSdk] Select the  Min. Device Api need to run your App:
 
@@ -214,8 +216,9 @@ III. USING LAMW
 
 		example: ARMv7a + Soft
 		
-		NOTE: 	Laz4Android2.0.0 support  "ARMv6" and "ARMv7a + Soft"
-			Fpcupdeluxe support  "ARMv7a + VFPv3" and "Aarch64"
+		NOTE: 	.Laz4Android2.0.0 support  "ARMv6" and "ARMv7a + Soft"
+			.Fpcupdeluxe support  "ARMv7a + VFPv3" and "Aarch64"
+			.LAMW Manager support  "ARMv7a + VFPv3" and "Aarch64"
 		
         2.9.Select Android Theme
 
@@ -293,10 +296,10 @@ III. USING LAMW
 
 	[Congratulations!!!]
 
-10. NOTE1: All LAMW projects [and demos] are AndroidStudio/Eclipse compatibles!
+10. NOTE1: All LAMW projects [and demos] are Android Studio/Eclipse compatibles!
 	ref. https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/How_to_open_LAMW_project_with_AndroidStudio.txt
 
-    NOTE2: Components from  Palettes "Android Bridges AppCompat"  and "Android Bridges JCenter" need build system "Gradle" [and Internet connection]
+    NOTE2: Components from  Palettes/Tabs "Android Bridges AppCompat"  and "Android Bridges JCenter" need build system "Gradle" [and Internet connection]
 
 11. About "untitled" demos:
 

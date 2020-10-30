@@ -1,6 +1,6 @@
 package org.lamw.appadmoddemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8.4 - 12 March - 2019
+//Lamw: Lazarus Android Module Wizard - version 0.8.6 - 30 October - 2020
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html

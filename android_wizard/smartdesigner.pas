@@ -588,7 +588,7 @@ begin
   else if (gradleVersNumber >= 4400) and (gradleVersNumber < 4600) then Result:= '3.1.0'
   else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then Result:= '3.2.1'
   else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then Result:= '3.3.2'
-  else Result:= '3.4.1'; //gradleVersNumber >= 5110)
+  else Result:= '3.4.1'; //gradleVersNumber >= 5110
 end;
 
 //https://developer.android.com/studio/releases/gradle-plugin.html#updating-plugin
@@ -641,7 +641,7 @@ begin
       tryGradleVer:= '4.9.2';   //fake -> '4.10.1'  //4.10.1 --> 4920     //28.0.3
    end else //(pluginNumber >= 340)
    begin
-       tryGradleVer:= '5.1.1';         //28.0.3
+       tryGradleVer:= '6.6.1';         //28.0.3
    end;
 
   numberAsString:= StringReplace(tryGradleVer,'.', '', [rfReplaceAll]); //3.3

@@ -1,6 +1,6 @@
 package org.lamw.applistviewdemo7;
 
-//LAMW: Lazarus Android Module Wizard - version 0.8.4.7 [unified!!] - 10 August - 2020 
+//LAMW: Lazarus Android Module Wizard - version 0.8.6.0 [AndroidX!!] - 30 October - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard

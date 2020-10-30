@@ -53,6 +53,7 @@ type
     procedure cbBuildSystemCloseUp(Sender: TObject);
     procedure CheckBoxLibraryClick(Sender: TObject);  // raw library
     procedure CheckBoxPIEClick(Sender: TObject);
+    procedure CheckBoxSupportChange(Sender: TObject);
     procedure CheckBoxSupportClick(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
@@ -405,9 +406,19 @@ begin
 end;
 
 procedure TFormWorkspace.ListBoxTargetAPICloseUp(Sender: TObject);
+var
+  intApi: integer;
 begin
-  if (Pos('AppCompat', ComboBoxTheme.Text) > 0) and (ListBoxTargetAPI.Text <> '28') then
-     ShowMessage('AppCompat theme need Target Api = 28'+ sLineBreak + '[android-sdk/platforms/android-28]');
+  if (Pos('AppCompat', ComboBoxTheme.Text) > 0) then
+  begin
+   intApi:= StrToInt(ListBoxTargetAPI.Text);
+
+   if intApi < 28  then
+   begin
+     ShowMessage('AppCompat theme need Target Api >= 28'+ sLineBreak + '[android-sdk/platforms/android-28]');
+   end;
+
+  end;
 end;
 
 procedure TFormWorkspace.RGInstructionClick(Sender: TObject);
@@ -1198,9 +1209,9 @@ begin
     begin
       ShowMessage('Warning/Recomendation:'+
                sLineBreak+
-               sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
+               sLineBreak+'[LAMW 0.8.6] "AppCompat" [material] theme need:'+
                sLineBreak+' 1. Java JDK 1.8'+
-               sLineBreak+' 2. Gradle 5.4.1 [https://gradle.org/next-steps/?version=5.4.1&format=bin]' +
+               sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]' +
                sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
                sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
                sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
@@ -1226,7 +1237,7 @@ begin
 
     intTargetApi:= StrToInt(ListBoxTargetAPI.Text);
 
-    if intTargetApi > 28 then
+    if intTargetApi < 28 then
     begin
        if Pos('28',ListBoxTargetAPI.Items.Text) > 0 then
        begin
@@ -1256,16 +1267,64 @@ begin
   FPieChecked:= CheckBoxPIE.Checked;
 end;
 
+procedure TFormWorkspace.CheckBoxSupportChange(Sender: TObject);
+var
+  apiMin: integer;
+begin
+   if TCheckBox(Sender).Checked then
+   begin
+      apiMin:= StrToInt(ListBoxMinSDK.Text);
+      if apiMin < 18 then
+      begin
+          ListBoxMinSDK.Text:= '18';
+          ShowMessage('warning: Support Library[v4] need device Api >= 18');
+      end;
+   end;
+end;
+
 procedure TFormWorkspace.CheckBoxSupportClick(Sender: TObject);
+var
+  intApi, index: integer;
+  flag: boolean;
 begin
   FSupport:=TCheckBox(Sender).Checked;
   if FSupport then
   begin
-     ListBoxTargetAPI.Text:= '28';
+     intApi:= StrToInt(ListBoxTargetAPI.Text);
+
+     if intApi < 28 then
+     begin
+       flag:= False;
+       if Pos('28',ListBoxTargetAPI.Items.Text) > 0 then
+       begin
+          flag:= True;
+          index:= ListBoxTargetAPI.Items.IndexOf('28');
+          ListBoxTargetAPI.ItemIndex:= index;
+          ListBoxTargetAPI.Text:= '28';
+          ListBoxTargetAPICloseUp(Self);
+       end;
+
+       if (not flag) then
+       begin
+          if (Pos('29',ListBoxTargetAPI.Items.Text) > 0) then
+          begin
+            flag:= True;
+            index:= ListBoxTargetAPI.Items.IndexOf('29');
+            ListBoxTargetAPI.ItemIndex:= index;
+            ListBoxTargetAPI.Text:= '29';
+            ListBoxTargetAPICloseUp(Self);
+          end;
+       end;
+
+       if not flag then
+          ShowMessage('warning: Support Library need TargetApi >= 28');
+
+     end;
+
      if (cbBuildSystem.Text <> 'Gradle') then
      begin
        cbBuildSystem.Text:= 'Gradle';
-       ShowMessage('Warning: Support Library need Gradle and Target API = 28');
+       ShowMessage('Warning: Support Library need Gradle 6.6.1 and Target API >= 28');
      end
   end
 end;
@@ -1289,7 +1348,7 @@ begin
   begin
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then
-      MessageDlg('[LAMW 0.8.5] "AppCompat" [material] theme need JDK 1.8 + Gradle 4.4.1 [or up]!', mtWarning, [mbOk], 0);
+      MessageDlg('[LAMW 0.8.6] "AppCompat" [material] theme need JDK 1.8 + Gradle 6.6.1 [or up]!', mtWarning, [mbOk], 0);
   end;
 
 end;
@@ -1342,9 +1401,9 @@ procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.6] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
-           sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin] or up' +
+           sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin] or up' +
            sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
@@ -1403,9 +1462,9 @@ procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.6] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
-           sLineBreak+' 2. Gradle 4.4.1 [https://gradle.org/next-steps/?version=4.4.1&format=bin]' +
+           sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]' +
            sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
@@ -1452,9 +1511,9 @@ begin
         tagVersion:= StrToInt(Trim(numberAsString));
     end;
 
-    if Result = '' then  //gradle-4.4.1
+    if Result = '' then  //gradle-6.6.1
     begin
-      userString:= '4.4.1';
+      userString:= '6.6.1';
       if InputQuery('Gradle', 'Please, Enter Gradle Version ', userString) then
       begin
         if UserString <> '' then
@@ -1469,7 +1528,7 @@ begin
         end
         else
         begin
-          Result:= '4.4.1';
+          Result:= '6.6.1';
           numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 41
           if Length(numberAsString) < 3 then
           begin
@@ -1493,7 +1552,7 @@ begin
   Result:= '';
   if HasBuildTools(sdkApi, tempOutBuildTool) then
   begin
-     Result:= tempOutBuildTool;  //26.0.2
+     Result:= tempOutBuildTool;  //28.0.3
   end;
 end;
 

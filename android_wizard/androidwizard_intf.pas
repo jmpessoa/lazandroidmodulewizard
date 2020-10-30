@@ -2458,10 +2458,12 @@ begin
                 strList.Add('    }');
                 end;
 
+                {
                 if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) then
                 begin
-                  if compileSdkVersion = '29'  then compileSdkVersion:= '28';  //LAMW dont support [yet] AndroidX libraries
+                  if compileSdkVersion = '29'  then compileSdkVersion:= '28';  //LAMW dont support [already!] AndroidX libraries
                 end;
+                }
 
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin

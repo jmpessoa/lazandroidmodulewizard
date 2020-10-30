@@ -85,7 +85,7 @@
 		-Frederico Marques - Tutorial in Portuguese
 			https://www.linkedin.com/pulse/lazarus-android-module-wizard-lamw-gere-seu-apk-usando-marques/	
 			
-		-TR3E - many, many contributions!!!!
+		-ADiV [a.k.a TR3E] - many, many contributions!!!!
 			tr3esoftware dot gmail com
 
 		-Lazarus forum community!
@@ -97,6 +97,18 @@
 	*  "LAMW_Getting_Started.txt"				
 	*					
 	***************************************************************************************************
+
+Version 0.8 - rev 06 - 30 - October - 2020
+
+	Migrate Material Theme/AppCompat to AndroidX [by @ADiV]
+
+	Requires SDK 28 or higher
+	and
+	Gradle 6.6.1
+ 
+	(downloaded from: https://gradle.org/releases/)
+
+	Thanks to  @ADiV!! [a.k.a TR3E]
 
 Version 0.8 - rev 05 - 13 - August - 2019
 	
