@@ -1086,10 +1086,12 @@ begin
          strList.Add('    }');
          end;
 
-         if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) then    //
+         {
+         if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) then    //Now [AndroidX] already support Api 29!
          begin
            if buildToolApi = '29'  then buildToolApi:= '28';
          end;
+         }
 
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin
@@ -1174,6 +1176,7 @@ begin
              if aSupportLib.MinAPI<=StrToInt(buildToolApi) then
                strList.Add('    '+directive+' '''+aSupportLib.Name+'''');//buildToolApi+'.+''');
            end;
+
            //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
 
             {
@@ -1195,6 +1198,7 @@ begin
             end;
             requiredList.Free;
             }
+
          end;
 
          if Pos('GDXGame', AndroidTheme) > 0 then
@@ -2913,6 +2917,7 @@ begin
   if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GDX' then hasControls:= True;
 
   if not hasControls then Exit;  //no form basead
+
   FSupport:=(LazarusIDE.ActiveProject.CustomData.Values['Support']='TRUE');
 
   AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
@@ -2963,7 +2968,7 @@ begin
 
     //re-add all [updated] java code ...
 
-    if FSupport then  // refactored by jmpessoa: UNIQUE "Controls.java" !!!
+    if (FSupport) or (Pos('AppCompat', AndroidTheme)>0) then  // refactored by jmpessoa: UNIQUE "Controls.java" !!!
     begin
 
        if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java') then
@@ -2972,10 +2977,12 @@ begin
          auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
          auxList.SaveToFile(FPathToJavaSource + DirectorySeparator + 'jSupported.java');
        end;
+
        if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') then
        begin
          ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'drawable');
          auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml');
+         ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
          auxList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
        end;
 
