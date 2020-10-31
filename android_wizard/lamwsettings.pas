@@ -25,7 +25,7 @@ type
 
   TLamwGlobalSettings = class
   public const
-    Version = '0.8.5';
+    Version = '0.8.6';
   private const
     IniFileName = 'LAMW.ini';
     IniFileSection = 'NewProject';
@@ -268,7 +268,7 @@ end;
 function TLamwGlobalSettings.GetPathToGradle: string;
 begin
   Result := GetPath(FPathToGradle, 'PathToGradle',
-    'Path to Gradle: [ex. C:\lamw\gradle-4.4.1]');
+    'Path to Gradle: [ex. C:\lamw\gradle-6.6.1]');
 end;
 
 function TLamwGlobalSettings.ReadIniString(const Key: string;
