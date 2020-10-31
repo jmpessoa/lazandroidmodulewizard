@@ -1858,6 +1858,7 @@ begin
               begin
                       FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
                       FVersionName := AttribStrings['android:versionName'];
+                      if FVersionName = '' then  FVersionName:= '1.0';
               end;
              end;
 
@@ -2514,6 +2515,12 @@ begin
 
                 //strList.Add('            versionCode 1');
                 //strList.Add('            versionName "1.0"');
+                if FVersionCode =  0 then
+                begin
+                  FVersionCode:= 1;
+                  FVersionName:= '1.0';
+                end;
+
                 strList.Add('            versionCode ' + intToStr(FVersionCode));
                 strList.Add('            versionName "' + FVersionName + '"');
                 strList.Add('    }');
