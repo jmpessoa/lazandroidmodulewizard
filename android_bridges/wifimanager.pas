@@ -41,7 +41,10 @@ jWifiManager = class(jControl)
     procedure SetWifiHotspotOn();
     procedure SetWifiHotspotOff();
     function IsWifiHotspotEnable(): boolean;
-    function CreateNewWifiNetwork(): boolean;
+    function CreateNewWifiNetwork(): boolean; overload;
+    function CreateNewWifiNetwork(_ssid: string; _password: string): boolean; overload;
+    function GetCurrentHotspotSSID(): string;
+    function GetCurrentHotspotPassword(): string;
 
  published
 
@@ -66,7 +69,10 @@ procedure jWifiManager_RequestWriteSettingsPermission(env: PJNIEnv; _jwifimanage
 procedure jWifiManager_SetWifiHotspotOn(env: PJNIEnv; _jwifimanager: JObject);
 procedure jWifiManager_SetWifiHotspotOff(env: PJNIEnv; _jwifimanager: JObject);
 function jWifiManager_IsWifiHotspotEnable(env: PJNIEnv; _jwifimanager: JObject): boolean;
-function jWifiManager_CreateNewWifiNetwork(env: PJNIEnv; _jwifimanager: JObject): boolean;
+function jWifiManager_CreateNewWifiNetwork(env: PJNIEnv; _jwifimanager: JObject): boolean; overload;
+function jWifiManager_CreateNewWifiNetwork(env: PJNIEnv; _jwifimanager: JObject; _ssid: string; _password: string): boolean; overload;
+function jWifiManager_GetCurrentHotspotSSID(env: PJNIEnv; _jwifimanager: JObject): string;
+function jWifiManager_GetCurrentHotspotPassword(env: PJNIEnv; _jwifimanager: JObject): string;
 
 
 implementation
@@ -233,6 +239,27 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jWifiManager_CreateNewWifiNetwork(FjEnv, FjObject);
+end;
+
+function jWifiManager.CreateNewWifiNetwork(_ssid: string; _password: string): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWifiManager_CreateNewWifiNetwork(FjEnv, FjObject, _ssid ,_password);
+end;
+
+function jWifiManager.GetCurrentHotspotSSID(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWifiManager_GetCurrentHotspotSSID(FjEnv, FjObject);
+end;
+
+function jWifiManager.GetCurrentHotspotPassword(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWifiManager_GetCurrentHotspotPassword(FjEnv, FjObject);
 end;
 
 {-------- jWifiManager_JNI_Bridge ----------}
@@ -530,6 +557,66 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'CreateNewWifiNetwork', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jwifimanager, jMethod);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jWifiManager_CreateNewWifiNetwork(env: PJNIEnv; _jwifimanager: JObject; _ssid: string; _password: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_ssid));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_password));
+  jCls:= env^.GetObjectClass(env, _jwifimanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'CreateNewWifiNetwork', '(Ljava/lang/String;Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jwifimanager, jMethod, @jParams);
+  Result:= boolean(jBoo);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jWifiManager_GetCurrentHotspotSSID(env: PJNIEnv; _jwifimanager: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwifimanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCurrentHotspotSSID', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jwifimanager, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+
+function jWifiManager_GetCurrentHotspotPassword(env: PJNIEnv; _jwifimanager: JObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwifimanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetCurrentHotspotPassword', '()Ljava/lang/String;');
+  jStr:= env^.CallObjectMethod(env, _jwifimanager, jMethod);
+  case jStr = nil of
+     True : Result:= '';
+     False: begin
+              jBoo:= JNI_False;
+              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
+            end;
+  end;
   env^.DeleteLocalRef(env, jCls);
 end;
 

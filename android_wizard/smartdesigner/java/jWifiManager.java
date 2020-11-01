@@ -409,5 +409,60 @@ public class jWifiManager /*extends ...*/ {
        }
        return result;
    }
+
+    public boolean CreateNewWifiNetwork(String _ssid, String _password) {
+
+        boolean result = false;
+        // creating new wifi configuration
+
+        if (wifiManager == null) return false;
+
+        wifiManager.setWifiEnabled(false); // turn off Wifi
+
+        WifiConfiguration myConfig = new WifiConfiguration();
+        myConfig.SSID = _ssid; // SSID name of netwok
+        myConfig.preSharedKey = _password; // password for network
+        myConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE); // 4 is for KeyMgmt.WPA2_PSK which is not exposed by android KeyMgmt class
+        myConfig.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN); // Set Auth Algorithms to open
+        try {
+            Method method = wifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            result = (Boolean) method.invoke(wifiManager, myConfig, true);  // setting and turing on android wifiap with new configrations
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+
+    }
+
+    public String GetCurrentHotspotSSID() throws InvocationTargetException, IllegalAccessException {
+        String strSSID= "";
+
+        if (wifiManager == null) return "";
+
+        Method[] methods = wifiManager.getClass().getDeclaredMethods();
+        for (Method m: methods) {
+            if (m.getName().equals("getWifiApConfiguration")) {
+                WifiConfiguration config = (WifiConfiguration) m.invoke(wifiManager);
+                strSSID = config.SSID;
+            }
+        }
+        return strSSID;
+    }
+
+    public String GetCurrentHotspotPassword() throws InvocationTargetException, IllegalAccessException {
+        String strPassword= "";
+
+        if (wifiManager == null) return "";
+
+        Method[] methods = wifiManager.getClass().getDeclaredMethods();
+        for (Method m: methods) {
+            if (m.getName().equals("getWifiApConfiguration")) {
+                WifiConfiguration config = (WifiConfiguration) m.invoke(wifiManager);
+                strPassword=config.preSharedKey;
+            }
+        }
+        return strPassword;
+    }
+
 }
 
