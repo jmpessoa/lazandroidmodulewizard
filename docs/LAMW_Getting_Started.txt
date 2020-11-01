@@ -9,6 +9,8 @@
 	Linux Install Tutorial:  LAMW folder  "...docs\linux"
 
 	New! LAMW Manager https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html
+		https://github.com/DanielOliveiraSouza/LAMW4Linux-installer
+		https://github.com/DanielOliveiraSouza/LAMW4Windows-installer
                   
 
 	About MacOS: X11 [libGL.dylib] is no longer bundled with Mountain Lion (and later!)			
@@ -77,7 +79,10 @@ I. Infrastructure
 	.Option 2) Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
 		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases
 
-	.Option 3) New! LAMW Manager https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html		
+	.Option 3) New! LAMW Manager https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html	
+		https://github.com/DanielOliveiraSouza/LAMW4Linux-installer
+		https://github.com/DanielOliveiraSouza/LAMW4Windows-installer
+	
 
 	.Option 4) Lazarus + FPC 3.2.0 [canonical/windows] "Do It Yourself"			
 
