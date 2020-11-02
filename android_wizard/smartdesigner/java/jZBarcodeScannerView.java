@@ -204,6 +204,7 @@ public class jZBarcodeScannerView extends FrameLayout {
         if (mCamera != null) {
             previewing = false;
             mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
             mCamera.release();
             mCamera = null;
         }
@@ -333,6 +334,7 @@ public class jZBarcodeScannerView extends FrameLayout {
     }
 
     public void Scan(Bitmap _barcodeBmp) {
+        if (_barcodeBmp != null) {
         //Bitmap barcodeBmp = BitmapFactory.decodeResource(getResources(), R.drawable.barcode);
         int width = _barcodeBmp.getWidth();
         int height = _barcodeBmp.getHeight();
@@ -348,6 +350,7 @@ public class jZBarcodeScannerView extends FrameLayout {
             }
         }
     }
+    }
 
     public void Scan() {
         if (!initialized) {
@@ -361,6 +364,17 @@ public class jZBarcodeScannerView extends FrameLayout {
             this.addView(mPreview);
         }
         else ReScan();
+    }
+
+    public void StopScan() {
+        if (initialized) {
+           releaseCamera();
+           barcodeScanned = false;
+           this.removeView(mPreview);
+           mPreview = null;
+           initialized = false;
+           previewing = true;
+        }
     }
 
     //https://mkyong.com/android/how-to-turn-onoff-camera-ledflashlight-in-android/

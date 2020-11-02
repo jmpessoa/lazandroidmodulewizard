@@ -71,6 +71,7 @@ jZBarcodeScannerView = class(jVisualControl)
     procedure ClearLayoutAll();
     procedure Scan(); overload;
     procedure Scan(_barcodeBmp: jObject); overload;
+    procedure StopScan();
     procedure SetFlashlight(_flashlightMode: boolean);
     procedure SetFlashlightMode(_flashlightMode: TFlashlightMode);
 
@@ -105,6 +106,7 @@ procedure jZBarcodeScannerView_ClearLayoutAll(env: PJNIEnv; _jbarcodescannerview
 procedure jZBarcodeScannerView_SetId(env: PJNIEnv; _jbarcodescannerview: JObject; _id: integer);
 procedure jZBarcodeScannerView_Scan(env: PJNIEnv; _jbarcodescannerview: JObject); overload;
 procedure jZBarcodeScannerView_Scan(env: PJNIEnv; _jzbarcodescannerview: JObject; _barcodeBmp: jObject); overload;
+procedure jZBarcodeScannerView_StopScan(env: PJNIEnv; _jbarcodescannerview: JObject);
 procedure jZBarcodeScannerView_SetFlashlight(env: PJNIEnv; _jzbarcodescannerview: JObject; _flashlightMode: boolean);
 
 
@@ -393,6 +395,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jZBarcodeScannerView_Scan(FjEnv, FjObject, _barcodeBmp);
+end;
+
+procedure jZBarcodeScannerView.StopScan();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jZBarcodeScannerView_StopScan(FjEnv, FjObject);
 end;
 
 procedure jZBarcodeScannerView.SetFlashlight(_flashlightMode: boolean);
@@ -685,6 +694,17 @@ begin
   jCls:= env^.GetObjectClass(env, _jzbarcodescannerview);
   jMethod:= env^.GetMethodID(env, jCls, 'Scan', '(Landroid/graphics/Bitmap;)V');
   env^.CallVoidMethodA(env, _jzbarcodescannerview, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jZBarcodeScannerView_StopScan(env: PJNIEnv; _jbarcodescannerview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jbarcodescannerview);
+  jMethod:= env^.GetMethodID(env, jCls, 'StopScan', '()V');
+  env^.CallVoidMethod(env, _jbarcodescannerview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
