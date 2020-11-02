@@ -89,7 +89,15 @@ class ZBarCameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // Camera preview released in activity
+        // This is necessary to prevent buffer errors: the camera must stop before the view is being destroyed.
+        try {
+            mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        } catch (Exception e){
+            mCamera = null;
+        }
     }
 
     @Override
@@ -202,17 +210,22 @@ public class jZBarcodeScannerView extends FrameLayout {
 
     private void releaseCamera() {
         if (mCamera != null) {
+            // This is necessary to prevent errors: the camea might already be releasing in SurfaceDestroy
+            try {
             previewing = false;
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
             mCamera.release();
             mCamera = null;
+            } catch (Exception e){
+                mCamera = null;
+            }
         }
     }
 
     private Runnable doAutoFocus = new Runnable() {
         public void run() {
-            if (previewing)
+            if (previewing && (mCamera != null) )
                 mCamera.autoFocus(autoFocusCB);
         }
     };
@@ -369,11 +382,11 @@ public class jZBarcodeScannerView extends FrameLayout {
     public void StopScan() {
         if (initialized) {
            releaseCamera();
-           barcodeScanned = false;
            this.removeView(mPreview);
            mPreview = null;
            initialized = false;
            previewing = true;
+           barcodeScanned = false;
         }
     }
 
