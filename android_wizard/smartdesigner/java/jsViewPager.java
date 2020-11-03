@@ -6,6 +6,8 @@ import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.viewpager.widget.PagerAdapter;
@@ -31,13 +33,32 @@ class CustomPagerAdapter extends PagerAdapter {
      */
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
-        collection.addView(Layouts.get(position));
-        return Layouts.get(position);
+    	    	
+    	View viewChild = Layouts.get(position); 
+    	
+    	if( viewChild == null ) return null;
+    	
+    	RelativeLayout layout = new RelativeLayout(collection.getContext());
+    	ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewPager.LayoutParams.MATCH_PARENT, 
+    			                                                   ViewPager.LayoutParams.MATCH_PARENT);
+        layout.setLayoutParams(params);        
+        collection.addView(layout);
+        
+        layout.addView(viewChild, params);
+    	
+    	return layout;    	    
     }
 
     @Override
     public void destroyItem(ViewGroup collection, int position, Object view) {
-        collection.removeView((View) view);
+    	
+        View viewChild = Layouts.get(position); 
+    	
+    	if( viewChild == null ) return;
+    	
+    	((RelativeLayout) view).removeView(viewChild);
+    	
+    	((ViewPager)collection).removeView((RelativeLayout) view);
     }
 
     @Override
@@ -47,7 +68,7 @@ class CustomPagerAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view == object;
+        return (view == object);
     }
 
     /*
@@ -211,9 +232,13 @@ public class jsViewPager extends ViewPager /*dummy*/ { //please, fix what GUI ob
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
      
-   public void AddPage(View _view, String _title) {	   
+   public void AddPage(View _view, String _title) {
+	  if( _view == null ) return;
+	  
 	  ViewGroup parent = (ViewGroup) _view.getParent();
-	  if (parent != null) parent.removeView(_view);	   
+	  
+	  if (parent != null) parent.removeView(_view);
+	 
 	  adapter.addPage(_view, _title);
    }
    
