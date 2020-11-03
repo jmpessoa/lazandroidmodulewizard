@@ -3,9 +3,11 @@ package org.lamw.appcompatadmobdemo1;
 import android.os.AsyncTask;
 import android.content.Context;
 import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Display;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -16,11 +18,12 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdListener;
-
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Developed by ADiV for LAMW on 2020-06-01
+// Developed by ADiV for LAMW on 2020-09-30
 // Updated for AdMob 17.2.1
 //-------------------------------------------------------------------------
 
@@ -50,7 +53,8 @@ public class jsAdMob extends FrameLayout {
    private OnClickListener onClickListener;   // click event
    private Boolean enabled  = true;           // click-touch enabled!
    
-   private int admobWidth = 0; // Control change of width
+   private int admobWidth         = 0; // Control change of width
+   private int admobWidthAdaptive = 0; // Adaptive width
    private boolean mIsLoading = false;
 
    private AdView     admobView    = null;
@@ -59,6 +63,7 @@ public class jsAdMob extends FrameLayout {
    private String     admobId      = "ca-app-pub-3940256099942544/6300978111";
    private int        admobBannerSize = 0;  //LMB initialize banner size to SMART_BANNER (0)
    private Boolean    admobBStop      = false;
+   private AdSize     admobAdSize  = null;
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jsAdMob(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -114,12 +119,64 @@ public class jsAdMob extends FrameLayout {
       return admobBannerSize;
    }
    
+   public int AdMobGetHeight() {
+	    if (admobView == null) return 0;
+	    
+	    // Step 2 - Determine the screen width (less decorations) to use for the ad width.
+	       Display display = controls.activity.getWindowManager().getDefaultDisplay();
+	       DisplayMetrics outMetrics = new DisplayMetrics();
+	       display.getMetrics(outMetrics);
+
+	       float widthPixels = outMetrics.widthPixels;
+	       float density = outMetrics.density;
+	       
+	       if( admobWidthAdaptive == 0 )        
+	           return (int) (widthPixels / density);
+	       else
+	    	   return (int) (admobWidthAdaptive / density);
+
+	   /* switch (admobBannerSize) {		 
+        case 1: // 320x50	Banner	Phones and Tablets	BANNER
+		 	  return AdSize.BANNER.getHeightInPixels(context);
+			 
+		 case 2: // 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
+			  return AdSize.LARGE_BANNER.getHeightInPixels(context);
+			  
+		 case 3: // 300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
+			  return AdSize.MEDIUM_RECTANGLE.getHeightInPixels(context);
+			  		 
+		 case 4: // 468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
+			  return AdSize.FULL_BANNER.getHeightInPixels(context);
+			  		 
+		 case 5: // 728x90	IAB Leaderboard	Tablets	LEADERBOARD
+			  return AdSize.LEADERBOARD.getHeightInPixels(context);
+			  
+		 case 6: // Adaptive size
+			  if(admobAdSize == null) return 0;
+			  return admobAdSize.getHeightInPixels(context);
+			 
+		 default: // screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
+			return AdSize.SMART_BANNER.getHeightInPixels(context);			
+		}*/
+	}
+   
    public void AdMobInit(){
 	  
-	   if( !admobInit ) { 
+	   /*if( !admobInit ) { 
 	    MobileAds.initialize(controls.activity);
 	    admobInit = true;
-	   }
+	   }*/
+	   
+	   if( admobInit ) return; 
+	   
+	   // Initialize the Mobile Ads SDK.
+       MobileAds.initialize(controls.activity, 
+    	   new OnInitializationCompleteListener() {    	           
+           @Override
+           public void onInitializationComplete(InitializationStatus initializationStatus) {
+        	   controls.pOnAdMobInitializationComplete(pascalObj);
+           }
+       });
    }
    
    public void AdMobFree(){
@@ -178,7 +235,7 @@ public class jsAdMob extends FrameLayout {
 	            /*private void showToast(String message) {            	
 	                Toast.makeText(controls.activity, message, Toast.LENGTH_SHORT).show();
 	            }*/
-	                        
+        	        		          
 	            
 	            @Override
 	            public void onAdLoaded() {
@@ -220,6 +277,13 @@ public class jsAdMob extends FrameLayout {
 	                //showToast("Ad opened.");
 	            	controls.pOnAdMobOpened(pascalObj);
 	            }
+	            
+	            @Override
+	            public void onAdClicked() {
+	                // Code to be executed when the user clicks on an ad.
+	            	controls.pOnAdMobClicked(pascalObj);
+	            }
+
 
 	            @Override
 	            public void onAdClosed() {
@@ -248,7 +312,7 @@ public class jsAdMob extends FrameLayout {
                 
         switch (admobBannerSize) {		 
          case 1: // 320x50	Banner	Phones and Tablets	BANNER
-		 	   admobView.setAdSize(AdSize.SMART_BANNER);
+		 	  admobView.setAdSize(AdSize.BANNER);
 			  break;
 		 case 2: // 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
 			   admobView.setAdSize(AdSize.LARGE_BANNER);
@@ -262,8 +326,12 @@ public class jsAdMob extends FrameLayout {
 		 case 5: // 728x90	IAB Leaderboard	Tablets	LEADERBOARD
 			   admobView.setAdSize(AdSize.LEADERBOARD);
 			  break;
+		 case 6:
+			    admobAdSize = getAdSize();		        
+				admobView.setAdSize(admobAdSize); 
+			 break;
 		 default: // screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
-			admobView.setAdSize(AdSize.SMART_BANNER);
+			  admobView.setAdSize(AdSize.SMART_BANNER);			
 		}
         
         
@@ -279,6 +347,32 @@ public class jsAdMob extends FrameLayout {
         
         admobWidth = this.getWidth();
    }
+   
+   private AdSize getAdSize() {
+	   
+	   // Step 2 - Determine the screen width (less decorations) to use for the ad width.
+       Display display = controls.activity.getWindowManager().getDefaultDisplay();
+       DisplayMetrics outMetrics = new DisplayMetrics();
+       display.getMetrics(outMetrics);
+
+       float widthPixels = outMetrics.widthPixels;
+       float density = outMetrics.density;
+       
+       int adWidth = 0;
+	   
+	   if( admobWidthAdaptive == 0 )        
+           adWidth = (int) (widthPixels / density);
+       else
+    	   adWidth = (int) (admobWidthAdaptive / density);
+	   
+       // Step 3 - Get adaptive ad size and return for setting on the ad view.
+       return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(controls.activity, adWidth);
+   }
+   
+   public void SetAdativeWidth( int _aWidth ){
+	   admobWidthAdaptive = _aWidth;
+   }
+
 
    public View GetView() {
       return this;

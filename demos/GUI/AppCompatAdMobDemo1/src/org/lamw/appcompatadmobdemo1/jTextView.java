@@ -123,14 +123,6 @@ public class jTextView extends TextView {
 	public void SetLParamHeight(int h) {
 		LAMWCommon.setLParamHeight(h);
 	}
-	
-	public int GetTop(){
-		return getTop();
-	}
-	
-	public int GetLeft(){
-		return getLeft();
-	}
     
 	public int GetLParamHeight() {
 		return  LAMWCommon.getLParamHeight();
@@ -225,6 +217,13 @@ public class jTextView extends TextView {
     public void SetTextTypeFace(int _typeface) {
         this.setTypeface(null, _typeface);
     }
+    
+    public void SetUnderline(boolean _on){
+        if( _on )
+      	  this.setPaintFlags(this.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+        else
+      	  this.setPaintFlags(Paint.ANTI_ALIAS_FLAG);
+      }
 
     public void Append(String _txt) {
         this.append( _txt);
@@ -285,11 +284,12 @@ public class jTextView extends TextView {
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 		
+		// by TR3E
 		if( d == null ){
 			this.setCompoundDrawables(null, null, null, null);
 			return;
 		}
-		
+				
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -306,6 +306,7 @@ public class jTextView extends TextView {
 		
 		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
+		// by TR3E
 		if( d == null ){
 			this.setCompoundDrawables(null, null, null, null);
 			return;

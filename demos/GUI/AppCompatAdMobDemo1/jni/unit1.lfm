@@ -1,15 +1,15 @@
 object AndroidModule1: TAndroidModule1
-  Left = 333
-  Top = 154
-  Width = 320
-  Height = 400
+  OnCreate = AndroidModule1Create
+  OnDestroy = AndroidModule1Destroy
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
-  OnCreate = AndroidModule1Create
-  OnDestroy = AndroidModule1Destroy
+  Left = 333
+  Top = 154
+  Width = 320
+  Height = 400
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrSilver
@@ -28,15 +28,15 @@ object AndroidModule1: TAndroidModule1
   OnActivityPause = AndroidModule1ActivityPause
   OnActivityResume = AndroidModule1ActivityResume
   object jButton1: jButton
-    Left = 53
-    Top = 176
-    Width = 213
-    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 53
+    Top = 175
+    Width = 213
+    Height = 50
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterInParent]
@@ -51,51 +51,51 @@ object AndroidModule1: TAndroidModule1
     OnClick = jButton1Click
   end
   object jsAdMob1: jsAdMob
-    Left = 0
-    Top = 304
-    Width = 320
-    Height = 96
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
     Enabled = True
+    Left = 0
+    Top = 304
+    Width = 320
+    Height = 96
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpBottom, rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
-    AdMobBannerSize = admobSmartBanner
+    AdMobBannerSize = admobAdaptive
   end
   object jsAdMob2: jsAdMob
-    Left = 0
-    Top = 0
-    Width = 320
-    Height = 96
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
     Enabled = True
+    Left = 0
+    Top = 0
+    Width = 320
+    Height = 96
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
-    AdMobBannerSize = admobSmartBanner
+    AdMobBannerSize = admobAdaptive
   end
   object jButton2: jButton
-    Left = 107
-    Top = 101
-    Width = 106
-    Height = 48
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 107
+    Top = 101
+    Width = 106
+    Height = 50
     Visible = True
     Anchor = jsAdMob2
     PosRelativeToAnchor = [raBelow]
@@ -111,15 +111,15 @@ object AndroidModule1: TAndroidModule1
     OnClick = jButton2Click
   end
   object lbInfo: jTextView
-    Left = 5
-    Top = 234
-    Width = 310
-    Height = 19
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 5
+    Top = 235
+    Width = 310
+    Height = 20
     Visible = True
     Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
