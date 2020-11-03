@@ -3212,7 +3212,8 @@ begin
 
       if (k<>-1) then
       begin
-        //remove our own support libs if any
+
+        //remove our own appCompat libs if any
         for i:=(tempList.Count-1) downto (k-1) do
         begin
           if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('androidx.appcompat:appcompat:', tempList.Strings[i])>0)) or
@@ -3224,7 +3225,23 @@ begin
               begin
                 tempList.Delete(i);
                 break;
-              end
+              end;
+            end;
+          end;
+        end;
+
+        //remove our own Support libs if any
+        for i:=(tempList.Count-1) downto (k-1) do
+        begin
+          if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('androidx.core:core:', tempList.Strings[i])>0)) then
+          begin
+            for aSupportLib in SupportLibs do
+            begin
+              if Pos(aSupportLib.Name,tempList.Strings[i])>0 then
+              begin
+                tempList.Delete(i);
+                break;
+              end;
             end;
           end;
         end;
@@ -3234,6 +3251,7 @@ begin
         if Pos('AppCompat', AndroidTheme) > 0 then
         begin
           innerSupported:= True; //that is, AppCompat has inner "Support" Libraries
+
           //get the compileSdkVersion
           compileSdkVersion:='';
           for i:=(tempList.Count-1) downto 0 do
@@ -3247,13 +3265,14 @@ begin
               break;
             end;
           end;
+
           if (Length(compileSdkVersion)>0) then
           begin
               for aAppCompatLib in AppCompatLibs do
               begin
                 if aAppCompatLib.MinAPI<=StrToInt(compileSdkVersion) then
                 begin
-                  tempList.Insert((k+1),'    '+aux+' '''+aAppCompatLib.Name+'''');//compileSdkVersion+'.+''');
+                  tempList.Insert((k+1),'    '+aux+' '''+aAppCompatLib.Name+'''');
                   Inc(k);
                 end;
               end;
@@ -3282,7 +3301,7 @@ begin
               begin
                 if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
                 begin
-                  tempList.Insert((k+1),'    '+aux+' '''+aSupportLib.Name + '''');//+compileSdkVersion+'.+''');
+                  tempList.Insert((k+1),'    '+aux+' '''+aSupportLib.Name + '''');
                   Inc(k);
                 end;
               end;
