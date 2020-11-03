@@ -811,6 +811,8 @@ var
   r: TDOMNode;
   n: TDOMElement;
   fn: string;
+  strList: TStringList;
+  fileGradle : string;
 begin
   // writing manifest
   if not Assigned(xml) then
@@ -818,6 +820,32 @@ begin
 
   xml.DocumentElement.AttribStrings['android:versionCode'] := IntToStr(FVersionCode);
   xml.DocumentElement.AttribStrings['android:versionName'] := FVersionName;
+
+  strList    := nil;
+  fileGradle := ExtractFilePath(FFileName) + PathDelim + 'build.gradle';
+
+  if fileExists(fileGradle) then
+  begin
+   strList:= TStringList.Create;
+
+   strList.LoadFromFile(fileGradle);
+
+   for i := 0 to strList.Count - 1 do
+   begin
+     if pos('versionCode', strList.Strings[i]) > 1 then
+      strList.Strings[i] := '            versionCode ' + intToStr(FVersionCode);
+
+     if pos('versionName', strList.Strings[i]) > 1 then
+     begin
+      strList.Strings[i] := '            versionName "'+FVersionName+'"';
+      break;
+     end;
+   end;
+
+   strList.SaveToFile(fileGradle);
+
+   strList.Free;
+  end;
 
   if not Assigned(FUsesSDKNode) then
   begin
