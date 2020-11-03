@@ -21,7 +21,7 @@ package org.lamw.appcompatadmobdemo1;
 
 import java.lang.Override;
 //import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 
@@ -38,12 +38,11 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.content.Context;
 import android.graphics.Canvas;
-//import android.util.DisplayMetrics;
 
 public class App extends AppCompatActivity {
-    private Controls       controls = null;
+private Controls       controls;
     
-    private int screenOrientation = 0; //For udapte screen orientation. [by TR3E]
+    private int screenOrientation = 0; //For update screen orientation. [by TR3E]
     private boolean rlSizeChanged = false;
     
     //New "RelativeLayout" adapted to "Multiwindow" and automatic resizing. [by TR3E]
@@ -56,18 +55,18 @@ public class App extends AppCompatActivity {
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         	super.onSizeChanged(w, h, oldw, oldh);
-        	        	   
+        	        	      
             if ((controls.screenWidth != w) || (controls.screenHeight != h)){            	
             	controls.screenWidth  = w;
             	controls.screenHeight = h;
-            	rlSizeChanged         = true;
+            	rlSizeChanged = true;            	
             }
                         
         }
         
         @Override
         protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);                                   
+            super.onDraw(canvas);                                    
             
             // If change size call "jAppOnRotate" for update screen. [by TR3E]
             if( controls.formChangeSize || rlSizeChanged ){            	
@@ -81,7 +80,7 @@ public class App extends AppCompatActivity {
             	if( controls.screenWidth < controls.screenHeight ) screenOrientation = 1;
             	if( controls.screenWidth > controls.screenHeight ) screenOrientation = 2;
             	
-            	controls.jAppOnRotate(screenOrientation);            	                        	
+            	controls.jAppOnRotate(screenOrientation);
             }
             
             // Call updatelayout automatically if necessary. [by TR3E]
@@ -94,9 +93,9 @@ public class App extends AppCompatActivity {
 	   
     @Override
     public void onCreate(Bundle savedInstanceState) {
-     super.onCreate(savedInstanceState);     
+     super.onCreate(savedInstanceState);          
      
-     //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
+      //ref. http://stackoverflow.com/questions/8706464/defaulthttpclient-to-androidhttpclient 
      int systemVersion = android.os.Build.VERSION.SDK_INT; 
      if (systemVersion > 9) {
          StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -110,36 +109,39 @@ public class App extends AppCompatActivity {
       controls.screenWidth  = getResources().getDisplayMetrics().widthPixels;
       controls.screenHeight = getResources().getDisplayMetrics().heightPixels;
       
-    //New "RelativeLayout" adapted to "Multiwindows" and automatic resizing. [by TR3E]
+      //New "RelativeLayout" adapted to "Multiwindows" and automatic resizing. [by TR3E]
       controls.appLayout   = new RLAppLayout(this);
-      controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);      
+      controls.appLayout.getRootView().setBackgroundColor (0x00FFFFFF);
+      
       controls.screenStyle = controls.jAppOnScreenStyle();
       controls.systemVersion = systemVersion;
+      
       switch( controls.screenStyle ) {
       	case 1  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );  break;
       	case 2  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  break;
       	default : ; // Device Default , Rotation by Device
-      } 	
+      }
+      
       this.setContentView(controls.appLayout);
+      
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
       
       controls.jAppOnCreate(this, controls.appLayout, getIntent());
       
       // Force updating the screen would need for Android 8 or higher [by TR3E]
-      controls.appLayout.requestLayout();
+      controls.appLayout.requestLayout();                 
     }
 
-    //[ifdef_api23up]
+   //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
     	
-    	if ( (permissions.length > 0) && (grantResults.length > 0) ) {
+        if ( (permissions.length > 0) && (grantResults.length > 0) ) {
             for (int i = 0; i < permissions.length; i++) {
                 controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[i], grantResults[i]);
             }
         }
     } //[endif_api23up]
-
 
     @Override    
     protected void onNewIntent(Intent intent) {
@@ -153,13 +155,13 @@ public class App extends AppCompatActivity {
     protected void onDestroy() { super.onDestroy(); controls.jAppOnDestroy();}
     
     @Override
-    protected void onPause() {super.onPause(); controls.jAppOnPause();  }
+    protected void onPause() {super.onPause(); controls.jAppOnPause();}
     
     @Override
-    protected void onRestart() {super.onRestart(); controls.jAppOnRestart(); }
+    protected void onRestart() {super.onRestart(); controls.jAppOnRestart();}
                                     	                                        
     @Override
-    protected void onResume() { super.onResume(); controls.jAppOnResume(); }  
+    protected void onResume() { super.onResume(); controls.jAppOnResume(); }
     	                                        
     @Override
     protected void onStart() { super.onStart(); controls.jAppOnStart(); }
@@ -172,22 +174,22 @@ public class App extends AppCompatActivity {
     
     @Override
     public    void onConfigurationChanged(Configuration newConfig) {
-    	super.onConfigurationChanged(newConfig);
+    	super.onConfigurationChanged(newConfig);    
     	
     	screenOrientation = newConfig.orientation;
     	
-    	controls.appLayout.requestLayout();    	
+    	controls.appLayout.requestLayout();
     }	   	
  
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
+     controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
     }
 
-// http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar
-@Override
-public boolean onOptionsItemSelected(MenuItem item) {
-	switch (item.getItemId()) {
+    // http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+	 switch (item.getItemId()) {
         case android.R.id.home:
             // app icon in action bar clicked; go home
 	    controls.jAppOnBackPressed();
@@ -196,10 +198,10 @@ public boolean onOptionsItemSelected(MenuItem item) {
 		String caption = item.getTitle().toString();
 		controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption, item.isChecked());
 		return true; //renabor
-    }
-}
+     }
+   }
 
- //by jmpessoa: context menu support -  Context menu items do not support icons!
+   //by jmpessoa: context menu support -  Context menu items do not support icons!
    @Override    
    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
       super.onCreateContextMenu(menu, v, menuInfo);
@@ -211,7 +213,8 @@ public boolean onOptionsItemSelected(MenuItem item) {
    /*by jmpessoa: Handles menu item selections*/
    @Override    
    public boolean onContextItemSelected(MenuItem item) {
-	  String caption = item.getTitle().toString();
+	   
+   	  String caption = item.getTitle().toString();
    	  controls.jAppOnClickContextMenuItem(item, item.getItemId(), caption, item.isChecked());
       return true; // stop propagating event
    }
@@ -219,15 +222,15 @@ public boolean onOptionsItemSelected(MenuItem item) {
    //by jmpessoa: option menu support
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
-	   
-	    controls.jAppOnCreateOptionsMenu(menu);
 	    
+	    controls.jAppOnCreateOptionsMenu(menu);
         return true;
    }   
    
    /*by jmpessoa: TODO :Handles prepare menu item*/
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
+	           
 	   boolean changeMenuItems = false;
 	   boolean continueChangingItem = true;
 	   	   
@@ -258,6 +261,7 @@ public boolean onOptionsItemSelected(MenuItem item) {
    
    @Override
    public boolean onKeyDown(int keyCode, KeyEvent event) {
+	   
 	  char c = event.getDisplayLabel();	        
 	  //boolean mute = controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));  //TODO
       //if (mute) return false;	  
@@ -317,5 +321,5 @@ public boolean onOptionsItemSelected(MenuItem item) {
         //default:  controls.jAppOnKeyDown(c,keyCode,KeyEvent.keyCodeToString(keyCode));         	
       }      
       return super.onKeyDown(keyCode, event);      
-   }                
+   }        
 }

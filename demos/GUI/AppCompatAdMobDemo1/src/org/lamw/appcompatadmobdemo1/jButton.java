@@ -240,6 +240,7 @@ public class jButton extends Button {
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 		
+		// by TR3E
 		if( d == null ){
 			this.setCompoundDrawables(null, null, null, null);
 			return;
@@ -261,9 +262,10 @@ public class jButton extends Button {
 		
 		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
+		// by TR3E
 		if( d == null ){
 			this.setCompoundDrawables(null, null, null, null);
-			return; // by tr3e
+			return;
 		}
 		
 		int h = d.getIntrinsicHeight(); 
