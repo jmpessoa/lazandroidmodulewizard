@@ -39,6 +39,8 @@ implementation
 
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
+ jWifiManager1.SetWifiEnabled(true);
+
  if jWifiManager1.NeedWriteSettingsPermission() then
     jWifiManager1.RequestWriteSettingsPermission();
 end;
