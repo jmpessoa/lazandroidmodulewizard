@@ -47,12 +47,14 @@ public class jWifiManager /*extends ...*/ {
 
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         //wifiManager = (WifiManager)Context.getSystemService(Context.WIFI_SERVICE);
-        if (wifiManager!= null) {
+        
+        // Better to start the app with the wifi deactivated to be able to use it for more purposes.
+        /*if (wifiManager!= null) {
             if (!wifiManager.isWifiEnabled()) {
                 //Toast.makeText(getApplicationContext(), "Turning WiFi ON...", Toast.LENGTH_LONG).show();
                 wifiManager.setWifiEnabled(true);
             }
-        }
+        }*/
     }
 
     public void jFree() {
