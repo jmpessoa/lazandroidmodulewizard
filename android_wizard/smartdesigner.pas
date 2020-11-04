@@ -767,7 +767,8 @@ begin
 
   if FSupport then
   begin
-     if FileExists(LamwGlobalSettings.PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') then
+     if FileExists(LamwGlobalSettings.PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') and
+        (not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml'))then
      begin
        strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'support'+DirectorySeparator+'support_provider_paths.xml');
        strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
@@ -2978,7 +2979,8 @@ begin
          auxList.SaveToFile(FPathToJavaSource + DirectorySeparator + 'jSupported.java');
        end;
 
-       if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') then
+       if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') and
+          (not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml'))then
        begin
          ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'drawable');
          auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml');

@@ -301,6 +301,9 @@ public class jImageFileManager /*extends ...*/ {
  public boolean SaveToFile(Bitmap _image,String _path, String _filename) {	   	    
 	    if( _image == null ) return false;
 	 
+	    File filePath = new File (_path);
+	    filePath.mkdirs(); // don't forget to make the directory
+	    
 	    File file = new File (_path +"/"+ _filename);
 	    
 	    if (file.exists ()) file.delete ();

@@ -2520,7 +2520,7 @@ public  String getStrDateTime() {
 //Controls Version Info
 //-------------------------------------------
 //GetControlsVersionFeatures ...  //Controls.java version-revision info! [0.6-04]
-public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good cause! please, use the  jForm_GetDateTime!!
+public  String GetControlsVersion() {  
   String listVersionInfo = 
 		  "7$0=GetControlsVersionInfo;" +  //added ... etc..
   		  "7$0=getLocale;"; //added ... etc.. 

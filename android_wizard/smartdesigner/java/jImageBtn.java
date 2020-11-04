@@ -1,4 +1,4 @@
-package org.lamw.appspeechtotextdemo2;
+package org.lamw.appjcentermikrotikrouterosdemo1;
 
 import java.lang.reflect.Field;
 
@@ -15,8 +15,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
-import android.os.Build;
 import android.os.Handler;
+import android.os.Build;
 import android.util.Log;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -25,8 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 //-------------------------------------------------------------------------
-// jImageBtn
-// Reviewed by ADiV on 2020/07/29
+//jImageBtn
+//Reviewed by ADiV on 2020/10/04
 //-------------------------------------------------------------------------
 
 public class jImageBtn extends ImageView {
@@ -65,28 +65,10 @@ public class jImageBtn extends ImageView {
 			int actType = event.getAction()&MotionEvent.ACTION_MASK;
 			
 			switch(actType) {
-
-				case MotionEvent.ACTION_UP: {
-					if( btnState == 0 ) return false;
-					btnState = 0;
-					controls.pOnUp(PasObj, Const.Click_Default);
-					//this.setImageBitmap(bmpUp);
-
-					//invalidate();
-					final Handler handler = new Handler();
-					handler.postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							// Do something after: 1s = 1000ms
-							if(btnState != 1) {
-								//btnState = 1;
-								mImage.setImageBitmap(bmpUp);
-							}
-						}
-					}, mSleep);  //1s = 1000ms
-					break;
-				}
-
+			    case MotionEvent.ACTION_UP: {				
+				 controls.pOnUp(PasObj, Const.Click_Default);
+				 break;
+			    }
 				case MotionEvent.ACTION_DOWN: {  
 					
 					if( btnState == 1 ) return false;
@@ -104,8 +86,8 @@ public class jImageBtn extends ImageView {
 						public void run() {
 							// Do something after: 1s = 1000ms
 							if(btnState != 0) {
-							 //btnState = 0;
-							 //mImage.setImageBitmap(bmpUp);
+							 btnState = 0;
+							 mImage.setImageBitmap(bmpUp);
 							 controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
 							}
 						}
@@ -218,7 +200,7 @@ public class jImageBtn extends ImageView {
 		}
 		
 	}
-
+	
 	public void SetImageState(int _state) {
 		if (_state == 0 ) {
 			if (bmpUp != null) {
@@ -231,19 +213,18 @@ public class jImageBtn extends ImageView {
 		  }
 		}
 	}
-
+    
     public void SetAlpha( int value ){
     	
         if( bmpUp == null ) return;
 		
 		if( value < 0 ) value = 0;
 		if( value > 255) value = 255;
-
+		
 		//[ifdef_api16up]
 		if(Build.VERSION.SDK_INT >= 16) setImageAlpha(value);
-        //[endif_api16up]
-
-	}
+		//[endif_api16up]
+    }
     
     public void SetSaturation( float value ){
      ColorMatrix matrix = new ColorMatrix();
@@ -251,6 +232,15 @@ public class jImageBtn extends ImageView {
      matrix.setSaturation(value); 
      
      setColorFilter(new ColorMatrixColorFilter(matrix));
+    }
+    
+    public void SetColorScale(float _red, float _green, float _blue, float _alpha){
+    	
+    	ColorMatrix matrix = new ColorMatrix();
+        
+        matrix.setScale(_red, _green, _blue, _alpha); 
+        
+        setColorFilter(new ColorMatrixColorFilter(matrix));
     }
 
 	public void SetSleepDown(int _sleepMiliSeconds) {
