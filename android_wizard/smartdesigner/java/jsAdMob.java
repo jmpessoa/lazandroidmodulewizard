@@ -120,22 +120,9 @@ public class jsAdMob extends FrameLayout {
    }
    
    public int AdMobGetHeight() {
-	    if (admobView == null) return 0;
-	    
-	    // Step 2 - Determine the screen width (less decorations) to use for the ad width.
-	       Display display = controls.activity.getWindowManager().getDefaultDisplay();
-	       DisplayMetrics outMetrics = new DisplayMetrics();
-	       display.getMetrics(outMetrics);
+	    if (admobView == null) return 0;	    	   
 
-	       float widthPixels = outMetrics.widthPixels;
-	       float density = outMetrics.density;
-	       
-	       if( admobWidthAdaptive == 0 )        
-	           return (int) (widthPixels / density);
-	       else
-	    	   return (int) (admobWidthAdaptive / density);
-
-	   /* switch (admobBannerSize) {		 
+	   switch (admobBannerSize) {		 
         case 1: // 320x50	Banner	Phones and Tablets	BANNER
 		 	  return AdSize.BANNER.getHeightInPixels(context);
 			 
@@ -157,7 +144,7 @@ public class jsAdMob extends FrameLayout {
 			 
 		 default: // screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
 			return AdSize.SMART_BANNER.getHeightInPixels(context);			
-		}*/
+		}
 	}
    
    public void AdMobInit(){
