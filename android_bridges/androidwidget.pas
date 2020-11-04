@@ -7435,7 +7435,7 @@ end;
 //return GetControlsVersionFeatures ... "6$4=GetControlsVersionInfo;6$4=getLocale"
 function jApp_GetControlsVersionFeatures(env:PJNIEnv;this:jobject): string;
 begin
-  Result:= jni_func_out_t(env, this, 'getStrDateTime');
+  Result:= jni_func_out_t(env, this, 'GetjFormVersionFeatures');
 end;
 
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString; 
@@ -7924,7 +7924,7 @@ end;
 //by jmpessoa
 function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
 begin
-  Result:= jni_func_out_t(env, Form, 'GetjFormVersionFeatures');
+  Result:= jni_func_out_t(env, Form, 'GetDateTime');
 end;
 
 function jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean): boolean;
