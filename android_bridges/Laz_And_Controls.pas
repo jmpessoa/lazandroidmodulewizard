@@ -2249,6 +2249,7 @@ type
     procedure SetImageDownScale(Value: single); // by ADiV
     procedure SetAlpha( Value : integer ); // by ADiV
     procedure SetSaturation(Value: single); // by ADiV
+    procedure SetColorScale(_red, _green, _blue, _alpha : single); // by ADiV
     procedure SetImageState(_imageState: TImageBtnState);
 
   published
@@ -12214,6 +12215,15 @@ begin
   if not FInitialized then exit;
 
   jni_proc_f(FjEnv, FjObject, 'SetSaturation', Value);
+end;
+
+// by ADiV
+procedure jImageBtn.SetColorScale(_red, _green, _blue, _alpha : single);
+begin
+
+  if not FInitialized then exit;
+
+  jni_proc_ffff(FjEnv, FjObject, 'SetColorScale', _red, _green, _blue, _alpha);
 end;
 
 Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
