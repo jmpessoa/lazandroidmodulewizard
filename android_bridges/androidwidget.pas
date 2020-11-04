@@ -7430,12 +7430,10 @@ begin
   Delete_jLocalRef(cls);
 end;
 
-//hacked by jmpessoa!! sorry, was for a good cause!
-//please, use the  jForm_GetDateTime!!
 //return GetControlsVersionFeatures ... "6$4=GetControlsVersionInfo;6$4=getLocale"
 function jApp_GetControlsVersionFeatures(env:PJNIEnv;this:jobject): string;
 begin
-  Result:= jni_func_out_t(env, this, 'GetjFormVersionFeatures');
+  Result:= jni_func_out_t(env, this, 'GetControlsVersion');
 end;
 
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString; 
