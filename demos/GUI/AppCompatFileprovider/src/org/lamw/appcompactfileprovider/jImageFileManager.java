@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package org.lamw.appcompactfileprovider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

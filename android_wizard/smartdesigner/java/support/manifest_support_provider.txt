@@ -1,1 +1,6 @@
-<provider android:name="androidx.core.content.FileProvider" android:authorities="dummyPackage.provider" android:exported="false" android:grantUriPermissions="true"><meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/support_provider_paths"/></provider>
+    <provider android:name="androidx.core.content.FileProvider" 
+          android:authorities="dummyPackage.fileprovider" 
+          android:exported="false" android:grantUriPermissions="true">
+          <meta-data android:name="android.support.FILE_PROVIDER_PATHS" 
+                     android:resource="@xml/support_provider_paths"/>
+    </provider>

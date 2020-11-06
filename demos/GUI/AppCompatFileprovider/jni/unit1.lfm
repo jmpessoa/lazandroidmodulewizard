@@ -1,0 +1,59 @@
+object AndroidModule1: TAndroidModule1
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Left = 326
+  Top = 143
+  Width = 320
+  Height = 400
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrWhite
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  OnActivityResult = AndroidModule1ActivityResult
+  object jButton1: jButton
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 60
+    Top = 175
+    Width = 200
+    Height = 50
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpFiveEighthOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Share an image without needing permissions'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton1Click
+  end
+  object iShareImage: jIntentManager
+    IntentAction = iaSend
+    Left = 208
+    Top = 276
+  end
+  object imgFile: jImageFileManager
+    Left = 232
+    Top = 64
+  end
+  object bmp: jBitmap
+    FilePath = fpathData
+    ImageIdentifier = 'lamw'
+    Width = 0
+    Height = 0
+    Left = 56
+    Top = 64
+  end
+end
