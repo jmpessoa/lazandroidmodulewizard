@@ -1,4 +1,4 @@
-package org.lamw.appsupportdemo5;
+package org.lamw.appcompactfileprovider;
 
 import android.content.Context;
 import android.net.Uri;
