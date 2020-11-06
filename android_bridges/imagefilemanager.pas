@@ -36,7 +36,8 @@ jImageFileManager = class(jControl)
     function LoadFromFile(_filenameInternalAppStorage: string): jObject; overload;
     function LoadFromFile(_pathEnvironment: string; _filename: string): jObject; overload;
     function SaveToFile(_image: jObject; _filename: string) : boolean; overload;
-    function SaveToFile(_image: jObject;_path: string; _filename: string) : boolean; overload;
+    function SaveToFile(_image: jObject; _path: string; _filename: string ) : boolean; overload;
+    function SaveToGallery(_image: jObject; _folderName, _fileName : string ) : boolean;
     function LoadFromUri(_imageUri: jObject): jObject;   overload;
 
     function GetBitmapToGrayscale( _bitmap : jObject ): jObject;
@@ -199,6 +200,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
    result := jni_func_bmp_tt_out_z(FjEnv, FjObject, 'SaveToFile', _image ,_path, _filename);
+end;
+
+function jImageFileManager.SaveToGallery(_image: jObject; _folderName, _fileName : string ) : boolean;
+begin
+  result := false;
+
+  //in designing component state: set value here...
+  if FInitialized then
+   result := jni_func_bmp_tt_out_z(FjEnv, FjObject, 'SaveToGallery', _image ,_folderName, _filename);
 end;
 
 function jImageFileManager.LoadFromUri(_imageUri: jObject): jObject;

@@ -33,6 +33,11 @@ import android.graphics.ColorMatrix;
 import android.graphics.Paint;
 import android.graphics.Canvas;
 
+import android.content.ContentValues;
+import android.media.MediaScannerConnection;
+import android.content.ContentResolver;
+import java.io.OutputStream;
+
 //-------------------------------------------------------------------------
 // jImageFileManager
 // Reviewed by TR3E on 10/10/2019
@@ -82,10 +87,12 @@ public class jImageFileManager /*extends ...*/ {
  }
  
  // By using this line you can able to see saved images in the gallery view.
- public void ShowImagesFromGallery () {	   
-	   controls.activity.sendBroadcast(new Intent(
-		   Intent.ACTION_MEDIA_MOUNTED,
-		   Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+ public void ShowImagesFromGallery () {	   	   	   
+	   Intent intent = new Intent();  
+	   intent.setAction(android.content.Intent.ACTION_VIEW);  
+	   intent.setType("image/*");
+	   intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	   controls.activity.startActivity(intent);
  }
  
  public Bitmap LoadFromSdCard(String _filename) {	   
@@ -323,6 +330,74 @@ public class jImageFileManager /*extends ...*/ {
 	    
 	    return true;
 }
+ 
+ public boolean SaveToGallery(Bitmap bitmap, String folderName, String fileName)
+ {
+     OutputStream fos;
+     File imageFile = null;
+     Uri  imageUri  = null;
+     boolean isPng  = true;
+     
+     if ( fileName.toLowerCase().contains(".jpg") ) isPng = false;
+     else if ( !(fileName.toLowerCase().contains(".png")) ) fileName = fileName + ".png";
+     
+     if (android.os.Build.VERSION.SDK_INT >= 29) {
+         ContentResolver resolver = context.getContentResolver();
+         ContentValues contentValues = new ContentValues();
+         contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+         if(isPng) contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+         else      contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+         contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, 
+        		 Environment.DIRECTORY_PICTURES + File.separator + folderName);
+         imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+         
+         try{
+          fos = resolver.openOutputStream(imageUri);
+         } catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			return false;
+		 }
+     } else {
+         String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() 
+        		            + File.separator + folderName;
+         
+         imageFile = new File(imagesDir);
+         
+         if (!imageFile.exists()) {
+             imageFile.mkdir();
+         }
+         
+         imageFile = new File(imagesDir, fileName);
+         
+         try{
+          fos = new FileOutputStream(imageFile);
+         } catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			return false;
+		 }
+     }
+
+     boolean saved = false;
+     
+     if(isPng) saved = bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+     else      saved = bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+     
+     try{
+      fos.flush();
+      fos.close();
+     } catch (IOException e) {
+		// TODO Auto-generated catch block
+		return false;
+	 }
+
+     if ((imageFile != null) && saved)  // pre Q
+     {
+         MediaScannerConnection.scanFile(context, new String[]{imageFile.toString()}, null, null);                 
+         return true;
+     }
+
+     return false;
+ }
 
  public Bitmap LoadFromUri(Uri _imageUri) {
       InputStream imageStream;
