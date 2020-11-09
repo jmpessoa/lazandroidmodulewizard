@@ -1653,86 +1653,24 @@ end;
   function jForm_GetIntExtra(env: PJNIEnv; _jform: JObject; intentData: jObject; extraName: string; defaultValue: integer): integer;
   function jForm_GetDoubleExtra(env: PJNIEnv; _jform: JObject; intentData: jObject; extraName: string; defaultValue: double): double;
 
-  procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _filename: string); overload;
-  procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _fullPath: string; _filename: string);  overload;
-  procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _filename: string);  overload;
-  function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _dirName: string): string;  overload;
-  function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _dirName: string): string;  overload;
-  function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _fullPath: string; _dirName: string): string;  overload;
-  function jForm_IsExternalStorageEmulated(env: PJNIEnv; _jform: JObject): boolean;
-  function jForm_IsExternalStorageRemovable(env: PJNIEnv; _jform: JObject): boolean;
-  function jForm_GetjFormVersionFeatures(env: PJNIEnv; _jform: JObject): string;
-
   function jForm_GetActionBar(env: PJNIEnv; _jform: JObject): jObject;
   procedure jForm_HideActionBar(env: PJNIEnv; _jform: JObject);
   procedure jForm_ShowActionBar(env: PJNIEnv; _jform: JObject);
-  procedure jForm_ShowTitleActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
   procedure jForm_ShowLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
   procedure jForm_SetTitleActionBar(env: PJNIEnv; _jform: JObject; _title: string);
-  procedure jForm_SetSubTitleActionBar(env: PJNIEnv; _jform: JObject; _subtitle: string);
 
-  procedure jForm_SetIconActionBar(env: PJNIEnv; _jform: JObject; _iconIdentifier: string);
-
-  procedure jForm_SetTabNavigationModeActionBar(env: PJNIEnv; _jform: JObject);
-  procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; _jform: JObject);
-
-  function jForm_GetStringResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
-
-  function jForm_GetStringResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): string;
-  function jForm_GetDrawableResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
   function jForm_GetDrawableResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): jObject;
   function jForm_GetQuantityStringByName(env: PJNIEnv; _jform: JObject; _resName: string; _quantity: integer): string;
-  function jForm_GetStringResourceByName(env: PJNIEnv; _jform: JObject; _resName: string): string;
-
-  function jForm_IsPackageInstalled(env: PJNIEnv; _jform: JObject; _packagename: string): boolean;
 
   procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer); overload;
   procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer); overload;
 
-  procedure jForm_SetScreenOrientation(env: PJNIEnv; _jform: JObject; _orientation: integer);
-  function jForm_GetScreenOrientation(env: PJNIEnv; _jform: JObject): integer;
-
-  function jForm_GetScreenDensity(env: PJNIEnv; _jform: JObject): string;
-  function jForm_GetScreenSize(env: PJNIEnv; _jform: JObject): string;
-  procedure jForm_LogDebug(env: PJNIEnv; _jform: JObject; _tag: string; _msg: string);
-
-  procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; _milliseconds: integer); overload;
-  procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; var _millisecondsPattern: TDynArrayOfInt64); overload;
-  procedure jForm_TakeScreenshot(env: PJNIEnv; _jform: JObject; _savePath: string; _saveFileNameJPG: string);
-
-  function jForm_GetTitleActionBar(env: PJNIEnv; _jform: JObject): string;
-  function jForm_GetSubTitleActionBar(env: PJNIEnv; _jform: JObject): string;
-
-  function jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string): string;
-  procedure jForm_CopyFromInternalAppStorageToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
-  procedure jForm_CopyFromAssetsToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
-
-  function jForm_GetActionBarHeight(env: PJNIEnv; _jform: JObject): integer;
-  function jForm_ActionBarIsShowing(env: PJNIEnv; _jform: JObject): boolean;
-
-  procedure jForm_ToggleSoftInput(env: PJNIEnv; _jform: JObject);
-  function jForm_GetDeviceModel(env: PJNIEnv; _jform: JObject): string;
-  function jForm_GetDeviceManufacturer(env: PJNIEnv; _jform: JObject): string;
-
-  procedure jForm_SetKeepScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
-  procedure jForm_SetTurnScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
-  procedure jForm_SetAllowLockWhileScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
-  procedure jForm_SetShowWhenLocked(env: PJNIEnv; _jform: JObject; _value: boolean);
+  procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; var _millisecondsPattern: TDynArrayOfInt64);
 
   function jForm_ParseUri(env: PJNIEnv; _jform: JObject; _uriAsString: string): jObject;
   function jForm_UriToString(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
-  function jForm_IsConnectedTo(env: PJNIEnv; _jform: JObject; _connectionType: integer): boolean;
-  function jForm_IsMobileDataEnabled(env: PJNIEnv; _jform: JObject): boolean;
 
-  procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject); overload;
-  procedure jForm_ShowSoftInput(env: PJNIEnv; _jform: JObject);
-
-  function jForm_GetNetworkStatus(env: PJNIEnv; _jform: JObject): integer;
-  function jForm_GetDeviceDataMobileIPAddress(env: PJNIEnv; _jform: JObject): string;
-  function jForm_GetDeviceWifiIPAddress(env: PJNIEnv; _jform: JObject): string;
-  function jForm_GetWifiBroadcastIPAddress(env: PJNIEnv; _jform: JObject): string;
   function jForm_GetRealPathFromURI(env: PJNIEnv; _jform: JObject; _Uri: jObject): string;
-  procedure jForm_StartDefaultActivityForFile(env: PJNIEnv; _jform: JObject; _filePath, _mimeType: string);
 
 //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -1781,37 +1719,19 @@ procedure Call_jCallStaticVoidMethodA(fullClassName: string; funcName: string; f
 // App - Main Activity
 //------------------------------------------------------------------------------
 
-//Please, use jForm_getDateTime...
-Function jApp_GetControlsVersionFeatures(env:PJNIEnv;this:jobject): String;
-
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
 function jApp_GetDriverList(env: PJNIEnv; this: JObject): TDynArrayOfString;
 function jApp_GetFolderList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
 function jApp_GetFileList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString;
 
-Procedure jApp_Finish(env:PJNIEnv;this:jobject);
-Procedure jApp_Recreate(env:PJNIEnv;this:jobject);
-
-Procedure jApp_Finish2(env:PJNIEnv;this:jobject);
 function  jApp_GetContext(env:PJNIEnv;this:jobject): jObject;
-function  jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
-
-function  jApp_GetContextTop(env:PJNIEnv; this:jobject): integer;
-function  jApp_GetStatusBarHeight(env:PJNIEnv; this:jobject): integer;
 
 function  jForm_GetOnViewClickListener        (env:PJNIEnv; Form: jObject): jObject;
 function  jForm_GetOnListItemClickListener    (env:PJNIEnv; Form: jObject): jObject;
 
-Procedure jApp_KillProcess             (env:PJNIEnv;this:jobject);
-Procedure jApp_ScreenStyle             (env:PJNIEnv;this:jobject; screenstyle : integer);
-
 procedure jApp_GetJNIEnv(var env: PJNIEnv);
 
-function  jApp_GetStringResourceId(env:PJNIEnv;this:jobject; _resName: string): integer;
-function  jApp_GetStringResourceById(env:PJNIEnv;this:jobject; _resId: integer ): string;
-
 // thierrydijoux - get a resource quantity string by name
-function  jApp_GetStringResourceByName(env:PJNIEnv;this:jobject; _resName: string): string;
 function  jApp_GetQuantityStringByName(env:PJNIEnv;this:jobject; _resName: string; _Quantity: integer): string;
 
 //------------------------------------------------------------------------------
@@ -1821,36 +1741,16 @@ function  jApp_GetQuantityStringByName(env:PJNIEnv;this:jobject; _resName: strin
 Function  jForm_Create                 (env:PJNIEnv;this:jobject; SelfObj : TObject) : jObject;
 Procedure jForm_Free2                   (env:PJNIEnv; Form    : jObject);
 Procedure jForm_Show2                   (env:PJNIEnv; Form    : jObject; effect : Integer);
-Procedure jForm_Close2                  (env:PJNIEnv;  Form: jObject);
 
 Function  jForm_GetLayout2(env:PJNIEnv; Form    : jObject) : jObject;
 Function jForm_GetView(env:PJNIEnv; Form: jObject): jObject;
 
 Function jForm_GetClickListener(env:PJNIEnv;  Form: jObject): jObject;
 Procedure jForm_FreeLayout              (env:PJNIEnv; Layout    : jObject);
-Procedure jForm_SetVisibility2          (env:PJNIEnv; Form    : jObject; visible : boolean);
 Procedure jForm_SetEnabled2             (env:PJNIEnv;Form    : jObject; enabled : Boolean);
-procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string); overload;
-procedure jForm_ShowMessage(env: PJNIEnv; _jform: JObject; _msg: string; _gravity: integer; _timeLength: integer); overload;
 
-function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
-
-function jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean): boolean;
-
-function jForm_IsWifiEnabled              (env: PJNIEnv;  _jform: JObject): boolean;
-function jForm_IsConnected              (env: PJNIEnv;  _jform: JObject): boolean;
-function jForm_IsConnectedWifi              (env: PJNIEnv;  _jform: JObject): boolean;
-
-function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv;  _jform: JObject; _directory: integer): string;
-function jForm_GetInternalAppStoragePath(env: PJNIEnv;  _jform: JObject): string;
-function jForm_CopyFile(env: PJNIEnv;  _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
 function jForm_CopyFileFromUri(env: PJNIEnv;  _jform: JObject; _srcUri : JObject; _destDir: string): string;
 
-function jForm_LoadFromAssets(env: PJNIEnv;  _jform: JObject; _fileName: string): string;
-function jForm_IsSdCardMounted(env: PJNIEnv;  _jform: JObject): boolean;
-function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
-function jForm_GetStripAccents(env: PJNIEnv; _jform: JObject; _str: string): string;
-function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
 function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
 
 function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string): TDynArrayOfString;
@@ -1858,37 +1758,13 @@ function jForm_GetDriverList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
 function jForm_GetFolderList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
 function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
 
-function jForm_FileExists(env: PJNIEnv; _jform: JObject; _fullFileName: string): boolean;
-function jForm_DirectoryExists(env: PJNIEnv; _jform: JObject; _fullDirectoryName: string): boolean;
-
-procedure jForm_Minimize(env: PJNIEnv; _jform: JObject);
-procedure jForm_Restart(env: PJNIEnv; _jform: JObject; _delay: integer);
 procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject; _view: jObject);  overload;
-function jForm_UriEncode(env: PJNIEnv; _jform: JObject; _message: string): string;
-function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: string): string;
 procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject);
-procedure jForm_RemoveFromViewParent(env: PJNIEnv; _jform: JObject);
-procedure jForm_SetLayoutVisibility(env: PJNIEnv; _jform: JObject; _value: boolean);
 function jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
-function jForm_GetSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string): integer;
-function jForm_GetSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string): string;
-function jForm_GetSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string): single;
-function jForm_GetSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string): int64;
-function jForm_PutSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string; _value: integer): boolean;
-function jForm_PutSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string; _value: int64): boolean;
-function jForm_PutSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string; _value: single): boolean;
-function jForm_PutSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string; _strValue: string): boolean;
-function jForm_IsRuntimePermissionNeed(env: PJNIEnv; _jform: JObject): boolean;
-function jForm_IsRuntimePermissionGranted(env: PJNIEnv; _jform: JObject; _androidPermission: string): boolean;
-procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermission: string; _requestCode: integer);  overload;
 procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; var _androidPermissions: TDynArrayOfString; _requestCode: integer);  overload;
 procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermissions: array of string; _requestCode: integer);  overload;
 
-function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
-function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
-
 procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string); overload;
-procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string; _scaleType : integer); overload;
 procedure jForm_SetBackgroundImageMatrix(env: PJNIEnv; _jform: JObject;
                                               _scaleX, _scaleY, _degress,
                                               _dx, _dy, _centerX, _centerY : real);
@@ -1899,9 +1775,6 @@ function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jO
 procedure jForm_SetAnimationDurationIn(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
 procedure jForm_SetAnimationDurationOut(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
 procedure jForm_SetAnimationMode(env: PJNIEnv; _jform: JObject; _animationMode: integer);
-
-function jForm_IsScreenLocked(env: PJNIEnv; _jform: JObject): boolean;
-function jForm_IsSleepMode(env: PJNIEnv; _jform: JObject): boolean;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -1979,8 +1852,6 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
                                           Touch2         : TfXY;
                                           Var TouchUp    : TOnTouchEvent;
                                           Var Mouches    : TMouches);
-
-  procedure jForm_ShowMessageAsync(env:PJNIEnv; Form:jObject; msg: string);
 
   procedure Java_Event_pAppOnCreate(env: PJNIEnv; this: jobject; context:jobject;  layout:jobject; intent: jobject);
 
@@ -2066,6 +1937,8 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_int_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _intent: jObject): jObject;
   function jni_func_t_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): jObject;
   function jni_func_t_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): integer;
+  function jni_func_t_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): single;
+  function jni_func_t_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): int64;
   function jni_func_t_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): string;
   function jni_func_t_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _str: string): boolean;
   function jni_func_uri_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): jObject;
@@ -2083,6 +1956,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_i_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int : integer): jObject;
   function jni_func_ii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1: integer): string;
   function jni_func_it_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _int: integer; _str: string): boolean;
+  function jni_func_it_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer; _str: string): string;
   function jni_func_iii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1, _int2: integer): string;
   function jni_func_int_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _intent: jObject): string;
   function jni_func_j_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: int64): string;
@@ -2094,10 +1968,14 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_bmp_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str1, _str2: string) : boolean;
   function jni_func_tt_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string): jObject;
   function jni_func_tt_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string): integer;
+  function jni_func_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string): boolean;
+  function jni_func_tt_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string): string;
   function jni_func_tz_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool: boolean): int64;
   function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
   function jni_func_tiii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0, _int1, _int2: integer): jObject;
   function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): boolean;
+  function jni_func_tj_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64): boolean;
+  function jni_func_tf_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _float: single): boolean;
   function jni_func_tii_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int1, _int2: integer): boolean;
 
 var
@@ -3381,21 +3259,21 @@ end;
 procedure jForm.ShowMessage(msg: string);
 begin
   if FInitialized then
-     jForm_ShowMessage(FjEnv, FjObject, msg);
+     jni_proc_t(FjEnv, FjObject, 'ShowMessage', msg);
 end;
 
 procedure jForm.ShowMessage(_msg: string; _gravity: TGravity; _timeLength: TShowLength);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_ShowMessage(FjEnv, FjObject, _msg , Ord(_gravity) ,Ord(_timeLength));
+     jni_proc_tii(FjEnv, FjObject, 'ShowMessage', _msg , Ord(_gravity) ,Ord(_timeLength));
 end;
 
 function jForm.GetDateTime: String;
 begin
   Result := '';
   if not FInitialized then Exit;
-  Result:= jForm_GetDateTime(FjEnv,FjObject);
+  Result:= jni_func_out_t(FjEnv,FjObject, 'GetDateTime');
 end;
 
 function jForm.GetDateTime( millisDateTime : int64 ) : string;
@@ -3449,7 +3327,7 @@ procedure jForm.SetVisible(Value: Boolean);
 begin
  FVisible:= Value;
  if FInitialized then
-   jForm_SetVisibility2(FjEnv, FjObject, FVisible);
+   jni_proc_z(FjEnv, FjObject, 'SetVisible', FVisible);
 end;
 
 procedure jForm.SetColor(Value: TARGBColorBridge);
@@ -3576,7 +3454,7 @@ begin
  // --------------------------------------------------------------------------
  // Java           Java          Java-> Pascal
  // jForm_Close -> RemoveView -> Java_Event_pOnClose
-  jForm_Close2(FjEnv, FjObject);  //close java form...  remove view layout ....
+  jni_proc(FjEnv, FjObject, 'Close2');  //close java form...  remove view layout ....
 end;
 
 //[2] after java form close......
@@ -3740,58 +3618,58 @@ begin
 
   Result:= False;
   if FInitialized then
-    Result:= jForm_SetWifiEnabled(FjEnv, FjObject, _status);
+    Result:= jni_func_z_out_z(FjEnv, FjObject, 'SetWifiEnabled', _status);
 end;
 
 function jForm.IsWifiEnabled(): boolean;
 begin
    if FInitialized then
-    Result:= jForm_IsWifiEnabled(FjEnv, FjObject);
+    Result:= jni_func_out_z(FjEnv, FjObject, 'IsWifiEnabled');
 end;
 
 function jForm.IsConnected(): boolean; // by renabor
 begin
    if FInitialized then
-    Result:= jForm_IsConnected(FjEnv, FjObject);
+    Result:= jni_func_out_z(FjEnv, FjObject, 'IsConnected');
 end;
 
 function jForm.IsConnectedWifi(): boolean; // by renabor
 begin
   if FInitialized then
-     Result:= jForm_IsConnectedWifi(FjEnv, FjObject);
+     Result:= jni_func_out_z(FjEnv, FjObject, 'IsConnectedWifi');
 end;
 
 function jForm.IsScreenLocked(): boolean;
 begin
    if FInitialized then
-    Result:= jForm_IsScreenLocked(FjEnv, FjObject);
+    Result:= jni_func_out_z(FjEnv, FjObject, 'IsScreenLocked');
 end;
 
 function jForm.IsSleepMode(): boolean;
 begin
    if FInitialized then
-    Result:= jForm_IsSleepMode(FjEnv, FjObject);
+    Result:= jni_func_out_z(FjEnv, FjObject, 'IsSleepMode');
 end;
 
 function jForm.GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
 begin
   Result:='';
   if FInitialized then
-    Result:= jForm_GetEnvironmentDirectoryPath(FjEnv, FjObject, Ord(_directory))
+    Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetEnvironmentDirectoryPath', Ord(_directory))
 end;
 
 function jForm.GetInternalAppStoragePath: string;
 begin
   Result:='';
   if FInitialized then
-    Result:= jForm_GetInternalAppStoragePath(FjEnv, FjObject);
+    Result:= jni_func_out_t(FjEnv, FjObject, 'GetInternalAppStoragePath');
 end;
 
 function jForm.CopyFile(srcFullFilename: string; destFullFilename: string): boolean;
 begin
   Result:= False;
   if FInitialized then
-    Result:= jForm_CopyFile(FjEnv, FjObject, srcFullFilename, destFullFilename);
+    Result:= jni_func_tt_out_z(FjEnv, FjObject, 'CopyFile', srcFullFilename, destFullFilename);
 end;
 
 //by Tomash
@@ -3806,68 +3684,68 @@ function jForm.LoadFromAssets(fileName: string): string;
 begin
   Result:= '';
   if FInitialized then
-    Result:= jForm_LoadFromAssets(FjEnv,  FjObject, fileName);
+    Result:= jni_func_t_out_t(FjEnv, FjObject, 'LoadFromAssets', fileName);
 end;
 
 function jForm.IsSdCardMounted: boolean;
 begin
   Result:= False;
   if FInitialized then
-    Result:= jForm_IsSdCardMounted(FjEnv, FjObject);
+    Result:= jni_func_out_z(FjEnv, FjObject, 'IsSdCardMounted');
 end;
 
 procedure jForm.DeleteFile(_filename: string);
 begin
   if FInitialized then
-     jForm_DeleteFile(FjEnv, FjObject, _filename);
+     jni_proc_t(FjEnv, FjObject, 'DeleteFile', _filename);
 end;
 
 procedure jForm.DeleteFile(_fullPath: string; _filename: string);
 begin
   if FInitialized then
-     jForm_DeleteFile(FjEnv,FjObject, _fullPath ,_filename);
+     jni_proc_tt(FjEnv,FjObject, 'DeleteFile', _fullPath ,_filename);
 end;
 
 procedure jForm.DeleteFile(_environmentDir: TEnvDirectory; _filename: string);
 begin
   if FInitialized then
-     jForm_DeleteFile(FjEnv, FjObject, Ord(_environmentDir) ,_filename);
+     jni_proc_it(FjEnv, FjObject, 'DeleteFile', Ord(_environmentDir) ,_filename);
 end;
 
 function jForm.CreateDir(_dirName: string): string;
 begin
   if FInitialized then
-    Result:= jForm_CreateDir(FjEnv,FjObject, _dirName);
+    Result:= jni_func_t_out_t(FjEnv,FjObject, 'CreateDir', _dirName);
 end;
 
 function jForm.CreateDir(_environmentDir: TEnvDirectory; _dirName: string): string;
 begin
   if FInitialized then
-    Result:= jForm_CreateDir(FjEnv, FjObject, Ord(_environmentDir) ,_dirName);
+    Result:= jni_func_it_out_t(FjEnv, FjObject, 'CreateDir', Ord(_environmentDir) ,_dirName);
 end;
 
 function jForm.CreateDir(_fullPath: string; _dirName: string): string;
 begin
   if FInitialized then
-    Result:= jForm_CreateDir(FjEnv, FjObject, _fullPath ,_dirName);
+    Result:= jni_func_tt_out_t(FjEnv, FjObject, 'CreateDir', _fullPath ,_dirName);
 end;
 
 function jForm.IsExternalStorageEmulated(): boolean;
 begin
   if FInitialized then
-    Result:= jForm_IsExternalStorageEmulated(FjEnv, FjObject);
+    Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageEmulated');
 end;
 
 function jForm.IsExternalStorageRemovable(): boolean;
 begin
   if FInitialized then
-    Result:= jForm_IsExternalStorageRemovable(FjEnv, FjObject);
+    Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageRemovable');
 end;
 
 function jForm.GetjFormVersionFeatures(): string;
 begin
   if FInitialized then
-    Result:= jForm_GetjFormVersionFeatures(FjEnv, FjObject);
+    Result:= jni_func_out_t(FjEnv, FjObject, 'GetjFormVersionFeatures');
 end;
 
 function jForm.GetActionBar(): jObject;
@@ -3902,7 +3780,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jForm_ShowTitleActionBar(FjEnv, FjObject, _value);
+       jni_proc_z(FjEnv, FjObject, 'ShowTitleActionBar', _value);
   end;
 end;
 
@@ -3967,7 +3845,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-        jForm_SetSubTitleActionBar(FjEnv, FjObject, _subtitle);
+        jni_proc_t(FjEnv, FjObject, 'SetSubTitleActionBar', _subtitle);
   end;
 end;
 
@@ -3976,7 +3854,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jForm_SetIconActionBar(FjEnv, FjObject, _iconIdentifier);
+       jni_proc_t(FjEnv, FjObject, 'SetIconActionBar', _iconIdentifier);
   end;
 end;
 
@@ -3985,7 +3863,7 @@ begin
   if FInitialized then
   begin
     if FActionBarTitle <> abtNone then
-      jForm_SetTabNavigationModeActionBar(FjEnv, FjObject);
+      jni_proc(FjEnv, FjObject, 'SetTabNavigationModeActionBar');
   end;
 end;
 
@@ -3994,26 +3872,26 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jForm_RemoveAllTabsActionBar(FjEnv, FjObject);
+       jni_proc(FjEnv, FjObject, 'RemoveAllTabsActionBar');
   end;
 end;
 
 function jForm.GetStringResourceId(_resName: string): integer;
 begin
   if FInitialized then
-   Result:= jForm_GetStringResourceId(FjEnv, FjObject, _resName);
+   Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetStringResourceId', _resName);
 end;
 
 function jForm.GetStringResourceById(_resID: integer): string;
 begin
   if FInitialized then
-   Result:= jForm_GetStringResourceById(FjEnv, FjObject, _resID);
+   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetStringResourceById', _resID);
 end;
 
 function jForm.GetDrawableResourceId(_resName: string): integer;
 begin
   if FInitialized then
-    Result:= jForm_GetDrawableResourceId(FjEnv, FjObject, _resName);
+    Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetDrawableResourceId', _resName);
 end;
 
 function jForm.GetDrawableResourceById(_resID: integer): jObject;
@@ -4031,7 +3909,7 @@ end;
 function jForm.GetStringResourceByName(_resName: string): string;
 begin
   if FInitialized then
-   Result:= jForm_GetStringResourceByName(FjEnv, FjObject, _resName);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStringResourceByName', _resName);
 end;
 
 function jForm.GetSystemVersion: Integer;
@@ -4056,7 +3934,7 @@ function jForm.IsPackageInstalled(_packagename: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_IsPackageInstalled(FjEnv, FjObject, _packagename);
+   Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsPackageInstalled', _packagename);
 end;
 
 procedure jForm.ShowCustomMessage(_panel: jObject; _gravity: TGravity);
@@ -4071,7 +3949,7 @@ begin
   //in designing component state: set value here...
   FScreenStyle:= _orientation;
   if FInitialized then
-     jForm_SetScreenOrientation(FjEnv, FjObject, Ord(_orientation));
+     jni_proc_i(FjEnv, FjObject, 'SetScreenOrientation', Ord(_orientation));
 end;
 
 function jForm.GetScreenOrientationStyle(): TScreenStyle;
@@ -4079,7 +3957,7 @@ begin
   //in designing component state: result value here...
   Result:= FScreenStyle;
   if FInitialized then
-   Result:= TScreenStyle(jForm_GetScreenOrientation(FjEnv, FjObject));
+   Result:= TScreenStyle(jni_func_out_i(FjEnv, FjObject, 'GetScreenOrientation'));
 end;
 
 function jForm.GetScreenDpi(): integer;
@@ -4093,7 +3971,7 @@ function jForm.GetScreenDensity(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetScreenDensity(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetScreenDensity');
 end;
 
 //SplitStr(var theString: string; delimiter: string): string;
@@ -4117,14 +3995,14 @@ function jForm.GetScreenSize(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetScreenSize(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetScreenSize');
 end;
 
 procedure jForm.LogDebug(_tag: string; _msg: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_LogDebug(FjEnv, FjObject, _tag ,_msg);
+     jni_proc_tt(FjEnv, FjObject, 'LogDebug', _tag ,_msg);
 end;
 
 procedure jForm.ShowCustomMessage(_layout: jObject; _gravity: TGravity; _lenghTimeSecond: integer);
@@ -4138,7 +4016,7 @@ procedure jForm.Vibrate(_milliseconds: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_Vibrate(FjEnv, FjObject, _milliseconds);
+     jni_proc_i(FjEnv, FjObject, 'Vibrate', _milliseconds);
 end;
 
 procedure jForm.Vibrate(var _millisecondsPattern: TDynArrayOfInt64);
@@ -4152,7 +4030,7 @@ procedure jForm.TakeScreenshot(_savePath: string; _saveFileNameJPG: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_TakeScreenshot(FjEnv, FjObject, _savePath ,_saveFileNameJPG);
+     jni_proc_tt(FjEnv, FjObject, 'TakeScreenshot', _savePath ,_saveFileNameJPG);
 end;
 
 procedure jForm.UpdateJNI(refApp: jApp);
@@ -4176,17 +4054,18 @@ begin
   if FInitialized then
   begin
     if FActionBarTitle <> abtNone then
-       Result:= jForm_GetTitleActionBar(FjEnv, FjObject);
+       Result:= jni_func_out_t(FjEnv, FjObject, 'GetTitleActionBar');
   end;
 end;
 
 function jForm.GetSubTitleActionBar(): string;
 begin
   //in designing component state: result value here...
+
   if FInitialized then
   begin
     if FActionBarTitle <> abtNone then
-      Result:= jForm_GetSubTitleActionBar(FjEnv, FjObject);
+      Result:= jni_func_out_t(FjEnv, FjObject, 'GetSubTitleActionBar');
   end;
 end;
 
@@ -4194,21 +4073,21 @@ function jForm.CopyFromAssetsToInternalAppStorage(_filename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jForm_CopyFromAssetsToInternalAppStorage(FjEnv, FjObject, _filename);
+    Result:= jni_func_t_out_t(FjEnv, FjObject, 'CopyFromAssetsToInternalAppStorage', _filename);
 end;
 
 procedure jForm.CopyFromInternalAppStorageToEnvironmentDir(_filename: string; _environmentDirPath: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_CopyFromInternalAppStorageToEnvironmentDir(FjEnv, FjObject, _filename ,_environmentDirPath);
+     jni_proc_tt(FjEnv, FjObject, 'CopyFromInternalAppStorageToEnvironmentDir', _filename ,_environmentDirPath);
 end;
 
 procedure jForm.CopyFromAssetsToEnvironmentDir(_filename: string; _environmentDirPath: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_CopyFromAssetsToEnvironmentDir(FjEnv, FjObject, _filename ,_environmentDirPath);
+     jni_proc_tt(FjEnv, FjObject, 'CopyFromAssetsToEnvironmentDir', _filename ,_environmentDirPath);
 end;
 
 function jForm.DumpExceptionCallStack(E: Exception): string; //by Euller and Oswaldo
@@ -4232,7 +4111,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-        Result:= jForm_GetActionBarHeight(FjEnv, FjObject);
+        Result:= jni_func_out_i(FjEnv, FjObject, 'GetActionBarHeight');
   end;
 end;
 
@@ -4252,7 +4131,7 @@ end;
 procedure jForm.StartDefaultActivityForFile(_filePath, _mimeType: string);
 begin
   if FInitialized then
-     jForm_StartDefaultActivityForFile(FjEnv, FjObject, _filePath, _mimeType);
+     jni_proc_tt(FjEnv, FjObject, 'StartDefaultActivityForFile', _filePath, _mimeType);
 end;
 
 function jForm.ActionBarIsShowing(): boolean;
@@ -4261,7 +4140,7 @@ begin
   if FInitialized then
   begin
     if FActionBarTitle <> abtNone then
-      Result:= jForm_ActionBarIsShowing(FjEnv, FjObject);
+      Result:= jni_func_out_z(FjEnv, FjObject, 'ActionBarIsShowing');
   end;
 end;
 
@@ -4269,21 +4148,21 @@ procedure jForm.ToggleSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_ToggleSoftInput(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ToggleSoftInput');
 end;
 
 function jForm.GetDeviceModel(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetDeviceModel(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceModel');
 end;
 
 function jForm.GetDeviceManufacturer(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetDeviceManufacturer(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceManufacturer');
 end;
 
 procedure jForm.SetActivityMode(Value: TActivityMode);
@@ -4296,28 +4175,28 @@ procedure jForm.SetKeepScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetKeepScreenOn(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetKeepScreenOn', _value);
 end;
 
 procedure jForm.SetTurnScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetTurnScreenOn(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetTurnScreenOn', _value);
 end;
 
 procedure jForm.SetAllowLockWhileScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetAllowLockWhileScreenOn(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetAllowLockWhileScreenOn', _value);
 end;
 
 procedure jForm.SetShowWhenLocked(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetShowWhenLocked(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetShowWhenLocked', _value);
 end;
 
 function jForm.ParseUri(_uriAsString: string): jObject;
@@ -4338,63 +4217,63 @@ function jForm.IsConnectedTo(_connectionType: TConnectionType): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_IsConnectedTo(FjEnv, FjObject, Ord(_connectionType));
+   Result:= jni_func_i_out_z(FjEnv, FjObject, 'IsConnectedTo', Ord(_connectionType));
 end;
 
 function jForm.IsMobileDataEnabled(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_IsMobileDataEnabled(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsMobileDataEnabled');
 end;
 
 procedure jForm.HideSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_HideSoftInput(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'HideSoftInput');
 end;
 
 procedure jForm.ShowSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_ShowSoftInput(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ShowSoftInput');
 end;
 
 function jForm.GetNetworkStatus(): TNetworkStatus;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= TNetworkStatus(jForm_GetNetworkStatus(FjEnv, FjObject));
+   Result:= TNetworkStatus(jni_func_out_i(FjEnv, FjObject, 'GetNetworkStatus'));
 end;
 
 function jForm.GetDeviceDataMobileIPAddress(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetDeviceDataMobileIPAddress(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceDataMobileIPAddress');
 end;
 
 function jForm.GetDeviceWifiIPAddress(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetDeviceWifiIPAddress(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceWifiIPAddress');
 end;
 
 function jForm.GetWifiBroadcastIPAddress(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetWifiBroadcastIPAddress(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetWifiBroadcastIPAddress');
 end;
 
 function jForm.LoadFromAssetsTextContent(_filename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_LoadFromAssetsTextContent(FjEnv, FjObject, _filename);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'LoadFromAssetsTextContent', _filename);
 end;
 
 function jForm.RGBA(color: string): TSimpleRGBAColor;
@@ -4454,14 +4333,14 @@ function jForm.GetStripAccents(_str: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetStripAccents(FjEnv, FjObject, _str);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStripAccents', _str);
 end;
 
 function jForm.GetPathFromAssetsFile(_assetsFileName: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetPathFromAssetsFile(FjEnv, FjObject, _assetsFileName);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetPathFromAssetsFile', _assetsFileName);
 end;
 
 function jForm.GetImageFromAssetsFile(_assetsImageFileName: string): jObject;
@@ -4521,7 +4400,7 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jForm_FileExists(FjEnv, FjObject, _fullFileName);
+   Result:= jni_func_t_out_z(FjEnv, FjObject, 'FileExists', _fullFileName);
 end;
 
 function jForm.DirectoryExists(_fullDirectoryName: string): boolean;
@@ -4529,21 +4408,21 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jForm_DirectoryExists(FjEnv, FjObject, _fullDirectoryName);
+   Result:= jni_func_t_out_z(FjEnv, FjObject, 'DirectoryExists', _fullDirectoryName);
 end;
 
 procedure jForm.Minimize();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_Minimize(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Minimize');
 end;
 
 procedure jForm.Restart(_delay: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_Restart(FjEnv, FjObject, _delay);
+     jni_proc_i(FjEnv, FjObject, 'Restart', _delay);
 end;
 
 procedure jForm.HideSoftInput(_view: jObject);
@@ -4557,14 +4436,14 @@ function jForm.UriEncode(_message: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_UriEncode(FjEnv, FjObject, _message);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'UriEncode', _message);
 end;
 
 function jForm.ParseHtmlFontAwesome(_htmlString: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_ParseHtmlFontAwesome(FjEnv, FjObject, _htmlString);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'ParseHtmlFontAwesome', _htmlString);
 end;
 
 procedure jForm.SetLayoutParent(_viewgroup: jObject);
@@ -4593,7 +4472,7 @@ procedure jForm.RemoveFromLayoutParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jForm_RemoveFromViewParent(FjEnv, FjObject);
+    jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
 end;
 
 
@@ -4602,84 +4481,84 @@ begin
   //in designing component state: set value here...
   FLayoutVisibility:= _value;
   if FInitialized then
-     jForm_SetLayoutVisibility(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetLayoutVisibility', _value);
 end;
 
 function jForm.GetSettingsSystemInt(_strKey: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetSettingsSystemInt(FjEnv, FjObject, _strKey);
+   Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetSettingsSystemInt', _strKey);
 end;
 
 function jForm.GetSettingsSystemString(_strKey: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetSettingsSystemString(FjEnv, FjObject, _strKey);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetSettingsSystemString', _strKey);
 end;
 
 function jForm.GetSettingsSystemFloat(_strKey: string): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetSettingsSystemFloat(FjEnv, FjObject, _strKey);
+   Result:= jni_func_t_out_f(FjEnv, FjObject, 'GetSettingsSystemFloat', _strKey);
 end;
 
 function jForm.GetSettingsSystemLong(_strKey: string): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetSettingsSystemLong(FjEnv, FjObject, _strKey);
+   Result:= jni_func_t_out_j(FjEnv, FjObject, 'GetSettingsSystemLong', _strKey);
 end;
 
 function jForm.PutSettingsSystemInt(_strKey: string; _value: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_PutSettingsSystemInt(FjEnv, FjObject, _strKey ,_value);
+   Result:= jni_func_ti_out_z(FjEnv, FjObject, 'PutSettingsSystemInt', _strKey ,_value);
 end;
 
 function jForm.PutSettingsSystemLong(_strKey: string; _value: int64): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_PutSettingsSystemLong(FjEnv, FjObject, _strKey ,_value);
+   Result:= jni_func_tj_out_z(FjEnv, FjObject, 'PutSettingsSystemLong', _strKey ,_value);
 end;
 
 function jForm.PutSettingsSystemFloat(_strKey: string; _value: single): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_PutSettingsSystemFloat(FjEnv, FjObject, _strKey ,_value);
+   Result:= jni_func_tf_out_z(FjEnv, FjObject, 'PutSettingsSystemFloat', _strKey ,_value);
 end;
 
 function jForm.PutSettingsSystemString(_strKey: string; _strValue: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_PutSettingsSystemString(FjEnv, FjObject, _strKey ,_strValue);
+   Result:= jni_func_tt_out_z(FjEnv, FjObject, 'PutSettingsSystemString', _strKey ,_strValue);
 end;
 
 function jForm.IsRuntimePermissionNeed(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_IsRuntimePermissionNeed(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsRuntimePermissionNeed');
 end;
 
 function jForm.IsRuntimePermissionGranted(_manifestPermission: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_IsRuntimePermissionGranted(FjEnv, FjObject, _manifestPermission);
+   Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsRuntimePermissionGranted', _manifestPermission);
 end;
 
 procedure jForm.RequestRuntimePermission(_manifestPermission: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestRuntimePermission(FjEnv, FjObject, _manifestPermission ,_requestCode);
+     jni_proc_ti(FjEnv, FjObject, 'RequestRuntimePermission', _manifestPermission ,_requestCode);
 end;
 
 procedure jForm.RequestRuntimePermission(var _androidPermissions: TDynArrayOfString; _requestCode: integer);
@@ -4700,14 +4579,14 @@ function jForm.HasActionBar(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_HasActionBar(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'HasActionBar');
 end;
 
 function jForm.IsAppCompatProject(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_IsAppCompatProject(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsAppCompatProject');
 end;
 
 function jForm.GetVersionCode() : integer;
@@ -4819,7 +4698,7 @@ begin
   //in designing component state: set value here...
  FBackgroundImageIdentifier:= _imageIdentifier;
   if FInitialized then
-     jForm_SetBackgroundImage(FjEnv, FjObject, _imageIdentifier, _scaleType);
+     jni_proc_ti(FjEnv, FjObject, 'SetBackgroundImage', _imageIdentifier, _scaleType);
 end;
 
 // BY ADiV
@@ -4881,17 +4760,6 @@ begin
 end;
 
 {-------- jForm_JNI_Bridge ----------}
-
-function jForm_GetStripAccents(env: PJNIEnv; _jform: JObject; _str: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'GetStripAccents', _str);
-end;
-
-function jForm_GetPathFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsFileName: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'GetPathFromAssetsFile', _assetsFileName);
-end;
-
 
 function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
 var
@@ -4987,130 +4855,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _filename: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _fullPath: string; _filename: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPath));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_DeleteFile(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _filename: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _environmentDir;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_filename));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'DeleteFile', '(ILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _dirName: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'CreateDir', _dirName);
-end;
-
-
-function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _environmentDir: integer; _dirName: string): string;
-var
-  jStr: JString;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _environmentDir;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_dirName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'CreateDir', '(ILjava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  Result:= GetPStringAndDeleteLocalRef(env, jStr);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_CreateDir(env: PJNIEnv; _jform: JObject; _fullPath: string; _dirName: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullPath));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_dirName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'CreateDir', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  Result:= GetPStringAndDeleteLocalRef(env, jStr);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_IsExternalStorageEmulated(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageEmulated', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_IsExternalStorageRemovable(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageRemovable', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetjFormVersionFeatures(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetjFormVersionFeatures');
-end;
-
 
 function jForm_GetActionBar(env: PJNIEnv; _jform: JObject): jObject;
 var
@@ -5145,19 +4889,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm_ShowTitleActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'ShowTitleActionBar', '(Z)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 procedure jForm_ShowLogoActionBar(env: PJNIEnv; _jform: JObject; _value: boolean);
 var
   jParams: array[0..0] of jValue;
@@ -5181,91 +4912,6 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'SetTitleActionBar', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_SetSubTitleActionBar(env: PJNIEnv; _jform: JObject; _subtitle: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_subtitle));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetSubTitleActionBar', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_SetIconActionBar(env: PJNIEnv; _jform: JObject; _iconIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetIconActionBar', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_SetTabNavigationModeActionBar(env: PJNIEnv; _jform: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTabNavigationModeActionBar', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_RemoveAllTabsActionBar(env: PJNIEnv; _jform: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveAllTabsActionBar', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetStringResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_resName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetStringResourceId', '(Ljava/lang/String;)I');
-  Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_GetStringResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): string;
-begin
-  Result:= jni_func_i_out_t(env, _jform, 'GetStringResourceById', _resID);
-end;
-
-function jForm_GetDrawableResourceId(env: PJNIEnv; _jform: JObject; _resName: string): integer;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_resName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetDrawableResourceId', '(Ljava/lang/String;)I');
-  Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -5302,91 +4948,6 @@ begin
 end;
 
 
-function jForm_GetStringResourceByName(env: PJNIEnv; _jform: JObject; _resName: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'GetStringResourceByName', _resName);
-end;
-
-function jForm_IsPackageInstalled(env: PJNIEnv; _jform: JObject; _packagename: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_packagename));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsPackageInstalled', '(Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_SetScreenOrientation(env: PJNIEnv; _jform: JObject; _orientation: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _orientation;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetScreenOrientation', '(I)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetScreenOrientation(env: PJNIEnv; _jform: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetScreenOrientation', '()I');
-  Result:= env^.CallIntMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetScreenDensity(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetScreenDensity');
-end;
-
-function jForm_GetScreenSize(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetScreenSize');
-end;
-
-procedure jForm_LogDebug(env: PJNIEnv; _jform: JObject; _tag: string; _msg: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_tag));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_msg));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'LogDebug', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; _milliseconds: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _milliseconds;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'Vibrate', '(I)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
 procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; var _millisecondsPattern: TDynArrayOfInt64);
 var
   jParams: array[0..0] of jValue;
@@ -5403,176 +4964,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'Vibrate', '([J)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_TakeScreenshot(env: PJNIEnv; _jform: JObject; _savePath: string; _saveFileNameJPG: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_savePath));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_saveFileNameJPG));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'TakeScreenshot', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetTitleActionBar(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetTitleActionBar');
-end;
-
-
-function jForm_GetSubTitleActionBar(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetSubTitleActionBar');
-end;
-
-
-function jForm_CopyFromAssetsToInternalAppStorage(env: PJNIEnv; _jform: JObject; _filename: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'CopyFromAssetsToInternalAppStorage', _filename);
-end;
-
-
-procedure jForm_CopyFromInternalAppStorageToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_environmentDir));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'CopyFromInternalAppStorageToEnvironmentDir', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_CopyFromAssetsToEnvironmentDir(env: PJNIEnv; _jform: JObject; _filename: string; _environmentDir: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_environmentDir));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'CopyFromAssetsToEnvironmentDir', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-   env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetActionBarHeight(env: PJNIEnv; _jform: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetActionBarHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_ActionBarIsShowing(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'ActionBarIsShowing', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_ToggleSoftInput(env: PJNIEnv; _jform: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'ToggleSoftInput', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetDeviceModel(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetDeviceModel');
-end;
-
-function jForm_GetDeviceManufacturer(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetDeviceManufacturer');
-end;
-
-procedure jForm_SetKeepScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetKeepScreenOn', '(Z)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_SetTurnScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTurnScreenOn', '(Z)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_SetAllowLockWhileScreenOn(env: PJNIEnv; _jform: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetAllowLockWhileScreenOn', '(Z)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_SetShowWhenLocked(env: PJNIEnv; _jform: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetShowWhenLocked', '(Z)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5603,85 +4994,6 @@ begin
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_IsConnectedTo(env: PJNIEnv; _jform: JObject; _connectionType: integer): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _connectionType;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsConnectedTo', '(I)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_IsMobileDataEnabled(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsMobileDataEnabled', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'HideSoftInput', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_ShowSoftInput(env: PJNIEnv; _jform: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'ShowSoftInput', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetNetworkStatus(env: PJNIEnv; _jform: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetNetworkStatus', '()I');
-  Result:= env^.CallIntMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetDeviceDataMobileIPAddress(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetDeviceDataMobileIPAddress');
-end;
-
-
-function jForm_GetDeviceWifiIPAddress(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetDeviceWifiIPAddress');
-end;
-
-function jForm_GetWifiBroadcastIPAddress(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetWifiBroadcastIPAddress');
 end;
 
 function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string): TDynArrayOfString;
@@ -5824,63 +5136,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
-function jForm_FileExists(env: PJNIEnv; _jform: JObject; _fullFileName: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFileName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'FileExists', '(Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_DirectoryExists(env: PJNIEnv; _jform: JObject; _fullDirectoryName: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullDirectoryName));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'DirectoryExists', '(Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_Minimize(env: PJNIEnv; _jform: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'Minimize', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_Restart(env: PJNIEnv; _jform: JObject; _delay: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _delay;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'Restart', '(I)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject; _view: jObject);
 var
   jParams: array[0..0] of jValue;
@@ -5892,16 +5147,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'HideSoftInput', '(Landroid/view/View;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_UriEncode(env: PJNIEnv; _jform: JObject; _message: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'UriEncode', _message);
-end;
-
-function jForm_ParseHtmlFontAwesome(env: PJNIEnv; _jform: JObject; _htmlString: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'ParseHtmlFontAwesome', _htmlString);
 end;
 
 procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject);
@@ -5917,30 +5162,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm_RemoveFromViewParent(env: PJNIEnv; _jform: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_SetLayoutVisibility(env: PJNIEnv; _jform: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutVisibility', '(Z)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 function jForm_GetParent(env: PJNIEnv; _jform: JObject): jObject;
 var
   jMethod: jMethodID=nil;
@@ -5950,220 +5171,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
   Result:= env^.CallObjectMethod(env, _jform, jMethod);
   Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetPrimaryColor(env: PJNIEnv; _jfom: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jfom);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetPrimaryColor', '()I');
-  Result:= env^.CallIntMethod(env, _jfom, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetPrimaryDarkColor(env: PJNIEnv; _jfom: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jfom);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetPrimaryDarkColor', '()I');
-  Result:= env^.CallIntMethod(env, _jfom, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_GetPrimaryLightColor(env: PJNIEnv; _jfom: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jfom);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetPrimaryLightColor', '()I');
-  Result:= env^.CallIntMethod(env, _jfom, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_GetAccentColor(env: PJNIEnv; _jfom: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jfom);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetAccentColor', '()I');
-  Result:= env^.CallIntMethod(env, _jfom, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string): integer;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemInt', '(Ljava/lang/String;)I');
-  Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'GetSettingsSystemString', _strKey);
-end;
-
-
-function jForm_GetSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string): single;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemFloat', '(Ljava/lang/String;)F');
-  Result:= env^.CallFloatMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_GetSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string): int64;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSettingsSystemLong', '(Ljava/lang/String;)J');
-  Result:= env^.CallLongMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_PutSettingsSystemInt(env: PJNIEnv; _jform: JObject; _strKey: string; _value: integer): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
-  jParams[1].i:= _value;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'PutSettingsSystemInt', '(Ljava/lang/String;I)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_PutSettingsSystemLong(env: PJNIEnv; _jform: JObject; _strKey: string; _value: int64): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
-  jParams[1].j:= _value;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'PutSettingsSystemLong', '(Ljava/lang/String;J)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_PutSettingsSystemFloat(env: PJNIEnv; _jform: JObject; _strKey: string; _value: single): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
-  jParams[1].f:= _value;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'PutSettingsSystemFloat', '(Ljava/lang/String;F)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_PutSettingsSystemString(env: PJNIEnv; _jform: JObject; _strKey: string; _strValue: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_strKey));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_strValue));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'PutSettingsSystemString', '(Ljava/lang/String;Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_IsRuntimePermissionNeed(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsRuntimePermissionNeed', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_IsRuntimePermissionGranted(env: PJNIEnv; _jform: JObject; _androidPermission: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_androidPermission));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsRuntimePermissionGranted', '(Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jForm_RequestRuntimePermission(env: PJNIEnv; _jform: JObject; _androidPermission: string; _requestCode: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_androidPermission));
-  jParams[1].i:= _requestCode;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestRuntimePermission', '(Ljava/lang/String;I)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -6215,34 +5222,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-
-function jForm_HasActionBar(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'HasActionBar', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jForm_IsAppCompatProject(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsAppCompatProject', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string);
 var
   jParams: array[0..0] of jValue;
@@ -6254,22 +5233,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundImage', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-// BY ADiV
-procedure jForm_SetBackgroundImage(env: PJNIEnv; _jform: JObject; _imageIdentifier: string; _scaleType : integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageIdentifier));
-  jParams[1].i:= _scaleType;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundImage', '(Ljava/lang/String;I)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -6374,22 +5337,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'GetRealPathFromURI', '(Landroid/net/Uri;)Ljava/lang/String;');
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jForm_StartDefaultActivityForFile(env: PJNIEnv; _jform: JObject; _filePath, _mimeType: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_filePath));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_mimeType));
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'StartDefaultActivityForFile', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -6600,12 +5547,12 @@ end;
 
 procedure jApp.Finish();
 begin
-  jApp_Finish2(Self.Jni.jEnv, Self.Jni.jThis);
+  jni_proc(Self.Jni.jEnv, Self.Jni.jThis, 'appFinish');
 end;
 
 procedure jApp.Recreate();
 begin
-  jApp_Recreate(Self.Jni.jEnv, Self.Jni.jThis);
+  jni_proc(Self.Jni.jEnv, Self.Jni.jThis, 'appRecreate');
 end;
 
 function jApp.GetContext(): jObject;
@@ -6615,12 +5562,12 @@ end;
 
 function jApp.GetContextTop: integer;
 begin
-  Result:= jApp_GetContextTop(Self.Jni.jEnv, Self.Jni.jThis);
+  Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'getContextTop');
 end;
 
 function jApp.GetStatusBarHeight: integer;
 begin
-  Result:= jApp_GetStatusBarHeight(Self.Jni.jEnv, Self.Jni.jThis);
+  Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'getStatusBarHeight');
 end;
 
 function jApp.GetActionBarHeight: integer;
@@ -6635,29 +5582,29 @@ end;
 
 function jApp.GetControlsVersionInfo: string;
 begin
-   Result:= jApp_GetControlsVersionInfo(Self.Jni.jEnv, Self.Jni.jThis); //"ver&rev|newFeature;ver$rev|newfeature2"
+  Result:= jni_func_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'GetControlsVersionInfo'); //"ver&rev|newFeature;ver$rev|newfeature2"
 end;
 
 function jApp.GetControlsVersionFeatures: string;     //"ver&rev|newFeature;ver$rev|newfeature2"
 begin
-   Result:= jApp_GetControlsVersionFeatures(Self.Jni.jEnv, Self.Jni.jThis);
+  Result:= jni_func_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'GetControlsVersion');
 end;
 
 //thanks to  thierrydijoux
 function jApp.GetStringResourceId(_resName: string): integer;
 begin
-   Result:= jApp_GetStringResourceId(Self.Jni.jEnv, Self.Jni.jThis, PChar(_resName));
+  Result:= jni_func_t_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'GetStringResourceId', PChar(_resName));
 end;
 
 function  jApp.GetStringResourceById(_resId: integer): string;
 begin
-  Result:= jApp_GetStringResourceById(Self.Jni.jEnv, Self.Jni.jThis, _resId);
+  Result:= jni_func_i_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'GetStringResourceById', _resId);
 end;
 
 //by thierrydijoux - get a resource string by name
 function jApp.GetStringResourceByName(_resName: string): string;
 begin
-  Result:= jApp_GetStringResourceByName(Self.Jni.jEnv, Self.Jni.jThis, _resName);
+  Result:= jni_func_t_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'getStringResourceByName', _resName);
 end;
 
 //by thierrydijoux - get a resource string by name
@@ -7430,12 +6377,6 @@ begin
   Delete_jLocalRef(cls);
 end;
 
-//return GetControlsVersionFeatures ... "6$4=GetControlsVersionInfo;6$4=getLocale"
-function jApp_GetControlsVersionFeatures(env:PJNIEnv;this:jobject): string;
-begin
-  Result:= jni_func_out_t(env, this, 'GetControlsVersion');
-end;
-
 function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TDynArrayOfString; 
   var
   JCls: JClass = nil;
@@ -7574,38 +6515,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jApp_Finish(env:PJNIEnv;this:jobject);
-Const
-  _cFuncName = 'appFinish';
-  _cFuncSig  = '()V';
-  _jMethod: jMethodID = nil;
-begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  env^.CallVoidMethod(env,this,_jMethod);
-end;
-
-Procedure jApp_Recreate(env:PJNIEnv;this:jobject);
-Const
-  _cFuncName = 'appRecreate';
-  _cFuncSig  = '()V';
-  _jMethod: jMethodID = nil;
-begin
-  jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
-  env^.CallVoidMethod(env,this,_jMethod);
-end;
-
-//by jmpessoa
-Procedure jApp_Finish2(env:PJNIEnv; this: jobject);
-var
-  cls: jClass;
-  method: jmethodID;
-begin
-  cls := env^.GetObjectClass(env, this);
-  method:= env^.GetMethodID(env, cls, 'appFinish', '()V');
-  env^.CallVoidMethod(env, this, method);
-  env^.DeleteLocalRef(env, cls);
-end;
-
 function  jApp_GetContext(env:PJNIEnv;this:jobject): jObject;
 var
   cls: jClass;
@@ -7615,33 +6524,6 @@ begin
   method:= env^.GetMethodID(env, cls, 'GetContext', '()Landroid/content/Context;');
   Result:= env^.CallObjectMethod(env, this, method);
   env^.DeleteLocalRef(env, cls);
-end;
-
-function jApp_GetContextTop(env: PJNIEnv; this: JObject): integer;
-var
-  cls: jClass = nil;
-  method: jmethodID = nil;
-begin
-  cls    := env^.GetObjectClass(env, this);
-  method := env^.GetMethodID(env, cls, 'getContextTop', '()I');
-  Result := env^.CallIntMethod(env, this, method);
-  env^.DeleteLocalRef(env, cls);
-end;
-
-function jApp_GetStatusBarHeight(env: PJNIEnv; this: JObject): integer;
-var
-  cls: jClass = nil;
-  method: jmethodID = nil;
-begin
-  cls    := env^.GetObjectClass(env, this);
-  method := env^.GetMethodID(env, cls, 'getStatusBarHeight', '()I');
-  Result := env^.CallIntMethod(env, this, method);
-  env^.DeleteLocalRef(env, cls);
-end;
-
-function jApp_GetControlsVersionInfo(env:PJNIEnv;this:jobject): string;
-begin
-  Result:= jni_func_out_t(env, this, 'GetControlsVersionInfo');
 end;
 
 function  jForm_GetOnViewClickListener(env:PJNIEnv; Form: jObject): jObject;
@@ -7666,29 +6548,6 @@ begin
   env^.DeleteLocalRef(env, cls);
 end;
 
-Procedure jApp_KillProcess(env:PJNIEnv;this:jobject);
-Const
- _cFuncName = 'appKillProcess';
- _cFuncSig  = '()V';
-Var
- _jMethod : jMethodID = nil;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- env^.CallVoidMethod(env,this,_jMethod);
-end;
-
-Procedure jApp_ScreenStyle(env:PJNIEnv; this:jobject; screenstyle: integer);
-Const
- _cFuncName = 'appScreenStyle';
- _cFuncSig  = '(I)';
-Var
- _jMethod : jMethodID = nil;
- _jParam  : jValue;
-begin
- jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
- _jParam.I := screenStyle;
- env^.CallVoidMethodA(env,this,_jMethod,@_jParam);
-end;
 
 //by jmpessoa
 procedure jApp_GetJNIEnv(var env:PJNIEnv);
@@ -7697,30 +6556,6 @@ var
 begin
   gVM^.GetEnv(gVM, @PEnv,JNI_VERSION_1_6);
   env:= PJNIEnv(PEnv);
-end;
-
-function  jApp_GetStringResourceId(env:PJNIEnv;this:jobject; _resName: string): integer;
-var
- _cls: jClass;
- _jMethod : jMethodID = nil;
- _jParams : array[0..0] of jValue;
-begin
-  _cls := env^.GetObjectClass(env, this);
-  _jMethod:= env^.GetMethodID(env, _cls, 'GetStringResourceId', '(Ljava/lang/String;)I');
-  _jParams[0].l := env^.NewStringUTF(env, pchar(_resName) );
-  Result:= env^.CallIntMethodA(env,this,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env,_jParams[0].l);
-  env^.DeleteLocalRef(env, _cls);
-end;
-
-function  jApp_GetStringResourceById(env:PJNIEnv;this:jobject; _resId: integer ): string;
-begin
-  Result:= jni_func_i_out_t(env, this, 'GetStringResourceById', _resId);
-end;
-
-function  jApp_GetStringResourceByName(env:PJNIEnv;this:jobject; _resName: string): string;
-begin
-  Result:= jni_func_t_out_t(env, this, 'getStringResourceByName', _resName);
 end;
 
 // thierrydijoux - get a resource quantity string by name
@@ -7788,17 +6623,6 @@ begin
     env^.CallVoidMethodA(env, Form, method,@_jParams);
     env^.DeleteLocalRef(env, cls);
 end;
-           //remove view layout ....
-Procedure jForm_Close2(env:PJNIEnv; Form: jObject);
-var
-  cls: jClass;
-  method: jmethodID;
-begin
-  cls := env^.GetObjectClass(env, Form);
-  method:= env^.GetMethodID(env, cls, 'Close2', '()V');
-  env^.CallVoidMethod(env, Form, method);
-  env^.DeleteLocalRef(env, cls);
-end;
 
 //by jmpessoa
 Function jForm_GetLayout2(env:PJNIEnv; Form: jObject): jObject;
@@ -7844,19 +6668,6 @@ begin
      env^.DeleteGlobalRef(env, Layout);
 end;
 
-Procedure jForm_SetVisibility2(env:PJNIEnv;Form : jObject; visible : boolean);
-var
-   cls: jClass;
-   method: jmethodID;
-   _jParams : array[0..0] of jValue;
-begin
-    _jParams[0].z := JBool(visible);
-    cls := env^.GetObjectClass(env, Form);
-    method:= env^.GetMethodID(env, cls, 'SetVisible', '(Z)V');
-    env^.CallVoidMethodA(env, Form, method, @_jParams);
-    env^.DeleteLocalRef(env, cls);
-end;
-
  //by jmpessoa
 Procedure jForm_SetEnabled2(env:PJNIEnv;Form : jObject; enabled : Boolean);
 var
@@ -7869,170 +6680,6 @@ begin
     method:= env^.GetMethodID(env, cls, 'SetEnabled', '(Z)V');
     env^.CallVoidMethodA(env, Form, method, @_jParams);
     env^.DeleteLocalRef(env, cls);
-end;
-
-//by jmpessoa
-procedure jForm_ShowMessage(env:PJNIEnv; Form:jObject; msg: string);
-var
-   cls: jClass;
-   method: jmethodID;
-    _jParams : Array[0..0] of jValue;
-begin
- _jParams[0].l:= env^.NewStringUTF(env, pchar(msg) );
-  cls := env^.GetObjectClass(env, Form);
-  method:= env^.GetMethodID(env, cls, 'ShowMessage', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, Form, method,@_jParams);
-  env^.DeleteLocalRef(env,_jParams[0].l);
-  env^.DeleteLocalRef(env, cls);
-end;
-
-procedure jForm_ShowMessage(env: PJNIEnv; _jform: JObject; _msg: string; _gravity: integer; _timeLength: integer);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_msg));
-  jParams[1].i:= _gravity;
-  jParams[2].i:= _timeLength;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'ShowMessage', '(Ljava/lang/String;II)V');
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-//by jmpessoa
-
-procedure jForm_ShowMessageAsync(env:PJNIEnv; Form:jObject; msg: string);
-var
-   cls: jClass;
-   method: jmethodID;
-    _jParams : Array[0..0] of jValue;
-begin
- gVM^.AttachCurrentThread(gVm,@env,nil); //fix here!
- _jParams[0].l:= env^.NewStringUTF(env, pchar(msg) );
-  cls := env^.GetObjectClass(env, Form);
-  method:= env^.GetMethodID(env, cls, 'ShowMessage', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, Form, method,@_jParams);
-  env^.DeleteLocalRef(env,_jParams[0].l);
-  env^.DeleteLocalRef(env, cls);
-end;
-
-//by jmpessoa
-function jForm_GetDateTime(env:PJNIEnv; Form:jObject): string;
-begin
-  Result:= jni_func_out_t(env, Form, 'GetDateTime');
-end;
-
-function jForm_SetWifiEnabled(env: PJNIEnv; _jform: JObject; _status: boolean): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_status);
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetWifiEnabled', '(Z)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jform, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_IsWifiEnabled(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsWifiEnabled', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-// by renabor
-function jForm_IsConnected(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsConnected', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-// by renabor
-function jForm_IsConnectedWifi(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsConnectedWifi', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_IsScreenLocked(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsScreenLocked', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_IsSleepMode(env: PJNIEnv; _jform: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsSleepMode', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jForm_GetEnvironmentDirectoryPath(env: PJNIEnv; _jform: JObject; _directory: integer): string;
-begin
-  Result:= jni_func_i_out_t(env, _jform, 'GetEnvironmentDirectoryPath', _directory);
-end;
-
-function jForm_GetInternalAppStoragePath(env: PJNIEnv; _jform: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jform, 'GetInternalAppStoragePath');
-end;
-
-function jForm_CopyFile(env: PJNIEnv; _jform: JObject; _srcFullName: string; _destFullName: string): boolean;
-var
-   _jBoo: JBoolean;
-   _jCls: jClass;
-   _jMethod: jmethodID;
-   _jParams : Array[0..1] of jValue;
-begin
- _jParams[0].l:= env^.NewStringUTF(env, pchar(_srcFullName) );
- _jParams[1].l:= env^.NewStringUTF(env, pchar(_destFullName) );
-  _jCls := env^.GetObjectClass(env, _jform);
-  _jMethod:= env^.GetMethodID(env, _jCls, 'CopyFile', '(Ljava/lang/String;Ljava/lang/String;)Z');
-  _jBoo:= env^.CallBooleanMethodA(env, _jform, _jMethod,@_jParams);
-  env^.DeleteLocalRef(env,_jParams[0].l);
-  env^.DeleteLocalRef(env,_jParams[1].l);
-  Result:= boolean(_jBoo);
-  env^.DeleteLocalRef(env, _jCls);
 end;
 
 function jForm_CopyFileFromUri(env: PJNIEnv;  _jform: JObject; _srcUri : JObject; _destDir: string): string;
@@ -8051,29 +6698,6 @@ begin
   Result:= GetPStringAndDeleteLocalRef(env, _jString);
   env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env, _jCls);
-end;
-
-function jForm_LoadFromAssets(env: PJNIEnv; _jform: JObject; _fileName: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'LoadFromAssets', _fileName);
-end;
-
-function jForm_IsSdCardMounted(env: PJNIEnv; _jform: JObject): boolean;
-var
-   _jBoo: JBoolean;
-   _jCls: jClass;
-   _jMethod: jmethodID;
-begin
-  _jCls := env^.GetObjectClass(env, _jform);
-  _jMethod:= env^.GetMethodID(env, _jCls, 'IsSdCardMounted', '()Z');
-  _jBoo:= env^.CallBooleanMethod(env, _jform, _jMethod);
-  Result:= boolean(_jBoo);
-  env^.DeleteLocalRef(env, _jCls);
-end;
-
-function jForm_LoadFromAssetsTextContent(env: PJNIEnv; _jform: JObject; _filename: string): string;
-begin
-  Result:= jni_func_t_out_t(env, _jform, 'LoadFromAssetsTextContent', _fileName);
 end;
 
 //------------------------------------------------------------------------------
@@ -9568,6 +8192,64 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jni_func_tj_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str: string; _long: int64): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].j:= _long;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;J)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_tf_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str: string; _float: single): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].f:= _float;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;F)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str0, _str1: string): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jni_func_tii_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                             _str: string; _int1, _int2: integer): boolean;
 var
@@ -9698,6 +8380,38 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jni_func_t_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _str: string): single;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)F');
+  Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_t_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _str: string): int64;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)J');
+  Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jni_func_t_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                           _str: string): string;
 var
@@ -9749,6 +8463,47 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(ILjava/lang/String;)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_it_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _int: integer; _str: string): string;
+var
+  jStr: JString;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _int;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(ILjava/lang/String;)Ljava/lang/String;');
+
+  jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_tt_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                           _str0, _str1: string): string;
+var
+  jStr: JString;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
+
+  jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 end;
