@@ -390,13 +390,10 @@ public class jImageFileManager /*extends ...*/ {
 		return false;
 	 }
 
-     if ((imageFile != null) && saved)  // pre Q
-     {
-         MediaScannerConnection.scanFile(context, new String[]{imageFile.toString()}, null, null);                 
-         return true;
-     }
+     if ((imageFile != null) && saved)  // pre Q     
+         MediaScannerConnection.scanFile(context, new String[]{imageFile.toString()}, null, null);                               
 
-     return false;
+     return saved;
  }
 
  public Bitmap LoadFromUri(Uri _imageUri) {
