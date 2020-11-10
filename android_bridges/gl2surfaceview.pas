@@ -1256,6 +1256,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].i:= _count;
   jCls:= env^.GetObjectClass(env, _jgl2surfaceview);
   jMethod:= env^.GetMethodID(env, jCls, 'GenTexturesIDs', '(I)[I');

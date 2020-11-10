@@ -1380,6 +1380,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jcopenmapview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetGeoPoints', '()[D');
   jresultArray:= env^.CallObjectMethod(env, _jcopenmapview, jMethod);
@@ -1453,6 +1454,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].i:= _index;
   jCls:= env^.GetObjectClass(env, _jcopenmapview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetGeoPoint', '(I)[D');
@@ -1592,6 +1594,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= _marker;
   jCls:= env^.GetObjectClass(env, _jcopenmapview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetMarkerPosition', '(Lorg/osmdroid/views/overlay/Marker;)[D');
@@ -1789,6 +1792,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jcopenmapview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetMarkersPositions', '()[D');
   jresultArray:= env^.CallObjectMethod(env, _jcopenmapview, jMethod);
@@ -1822,6 +1826,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].i:= _index;
   jCls:= env^.GetObjectClass(env, _jcopenmapview);
   jMethod:= env^.GetMethodID(env, jCls, 'GetMarkerPosition', '(I)[D');

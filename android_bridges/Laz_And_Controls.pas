@@ -3919,6 +3919,8 @@ begin
 
   if not Assigned(Obj) then Exit;
 
+  arrayResult := nil;
+
   if Obj is jHttpClient then
   begin
     pascontent := '';
@@ -13850,6 +13852,8 @@ begin
    if FFontSize > 0 then
     jDBListView_setFontSize(FjEnv, FjObject , FFontSize);
 
+   weights := nil;
+
    if FColWeights.Count > 0 then
    begin
     SetLength(weights, FColWeights.Count);
@@ -13857,6 +13861,8 @@ begin
       weights[i] := StrToFloat(FColWeights[i]);
     jDBListView_SetColumnWeights(FjEnv, FjObject, weights{FColWeights});
    end;
+
+   names := nil;
 
    if FColNames.Count > 0 then
    begin
@@ -13950,6 +13956,8 @@ begin
   if FColWeights <> Value then
      FColWeights.Assign(Value);
 
+  weights := nil;
+
   if FInitialized and (Value.Count <> 0) then
   begin
     SetLength(weights, Value.Count);
@@ -13966,6 +13974,8 @@ var
 begin
   if FColNames <> Value then
      FColNames.Assign(Value);
+
+  names := nil;
 
   if FInitialized {and (Value.Count <> 0)} then
   begin

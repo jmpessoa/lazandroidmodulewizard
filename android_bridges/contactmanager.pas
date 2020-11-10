@@ -692,6 +692,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_delimiter));
   jCls:= env^.GetObjectClass(env, _jcontactmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetContactsFromSIMCard', '(Ljava/lang/String;)[Ljava/lang/String;');

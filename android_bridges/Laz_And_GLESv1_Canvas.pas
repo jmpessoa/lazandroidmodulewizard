@@ -233,8 +233,8 @@ jCanvasES1 = class(jGLViewEvent)
 
 implementation
 
-const
-  CrLf = #13#10;
+//const
+//  CrLf = #13#10;
 
 Function _glRGBA ( R,G,B,A : Single  ) : TgfRGBA;
  begin
@@ -715,10 +715,10 @@ end;
 //-----------------------------------------------------------------------------
 
 Const
- cShaderHelp     = '//';
- cShaderVertex   = '[Vertex:';
- cShaderFragment = '[Fragment:';
- cCrLf           = #13#10;
+ //cShaderHelp     = '//';
+ //cShaderVertex   = '[Vertex:';
+ //cShaderFragment = '[Fragment:';
+ //cCrLf           = #13#10;
  czNear          =    0.1;
  czFar           = 1000.0;
  cfieldOfView    =   60.0;

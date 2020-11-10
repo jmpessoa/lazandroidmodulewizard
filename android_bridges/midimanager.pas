@@ -101,11 +101,11 @@ const // DoAction _cmd parameter:
   CMD_GET_STATUS       = 2; // return value of myStatus
   CMD_GET_DEVICE_ID    = 3; // return device iD if active
   CMD_GET_DEVICE_COUNT = 4; // how many devices available
-    GET_COUNT_INPUT    = 1; //
-    GET_COUNT_OUTPUT   = 2; //
-    GET_COUNT_ALL      = 3; //
   CMD_ALL_NOTES_OFF    = 5; // all notes off at time T=_param
   CMD_MIDI_CLOSE       = 6;
+  //GET_COUNT_INPUT    = 1; //
+  //GET_COUNT_OUTPUT   = 2; //
+  //GET_COUNT_ALL      = 3; //
 
 function jMidiManager_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
 var

@@ -311,6 +311,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jwifimanager);
   jMethod:= env^.GetMethodID(env, jCls, 'Scan', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jwifimanager, jMethod);

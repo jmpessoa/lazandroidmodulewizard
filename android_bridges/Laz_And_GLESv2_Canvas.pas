@@ -70,7 +70,7 @@ unit Laz_And_GLESv2_Canvas; {start: 2013-10-26: the simonsayz's "And_GLESv2_Canv
 
 interface
 
-uses ctypes,SysUtils,Classes,Math,
+uses SysUtils,Classes,Math,
      And_jni,And_jni_Bridge, Laz_And_Controls, AndroidWidget,
      {And_lib_Image,} Laz_And_GLESv2_Canvas_h;
 
@@ -268,7 +268,7 @@ Type
    FShaderVars : TxgShaderVars; // Shader Interface Variable
    FShader     : TxgShader;     //
    FAlpha      : Single;
-   FMVP        : TM4x4;         // ModelView , Projection
+   //FMVP        : TM4x4;         // ModelView , Projection
 
    procedure SetImages(Value: jImageList);   //by jmpessoa
 
@@ -368,8 +368,8 @@ Type
 
 implementation
 
-const
-  CrLf = #13#10;
+//const
+//  CrLf = #13#10;
 
 //-----------------------------------------------------------------------------
 //
@@ -581,7 +581,6 @@ Function xyTriangulation(XYs : TXYs; var output: TxyTriangles): Boolean;
  Var
   i                : Integer;
   buffer           : TxyTriangles;
-  bufferSize       : Integer;
   itemCount        : Integer;
   earIndex         : Integer;
   newxy            : TXYs;
@@ -594,7 +593,6 @@ Function xyTriangulation(XYs : TXYs; var output: TxyTriangles): Boolean;
   if XYs.Cnt < 3 then Exit;
 
   itemCount  := 0;
-  bufferSize := 0;
   vNum := XYs.Cnt;
 
   While vNum > 3 do
@@ -1706,7 +1704,10 @@ var
   T : TM4x4;
 begin
   if FInitialized then
-     _glTranslatef (T,X,Y,Z);     MVP := _mM4x4(T,MVP);
+  begin
+     _glTranslatef (T,X,Y,Z);
+     MVP := _mM4x4(T,MVP);
+  end;
 end;
 
 //
@@ -1715,7 +1716,10 @@ var
   R : TM4x4;
 begin
   if FInitialized then
-     _glRotatef (R,Angle,X,Y,Z);  MVP := _mM4x4(R,MVP);
+  begin
+     _glRotatef (R,Angle,X,Y,Z);
+     MVP := _mM4x4(R,MVP);
+  end;
 end;
 
 //
@@ -1724,7 +1728,10 @@ var
   S : TM4x4;
 begin
   if FInitialized then
-     _glScalef (S,X,Y,Z);         MVP := _mM4x4(S,MVP);
+  begin
+     _glScalef (S,X,Y,Z);
+     MVP := _mM4x4(S,MVP);
+  end;
 end;
 
 //
@@ -1902,6 +1909,7 @@ var
   xyzTris  : TxyzTriangles;
   i,j      : Integer;
 begin
+
   if not FInitialized then Exit;
   //
   If Not(xyTriangulation(Pts,xyTris)) then Exit;

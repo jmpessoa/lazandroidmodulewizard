@@ -242,6 +242,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_filename));
   jCls:= env^.GetObjectClass(env, _jfileprovider);
   jMethod:= env^.GetMethodID(env, jCls, 'GetContent', '(Ljava/lang/String;)[B');

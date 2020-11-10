@@ -854,8 +854,8 @@ type
     FInitialized : boolean;
     FAppName     : string;
 
-    FMainActivity: string;
-    FPackageName   : string;
+    //FMainActivity: string;
+    //FPackageName   : string;
     FAPILevel      : Integer;
 
     FjClassName   : string;
@@ -5007,6 +5007,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;');
@@ -5042,6 +5043,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDriverList', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jform, jMethod);
@@ -5076,6 +5078,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_envPath));
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetFolderList', '(Ljava/lang/String;)[Ljava/lang/String;');
@@ -5112,6 +5115,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_envPath));
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'GetFileList', '(Ljava/lang/String;)[Ljava/lang/String;');
@@ -6387,7 +6391,7 @@ function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TD
   ResB: JBoolean;
   SizeArr, i: Integer;
 begin  
-
+  Result := nil;
   JCls := env^.GetObjectClass(env, this);
   JParams[0].l := env^.NewStringUTF(env, PChar(Path)); 
   JMethod := env^.GetMethodID(env, JCls, 'getAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;'); 
@@ -6421,7 +6425,7 @@ function jApp_GetDriverList(env: PJNIEnv; this: JObject): TDynArrayOfString;
   ResB: JBoolean;
   SizeArr, i: Integer;
 begin
-
+  Result := nil;
   JCls := env^.GetObjectClass(env, this);
   JMethod := env^.GetMethodID(env, JCls, 'getDriverList', '()[Ljava/lang/String;');
   DataArray := env^.CallObjectMethod(env, this, JMethod);
@@ -6455,7 +6459,7 @@ function jApp_GetFolderList(env: PJNIEnv; this: JObject; Path: string): TDynArra
   ResB: JBoolean;
   SizeArr, i: Integer;
 begin
-
+  Result := nil;
   JCls := env^.GetObjectClass(env, this);
   JParams[0].l := env^.NewStringUTF(env, PChar(Path));
   JMethod := env^.GetMethodID(env, JCls, 'getFolderList', '(Ljava/lang/String;)[Ljava/lang/String;');
@@ -6490,7 +6494,7 @@ function jApp_GetFileList(env: PJNIEnv; this: JObject; Path: string): TDynArrayO
   ResB: JBoolean;
   SizeArr, i: Integer;
 begin
-
+  Result := nil;
   JCls := env^.GetObjectClass(env, this);
   JParams[0].l := env^.NewStringUTF(env, PChar(Path));
   JMethod := env^.GetMethodID(env, JCls, 'getFileList', '(Ljava/lang/String;)[Ljava/lang/String;');
@@ -6565,7 +6569,6 @@ var
  _jMethod : jMethodID = nil;
  _jParams : array[0..1] of jValue;
  _jString : jstring;
- _jBoolean: jBoolean;
 begin
   _cls := env^.GetObjectClass(env, this);
   _jMethod:= env^.GetMethodID(env, _cls, 'getQuantityStringByName', '(Ljava/lang/String;I)Ljava/lang/String;');
@@ -6687,7 +6690,6 @@ var
    _jCls: jClass;
    _jMethod: jmethodID;
    _jString : jstring;
-   _jBoolean: jBoolean;
    _jParams : Array[0..1] of jValue;
 begin
  _jParams[0].l:= _srcUri;
@@ -6892,7 +6894,6 @@ Function  jSysInfo_PathApp(env:PJNIEnv; this:jobject; context : jObject; AppName
   _jMethod : jMethodID = nil;
   _jParams : Array[0..1] of jValue;
   _jString : jString;
-  _jBoolean: jBoolean;
  begin
   jClassMethod(_cFuncName,_cFuncSig,env,gjClass,_jMethod);
   _jParams[0].l := context;
@@ -8517,6 +8518,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= _bitmap;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
 

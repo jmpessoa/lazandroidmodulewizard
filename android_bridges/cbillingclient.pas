@@ -257,7 +257,6 @@ uses
   StrUtils,
   DateUtils,
   And_jni,
-  And_jni_Bridge,
   {$ifdef test_billing}
   Laz_And_Controls,
   {$endif test_billing}
@@ -869,7 +868,7 @@ begin
 end;
 
 function TPurchaseItem.OrderDateStr: string;
-var DT: TDateTime; T: Int64;
+var DT: TDateTime;
 begin
   DT := OrderDateTime;
   if DT < 45000 then
@@ -1133,7 +1132,7 @@ procedure jcBillingClient.ProcessProductList(const xml: string; List: TList;
   EventClear, EventDone: TBillingEvent; var Hash: string);
 
   procedure FixProductLinks;
-  var i, j: integer; pid: string;
+  var i, j: integer;
   begin
     for i := 0 to PurchaseCount-1 do
       Purchase[i].fProduct := nil;

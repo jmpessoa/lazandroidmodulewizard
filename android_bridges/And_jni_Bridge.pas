@@ -6128,6 +6128,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_centerItemCaption));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_delimiter));
   jCls:= env^.GetObjectClass(env, _jlistview);
@@ -6294,6 +6295,7 @@ var
   i: integer;
   tmp:pchar;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_appInternalFileName));
   jCls:= env^.GetObjectClass(env, _jlistview);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromFile', '(Ljava/lang/String;)[Ljava/lang/String;');
@@ -11558,6 +11560,7 @@ var
   i: integer;
   jStrings: array of jObject;
 begin
+  jStrings := nil;
   newSize0:= Length(_insertQueries);
   SetLength(jStrings, newSize0+1);
   jStrings[newSize0] := env^.NewStringUTF(env, PChar(''));
@@ -12165,6 +12168,7 @@ end;
      jStrings: array of jObject;
      i: integer;
    begin
+     jStrings := nil;
      newSize0:= Length(_value);
      SetLength(jStrings, newSize0+1);
      jStrings[newSize0] := env^.NewStringUTF(env, PChar(''));
@@ -12527,7 +12531,6 @@ end;
 function jHttpClient_GetCookieValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -12543,7 +12546,6 @@ end;
 function jHttpClient_GetCookieName(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -12567,6 +12569,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_nameValueSeparator));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetCookies', '(Ljava/lang/String;)[Ljava/lang/String;');
@@ -12670,6 +12673,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_urlString));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_nameValueSeparator));
   jCls:= env^.GetObjectClass(env, _jhttpclient);
@@ -12774,6 +12778,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= _httpConnection;
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'GetHeaderFields', '(Ljava/net/HttpURLConnection;)[Ljava/lang/String;');
@@ -13166,7 +13171,6 @@ function jContact_getDisplayNameList(env:PJNIEnv; this:jobject; delimiter: char)
 var
  _jMethod  : jMethodID = nil;
  _jString  : jString;
- _jBoolean : jBoolean;
  _jParams : array[0..0] of jValue;
  jCls: jClass=nil;
 begin
