@@ -289,6 +289,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jmyhello);
   jMethod:= env^.GetMethodID(env, jCls, 'GetStringArray', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jmyhello, jMethod);
@@ -324,6 +325,7 @@ var
   jNewArray0: jObject=nil;
   i: integer;
 begin
+  Result := nil;
   newSize0:= Length(_msgArray); //?
   jNewArray0:= env^.NewObjectArray(env, newSize0,env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
   for i:= 0 to newSize0 - 1 do
@@ -366,6 +368,7 @@ var
   jNewArray1: jObject=nil;
   i: integer;
 begin
+  Result := nil;
   newSize0:= Length(_strArrayA); //?
   jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
   for i:= 0 to newSize0 - 1 do
@@ -408,6 +411,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jmyhello);
   jMethod:= env^.GetMethodID(env, jCls, 'GetIntArray', '()[I');
   jresultArray:= env^.CallObjectMethod(env, _jmyhello, jMethod);
@@ -429,6 +433,7 @@ var
   newSize1: integer;
   jNewArray1: jObject=nil;
 begin
+  Result := nil;
   newSize0:= _size; //?
   jNewArray0:= env^.NewIntArray(env, newSize0);  // allocate
   env^.SetIntArrayRegion(env, jNewArray0, 0 , newSize0, @_vA[0] {source});

@@ -306,6 +306,7 @@ var
   sizeArray: integer;
   i: integer;
 begin
+    Result := nil;
     sizeArray:=  env^.GetArrayLength(env, stringArrayData);
     SetLength(Result, sizeArray);
     for i:= 0 to sizeArray - 1 do
@@ -325,6 +326,7 @@ function GetDynArrayOfSingle(env: PJNIEnv; floatArrayData: jfloatArray): TDynArr
 var
   sizeArray: integer;
 begin
+  Result := nil;
   sizeArray:=  env^.GetArrayLength(env, floatArrayData);
   SetLength(Result, sizeArray);
   env^.GetFloatArrayRegion(env, floatArrayData, 0, sizeArray, @Result[0] {target});
@@ -334,6 +336,7 @@ function GetDynArrayOfDouble(env: PJNIEnv; doubleArrayData: jfloatArray): TDynAr
 var
   sizeArray: integer;
 begin
+  Result := nil;
   sizeArray:=  env^.GetArrayLength(env, doubleArrayData);
   SetLength(Result, sizeArray);
   env^.GetDoubleArrayRegion(env, doubleArrayData, 0, sizeArray, @Result[0] {target});
@@ -343,6 +346,7 @@ function GetDynArrayOfInteger(env: PJNIEnv; intArrayData: jintArray): TDynArrayO
 var
   sizeArray: integer;
 begin
+  Result := nil;
   sizeArray:=  env^.GetArrayLength(env, intArrayData);
   SetLength(Result, sizeArray);
   env^.GetIntArrayRegion(env, intArrayData, 0, sizeArray, @Result[0] {target});
@@ -352,6 +356,7 @@ function GetDynArrayOfJByte(env: PJNIEnv; byteArrayData: jbytearray): TDynArrayO
 var
   sizeArray: integer;
 begin
+  Result := nil;
   sizeArray:=  env^.GetArrayLength(env, byteArrayData);
   SetLength(Result, sizeArray);
   env^.GetByteArrayRegion(env, byteArrayData, 0, sizeArray, @Result[0] {target});
@@ -523,6 +528,9 @@ begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
+  arrayResult := nil;
+  arrayResultHeader := nil;
+
   if byteArrayData <> nil then
   begin
     sizeArray:=  env^.GetArrayLength(env, byteArrayData);
@@ -624,6 +632,10 @@ var
   keepConnected: boolean;
 begin
   keepConnected := true;
+
+  arrayResult := nil;
+  arrayResultHeader := nil;
+
   if byteArrayData <> nil then
   begin
      sizeArray:=  env^.GetArrayLength(env, byteArrayData);
@@ -1056,6 +1068,8 @@ var
   arrayResult: array of single;
 begin
 
+  arrayResult := nil;
+
   if values <> nil then
   begin
     sizeArray:=  env^.GetArrayLength(env, values);
@@ -1201,6 +1215,8 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  arrayResult := nil;
 
   if byteArrayReceived <> nil then
   begin
@@ -1476,6 +1492,9 @@ begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
+  arrayResultX := nil;
+  arrayResultY := nil;
+
   if not Assigned(Obj)  then Exit;
 
   if Obj is jDrawingView then
@@ -1512,6 +1531,9 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  arrayResultX := nil;
+  arrayResultY := nil;
 
   if not Assigned(Obj)  then Exit;
 
@@ -2173,6 +2195,9 @@ var
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
+  arrayResultX := nil;
+  arrayResultY := nil;
 
   if not Assigned(Obj)  then Exit;
 

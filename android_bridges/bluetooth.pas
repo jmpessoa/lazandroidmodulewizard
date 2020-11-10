@@ -395,6 +395,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'GetPairedDevices', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jbluetooth, jMethod);
@@ -427,6 +428,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'GetFoundedDevices', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jbluetooth, jMethod);
@@ -459,6 +461,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jbluetooth);
   jMethod:= env^.GetMethodID(env, jCls, 'GetReachablePairedDevices', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jbluetooth, jMethod);

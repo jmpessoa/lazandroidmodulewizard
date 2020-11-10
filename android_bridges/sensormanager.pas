@@ -394,6 +394,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceSensorsTypes', '()[I');
   jresultArray:= env^.CallObjectMethod(env, _jsensormanager, jMethod);
@@ -417,6 +418,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceSensorsNames', '()[Ljava/lang/String;');
   jresultArray:= env^.CallObjectMethod(env, _jsensormanager, jMethod);
@@ -508,6 +510,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].i:= _sensorType;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorsNames', '(I)[Ljava/lang/String;');

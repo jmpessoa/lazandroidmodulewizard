@@ -467,7 +467,6 @@ procedure jDrawingView.Init(refApp: jApp);
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
-  obj: JObject=nil;
 begin
   if not FInitialized  then
   begin
@@ -2848,6 +2847,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
   jParams[1].f:= _x;
   jParams[2].f:= _y;
@@ -2872,6 +2872,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
   jParams[1].f:= _x;
   jParams[2].f:= _y;
@@ -2897,6 +2898,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
   jParams[1].f:= _x;
   jParams[2].f:= _y;
@@ -2924,6 +2926,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
   jParams[1].f:= _x;
   jParams[2].f:= _y;
@@ -2950,6 +2953,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
   jParams[1].f:= _left;
   jParams[2].f:= _top;
@@ -2978,6 +2982,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
   jParams[1].f:= _x;
   jParams[2].f:= _y;

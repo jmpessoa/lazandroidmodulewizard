@@ -399,6 +399,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_cmd));
   jCls:= env^.GetObjectClass(env, _jcmikrotikrouteros);
   jMethod:= env^.GetMethodID(env, jCls, 'ExecuteForResult', '(Ljava/lang/String;)[Ljava/lang/String;');

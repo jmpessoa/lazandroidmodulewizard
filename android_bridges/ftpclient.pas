@@ -26,7 +26,7 @@ jFTPClient = class(jControl)
 
     FHost: string;
     FPort: integer;
-    FIdentityCertificateKey: string;
+    //FIdentityCertificateKey: string;
     FPassword: string;
     FUsername: string;
     FWorkingDirectory: string;

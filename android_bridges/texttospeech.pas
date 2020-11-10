@@ -5,7 +5,7 @@ unit texttospeech;
 interface
 
 uses
-  Classes, SysUtils, And_jni, AndroidWidget;
+  Classes, SysUtils, AndroidWidget;
 
 type
 

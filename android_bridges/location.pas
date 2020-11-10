@@ -472,6 +472,9 @@ var
   longitude: TDynArrayOfDouble;
   p: TGeoPoint2D;
 begin
+  latitude := nil;
+  longitude := nil;
+
   if FInitialized then
   begin
     count:= Length(geoPoints);
@@ -496,6 +499,9 @@ var
   longitude: TDynArrayOfDouble;
   p: TGeoPoint2D;
 begin
+  latitude := nil;
+  longitude := nil;
+
   if FInitialized then
   begin
     count:= Length(geoPoints);
@@ -520,6 +526,9 @@ var
   longitude: TDynArrayOfDouble;
   p: TGeoPoint2D;
 begin
+  latitude := nil;
+  longitude := nil;
+
   if FInitialized then
   begin
     count:= Length(geoPoints);
@@ -656,6 +665,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_locationAddress));
   jCls:= env^.GetObjectClass(env, _jlocation);
   jMethod:= env^.GetMethodID(env, jCls, 'GetLatitudeLongitude', '(Ljava/lang/String;)[D');

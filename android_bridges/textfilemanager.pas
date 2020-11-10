@@ -230,6 +230,7 @@ function jTextFileManager.LoadFromAssetsAsText(_filePath: string; IsUTF8: boolea
 var
   s: AnsiString; L: integer; buf: TDynArrayOfJByte;
 begin
+  s := '';
   result:= '';
   buf:= LoadFromAssetsAsJByteArray(_filePath);
   L:= length(buf);
@@ -492,6 +493,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_filePath));
   jCls:= env^.GetObjectClass(env, _jtextfilemanager);
   jMethod:= env^.GetMethodID(env, jCls, 'LoadFromAssetsAsJByteArray', '(Ljava/lang/String;)[B');
