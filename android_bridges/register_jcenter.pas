@@ -6,6 +6,7 @@ interface
   
 uses
   Classes,
+  ctoytimerservice,
   cbillingclient,
   cqrgen,
   cbluetoothspp,
@@ -24,6 +25,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jctoytimerservice_icon.lrs}
   {$I jcbillingclient_icon.lrs}
   {$I jcqrgen_icon.lrs}
   {$I jcbluetoothspp_icon.lrs}
@@ -35,6 +37,7 @@ begin
   {$I jcmikrotikrouteros_icon.lrs}
   RegisterComponents('Android Bridges jCenter',
     [
+      jcToyTimerService,
       jcBillingClient,
       jcQRGen,
       jcBluetoothSPP,

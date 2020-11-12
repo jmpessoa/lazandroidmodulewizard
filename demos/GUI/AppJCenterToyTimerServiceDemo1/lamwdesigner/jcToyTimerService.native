@@ -1,0 +1,1 @@
+public native void pOnToyTimerServicePullElapsedTime(long pasobj, long elapsedTime);

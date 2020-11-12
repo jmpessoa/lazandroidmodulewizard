@@ -267,6 +267,10 @@ uses
 
    //by Marco Bramardi
    procedure Java_Event_pOnBillingClientEvent(env:PJNIEnv; this:JObject; Obj: TObject; xml: JString);
+
+   //jcToyTimerService
+   procedure Java_Event_pOnToyTimerServicePullElapsedTime(env:PJNIEnv;this:JObject;Sender:TObject;elapsedTime:int64);
+
 implementation
 
 uses
@@ -280,7 +284,8 @@ uses
    stablayout, treelistview, customcamera, calendarview, searchview, telephonymanager,
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
-   ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext, cbillingclient;
+   ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
+   cbillingclient, ctoytimerservice;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3035,6 +3040,18 @@ begin
   gApp.Jni.jThis:= this;
   jForm(jcBillingClient(Obj).Owner).UpdateJNI(gApp);
   jcBillingClient(Obj).GenEvent_OnBillingClientEvent(pasStr);
+end;
+
+//jcToyTimerService
+procedure Java_Event_pOnToyTimerServicePullElapsedTime(env:PJNIEnv;this:JObject;Sender:TObject;elapsedTime:int64);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jcToyTimerService then
+  begin
+    jForm(jcToyTimerService(Sender).Owner).UpdateJNI(gApp);
+    jcToyTimerService(Sender).GenEvent_OnToyTimerServicePullElapsedTime(Sender,elapsedTime);
+  end;
 end;
 
 end.

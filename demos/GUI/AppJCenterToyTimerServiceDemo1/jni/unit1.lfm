@@ -1,0 +1,96 @@
+object AndroidModule1: TAndroidModule1
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Left = 455
+  Top = 32
+  Width = 320
+  Height = 400
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  OnActivityStart = AndroidModule1ActivityStart
+  OnActivityStop = AndroidModule1ActivityStop
+  object jTextView1: jTextView
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 45
+    Top = 5
+    Width = 229
+    Height = 26
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App Toy Timer Service Demo1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jTextView2: jTextView
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 119
+    Top = 187
+    Width = 81
+    Height = 26
+    Visible = True
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Elapsed time:'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object jButton1: jButton
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 53
+    Top = 338
+    Width = 213
+    Height = 57
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpBottom, rpCenterHorizontal]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Timer On'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton1Click
+  end
+  object jcToyTimerService1: jcToyTimerService
+    OnPullElapsedTime = jcToyTimerService1PullElapsedTime
+    left = 67
+    top = 85
+  end
+end

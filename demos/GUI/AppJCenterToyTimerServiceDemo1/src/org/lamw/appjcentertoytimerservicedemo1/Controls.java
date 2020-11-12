@@ -2236,7 +2236,7 @@ public native void pAppOnRequestPermissionResult(int requestCode, String permiss
 //Load Pascal Library - Please, do not edit the static content commented in the template file
 // -------------------------------------------------------------------------------------------
 static {
-/*libsmartload*/
+try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
 }
 // -------------------------------------------------------------------------
 //  Activity Event
@@ -3086,5 +3086,18 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 //-------------------------------------------------------------------------------------------------------
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
+
+public  java.lang.Object jButton_Create(long pasobj ) {
+  return (java.lang.Object)( new jButton(this.activity,this,pasobj));
+}
+
+public java.lang.Object jcToyTimerService_jCreate(long _Self) {
+  return (java.lang.Object)(new jcToyTimerService(this,_Self));
+}
+public native void pOnToyTimerServicePullElapsedTime(long pasobj, long elapsedTime);
+
+public  java.lang.Object jTextView_Create(long pasobj) {
+  return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
+}
 
 }
