@@ -1166,7 +1166,7 @@ public class jHttpClient /*extends ...*/ {
 	 	        //Create a pattern
 	 	        Pattern pattern = Pattern.compile(patternString);
 	 	        if (null == pattern) {
-	 	            return null;
+	 	            return "";
 	 	        }
 
 	 	        //Match the pattern string in provided string
@@ -1189,7 +1189,7 @@ public class jHttpClient /*extends ...*/ {
 	        protected String doInBackground(String... stringUrl) {	            	           
 	            final String currentVersion_PatternSeq = "<div[^>]*?>Current\\sVersion</div><span[^>]*?>(.*?)><div[^>]*?>(.*?)><span[^>]*?>(.*?)</span>";
 	     	    final String appVersion_PatternSeq = "htlgb\">([^<]*)</s";
-	     	    String playStoreAppVersion = null;
+	     	    String playStoreAppVersion = "";
 
 	     	    BufferedReader inReader = null;
 	     	    URLConnection uc = null;
@@ -1200,13 +1200,13 @@ public class jHttpClient /*extends ...*/ {
 	     	    try{
 	     	     url = new URL(stringUrl[0]);
 	     	    } catch (MalformedURLException e) {
-	     	     return null;
+	     	     return "";
 	     	    }
 	     	    
 	     	    try{
 	     	     uc = url.openConnection();
 	     	     if(uc == null) {
-	     	       return null;
+	     	       return "";
 	     	     }
 	     	     uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 	     	     inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
@@ -1218,26 +1218,26 @@ public class jHttpClient /*extends ...*/ {
 	     	     }
 	     	    
 	     	    } catch (IOException e) {
-	     	     return null;	
+	     	     return "";	
 	     	    }
 	     	    
 
 	     	    // Get the current version pattern sequence 
 	     	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
-	     	    if(null == versionString){ 
-	     	        return null;
+	     	    if(versionString.length() <= 0){ 
+	     	        return "";
 	     	    }else{
 	     	        // get version from "htlgb">X.X.X</span>
 	     	        playStoreAppVersion = GetAppVersion(appVersion_PatternSeq, versionString);
 	     	    }
 
-	     	    return playStoreAppVersion;
+	     	    return playStoreAppVersion;	     	    
 	        }
 
 	        @Override
 	        protected void onPostExecute(String content) { //content --> playStoreAppVersion
 	            //public native void pOnHttpClientContentResult(long pasobj, byte[] content);
-                byte[] b = content.getBytes();
+	        	byte[] b = content.getBytes();
 	            controls.pOnHttpClientContentResult(pascalObj, b);
 	        }
 
