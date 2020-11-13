@@ -60,30 +60,15 @@ public class jRadioButton extends RadioButton {
 		return LAMWCommon.getParent();
 	}
 	
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
+	public  void SetViewParent( android.view.ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
-	}
-
-	public  void setParent2( android.view.ViewGroup _viewgroup ) { //need by RadioGroup [LinearLayout!]
-		LAMWCommon.setParent(_viewgroup);
-
-		//With newer Android, the below gives an error: cannot cast marginlayout to linearlayout
-		//ViewGroup parent = LAMWCommon.getParent();
-		//if (parent != null) { parent.removeView(this); }
-		//parent = _viewgroup;
-		//parent.addView(this, 0); //LinearLayout [no lparams], insert at index O ...
-
-		// ?? better !!?? not sure
-		// parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		// lparams = null;
-		// lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
 	}
 	
-	public void setLParamWidth(int _w) {
+	public void SetLParamWidth(int _w) {
 		LAMWCommon.setLParamWidth(_w);
 	}
 
-	public void setLParamHeight(int _h) {
+	public void SetLParamHeight(int _h) {
 		LAMWCommon.setLParamHeight(_h);
 	}
 
@@ -91,19 +76,19 @@ public class jRadioButton extends RadioButton {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int idAnchor) {
+	public void SetLayoutAll(int idAnchor) {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 

@@ -4183,7 +4183,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jTextView_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -4209,11 +4209,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   jTextView_setParent(FjEnv, FjObject , FjPRLayout);
-
-   View_setId(FjEnv, FjObject, Self.Id);
+   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -4225,7 +4224,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jTextView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -4233,14 +4232,14 @@ begin
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jTextView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jTextView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -4279,7 +4278,7 @@ procedure jTextView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     jTextView_setParent(FjEnv, FjObject, FjPRLayout);
+     View_SetParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jTextView.RemoveFromViewParent;
@@ -4292,7 +4291,7 @@ procedure jTextView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     jTextView_setParent(FjEnv, FjObject, FjPRLayout);
+     View_SetParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jTextView.SetColor(Value: TARGBColorBridge);
@@ -4446,7 +4445,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jTextView_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jTextView.GetHeight: integer;
@@ -4457,7 +4456,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jTextView_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jTextView.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
@@ -4588,16 +4587,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jTextView_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jTextView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jTextView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -4607,7 +4606,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jTextView.SetAllCaps(_value: boolean);
@@ -4680,7 +4679,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jEditText_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -4706,11 +4705,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jEditText_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+    View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-   jEditText_setParent(FjEnv, FjObject , FjPRLayout);
-
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -4722,7 +4720,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jEditText_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -4730,14 +4728,14 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jEditText_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jEditText_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -4815,7 +4813,7 @@ Procedure jEditText.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jEditText_setParent(FjEnv, FjObject , FjPRLayout);
+    View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jEditText.RemoveFromViewParent;
@@ -4828,7 +4826,7 @@ procedure jEditText.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     jEditText_setParent(FjEnv, FjObject, FjPRLayout);
+     View_SetParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jEditText.setColor(Value: TARGBColorBridge);
@@ -4848,7 +4846,7 @@ function jEditText.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jEditText_getText(FjEnv, FjObject );
+     Result:= jni_func_out_t(FjEnv, FjObject, 'GetText');;
 end;
 
 procedure jEditText.SetText(Value: string);
@@ -5265,7 +5263,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jEditText_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jEditText.GetHeight: integer;
@@ -5276,7 +5274,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jEditText_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jEditText.SetFontFromAssets(_fontName: string);
@@ -5358,16 +5356,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jEditText_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jEditText_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jEditText_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -5377,7 +5375,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jEditText_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jEditText.SetSoftInputShownOnFocus(_show: boolean);
@@ -5450,7 +5448,7 @@ begin
    begin
      if FjObject  <> nil then
      begin
-       jButton_Free(FjEnv, FjObject );
+       jni_free(FjEnv, FjObject );
        FjObject := nil;
      end;
    end;
@@ -5476,11 +5474,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-   jButton_setParent(FjEnv, FjObject , FjPRLayout);
-
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
 
@@ -5493,7 +5490,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-       jButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -5501,14 +5498,14 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -5542,7 +5539,7 @@ procedure jButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jButton_setParent(FjEnv, FjObject , FjPRLayout);
+    View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jButton.RemoveFromViewParent;
@@ -5555,7 +5552,7 @@ procedure jButton.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     jButton_setParent(FjEnv, FjObject, FjPRLayout);
+     View_SetParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jButton.SetAllCaps(AValue: Boolean);
@@ -5680,7 +5677,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jButton_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jButton.GetHeight: integer;
@@ -5691,7 +5688,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jButton_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
@@ -5745,16 +5742,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jButton_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -5764,7 +5761,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jButton.SetFocus();
@@ -5802,7 +5799,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jCheckBox_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -5828,10 +5825,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jCheckBox_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -5843,20 +5840,20 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jCheckBox_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jCheckBox_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= 0;
 
-  jCheckBox_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -5886,7 +5883,7 @@ Procedure jCheckBox.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jCheckBox_setParent(FjEnv, FjObject , FjPRLayout);
+    View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jCheckBox.RemoveFromViewParent;
@@ -6004,16 +6001,16 @@ begin
     //in designing component state: set value here...
   if FInitialized then
   begin
-     jCheckBox_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jCheckBox_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jCheckBox_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -6023,7 +6020,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     jCheckBox_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 //------------------------------------------------------------------------------
@@ -6054,7 +6051,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jRadioButton_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -6087,18 +6084,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jRadioButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   if not flag then
-   begin
-    jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
-   end
-   else
-   begin
-    jRadioButton_setParent2(FjEnv, FjObject , FjPRLayout);
-   end;
-
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -6110,14 +6099,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jRadioButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jRadioButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
@@ -6125,7 +6114,7 @@ begin
   else Self.AnchorId:= -1;
 
    if not flag then
-     jRadioButton_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+     View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -6155,7 +6144,7 @@ Procedure jRadioButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jRadioButton_setParent(FjEnv, FjObject , FjPRLayout);
+    View_SetParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jRadioButton.RemoveFromViewParent;
@@ -6273,16 +6262,16 @@ begin
     //in designing component state: set value here...
   if FInitialized then
   begin
-     jRadioButton_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jRadioButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jRadioButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -6292,7 +6281,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     jRadioButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 //------------------------------------------------------------------------------
@@ -6328,7 +6317,7 @@ begin
    begin
      if FjObject  <> nil then
      begin
-       jProgressBar_Free(FjEnv, FjObject );
+       jni_free(FjEnv, FjObject );
        FjObject := nil;
      end;
    end;
@@ -6353,10 +6342,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jProgressBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   jProgressBar_setParent(FjEnv, FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -6368,21 +6357,21 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jProgressBar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jProgressBar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
   
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jProgressBar_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -6401,7 +6390,7 @@ Procedure jProgressBar.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     jProgressBar_setParent(FjEnv, FjObject , FjPRLayout);
+     View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jProgressBar.RemoveFromViewParent;
@@ -6498,17 +6487,17 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jProgressBar_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jProgressBar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jProgressBar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -6529,7 +6518,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     jProgressBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 //------------------------------------------------------------------------------
@@ -6565,7 +6554,7 @@ begin
    begin
      if FjObject  <> nil then
      begin
-       jImageView_Free(FjEnv, FjObject );
+       jni_free(FjEnv, FjObject );
        FjObject := nil;
      end;
    end;
@@ -6591,10 +6580,10 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jImageView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   jImageView_setParent(FjEnv,FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv,FjObject , FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -6606,14 +6595,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jImageView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jImageView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
@@ -6648,7 +6637,7 @@ begin
   if  FImageScaleType <> scaleCenter  then
     jImageView_SetScaleType(FjEnv, FjObject, Ord(FImageScaleType));;
 
-  jImageView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -6665,7 +6654,7 @@ procedure jImageView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jImageView_setParent(FjEnv,FjObject , FjPRLayout);
+    View_SetParent(FjEnv,FjObject , FjPRLayout);
 end;
 
 procedure jImageView.RemoveFromViewParent;
@@ -6678,7 +6667,7 @@ procedure jImageView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     jImageView_setParent(FjEnv, FjObject, FjPRLayout);
+     View_SetParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 function jImageView.GetView(): jObject;
@@ -6836,7 +6825,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jImageView_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jImageView.GetHeight: integer;
@@ -6847,7 +6836,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jImageView_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jImageView.ClearLayout();
@@ -6858,16 +6847,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jImageView_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jImageView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jImageView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -7065,7 +7054,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     jImageView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jImageView.SetCollapseMode(_collapsemode: TCollapsingMode);
@@ -7278,7 +7267,7 @@ procedure jImageList.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageList_jFree(FjEnv, FjObject);
+     jni_free(FjEnv, FjObject);
 end;
 
 procedure jImageList.SetImages(Value: TStrings);
@@ -7387,7 +7376,7 @@ procedure jHttpClient.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_jFree(FjEnv, FjObject);
+     jni_free(FjEnv, FjObject);
 end;
 
 procedure jHttpClient.SetAuthenticationUser(_userName: string; _password: string);
@@ -7464,7 +7453,7 @@ begin
   if FInitialized then
   begin
     jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
-    Result := jHTTPClient_Get(FjEnv, FjObject, _stringUrl)
+    Result := jni_func_t_out_t(FjEnv, FjObject, 'Get', _stringUrl);
   end else Result := '';
 end;
 
@@ -7474,7 +7463,7 @@ begin
   if not FInitialized then Exit;
 
   if  FUrl <> '' then
-    Result := jHTTPClient_Get(FjEnv, FjObject, FUrl)
+    Result := jni_func_t_out_t(FjEnv, FjObject, 'Post', FUrl)
 end;
 
 procedure jHttpClient.ClearNameValueData; //ClearPost2Values;
@@ -7494,7 +7483,7 @@ begin
   begin
 
     jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
-    Result := jHTTPClient_Post(FjEnv, FjObject, _stringUrl)
+    Result := jni_func_t_out_t(FjEnv, FjObject, 'GetStateful', _stringUrl);
   end else Result := '';
 end;
 
@@ -7565,14 +7554,14 @@ function jHttpClient.GetStateful(_url: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetStateful(FjEnv, FjObject, _url);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStateful', _url);
 end;
 
 function jHttpClient.PostStateful(_url: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_PostStateful(FjEnv, FjObject, _url);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'PostStateful', _url);
 end;
 
 
@@ -7995,8 +7984,7 @@ begin
   if FInitialized then
   begin
     if toName<> '' then
-      FMobileNumber:= jContact_getMobileNumberByDisplayName(gApp.Jni.jEnv, gApp.Jni.jThis,
-                                                            toName);
+      FMobileNumber:= jContact_getMobileNumberByDisplayName(gApp.Jni.jEnv, gApp.Jni.jThis, toName);
     if FMobileNumber <> '' then
         Result:= jSend_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,
                   FMobileNumber,     //to
@@ -8160,7 +8148,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jListView_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -8304,7 +8292,7 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jListView_setParent(FjEnv, FjObject , FjPRLayout);
+   View_SetParent(FjEnv, FjObject , FjPRLayout);
    View_setId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -8317,7 +8305,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -8325,14 +8313,14 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jListView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -8447,7 +8435,7 @@ procedure jListView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jListView_setParent(FjEnv, FjObject , FjPRLayout);
+    View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jListView.RemoveFromViewParent;
@@ -8460,7 +8448,7 @@ procedure jListView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     jListView_setParent(FjEnv, FjObject, FjPRLayout);
+     View_SetParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jListView.SetColor (Value: TARGBColorBridge);
@@ -8565,7 +8553,7 @@ end;
 function jListView.GetItemText(index: Integer): string;
 begin
   if FInitialized then
-    Result:= jListView_GetItemText(FjEnv, FjObject , index);
+    Result:= jni_func_i_out_t(FjEnv, FjObject, 'getItemText', index);
 end;
 
 function jListView.GetCount: integer;
@@ -8633,17 +8621,17 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jListView_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;  
@@ -8857,7 +8845,7 @@ function jListView.GetItemCaption(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_GetItemCaption(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetItemCaption');
 end;
 
 procedure jListView.DispatchOnDrawItemTextColor(_value: boolean);
@@ -8909,7 +8897,7 @@ function jListView.GetWidgetText(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_GetWidgetText(FjEnv, FjObject, _index);
+   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetWidgetText', _index);
 end;
 
 procedure jListView.SetWidgetCheck(_value: boolean; _index: integer);
@@ -8940,7 +8928,7 @@ function jListView.GetItemTagString(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_getItemTagString(FjEnv, FjObject, _index);
+   Result:= jni_func_i_out_t(FjEnv, FjObject, 'getItemTagString', _index);
 end;
 
 function jListView.GetWidth: integer;
@@ -8951,7 +8939,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jListView_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jListView.GetHeight: integer;
@@ -8962,7 +8950,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jListView_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 function jListView.GetTotalHeight: integer;
@@ -9009,21 +8997,21 @@ function jListView.GetCenterItemCaption(_fullItemCaption: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_GetCenterItemCaption(FjEnv, FjObject, _fullItemCaption);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetCenterItemCaption', _fullItemCaption);
 end;
 
 function jListView.GetLeftItemCaption(_fullItemCaption: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_GetLeftItemCaption(FjEnv, FjObject, _fullItemCaption);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetLeftItemCaption', _fullItemCaption);
 end;
 
 function jListView.GetRightItemCaption(_fullItemCaption: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_GetRightItemCaption(FjEnv, FjObject, _fullItemCaption);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetRightItemCaption', _fullItemCaption);
 end;
 
 function jListView.GetLongPressSelectedItem(): integer;
@@ -9335,7 +9323,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jScrollView_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -9362,8 +9350,8 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -9375,20 +9363,20 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -9409,7 +9397,7 @@ procedure jScrollView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jScrollView_setParent(FjEnv, FjObject , FjPRLayout);
+    View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jScrollView.RemoveFromViewParent;
@@ -9457,17 +9445,17 @@ begin
     //in designing component state: set value here...
   if FInitialized then
   begin
-     jScrollView_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -9563,7 +9551,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jScrollView_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jScrollView.GetHeight: integer;
@@ -9574,7 +9562,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jScrollView_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jScrollView.DispatchOnScrollChangedEvent(_value: boolean);
@@ -9730,7 +9718,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jHorizontalScrollView_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -9755,8 +9743,8 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -9768,21 +9756,21 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jHorizontalScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jHorizontalScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jHorizontalScrollView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -9799,7 +9787,7 @@ procedure jHorizontalScrollView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jHorizontalScrollView_setParent(FjEnv, FjObject , FjPRLayout);
+    View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jHorizontalScrollView.RemoveFromViewParent;
@@ -9816,7 +9804,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jHorizontalScrollView_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jHorizontalScrollView.GetHeight: integer;
@@ -9827,7 +9815,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jHorizontalScrollView_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 function jHorizontalScrollView.GetView: jObject;
@@ -9869,17 +9857,17 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jHorizontalScrollView_clearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jHorizontalScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jHorizontalScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -10110,7 +10098,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jWebView_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -10134,8 +10122,8 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jWebView_setParent(FjEnv, FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -10149,21 +10137,21 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jWebView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jWebView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  jWebView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -10182,7 +10170,7 @@ procedure jWebView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jWebView_setParent(FjEnv, FjObject , FjPRLayout);
+    View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jWebView.RemoveFromViewParent;
@@ -10302,17 +10290,17 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jWebView_clearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jWebView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jWebView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -10464,7 +10452,7 @@ Destructor jBitmap.Destroy;
   begin
     if FjObject  <> nil then
     begin
-      jBitmap_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -11077,7 +11065,7 @@ function jBitmap.GetBase64StringFromImageFile(_fullPathToImageFile: string): str
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetBase64StringFromImageFile(FjEnv, FjObject, _fullPathToImageFile);
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetBase64StringFromImageFile', _fullPathToImageFile);
 end;
 
 //------------------------------------------------------------------------------
@@ -11100,7 +11088,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jCanvas_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -11550,7 +11538,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jView_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -11580,9 +11568,9 @@ begin
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
    FjPRLayoutHome:= FjPRLayout;
-   jView_setParent(FjEnv,FjObject , FjPRLayout);
 
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv,FjObject , FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -11594,19 +11582,19 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  jView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -11624,7 +11612,7 @@ procedure jView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    jView_setParent(FjEnv,FjObject , FjPRLayout);
+    View_SetParent(FjEnv,FjObject , FjPRLayout);
 end;
 
 procedure jView.RemoveFromViewParent;
@@ -11690,16 +11678,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jView_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end; 
@@ -11723,7 +11711,7 @@ begin
    if sysIsWidthExactToParent(Self) then
     Result := sysGetWidthOfParent(FParent)
    else
-    Result:= jView_getLParamWidth(FjEnv, FjObject );
+    Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jView.GetHeight: integer;
@@ -11734,7 +11722,7 @@ begin
    if sysIsHeightExactToParent(Self) then
     Result := sysGetHeightOfParent(FParent)
    else
-    Result:= jView_getLParamHeight(FjEnv, FjObject );
+    Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -11807,7 +11795,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-       jTimer_Free(FjEnv, FjObject );
+       jni_free(FjEnv, FjObject );
        FjObject := nil;
     end;
   end;
@@ -11863,7 +11851,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jDialogYN_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -11963,7 +11951,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jDialogProgress_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -12093,7 +12081,7 @@ Destructor jImageBtn.Destroy;
   begin
     if FjObject  <> nil then
     begin
-      jImageBtn_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -12116,12 +12104,12 @@ begin
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
    if FGravityInParent <> lgNone then
-     jImageBtn_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -12133,14 +12121,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jImageBtn_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jImageBtn_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
@@ -12168,7 +12156,7 @@ begin
     end;
   end;
 
-  jImageBtn_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if FSleepDown > 0 then
      jImageBtn_SetSleepDown(FjEnv, FjObject, FSleepDown);
@@ -12191,7 +12179,7 @@ procedure jImageBtn.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     jImageBtn_setParent(FjEnv, FjObject , FjPRLayout);
+     View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jImageBtn.RemoveFromViewParent;
@@ -12355,16 +12343,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jImageBtn_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          jImageBtn_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         jImageBtn_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -12420,7 +12408,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     jImageBtn_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jImageBtn.SetSleepDown(_sleepMiliSeconds: integer);
@@ -12461,7 +12449,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jAsyncTask_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -12614,7 +12602,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jSqliteCursor_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -12789,7 +12777,7 @@ function jSqliteCursor.GetColumName(columnIndex: integer): string;
 begin
 
    if FInitialized  then
-    result:= jSqliteCursor_GetColumName(FjEnv, FjObject , columnIndex)
+    result:= jni_func_i_out_t(FjEnv, FjObject, 'GetColumName', columnIndex)
    else
     result := '';
 end;
@@ -12823,7 +12811,7 @@ function jSqliteCursor.GetValueAsString(columnIndex: integer): string;
 begin
 
  if FInitialized  then
-  result := jSqliteCursor_GetValueAsString(FjEnv, FjObject , columnIndex)
+  result := jni_func_i_out_t(FjEnv, FjObject, 'GetValueAsString', columnIndex)
  else
   result := '';
 end;
@@ -12913,7 +12901,7 @@ function jSqliteCursor.GetValueToString(columnIndex: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   result := jSqliteCursor_GetValueToString(FjEnv, FjObject, columnIndex)
+   result := jni_func_i_out_t(FjEnv, FjObject, 'GetValueToString', columnIndex)
   else
    result := '';
 end;
@@ -12956,7 +12944,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jSqliteDataAccess_Free(FjEnv, FjObject );
+      jni_free(FjEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -13057,7 +13045,7 @@ begin
 
    if not FInitialized then Exit;
 
-   Result := jSqliteDataAccess_Select(FjEnv, FjObject, selectQuery);
+   Result := jni_func_t_out_t(FjEnv, FjObject, 'Select', selectQuery);
    //Restult: True or false must select the cursor to maintain consistency
    if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
@@ -13349,7 +13337,7 @@ begin
   begin
    if FjObject  <> nil then
    begin
-     jPanel_Free(FjEnv, FjObject);
+     jni_free(FjEnv, FjObject);
      FjObject := nil;
    end;
   end;
@@ -13372,9 +13360,9 @@ begin
      sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
     FjPRLayoutHome:= FjPRLayout;
-    jPanel_setParent(FjEnv, FjObject , FjPRLayout);
-    View_setId(FjEnv, FjObject, Self.Id);
 
+    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
   FWidth  := sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight );
@@ -13388,7 +13376,7 @@ begin
   begin
    if rToA in FPositionRelativeToAnchor then
    begin
-     jPanel_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
    end;
   end;
 
@@ -13396,7 +13384,7 @@ begin
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jPanel_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
     end;
   end;
 
@@ -13409,7 +13397,7 @@ begin
    if FMaxZoomFactor <> 4.00 then jPanel_SetMaxZoomFactor(FjEnv, FjObject, FMaxZoomFactor);
   end;
 
-  jPanel_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -13504,7 +13492,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jPanel_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jPanel.GetHeight: integer;
@@ -13515,7 +13503,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jPanel_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jPanel.ClearLayout;
@@ -13528,12 +13516,12 @@ begin
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
-       jPanel_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
   end;
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
-      jPanel_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -13552,7 +13540,7 @@ procedure jPanel.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-   jPanel_setParent(FjEnv, FjObject , FjPRLayout);
+   View_SetParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jPanel.RemoveFromViewParent;
@@ -13565,7 +13553,7 @@ procedure jPanel.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     jPanel_setParent(FjEnv, FjObject, FjPRLayout);
+     View_SetParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jPanel.RemoveView(_view: jObject);
@@ -13899,7 +13887,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jDBListView_AddLParamsAnchorRule(FjEnv, FjObject,
+      View_AddLParamsAnchorRule(FjEnv, FjObject,
         GetPositionRelativeToAnchor(rToA));
     end;
   end;
@@ -13907,7 +13895,7 @@ begin
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jDBListView_AddLParamsParentRule(FjEnv, FjObject,
+      View_AddLParamsParentRule(FjEnv, FjObject,
         GetPositionRelativeToParent(rToP));
     end;
   end;
@@ -13917,7 +13905,7 @@ begin
   else
     Self.AnchorId := -1; //dummy
 
-  jDBListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -14058,7 +14046,7 @@ procedure jDBListView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_jFree(FjEnv, FjObject);
+    jni_free(FjEnv, FjObject);
 end;
 
 function jDBListView.GetView(): jObject;
@@ -14094,28 +14082,28 @@ procedure jDBListView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetLParamWidth(FjEnv, FjObject, _w);
+    View_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jDBListView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetLParamHeight(FjEnv, FjObject, _h);
+    View_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 procedure jDBListView.setLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_setLGravity(FjEnv, FjObject, _g);
+    View_SetLGravity(FjEnv, FjObject, _g);
 end;
 
 procedure jDBListView.setLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_setLWeight(FjEnv, FjObject, _w);
+    View_SetLWeight(FjEnv, FjObject, _w);
 end;
 
 procedure jDBListView.SetLeftTopRightBottomWidthHeight(_left: integer;
@@ -14130,21 +14118,21 @@ procedure jDBListView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+    View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jDBListView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+    View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jDBListView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+    View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jDBListView.ClearLayout();
@@ -14155,15 +14143,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jDBListView_clearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jDBListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jDBListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -14194,7 +14182,7 @@ function jDBListView.GetItemCaption(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jDBListView_GetItemCaption(FjEnv, FjObject);
+    Result := jni_func_out_t(FjEnv, FjObject, 'GetItemCaption');
 end;
 
 procedure jDBListView.SetSelection(_index: integer);

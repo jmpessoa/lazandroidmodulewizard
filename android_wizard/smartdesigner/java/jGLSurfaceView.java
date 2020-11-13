@@ -112,7 +112,7 @@ public class jGLSurfaceView extends GLSurfaceView {
 		}
 	}
 
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
+	public  void SetViewParent( android.view.ViewGroup _viewgroup ) {
 		if (parent != null) { parent.removeView(this); }
 		parent = _viewgroup;
 
@@ -249,46 +249,46 @@ public class jGLSurfaceView extends GLSurfaceView {
 	}
 
 	//by jmpessoa
-	public void setLParamWidth(int _w) {
+	public void SetLParamWidth(int _w) {
 		lparamW = _w;
 	}
 	//by jmpessoa
-	public void setLParamHeight(int _h) {
+	public void SetLParamHeight(int _h) {
 		lparamH = _h;
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		lgravity = _g;
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		lweight = _w;
 	}
 
 	//by jmpessoa
-	public int getLParamHeight() {
+	public int GetLParamHeight() {
 		return getHeight();
 	}
 
 	//by jmpessoa
-	public int getLParamWidth() {
+	public int GetLParamWidth() {
 		return getWidth();
 	}
 
 	//by jmpessoa
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		lparamsAnchorRule[countAnchorRule] = rule;
 		countAnchorRule = countAnchorRule + 1;
 	}
 
 	//by jmpessoa
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		lparamsParentRule[countParentRule] = rule;
 		countParentRule = countParentRule + 1;
 	}
 
 	//by jmpessoa
-	public void setLayoutAll(int idAnchor) {
+	public void SetLayoutAll(int idAnchor) {
 		lparams.width  = lparamW;
 		lparams.height = lparamH;
 		lparams.setMargins(marginLeft, marginTop,marginRight,marginBottom);

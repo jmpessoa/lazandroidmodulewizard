@@ -1347,7 +1347,7 @@ begin
   begin
         if FjObject  <> nil then
         begin
-          jGLSurfaceView_Free(FjEnv, FjObject );
+          jni_free(FjEnv, FjObject );
           FjObject := nil;
         end;
   end;
@@ -1390,8 +1390,8 @@ begin
 
    if FjObject = nil then exit;
 
-   jGLSurfaceView_setParent(FjEnv, FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
@@ -1403,7 +1403,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jGLSurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -1411,14 +1411,14 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       jGLSurfaceView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jGLSurfaceView_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -2183,7 +2183,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jGLSurfaceView_getLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jCanvasES2.GetHeight: integer;
@@ -2194,7 +2194,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jGLSurfaceView_getLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jCanvasES2.ClearLayout();
@@ -2205,15 +2205,15 @@ begin
   //in designing component state: set value here...
   if not FInitialized then exit;
 
-  jGLSurfaceView_ClearLayoutAll(FjEnv, FjObject);
+  View_ClearLayoutAll(FjEnv, FjObject);
 
   for rToP := rpBottom to rpCenterVertical do
     if rToP in FPositionRelativeToParent then
-       jGLSurfaceView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
 
   for rToA := raAbove to raAlignRight do
     if rToA in FPositionRelativeToAnchor then
-       jGLSurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 end;
 
 procedure jCanvasES2.UpdateLayout();
