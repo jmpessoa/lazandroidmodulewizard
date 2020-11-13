@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="AppToolbarDemo2" default="help">
-<property name="sdk.dir" location="C:\adt32\sdk\"/>
-<property name="target"  value="android-21"/>
+<property name="sdk.dir" location="C:\android\sdk\"/>
+<property name="target" value="android-28"/>
 <property file="ant.properties"/>
 <fail message="sdk.dir is missing." unless="sdk.dir"/>
 
 <!-- Tags required to enable conditional compilation in java sources -->
-<property name="src.dir" location=".\src\org\law\apptoolbardemo2\"/>
+<property name="src.dir" location=".\src\org\lamw\apptoolbardemo2\"/>
 <property name="source.dir" value="${src.dir}/${target}" />
 <import file="${sdk.dir}/tools/ant/build.xml"/>
 
@@ -27,6 +27,11 @@
 <property name="api23" value="true"/>
 <property name="api24" value="true"/>
 <property name="api25" value="true"/>
+<property name="api26" value="true"/>
+<property name="api27" value="true"/>
+<property name="api28" value="true"/>
+<property name="api29" value="false"/>
+<property name="api30" value="false"/>
 
 <!-- API conditions, do not modify -->
 <condition property="ifdef_api10up" value="/*">
@@ -157,6 +162,46 @@
 </condition>
 <property name="ifdef_api25up" value=""/>
 <property name="endif_api25up" value=""/>
+<condition property="ifdef_api26up" value="/*">
+  <equals arg1="${api26}" arg2="false"/>
+</condition>
+<condition property="endif_api26up" value="*/">
+  <equals arg1="${api26}" arg2="false"/>
+</condition>
+<property name="ifdef_api26up" value=""/>
+<property name="endif_api26up" value=""/>
+<condition property="ifdef_api27up" value="/*">
+  <equals arg1="${api27}" arg2="false"/>
+</condition>
+<condition property="endif_api27up" value="*/">
+  <equals arg1="${api27}" arg2="false"/>
+</condition>
+<property name="ifdef_api27up" value=""/>
+<property name="endif_api27up" value=""/>
+<condition property="ifdef_api28up" value="/*">
+  <equals arg1="${api28}" arg2="false"/>
+</condition>
+<condition property="endif_api28up" value="*/">
+  <equals arg1="${api28}" arg2="false"/>
+</condition>
+<property name="ifdef_api28up" value=""/>
+<property name="endif_api28up" value=""/>
+<condition property="ifdef_api29up" value="/*">
+  <equals arg1="${api29}" arg2="false"/>
+</condition>
+<condition property="endif_api29up" value="*/">
+  <equals arg1="${api29}" arg2="false"/>
+</condition>
+<property name="ifdef_api29up" value=""/>
+<property name="endif_api29up" value=""/>
+<condition property="ifdef_api30up" value="/*">
+  <equals arg1="${api30}" arg2="false"/>
+</condition>
+<condition property="endif_api30up" value="*/">
+  <equals arg1="${api30}" arg2="false"/>
+</condition>
+<property name="ifdef_api30up" value=""/>
+<property name="endif_api30up" value=""/>
 
 <!-- Copy & filter java sources for defined Android target, do not modify -->
 <copy todir="${src.dir}/${target}">
@@ -196,6 +241,16 @@
     <filter token="endif_api24up" value="${endif_api24up}"/>
     <filter token="ifdef_api25up" value="${ifdef_api25up}"/>
     <filter token="endif_api25up" value="${endif_api25up}"/>
+    <filter token="ifdef_api26up" value="${ifdef_api26up}"/>
+    <filter token="endif_api26up" value="${endif_api26up}"/>
+    <filter token="ifdef_api27up" value="${ifdef_api27up}"/>
+    <filter token="endif_api27up" value="${endif_api27up}"/>
+    <filter token="ifdef_api28up" value="${ifdef_api28up}"/>
+    <filter token="endif_api28up" value="${endif_api28up}"/>
+    <filter token="ifdef_api29up" value="${ifdef_api29up}"/>
+    <filter token="endif_api29up" value="${endif_api29up}"/>
+    <filter token="ifdef_api30up" value="${ifdef_api30up}"/>
+    <filter token="endif_api30up" value="${endif_api30up}"/>
   </filterset>
 </copy>
 </project>

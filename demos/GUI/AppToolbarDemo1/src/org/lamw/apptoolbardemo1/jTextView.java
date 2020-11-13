@@ -9,6 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.RadialGradient;
@@ -19,17 +22,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
+import android.text.method.LinkMovementMethod;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
-import android.text.util.Linkify;
+//import android.text.util.Linkify;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Gravity;
-import android.widget.AdapterView;
 import android.widget.TextView;
-
 
 public class jTextView extends TextView {
     //Java-Pascal Interface
@@ -49,7 +52,7 @@ public class jTextView extends TextView {
     private int mRadius = 20;    
     
     int mTextAlignment;
-    	    
+        	    
     public  jTextView(android.content.Context context,
                       Controls ctrls,long pasobj ) {
         super(context);
@@ -67,8 +70,7 @@ public class jTextView extends TextView {
         };                     
         
         setOnClickListener(onClickListener);
-        
-        
+                
         onLongClickListener = new OnLongClickListener() {
 
 			@Override
@@ -109,6 +111,8 @@ public class jTextView extends TextView {
 	}
 
 	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+		String tag = ""+left+"|"+top+"|"+right+"|"+bottom;
+	    this.setTag(tag); ////nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 		
@@ -176,7 +180,7 @@ public class jTextView extends TextView {
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END               ); }; break;
  //[endif_api14up]
-            
+
  /* //[endif_api14up]
             case 0 : { setGravity( Gravity.LEFT              ); }; break;
             case 1 : { setGravity( Gravity.RIGHT             ); }; break;
@@ -213,6 +217,13 @@ public class jTextView extends TextView {
     public void SetTextTypeFace(int _typeface) {
         this.setTypeface(null, _typeface);
     }
+    
+    public void SetUnderline(boolean _on){
+        if( _on )
+      	  this.setPaintFlags(this.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+        else
+      	  this.setPaintFlags(Paint.ANTI_ALIAS_FLAG);
+      }
 
     public void Append(String _txt) {
         this.append( _txt);
@@ -270,24 +281,15 @@ public class jTextView extends TextView {
 	    if (!mEnabled) this.setEnabled(false); 
 	}
 	
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+				
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -301,8 +303,15 @@ public class jTextView extends TextView {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -386,7 +395,7 @@ public class jTextView extends TextView {
            
 	//SweepGradient (float cx, float cy,  int color0,  int color1) 			
 	public void SetShaderSweepGradient(int _color1, int _color2) {	
-		
+
 		float min = this.getHeight();
 		if (min > this.getWidth() ) min = this.getWidth();
 		
@@ -399,7 +408,7 @@ public class jTextView extends TextView {
 	 */	
 	public void SetTextDirection(int _textDirection) {		
 		//[ifdef_api17up]
-		 if(Build.VERSION.SDK_INT >= 17) {
+		 if(Build.VERSION.SDK_INT >= 17) {  //need target = 17 !!!
 				switch  (_textDirection) {
 				case 0: this.setTextDirection(View.TEXT_DIRECTION_INHERIT);	 break; 
 				case 1: this.setTextDirection(View.TEXT_DIRECTION_FIRST_STRONG); break; 	 
@@ -409,7 +418,7 @@ public class jTextView extends TextView {
 					 		  		  		   
 				}			
 		 }	
-       //[endif_api17up]				
+       //[endif_api17up]
 	}
 	
 	
@@ -424,10 +433,8 @@ public class jTextView extends TextView {
 		
 	/*
 	 * if text is small then add space before and after text
-       txtEventName.setText("\t \t \t \t \t \t"+eventName+"\t \t \t \t \t \t");
-       
-       or
-       
+       txtEventName.setText("\t \t \t \t \t \t"+eventName+"\t \t \t \t \t \t");       
+       or       
        String summary = "<html><FONT color='#fdb728' FACE='courier'><marquee behavior='scroll' direction='left' scrollamount=10>"
                 + "Hello Droid" + "</marquee></FONT></html>";
        webView.loadData(summary, "text/html", "utf-8");     
@@ -441,15 +448,30 @@ public class jTextView extends TextView {
 		this.setSelected(true);  	
 		//this.invalidate()
 	}
-	
+
 	//http://rajeshandroiddeveloper.blogspot.com.br/2013/07/how-to-implement-custom-font-to-text.html
 	public void SetTextAsLink(String _linkText) {
-		 this.setText(Html.fromHtml(_linkText));  //"www.google.com" 
-	     Linkify.addLinks(this, Linkify.ALL);
+
+               //[ifdef_api24up]
+	       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+	           this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));
+               }else //[endif_api24up]
+		   this.setText(Html.fromHtml(_linkText));
+
+               this.setMovementMethod(LinkMovementMethod.getInstance());
 	}
-	
-	
-	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)	
+
+	public void SetTextAsLink(String _linkText, int _color) {  //by TR3E
+		//[ifdef_api24up]
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+			this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));
+		}else //[endif_api24up]
+			this.setText(Html.fromHtml(_linkText));
+
+		this.setMovementMethod(LinkMovementMethod.getInstance());
+		this.setLinkTextColor(_color);
+	}
+	//You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
 	public void SetBackgroundAlpha(int _alpha) {
 		this.getBackground().setAlpha(_alpha); //0-255
 	}
@@ -461,6 +483,26 @@ public class jTextView extends TextView {
 
 	public void WrapParent() {
 		LAMWCommon.WrapParent();		
+	}		
+	
+	public void SetContentDescription(String _description) {
+	    this.setContentDescription(_description);
 	}
-		
+
+	public void SetScrollingMovement() {  //TODO Pascal
+		this.setMovementMethod(new ScrollingMovementMethod());
+	}
+
+	public void SetAllCaps(boolean _value) {
+		this.setAllCaps(_value);
+	}
+
+	public void SetTextAsHtml(String _htmlText) {
+		//[ifdef_api24up]
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+			this.setText(Html.fromHtml(_htmlText, Html.FROM_HTML_MODE_LEGACY));
+		}else //[endif_api24up]
+			this.setText(Html.fromHtml(_htmlText)); //Html.fromHtml("5x<sup>2</sup>")
+	}
+
 }

@@ -1,4 +1,4 @@
-{hint: save all files to location: C:\android-neon\eclipse\workspace\AppToolbarDemo2\jni\ }
+{hint: save all files to location: C:\android-neon\eclipse\workspace\AppToolbarDemo1\jni\ }
 library controls;  //[by Lamw: Lazarus Android Module Wizard: 10/13/2017 0:33:53]
   
 {$mode delphi}
@@ -9,17 +9,17 @@ uses
   
 {%region /fold 'LAMW generated code'}
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnCreate
   Signature: (Landroid/content/Context;Landroid/widget/RelativeLayout;Landroid/content/Intent;)V }
 procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
   layout: JObject; intent: JObject); cdecl;
 begin
   Java_Event_pAppOnCreate(PEnv, this, context, layout, intent);
-    AndroidModule1.Init(gApp);
+    AndroidModule1.ReInit(gApp);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnScreenStyle
   Signature: ()I }
 function pAppOnScreenStyle(PEnv: PJNIEnv; this: JObject): JInt; cdecl;
@@ -27,7 +27,7 @@ begin
   Result:=Java_Event_pAppOnScreenStyle(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnNewIntent
   Signature: (Landroid/content/Intent;)V }
 procedure pAppOnNewIntent(PEnv: PJNIEnv; this: JObject; intent: JObject); cdecl;
@@ -35,7 +35,7 @@ begin
   Java_Event_pAppOnNewIntent(PEnv, this, intent);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnDestroy
   Signature: ()V }
 procedure pAppOnDestroy(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -43,7 +43,7 @@ begin
   Java_Event_pAppOnDestroy(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnPause
   Signature: ()V }
 procedure pAppOnPause(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -51,7 +51,7 @@ begin
   Java_Event_pAppOnPause(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnRestart
   Signature: ()V }
 procedure pAppOnRestart(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -59,7 +59,7 @@ begin
   Java_Event_pAppOnRestart(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnResume
   Signature: ()V }
 procedure pAppOnResume(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -67,7 +67,7 @@ begin
   Java_Event_pAppOnResume(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnStart
   Signature: ()V }
 procedure pAppOnStart(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -75,7 +75,7 @@ begin
   Java_Event_pAppOnStart(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnStop
   Signature: ()V }
 procedure pAppOnStop(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -83,7 +83,7 @@ begin
   Java_Event_pAppOnStop(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnBackPressed
   Signature: ()V }
 procedure pAppOnBackPressed(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -91,7 +91,7 @@ begin
   Java_Event_pAppOnBackPressed(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnRotate
   Signature: (I)I }
 function pAppOnRotate(PEnv: PJNIEnv; this: JObject; rotate: JInt): JInt; cdecl;
@@ -99,7 +99,15 @@ begin
   Result:=Java_Event_pAppOnRotate(PEnv, this, rotate);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
+  Method:    pAppOnUpdateLayout
+  Signature: ()V }
+procedure pAppOnUpdateLayout(PEnv: PJNIEnv; this: JObject); cdecl;
+begin
+  Java_Event_pAppOnUpdateLayout(PEnv, this);
+end;
+
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnConfigurationChanged
   Signature: ()V }
 procedure pAppOnConfigurationChanged(PEnv: PJNIEnv; this: JObject); cdecl;
@@ -107,7 +115,7 @@ begin
   Java_Event_pAppOnConfigurationChanged(PEnv, this);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnActivityResult
   Signature: (IILandroid/content/Intent;)V }
 procedure pAppOnActivityResult(PEnv: PJNIEnv; this: JObject; requestCode: JInt;
@@ -116,7 +124,7 @@ begin
   Java_Event_pAppOnActivityResult(PEnv, this, requestCode, resultCode, data);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnCreateOptionsMenu
   Signature: (Landroid/view/Menu;)V }
 procedure pAppOnCreateOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject);
@@ -125,7 +133,7 @@ begin
   Java_Event_pAppOnCreateOptionsMenu(PEnv, this, menu);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnClickOptionMenuItem
   Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
 procedure pAppOnClickOptionMenuItem(PEnv: PJNIEnv; this: JObject;
@@ -136,7 +144,7 @@ begin
     itemCaption, checked);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnPrepareOptionsMenu
   Signature: (Landroid/view/Menu;I)Z }
 function pAppOnPrepareOptionsMenu(PEnv: PJNIEnv; this: JObject; menu: JObject;
@@ -145,7 +153,7 @@ begin
   Result:=Java_Event_pAppOnPrepareOptionsMenu(PEnv, this, menu, menuSize);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnPrepareOptionsMenuItem
   Signature: (Landroid/view/Menu;Landroid/view/MenuItem;I)Z }
 function pAppOnPrepareOptionsMenuItem(PEnv: PJNIEnv; this: JObject;
@@ -155,7 +163,7 @@ begin
     itemIndex);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnCreateContextMenu
   Signature: (Landroid/view/ContextMenu;)V }
 procedure pAppOnCreateContextMenu(PEnv: PJNIEnv; this: JObject; menu: JObject);
@@ -164,7 +172,7 @@ begin
   Java_Event_pAppOnCreateContextMenu(PEnv, this, menu);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnClickContextMenuItem
   Signature: (Landroid/view/MenuItem;ILjava/lang/String;Z)V }
 procedure pAppOnClickContextMenuItem(PEnv: PJNIEnv; this: JObject;
@@ -175,7 +183,7 @@ begin
     itemCaption, checked);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnDraw
   Signature: (J)V }
 procedure pOnDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -183,7 +191,7 @@ begin
   Java_Event_pOnDraw(PEnv, this, TObject(pasobj));
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnTouch
   Signature: (JIIFFFF)V }
 procedure pOnTouch(PEnv: PJNIEnv; this: JObject; pasobj: JLong; act: JInt;
@@ -192,7 +200,7 @@ begin
   Java_Event_pOnTouch(PEnv, this, TObject(pasobj), act, cnt, x1, y1, x2, y2);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnClickGeneric
   Signature: (JI)V }
 procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -201,7 +209,7 @@ begin
   Java_Event_pOnClickGeneric(PEnv, this, TObject(pasobj), value);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnSpecialKeyDown
   Signature: (CILjava/lang/String;)Z }
 function pAppOnSpecialKeyDown(PEnv: PJNIEnv; this: JObject; keyChar: JChar;
@@ -211,7 +219,25 @@ begin
     keyCodeString);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
+  Method:    pOnDown
+  Signature: (JI)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
+  cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_apptoolbardemo1_Controls
+  Method:    pOnUp
+  Signature: (JI)V }
+procedure pOnUp(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
+  cdecl;
+begin
+  Java_Event_pOnUp(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
@@ -220,7 +246,7 @@ begin
   Java_Event_pOnClick(PEnv, this, TObject(pasobj), value);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnLongClick
   Signature: (JI)V }
 procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
@@ -229,7 +255,16 @@ begin
   Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
+  Method:    pOnDoubleClick
+  Signature: (JI)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  value: JInt); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnChange
   Signature: (JLjava/lang/String;I)V }
 procedure pOnChange(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString;
@@ -238,7 +273,7 @@ begin
   Java_Event_pOnChange(PEnv, this, TObject(pasobj), txt, count);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnChanged
   Signature: (JLjava/lang/String;I)V }
 procedure pOnChanged(PEnv: PJNIEnv; this: JObject; pasobj: JLong; txt: JString;
@@ -247,7 +282,7 @@ begin
   Java_Event_pOnChanged(PEnv, this, TObject(pasobj), txt, count);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnEnter
   Signature: (J)V }
 procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -255,7 +290,15 @@ begin
   Java_Event_pOnEnter(PEnv, this, TObject(pasobj));
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnClose
   Signature: (J)V }
 procedure pOnClose(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -263,7 +306,7 @@ begin
   Java_Event_pOnClose(PEnv, this, TObject(pasobj));
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnViewClick
   Signature: (Landroid/view/View;I)V }
 procedure pAppOnViewClick(PEnv: PJNIEnv; this: JObject; view: JObject; id: JInt
@@ -272,7 +315,7 @@ begin
   Java_Event_pAppOnViewClick(PEnv, this, view, id);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pAppOnListItemClick
   Signature: (Landroid/widget/AdapterView;Landroid/view/View;II)V }
 procedure pAppOnListItemClick(PEnv: PJNIEnv; this: JObject; adapter: JObject;
@@ -281,7 +324,7 @@ begin
   Java_Event_pAppOnListItemClick(PEnv, this, adapter, view, position, id);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnFlingGestureDetected
   Signature: (JI)V }
 procedure pOnFlingGestureDetected(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -290,7 +333,7 @@ begin
   Java_Event_pOnFlingGestureDetected(PEnv, this, TObject(pasobj), direction);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnPinchZoomGestureDetected
   Signature: (JFI)V }
 procedure pOnPinchZoomGestureDetected(PEnv: PJNIEnv; this: JObject;
@@ -300,7 +343,7 @@ begin
     scaleFactor, state);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnLostFocus
   Signature: (JLjava/lang/String;)V }
 procedure pOnLostFocus(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -309,7 +352,16 @@ begin
   Java_Event_pOnLostFocus(PEnv, this, TObject(pasobj), text);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
+  Method:    pOnFocus
+  Signature: (JLjava/lang/String;)V }
+procedure pOnFocus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; text: JString);
+  cdecl;
+begin
+  Java_Event_pOnFocus(PEnv, this, TObject(pasobj), text);
+end;
+
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnBeforeDispatchDraw
   Signature: (JLandroid/graphics/Canvas;I)V }
 procedure pOnBeforeDispatchDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -318,7 +370,7 @@ begin
   Java_Event_pOnBeforeDispatchDraw(PEnv, this, TObject(pasobj), canvas, tag);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnAfterDispatchDraw
   Signature: (JLandroid/graphics/Canvas;I)V }
 procedure pOnAfterDispatchDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -327,7 +379,7 @@ begin
   Java_Event_pOnAfterDispatchDraw(PEnv, this, TObject(pasobj), canvas, tag);
 end;
 
-{ Class:     org_law_apptoolbardemo2_Controls
+{ Class:     org_lamw_apptoolbardemo1_Controls
   Method:    pOnLayouting
   Signature: (JZ)V }
 procedure pOnLayouting(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -336,7 +388,17 @@ begin
   Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
 end;
 
-const NativeMethods: array[0..36] of JNINativeMethod = (
+{ Class:     org_lamw_apptoolbardemo1_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+const NativeMethods: array[0..43] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -371,6 +433,9 @@ const NativeMethods: array[0..36] of JNINativeMethod = (
    (name: 'pAppOnRotate';
     signature: '(I)I';
     fnPtr: @pAppOnRotate; ),
+   (name: 'pAppOnUpdateLayout';
+    signature: '()V';
+    fnPtr: @pAppOnUpdateLayout; ),
    (name: 'pAppOnConfigurationChanged';
     signature: '()V';
     fnPtr: @pAppOnConfigurationChanged; ),
@@ -407,12 +472,21 @@ const NativeMethods: array[0..36] of JNINativeMethod = (
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(JI)V';
+    fnPtr: @pOnDown; ),
+   (name: 'pOnUp';
+    signature: '(JI)V';
+    fnPtr: @pOnUp; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
    (name: 'pOnLongClick';
     signature: '(JI)V';
     fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(JI)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -422,6 +496,9 @@ const NativeMethods: array[0..36] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -440,6 +517,9 @@ const NativeMethods: array[0..36] of JNINativeMethod = (
    (name: 'pOnLostFocus';
     signature: '(JLjava/lang/String;)V';
     fnPtr: @pOnLostFocus; ),
+   (name: 'pOnFocus';
+    signature: '(JLjava/lang/String;)V';
+    fnPtr: @pOnFocus; ),
    (name: 'pOnBeforeDispatchDraw';
     signature: '(JLandroid/graphics/Canvas;I)V';
     fnPtr: @pOnBeforeDispatchDraw; ),
@@ -448,7 +528,10 @@ const NativeMethods: array[0..36] of JNINativeMethod = (
     fnPtr: @pOnAfterDispatchDraw; ),
    (name: 'pOnLayouting';
     signature: '(JZ)V';
-    fnPtr: @pOnLayouting; )
+    fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
@@ -482,7 +565,7 @@ begin
   if PEnv <> nil then
   begin
      curEnv:= PJNIEnv(PEnv);
-     RegisterNativeMethods(curEnv, 'org/law/apptoolbardemo2/Controls');
+     RegisterNativeMethods(curEnv, 'org/lamw/apptoolbardemo1/Controls');
   end;
   gVM:= VM; {AndroidWidget.pas}
 end;
@@ -508,67 +591,76 @@ end;
 exports
   JNI_OnLoad name 'JNI_OnLoad',
   JNI_OnUnload name 'JNI_OnUnload',
-  pAppOnCreate name 'Java_org_law_apptoolbardemo2_Controls_pAppOnCreate',
-  pAppOnScreenStyle name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnCreate name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnCreate',
+  pAppOnScreenStyle name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnScreenStyle',
-  pAppOnNewIntent name 'Java_org_law_apptoolbardemo2_Controls_pAppOnNewIntent',
-  pAppOnDestroy name 'Java_org_law_apptoolbardemo2_Controls_pAppOnDestroy',
-  pAppOnPause name 'Java_org_law_apptoolbardemo2_Controls_pAppOnPause',
-  pAppOnRestart name 'Java_org_law_apptoolbardemo2_Controls_pAppOnRestart',
-  pAppOnResume name 'Java_org_law_apptoolbardemo2_Controls_pAppOnResume',
-  pAppOnStart name 'Java_org_law_apptoolbardemo2_Controls_pAppOnStart',
-  pAppOnStop name 'Java_org_law_apptoolbardemo2_Controls_pAppOnStop',
-  pAppOnBackPressed name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnNewIntent name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnNewIntent',
+  pAppOnDestroy name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnDestroy',
+  pAppOnPause name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnPause',
+  pAppOnRestart name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnRestart',
+  pAppOnResume name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnResume',
+  pAppOnStart name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnStart',
+  pAppOnStop name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnStop',
+  pAppOnBackPressed name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnBackPressed',
-  pAppOnRotate name 'Java_org_law_apptoolbardemo2_Controls_pAppOnRotate',
-  pAppOnConfigurationChanged name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnRotate name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnRotate',
+  pAppOnUpdateLayout name 'Java_org_lamw_apptoolbardemo1_Controls_'
+    +'pAppOnUpdateLayout',
+  pAppOnConfigurationChanged name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnConfigurationChanged',
-  pAppOnActivityResult name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnActivityResult name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnActivityResult',
-  pAppOnCreateOptionsMenu name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnCreateOptionsMenu name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnCreateOptionsMenu',
-  pAppOnClickOptionMenuItem name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnClickOptionMenuItem name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnClickOptionMenuItem',
-  pAppOnPrepareOptionsMenu name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnPrepareOptionsMenu name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnPrepareOptionsMenu',
-  pAppOnPrepareOptionsMenuItem name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnPrepareOptionsMenuItem name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnPrepareOptionsMenuItem',
-  pAppOnCreateContextMenu name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnCreateContextMenu name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnCreateContextMenu',
-  pAppOnClickContextMenuItem name 'Java_org_law_apptoolbardemo2_Controls_'
+  pAppOnClickContextMenuItem name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnClickContextMenuItem',
-  pOnDraw name 'Java_org_law_apptoolbardemo2_Controls_pOnDraw',
-  pOnTouch name 'Java_org_law_apptoolbardemo2_Controls_pOnTouch',
-  pOnClickGeneric name 'Java_org_law_apptoolbardemo2_Controls_pOnClickGeneric',
-  pAppOnSpecialKeyDown name 'Java_org_law_apptoolbardemo2_Controls_'
+  pOnDraw name 'Java_org_lamw_apptoolbardemo1_Controls_pOnDraw',
+  pOnTouch name 'Java_org_lamw_apptoolbardemo1_Controls_pOnTouch',
+  pOnClickGeneric name 'Java_org_lamw_apptoolbardemo1_Controls_pOnClickGeneric',
+  pAppOnSpecialKeyDown name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnSpecialKeyDown',
-  pOnClick name 'Java_org_law_apptoolbardemo2_Controls_pOnClick',
-  pOnLongClick name 'Java_org_law_apptoolbardemo2_Controls_pOnLongClick',
-  pOnChange name 'Java_org_law_apptoolbardemo2_Controls_pOnChange',
-  pOnChanged name 'Java_org_law_apptoolbardemo2_Controls_pOnChanged',
-  pOnEnter name 'Java_org_law_apptoolbardemo2_Controls_pOnEnter',
-  pOnClose name 'Java_org_law_apptoolbardemo2_Controls_pOnClose',
-  pAppOnViewClick name 'Java_org_law_apptoolbardemo2_Controls_pAppOnViewClick',
-  pAppOnListItemClick name 'Java_org_law_apptoolbardemo2_Controls_'
+  pOnDown name 'Java_org_lamw_apptoolbardemo1_Controls_pOnDown',
+  pOnUp name 'Java_org_lamw_apptoolbardemo1_Controls_pOnUp',
+  pOnClick name 'Java_org_lamw_apptoolbardemo1_Controls_pOnClick',
+  pOnLongClick name 'Java_org_lamw_apptoolbardemo1_Controls_pOnLongClick',
+  pOnDoubleClick name 'Java_org_lamw_apptoolbardemo1_Controls_pOnDoubleClick',
+  pOnChange name 'Java_org_lamw_apptoolbardemo1_Controls_pOnChange',
+  pOnChanged name 'Java_org_lamw_apptoolbardemo1_Controls_pOnChanged',
+  pOnEnter name 'Java_org_lamw_apptoolbardemo1_Controls_pOnEnter',
+  pOnBackPressed name 'Java_org_lamw_apptoolbardemo1_Controls_pOnBackPressed',
+  pOnClose name 'Java_org_lamw_apptoolbardemo1_Controls_pOnClose',
+  pAppOnViewClick name 'Java_org_lamw_apptoolbardemo1_Controls_pAppOnViewClick',
+  pAppOnListItemClick name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pAppOnListItemClick',
-  pOnFlingGestureDetected name 'Java_org_law_apptoolbardemo2_Controls_'
+  pOnFlingGestureDetected name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pOnFlingGestureDetected',
-  pOnPinchZoomGestureDetected name 'Java_org_law_apptoolbardemo2_Controls_'
+  pOnPinchZoomGestureDetected name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pOnPinchZoomGestureDetected',
-  pOnLostFocus name 'Java_org_law_apptoolbardemo2_Controls_pOnLostFocus',
-  pOnBeforeDispatchDraw name 'Java_org_law_apptoolbardemo2_Controls_'
+  pOnLostFocus name 'Java_org_lamw_apptoolbardemo1_Controls_pOnLostFocus',
+  pOnFocus name 'Java_org_lamw_apptoolbardemo1_Controls_pOnFocus',
+  pOnBeforeDispatchDraw name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pOnBeforeDispatchDraw',
-  pOnAfterDispatchDraw name 'Java_org_law_apptoolbardemo2_Controls_'
+  pOnAfterDispatchDraw name 'Java_org_lamw_apptoolbardemo1_Controls_'
     +'pOnAfterDispatchDraw',
-  pOnLayouting name 'Java_org_law_apptoolbardemo2_Controls_pOnLayouting';
+  pOnLayouting name 'Java_org_lamw_apptoolbardemo1_Controls_pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_org_lamw_apptoolbardemo1_Controls_'
+    +'pAppOnRequestPermissionResult';
 
 {%endregion}
   
 begin
   gApp:= jApp.Create(nil);
   gApp.Title:= 'JNI Android Bridges Library';
-  gjAppName:= 'org.law.apptoolbardemo2';
-  gjClassName:= 'org/law/apptoolbardemo2/Controls';
+  gjAppName:= 'org.lamw.apptoolbardemo1';
+  gjClassName:= 'org/lamw/apptoolbardemo1/Controls';
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;

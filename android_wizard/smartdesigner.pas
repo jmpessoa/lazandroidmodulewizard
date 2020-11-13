@@ -23,7 +23,7 @@ type
     FPackageName: string;
     FStartModuleVarName: string;
     // all Paths have trailing PathDelim
-    FPathToJavaSource: string;
+    FPathToJavaSource: string;  //Included Path Delimiter!
     FPathToAndroidProject: string;  //Included Path Delimiter!
 
     FPathToAndroidSDK: string;  //Included Path Delimiter!
@@ -2976,7 +2976,7 @@ begin
        begin
          auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java');
          auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
-         auxList.SaveToFile(FPathToJavaSource + DirectorySeparator + 'jSupported.java');
+         auxList.SaveToFile(FPathToJavaSource + 'jSupported.java');
        end;
 
        if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') and
@@ -2995,7 +2995,7 @@ begin
        begin
          auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+ 'jSupported.java');
          auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
-         auxList.SaveToFile(FPathToJavaSource + DirectorySeparator + 'jSupported.java');
+         auxList.SaveToFile(FPathToJavaSource  + 'jSupported.java');
        end;
     end;
 

@@ -1,4 +1,4 @@
-{Hint: save all files to location: C:\android-neon\eclipse\workspace\AppToolbarDemo2\jni }
+{Hint: save all files to location: C:\android-neon\eclipse\workspace\AppToolbarDemo1\jni }
 unit unit1;
 
 {$mode delphi}
