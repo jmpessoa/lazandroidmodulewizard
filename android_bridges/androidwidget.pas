@@ -1660,7 +1660,6 @@ end;
   procedure jForm_SetTitleActionBar(env: PJNIEnv; _jform: JObject; _title: string);
 
   function jForm_GetDrawableResourceById(env: PJNIEnv; _jform: JObject; _resID: integer): jObject;
-  function jForm_GetQuantityStringByName(env: PJNIEnv; _jform: JObject; _resName: string; _quantity: integer): string;
 
   procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer); overload;
   procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer); overload;
@@ -1731,9 +1730,6 @@ function  jForm_GetOnListItemClickListener    (env:PJNIEnv; Form: jObject): jObj
 
 procedure jApp_GetJNIEnv(var env: PJNIEnv);
 
-// thierrydijoux - get a resource quantity string by name
-function  jApp_GetQuantityStringByName(env:PJNIEnv;this:jobject; _resName: string; _Quantity: integer): string;
-
 //------------------------------------------------------------------------------
 // Form
 //------------------------------------------------------------------------------
@@ -1780,7 +1776,21 @@ procedure jForm_SetAnimationMode(env: PJNIEnv; _jform: JObject; _animationMode: 
 // View  - Generics
 //------------------------------------------------------------------------------
 
-Procedure View_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean); overload;
+procedure View_AddLParamsParentRule   (env:PJNIEnv; _jobject : jObject; rule: DWord);
+procedure View_AddLParamsAnchorRule   (env:PJNIEnv; _jobject : jObject; rule: DWord);
+procedure View_SetLGravity            (env: PJNIEnv; _jobject: JObject; _value: integer);
+procedure View_SetLWeight             (env: PJNIEnv; _jobject: JObject; _w: single);
+procedure View_SetParent              (env:PJNIEnv; _jobject : jObject; ViewGroup : jObject);
+procedure View_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean); overload;
+
+procedure View_SetLParamHeight        (env:PJNIEnv; _jobject : jObject; h: DWord);
+procedure View_SetLParamWidth         (env:PJNIEnv; _jobject : jObject; w: DWord);
+
+function  View_GetLParamWidth         (env:PJNIEnv; _jobject : jObject): integer;
+function  View_GetLParamHeight        (env:PJNIEnv; _jobject : jObject): integer;
+
+procedure View_SetLayoutAll           (env:PJNIEnv; _jobject : jObject; idAnchor: DWord);
+procedure View_ClearLayoutAll         (env: PJNIEnv; _jobject : JObject);
 
 Procedure View_SetVisible             (env:PJNIEnv; view: jObject; visible : Boolean); overload;
 function  View_GetVisible             (env:PJNIEnv; view: jObject): boolean;
@@ -1890,6 +1900,8 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function  jni_create(env: PJNIEnv; this: jobject; _self: TObject; javaFuncion: string) : jObject;
   function  jni_create_i(env: PJNIEnv; this: jObject; _self: TObject; javaFuncion: string; _int: integer): jObject;
 
+  procedure jni_free(env:PJNIEnv; this : jObject);
+
   procedure jni_proc_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject );
   procedure jni_proc_bmp_iiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject; _int0, _int1, _int2, _int3 : integer);
   procedure jni_proc_bmp_ii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: JObject; _int0, _int1 : integer);
@@ -1973,6 +1985,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_tz_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool: boolean): int64;
   function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
   function jni_func_tiii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0, _int1, _int2: integer): jObject;
+  function jni_func_ti_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): string;
   function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): boolean;
   function jni_func_tj_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64): boolean;
   function jni_func_tf_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _float: single): boolean;
@@ -3903,7 +3916,7 @@ end;
 function jForm.GetQuantityStringByName(_resName: string; _quantity: integer): string;
 begin
   if FInitialized then
-   Result:= jForm_GetQuantityStringByName(FjEnv, FjObject, _resName ,_quantity);
+   Result:= jni_func_ti_out_t(FjEnv, FjObject, 'GetQuantityStringByName', _resName ,_quantity);
 end;
 
 function jForm.GetStringResourceByName(_resName: string): string;
@@ -4930,24 +4943,6 @@ begin
 end;
 
 
-function jForm_GetQuantityStringByName(env: PJNIEnv; _jform: JObject; _resName: string; _quantity: integer): string;
-var
-  jStr: JString;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_resName));
-  jParams[1].i:= _quantity;
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetQuantityStringByName', '(Ljava/lang/String;I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-  Result:= GetPStringAndDeleteLocalRef(env, jStr);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
 procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; var _millisecondsPattern: TDynArrayOfInt64);
 var
   jParams: array[0..0] of jValue;
@@ -5614,7 +5609,7 @@ end;
 //by thierrydijoux - get a resource string by name
 function jApp.GetQuantityStringByName(_resName: string; _Quantity: integer): string;
 begin
-  Result:= jApp_GetQuantityStringByName(Self.Jni.jEnv, Self.Jni.jThis, _resName, _Quantity);
+  Result:= jni_func_ti_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'getQuantityStringByName', _resName, _Quantity);
 end;
 
 function jApp.GetMainActivityName: string;
@@ -6562,24 +6557,6 @@ begin
   env:= PJNIEnv(PEnv);
 end;
 
-// thierrydijoux - get a resource quantity string by name
-function  jApp_GetQuantityStringByName(env:PJNIEnv;this:jobject; _resName: string; _Quantity: integer): string;
-var
- _cls: jClass;
- _jMethod : jMethodID = nil;
- _jParams : array[0..1] of jValue;
- _jString : jstring;
-begin
-  _cls := env^.GetObjectClass(env, this);
-  _jMethod:= env^.GetMethodID(env, _cls, 'getQuantityStringByName', '(Ljava/lang/String;I)Ljava/lang/String;');
-  _jParams[0].l := env^.NewStringUTF(env, pchar(_resName) );
-  _jParams[1].i:= _Quantity;
-  _jString:= env^.CallObjectMethodA(env,this,_jMethod,@_jParams);
-   env^.DeleteLocalRef(env,_jParams[0].l); //added..
-   Result:= GetPStringAndDeleteLocalRef(env, _jString);
-  env^.DeleteLocalRef(env, _cls);
-end;
-
 //------------------------------------------------------------------------------
 // Form
 //------------------------------------------------------------------------------
@@ -6705,6 +6682,144 @@ end;
 //------------------------------------------------------------------------------
 // View  - generics - "controls.java"
 //------------------------------------------------------------------------------
+
+//by jmpessoa
+procedure View_AddLParamsParentRule(env:PJNIEnv; _jobject : jObject; rule: DWord);
+Var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].i := rule;
+   cls:= env^.GetObjectClass(env, _jobject);
+  _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsParentRule', '(I)V');
+    env^.CallVoidMethodA(env,_jobject,_jMethod,@_jParams);
+    env^.DeleteLocalRef(env, cls);
+end;
+
+procedure View_AddLParamsAnchorRule(env:PJNIEnv; _jobject : jObject; rule: DWord);
+var
+   _jMethod : jMethodID = nil;
+    _jParams : array[0..0] of jValue;
+   cls: jClass;
+begin
+   _jParams[0].i := rule;
+   cls := env^.GetObjectClass(env, _jobject);
+   _jMethod:= env^.GetMethodID(env, cls, 'AddLParamsAnchorRule', '(I)V');
+   env^.CallVoidMethodA(env, _jobject, _jMethod, @_jParams);
+   env^.DeleteLocalRef(env, cls);
+end;
+
+procedure View_SetLGravity(env: PJNIEnv; _jobject: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].i:= _value;
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure View_SetLWeight(env: PJNIEnv; _jobject: JObject; _w: single);
+var
+       jParams: array[0..0] of jValue;
+       jMethod: jMethodID = nil;
+       jCls: jClass = nil;
+begin
+       jParams[0].f := _w;
+       jCls := env^.GetObjectClass(env, _jobject);
+       jMethod := env^.GetMethodID(env, jCls, 'SetLWeight', '(F)V');
+       env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+       env^.DeleteLocalRef(env, jCls);
+end;
+
+Procedure View_SetLParamHeight(env:PJNIEnv; _jobject : jObject; h: DWord);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].i := h;
+  cls := env^.GetObjectClass(env, _jobject);
+_jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
+ env^.CallVoidMethodA(env, _jobject,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure View_SetLParamWidth(env:PJNIEnv; _jobject : jObject; w: DWord);
+var
+   _jMethod : jMethodID = nil;
+   _jParams : array[0..0] of jValue;
+   cls: jClass;
+begin
+   _jParams[0].i := w;
+   cls := env^.GetObjectClass(env, _jobject);
+    _jMethod:= env^.GetMethodID(env, cls, 'SetLParamWidth', '(I)V');
+   env^.CallVoidMethodA(env,_jobject,_jMethod,@_jParams);
+   env^.DeleteLocalRef(env, cls);
+end;
+
+procedure View_SetLayoutAll(env:PJNIEnv; _jobject : jObject;  idAnchor: DWord);
+var
+ _jMethod : jMethodID = nil;
+ _jParams : array[0..0] of jValue;
+ cls: jClass;
+begin
+ _jParams[0].i := idAnchor;
+ cls := env^.GetObjectClass(env, _jobject);
+  _jMethod:= env^.GetMethodID(env, cls, 'SetLayoutAll', '(I)V');
+ env^.CallVoidMethodA(env,_jobject,_jMethod,@_jParams);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+procedure View_ClearLayoutAll(env: PJNIEnv; _jobject: JObject);
+var
+    jMethod: jMethodID=nil;
+    jCls: jClass=nil;
+begin
+    jCls:= env^.GetObjectClass(env, _jobject);
+    jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
+    env^.CallVoidMethod(env, _jobject, jMethod);
+    env^.DeleteLocalRef(env, jCls);
+end;
+
+function View_GetLParamWidth(env:PJNIEnv; _jobject : jObject): integer;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls := env^.GetObjectClass(env, _jobject);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamWidth', '()I');
+  Result:= env^.CallIntMethod(env,_jobject,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+function View_GetLParamHeight(env:PJNIEnv; _jobject : jObject ): integer;
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+   cls := env^.GetObjectClass(env, _jobject);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetLParamHeight', '()I');
+ Result:= env^.CallIntMethod(env,_jobject,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+procedure View_SetParent(env:PJNIEnv; _jobject : jObject; ViewGroup : jObject);
+ var
+  _jMethod : jMethodID = nil;
+  _jParams : array[0..0] of jValue;
+  cls: jClass;
+ begin
+  _jParams[0].l := ViewGroup;
+  cls := env^.GetObjectClass(env, _jobject);
+  _jMethod:= env^.GetMethodID(env, cls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
+  env^.CallVoidMethodA(env, _jobject,_jMethod,@_jParams);
+  env^.DeleteLocalRef(env, cls);
+ end;
 
 Procedure View_SetId(env:PJNIEnv; view : jObject; Id :DWord);
 var
@@ -7080,6 +7195,18 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(JI)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
+end;
+
+procedure jni_free(env:PJNIEnv; this : jObject);
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+  cls:= env^.GetObjectClass(env, this);
+  _jMethod:= env^.GetMethodID(env, cls, 'Free', '()V');
+  env^.CallVoidMethod(env, this, _jMethod);
+  env^.DeleteGlobalRef(env, this);
+  env^.DeleteLocalRef(env, cls);
 end;
 
 procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string );
@@ -8174,7 +8301,7 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+function jni_func_ti_out_z( env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                             _str: string; _int: integer): boolean;
 var
   jBoo: JBoolean;
@@ -8190,6 +8317,26 @@ begin
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function  jni_func_ti_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                             _str: string; _int: integer): string;
+var
+ jCls: jClass=nil;
+ jMethod : jMethodID = nil;
+ jParams : array[0..1] of jValue;
+ jStr: JString;
+begin
+  jParams[0].l := env^.NewStringUTF(env, pchar(_str) );
+  jParams[1].i:= _int;
+
+  jCls := env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)Ljava/lang/String;');
+
+   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+   env^.DeleteLocalRef(env,jParams[0].l); //added..
+   Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);
 end;
 

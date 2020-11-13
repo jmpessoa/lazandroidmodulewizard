@@ -62,7 +62,7 @@ public class jView extends View {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
-	public void setParent( android.view.ViewGroup _viewgroup ) {
+	public void SetViewParent( android.view.ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
 
@@ -158,45 +158,45 @@ public class jView extends View {
 		LAMWCommon.free();
 	}
 
-	public void setLParamWidth(int _w) {
+	public void SetLParamWidth(int _w) {
 		LAMWCommon.setLParamWidth(_w);
 	}
 
-	public void setLParamHeight(int _h) {
+	public void SetLParamHeight(int _h) {
 		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public int getLParamHeight() {
+	public int GetLParamHeight() {
 		//return getHeight();
 		return  LAMWCommon.getLParamHeight();
 	}
 
-	public int getLParamWidth() {
+	public int GetLParamWidth() {
 		//return getWidth();
 		return LAMWCommon.getLParamWidth();
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int _idAnchor) {
+	public void SetLayoutAll(int _idAnchor) {
 		LAMWCommon.setLayoutAll(_idAnchor);
 	}
 
-	public void clearLayoutAll() {
+	public void ClearLayoutAll() {
 		LAMWCommon.clearLayoutAll();
 	}
 }

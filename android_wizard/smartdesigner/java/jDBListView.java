@@ -135,11 +135,11 @@ class jDBRecordView extends ListView {
     	LAMWCommon.setLParamHeight(_h);
     }
 
-    public void setLGravity(int _g) {
+    public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
     }
 
-    public void setLWeight(float _w) {
+    public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
     }
 
