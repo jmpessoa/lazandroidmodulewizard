@@ -1,6 +1,6 @@
 package org.lamw.appcompatcollapsingtoolbardemo1;
 
-//LAMW: Lazarus Android Module Wizard  - version 0.8.4.6  - 10 November - 2019
+//LAMW: Lazarus Android Module Wizard - version 0.8.6.1 [AndroidX!!] - 11 November - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -51,6 +51,7 @@ package org.lamw.appcompatcollapsingtoolbardemo1;
 //			12.2013 LAMW Started by jmpessoa
 
 import android.provider.DocumentsContract;
+import android.provider.Settings.Secure;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -67,9 +68,11 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.ContentResolver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -138,6 +141,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.lang.Object;
 
+//need by GDXGme framework...
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
@@ -146,14 +150,26 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
-
 import android.app.KeyguardManager;
 import android.os.PowerManager;
 import android.os.BatteryManager;
-
 import android.content.IntentFilter;
-
+import android.media.MediaScannerConnection;
 import java.text.Normalizer;
+
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.MalformedURLException;
+import java.io.BufferedReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import java.text.ParseException;
+import java.text.DateFormat;
+import java.util.Calendar; 
+
+//import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
 //-------------------------------------------------------------------------
 //Constants
@@ -162,6 +178,8 @@ class Const {
   public static final int TouchDown                   =  0;
   public static final int TouchMove                   =  1;
   public static final int TouchUp                     =  2;
+  public static final int Click                 	  =  3; // new
+  public static final int DoubleClick                 =  4;  // new
   public static final int Click_Default               =  0;
 }
 
@@ -235,7 +253,7 @@ class jForm {
 
 		layout.setOnClickListener(onClickListener);
 
-		// To ensure that the image is always in the background by TR3E
+		// To ensure that the image is always in the background by ADiV
 		mImageBackground = new ImageView(controls.activity);
 
 		if (mImageBackground != null) {
@@ -503,7 +521,7 @@ class jForm {
 		controls.pOnClose(PasObj);
 	}
 
-	//by TR3E
+	//by ADiV
 	public boolean IsScreenLocked() {
 		KeyguardManager myKM = (KeyguardManager) controls.activity.getSystemService(Context.KEYGUARD_SERVICE);
 
@@ -512,7 +530,7 @@ class jForm {
 		return myKM.inKeyguardRestrictedInputMode();
 	}
 
-	//by TR3E
+	//by ADiV
 	public boolean IsSleepMode() {
 		PowerManager powerManager = (PowerManager) controls.activity.getSystemService(Context.POWER_SERVICE);
 
@@ -523,7 +541,7 @@ class jForm {
 		return !isScreenAwake;
 	}
 
-	public boolean IsConnected() { //by TR3E
+	public boolean IsConnected() { //by ADiV
 
 		ConnectivityManager cm = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -537,7 +555,7 @@ class jForm {
 		return false;
 	}
 
-	public boolean IsConnectedWifi() { // by TR3E
+	public boolean IsConnectedWifi() { // by ADiV
 
 		ConnectivityManager cm = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -551,7 +569,7 @@ class jForm {
 		return false;
 	}
 
-	public boolean IsConnectedTo(int _connectionType) { // by TR3E
+	public boolean IsConnectedTo(int _connectionType) { // by ADiV
 
 		ConnectivityManager cm = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -590,7 +608,7 @@ class jForm {
 		Toast toast = Toast.makeText(controls.activity, msg, Toast.LENGTH_SHORT);
 
 		if (toast != null) {
-			toast.setGravity(Gravity.BOTTOM, 0, 0);
+			//toast.setGravity(Gravity.BOTTOM, 0, 0);
 			toast.show();
 		}
 	}
@@ -622,15 +640,54 @@ class jForm {
 		return (formatter.format(new Date()));
 	}
 	
-	// by TR3E
+	// by ADiV
+	public String GetDateTime(long millisDateTime) {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return (formatter.format(millisDateTime));
+	}
+	
+	// by ADiV
 	public long GetTimeInMilliseconds(){
 		return controls.getTick();
 	}
 
-	//by TR3E
+	//by ADiV
 	public String GetTimeHHssSS( long millisTime ) {
 		  SimpleDateFormat formatter = new SimpleDateFormat ( "mm:ss:SS" );
 		  return( formatter.format ( new Date (millisTime) ) );	
+	}
+	
+	//by ADiV
+	public long GetDateTimeToMillis( String _dateTime, boolean _zone ){
+		String     sPattern  = "yyyy-MM-dd HH:mm:ss";
+	    
+	    long offset = 0;
+	    
+	    if(_zone){
+	     Calendar calendar = Calendar.getInstance(Locale.getDefault());
+	     
+	     if( calendar != null )
+	      offset = -(calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET));// / (60 * 1000);
+	    }
+	    
+	    DateFormat formatter = new SimpleDateFormat(sPattern);
+	        
+	    if( formatter == null ) return 0;
+			
+		long lnsTime = 0;
+		
+	    try{
+	    
+	     Date dateObject = formatter.parse(_dateTime);
+
+	     if( dateObject != null )
+	      lnsTime = dateObject.getTime();
+	    
+	    }catch (java.text.ParseException e){        
+	            e.printStackTrace();            
+	    }
+	    
+	    return (lnsTime - offset);
 	}
 
 	//Free object except Self, Pascal Code Free the class.
@@ -783,7 +840,7 @@ class jForm {
 
 		return absPath;
 	}
-
+	
 	public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath
 		String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
 		return PathDat;
@@ -856,8 +913,11 @@ class jForm {
 		return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
 	}
 
-	public void DeleteFile(String _filename) {
-		this.controls.activity.deleteFile(_filename);
+	public void DeleteFile(String _fileFull) {
+		   File file = new File(_fileFull);
+		   
+		   if( file.isFile() )
+		    file.delete();
 	}
 
 	public void DeleteFile(String _fullPath, String _filename) {
@@ -967,7 +1027,7 @@ class jForm {
 	}
 
 	public Drawable GetDrawableResourceById(int _resID) {
-		if (_resID == 0) return null; // by tr3e
+		if (_resID == 0) return null; // by ADiV
 
 		Drawable res = null;
 
@@ -983,7 +1043,7 @@ class jForm {
 		return res;
 	}
 
-	//BY TR3E
+	//BY ADiV
 	public void SetBackgroundImage(String _imageIdentifier, int _scaleType) {
 
 		if (mImageBackground == null) return;
@@ -1020,7 +1080,7 @@ class jForm {
 		mImageBackground.setImageDrawable(d);
 	}
 
-	//BY TR3E
+	//BY ADiV
 	public void SetBackgroundImageMatrix(float _scaleX, float _scaleY, float _degress, float _dx, float _dy, float _centerX, float _centerY) {
 
 		if (mImageBackground == null) return;
@@ -1038,11 +1098,10 @@ class jForm {
 		//mImageBackground.invalidate();
 	}
 
-	// BY TR3E
+	// BY ADiV
 	public void SetBackgroundImage(String _imageIdentifier) {
 		SetBackgroundImage(_imageIdentifier, 6); // FIT_XY for default
 	}
-
 
 	//by  thierrydijoux
 	public String GetQuantityStringByName(String _resName, int _quantity) {
@@ -1059,22 +1118,21 @@ class jForm {
 	}
 
 	public ActionBar GetActionBar() {
-		if (!jCommons.IsAppCompatProject()) {
+		if (!jCommons.IsAppCompatProject(controls)) {
 			return (controls.activity).getActionBar();
 		} else return null;
 	}
 	
-	// BY TR3E
+	// BY ADiV
 	public int GetBatteryPercent() {
 		
 		int ret = -1;
 
 	    if (Build.VERSION.SDK_INT >= 21) {
-
+             //[ifdef_api21up]
 	         BatteryManager bm = (BatteryManager) this.controls.activity.getSystemService(this.controls.activity.BATTERY_SERVICE);
-	         
-	         if( bm != null )
-	          ret = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+	         if( bm != null ) ret = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+			//[endif_api21up]
 
 	    } else {
 
@@ -1136,9 +1194,29 @@ class jForm {
 //[ifdef_api14up]
 		Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
 
-		if (d != null) // by tr3e
+		if (d != null) // by ADiV
 			jCommons.ActionBarSetIcon(controls, d);
 //[endif_api14up]
+	}
+	
+	//By ADiV
+	public void SetActionBarShowHome(boolean showHome) {
+			   jCommons.ActionBarShowHome(controls, showHome);
+	}
+
+	//By ADiV
+	public void SetActionBarColor(int color) {
+		   jCommons.ActionBarSetColor(controls, color);
+	}
+
+	//By ADiV
+	public void SetNavigationColor(int color) {
+		   jCommons.NavigationSetColor(controls, color);
+	}
+
+	//By ADiV
+	public void SetStatusColor(int color) {
+			   jCommons.StatusSetColor(controls, color);
 	}
 
 	public void SetTabNavigationModeActionBar() {
@@ -1165,7 +1243,7 @@ class jForm {
 	}
 
 	public boolean IsAppCompatProject() {
-		return jCommons.IsAppCompatProject();
+		return jCommons.IsAppCompatProject(controls);
 	}
 
 	public boolean IsPackageInstalled(String _packagename) {
@@ -1176,6 +1254,102 @@ class jForm {
 		} catch (NameNotFoundException e) {
 			return false;
 		}
+	}
+	
+	// By ADiV
+	public int GetVersionCode(){
+		PackageManager pm = controls.activity.getPackageManager();
+		
+	    try {
+	    	PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
+	        return pinfo.versionCode;
+	    } catch (NameNotFoundException e) {
+	        return 0;
+	    }
+	}
+
+	//By ADiV
+	public String GetVersionName(){
+		PackageManager pm = controls.activity.getPackageManager();
+		
+	    try {
+	    	PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
+	        return pinfo.versionName;
+	    } catch (NameNotFoundException e) {
+	        return "";
+	    }
+	}
+	
+	// by ADiV
+	private String GetAppVersion(String patternString, String inputString) {
+	    try{
+	        //Create a pattern
+	        Pattern pattern = Pattern.compile(patternString);
+	        if (null == pattern) {
+	            return null;
+	        }
+
+	        //Match the pattern string in provided string
+	        Matcher matcher = pattern.matcher(inputString);
+	        if (null != matcher && matcher.find()) {
+	            return matcher.group(1);
+	        }
+
+	    }catch (PatternSyntaxException ex) {
+
+	        ex.printStackTrace();
+	    }
+
+	    return null;
+	}
+
+	// by ADiV
+	public String GetVersionPlayStore(String appUrlString) {
+	    final String currentVersion_PatternSeq = "<div[^>]*?>Current\\sVersion</div><span[^>]*?>(.*?)><div[^>]*?>(.*?)><span[^>]*?>(.*?)</span>";
+	    final String appVersion_PatternSeq = "htlgb\">([^<]*)</s";
+	    String playStoreAppVersion = null;
+
+	    BufferedReader inReader = null;
+	    URLConnection uc = null;
+	    StringBuilder urlData = new StringBuilder();
+	    
+	    URL url;
+	   
+	    try{
+	     url = new URL(appUrlString);
+	    } catch (MalformedURLException e) {
+	     return null;
+	    }
+	    
+	    try{
+	     uc = url.openConnection();
+	     if(uc == null) {
+	       return null;
+	     }
+	     uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+	     inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
+	     if (null != inReader) {
+	        String str = "";
+	        while ((str = inReader.readLine()) != null) {
+	                       urlData.append(str);
+	        }
+	     }
+	    
+	    } catch (IOException e) {
+	     return null;	
+	    }
+	    
+
+	    // Get the current version pattern sequence 
+	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
+	    if(null == versionString){ 
+	        return null;
+	    }else{
+	        // get version from "htlgb">X.X.X</span>
+	        playStoreAppVersion = GetAppVersion(appVersion_PatternSeq, versionString);
+	    }
+
+	    return playStoreAppVersion;
 	}
 
 	//android.view.View
@@ -1259,14 +1433,18 @@ class jForm {
 	       return r; 
 	}
 
+	public int GetScreenDpi() {
+		String r= "";
+		DisplayMetrics metrics = new DisplayMetrics();
+		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		return metrics.densityDpi;
+	}
+
 	public String GetScreenDensity() {
 		String r = "";
 		DisplayMetrics metrics = new DisplayMetrics();
-
 		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
 		int density = metrics.densityDpi;
-
 //[ifdef_api16up]
 		if (density == DisplayMetrics.DENSITY_XXHIGH) {
 			r = "XXHIGH:" + String.valueOf(density);
@@ -1280,7 +1458,8 @@ class jForm {
 				r = "MEDIUM:" + String.valueOf(density);
 			} else if (density == DisplayMetrics.DENSITY_LOW) {
 				r = "LOW:" + String.valueOf(density);
-			}
+			} else
+	    	   r= "CUSTOM:" + String.valueOf(density);
 		return r;
 	}
 
@@ -1358,31 +1537,32 @@ class jForm {
 	//https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
 	public String CopyFromAssetsToInternalAppStorage(String _filename) {
 		InputStream is = null;
-		FileOutputStream fos = null;
+		FileOutputStream fos = null;			
 		String PathDat = controls.activity.getFilesDir().getAbsolutePath();
-		try {
-			File outfile = new File(PathDat + "/" + _filename);
+		String _filename2 = _filename.substring(_filename.lastIndexOf("/")+1); //by Tomash - add support for folders in assets
+		try {		   		     			
+			File outfile = new File(PathDat+"/"+_filename2);								
 			// if file doesnt exists, then create it
 			if (!outfile.exists()) {
-				outfile.createNewFile();
-			}
+				outfile.createNewFile();			
+			}												
 			fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name														
-			is = controls.activity.getAssets().open(_filename);
-			int size = is.available();
-			byte[] buffer = new byte[size];
-			for (int c = is.read(buffer); c != -1; c = is.read(buffer)) {
-				fos.write(buffer, 0, c);
-			}
-			is.close();
-			fos.close();
-		} catch (IOException e) {
+			is = controls.activity.getAssets().open(_filename);																				
+			int size = is.available();	     
+			byte[] buffer = new byte[size];												
+			for (int c = is.read(buffer); c != -1; c = is.read(buffer)){
+		      fos.write(buffer, 0, c);
+			}																
+			is.close();								
+			fos.close();															
+		}catch (IOException e) {
 			// Log.i("ShareFromAssets","fail!!");
-			e.printStackTrace();
+		     e.printStackTrace();			     
 		}
-		return PathDat + "/" + _filename;
+		return PathDat + "/" +_filename2;
 	}
 
-	//by TR3E
+	//by ADiV
 	public String GetStripAccents(String _str) {
 		_str = Normalizer.normalize(_str, Normalizer.Form.NFD);
 		_str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
@@ -1409,7 +1589,8 @@ class jForm {
 
 	public void CopyFromAssetsToEnvironmentDir(String _filename, String _environmentDir) {
 		CopyFromAssetsToInternalAppStorage(_filename);
-		CopyFromInternalAppStorageToEnvironmentDir(_filename, _environmentDir);
+		String _filename2 = _filename.substring(_filename.lastIndexOf("/")+1); //by Tomash - add support for folders in assets
+		CopyFromInternalAppStorageToEnvironmentDir(_filename2,_environmentDir);
 	}
 
 	public void ToggleSoftInput() {
@@ -1449,10 +1630,18 @@ class jForm {
 	}
 
 	public void SetTurnScreenOn(boolean _value) {
-		if (_value)
-			controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-		else
+		
+		if (Build.VERSION.SDK_INT >= 27) {
+			//[ifdef_api27up]
+			controls.activity.setTurnScreenOn(_value);
+			//[endif_api27up]
+	    } else {
+		 if (_value)
+		   controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+		 else
 			controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+	    }
+		
 	}
 
 	public void SetAllowLockWhileScreenOn(boolean _value) {
@@ -1463,10 +1652,17 @@ class jForm {
 	}
 
 	public void SetShowWhenLocked(boolean _value) {
-		if (_value)
-			controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-		else
+		
+		if (Build.VERSION.SDK_INT >= 27) {
+			//[ifdef_api27up]
+			controls.activity.setShowWhenLocked(_value);
+			//[endif_api27up]
+	    } else {
+		 if (_value)
+		    controls.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+		 else
 			controls.activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+	    }
 	}
 
 	public Uri ParseUri(String _uriAsString) {
@@ -1775,7 +1971,7 @@ class jForm {
 		jCommons.RequestRuntimePermission(controls, _androidPermissions, _requestCode);
 	}
 
-	//by TR3E
+	//by ADiV
 	public int GetScreenWidth( ){
 			int w = controls.appLayout.getWidth();
 			
@@ -1785,17 +1981,58 @@ class jForm {
 			return w;
 	}
 		
-	//by TR3E
+	//by ADiV
 	public int GetScreenHeight( ){
 			int h = controls.appLayout.getHeight();
 			
 			if( h <= 0 )
 				h = controls.screenHeight;
-			
+					
 			return h;
 	}
+	
+	//by ADiV
+	public boolean IsInMultiWindowMode(){
+		boolean r = false;
+		if (Build.VERSION.SDK_INT >= 24) {
+			//[ifdef_api24up]
+			if (((Activity) controls.activity).isInMultiWindowMode()) r = true;
+			//[endif_api24up]
+		}
+		return r;
+	}
+	
+	//by ADiV
+	public int GetRealScreenWidth(){
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		
+		if(displaymetrics == null) return 0;
 
-	//by TR3E
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			controls.activity.getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics); //need min Api  17
+			//[endif_api17up]
+		}
+
+        return displaymetrics.widthPixels;
+	}
+	
+	//by ADiV
+	public int GetRealScreenHeight(){
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		
+		if(displaymetrics == null) return 0;
+
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+		     controls.activity.getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+			//[endif_api17up]
+		}
+
+		return displaymetrics.heightPixels;
+	}
+
+	//by ADiV
 	public String GetSystemVersionString() {
 		return android.os.Build.VERSION.RELEASE;
 	}
@@ -1868,6 +2105,62 @@ class jForm {
 		   return path;
 	}
 
+   //by Tomash
+   //refactored by jmpessoa
+   public void StartDefaultActivityForFile(String _filePath, String _mimeType) {
+	   File file = new File(_filePath);
+	   Intent intent = new Intent(Intent.ACTION_VIEW);
+	   Uri newUri = jSupported.FileProviderGetUriForFile(controls, file);
+	   if  (jSupported.IsAppSupportedProject()) {
+		   intent.setDataAndType(newUri, _mimeType);
+		   intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+				   Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET |
+				   Intent.FLAG_GRANT_READ_URI_PERMISSION);
+	   }
+	   else {
+		   intent.setDataAndType(Uri.parse("file://" + file),_mimeType);
+	   }
+	   controls.activity.startActivity(intent);
+   }
+
+	public String CopyFileFromUri(Uri _srcUri, String _outputDir) {
+	
+		String fileName = "";
+		ContentResolver cr = controls.activity.getContentResolver();
+    	String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
+    	Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);
+    	if (metaCursor != null) {
+            try {
+                if (metaCursor.moveToFirst()) {
+                    fileName = metaCursor.getString(0);
+                }
+            } finally {
+                metaCursor.close();
+            }
+    	}	
+	
+		if (fileName != "") {
+		 try {	
+ 			InputStream input = cr.openInputStream(_srcUri);
+ 			OutputStream output = new FileOutputStream(new File(_outputDir + "/" + fileName));
+			byte[] buf = new byte[1024];
+			int bytesRead;
+			while ((bytesRead = input.read(buf)) > 0) {
+				output.write(buf, 0, bytesRead);
+				}
+  	    	input.close();
+   	    	output.close();
+	        return fileName;
+		 } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		 }
+		} else {
+		 return "";	
+		}	
+	}    
+
 }
 //**class entrypoint**//please, do not remove/change this line!
 
@@ -1882,10 +2175,10 @@ public int systemVersion;
 public int screenWidth = 0;
 public int screenHeight = 0;
 
-public boolean formChangeSize = false; // OnRotate if change size or show form with rotate [by TR3E]
-public boolean formNeedLayout = false; // Automatic updatelayout [by TR3E]
+public boolean formChangeSize = false; // OnRotate if change size or show form with rotate [by ADiV]
+public boolean formNeedLayout = false; // Automatic updatelayout [by ADiV]
 
-private int javaNewId = 100000;   // To assign java id from 100001 onwards [by TR3E]
+private int javaNewId = 100000;   // To assign java id from 100001 onwards [by ADiV]
 
 public boolean isGDXGame = false; //prepare to LAMW GDXGame		
 public Object GDXGame = null;	//prepare to LAMW GDXGame
@@ -1920,6 +2213,7 @@ public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, f
 public native void pOnClickGeneric(long pasobj, int value);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
 public native void pOnDown(long pasobj, int value);
+public native void pOnUp(long pasobj, int value);
 public native void pOnClick(long pasobj, int value);
 public native void pOnLongClick(long pasobj, int value);
 public native void pOnDoubleClick(long pasobj, int value);
@@ -1933,6 +2227,7 @@ public native void pAppOnListItemClick(AdapterView adapter, View view, int posit
 public native void pOnFlingGestureDetected(long pasobj, int direction);
 public native void pOnPinchZoomGestureDetected(long pasobj, float scaleFactor, int state);
 public native void pOnLostFocus(long pasobj, String text);
+public native void pOnFocus(long pasobj, String text);
 public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
@@ -2094,11 +2389,11 @@ public  void classChkNull (Class<?> object) {
    if (object != null) { Log.i("JAVA","checkNull-Not Null"); };
 }
 
-public Context GetContext() {   
+public Context GetContext() {
    return this.activity; 
 }
 
-//by TR3E Software
+//by ADiV Software
 public int getContextTop(){
  ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
  
@@ -2109,9 +2404,19 @@ public int getContextTop(){
 	
 }
 
-//by  TR3E Software
+//by  ADiV
 public int getStatusBarHeight() {
 	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+	
+	if ( resourceId > 0 )
+		return this.activity.getResources().getDimensionPixelSize(resourceId);
+	else
+		return 0;
+}
+
+//by  ADiV
+public int GetNavigationHeight() {
+	int resourceId = this.activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
 	
 	if ( resourceId > 0 )
 		return this.activity.getResources().getDimensionPixelSize(resourceId);
@@ -2227,7 +2532,7 @@ public  String getStrDateTime() {
 //Controls Version Info
 //-------------------------------------------
 //GetControlsVersionFeatures ...  //Controls.java version-revision info! [0.6-04]
-public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good cause! please, use the  jForm_GetDateTime!!
+public  String GetControlsVersion() {  
   String listVersionInfo = 
 		  "7$0=GetControlsVersionInfo;" +  //added ... etc..
   		  "7$0=getLocale;"; //added ... etc.. 
@@ -2407,28 +2712,41 @@ public  String getDevPhoneNumber() {
 
 // Result: Device ID - LORDMAN
 // Remarks : Nexus7 (no moblie device) -> Crash : fixed code - Simon
-public  String getDevDeviceID() {
-	String f = "";
-  TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-	if (telephony!=null) {
-		try {
-			f = telephony.getDeviceId();
-		} catch (SecurityException ex) {
-			Log.e("getDevDeviceID", ex.getMessage());
-		}
-	}
-  return f;
+// ANDROID_ID - Added by Tomash
+@SuppressLint("NewApi")
+public String getDevDeviceID() {
+  String devid = "";
+  try {
+    TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
+    if (telephony != null) {
+        devid = telephony.getDeviceId();
+    	
+    	if (devid==null) {   //tk+
+    		devid="";    		
+    	}
+    } else {
+    	devid="";
+    }
+    if (devid=="") {	
+        devid = Secure.getString(activity.getContentResolver(),Secure.ANDROID_ID);
+    }    	
+  }
+  catch (SecurityException e) //ExceptionExceptionException
+      { e.printStackTrace(); }
+  return devid;
 }
 // -------------------------------------------------------------------------
 //  Bitmap
 // -------------------------------------------------------------------------
 // Get Image Width,Height without Decoding
+/* Tomash: unused? See jBitmap.java GetBitmapSizeFromFile
 public  int Image_getWH (String filename ) {
   BitmapFactory.Options options = new BitmapFactory.Options();
   options.inJustDecodeBounds = true;
   BitmapFactory.decodeFile(filename, options);
   return ( (options.outWidth << 16) | (options.outHeight) );
 }
+*/
 
 //
 public  Bitmap Image_resample(String infile,int size) {
@@ -2476,6 +2794,12 @@ public  void Image_save(Bitmap bmp, String filename) {
 //
 public  void jToast( String str ) {
    Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
+}
+
+boolean IsEmailValid(String email) {
+	if(email == null) return false;
+	
+	return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
 }
 
 //by jmpessoa
@@ -2647,46 +2971,121 @@ public  int[] getBmpArray(String file) {
   pixels[length+1] = bmp.getHeight();
   return ( pixels );
 }
+
+private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = this.GetContext().getContentResolver().query(contentURI, null,
+                null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            try {
+                int idx = cursor
+                        .getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                result = cursor.getString(idx);
+            } catch (Exception e) {
+                result = "";
+            }
+            cursor.close();
+        }
+        return result;
+}
+
 // -------------------------------------------------------------------------
 //  Camera
 // -------------------------------------------------------------------------
-  public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
-	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);	
-	  Uri mImageCaptureUri = Uri.fromFile(new File("", filename));	  
-	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	  intent.putExtra("return-data", true);
-	  activity.startActivityForResult(intent, 12345);
-  }
   /*
    * NOTE: The DCIM folder on the microSD card in your Android device is where Android stores the photos and videos 
    * you take with the device's built-in camera. When you open the Android Gallery app, 
    * you are browsing the files saved in the DCIM folder....
-   */ 
-public String jCamera_takePhoto(String path, String filename) {
- 	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
-	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	  intent.putExtra("return-data", true);
-	  this.activity.startActivityForResult(intent, 12345); //12345 = requestCode
-	  return (path+'/'+filename);	  
+   */
+private void galleryAddPic(File image_uri) {
+          if (Build.VERSION.SDK_INT < 19) {
+             this.activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(image_uri)));
+          }
+          else
+          {
+             MediaScannerConnection.scanFile(
+               this.activity,
+               new String[] {image_uri.getAbsolutePath()},
+               new String[] {"image/jpg"},
+               new MediaScannerConnection.OnScanCompletedListener() {
+                   @Override
+                        public void onScanCompleted(String path, Uri uri) {
+                              Log.e("Camera","File " + path + " was scanned successfully: " + uri);
+                        }
+               });
+          }
+}
+
+public String jCamera_takePhoto(String path, String filename, int requestCode, boolean addToGallery) {
+
+	      //StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder(); //by Guser97
+	      //StrictMode.setVmPolicy(builder.build()); //by Guser97
+
+          Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+          //String  image_path = (path+File.separator+filename);
+          File newfile = new File(path, File.separator+filename);
+	      File dirAsFile;
+
+          if (newfile!=null) {
+			  dirAsFile = newfile.getParentFile();
+			  if (dirAsFile!= null) {
+				  if (!dirAsFile.exists()) {
+					  dirAsFile.mkdirs();
+				  }
+				  try {
+					  newfile.createNewFile();
+				  } catch (IOException e) {
+					  Log.e("File creation error", newfile.getPath());
+				  }
+			  }
+		  }
+
+          if (newfile!=null) {
+		     Uri uri = jSupported.FileProviderGetUriForFile(this.GetContext(), newfile);
+             if (jSupported.IsAppSupportedProject()) {
+               intent.putExtra(MediaStore.EXTRA_OUTPUT, uri); //outputFileUri
+               intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+             }
+             else {
+                   jSupported.SetStrictMode(); //by Guser97
+	           intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri); //mImageCaptureUri
+	           intent.putExtra("return-data", true);
+             }
+
+             if (intent.resolveActivity(this.GetContext().getPackageManager()) != null) {
+               this.activity.startActivityForResult(intent, requestCode);
+             }
+
+             if (addToGallery) galleryAddPic(newfile);
+
+             return newfile.toString();
+          }
+          else return "";
 }
 
 public String jCamera_takePhoto(String path, String filename, int requestCode) {
-	  Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	  Uri mImageCaptureUri = Uri.fromFile(new File(path, '/'+filename)); // get Android.Uri from file
-	  intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-	  intent.putExtra("return-data", true);
-	  this.activity.startActivityForResult(intent, requestCode); //12345 = requestCode
-	  return (path+'/'+filename);	  
+       return jCamera_takePhoto(path, filename, requestCode, true);
 }
+
+
+	public String jCamera_takePhoto(String path, String filename) {
+		return jCamera_takePhoto(path, filename, 12345);
+	}
+
+	public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		Uri mImageCaptureUri = Uri.fromFile(new File("", filename));
+		intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+		intent.putExtra("return-data", true);
+		activity.startActivityForResult(intent, 12345);
+	}
 
 //-------------------------------------------------------------------------------------------------------
 //SMART LAMW DESIGNER
 //-------------------------------------------------------------------------------------------------------
-
-public  java.lang.Object jCheckBox_Create(long pasobj ) {
-  return (java.lang.Object)( new jCheckBox(this.activity,this,pasobj));
-}
 
 public  java.lang.Object jImageView_Create(long pasobj ) {
   return (java.lang.Object)( new jImageView(this.activity,this,pasobj));
@@ -2696,11 +3095,6 @@ public native void pOnImageViewPopupItemSelected(long pasobj, String caption);
 public  java.lang.Object jPanel_Create(long pasobj ) {
   return (java.lang.Object)(new jPanel(this.activity,this,pasobj));
 }
-
-public java.lang.Object jRatingBar_jCreate(long _Self,  int _numStars, int _style, boolean _isIndicator) {
-  return (java.lang.Object)(new jRatingBar(this,_Self,_numStars,_style,_isIndicator));
-}
-public native void pOnRatingBarChanged(long pasobj, float rating);
 
 public java.lang.Object jsAppBarLayout_jCreate(long _Self) {
   return (java.lang.Object)(new jsAppBarLayout(this,_Self));
@@ -2721,17 +3115,18 @@ public java.lang.Object jsFloatingButton_jCreate(long _Self) {
 public java.lang.Object jsRecyclerView_jCreate(long _Self, int _mode, int _direction, int _cols) {
   return (java.lang.Object)(new jsRecyclerView(this,_Self,_mode,_direction,_cols));
 }
-public native void pOnRecyclerViewItemClick(long pasobj, int itemIndex, int arrayContentCount);
-public native void pOnRecyclerViewItemWidgetClick(long pasobj, int itemIndex, int widgetClass, String widgetCaption, int status);									
+public native void pOnRecyclerViewItemClick(long pasobj, int itemIndex);
+public native void pOnRecyclerViewItemLongClick(long pasobj, int itemIndex);
+public native void pOnRecyclerViewItemTouchUp(long pasobj, int itemIndex);
+public native void pOnRecyclerViewItemTouchDown(long pasobj, int itemIndex);
+public native void pOnRecyclerViewItemWidgetClick(long pasobj, int itemIndex, int widgetClass, int widgetId, int status);
+public native void pOnRecyclerViewItemWidgetLongClick(long pasobj, int itemIndex, int widgetClass, int widgetId);
+public native void pOnRecyclerViewItemWidgetTouchUp(long pasobj, int itemIndex, int widgetClass, int widgetId);
+public native void pOnRecyclerViewItemWidgetTouchDown(long pasobj, int itemIndex, int widgetClass, int widgetId);									
 
 public java.lang.Object jsToolbar_jCreate(long _Self, boolean _asActionBar) {
   return (java.lang.Object)(new jsToolbar(this,_Self,_asActionBar));
 }
-
-public java.lang.Object jSwitchButton_jCreate(long _Self) {
-   return (java.lang.Object)(new jSwitchButton(this,_Self));
-}
-public native void pOnChangeSwitchButton(long pasobj, boolean state);
 
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));

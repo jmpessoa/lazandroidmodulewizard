@@ -5,7 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.CoordinatorLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 /*Draft java code by "Lazarus Android Module Wizard" [12/12/2017 1:30:46]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/

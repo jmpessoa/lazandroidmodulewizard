@@ -26,9 +26,6 @@ type
     procedure jsFloatingButton1Click(Sender: TObject);
     procedure jsRecyclerView1ItemClick(Sender: TObject; itemPosition: integer;
       itemArrayOfStringCount: integer);
-    procedure jsRecyclerView1ItemWidgetClick(Sender: TObject;
-      itemPosition: integer; widget: TItemContentFormat; caption: string;
-      status: TItemWidgetStatus);
     procedure jsToolbar1ClickNavigationIcon(Sender: TObject);
   private
     {private declarations}
@@ -82,7 +79,7 @@ b2) CollapsingToolbarLayout
       LayoutParamWidth = lpMatchParent
 
  b3) Toolbar
-       LayoutParamHeight = lpOneQuarterOfParent  (or ....)
+       LayoutParamHeight = lpOneQuarterOfParent  (or ....)     // I apply this to fix the demo bug! [thanks to @Segator!]
        LayoutParamWidth = lpMatchParent
 
 b4) ImageView
@@ -94,12 +91,13 @@ b4) ImageView
 procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
 begin
 
-  if AndroidModule2 = nil then   //NOTE: "ActivityMode = actEasel"  dont show!!
+  if AndroidModule2 = nil then   //NOTE: "ActivityMode = actEasel" --> dont show!!
   begin
     gApp.CreateForm(TAndroidModule2, AndroidModule2);
     AndroidModule2.Init(gApp);  //dispatch "OnJNIPrompt" in  AndroidModule2
   end;
 
+  //jsCoordinatorLayout1.SetFitsSystemWindows(True);   //**   need this???
   jsAppBarLayout1.SetFitsSystemWindows(True);
 
   jsCollapsingToolbarLayout1.SetFitsSystemWindows(True);
@@ -111,7 +109,8 @@ begin
 
   //jsToolbar1.AsActionBar:= True;             //need be seted in design time!
   //jsToolbar1.BackgroundColor:= colbrDefault; //need be seted in design time!
-  //jsToolbar1.SetHeightByDisplayMetricsDensity(54);//optional absolut value....
+
+  //jsToolbar1.SetHeightByDisplayMetricsDensity(60);//** need be seted to an absolute value!  //need this ??
   jsToolbar1.SetCollapseMode(cmPin);
 
   jImageView1.SetFitsSystemWindows(True);
@@ -119,39 +118,33 @@ begin
 
   jsRecyclerView1.SetClipToPadding(False);
   jsRecyclerView1.SetAppBarLayoutScrollingViewBehavior();
-  jsRecyclerView1.SetItemContentLayout(AndroidModule2.jPanel1.View,  True {true=cardview});   //custom item view!
+  jsRecyclerView1.SetItemContentLayout(AndroidModule2.jPanel1.View,  True {cardview});   //custom item view!
+  jsRecyclerView1.SetItemContentFormat('IMAGE|TEXT');
 
-  {
-  jsRecyclerView1.AddItemContentFormat(cfImage);
-  jsRecyclerView1.AddItemContentFormat(cfText);
-  jsRecyclerView1.AddItemContentFormat(cfCheck);
-  jsRecyclerView1.AddItemContentFormat(cfRating);
-  jsRecyclerView1.AddItemContentFormat(cfSwitch);
-  jsRecyclerView1.SetItemContentFormat();
-   }
-   //or
-  jsRecyclerView1.SetItemContentFormat('IMAGE|TEXT|CHECK|RATING|SWITCH');
-  jsRecyclerView1.Add('lance.png@assets|Do you see over yonder, friend Sancho, thirty or forty hulking giants? I intend to do battle with them and slay them...|OK@1|2.0|OFF:ON@0');
-  jsRecyclerView1.Add('windmil.png@assets|Take care... those things over there are not giants but windmills...|OK@0|3.0|Sound@0');
-  jsRecyclerView1.Add('don_quixote.png@assets|The poet can recount or sing about things not as they were, but as they should have been...|OK@0|3.0|Sound@1');
-  jsRecyclerView1.Add('lance.png@assets|The historian must write about them not as they should have been, but as they were, without adding or subtracting anything from the truth...|OK@0|2.5|OFF:ON@1');
-  jsRecyclerView1.Add('don_quixote.png@assets|Bear in mind... one man is no more than another, unless he does more than another...|OK@1|2.5|Sound@1');
-  jsRecyclerView1.Add('ic_launcher@drawable|My idea is to become a lunatic for no good reason at all...|OK@0|3.0|Sound@0');
+  jsRecyclerView1.Add('lance.png@assets|Do you see over yonder, friend Sancho, thirty or forty hulking giants? I intend to do battle with them and slay them...');
+  jsRecyclerView1.Add('windmil.png@assets|Take care... those things over there are not giants but windmills...');
+  jsRecyclerView1.Add('don_quixote.png@assets|The poet can recount or sing about things not as they were, but as they should have been...');
+  jsRecyclerView1.Add('lance.png@assets|The historian must write about them not as they should have been, but as they were, without adding or subtracting anything from the truth...');
+  jsRecyclerView1.Add('windmil.png@assets|Until death it is all life...');
+  jsRecyclerView1.Add('don_quixote.png@assets|The proof of the pudding is in the eating...');
+  jsRecyclerView1.Add('lance.png@assets|The maddest thing a man can do in this life is to let himself die...');
+  jsRecyclerView1.Add('windmil.png@assets|Wit and humor do not reside in slow minds...');
+  jsRecyclerView1.Add('don_quixote.png@assets|The wounds received in battle bestow honor, they do not take it away...');
+  jsRecyclerView1.Add('lance.png@assets|The most perceptive character in a play is the fool, because the man who wishes to seem simple cannot possibly be a simpleton...');
+  jsRecyclerView1.Add('windmil.png@assets|After the gratifications of brutish appetites are past, the greatest pleasure then is to get rid of that which entertained it...');
+  jsRecyclerView1.Add('don_quixote.png@assets|Bear in mind... one man is no more than another, unless he does more than another...');
+  jsRecyclerView1.Add('lance.png@assets|Love and War are the same thing, and stratagems and policy are as allowable in the one as in the other...');
+  jsRecyclerView1.Add('windmil.png@assets|My idea is to become a lunatic for no good reason at all...');
 
-  (* hint:
-  windmil.png@assets
-  //or
-  ic_launcher@drawable
-  //or
-  url@http://icons.iconarchive.com/icons/alecive/flatwoken/128/Apps-Google-Chrome-App-List-icon.png
-  *)
+  jsRecyclerView1.GravityInParent:= lgTop;
 
   //jsFloatingButton1.GravityInParent:= lgNone; //need be seted in design time!
+  jsFloatingButton1.ImageIdentifier:= 'ic_lemur';
   jsFloatingButton1.SetPressedRippleColor(colbrCyan);
   jsFloatingButton1.SetAnchorGravity(lgBottomRight, jsAppBarLayout1.Id);
 
+  ShowMessage('Prompt....');
 end;
-
 
 procedure TAndroidModule1.jsFloatingButton1Click(Sender: TObject);
 begin
@@ -165,28 +158,8 @@ begin
   ShowMessage('itemIndex = ' + IntToStr(itemPosition) );
   for i:= 0 to itemArrayOfStringCount-1 do
   begin
-    ShowMessage(jsRecyclerView1.GetSelectedContent(i));
+    //ShowMessage(jsRecyclerView1.GetSelectedContent(i));
   end;
-end;
-
-procedure TAndroidModule1.jsRecyclerView1ItemWidgetClick(Sender: TObject;
-  itemPosition: integer; widget: TItemContentFormat; caption: string;
-  status: TItemWidgetStatus);
-begin
-   case widget of
-      cfImage: begin ShowMessage('cfImage');  end;
-      cfCheck: begin ShowMessage('cfCheck'); end;
-      cfRating: begin ShowMessage('cfRating'); end;
-      cfSwitch: begin ShowMessage('cfSwitch'); end;
-   end;
-
-   ShowMessage(caption + '  index = '+ IntToStr(itemPosition));
-
-   case status of
-       wsNone: begin ShowMessage('wsNone');  end;
-       wsChecked: begin ShowMessage('wsChecked'); end;
-   end;
-
 end;
 
 procedure TAndroidModule1.jsToolbar1ClickNavigationIcon(Sender: TObject);

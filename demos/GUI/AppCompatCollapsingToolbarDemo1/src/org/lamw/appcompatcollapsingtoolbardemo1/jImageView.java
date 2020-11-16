@@ -162,14 +162,14 @@ public class jImageView extends ImageView {
 		return true;
 	}
 
-	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		 String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
 	         this.setTag(tag);  //nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
 
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
+	public  void SetViewParent( android.view.ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
 
@@ -278,7 +278,10 @@ public class jImageView extends ImageView {
 	public void SetImageByResIdentifier(String _imageResIdentifier) {
 		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
-		if( d == null ) return;
+		if( d == null ) { 
+			this.setImageBitmap(null); 
+			return; 
+		}
 		
 		Bitmap b = ((BitmapDrawable)d).getBitmap();
 		
@@ -296,11 +299,11 @@ public class jImageView extends ImageView {
 		this.invalidate();
 	}
 
-	public void setLParamWidth(int _w) {
+	public void SetLParamWidth(int _w) {
 		LAMWCommon.setLParamWidth(_w);
 	}
 
-	public void setLParamHeight(int _h) {		
+	public void SetLParamHeight(int _h) {		
 		LAMWCommon.setLParamHeight(_h);
 	}
 
@@ -308,15 +311,15 @@ public class jImageView extends ImageView {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public int getLParamHeight() {
+	public int GetLParamHeight() {
 		return  LAMWCommon.getLParamHeight();
 	}
 
-	public int getLParamWidth() {				
+	public int GetLParamWidth() {				
 		return LAMWCommon.getLParamWidth();
 	}
 
@@ -332,15 +335,15 @@ public class jImageView extends ImageView {
 		} else return 0;
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int idAnchor) {
+	public void SetLayoutAll(int idAnchor) {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 
@@ -1049,9 +1052,15 @@ public class jImageView extends ImageView {
 	}
 
 	public void SetImageDrawable(AnimationDrawable _imageAnimation) {
-		if (_imageAnimation == null) return;
+		if (_imageAnimation == null) { 
+			this.setImageDrawable(null); 
+			return; 
+		}
+		
 		_imageAnimation.stop();
+		
         if(this.getDrawable() == null) this.setImageDrawable(_imageAnimation);
+        
 		_imageAnimation.setOneShot(false);
 		_imageAnimation.setVisible(true, true);
 		_imageAnimation.start();

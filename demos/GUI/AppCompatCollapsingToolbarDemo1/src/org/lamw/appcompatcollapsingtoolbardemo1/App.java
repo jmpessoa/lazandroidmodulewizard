@@ -1,6 +1,6 @@
 package org.lamw.appcompatcollapsingtoolbardemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8.4 - 12 March - 2019
+//Lamw: Lazarus Android Module Wizard - version 0.8.6 - 30 October - 2020
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -21,7 +21,7 @@ package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import java.lang.Override;
 //import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo; 

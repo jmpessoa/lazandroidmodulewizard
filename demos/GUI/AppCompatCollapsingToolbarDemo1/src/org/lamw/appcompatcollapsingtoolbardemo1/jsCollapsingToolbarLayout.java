@@ -7,8 +7,8 @@ import android.os.Build;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/3/2018 19:05:56]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/

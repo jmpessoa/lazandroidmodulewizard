@@ -1,3 +1,0 @@
-<Libraries Value="C:\laztoapk\downloads\android-ndk-r20\platforms\android-22\arch-mips\usr\lib;C:\laztoapk\downloads\android-ndk-r20\toolchains\mipsel-linux-android-4.9\prebuilt\windows-x86_64\lib\gcc\mipsel-linux-android\4.9.x"/>
-<TargetCPU Value="mipsel"/>
-<CustomOptions Value="-Xd -XPmipsel-linux-android- -FDC:\laztoapk\downloads\android-ndk-r20\toolchains\mipsel-linux-android-4.9\prebuilt\windows-x86_64\bin"/>

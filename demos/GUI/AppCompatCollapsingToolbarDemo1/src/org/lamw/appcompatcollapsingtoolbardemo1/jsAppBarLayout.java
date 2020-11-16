@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.AppBarLayout;
+import com.google.android.material.appbar.AppBarLayout;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/3/2018 18:04:10]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/

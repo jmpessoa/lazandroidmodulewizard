@@ -14,7 +14,7 @@ public class jSupported {
 		Uri r = null;
 		if (Build.VERSION.SDK_INT >= 24) {
 			//[ifdef_api24up]
-			r = FileProvider.getUriForFile(controls.GetContext(), controls.GetContext().getApplicationContext().getPackageName() + ".provider", file);
+			r = FileProvider.getUriForFile(controls.GetContext(), controls.GetContext().getApplicationContext().getPackageName() + ".fileprovider", file);
 			//[endif_api24up]
 		}
 		else {
@@ -28,7 +28,7 @@ public class jSupported {
 
 		if (Build.VERSION.SDK_INT >= 24) {
 			//[ifdef_api24up]
-			r = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", file);
+			r = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".fileprovider", file);
 			//[endif_api24up]
 		}
 		else {

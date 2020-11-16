@@ -5,9 +5,9 @@ import android.content.res.ColorStateList;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.CoordinatorLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 /*Draft java code by "Lazarus Android Module Wizard" [12/2/2017 16:23:10]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/

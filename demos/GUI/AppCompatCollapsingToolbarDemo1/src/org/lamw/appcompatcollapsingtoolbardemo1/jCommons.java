@@ -2,11 +2,18 @@ package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.graphics.drawable.ColorDrawable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.drawerlayout.widget.DrawerLayout;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.tabs.TabLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +27,6 @@ import android.content.Context;
 //import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.Gravity;
-import android.support.design.widget.CoordinatorLayout; //a framelayout like
-import android.support.v4.content.res.ResourcesCompat;
-//import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.widget.DrawerLayout; //extends ViewGroup
-import android.support.design.widget.AppBarLayout; //extends LinearLayout
-import android.support.design.widget.CollapsingToolbarLayout; //extends framelayout
-import android.support.v4.widget.NestedScrollView; //extends framelayout
-import android.support.design.widget.TabLayout;  //framelayout
 //import android.util.Log;
 
 public class jCommons {
@@ -568,59 +567,133 @@ public class jCommons {
 	}
 
 	public static boolean HasActionBar(Controls controls) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null) return true;
-		else return false;
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null) return true;
+		  else return false;
+                } else return false;
 	}
 
 	public static void SetActionBarSubTitle(Controls controls, String subtitle) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
-		  ((AppCompatActivity) controls.activity).getSupportActionBar().setSubtitle(subtitle);
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
+		    ((AppCompatActivity) controls.activity).getSupportActionBar().setSubtitle(subtitle);
+                }
 	}
 
 	public static void SetActionBarTitle(Controls controls, String title) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().setTitle(title);
+                }
 	}
 
 	public static void ActionBarHide(Controls controls) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+  		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().hide();
+                }
 	}
 
 	public static void ActionBarShow(Controls controls) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().show();
+                }
 	}
 
 	public static void ActionBarShowTitle(Controls controls, boolean value) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayShowTitleEnabled(value);
+                }
 	}
 
 	public static void ActionBarShowLogo(Controls controls, boolean value) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+ 		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayUseLogoEnabled(value);
+                }
 	}
 
 	public static void ActionBarDisplayHomeAsUpEnabled(Controls controls, boolean value) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().setDisplayHomeAsUpEnabled(value);
+                }
 	}
 
 	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
-			((AppCompatActivity) controls.activity).getSupportActionBar().setIcon(icon);;
+                if (controls.activity instanceof AppCompatActivity)
+                {
+                	androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+            		
+            		if (actionBar != null){
+            			
+            			if( icon != null ){
+            				actionBar.setDisplayShowHomeEnabled(true);	       
+            				actionBar.setIcon(icon);
+            			} else {
+            				actionBar.setDisplayShowHomeEnabled(false);
+            				actionBar.setIcon(null);
+            			}
+            		}
+                }
 
 	}
+	
+	public static void ActionBarShowHome(Controls controls, boolean showHome){
+		if (controls.activity instanceof AppCompatActivity)
+        {
+		 androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		
+		 if (actionBar != null){
+			actionBar.setDisplayHomeAsUpEnabled(showHome);
+			actionBar.setDisplayShowHomeEnabled(showHome);	        								 
+		 }
+        }
+	}
+	
+	public static void ActionBarSetColor(Controls controls, int color){
+		if (controls.activity instanceof AppCompatActivity)
+        {
+		 androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		
+		 if (actionBar != null)						
+		     actionBar.setBackgroundDrawable(new ColorDrawable(color));
+        }				    		
+	}
+	
+	public static void NavigationSetColor(Controls controls, int color){        		
+		if (controls.activity instanceof AppCompatActivity)
+        {	
+			if (Build.VERSION.SDK_INT >= 21)				
+				((AppCompatActivity) controls.activity).getWindow().setNavigationBarColor(color);							
+        }    				
+	}
+	
+	public static void StatusSetColor(Controls controls, int color){
+		if (controls.activity instanceof AppCompatActivity)
+        {	
+			if (Build.VERSION.SDK_INT >= 21)				
+				((AppCompatActivity) controls.activity).getWindow().setStatusBarColor(color);										    
+        }	
+	}		
 
 	public static void ActionBarSetTabNavigationMode(Controls controls) {
       //not AppCompat ..
@@ -635,10 +708,18 @@ public class jCommons {
 	}
 
 	public static boolean ActionBarIsShowing(Controls controls) {
-		android.support.v7.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
-		if (actionBar != null)
+                if (controls.activity instanceof AppCompatActivity)
+                {
+          androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
+		  if (actionBar != null)
 			return actionBar.isShowing();
-		else return false;
+		  else return false;
+                } else return false;
+	}
+
+	public static boolean IsAppCompatProject(Controls controls) {
+                if (controls.activity instanceof AppCompatActivity) return true;
+		  else return false;
 	}
 
 	public static boolean IsAppCompatProject() {
