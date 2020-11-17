@@ -986,11 +986,9 @@ begin
          begin
            providerList:= TStringList.Create;
            providerList.LoadFromFile(FPathToJavaTemplates +DirectorySeparator+'support'+DirectorySeparator+'manifest_support_provider.txt');
-
            supportProvider:= StringReplace(providerList.Text, 'dummyPackage',strPackName, [rfReplaceAll, rfIgnoreCase]);
            tempStr:= auxList.Text;  //manifest
-
-           if Pos('android.support.v4.content.FileProvider', tempStr) <= 0 then
+           if Pos('androidx.core.content.FileProvider', tempStr) <= 0 then    //androidX
            begin
              insertRef:= '</activity>'; //insert reference point
              p1:= Pos(insertRef, tempStr);
@@ -999,7 +997,6 @@ begin
              auxList.Text:= tempStr;
            end;
            providerList.Free;
-
          end;
       end;
 

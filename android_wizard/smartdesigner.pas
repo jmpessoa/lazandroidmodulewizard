@@ -717,7 +717,6 @@ begin
   end;
 
   AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
-
   FSupport:= (LazarusIDE.ActiveProject.CustomData.Values['Support']='TRUE');
 
   if not FileExists(targetpath+DirectorySeparator+'styles.xml') then
@@ -765,36 +764,49 @@ begin
     SaveToFile(targetpath);
   end;
 
-  if FSupport then
+  if (FSupport) or (Pos('AppCompat', AndroidTheme) > 0) then
   begin
-     if FileExists(LamwGlobalSettings.PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') and
-        (not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml'))then
-     begin
-       strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'support'+DirectorySeparator+'support_provider_paths.xml');
-       strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
-     end;
+    strList.Clear;
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
 
-     if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt') then
-     begin
-       providerList:= TStringList.Create;
-       providerList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt');
-       supportProvider  := StringReplace(providerList.Text, 'dummyPackage',FPackageName, [rfReplaceAll, rfIgnoreCase]);
-       providerList.Free;
-
+    if Pos('android.support.v4.content.FileProvider', strList.Text) > 0 then //update to androidX
+    begin
+       tempStr:= StringReplace(strList.Text, 'android.support.v4.content.FileProvider','androidx.core.content.FileProvider', [rfReplaceAll, rfIgnoreCase]);
        strList.Clear;
-       strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-       tempStr:= strList.Text;  //manifest
-       if Pos('androidx.core.content.FileProvider', tempStr) <= 0 then
+       strList.Text:= tempStr;
+       strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+    end
+    else
+    begin
+
+       {
+       if FileExists(LamwGlobalSettings.PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') and
+          (not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml'))then
        begin
-         insertRef:= '</activity>'; //insert reference point
-         p1:= Pos(insertRef, tempStr);
-         Insert(sLineBreak + supportProvider, tempStr, p1+Length(insertRef) );
-         strList.Clear;
-         strList.Text:= tempStr;
-         strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+         strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'support'+DirectorySeparator+'support_provider_paths.xml');
+         strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
+       end;
+       }
+
+       if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt') then
+       begin
+         providerList:= TStringList.Create;
+         providerList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt');
+         supportProvider  := StringReplace(providerList.Text, 'dummyPackage',FPackageName, [rfReplaceAll, rfIgnoreCase]);
+         providerList.Free;
+         if Pos('androidx.core.content.FileProvider', tempStr) <= 0 then
+         begin
+           tempStr:= strList.Text;  //manifest
+           insertRef:= '</activity>'; //insert reference point
+           p1:= Pos(insertRef, tempStr);
+           Insert(sLineBreak + supportProvider, tempStr, p1+Length(insertRef) );
+           strList.Clear;
+           strList.Text:= tempStr;
+           strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+         end;
        end;
 
-     end;
+    end;
   end;
 
   if sdkManifMInApiNumber < minsdkApi  then
