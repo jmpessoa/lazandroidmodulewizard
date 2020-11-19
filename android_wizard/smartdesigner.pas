@@ -2335,14 +2335,21 @@ begin
    //-----
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.provider') then
    begin
+     manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+
+     if Pos('org.lamw.fileprovider', manifestList.Text) > 0 then  //fix old projects [thanks to Manlio!]
+     begin
+       tempStr:= Trim(StringReplace(manifestList.Text, 'org.lamw.fileprovider', FPackageName, [rfReplaceAll,rfIgnoreCase]) );
+       manifestList.Text:= tempStr;
+       manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+     end;
+
+     aux:= manifestList.Text;
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.provider');
      if auxList.Text <> '' then
      begin
-       tempStr:= Trim(auxList.Text);
-       tempStr:= Trim( StringReplace(tempStr, 'org.lamw.provider', FPackageName, [rfReplaceAll,rfIgnoreCase]) );
+       tempStr:= Trim(StringReplace(auxList.Text, 'org.lamw.fileprovider', FPackageName, [rfReplaceAll,rfIgnoreCase]) );
        insertRef:= '</activity>'; //insert reference point
-       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-       aux:= manifestList.Text;
        //listRequirements.Add(tempStr);  //Add providers
        if Pos(tempStr , aux) <= 0 then
        begin
@@ -2352,6 +2359,7 @@ begin
          manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
        end;
      end;
+
    end;
    //-----
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.receiver') then
