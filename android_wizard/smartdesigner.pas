@@ -794,7 +794,7 @@ begin
          providerList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt');
          supportProvider  := StringReplace(providerList.Text, 'dummyPackage',FPackageName, [rfReplaceAll, rfIgnoreCase]);
          providerList.Free;
-         if Pos('androidx.core.content.FileProvider', tempStr) <= 0 then
+         if Pos('androidx.core.content.FileProvider', strList.Text) <= 0 then
          begin
            tempStr:= strList.Text;  //manifest
            insertRef:= '</activity>'; //insert reference point
