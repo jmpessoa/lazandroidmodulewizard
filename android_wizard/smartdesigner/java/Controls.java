@@ -1286,7 +1286,7 @@ class jForm {
 	        //Create a pattern
 	        Pattern pattern = Pattern.compile(patternString);
 	        if (null == pattern) {
-	            return null;
+	            return "";
 	        }
 
 	        //Match the pattern string in provided string
@@ -1300,14 +1300,14 @@ class jForm {
 	        ex.printStackTrace();
 	    }
 
-	    return null;
+	    return "";
 	}
 
 	// by ADiV
 	public String GetVersionPlayStore(String appUrlString) {
 	    final String currentVersion_PatternSeq = "<div[^>]*?>Current\\sVersion</div><span[^>]*?>(.*?)><div[^>]*?>(.*?)><span[^>]*?>(.*?)</span>";
 	    final String appVersion_PatternSeq = "htlgb\">([^<]*)</s";
-	    String playStoreAppVersion = null;
+	    String playStoreAppVersion = "";
 
 	    BufferedReader inReader = null;
 	    URLConnection uc = null;
@@ -1318,13 +1318,13 @@ class jForm {
 	    try{
 	     url = new URL(appUrlString);
 	    } catch (MalformedURLException e) {
-	     return null;
+	     return "";
 	    }
 	    
 	    try{
 	     uc = url.openConnection();
 	     if(uc == null) {
-	       return null;
+	       return "";
 	     }
 	     uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 	     inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
@@ -1336,14 +1336,14 @@ class jForm {
 	     }
 	    
 	    } catch (IOException e) {
-	     return null;	
+	     return "";	
 	    }
 	    
 
 	    // Get the current version pattern sequence 
 	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
 	    if(null == versionString){ 
-	        return null;
+	        return "";
 	    }else{
 	        // get version from "htlgb">X.X.X</span>
 	        playStoreAppVersion = GetAppVersion(appVersion_PatternSeq, versionString);
@@ -1749,7 +1749,7 @@ class jForm {
 		// DhcpInfo  is a simple object for retrieving the results of a DHCP request
 		DhcpInfo dhcp = mWifi.getDhcpInfo();
 		if (dhcp == null) {
-			return null;
+			return "";
 		}
 		int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
 		byte[] quads = new byte[4];
