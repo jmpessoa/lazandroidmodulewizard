@@ -33,9 +33,12 @@ jWindowManager = class(jControl)
     procedure SetViewFocusable(_value:boolean);//Segator
 
     procedure RequestDrawOverlayRuntimePermission(_packageName: string; _requestCode: integer);
+    procedure RequestIgnoreBatteryOptimizationRuntimePermission(_packageName: string; _requestCode: integer);
+    procedure RequestIgnoreBackgrundDataRestrictionRuntimePermission(_packageName: string; _requestCode: integer);
     function IsDrawOverlaysRuntimePermissionNeed(): boolean;
     function CanDrawOverlays(): boolean;
-
+    function IgnoringBatteryOptimizations(): boolean;
+    function IgnoringDataRestriction(): boolean;
 
  published
 
@@ -53,8 +56,12 @@ procedure jWindowManager_SetRadiusRoundCorner(env: PJNIEnv; _jwindowmanager: JOb
 procedure jWindowManager_SetViewFocusable(env: PJNIEnv; _jwindowmanager: JObject; _value: boolean);
 
 procedure jWindowManager_RequestDrawOverlayRuntimePermission(env: PJNIEnv; _jwindowmanager: JObject; _packageName: string; _requestCode: integer);
+procedure jWindowManager_RequestIgnoreBatteryOptimizationRuntimePermission(env: PJNIEnv; _jwindowmanager: JObject; _packageName: string; _requestCode: integer);
+procedure jWindowManager_RequestIgnoreBackgrundDataRestrictionRuntimePermission(env: PJNIEnv; _jwindowmanager: JObject; _packageName: string; _requestCode: integer);
 function jWindowManager_IsDrawOverlaysRuntimePermissionNeed(env: PJNIEnv; _jwindowmanager: JObject): boolean;
 function jWindowManager_CanDrawOverlays(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+function jWindowManager_IgnoringBatteryOptimizations(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+function jWindowManager_IgnoringDataRestriction(env: PJNIEnv; _jwindowmanager: JObject): boolean;
 
 implementation
 
@@ -167,6 +174,20 @@ begin
      jWindowManager_RequestDrawOverlayRuntimePermission(FjEnv, FjObject, _packageName ,_requestCode);
 end;
 
+procedure jWindowManager.RequestIgnoreBackgrundDataRestrictionRuntimePermission(_packageName: string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWindowManager_RequestIgnoreBackgrundDataRestrictionRuntimePermission(FjEnv, FjObject, _packageName ,_requestCode);
+end;
+
+procedure jWindowManager.RequestIgnoreBatteryOptimizationRuntimePermission(_packageName: string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWindowManager_RequestIgnoreBatteryOptimizationRuntimePermission(FjEnv, FjObject, _packageName ,_requestCode);
+end;
+
 function jWindowManager.IsDrawOverlaysRuntimePermissionNeed(): boolean;
 begin
   //in designing component state: result value here...
@@ -179,6 +200,20 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jWindowManager_CanDrawOverlays(FjEnv, FjObject);
+end;
+
+function jWindowManager.IgnoringBatteryOptimizations(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWindowManager_IgnoringBatteryOptimizations(FjEnv, FjObject);
+end;
+
+function jWindowManager.IgnoringDataRestriction(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jWindowManager_IgnoringDataRestriction(FjEnv, FjObject);
 end;
 
 {-------- jWindowManager_JNI_Bridge ----------}
@@ -335,6 +370,36 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jWindowManager_RequestIgnoreBatteryOptimizationRuntimePermission(env: PJNIEnv; _jwindowmanager: JObject; _packageName: string; _requestCode: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packageName));
+  jParams[1].i:= _requestCode;
+  jCls:= env^.GetObjectClass(env, _jwindowmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestIgnoreBatteryOptimizationRuntimePermission', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jwindowmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jWindowManager_RequestIgnoreBackgrundDataRestrictionRuntimePermission(env: PJNIEnv; _jwindowmanager: JObject; _packageName: string; _requestCode: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_packageName));
+  jParams[1].i:= _requestCode;
+  jCls:= env^.GetObjectClass(env, _jwindowmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestIgnoreBackgrundDataRestrictionRuntimePermission', '(Ljava/lang/String;I)V');
+  env^.CallVoidMethodA(env, _jwindowmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jWindowManager_IsDrawOverlaysRuntimePermissionNeed(env: PJNIEnv; _jwindowmanager: JObject): boolean;
 var
   jBoo: JBoolean;
@@ -356,6 +421,32 @@ var
 begin
   jCls:= env^.GetObjectClass(env, _jwindowmanager);
   jMethod:= env^.GetMethodID(env, jCls, 'CanDrawOverlays', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jwindowmanager, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jWindowManager_IgnoringBatteryOptimizations(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwindowmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'IgnoringBatteryOptimizations', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jwindowmanager, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jWindowManager_IgnoringDataRestriction(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jwindowmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'IgnoringDataRestriction', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jwindowmanager, jMethod);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
