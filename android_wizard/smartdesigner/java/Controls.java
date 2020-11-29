@@ -1885,10 +1885,12 @@ class jForm {
 	}
 
         public void MoveToBack() {
-
                controls.activity.moveTaskToBack(true);
-
         }
+
+	public void MoveTaskToBack(boolean _nonRoot) {   //the "guide line' is try to mimic java Api ...
+		controls.activity.moveTaskToBack(_nonRoot);
+	}
 
 	public void Restart(int _delay) {
 		PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0,

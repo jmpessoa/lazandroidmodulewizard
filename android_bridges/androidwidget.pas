@@ -1337,7 +1337,11 @@ type
     function DirectoryExists(_fullDirectoryName: string): boolean;
 
     procedure Minimize();
+
     procedure MoveToBack();
+    //the "guide line' is try to mimic java Api ...
+    procedure MoveTaskToBack(_nonRoot: boolean);
+
     procedure Restart(_delay: integer);
     procedure HideSoftInput(_view: jObject); overload;
     function UriEncode(_message: string): string;
@@ -1772,6 +1776,8 @@ function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jO
 procedure jForm_SetAnimationDurationIn(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
 procedure jForm_SetAnimationDurationOut(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
 procedure jForm_SetAnimationMode(env: PJNIEnv; _jform: JObject; _animationMode: integer);
+procedure jForm_MoveTaskToBack(env: PJNIEnv; _jform: JObject; _nonRoot: boolean);
+
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -4439,6 +4445,13 @@ begin
      jni_proc(FjEnv, FjObject, 'MoveToBack');
 end;
 
+procedure jForm.MoveTaskToBack(_nonRoot: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_MoveTaskToBack(FjEnv, FjObject, _nonRoot);
+end;
+
 procedure jForm.Restart(_delay: integer);
 begin
   //in designing component state: set value here...
@@ -5347,6 +5360,18 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jForm_MoveTaskToBack(env: PJNIEnv; _jform: JObject; _nonRoot: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].z:= JBool(_nonRoot);
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'MoveTaskToBack', '(Z)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 //-----{ jApp } ------
 
