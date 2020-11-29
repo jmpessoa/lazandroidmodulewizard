@@ -1337,6 +1337,7 @@ type
     function DirectoryExists(_fullDirectoryName: string): boolean;
 
     procedure Minimize();
+    procedure MoveToBack();
     procedure Restart(_delay: integer);
     procedure HideSoftInput(_view: jObject); overload;
     function UriEncode(_message: string): string;
@@ -4429,6 +4430,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'Minimize');
+end;
+
+procedure jForm.MoveToBack();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'MoveToBack');
 end;
 
 procedure jForm.Restart(_delay: integer);
