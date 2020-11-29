@@ -1,4 +1,4 @@
-package org.lamw.appjcentertoytimerservicedemo1;
+package org.lamw.appjcentertoytimerservicmoveTaskToBackedemo1;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.1 [AndroidX!!] - 11 November - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -1881,7 +1881,14 @@ class jForm {
 		main.addCategory(Intent.CATEGORY_HOME);
 		main.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		controls.activity.startActivity(main);
+
 	}
+
+        public void MoveToBack() {
+
+               controls.activity.moveTaskToBack(true);
+
+        }
 
 	public void Restart(int _delay) {
 		PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0,
