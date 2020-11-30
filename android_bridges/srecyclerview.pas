@@ -127,7 +127,9 @@ jsRecyclerView = class(jVisualControl)
     procedure SetWidgetTextColor( position : integer; widget: TItemContentFormat; widgetId : integer; value: TARGBColorBridge );
 
     procedure SetItemsRound(round : integer);
-    procedure SetItemBackgroundColor(position: integer; value: TARGBColorBridge; round : integer);
+
+    //cornerRadiusRound=0 not  Rounded!
+    procedure SetItemBackgroundColor(position: integer; value: TARGBColorBridge;  cornerRadiusRound: integer);
     procedure SetCardBackgroundColor(value: TARGBColorBridge);
 
     procedure SetItemSelect( position :integer; select: integer);
@@ -680,11 +682,11 @@ begin
      jni_proc_i(FjEnv, FjObject, 'SetItemsRound', round);
 end;
 
-procedure jsRecyclerView.SetItemBackgroundColor(position: integer; value: TARGBColorBridge; round : integer);
+procedure jsRecyclerView.SetItemBackgroundColor(position: integer; value: TARGBColorBridge; cornerRadiusRound : integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iii(FjEnv, FjObject, 'SetItemBackgroundColor', position, GetARGB(FCustomColor, value), round);
+     jni_proc_iii(FjEnv, FjObject, 'SetItemBackgroundColor', position, GetARGB(FCustomColor, value), cornerRadiusRound);
 end;
 
 function jsRecyclerView.GetWidgetText( position : integer; widget : TItemContentFormat; widgetId : integer ) : string;

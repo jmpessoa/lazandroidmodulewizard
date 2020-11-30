@@ -182,7 +182,7 @@ class ItemObject {
 				indexProgress++;
 			}
 			
-			if ( formats[i].startsWith("PANEL") )	{  //value  ex: OFF:ON@0  OFF:ON@1   //1=checked
+			if ( formats[i].startsWith("PANEL") )	{  //value  ex: color@cornerRadiusRound
 				panel[indexPanel] =  contents[i];				
 				idPanel[indexPanel] = -1;
 				indexPanel++;
@@ -391,7 +391,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 			int index = countpanel - i - 1;
 			
 			String delimiter = "@";
-            String panelData = itemList.get(position).panel[index];  //image@drawable
+            String panelData = itemList.get(position).panel[index];  //??@??
             String[] namevalue = panelData.split(Pattern.quote(delimiter));
             
             holderView.panel[index].setBackgroundColor( Integer.parseInt(namevalue[0]) );                                    
@@ -708,7 +708,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     	int countpanel = itemList.get(position).countpanel;
     	
     	if( countpanel > 0 )
-    		itemList.get(position).panel[0] = Integer.toString(color)+"@"+Integer.toString(round);    		    	
+    		itemList.get(position).panel[0] = Integer.toString(color)+"@"+Integer.toString(round); //color@cornerRadiusRound
     }
     
     public void SetWidgetTextColor( int position, int widget, int widgetid, int color ){
@@ -963,7 +963,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				
 				//--- Shadow layer
 				
-				int shColor    = drafTextView.getShadowColor();
+				int shColor    = drafTextView.getShadowColor();  //need min API 16!
 				float shDx     = drafTextView.getShadowDx();
 				float shDy     = drafTextView.getShadowDy();
 				float shRadius = drafTextView.getShadowRadius();
@@ -2007,8 +2007,9 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
 	   rcAdapter.SetItemsRound(round);
    }
    
-   public void SetItemBackgroundColor( int position, int backColor, int round ){	   
-	   rcAdapter.SetItemBackgroundColor( position, backColor, round );
+   public void SetItemBackgroundColor( int position, int backColor, int cornerRadiusRound ){
+	   rcAdapter.SetItemBackgroundColor( position, backColor, cornerRadiusRound );
+	   //if cornerRadiusRound == 0 then not Rounded!
    }
    
    public void SetItemSeparatorColorHeight( int _color, float _height ){
