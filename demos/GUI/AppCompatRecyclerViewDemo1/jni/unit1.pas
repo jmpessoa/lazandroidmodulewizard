@@ -23,12 +23,12 @@ type
     jTextView1: jTextView;
     jTextView2: jTextView;
     jTextView3: jTextView;
-    procedure AndroidModule1Create(Sender: TObject);
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jsRecyclerView1ItemClick(Sender: TObject; itemPosition: integer);
     procedure jsRecyclerView1ItemWidgetClick(Sender: TObject;
       itemPosition: integer; widget: TItemContentFormat; widgetId: integer;
       status: TItemWidgetStatus);
+
   private
     {private declarations}
   public
@@ -65,8 +65,8 @@ begin
   jsRecyclerView1.AddItemContentFormat(cfSwitch);
   jsRecyclerView1.SetItemContentFormat();
 
-  jsRecyclerView1.Add('don_quixote@drawable|Do you see friend Sancho...|thirty or forty hulking giants?|OK@1|2.5|OFF:ON@1');
-  jsRecyclerView1.Add('lance.png@assets|Take care...|there are not giants but windmills...|OK@0|3.5|Sound@0');
+  jsRecyclerView1.Add( 'don_quixote@drawable|Do you see friend Sancho...|thirty or forty hulking giants?|OK@0|2.5|ON:OFF@1');
+  jsRecyclerView1.Add( 'lance.png@assets|Take care...|there are not giants but windmills...|OK@0|3.5|Sound@0');
 
   (*Notes:
 
@@ -86,15 +86,8 @@ begin
 
 end;
 
-procedure TAndroidModule1.AndroidModule1Create(Sender: TObject);
-begin
-
-end;
-
 procedure TAndroidModule1.jsRecyclerView1ItemClick(Sender: TObject;
   itemPosition: integer);
-var
-  i: integer;
 begin
 
   ShowMessage('itemIndex = ' + IntToStr(itemPosition) );
@@ -108,7 +101,7 @@ procedure TAndroidModule1.jsRecyclerView1ItemWidgetClick(Sender: TObject;
   itemPosition: integer; widget: TItemContentFormat; widgetId: integer;
   status: TItemWidgetStatus);
 begin
-    case widget of
+  case widget of
       cfImage: begin ShowMessage('widget = cfImage');  end;
       cfCheck: begin ShowMessage('widget = cfCheck'); end;
       cfRating: begin ShowMessage('widget = cfRating'); end;
