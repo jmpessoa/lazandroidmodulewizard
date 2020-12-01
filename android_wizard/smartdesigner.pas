@@ -41,6 +41,7 @@ type
     FChipArchitecture: string;
     FNDKIndex: string;
     FMaxNdk: integer;
+    FMinSdkControl: integer;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
@@ -674,18 +675,17 @@ end;
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
   strList, providerList: TStringList;
-  i, p, k, minsdkApi, sdkManifMInApiNumber: integer;
+  i, p, k, minsdkApi, sdkManifMinApiNumber: integer;
   strTargetApi, auxStr, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
   aSupportLib:TSupportLib;
   AndroidTheme: string;
-  androidPluginStr: string;
   androidPluginNumber: integer;
   pluginVersion: string;
   gradleCompatible, outgradleCompatible: string;
   gradleCompatibleAsNumber: integer;
   linuxPathToAndroidSdk: string;
   linuxPathToGradle: string;
-  linuxDirSeparator: string;
+  linuxDirSeparator: string; //don't delete it!
   buildToolApi: string;
   directive: string;
   FSupport:boolean;
@@ -719,6 +719,13 @@ begin
   AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
   FSupport:= (LazarusIDE.ActiveProject.CustomData.Values['Support']='TRUE');
 
+  if Pos('AppCompat', AndroidTheme) > 0 then
+  begin
+     LazarusIDE.ActiveProject.CustomData.Values['Support']:='TRUE';
+     FSupport:= True;
+  end;
+
+
   if not FileExists(targetpath+DirectorySeparator+'styles.xml') then
   begin
     if (Pos('AppCompat', AndroidTheme) > 0) or (Pos('GDXGame', AndroidTheme) > 0) then
@@ -741,6 +748,7 @@ begin
   end;
 
   minsdkApi:= 14;
+  if  minsdkApi < FMinSdkControl then minsdkApi:= FMinSdkControl;
 
   sdkManifMinApi:= GetMinSDKFromManifest();
   if sdkManifMinApi <> '' then
@@ -779,15 +787,6 @@ begin
     else
     begin
 
-       {
-       if FileExists(LamwGlobalSettings.PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') and
-          (not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml'))then
-       begin
-         strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'support'+DirectorySeparator+'support_provider_paths.xml');
-         strList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
-       end;
-       }
-
        if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt') then
        begin
          providerList:= TStringList.Create;
@@ -809,7 +808,7 @@ begin
     end;
   end;
 
-  if sdkManifMInApiNumber < minsdkApi  then
+  if sdkManifMinApiNumber < minsdkApi  then
   begin
     strList.Clear;
     strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
@@ -1635,7 +1634,7 @@ begin
          if Pos('VFPV3', projectCustom) > 0  then
             alertMsg:= 'WARNING: Custom Option "-CfVFPV3" not supported '+sLineBreak+
                        '[out-of-box] by Laz4Android'+sLineBreak+ sLineBreak+
-                       'Hint: "Project" --> "Project Option" --> "Custom Options"'+sLineBreak+
+                       'Hint: "Project" --> "Project Option" -->'+sLineBreak+'"[LAMW] Android Project Options" --> "Build"'+sLineBreak+
                        'change -CfVFPV3 to -CfSoft'+sLineBreak+
                        sLineBreak+'[Ctrl+c to Copy to Clipboard]';
 
@@ -2072,12 +2071,13 @@ end;
 function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
   out nativeAdded: boolean): boolean;
 var
-  list, auxList, stringList, manifestList, gradleList: TStringList;
-  p, p1, p2, i, minSdkManifest, minSdkControl: integer;
+  list, auxList, manifestList, gradleList: TStringList;
+  p, p1, p2, i, minSdkManifest: integer;
   aux, tempStr, auxStr: string;
   insertRef, minSdkManifestStr: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
+  tempMinSdk: integer;
 begin
    nativeAdded:= False;
    Result:= False;
@@ -2136,9 +2136,6 @@ begin
      end;
 
      aux:= list.Text;
-     //list.LoadFromFile(FPathToJavaSource+'Controls.java');
-     //list.Insert(list.Count-1, aux);
-     //list.SaveToFile(FPathToJavaSource+'Controls.java');
      ControlsJava.Insert(ControlsJava.Count-1, aux);
 
    end;
@@ -2154,13 +2151,16 @@ begin
        minSdkManifest:= 14;
 
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk');
-     minSdkControl:= StrToInt(auxList.Strings[0]);
-     if minSdkControl > minSdkManifest then
+
+     tempMinSdk:= StrToInt(auxList.Strings[0]);
+     if FMinSdkControl < tempMinSdk then FMinSdkControl:= tempMinSdk;
+
+     if FMinSdkControl > minSdkManifest then
      begin
         auxList.Clear;
         auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
         tempStr:= auxList.Text;
-        tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+IntTostr(minSdkManifest)+'"' , 'android:minSdkVersion="'+IntToStr(minSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
+        tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+IntTostr(minSdkManifest)+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
         auxList.Text:= tempStr;
         auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
 
@@ -2168,7 +2168,7 @@ begin
         begin
           auxList.LoadFromFile(FPathToAndroidProject+'build.gradle');
           tempStr:= auxList.Text;
-          tempStr:= StringReplace(tempStr, 'minSdkVersion '+IntTostr(minSdkManifest), 'minSdkVersion '+IntToStr(minSdkControl), [rfReplaceAll,rfIgnoreCase]);
+          tempStr:= StringReplace(tempStr, 'minSdkVersion '+IntTostr(minSdkManifest), 'minSdkVersion '+IntToStr(FMinSdkControl), [rfReplaceAll,rfIgnoreCase]);
           auxList.Text:= tempStr;
           auxList.SaveToFile(FPathToAndroidProject+'build.gradle');
         end;
@@ -2527,11 +2527,8 @@ begin
       end;
    end;
    //-----
-   //if listRequirements.Count > 0 then
-     //listRequirements.SaveToFile(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+jclassname+'.required');
 
    manifestList.Free;
-   //listRequirements.Free;
    list.Free;
    auxList.Free;
 
