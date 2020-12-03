@@ -2127,8 +2127,16 @@ begin
           strList.Add('set PATH=%JAVA_HOME%'+PathDelim+'bin;%PATH%');
           strList.Add('set JAVA_TOOL_OPTIONS=-Duser.language=en');
           strList.Add('cd '+FAndroidProjectName);
+          strList.Add('if exist "'+Lowercase(FSmallProjName)+'-release.keystore" goto Error');
           strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
                       FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
+          strList.Add(':Error');
+          strList.Add('echo off');
+          strList.Add('cls');
+          strList.Add('echo.');
+          strList.Add('echo Signature file created previously, remember that if you delete this file and it was uploaded to Google Play, you will not be able to upload another app without this signature.');
+          strList.Add('echo.');
+          strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'release-keystore.bat');
 
           strList.Clear;
