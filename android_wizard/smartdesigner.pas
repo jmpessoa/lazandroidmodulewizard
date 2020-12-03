@@ -698,6 +698,7 @@ var
   FVersionCode : integer;
   FVersionName : string;
   xmlAndroidManifest: TXMLDocument;
+  foundSignature : boolean;
 begin
 
   strList:= TStringList.Create;
@@ -985,6 +986,16 @@ begin
          end;
 
          strList.Clear;
+         foundSignature := false;
+
+         if fileExists(FPathToAndroidProject+'gradle.properties') then
+         begin
+          strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
+
+          foundSignature := (strList.Count = 4);
+         end;
+
+         strList.Clear;
          strList.Add('buildscript {');
          strList.Add('    repositories {');
          strList.Add('        jcenter()');
@@ -1155,6 +1166,24 @@ begin
          strList.Add('            versionCode ' + intToStr(FVersionCode));
          strList.Add('            versionName "'+FVersionName+'"');
          strList.Add('    }');
+
+         if foundSignature then
+         begin
+          strList.Add('    signingConfigs {');
+          strList.Add('        release {');
+          strList.Add('            storeFile file(RELEASE_STORE_FILE)');
+          strList.Add('            storePassword RELEASE_STORE_PASSWORD');
+          strList.Add('            keyAlias RELEASE_KEY_ALIAS');
+          strList.Add('            keyPassword RELEASE_KEY_PASSWORD');
+          strList.Add('        }');
+          strList.Add('    }');
+          strList.Add('    buildTypes {');
+          strList.Add('        release {');
+          strList.Add('            signingConfig signingConfigs.release');
+          strList.Add('        }');
+          strList.Add('    }');
+         end;
+
          strList.Add('    sourceSets {');
          strList.Add('        main {');
          strList.Add('            manifest.srcFile ''AndroidManifest.xml''');
