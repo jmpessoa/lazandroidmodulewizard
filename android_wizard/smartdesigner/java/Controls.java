@@ -1,4 +1,4 @@
-package org.lamw.appjcentertoytimerservicmoveTaskToBackedemo1;
+package org.lamw.appbluetoothlowenergydemo1;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.1 [AndroidX!!] - 11 November - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -2168,7 +2168,15 @@ class jForm {
 		} else {
 		 return "";	
 		}	
-	}    
+	}
+
+	public void RunOnUiThread() {
+        controls.activity.runOnUiThread(new Runnable() {
+            public void run() {
+                controls.pOnRunOnUiThread(PasObj);
+            };
+        });
+    }
 
 }
 //**class entrypoint**//please, do not remove/change this line!
@@ -2241,6 +2249,7 @@ public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
 public native void pAppOnRequestPermissionResult(int requestCode, String permission, int grantResult);
+public native void pOnRunOnUiThread(long pasobj);
 // -------------------------------------------------------------------------------------------
 //Load Pascal Library - Please, do not edit the static content commented in the template file
 // -------------------------------------------------------------------------------------------

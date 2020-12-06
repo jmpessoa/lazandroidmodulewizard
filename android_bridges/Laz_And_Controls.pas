@@ -2461,6 +2461,9 @@ type
   procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
   procedure Java_Event_pOnImageViewPopupItemSelected(env:PJNIEnv;this:JObject;Sender:TObject;caption:jString);
 
+  //thanks to WayneSherman
+  procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject);
+
   //Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
   (**Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;**) //droped And_lib_Unzip.pas
@@ -3165,6 +3168,17 @@ begin
     Exit;
   end;
 
+end;
+
+procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jForm then
+  begin
+    jForm(jForm(Sender).Owner).UpdateJNI(gApp);
+    jForm(Sender).GenEvent_OnRunOnUiThread(Sender);
+  end;
 end;
 
 Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: boolean);//deprecated

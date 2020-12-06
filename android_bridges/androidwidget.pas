@@ -1096,6 +1096,7 @@ type
   { jForm }
 
   TAnimationMode = (animNone, animFade, animRightToLeft, animLeftToRight);
+  TOnRunOnUiThread=procedure(Sender:TObject) of object;
 
   jForm = class(TAndroidForm)
   private
@@ -1146,6 +1147,9 @@ type
     FOnActivityStart: TOnActivityStart;
     FOnActivityStop: TOnActivityStop;
     FOnRequestPermissionResult: TOnRequestPermissionResult;
+    FOnRunOnUiThread: TOnRunOnUiThread;
+
+
     FLayoutVisibility: boolean;
     FBackgroundImageIdentifier: string;
 
@@ -1423,13 +1427,15 @@ type
         ........
       end;}
 
-
     function ToSignedByte(b: byte): shortint;
-
     procedure StartDefaultActivityForFile(_filePath, _mimeType: string); //by Tomash
+
+    procedure RunOnUiThread();   //thanks to WayneSherman!
+    procedure GenEvent_OnRunOnUiThread(Sender:TObject);
 
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
+
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1507,6 +1513,7 @@ type
 
     property OnActivityStart: TOnActivityStart read FOnActivityStart write FOnActivityStart;
     property OnActivityStop: TOnActivityStop read FOnActivityStop write FOnActivityStop;
+    property OnRunOnUiThread: TOnRunOnUiThread read FOnRunOnUiThread write FOnRunOnUiThread;
   end;
 
 
@@ -1777,6 +1784,9 @@ procedure jForm_SetAnimationDurationIn(env: PJNIEnv; _jform: JObject; _animation
 procedure jForm_SetAnimationDurationOut(env: PJNIEnv; _jform: JObject; _animationDuration: integer);
 procedure jForm_SetAnimationMode(env: PJNIEnv; _jform: JObject; _animationMode: integer);
 procedure jForm_MoveTaskToBack(env: PJNIEnv; _jform: JObject; _nonRoot: boolean);
+
+// thanks to WayneSherman
+procedure jForm_RunOnUiThread(env: PJNIEnv; _jform: JObject);
 
 
 //------------------------------------------------------------------------------
@@ -4793,6 +4803,13 @@ begin
      jForm_SetAnimationMode(FjEnv, FjObject, Ord(_animationMode));
 end;
 
+procedure jForm.RunOnUiThread();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_RunOnUiThread(FjEnv, FjObject);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
@@ -5371,6 +5388,22 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'MoveTaskToBack', '(Z)V');
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_RunOnUiThread(env: PJNIEnv; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'RunOnUiThread', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm.GenEvent_OnRunOnUiThread(Sender:TObject);
+begin
+  if Assigned(FOnRunOnUiThread) then FOnRunOnUiThread(Sender);
 end;
 
 //-----{ jApp } ------
