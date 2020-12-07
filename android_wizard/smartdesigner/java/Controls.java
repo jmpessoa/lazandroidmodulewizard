@@ -2170,10 +2170,10 @@ class jForm {
 		}	
 	}
 
-	public void RunOnUiThread() {
+	public void RunOnUiThread(final int _tag) {
         controls.activity.runOnUiThread(new Runnable() {
             public void run() {
-                controls.pOnRunOnUiThread(PasObj);
+                controls.pOnRunOnUiThread(PasObj, _tag);
             };
         });
     }
@@ -2249,7 +2249,7 @@ public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
 public native void pAppOnRequestPermissionResult(int requestCode, String permission, int grantResult);
-public native void pOnRunOnUiThread(long pasobj);
+public native void pOnRunOnUiThread(long pasobj, int tag);
 // -------------------------------------------------------------------------------------------
 //Load Pascal Library - Please, do not edit the static content commented in the template file
 // -------------------------------------------------------------------------------------------

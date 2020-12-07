@@ -1096,7 +1096,7 @@ type
   { jForm }
 
   TAnimationMode = (animNone, animFade, animRightToLeft, animLeftToRight);
-  TOnRunOnUiThread=procedure(Sender:TObject) of object;
+  TOnRunOnUiThread=procedure(Sender:TObject;tag:integer) of object;
 
   jForm = class(TAndroidForm)
   private
@@ -1430,8 +1430,8 @@ type
     function ToSignedByte(b: byte): shortint;
     procedure StartDefaultActivityForFile(_filePath, _mimeType: string); //by Tomash
 
-    procedure RunOnUiThread();   //thanks to WayneSherman!
-    procedure GenEvent_OnRunOnUiThread(Sender:TObject);
+    procedure RunOnUiThread(_tag: integer);   //thanks to WayneSherman!
+    procedure GenEvent_OnRunOnUiThread(Sender:TObject;tag:integer);
 
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
@@ -1786,7 +1786,8 @@ procedure jForm_SetAnimationMode(env: PJNIEnv; _jform: JObject; _animationMode: 
 procedure jForm_MoveTaskToBack(env: PJNIEnv; _jform: JObject; _nonRoot: boolean);
 
 // thanks to WayneSherman
-procedure jForm_RunOnUiThread(env: PJNIEnv; _jform: JObject);
+procedure jForm_RunOnUiThread(env: PJNIEnv; _jform: JObject; _tag: integer);
+
 
 
 //------------------------------------------------------------------------------
@@ -4803,11 +4804,11 @@ begin
      jForm_SetAnimationMode(FjEnv, FjObject, Ord(_animationMode));
 end;
 
-procedure jForm.RunOnUiThread();
+procedure jForm.RunOnUiThread(_tag: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RunOnUiThread(FjEnv, FjObject);
+     jForm_RunOnUiThread(FjEnv, FjObject, _tag);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -5390,20 +5391,22 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm_RunOnUiThread(env: PJNIEnv; _jform: JObject);
+procedure jForm_RunOnUiThread(env: PJNIEnv; _jform: JObject; _tag: integer);
 var
+  jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
+  jParams[0].i:= _tag;
   jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'RunOnUiThread', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
+  jMethod:= env^.GetMethodID(env, jCls, 'RunOnUiThread', '(I)V');
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm.GenEvent_OnRunOnUiThread(Sender:TObject);
+procedure jForm.GenEvent_OnRunOnUiThread(Sender:TObject;tag:integer);
 begin
-  if Assigned(FOnRunOnUiThread) then FOnRunOnUiThread(Sender);
+  if Assigned(FOnRunOnUiThread) then FOnRunOnUiThread(Sender,tag);
 end;
 
 //-----{ jApp } ------

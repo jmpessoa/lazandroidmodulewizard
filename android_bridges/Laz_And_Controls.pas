@@ -2462,7 +2462,8 @@ type
   procedure Java_Event_pOnImageViewPopupItemSelected(env:PJNIEnv;this:JObject;Sender:TObject;caption:jString);
 
   //thanks to WayneSherman
-  procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject);
+ procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject;tag:integer);
+
 
   //Asset Function (P : Pascal Native)
   Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
@@ -3170,14 +3171,14 @@ begin
 
 end;
 
-procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject);
+procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject;tag:integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
   if Sender is jForm then
   begin
     jForm(jForm(Sender).Owner).UpdateJNI(gApp);
-    jForm(Sender).GenEvent_OnRunOnUiThread(Sender);
+    jForm(Sender).GenEvent_OnRunOnUiThread(Sender,tag);
   end;
 end;
 
