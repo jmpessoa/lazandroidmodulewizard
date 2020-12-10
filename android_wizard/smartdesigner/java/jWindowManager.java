@@ -279,40 +279,19 @@ public class jWindowManager /*extends ...*/ {
         return r;
     }
 
-    public boolean IgnoringDataRestriction() {
+    public boolean isAffectedByDataSaver() {
         boolean r = true;
         if (Build.VERSION.SDK_INT >= 24) {
             //[ifdef_api24up]
             ConnectivityManager connMgr = (ConnectivityManager)
             context.getSystemService(Context.CONNECTIVITY_SERVICE);
-             // Checks if the device is on a metered network
-             if (connMgr.isActiveNetworkMetered()) {
-               // Checks user’s Data Saver settings.
-               switch (connMgr.getRestrictBackgroundStatus()) {
-                 case ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED:
-                 // Background data usage is blocked for this app. Wherever possible,
-                 // the app should also use less data in the foreground.
-                 r =false;
-
-                 case ConnectivityManager.RESTRICT_BACKGROUND_STATUS_WHITELISTED:
-                 // The app is allowed to bypass Data Saver. Nevertheless, wherever possible,
-                 // the app should use less data in the foreground and background.
-                 r =true;
-
-                 case ConnectivityManager.RESTRICT_BACKGROUND_STATUS_DISABLED:
-                 // Data Saver is disabled. Since the device is connected to a
-                 // metered network, the app should use less data wherever possible.
-                 r =true;
-               }
-             } else {
-               // The device is not on a metered network.
-               // Use data as required to perform syncs, downloads, and updates.
-               r =true;
-             }
+             return connMgr != null
+                && connMgr.isActiveNetworkMetered()
+                && connMgr.getRestrictBackgroundStatus() == ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED;
+        } else {
+        return false;
         }
-        return r;
     }
-
     //RequestRuntimePermission
     public void RequestIgnoreBatteryOptimizationRuntimePermission(String _packageName, int _requestCode) {
         if (Build.VERSION.SDK_INT >= 23) {
