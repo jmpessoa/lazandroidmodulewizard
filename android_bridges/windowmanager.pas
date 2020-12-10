@@ -38,7 +38,7 @@ jWindowManager = class(jControl)
     function IsDrawOverlaysRuntimePermissionNeed(): boolean;
     function CanDrawOverlays(): boolean;
     function IgnoringBatteryOptimizations(): boolean;
-    function IgnoringDataRestriction(): boolean;
+    function isAffectedByDataSaver(): boolean;
 
  published
 
@@ -61,7 +61,7 @@ procedure jWindowManager_RequestIgnoreBackgrundDataRestrictionRuntimePermission(
 function jWindowManager_IsDrawOverlaysRuntimePermissionNeed(env: PJNIEnv; _jwindowmanager: JObject): boolean;
 function jWindowManager_CanDrawOverlays(env: PJNIEnv; _jwindowmanager: JObject): boolean;
 function jWindowManager_IgnoringBatteryOptimizations(env: PJNIEnv; _jwindowmanager: JObject): boolean;
-function jWindowManager_IgnoringDataRestriction(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+function jWindowManager_isAffectedByDataSaver(env: PJNIEnv; _jwindowmanager: JObject): boolean;
 
 implementation
 
@@ -209,11 +209,11 @@ begin
    Result:= jWindowManager_IgnoringBatteryOptimizations(FjEnv, FjObject);
 end;
 
-function jWindowManager.IgnoringDataRestriction(): boolean;
+function jWindowManager.isAffectedByDataSaver(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWindowManager_IgnoringDataRestriction(FjEnv, FjObject);
+   Result:= jWindowManager_isAffectedByDataSaver(FjEnv, FjObject);
 end;
 
 {-------- jWindowManager_JNI_Bridge ----------}
@@ -439,14 +439,14 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-function jWindowManager_IgnoringDataRestriction(env: PJNIEnv; _jwindowmanager: JObject): boolean;
+function jWindowManager_isAffectedByDataSaver(env: PJNIEnv; _jwindowmanager: JObject): boolean;
 var
   jBoo: JBoolean;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
   jCls:= env^.GetObjectClass(env, _jwindowmanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'IgnoringDataRestriction', '()Z');
+  jMethod:= env^.GetMethodID(env, jCls, 'isAffectedByDataSaver', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jwindowmanager, jMethod);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
