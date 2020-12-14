@@ -10,7 +10,7 @@ import com.android.billingclient.api.BillingClient.FeatureType;
 import com.android.billingclient.api.BillingClient.SkuType;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.BillingResult; 
 import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set; 
 import java.util.Arrays;
 
-// Billing Library version 2.0
+// Billing Library version 3.0.1
 // https://developer.android.com/google/play/billing/billing_library_overview
 
 // https://medium.com/exploring-android/exploring-the-play-billing-library-for-android-55321f282929
@@ -129,6 +129,7 @@ public class jcBillingClient implements PurchasesUpdatedListener {
             Callback("connect", "already_connected", "");
             return; // already connected
         };
+                
         startServiceConnection(new Runnable() {
             @Override
             public void run() {
@@ -242,7 +243,7 @@ public class jcBillingClient implements PurchasesUpdatedListener {
         AcknowledgePurchaseParams params =
             AcknowledgePurchaseParams.newBuilder()
                 .setPurchaseToken(token)
-                .setDeveloperPayload(payload)
+                //.setDeveloperPayload(payload)
                 .build();
         mBillingClient.acknowledgePurchase(params, listener);
     }
@@ -339,22 +340,24 @@ public class jcBillingClient implements PurchasesUpdatedListener {
             CallbackLog("WARNING: Connection needed for QueryPurchases. Call Connect(True)");
             Connect(""); // start a connection request instead
             return;
-        };
+        }
         CallbackLog("QueryPurchases");
         Runnable queryToExecute = new Runnable() {
             @Override
             public void run() {
                 // load list with INAPP stuff
                 PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
+                
                 if (purchasesResult.getResponseCode() != BillingResponseCode.OK) {
                     CallbackError("QueryPurchases.INAPP",
                       purchasesResult.getResponseCode(),
                       purchasesResult.getBillingResult().getDebugMessage());
                     return;
                 }
+                
                 if (areSubscriptionsSupported()) {
-                    PurchasesResult subscriptionResult
-                            = mBillingClient.queryPurchases(SkuType.SUBS);
+                    PurchasesResult subscriptionResult = mBillingClient.queryPurchases(SkuType.SUBS);
+                    
                     CallbackInfo("subs=1", "subscriptions supported");
                     if (subscriptionResult.getResponseCode() == BillingResponseCode.OK) {
                         // Add SUBS stuff to list, subscriptionResult.getPurchasesList().size());
@@ -405,25 +408,31 @@ public class jcBillingClient implements PurchasesUpdatedListener {
                 mBillingClient.querySkuDetailsAsync(params,
                     new SkuDetailsResponseListener() {
                         @Override
-                        public void onSkuDetailsResponse(BillingResult billingResult,
-                                List<SkuDetails> skuDetailsList) {
+                        public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
                             int resultCode = billingResult.getResponseCode();
-                            if (resultCode != BillingResponseCode.OK) {
-                                CallbackError("buy", resultCode,
-                                    billingResult.getDebugMessage());
+                            
+                            if (skuDetailsList == null) {
+                                CallbackError("buy", ERROR_SKU_NOT_FOUND, "Bad SKU, cannot find product");
                                 return;
-                            };
-
+                            }
+                            
                             if (skuDetailsList.size() != 1) {
-                              CallbackError("buy", ERROR_SKU_NOT_FOUND, "Bad SKU, cannot find product");
-                              return;
-                            };
+                                CallbackError("buy", ERROR_SKU_NOT_FOUND, "Bad SKU, cannot find product");
+                                return;
+                            }
+                            
+                            if (resultCode != BillingResponseCode.OK) {
+                                CallbackError("buy", resultCode, billingResult.getDebugMessage());
+                                return;
+                            }
 
                             SkuDetails skuDetails = skuDetailsList.get(0);
+                            
                             BillingFlowParams flowParams = BillingFlowParams.newBuilder()
                               .setSkuDetails(skuDetails)
-                              .setOldSku(oldSku)
+                              //.setOldSku(oldSku)
                               .build();
+                            
                             mBillingClient.launchBillingFlow(controls.activity, flowParams);
                         }
                     }
@@ -440,11 +449,15 @@ public class jcBillingClient implements PurchasesUpdatedListener {
             CallbackLog("WARNING: Connection needed for SkuDetails");
             //Connect(""); // start a connection request instead
             return;
-        };
+        }
+        
         final List<String> skusList = Arrays.asList(_skus.split(","));
+        
         // Creating a runnable from the request to use it inside our connection retry policy below
         int count = skusList.size();
+        
         CallbackLog("querySkuDetailsAsync.# " + Integer.toString(count) + " skus " + _skus);
+        
         Runnable queryRequest = new Runnable() {
             @Override
             public void run() {
@@ -453,7 +466,9 @@ public class jcBillingClient implements PurchasesUpdatedListener {
                   .setSkusList(skusList)
                   .setType(_itemType)
                   .build();
+                
                 CallbackLog("querySkuDetailsAsync.Type " + _itemType);
+                
                 mBillingClient.querySkuDetailsAsync(params,
                     new SkuDetailsResponseListener() {
                         @Override
@@ -479,11 +494,11 @@ public class jcBillingClient implements PurchasesUpdatedListener {
                             } else {
                               CallbackLog("querySkuDetailsAsync.ERROR " +
                                 Integer.toString(resultCode) + " " + billingResult.getDebugMessage());
-                            };
+                            }
                         }
                     }
                 );
-            };
+            }
         };
         executeServiceRequest(queryRequest);
     }
@@ -544,7 +559,7 @@ public class jcBillingClient implements PurchasesUpdatedListener {
             public void run() {
                 ConsumeParams params = ConsumeParams.newBuilder()
                     .setPurchaseToken(token)
-                    .setDeveloperPayload(payload)
+                    //.setDeveloperPayload(payload)
                     .build();
                 // Consume the purchase async
                 mBillingClient.consumeAsync(params, listener);
