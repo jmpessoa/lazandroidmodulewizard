@@ -588,7 +588,7 @@ implementation
 
 const
   // TBillingItem.PurchaseState has one of these values
-  PURCHASE_STATE_UNSPECIFIED  = '0';
+  //PURCHASE_STATE_UNSPECIFIED  = '0';
   PURCHASE_STATE_PURCHASED    = '1';
   PURCHASE_STATE_PENDING      = '2';
 
@@ -641,83 +641,26 @@ begin
   Result := env^.NewGlobalRef(env, Result);
 end;
 
-procedure jcBillingClient_VoidMethod(env: PJNIEnv; _jbillingclient: JObject; MethodName: string);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jbillingclient);
-  jMethod:= env^.GetMethodID(env, jCls, PChar(MethodName), '()V');
-  env^.CallVoidMethod(env, _jbillingclient, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jcBillingClient_VoidMethodString(env: PJNIEnv; _jbillingclient: JObject; MethodName, param: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jmethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l := env^.NewStringUTF(env, PChar(param));
-  jCls:= env^.GetObjectClass(env, _jbillingclient);
-  jMethod:= env^.GetMethodID(env, jCls, PChar(MethodName), '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jbillingclient, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jcBillingClient_VoidMethodStringString(env: PJNIEnv; _jbillingclient: JObject; MethodName, param1, param2: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jmethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l := env^.NewStringUTF(env, PChar(param1));
-  jParams[1].l := env^.NewStringUTF(env, PChar(param2));
-  jCls:= env^.GetObjectClass(env, _jbillingclient);
-  jMethod:= env^.GetMethodID(env, jCls, PChar(MethodName), '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jbillingclient, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jParams[0].l);
-  env^.DeleteLocalRef(env, jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jcBillingClient_StringMethod(env: PJNIEnv; _jbillingclient: JObject; MethodName: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jbillingclient);
-  jMethod:= env^.GetMethodID(env, jCls, PChar(MethodName), '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jbillingclient, jMethod);
-  case jStr = nil of
-     True: Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 { TConsumedItem }
 
 function TConsumedItem.GetConsumedData: string;
 var SL: TStringList;
 begin
   SL := TStringList.Create;
+
   SL.Add('<ConsumedItem>');
   SL.Add('<ci_json>' + fJson +'</ci_json>');
+
   case Kind of
     bkSubs:  SL.Add('<ci_kind>subs</ci_kind>');
     bkInapp: SL.Add('<ci_kind>inapp</ci_kind>');
   end;
+
   case Status of
     csPending:  SL.Add('<ci_status>pending</ci_status>');
     csConsumed: SL.Add('<ci_status>consumed</ci_status>');
   end;
+
   SL.Add('</ConsumedItem>');
   result := SL.text;
   SL.Free;
@@ -741,14 +684,18 @@ procedure TConsumedItem.SetConsumedData(const s: string);
 var t: string;
 begin
   t := extract('ci_status');
+
   if t = 'pending' then
     fConsumedStatus := csPending;
+
   if t = 'consumed' then
     fConsumedStatus := csConsumed;
 
   t := extract('ci_kind');
+
   if t = 'subs' then
     fKind := bkSubs;
+
   if t = 'inapp' then
     fKind := bkInapp;
 
@@ -788,6 +735,7 @@ begin
     if IsNotYetAcknowledged then
       SL.Add('<br><a href="billing:acknowledge='+
         GetString('purchaseToken') + '">ACKNOWLEDGE THIS PURCHASE</a><br>&nbsp;');
+
     if IsConsumable then
       SL.Add('<br><a href="billing:consume='+
         GetString('purchaseToken') + '">CONSUME THIS PURCHASE</a>');
@@ -848,7 +796,9 @@ function TPurchaseItem.purchaseTime: int64;
 var s: string;
 begin
   result := 0;
+
   s := GetString('purchaseTime');
+
   if s <> '' then
     try
       result := StrToInt64(s)
@@ -909,8 +859,10 @@ procedure TBillingItem.DumpProp(AName, AValue: string; SL: TStringList;
   HTML: boolean);
 begin
   if AValue = '' then exit;
+
   if HTML then
     AName := '<br><b>' + AName + '</b>';
+
   SL.Add(AName + ' = ' + AValue);
 end;
 
@@ -925,6 +877,7 @@ begin
   p := productId;
   //p := GetString('skuDetailsToken');
   if Kind=bkSubs then s := 'sub' else s := 'buy';
+
   result := '<p><b>' + title + '</b>' +
     '<br>' + Description + // ; GetString('desc') +
     '<br>sku = ' + p +
@@ -980,7 +933,9 @@ function TBillingItem.GetInt64(const AName: string; def: int64): Int64;
 var s: string;
 begin
   result := def;
+
   s := GetString(AName);
+
   if (s<>'') then
     try
       result := StrToInt64(s);
@@ -997,6 +952,7 @@ procedure TBillingItem.Dump(SL: TStringList; HTML: boolean);
   end;
 begin
   DumpProp('json', fJson, SL, HTML);
+
   if Self is TPurchaseItem then begin
     DumpID('packageName');
     DumpID('acknowledged');
@@ -1061,6 +1017,7 @@ procedure jcBillingClient.Notify(BillingEvent: TBillingEvent; msg: string);
 begin
   if KeepLogs then
     LogEvent(BillingEvent, msg);
+
   if Assigned(fOnBillingEvent) then
     fOnBillingEvent(Self, BillingEvent);
 end;
@@ -1068,6 +1025,7 @@ end;
 function jcBillingClient.DeveloperPayload(Item: TPurchaseItem): string;
 begin
   result := Item.developerPayload;
+
   if Assigned(fOnDeveloperPayload) then
     fOnDeveloperPayload(Self, Item, result);
 end;
@@ -1089,15 +1047,20 @@ var
   CI: TConsumedItem;
 begin
   x2 := pos('<BillingClientConsumedData>', AValue);
+
   if x2 = 0 then exit; // bad data, ignore it
+
   hash := CalcHash(AValue);
+
   if hash = fConsumedHash then begin
     LogEvent(beLog, 'NO CHANGES IN CONSUMED LIST');
     exit;
   end;
+
   fConsumedHash := Hash;
   Notify(beConsumedListCleared);
   ClearList(fConsumedList);
+
   while x2 > 0 do begin
     x1 := PosEx('<ConsumedItem>', AValue, x2);
     if x1 < x2 then break;
@@ -1107,6 +1070,7 @@ begin
     fConsumedList.Add(CI);
     CI.SetConsumedData(copy(AValue, x1, x2-x1));
   end;
+
   Notify(beConsumedListUpdated);
 end;
 
@@ -1114,10 +1078,13 @@ function jcBillingClient.GetConsumedData: string;
 var SL: TStringList; i: integer;
 begin
   SL := TStringList.Create;
+
   SL.Add('<!-- Do not modify this file, manually or otherwise! -->');
   SL.Add('<BillingClientConsumedData>');
+
   for i := 0 to ConsumedCount-1 do
     SL.Add(Consumed[i].GetConsumedData);
+
   SL.Add('</BillingClientConsumedData>');
   result := SL.Text;
   SL.Free;
@@ -1136,6 +1103,7 @@ procedure jcBillingClient.ProcessProductList(const xml: string; List: TList;
   begin
     for i := 0 to PurchaseCount-1 do
       Purchase[i].fProduct := nil;
+
     for j := 0 to InappCount-1 do begin
       for i := 0 to PurchaseCount-1 do
         if Purchase[i].productId = Inapp[j].productId then begin
@@ -1145,6 +1113,7 @@ procedure jcBillingClient.ProcessProductList(const xml: string; List: TList;
           break;
         end;
     end;
+
     for j := 0 to SubsCount-1 do begin
       for i := 0 to PurchaseCount-1 do
         if Purchase[i].productId = Subs[j].productId then begin
@@ -1159,30 +1128,41 @@ var s, XmlHash: string; px: integer; P: TBillingItem;
 begin
   // xml contains <sku1>...</sku1> ... <skuN>..</skuN>
   if not FInitialized  then Exit;
+
   XmlHash := CalcHash(xml);
+
   if XmlHash = Hash then begin
     LogEvent(EventDone, 'NO CHANGE'); //
     exit; // nothing changed, don't rebuild and trigger events unnecessarily
   end;
+
   Hash := XmlHash;
   Notify(EventClear);
   ClearList(List);
+
   px := 0;
+
   repeat
     inc(px);
+
     s := GetXmlVal(xml, 'sku' + IntToStr(px));
+
     if s = '' then break;
+
     if List = fPurchaseList then
       P := TPurchaseItem.Create()
     else
       P := TBillingItem.Create();
+
     List.Add(P);
     P.fJson := s;
+
     if List = fInappList then
       P.fKind := bkInapp;
     if List = fSubsList then
       P.fKind := bkSubs;
   until s='';
+
   FixProductLinks;
   Notify(EventDone);
 end;
@@ -1192,14 +1172,18 @@ var i: integer;
 begin
   for i := 0 to L.Count-1 do
     TObject(L[i]).Free;
+
   L.Clear;
+
   if AndFree then L.Free;
 end;
 
 procedure jcBillingClient.SetAutoAcknowledge(AValue: boolean);
 begin
   if fAutoAcknowledge=AValue then Exit;
+
   fAutoAcknowledge:=AValue;
+
   if AValue then // AutoAcknowledge was just turned on, if there's anything not yet acknowledged, do it now
     AcknowledgeAll;
 end;
@@ -1207,12 +1191,14 @@ end;
 procedure jcBillingClient.SetInappSkus(AValue: string);
 begin
   if fInappSkus=AValue then Exit;
+
   fInappSkus:=AValue;
 end;
 
 procedure jcBillingClient.SetSubsSkus(AValue: string);
 begin
   if fSubsSkus=AValue then Exit;
+
   fSubsSkus:=AValue;
 end;
 
@@ -1452,7 +1438,7 @@ end;
 function jcBillingClient.GetStatus: string;
 begin
   if FInitialized then
-    result := jcBillingClient_StringMethod(FjEnv, FjObject, 'GetStatus')
+    result := jni_func_out_t(FjEnv, FjObject, 'GetStatus')
   else
     result := 'Object not initialized';
 end;
@@ -1468,22 +1454,29 @@ var x: integer; Param1, Param2: string;
 begin
   //showMessage(cmd);
   result := pos('billing:', cmd) = 1;
+
   if not result then exit;
+
   Cmd := copy(cmd, pos(':',cmd)+1, 1000);
+
   x := pos(',', cmd);
+
   if x = 0 then
     Param2 := ''
   else begin
     Param2 := copy(cmd, x+1, 1000);
     SetLength(cmd, x-1);
   end;
+
   x := pos('=', cmd);
+
   if x = 0 then
     Param1 := ''
   else begin
     Param1 := copy(cmd, x+1, 1000);
     SetLength(cmd, x-1);
   end;
+
   result := DoCmd(Cmd, Param1, Param2);
   {$ifdef test_billing}
   if result then
@@ -1504,6 +1497,7 @@ begin
     result := TBillingItem(fInappList[i]);
     if result.productId = sku then exit;
   end;
+
   result := nil;
 end;
 
@@ -1514,6 +1508,7 @@ begin
     result := TBillingItem(fSubsList[i]);
     if result.productId = sku then exit;
   end;
+
   result := nil;
 end;
 
@@ -1600,7 +1595,9 @@ procedure jcBillingClient.LogEvent(E: TBillingEvent; msg: string);
 var s: string;
 begin
   if not KeepLogs then exit;
+
   s := EventDesc[E] + '  ';
+
   case E of
   beError:
     s := s + 'LastError = ' + LastError;
@@ -1617,8 +1614,10 @@ begin
   //beConsumeOK:
   //  s := s + '"' + ActiveConsume + '" consumed';
   end;
+
   if msg <> '' then
     s := s + ' ' + msg;
+
   LogEvent(s);
 end;
 
@@ -1911,7 +1910,9 @@ begin
     SL.Add('<p><b>Billing events log</b>')
   else
     SL.Add('BILLING EVENTS');
+
   C := Logs.Count-1;
+
   for i := 0 to C do begin
     if RecentOnTop then
       j := C-i
@@ -2005,17 +2006,23 @@ end;
 procedure jcBillingClient.Buy(const sku: string);
 begin
   if not FInitialized then exit;
+
   LogEvent(beOperation, 'Buy');
+
   fInFlow  := 'buy=' + sku;
-  jcBillingClient_VoidMethodString(FjEnv, FjObject, 'Buy', sku);
+
+  jni_proc_t(FjEnv, FjObject, 'Buy', sku);
 end;
 
 procedure jcBillingClient.Subscribe(const sku: string; const OldSubsSKU: string);
 begin
   if not FInitialized then exit;
+
   LogEvent(beOperation, 'Subscribe');
+
   fInFlow  := 'sub=' + sku;
-  jcBillingClient_VoidMethodStringString(FjEnv, FjObject, 'Sub', sku, OldSubsSKU);
+
+  jni_proc_tt(FjEnv, FjObject, 'Sub', sku, OldSubsSKU);
 end;
 
 procedure jcBillingClient.AcknowledgeAll;
@@ -2040,17 +2047,17 @@ procedure jcBillingClient.Acknowledge(const PurchaseToken, Payload: string);
 begin
   //ShowMessage('Acknowledge: ' + PurchaseToken + #13#13#10#10 + Payload);
   if not FInitialized then exit;
+
   LogEvent(beOperation, 'Acknowledge');
-  jcBillingClient_VoidMethodStringString(FjEnv, FjObject,
-      'Acknowledge', PurchaseToken, Payload);
+
+  jni_proc_tt(FjEnv, FjObject, 'Acknowledge', PurchaseToken, Payload);
 end;
 
 procedure jcBillingClient.Consume(Item: TPurchaseItem; const Payload: string);
 begin
   if FInitialized and (Item<>nil) then begin
     AddConsumed(Item, csPending);
-    jcBillingClient_VoidMethodStringString(FjEnv, FjObject,
-      'Consume', Item.PurchaseToken, Payload);
+    jni_proc_tt(FjEnv, FjObject, 'Consume', Item.PurchaseToken, Payload);
   end;
 end;
 
@@ -2105,22 +2112,26 @@ end;
 procedure jcBillingClient.Connect(AutoQuery: boolean);
 begin
   if not FInitialized then exit;
+
   if fConsumedHash = '' then
     LoadConsumed();
+
   fInFlow  := '';
   fAutoQuery := AutoQuery;
+
   if AutoQuery then
     LogEvent(beOperation, 'Connect+AutoQuery')
   else
     LogEvent(beOperation, 'Connect');
-  jcBillingClient_VoidMethodString(FjEnv, FjObject,
-    'Connect', Base64PublicKey);
+
+  jni_proc_t(FjEnv, FjObject,'Connect', Base64PublicKey);
 end;
 
 procedure jcBillingClient.DeleteConsumed(Item: TConsumedItem);
 begin
   if fConsumedList.IndexOf(Item) >= 0 then
     fConsumedList.Remove(Item);
+
   Item.Free;
   SaveConsumed();
 end;
@@ -2132,39 +2143,45 @@ begin
     result := Purchase[i];
     if result.purchaseToken = PurchaseToken then exit;
   end;
+
   result := nil;
 end;
 
 procedure jcBillingClient.QueryPurchases();
 begin
   if not FInitialized then exit;
-  fInFlow  := '';
+
   LogEvent(beOperation, 'QueryPurchases');
-  jcBillingClient_VoidMethod(FjEnv, FjObject, 'QueryPurchases');
+
+  jni_proc(FjEnv, FjObject, 'QueryPurchases');
 end;
 
 procedure jcBillingClient.QueryInappList();
 begin
   if not FInitialized then exit;
+
   LogEvent(beOperation, 'QueryInappList');
+
   if InappSkus='' then begin
     LogEvent(beError, 'InappSkus (comma-separated string of SKUs) is blank.');
     exit;
   end;
-  fInFlow  := '';
-  jcBillingClient_VoidMethodString(FjEnv, FjObject, 'QueryInappList', InappSkus);
+
+  jni_proc_t(FjEnv, FjObject, 'QueryInappList', InappSkus);
 end;
 
 procedure jcBillingClient.QuerySubsList();
 begin
   if not FInitialized then exit;
+
   LogEvent(beOperation, 'QuerySubsList');
+
   if SubsSkus='' then begin
     LogEvent(beError, 'SubsSkus (comma-separated string of SKUs) is blank.');
     exit;
   end;
-  fInFlow  := '';
-  jcBillingClient_VoidMethodString(FjEnv, FjObject, 'QuerySubsList', SubsSkus);
+
+  jni_proc_t(FjEnv, FjObject, 'QuerySubsList', SubsSkus);
 end;
 
 function jcBillingClient.IsSubs(const sku: string): boolean;
@@ -2180,7 +2197,9 @@ end;
 procedure jcBillingClient.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
+
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+
   FjObject := jcBillingClient_Create(FjEnv, FjThis, Self);
   //DBG := 'Dbg1';
   if FjObject = nil then exit;
@@ -2192,7 +2211,7 @@ procedure jcBillingClient.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBillingClient_VoidMethod(FjEnv, FjObject, 'jFree');
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jcBillingClient.Retry;
