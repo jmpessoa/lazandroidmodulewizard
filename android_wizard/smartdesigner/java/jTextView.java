@@ -97,6 +97,12 @@ public class jTextView extends TextView {
 	public long GetPasObj() {
 		return LAMWCommon.getPasObj();
 	}
+	
+	public void BringToFront() {
+		 this.bringToFront();
+
+		 LAMWCommon.BringToFront();		
+	}
 
 	public  void SetViewParent(ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);

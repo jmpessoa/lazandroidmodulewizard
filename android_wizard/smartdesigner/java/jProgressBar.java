@@ -98,14 +98,9 @@ public class jProgressBar extends ProgressBar {
 	}
 	
 	public void BringToFront() {
-		this.bringToFront();	
-		if (android.os.Build.VERSION.SDK_INT < 19 ) {			
-			ViewGroup parent = LAMWCommon.getParent();
-	       	if (parent!= null) {
-	       		parent.requestLayout();
-	       		parent.invalidate();	
-	       	}
-		}
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();		
 	}
 	
 	public void SetColors(int _color, int _colorBack){		

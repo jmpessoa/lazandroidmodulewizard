@@ -95,6 +95,12 @@ public class jButton extends Button {
 	public long GetPasObj() {
 		return LAMWCommon.getPasObj();
 	}
+	
+	public void BringToFront() {
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();
+	}
 
 	public  void SetViewParent(ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);

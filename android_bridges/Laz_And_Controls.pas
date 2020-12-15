@@ -1001,6 +1001,7 @@ type
     procedure SetAllCaps(_value: boolean);
     procedure SetTextAsHtml(_htmlText: string);
 
+    procedure BringToFront();
     procedure SetUnderline( _on : boolean ); // by ADiV
 
   published
@@ -1250,6 +1251,7 @@ type
     procedure ResetViewParent();  override;
     procedure SetFocus();
 
+    procedure BringToFront(); // By ADiV
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -2115,7 +2117,7 @@ type
     procedure DrawRect(var _box: TDynArrayOfSingle); overload;
     procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
     procedure Clear( _color : TARGBColorBridge ); overload; //by ADiV
-    procedure Clear(_color: integer); overload;
+    procedure Clear(_color: DWord); overload;
     function GetJInstance(): jObject;
     procedure SaveBitmapJPG(_fullPathFileName: string);
 
@@ -4646,6 +4648,13 @@ begin
   jni_proc_z( FjEnv, FjObject, 'SetUnderline', _on);
 end;
 
+procedure jTextView.BringToFront();
+begin
+ //in designing component state: set value here...
+ if FInitialized then
+  View_BringToFront( FjEnv, FjObject);
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -5786,6 +5795,13 @@ begin
      jButton_SetFocus(FjEnv, FjObject);
 end;
 
+procedure jButton.BringToFront();
+begin
+ //in designing component state: set value here...
+ if FInitialized then
+    View_BringToFront(FjEnv, FjObject);
+end;
+
 //------------------------------------------------------------------------------
 // jCheckBox
 //------------------------------------------------------------------------------
@@ -6434,7 +6450,7 @@ procedure jProgressBar.BringToFront();
 begin
  if not FInitialized then Exit;
 
- jni_proc(FjEnv, FjObject, 'BringToFront');
+  View_BringToFront(FjEnv, FjObject);
 end;
 
 procedure jProgressBar.SetColors( _color, _colorBack : TARGBColorBridge );
@@ -7097,7 +7113,7 @@ procedure jImageView.BringToFront();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_BringToFront(FjEnv, FjObject);
+     View_BringToFront(FjEnv, FjObject);
 end;
 
 procedure jImageView.SetVisibilityGone();
@@ -8694,7 +8710,7 @@ procedure jListView.BringToFront();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_BringToFront(FjEnv, FjObject);
+     View_BringToFront(FjEnv, FjObject);
 end;
 
 procedure jListView.SetVisibilityGone();
@@ -11504,7 +11520,7 @@ begin
     jCanvas_Clear(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
-procedure jCanvas.Clear(_color: integer);
+procedure jCanvas.Clear(_color: DWord);
 begin
   //in designing component state: set value here...
   if FInitialized then
@@ -12347,7 +12363,7 @@ end;
 procedure jImageBtn.BringToFront();
 begin
   if FInitialized then
-   jni_proc(FjEnv, FjObject, 'BringToFront');
+   View_BringToFront(FjEnv, FjObject);
 end;
 
 procedure jImageBtn.ClearLayout();
@@ -13603,7 +13619,7 @@ procedure jPanel.BringToFront();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_BringToFront(FjEnv, FjObject);
+     View_BringToFront(FjEnv, FjObject);
 end;
 
 procedure jPanel.SetVisibilityGone();

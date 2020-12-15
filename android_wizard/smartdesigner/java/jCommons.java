@@ -122,6 +122,15 @@ public class jCommons {
 		return parent;
 	}
 	
+	public void BringToFront() {
+		 if (Build.VERSION.SDK_INT < 19 ) {
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+	     }		
+	}
+	
 	public void removeFromViewParent() {
 		if (!mRemovedFromParent) {
 			if (aOwnerView != null)  {

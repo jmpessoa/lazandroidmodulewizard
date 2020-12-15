@@ -1810,19 +1810,21 @@ function  View_GetLParamHeight        (env:PJNIEnv; _jobject : jObject): integer
 procedure View_SetLayoutAll           (env:PJNIEnv; _jobject : jObject; idAnchor: DWord);
 procedure View_ClearLayoutAll         (env: PJNIEnv; _jobject : JObject);
 
-Procedure View_SetVisible             (env:PJNIEnv; view: jObject; visible : Boolean); overload;
+procedure View_SetVisible             (env:PJNIEnv; view: jObject; visible : Boolean); overload;
 function  View_GetVisible             (env:PJNIEnv; view: jObject): boolean;
 
 procedure View_SetId                  (env:PJNIEnv; view : jObject; Id :DWord);
 
 procedure View_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jobject: JObject; _left, _top, _right, _bottom, _width, _height: integer);
 
-Procedure View_SetBackGroundColor     (env:PJNIEnv;this:jobject; view : jObject; color : DWord);  overload;
-Procedure View_SetBackGroundColor     (env:PJNIEnv;view : jObject; color : DWord);  overload;
+procedure View_SetBackGroundColor     (env:PJNIEnv;this:jobject; view : jObject; color : DWord);  overload;
+procedure View_SetBackGroundColor     (env:PJNIEnv;view : jObject; color : DWord);  overload;
 
-Procedure View_Invalidate             (env:PJNIEnv;this:jobject; view : jObject); overload;
-Procedure View_Invalidate             (env:PJNIEnv; view : jObject); overload;
-Procedure View_PostInvalidate(env:PJNIEnv; view : jObject);
+procedure View_Invalidate             (env:PJNIEnv;this:jobject; view : jObject); overload;
+procedure View_Invalidate             (env:PJNIEnv; view : jObject); overload;
+procedure View_PostInvalidate         (env:PJNIEnv; view : jObject);
+
+procedure View_BringToFront           (env:PJNIEnv; view : jObject);
 
 // System Info
 Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject;context : jObject) : TWH;
@@ -7044,6 +7046,17 @@ var
 begin
   cls:= env^.GetObjectClass(env, view);
  _jMethod:= env^.GetMethodID(env, cls, 'postInvalidate', '()V');
+ env^.CallVoidMethod(env,view,_jMethod);
+ env^.DeleteLocalRef(env, cls);
+end;
+
+Procedure View_BringToFront(env:PJNIEnv; view : jObject);
+var
+ _jMethod : jMethodID = nil;
+ cls: jClass;
+begin
+  cls:= env^.GetObjectClass(env, view);
+ _jMethod:= env^.GetMethodID(env, cls, 'BringToFront', '()V');
  env^.CallVoidMethod(env,view,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;

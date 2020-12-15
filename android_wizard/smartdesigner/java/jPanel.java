@@ -313,14 +313,9 @@ public class jPanel extends RelativeLayout {
     on the view's parent to force the parent to redraw with the new child ordering.
   */
 	public void BringToFront() {
-		this.bringToFront();	
-		if (Build.VERSION.SDK_INT < 19 ) {			
-			ViewGroup parent = LAMWCommon.getParent();
-	       	if (parent!= null) {
-	       		parent.requestLayout();
-	       		parent.invalidate();	
-	       	}
-		}
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();
 
 		//fadeOutAnimation(layout, 2000);
 		//fadeInAnimation(layout, 2000);
