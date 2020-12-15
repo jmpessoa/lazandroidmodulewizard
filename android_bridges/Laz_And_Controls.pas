@@ -2115,7 +2115,7 @@ type
     procedure DrawRect(var _box: TDynArrayOfSingle); overload;
     procedure DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
     procedure Clear( _color : TARGBColorBridge ); overload; //by ADiV
-    procedure Clear(_color: integer); overload;
+    procedure Clear(_color: DWord); overload;
     function GetJInstance(): jObject;
     procedure SaveBitmapJPG(_fullPathFileName: string);
 
@@ -11504,7 +11504,7 @@ begin
     jCanvas_Clear(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
-procedure jCanvas.Clear(_color: integer);
+procedure jCanvas.Clear(_color: DWord);
 begin
   //in designing component state: set value here...
   if FInitialized then
