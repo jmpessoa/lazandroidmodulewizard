@@ -1759,12 +1759,14 @@ public class jListView extends ListView {
 	// by ADiV
 	public void SetItemLayout( int _itemlayout ){
 		itemLayout = _itemlayout;
+		
 		aadapter.notifyDataSetChanged();
 	}
 	
 	// by ADiV
 	public void SetTextAlign( int _textAlign ){
 		textAlign = _textAlign;
+		
 		aadapter.notifyDataSetChanged();
 	}
 	
@@ -1829,7 +1831,7 @@ public class jListView extends ListView {
 	//
 	public  void clear() {
 		lastSelectedItem = -1;
-		alist.clear();
+		alist.clear();			
 		aadapter.notifyDataSetChanged();
 	}
 	
@@ -2601,13 +2603,9 @@ public String GetLeftItemCaption(String _fullItemCaption) {
   */	
 	public void BringToFront() {
 		this.bringToFront();
-		if (Build.VERSION.SDK_INT < 19 ) {			
-			ViewGroup parent = LAMWCommon.getParent();
-	       	if (parent!= null) {
-	       		parent.requestLayout();
-	       		parent.invalidate();	
-	       	}
-		}	
+		
+		LAMWCommon.BringToFront();
+		
 		this.setVisibility(android.view.View.VISIBLE);
 	}
 	

@@ -352,7 +352,6 @@ procedure jImageView_SetCollapseMode(env: PJNIEnv; _jimageview: JObject; _mode: 
 procedure jImageView_SetFitsSystemWindows(env: PJNIEnv; _jimageview: JObject; _value: boolean);
 procedure jImageView_SetScrollFlag(env: PJNIEnv; _jimageview: JObject; _collapsingScrollFlag: integer);
 procedure jImageView_RemoveFromViewParent(env: PJNIEnv; _jimageview: JObject);
-procedure jImageView_BringToFront(env: PJNIEnv; _jimageview: JObject);
 procedure jImageView_SetVisibilityGone(env: PJNIEnv; _jimageview: JObject);
 
 procedure jImageView_SetRotation(env: PJNIEnv; _jimageview: JObject; angle: integer);
@@ -476,7 +475,6 @@ procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: in
 function jListView_GetCheckedItemPosition(env: PJNIEnv; _jlistview: JObject): integer;
 Procedure jListView_RemoveFromViewParent(env:PJNIEnv; _jlistview: jObject);
 procedure jListView_SetFitsSystemWindows(env: PJNIEnv; _jlistview: JObject; _value: boolean);
-procedure jListView_BringToFront(env: PJNIEnv; _jlistview: JObject);
 procedure jListView_SetVisibilityGone(env: PJNIEnv; _jlistview: JObject);
 procedure jListView_SaveToFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
 //procedure jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
@@ -551,7 +549,6 @@ procedure jPanel_RemoveView(env: PJNIEnv; _jpanel: JObject; _view: jObject);
 procedure jPanel_RemoveAllViews(env: PJNIEnv; _jpanel: JObject);
 function jPanel_GetChildCount(env: PJNIEnv; _jpanel: JObject): integer;
 procedure jPanel_BringChildToFront(env: PJNIEnv; _jpanel: JObject; _view: jObject);
-procedure jPanel_BringToFront(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetVisibilityGone(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetAnimationDurationIn(env: PJNIEnv; _jpanel: JObject; _animationDurationIn: integer);
 procedure jPanel_SetAnimationMode(env: PJNIEnv; _jpanel: JObject; _animationMode: integer);
@@ -3582,17 +3579,6 @@ _jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
  env^.DeleteLocalRef(env, cls);
 end;
 
-procedure jImageView_BringToFront(env: PJNIEnv; _jimageview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jimageview);
-  jMethod:= env^.GetMethodID(env, jCls, 'BringToFront', '()V');
-  env^.CallVoidMethod(env, _jimageview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 procedure jImageView_SetVisibilityGone(env: PJNIEnv; _jimageview: JObject);
 var
   jMethod: jMethodID=nil;
@@ -4939,17 +4925,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jListView_BringToFront(env: PJNIEnv; _jlistview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jlistview);
-  jMethod:= env^.GetMethodID(env, jCls, 'BringToFront', '()V');
-  env^.CallVoidMethod(env, _jlistview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 procedure jListView_SetVisibilityGone(env: PJNIEnv; _jlistview: JObject);
 var
   jMethod: jMethodID=nil;
@@ -5787,17 +5762,6 @@ var
 begin
   jCls:= env^.GetObjectClass(env, _jpanel);
   jMethod:= env^.GetMethodID(env, jCls, 'SetVisibilityGone', '()V');
-  env^.CallVoidMethod(env, _jpanel, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jPanel_BringToFront(env: PJNIEnv; _jpanel: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jpanel);
-  jMethod:= env^.GetMethodID(env, jCls, 'BringToFront', '()V');
   env^.CallVoidMethod(env, _jpanel, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;

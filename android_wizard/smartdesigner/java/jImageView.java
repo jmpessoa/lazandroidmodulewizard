@@ -654,17 +654,10 @@ public class jImageView extends ImageView {
   */
     
 	public void BringToFront() {
-		 ViewGroup parent = LAMWCommon.getParent();
+		 
+		this.bringToFront();
 
-		 this.bringToFront();
-
-		 if (Build.VERSION.SDK_INT < 19 ) {
-
-	       	if (parent!= null) {
-	       		parent.requestLayout();
-	       		parent.invalidate();	
-	       	}
-	     }
+		LAMWCommon.BringToFront();
 
 		if ( (animationDurationIn > 0)  && (animationMode != 0) ) {
 			switch (animationMode) {

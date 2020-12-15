@@ -252,17 +252,9 @@ public class jImageBtn extends ImageView {
 	}
 	
 	public void BringToFront() {
-		 ViewGroup parent = LAMWCommon.getParent();
-
 		 this.bringToFront();
 
-		 if (Build.VERSION.SDK_INT < 19 ) {
-
-	       	if (parent!= null) {
-	       		parent.requestLayout();
-	       		parent.invalidate();	
-	       	}
-	     }		
+		 LAMWCommon.BringToFront();		
 	}
 
 	public  void Free() {
