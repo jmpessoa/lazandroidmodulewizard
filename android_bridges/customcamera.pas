@@ -24,7 +24,6 @@ jCustomCamera = class(jVisualControl)
  private
     FColor: TARGBColorBridge;
     FOnClick: TOnNotify;
-    //FOnSurfaceCreated: TCustomCameraSurfaceCreated;
     FOnSurfaceChanged: TCustomCameraSurfaceChanged;
     FOnPictureTaken: TCustomCameraPictureTaken;
 
@@ -43,7 +42,6 @@ jCustomCamera = class(jVisualControl)
     procedure UpdateLayout; override;
     
     procedure GenEvent_OnClick(Obj: TObject);
-    procedure GenEvent_OnCustomCameraSurfaceCreated(Obj: TObject);
     procedure GenEvent_OnCustomCameraSurfaceChanged(Obj: TObject; width: integer; height: integer);
     procedure GenEvent_OnCustomCameraPictureTaken(Obj: TObject; picture: jObject; fullPath: string);
 
@@ -262,11 +260,6 @@ end;
 procedure jCustomCamera.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
-end;
-
-procedure jCustomCamera.GenEvent_OnCustomCameraSurfaceCreated(Obj: TObject);
-begin
-  //if Assigned(FOnSurfaceCreated) then FOnSurfaceCreated(Obj);
 end;
 
 procedure jCustomCamera.GenEvent_OnCustomCameraSurfaceChanged(Obj: TObject;

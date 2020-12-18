@@ -57,7 +57,7 @@ public class jVideoView extends VideoView /*dummy*/ { //please, fix what GUI obj
        onClickListener = new OnClickListener(){
        /*.*/public void onClick(View view){     // *.* is a mask to future parse...;
                if (enabled) {
-                  controls.pOnClickGeneric(pasobj, Const.Click_Default); //JNI event onClick!
+                  controls.pOnClickGeneric(pasobj); //JNI event onClick!
                }
             };
        };

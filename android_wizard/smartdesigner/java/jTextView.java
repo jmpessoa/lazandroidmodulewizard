@@ -77,7 +77,7 @@ public class jTextView extends TextView {
 			public boolean onLongClick(View arg0) {
 				// TODO Auto-generated method stub				
 				   if (mEnabled) {
-	                    controls.pOnLongClick(LAMWCommon.getPasObj(), Const.Click_Default);
+	                    controls.pOnLongClick(LAMWCommon.getPasObj());
 	               }								
 				   return false;  //true if the callback consumed the long click, false otherwise. 
  			}

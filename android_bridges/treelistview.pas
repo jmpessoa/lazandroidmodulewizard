@@ -81,8 +81,6 @@ type
     property OnLongClickItem: TOnClickTreeListItem read FOnLongClickTreeViewItem write FOnLongClickTreeViewItem;
 end;
 
-procedure TreeViewList_Log (msg: string);
-
 function jTreeListView_jCreate(env: PJNIEnv; _Self: int64; this: JObject): jObject;
 procedure jTreeListView_jFree(env: PJNIEnv; _jtreelistview: JObject);
 procedure jTreeListView_SetViewParent(env: PJNIEnv; _jtreelistview: JObject; _viewgroup: jObject);
@@ -116,17 +114,6 @@ function jTreeListView_GetRootNode(env: PJNIEnv; _jtreelistview: JObject): integ
 function jTreeListView_GetParentNode(env: PJNIEnv; _jtreelistview: JObject; _id: integer): integer;
 
 implementation
-
-
-//-----------------------------------------------------------------------------
-//  For debug
-//-----------------------------------------------------------------------------
-
-
-procedure TreeViewList_Log (msg: string);
-begin
-  // __android_log_write(ANDROID_LOG_INFO, 'jTreeListView', PChar(msg));  //from  And_log_h
-end;
 
 
 {---------  jTreeListView  --------------}
