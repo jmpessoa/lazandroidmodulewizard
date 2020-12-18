@@ -7,7 +7,7 @@ interface
 uses
   Classes, AndroidWidget, And_jni;
 
-  function trySupportParent(var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp): boolean;
+  function trySupportParent(var FjPRLayout: jObject; FParent: TAndroidWidget; refApp: jApp): boolean;
 
 implementation
 
@@ -17,7 +17,7 @@ uses
   stoolbar, stablayout, snestedscrollview, sviewpager;
 
 
-function trySupportParent(var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp): boolean;
+function trySupportParent(var FjPRLayout: jObject; FParent: TAndroidWidget; refApp: jApp): boolean;
 begin
 
   Result:= False;

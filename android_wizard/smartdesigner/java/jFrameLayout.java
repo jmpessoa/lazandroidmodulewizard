@@ -33,7 +33,7 @@ public class jFrameLayout extends FrameLayout /*dummy*/ { //please, fix what GUI
       onClickListener = new OnClickListener(){
       /*.*/public void onClick(View view){     // *.* is a mask to future parse...;
               if (enabled) {
-                 controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+                 controls.pOnClickGeneric(pascalObj); //JNI event onClick!
               }
            };
       };

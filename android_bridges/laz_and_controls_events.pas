@@ -126,7 +126,7 @@ uses
 
    procedure Java_Event_pRadioGroupCheckedChanged(env: PJNIEnv; this: jobject; Obj: TObject; checkedIndex: integer; checkedCaption: JString);
 
-   Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+   Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject);
 
    Procedure Java_Event_pOnClickAutoDropDownItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
    procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);
@@ -177,7 +177,6 @@ uses
 
    Procedure Java_Event_pOnSTabSelected(env: PJNIEnv; this: jobject; Obj: TObject; position: integer;  title: JString);
 
-   Procedure Java_Event_pOnCustomCameraSurfaceCreated(env: PJNIEnv; this: jobject; Obj: TObject);
    Procedure Java_Event_pOnCustomCameraSurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
    Procedure Java_Event_pOnCustomCameraPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject; picture: JObject;  fullPath: JString);
 
@@ -1796,7 +1795,7 @@ begin
   end;
 end;
 
-Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
@@ -2296,17 +2295,6 @@ begin
       pastitle:= string( env^.GetStringUTFChars(env,title,@_jBoolean) );
     end;
     jsTabLayout(Obj).GenEvent_OnSTabSelected(Obj, position, pastitle);
-  end;
-end;
-
-procedure Java_Event_pOnCustomCameraSurfaceCreated(env: PJNIEnv; this: jobject; Obj: TObject);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-  if Obj is jCustomCamera then
-  begin
-    jForm(jCustomCamera(Obj).Owner).UpdateJNI(gApp);
-    jCustomCamera(Obj).GenEvent_OnCustomCameraSurfaceCreated(Obj);
   end;
 end;
 

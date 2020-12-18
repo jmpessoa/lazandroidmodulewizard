@@ -310,7 +310,7 @@ public class jComboEditText extends AutoCompleteTextView /*dummy*/ { //please, f
       onClickListener = new OnClickListener(){
          /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
             if (enabled) {
-               controls.pOnClickGeneric(LAMWCommon.getPasObj(), Const.Click_Default); //JNI event onClick!
+               controls.pOnClickGeneric(LAMWCommon.getPasObj()); //JNI event onClick!
             }
          };
       };

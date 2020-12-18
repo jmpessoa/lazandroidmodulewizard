@@ -42,7 +42,7 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
 
             /*.*/public void onClick(View view) {     // *.* is a mask to future parse...;
                 if (enabled) {
-                   // controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+                   // controls.pOnClickGeneric(pascalObj); //JNI event onClick!
                 }
             }
 

@@ -2362,12 +2362,12 @@ type
   // Control Event
   Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject; Obj: TObject);
 
-  procedure Java_Event_pOnDown(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
-  procedure Java_Event_pOnUp(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  procedure Java_Event_pOnDown(env: PJNIEnv; this: jobject; Obj: TObject);
+  procedure Java_Event_pOnUp(env: PJNIEnv; this: jobject; Obj: TObject);
 
-  procedure Java_Event_pOnDoubleClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  procedure Java_Event_pOnDoubleClick(env: PJNIEnv; this: jobject; Obj: TObject);
   Procedure Java_Event_pOnClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
-  Procedure Java_Event_pOnLongClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+  Procedure Java_Event_pOnLongClick(env: PJNIEnv; this: jobject; Obj: TObject);
 
   //by jmpessoa
   Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);  overload;
@@ -2468,10 +2468,8 @@ type
 
 
   //Asset Function (P : Pascal Native)
-  Function  Asset_SaveToFile (srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;
+  Function  Asset_SaveToFile (srcFile,outFile : String) : Boolean;
   (**Function  Asset_SaveToFileP(srcFile,outFile : String; SkipExists : Boolean = False) : Boolean;**) //droped And_lib_Unzip.pas
-
-  procedure DBListView_Log (msg: string);
 
 implementation
 
@@ -2499,12 +2497,12 @@ end;
 
 // srcFile  'test.txt'
 // outFile  '/data/data/com/kredix/files/test.txt'
-Function  Asset_SaveToFile(srcFile, outFile : String; SkipExists : Boolean = False) : Boolean;
+Function  Asset_SaveToFile(srcFile, outFile : String) : Boolean;
  begin
   Result := True;
-  //If SkipExists = True then
-  // If FileExists(outFile) then Exit;
+
   jAsset_SaveToFile(gApp.Jni.jEnv,gApp.Jni.jThis,srcFile,outFile);
+
   Result := FileExists(outFile);
  end;
 
@@ -3016,7 +3014,7 @@ begin
   end;
 end;
 
-procedure Java_Event_pOnDown(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+procedure Java_Event_pOnDown(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
 
   //----update global "gApp": to whom it may concern------
@@ -3038,7 +3036,7 @@ begin
 
 end;
 
-procedure Java_Event_pOnUp(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+procedure Java_Event_pOnUp(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
 
   //----update global "gApp": to whom it may concern------
@@ -3054,7 +3052,7 @@ begin
 
 end;
 
-procedure Java_Event_pOnDoubleClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+procedure Java_Event_pOnDoubleClick(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
 
   //----update global "gApp": to whom it may concern------
@@ -3140,7 +3138,7 @@ begin
   end;
 end;
 
-Procedure Java_Event_pOnLongClick(env: PJNIEnv; this: jobject; Obj: TObject; Value: integer);
+Procedure Java_Event_pOnLongClick(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
 
   //----update global "gApp": to whom it may concern------
@@ -11288,7 +11286,7 @@ Procedure jCanvas.DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single)
 var
   r1, t1: integer;
 begin
-  r1:= Round(size-20);
+  r1:= size-20;
   t1:= Round((size-20)*(1/ratio));
   if FInitialized then
     jCanvas_drawBitmap(FjEnv, FjObject , bmp, x1, y1, r1, t1);
@@ -11298,7 +11296,7 @@ Procedure jCanvas.DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single)
 var
   r1, t1: integer;
 begin
-  r1:= Round(size-10);
+  r1:= size-10;
   t1:= Round((size-10)*(1/ratio));
   if FInitialized then
     jCanvas_drawBitmap(FjEnv, FjObject , bmp.GetJavaBitmap, x1, y1, r1, t1);
@@ -13793,15 +13791,6 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jPanel_SetFitsSystemWindows(FjEnv, FjObject, _value);
-end;
-
-
-//-----------------------------------------------------------------------------
-//  For debug
-//-----------------------------------------------------------------------------
-procedure DBListView_Log (msg: string);
-begin
-  //__android_log_write(ANDROID_LOG_INFO, 'jDBListView', Pchar(msg));
 end;
 
 {---------  jDBListView  --------------}

@@ -17,7 +17,7 @@ begin
    if FParent is jForm then Exit;  //default
 
    if not tryCommonParent(FjPRLayout, FParent, FjEnv, refApp) then
-      trySupportParent(FjPRLayout, FParent, FjEnv, refApp);
+      trySupportParent(FjPRLayout, FParent, refApp);
 end;
 
 end.

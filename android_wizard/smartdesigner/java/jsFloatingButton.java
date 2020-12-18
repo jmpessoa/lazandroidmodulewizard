@@ -36,7 +36,7 @@ public class jsFloatingButton extends FloatingActionButton /*dummy*/ { //please,
       onClickListener = new OnClickListener(){
       /*.*/public void onClick(View view){     // *.* is a mask to future parse...;
               if (enabled) {
-                 controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+                 controls.pOnClickGeneric(pascalObj); //JNI event onClick!
               }
            };
       };

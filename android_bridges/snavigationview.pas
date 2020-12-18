@@ -485,7 +485,7 @@ procedure jsNavigationView.SetSelectedItemTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetSelectedItemTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+     jsNavigationView_SetSelectedItemTextColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsNavigationView.AddHeaderView(_color: TARGBColorBridge; _drawableLogoIdentifier: string; _text: string; _height: integer);

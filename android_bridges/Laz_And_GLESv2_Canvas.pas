@@ -1705,6 +1705,7 @@ var
 begin
   if FInitialized then
   begin
+     T[0][0]:= 0;
      _glTranslatef (T,X,Y,Z);
      MVP := _mM4x4(T,MVP);
   end;
@@ -1717,6 +1718,7 @@ var
 begin
   if FInitialized then
   begin
+     R[0][0]:= 0;
      _glRotatef (R,Angle,X,Y,Z);
      MVP := _mM4x4(R,MVP);
   end;
@@ -1729,6 +1731,7 @@ var
 begin
   if FInitialized then
   begin
+     S[0][0]:= 0;
      _glScalef (S,X,Y,Z);
      MVP := _mM4x4(S,MVP);
   end;
@@ -1911,6 +1914,8 @@ var
 begin
 
   if not FInitialized then Exit;
+
+  xyTris.Cnt:= 0;
   //
   If Not(xyTriangulation(Pts,xyTris)) then Exit;
   xyzTris.Cnt := xyTris.Cnt;
@@ -1944,6 +1949,9 @@ var
 begin
   //
   if not FInitialized then Exit;
+
+  xyTris.Cnt := 0;
+
   If Not(xyTriangulation(Pts,xyTris)) then Exit;
   Color := _RGBA(1,1,1,1);
   xyzTris.Cnt := xyTris.Cnt;

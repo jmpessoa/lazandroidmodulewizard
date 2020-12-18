@@ -82,7 +82,6 @@ type
   procedure jPaintShader_SetIndex(env: PJNIEnv; _jpaintshader: JObject; _Value: Integer);
   function  jPaintShader_GetColor(env: PJNIEnv; _jpaintshader: JObject): Integer;
   procedure jPaintShader_Bind    (env: PJNIEnv; _jpaintshader: JObject; _ID: Integer);
-  procedure jPaintShader_Clear   (env: PJNIEnv; _jpaintshader: JObject);
   procedure jPaintShader_Combine (env: PJNIEnv; _jpaintshader: JObject; _shdrA, _shdrB: Integer; _Mode: JByte; _dstID: Integer);
   // gradients, bitmap shaders
   function  jPaintShader_NewBitmapShader  (env: PJNIEnv; _jpaintshader: JObject; _Bitmap: JOBject; _tileX, _tileY: JByte; _ID: Integer): Integer; overload;
@@ -380,11 +379,6 @@ begin
   jMethod := env^.GetMethodID(env, jCls, 'GetColor', '()I');
   Result := env^.CallIntMethod(env, _jpaintshader, jMethod);
   env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jPaintShader_Clear(env: PJNIEnv; _jpaintshader: JObject);
-begin
-  // ()V
 end;
 
 procedure jPaintShader_Combine(env: PJNIEnv; _jpaintshader: JObject; _shdrA, _shdrB: Integer; _Mode: JByte; _dstID: Integer);

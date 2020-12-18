@@ -140,7 +140,7 @@ jsRecyclerView = class(jVisualControl)
     function  GetItemsSelect() : integer;
     function  GetItemSelectFirst() : integer; overload;
     function  GetItemSelectFirst( _int : integer ) : integer; overload;
-    procedure ClearItemsSelect( position :integer );
+    procedure ClearItemsSelect;
 
     procedure ScrollToPosition( position :integer );
     procedure SmoothScrollToPosition( position :integer );
@@ -607,7 +607,7 @@ begin
      jni_proc_i(FjEnv, FjObject, 'ScrollToPosition', position );
 end;
 
-procedure jsRecyclerView.ClearItemsSelect( position :integer );
+procedure jsRecyclerView.ClearItemsSelect;
 begin
   //in designing component state: set value here...
   if FInitialized then

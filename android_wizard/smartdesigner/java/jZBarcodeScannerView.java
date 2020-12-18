@@ -177,7 +177,7 @@ public class jZBarcodeScannerView extends FrameLayout {
                 if (enabled) {
                     if (initialized) {
                         //Log.i("onClickListener","onClickListener");
-                        controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+                        controls.pOnClickGeneric(pascalObj); //JNI event onClick!
                     }
                 }
             };

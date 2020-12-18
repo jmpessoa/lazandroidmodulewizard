@@ -66,7 +66,7 @@ public class jImageBtn extends ImageView {
 			
 			switch(actType) {
 			    case MotionEvent.ACTION_UP: {				
-				 controls.pOnUp(PasObj, Const.Click_Default);
+				 controls.pOnUp(PasObj);
 				 break;
 			    }
 				case MotionEvent.ACTION_DOWN: {  
@@ -75,7 +75,7 @@ public class jImageBtn extends ImageView {
 										
 					btnState = 1;
 					
-					controls.pOnDown(PasObj, Const.Click_Default);
+					controls.pOnDown(PasObj);
 					
 				    this.setImageBitmap(bmpDn);
 				    

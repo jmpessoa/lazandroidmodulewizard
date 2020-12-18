@@ -65,8 +65,8 @@ type
     function AllNotesOff(timestamp: int64 = 0): integer;
     function Start: integer;
     function MyId: string;
-    procedure GenEvent_OnOpened(Obj: TObject);
-    procedure GenEvent_OnEvent(Obj: TObject; info: integer; data: int64);
+    procedure GenEvent_OnOpened(Sender: TObject);
+    procedure GenEvent_OnEvent(Sender: TObject; info: integer; data: int64);
     procedure GenEvent_OnMidiManagerDeviceAdded(Sender:TObject;deviceId:integer;deviceName:string;productId:string;manufacture:string);
     procedure GenEvent_OnMidiManagerDeviceRemoved(Sender:TObject;deviceId:integer;deviceName:string;productId:string;manufacture:string);
     function Active: boolean;
@@ -298,16 +298,16 @@ begin
   result := DoAction(CMD_GET_STATUS);
 end;
 
-procedure jMidiManager.GenEvent_OnOpened(Obj: TObject);
+procedure jMidiManager.GenEvent_OnOpened(Sender: TObject);
 begin
   if Assigned(fOnEvent) then
-    fOnEvent(Self, 0, 1);
+    fOnEvent(Sender, 0, 1);
 end;
 
-procedure jMidiManager.GenEvent_OnEvent(Obj: TObject; info: integer; data: int64);
+procedure jMidiManager.GenEvent_OnEvent(Sender: TObject; info: integer; data: int64);
 begin
   if assigned(fOnEvent) then
-    fOnEvent(self, info, data);
+    fOnEvent(Sender, info, data);
 end;
 
 function jMidiManager.Active: boolean;

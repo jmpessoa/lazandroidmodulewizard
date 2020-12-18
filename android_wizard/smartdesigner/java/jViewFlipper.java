@@ -47,7 +47,7 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
       onClickListener = new OnClickListener(){
           /*.*/public void onClick(View view){     // *.* is a mask to future parse...;
              if (enabled) {
-                controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+                controls.pOnClickGeneric(pascalObj); //JNI event onClick!
              }
            };
       };
@@ -56,7 +56,7 @@ public class jViewFlipper extends ViewFlipper /*dummy*/ { //please, fix what GUI
        onLongClickListener = new OnLongClickListener(){
            /*.*/public boolean onLongClick(View view){     // *.* is a mask to future parse...;
                if (enabled) {
-                   controls.pOnLongClick(pascalObj, Const.Click_Default); //JNI event onClick!
+                   controls.pOnLongClick(pascalObj); //JNI event onClick!
                }
                return true;
            };
