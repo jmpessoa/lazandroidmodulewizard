@@ -1165,22 +1165,20 @@ public class jHttpClient /*extends ...*/ {
 	 	    try{
 	 	        //Create a pattern
 	 	        Pattern pattern = Pattern.compile(patternString);
-	 	        if (null == pattern) {
-	 	            return "";
-	 	        }
+	 	        
+	 	        if (null == pattern)  return "";	 	        
 
 	 	        //Match the pattern string in provided string
 	 	        Matcher matcher = pattern.matcher(inputString);
-	 	        if (null != matcher && matcher.find()) {
-	 	            return matcher.group(1);
-	 	        }
+	 	        
+	 	        if ((null != matcher) && matcher.find())
+	 	            return matcher.group(1);	 	        
 
 	 	    }catch (PatternSyntaxException ex) {
-
 	 	        ex.printStackTrace();
 	 	    }
 
-	 	    return null;
+	 	    return "";
 	 	}
 	    
 	    class AsyncGooglePlay extends AsyncTask<String, Void, String> {
@@ -1205,11 +1203,13 @@ public class jHttpClient /*extends ...*/ {
 	     	    
 	     	    try{
 	     	     uc = url.openConnection();
-	     	     if(uc == null) {
-	     	       return "";
-	     	     }
+	     	     
+	     	     if(uc == null) return "";
+	     	     
 	     	     uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+	     	     
 	     	     inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
+	     	     
 	     	     if (null != inReader) {
 	     	        String str = "";
 	     	        while ((str = inReader.readLine()) != null) {
@@ -1219,11 +1219,11 @@ public class jHttpClient /*extends ...*/ {
 	     	    
 	     	    } catch (IOException e) {
 	     	     return "";	
-	     	    }
-	     	    
+	     	    }	     	    
 
 	     	    // Get the current version pattern sequence 
 	     	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
+	     	    
 	     	    if(versionString.length() <= 0){ 
 	     	        return "";
 	     	    }else{
