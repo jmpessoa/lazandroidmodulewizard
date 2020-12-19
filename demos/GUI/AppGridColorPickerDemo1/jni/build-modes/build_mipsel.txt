@@ -1,0 +1,3 @@
+<Libraries Value="D:\lamw\android-ndk-r16b\platforms\android-22\arch-mips\usr\lib;D:\lamw\android-ndk-r16b\toolchains\mipsel-linux-android-4.9\prebuilt\windows-x86_64\lib\gcc\mipsel-linux-android\4.9.x"/>
+<TargetCPU Value="mipsel"/>
+<CustomOptions Value="-Xd -XPmipsel-linux-android- -FDD:\lamw\android-ndk-r16b\toolchains\mipsel-linux-android-4.9\prebuilt\windows-x86_64\bin"/>

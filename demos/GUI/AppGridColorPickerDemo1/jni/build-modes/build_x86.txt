@@ -1,0 +1,3 @@
+<Libraries Value="D:\lamw\android-ndk-r16b\platforms\android-22\arch-x86\usr\lib;D:\lamw\android-ndk-r16b\toolchains\x86-4.9\prebuilt\windows-x86_64\lib\gcc\i686-android-linux\4.9.x"/>
+<TargetCPU Value="i386"/>
+<CustomOptions Value="-Xd -XPi686-linux-android- -FDD:\lamw\android-ndk-r16b\toolchains\x86-4.9\prebuilt\windows-x86_64\bin"/>
