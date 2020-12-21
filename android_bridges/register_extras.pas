@@ -10,8 +10,6 @@ uses
   Classes,
   bluetoothlowenergy,
   netapi,
-  orbotvpnservice,
-  toyvpnclient,
   barcodegen,
   ussdservice,
   customspeechtotext,
@@ -78,8 +76,6 @@ implementation
 Procedure Register;
 begin
   {$I jnetapi_icon.lrs}
-  {$I jorbotvpnservice_icon.lrs}
-  {$I jtoyvpnclient_icon.lrs}
   {$I jbarcodegen_icon.lrs}
   {$I jussdservice_icon.lrs}
   {$I jftpclient_icon.lrs}
@@ -148,8 +144,6 @@ begin
   RegisterComponents('Android Bridges Extra',
    [
       jNetApi,
-      jOrbotVpnService,
-      jToyVpnClient,
       jBarcodeGen,
       jUSSDService,
       jFTPClient,
