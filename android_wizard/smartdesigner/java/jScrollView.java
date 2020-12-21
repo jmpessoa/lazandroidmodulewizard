@@ -80,6 +80,12 @@ public class jScrollView extends ScrollView {
     public void SetViewParent(android.view.ViewGroup _viewgroup) {
         LAMWCommon.setParent(_viewgroup);
     }
+    
+    public void BringToFront() {
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();
+    }
 
     public void setScrollSize(int _size) {
         scrollxywh.height = _size;

@@ -1875,6 +1875,8 @@ type
     procedure Delete(_index: integer);
     procedure Clear();
 
+    procedure BringToFront();
+
     procedure GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
     procedure GenEvent_OnScrollViewInnerItemLongClick(Sender:TObject;index:integer;itemId:integer);
   published
@@ -9704,6 +9706,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jScrollView_Clear(FjEnv, FjObject);
+end;
+
+procedure jScrollView.BringToFront();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     View_BringToFront(FjEnv, FjObject);
 end;
 
 procedure jScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
