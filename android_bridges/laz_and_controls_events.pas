@@ -270,6 +270,12 @@ uses
    //jcToyTimerService
    procedure Java_Event_pOnToyTimerServicePullElapsedTime(env:PJNIEnv;this:JObject;Sender:TObject;elapsedTime:int64);
 
+   procedure Java_Event_pOnBluetoothLEConnected(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString;bondState:integer);
+   procedure Java_Event_pOnBluetoothLEScanCompleted(env:PJNIEnv;this:JObject;Sender:TObject;deviceNameArray:jstringArray;deviceAddressArray:jstringArray);
+   procedure Java_Event_pOnBluetoothLEServiceDiscovered(env:PJNIEnv;this:JObject;Sender:TObject;serviceIndex:integer;serviceUUID:jString;characteristicUUIDArray:jstringArray);
+   procedure Java_Event_pOnBluetoothLECharacteristicChanged(env:PJNIEnv;this:JObject;Sender:TObject;strValue:jString;strCharacteristic:jString);
+   procedure Java_Event_pOnBluetoothLECharacteristicRead(env:PJNIEnv;this:JObject;Sender:TObject;strValue:jString;strCharacteristic:jString);
+
 implementation
 
 uses
@@ -284,7 +290,7 @@ uses
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
-   cbillingclient, ctoytimerservice;
+   cbillingclient, ctoytimerservice, bluetoothlowenergy;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3039,6 +3045,58 @@ begin
   begin
     jForm(jcToyTimerService(Sender).Owner).UpdateJNI(gApp);
     jcToyTimerService(Sender).GenEvent_OnToyTimerServicePullElapsedTime(Sender,elapsedTime);
+  end;
+end;
+
+//jBluetoothLowEnergy
+procedure Java_Event_pOnBluetoothLEConnected(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString;bondState:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jBluetoothLowEnergy then
+  begin
+    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
+    jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLEConnected(Sender,GetString(env,deviceName),GetString(env,deviceAddress),bondState);
+  end;
+end;
+procedure Java_Event_pOnBluetoothLEScanCompleted(env:PJNIEnv;this:JObject;Sender:TObject;deviceNameArray:jstringArray;deviceAddressArray:jstringArray);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jBluetoothLowEnergy then
+  begin
+    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
+    jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLEScanCompleted(Sender,GetDynArrayOfString(env,deviceNameArray),GetDynArrayOfString(env,deviceAddressArray));
+  end;
+end;
+procedure Java_Event_pOnBluetoothLEServiceDiscovered(env:PJNIEnv;this:JObject;Sender:TObject;serviceIndex:integer;serviceUUID:jString;characteristicUUIDArray:jstringArray);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jBluetoothLowEnergy then
+  begin
+    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
+    jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLEServiceDiscovered(Sender,serviceIndex,GetString(env,serviceUUID),GetDynArrayOfString(env,characteristicUUIDArray));
+  end;
+end;
+procedure Java_Event_pOnBluetoothLECharacteristicChanged(env:PJNIEnv;this:JObject;Sender:TObject;strValue:jString;strCharacteristic:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jBluetoothLowEnergy then
+  begin
+    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
+    jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLECharacteristicChanged(Sender,GetString(env,strValue),GetString(env,strCharacteristic));
+  end;
+end;
+procedure Java_Event_pOnBluetoothLECharacteristicRead(env:PJNIEnv;this:JObject;Sender:TObject;strValue:jString;strCharacteristic:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jBluetoothLowEnergy then
+  begin
+    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
+    jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLECharacteristicRead(Sender,GetString(env,strValue),GetString(env,strCharacteristic));
   end;
 end;
 

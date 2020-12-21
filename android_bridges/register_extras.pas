@@ -8,7 +8,10 @@ interface
 
 uses
   Classes,
+  bluetoothlowenergy,
   netapi,
+  orbotvpnservice,
+  toyvpnclient,
   barcodegen,
   ussdservice,
   customspeechtotext,
@@ -75,6 +78,8 @@ implementation
 Procedure Register;
 begin
   {$I jnetapi_icon.lrs}
+  {$I jorbotvpnservice_icon.lrs}
+  {$I jtoyvpnclient_icon.lrs}
   {$I jbarcodegen_icon.lrs}
   {$I jussdservice_icon.lrs}
   {$I jftpclient_icon.lrs}
@@ -131,6 +136,7 @@ begin
   {$I jbluetooth_icon.lrs}
   {$I jbluetoothclientsocket_icon.lrs}
   {$I jbluetoothserversocket_icon.lrs}
+  {$I jbluetoothlowenergy_icon.lrs}
   {$I jsqlitedataaccess_icon.lrs}
   {$I jsqlitecursor_icon.lrs}
   {$I joraclejdbcconnection_icon.lrs}
@@ -142,6 +148,8 @@ begin
   RegisterComponents('Android Bridges Extra',
    [
       jNetApi,
+      jOrbotVpnService,
+      jToyVpnClient,
       jBarcodeGen,
       jUSSDService,
       jFTPClient,
@@ -198,6 +206,7 @@ begin
       jBluetooth,
       jBluetoothClientSocket,
       jBluetoothServerSocket,
+      jBluetoothLowEnergy,
       jSqliteDataAccess,
       jSqliteCursor,
       jOracleJDBCConnection,

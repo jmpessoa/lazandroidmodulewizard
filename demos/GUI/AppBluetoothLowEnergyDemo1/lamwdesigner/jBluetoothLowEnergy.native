@@ -1,0 +1,5 @@
+public native void pOnBluetoothLEConnected(long pasobj, String deviceName, String deviceAddress, int bondState);
+public native void pOnBluetoothLEScanCompleted(long pasobj, String[] deviceNameArray, String[] deviceAddressArray);
+public native void pOnBluetoothLEServiceDiscovered(long pasobj, int serviceIndex, String serviceUUID, String[] characteristicUUIDArray);
+public native void pOnBluetoothLECharacteristicChanged(long pasobj, String strValue, String strCharacteristic);
+public native void pOnBluetoothLECharacteristicRead(long pasobj, String strValue, String strCharacteristic);
