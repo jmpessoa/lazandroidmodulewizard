@@ -1,10 +1,10 @@
 object FormImportLAMWStuff: TFormImportLAMWStuff
   Left = 446
-  Height = 329
+  Height = 362
   Top = 216
   Width = 432
   Caption = 'Import LAMW Stuff'
-  ClientHeight = 329
+  ClientHeight = 362
   ClientWidth = 432
   DesignTimePPI = 120
   FormStyle = fsStayOnTop
@@ -88,7 +88,6 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
-  LCLVersion = '2.0.0.4'
   object ListBoxTarget: TListBox
     Left = 17
     Height = 136
@@ -133,9 +132,9 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     OnClick = SpeedButton1Click
   end
   object BitBtn1: TBitBtn
-    Left = 216
+    Left = 224
     Height = 38
-    Top = 272
+    Top = 306
     Width = 93
     Anchors = [akTop, akRight]
     Default = True
@@ -148,7 +147,7 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
   object BitBtn2: TBitBtn
     Left = 321
     Height = 38
-    Top = 272
+    Top = 306
     Width = 94
     Anchors = [akTop, akRight]
     Cancel = True
@@ -166,9 +165,35 @@ object FormImportLAMWStuff: TFormImportLAMWStuff
     Caption = '?'
     OnClick = SpeedButton2Click
   end
+  object CheckGroupImages: TCheckGroup
+    Left = 17
+    Height = 88
+    Top = 256
+    Width = 152
+    AutoFill = True
+    Caption = 'Import Images'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.TopBottomSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 1
+    ClientHeight = 63
+    ClientWidth = 148
+    Items.Strings = (
+      'drawable-hdpi'
+      'drawable'
+    )
+    TabOrder = 4
+    Data = {
+      020000000202
+    }
+  end
   object OpenDialog1: TOpenDialog
     Filter = 'LFM|*.lfm'
-    left = 80
-    top = 264
+    left = 40
+    top = 72
   end
 end

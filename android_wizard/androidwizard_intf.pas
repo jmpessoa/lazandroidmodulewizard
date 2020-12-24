@@ -3239,6 +3239,12 @@ begin
 
   if FModuleType <= 0 then  //GUI or gdx controls
   begin
+
+    //https://forum.lazarus.freepascal.org/index.php/topic,45715.msg386317
+    sourceList.Add('  {$IFDEF UNIX}{$IFDEF UseCThreads}');
+    sourceList.Add('  cthreads,');
+    sourceList.Add('  {$ENDIF}{$ENDIF}');
+
     sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,');
     sourceList.Add('  Laz_And_Controls_Events;');
     sourceList.Add(' ');
@@ -4015,10 +4021,11 @@ begin
 
    sourceList.Add('uses');
 
+   //https://forum.lazarus.freepascal.org/index.php/topic,45715.msg386317
+   //TODO: need drop this IFDEF from here?
    sourceList.Add('  {$IFDEF UNIX}{$IFDEF UseCThreads}');
    sourceList.Add('  cthreads,');
    sourceList.Add('  {$ENDIF}{$ENDIF}');
-
 
    sourceList.Add('  ' + GetInterfaceUsesSection);
 

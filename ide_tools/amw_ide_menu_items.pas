@@ -1080,6 +1080,14 @@ begin
   end;
 end;
 
+function GetResSourcePath(fullPathToProjectLFM: string): string;
+var
+  p: integer;
+begin
+  p:= Pos('jni', fullPathToProjectLFM);
+  Result:= Copy(fullPathToProjectLFM, 1, p-1) + 'res';
+end;
+
 procedure StartImportLAMWStuff(Sender: TObject);
 var
   Project: TLazProject;
@@ -1087,16 +1095,18 @@ var
   listUnit: TStringList;
   listComponent: TStringList;
   listTemp: TStringList;
-  listProjComp, unitsList: TStringList;
+  listProjComp, unitsList, imagesList: TStringList;
   fileName: string;
   pathToProject: string;
-  p, i, k: integer;
+  p, i, k, count, j: integer;
   compName: string;
   pathToJavaTemplates: string;
   package, pathToJavasSrc: string;
-  fullPathToUnitTarget, fullPathToUnitSourceLFM: string;
+  fullPathToUnitTarget, fullPathToUnitSourceLFM, fullPathToResSource, fullPathToResTarget: string;
   listIndex: integer;
   tempStr, targetFormName, sourceFormName: string;
+  drawable_hdpi_checked, drawable_checked: boolean;
+  fullImageFilename, shortImageFilename: string;
 begin
   listProject:= TStringList.Create;
   listUnit:= TStringList.Create;
@@ -1147,9 +1157,21 @@ begin
        FormImportLAMWStuff.ListBoxTarget.Items.Add(ExtractFileName(ChangeFileExt(unitsList.Strings[k], '')));
      end;
 
+     //try import images from drawable....
+     fullPathToResSource:= GetResSourcePath(FormImportLAMWStuff.EditSource.Text);
+     fullPathToResTarget:= pathToProject + 'res';
+
+     FormImportLAMWStuff.CheckGroupImages.Checked[0]:= True;   //drawable-hdpi
+     if DirectoryExists(fullPathToResSource+DirectorySeparator+'drawable') then
+       FormImportLAMWStuff.CheckGroupImages.Checked[1]:= True
+     else
+       FormImportLAMWStuff.CheckGroupImages.Checked[1]:= False;
 
      if FormImportLAMWStuff.ShowModal = mrOK then
      begin
+
+         drawable_hdpi_checked:= FormImportLAMWStuff.CheckGroupImages.Checked[0];
+         drawable_checked:= FormImportLAMWStuff.CheckGroupImages.Checked[1];
 
          listIndex:= FormImportLAMWStuff.ListBoxTarget.ItemIndex;
          fullPathToUnitSourceLFM:= FormImportLAMWStuff.EditSource.Text;
@@ -1183,7 +1205,7 @@ begin
             end else ShowMessage('Fail. None [target] LAMW Form were selected...');
          end else ShowMessage('Fail. None [candidate] Unit were selected...');
      end;
-     unitsList.Free;
+     if unitsList <> nil then unitsList.Free;
   end;
 
   if listComponent.Count > 0 then
@@ -1203,7 +1225,7 @@ begin
     listTemp.LoadFromFile(fullPathToUnitSourceLFM);
     tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
     listTemp.Text:= tempStr;
-    ShowMessage(fullPathToUnitTarget);
+    //ShowMessage(fullPathToUnitTarget);
     listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
 
     listTemp.Clear;
@@ -1217,12 +1239,55 @@ begin
     //listComponent.Add('jForm');
     Project.Files[listIndex+1].CustomData['jControls']:= listComponent.DelimitedText;
 
+    if drawable_hdpi_checked then
+    begin
+      imagesList:= FindAllFiles(fullPathToResSource+DirectorySeparator+'drawable-hdpi', '*.*', False);
+      if imagesList <> nil then
+      begin
+         count:= imagesList.Count;
+         for j:= 0 to count-1 do
+         begin
+           shortImageFilename:= ExtractFileName(imagesList.Strings[j]);
+           fullImageFilename:= fullPathToResTarget + DirectorySeparator+'drawable-hdpi' + DirectorySeparator + shortImageFilename;
+           if not FileExists(fullImageFilename) then
+           begin
+              CopyFile(imagesList.Strings[j],fullImageFilename);
+           end;
+         end;
+         imagesList.Free;
+      end;
+    end;
+
+    if drawable_checked then
+    begin
+      if DirectoryExists(fullPathToResSource+DirectorySeparator+'drawable') then
+      begin
+        imagesList:= FindAllFiles(fullPathToResSource+DirectorySeparator+'drawable', '*.*', False);
+        if imagesList <> nil then
+        begin
+           count:= imagesList.Count;
+           for j:= 0 to count-1 do
+           begin
+             shortImageFilename:= ExtractFileName(imagesList.Strings[j]);
+             fullImageFilename:= fullPathToResTarget + DirectorySeparator+'drawable' + DirectorySeparator + shortImageFilename;
+             if not FileExists(fullImageFilename) then
+             begin
+                CopyFile(imagesList.Strings[j],fullImageFilename);
+             end;
+           end;
+           imagesList.Free;
+        end;
+      end;
+    end;
+
     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
                 'Hints:'+ sLineBreak +
                 '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
                 '.(Re)"Open" the project to update the form display content ...' + sLineBreak +
                 '      Or close the form unit tab and reopen it [Project Inspector...]'+ sLineBreak +
                 '      to see the content changes...');
+
+
   end
   else
   begin
@@ -1234,7 +1299,7 @@ begin
          listTemp.LoadFromFile(fullPathToUnitSourceLFM);
          tempStr:=StringReplace(listTemp.Text, sourceFormName, targetFormName, [rfReplaceAll, rfIgnoreCase]);
          listTemp.Text:= tempStr;
-         ShowMessage(fullPathToUnitTarget);
+         //ShowMessage(fullPathToUnitTarget);
          listTemp.SaveToFile(ChangeFileExt(fullPathToUnitTarget, '.lfm'));
 
          listTemp.Clear;
@@ -1244,6 +1309,48 @@ begin
          listTemp.Strings[0]:= 'unit '+ChangeFileExt(ExtractFileName(fullPathToUnitTarget),'') +';';
          listTemp.Strings[1]:='//';
          listTemp.SaveToFile(fullPathToUnitTarget);
+
+         //import images from drawable....
+         if drawable_hdpi_checked then
+         begin
+           imagesList:= FindAllFiles(fullPathToResSource+DirectorySeparator+'drawable-hdpi', '*.*', False);
+           if imagesList <> nil then
+           begin
+              count:= imagesList.Count;
+              for j:= 0 to count-1 do
+              begin
+                shortImageFilename:= ExtractFileName(imagesList.Strings[j]);
+                fullImageFilename:= fullPathToResTarget + DirectorySeparator+'drawable-hdpi' + DirectorySeparator + shortImageFilename;
+                if not FileExists(fullImageFilename) then
+                begin
+                   CopyFile(imagesList.Strings[j],fullImageFilename);
+                end;
+              end;
+              imagesList.Free;
+           end;
+         end;
+
+         if drawable_checked then
+         begin
+           if DirectoryExists(fullPathToResSource+DirectorySeparator+'drawable') then
+           begin
+               imagesList:= FindAllFiles(fullPathToResSource+DirectorySeparator+'drawable', '*.*', False);
+               if imagesList <> nil then
+               begin
+                  count:= imagesList.Count;
+                  for j:= 0 to count-1 do
+                  begin
+                    shortImageFilename:= ExtractFileName(imagesList.Strings[j]);
+                    fullImageFilename:= fullPathToResTarget + DirectorySeparator+'drawable' + DirectorySeparator + shortImageFilename;
+                    if not FileExists(fullImageFilename) then
+                    begin
+                       CopyFile(imagesList.Strings[j],fullImageFilename);
+                    end;
+                  end;
+                  imagesList.Free;
+               end;
+           end;
+         end;
 
          ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
                     'Hints:'+ sLineBreak +

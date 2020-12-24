@@ -1,4 +1,4 @@
-package org.lamw.appbluetoothlowenergydemo1;
+package org.lamw.applistviewdemo8;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.1 [AndroidX!!] - 11 November - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -846,6 +846,24 @@ class jForm {
 		return PathDat;
 	}
 
+    //checks if external storage is available for read and write
+    public boolean IsExternalStorageReadWriteAvailable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    //checks if external storage is available for read
+    public boolean IsExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
 	private void copyFileUsingFileStreams(File source, File dest)
 			throws IOException {
 		InputStream input = null;
@@ -853,14 +871,15 @@ class jForm {
 		try {
 			input = new FileInputStream(source);
 			output = new FileOutputStream(dest);
+
 			byte[] buf = new byte[1024];
 			int bytesRead;
 			while ((bytesRead = input.read(buf)) > 0) {
 				output.write(buf, 0, bytesRead);
 			}
 		} finally {
-			input.close();
-			output.close();
+			if (input != null) input.close();
+			if (output != null) output.close();
 		}
 	}
 

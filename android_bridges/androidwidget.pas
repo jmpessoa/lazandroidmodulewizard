@@ -1436,6 +1436,9 @@ type
     Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
 
+    function IsExternalStorageReadWriteAvailable(): boolean;
+    function IsExternalStorageReadable(): boolean;
+
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1682,6 +1685,9 @@ end;
   function jForm_UriToString(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
 
   function jForm_GetRealPathFromURI(env: PJNIEnv; _jform: JObject; _Uri: jObject): string;
+  function jForm_IsExternalStorageReadWriteAvailable(env: PJNIEnv; _jform: JObject): boolean;
+  function jForm_IsExternalStorageReadable(env: PJNIEnv; _jform: JObject): boolean;
+
 
 //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -4813,6 +4819,25 @@ begin
      jForm_RunOnUiThread(FjEnv, FjObject, _tag);
 end;
 
+function jForm.IsExternalStorageReadWriteAvailable(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsExternalStorageReadWriteAvailable(FjEnv, FjObject);
+end;
+
+function jForm.IsExternalStorageReadable(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsExternalStorageReadable(FjEnv, FjObject);
+end;
+
+procedure jForm.GenEvent_OnRunOnUiThread(Sender:TObject;tag:integer);
+begin
+  if Assigned(FOnRunOnUiThread) then FOnRunOnUiThread(Sender,tag);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
@@ -5406,10 +5431,33 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm.GenEvent_OnRunOnUiThread(Sender:TObject;tag:integer);
+function jForm_IsExternalStorageReadWriteAvailable(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
 begin
-  if Assigned(FOnRunOnUiThread) then FOnRunOnUiThread(Sender,tag);
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageReadWriteAvailable', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
 end;
+
+
+function jForm_IsExternalStorageReadable(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageReadable', '()Z');
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 
 //-----{ jApp } ------
 

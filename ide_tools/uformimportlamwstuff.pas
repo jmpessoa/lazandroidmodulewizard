@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  Buttons;
+  Buttons, ExtCtrls;
 
 type
 
@@ -15,6 +15,7 @@ type
   TFormImportLAMWStuff = class(TForm)
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    CheckGroupImages: TCheckGroup;
     EditSource: TEdit;
     Label1: TLabel;
     Label2: TLabel;
