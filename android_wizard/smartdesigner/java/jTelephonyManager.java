@@ -9,11 +9,14 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import java.util.Objects;
 
 //http://danielthat.blogspot.com/2013/06/android-make-phone-call-with-speaker-on.html
 //https://www.mkyong.com/android/how-to-make-a-phone-call-in-android/
@@ -246,6 +249,50 @@ public class jTelephonyManager /*extends ...*/ {
         }
 
         return data;
+    }
+    //By Segator
+    public String GetNetworkType() {
+        int networkType =-1;
+        if(isListenerRemoved)
+            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+        try {
+             networkType = Objects.requireNonNull(mTelephonyManager).getNetworkType();
+                } catch (SecurityException securityException) {
+            Log.d("jTelephonyMgr_GetNetworkType", "Sorry... Not Permission granted!!");
+        }
+        switch (networkType) {
+        case TelephonyManager.NETWORK_TYPE_GPRS: return "GPRS";
+        case TelephonyManager.NETWORK_TYPE_EDGE: return "EDGE";
+        case TelephonyManager.NETWORK_TYPE_CDMA: return "CDMA";
+        case TelephonyManager.NETWORK_TYPE_1xRTT: return "1xRTT";
+        case TelephonyManager.NETWORK_TYPE_IDEN: return "IDEN";
+            // "2G"
+        case TelephonyManager.NETWORK_TYPE_UMTS: return "UMTS";
+        case TelephonyManager.NETWORK_TYPE_EVDO_0: return "EVDO_0";
+        case TelephonyManager.NETWORK_TYPE_EVDO_A: return "EVDO_A";
+        case TelephonyManager.NETWORK_TYPE_HSDPA: return "HSDPA";
+        case TelephonyManager.NETWORK_TYPE_HSUPA: return "HSUPA";
+        case TelephonyManager.NETWORK_TYPE_HSPA: return "HSPA";
+        case TelephonyManager.NETWORK_TYPE_EVDO_B: return "EVDO_B";
+        case TelephonyManager.NETWORK_TYPE_EHRPD: return "EHRPD";
+        case TelephonyManager.NETWORK_TYPE_HSPAP: return "HSPAP";
+            // "3G";
+        case TelephonyManager.NETWORK_TYPE_LTE: return "LTE";
+            // "4G"
+        case TelephonyManager.NETWORK_TYPE_NR: return "NR";
+            // "5G"
+        default:
+            return String.valueOf(networkType);
+    }
+
+    }
+
+    public long GetTotalRxBytes(){
+    return TrafficStats.getTotalRxBytes();
+    }
+
+    public long GetTotalTxBytes(){
+    return TrafficStats.getTotalTxBytes();
     }
 
     public boolean IsNetworkRoaming() {
