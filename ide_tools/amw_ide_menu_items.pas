@@ -473,16 +473,16 @@ end;
 procedure ConvertToAppCompat(paramTheme: string);
 var
    Project: TLazProject;
-   p: integer;
+   p, p1: integer;
    packageName: string;
    pathToJavaTemplates: string;
    fileName: string;
    pathToProject: string;
    pathToJavaSrc: string;
-   list: TStringList;
+   list, manifestList: TStringList;
    isOldTheme: boolean;
-   targetApi, tmpStr: string;
-   gradlePath, gradleVersion: string;
+   targetApi, tmpStr, supportProvider: string;
+   gradlePath, gradleVersion, tempStr, insertRef: string;
 begin
   Project:= LazarusIDE.ActiveProject;
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] = 'GUI' ) then
@@ -499,9 +499,8 @@ begin
       isOldTheme:= False;
 
     Project.CustomData.Values['Theme']:= paramTheme;
-
     Project.CustomData.Values['BuildSystem']:= 'Gradle';
-    //Project.CustomData.Values['LamwVersion']:= '0.8';
+    Project.CustomData.Values['Support']:= 'TRUE';
 
     packageName:= Project.CustomData.Values['Package'];
 
@@ -533,6 +532,29 @@ begin
         list.Strings[0]:= 'package '+packageName+';';
         list.SaveToFile(pathToJavaSrc+DirectorySeparator+'jSupported.java');
 
+        list.Clear;  //androidX
+        ForceDirectories(pathToProject+ 'res' +DirectorySeparator+'xml');
+        list.LoadFromFile(pathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml');
+        list.SaveToFile(pathToProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
+
+        list.Clear;
+        list.LoadFromFile(pathToJavaTemplates +DirectorySeparator+'support'+DirectorySeparator+'manifest_support_provider.txt');
+        supportProvider:= StringReplace(list.Text, 'dummyPackage',packageName, [rfReplaceAll, rfIgnoreCase]);
+
+        manifestList:= TStringList.Create;
+        manifestList.LoadFromFile(pathToProject + 'AndroidManifest.xml');
+        tempStr:= manifestList.Text;  //manifest
+        if Pos('androidx.core.content.FileProvider', tempStr) <= 0 then    //androidX
+        begin
+           insertRef:= '</activity>'; //insert reference point
+           p1:= Pos(insertRef, tempStr);
+           Insert(sLineBreak + supportProvider, tempStr, p1+Length(insertRef));
+           manifestList.Clear;
+           manifestList.Text:= tempStr;
+           manifestList.SaveToFile(pathToProject + 'AndroidManifest.xml');
+        end;
+        manifestList.Free;
+
         list.Clear;
         list.LoadFromFile(pathToJavaTemplates+DirectorySeparator + 'values'+DirectorySeparator+paramTheme+'.xml');
         list.SaveToFile(pathToProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
@@ -563,7 +585,7 @@ begin
           list.Clear;
           list.LoadFromFile(pathToJavaTemplates+DirectorySeparator+'support'+DirectorySeparator+'buildgradle.txt');
 
-          if StrToInt(targetApi) < 26 then targetApi:= '26';
+          if StrToInt(targetApi) < 28 then targetApi:= '28';
 
           tmpStr:= StringReplace(list.Text,'#sdkapi', targetApi, [rfReplaceAll]);
           list.Text:= tmpStr;

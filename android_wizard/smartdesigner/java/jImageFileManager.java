@@ -1,4 +1,4 @@
-package com.example.appchronometerdemo1;
+package org.lamw.appsharefiledemo2;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -342,6 +342,7 @@ public class jImageFileManager /*extends ...*/ {
      else if ( !(fileName.toLowerCase().contains(".png")) ) fileName = fileName + ".png";
      
      if (android.os.Build.VERSION.SDK_INT >= 29) {
+		 //[ifdef_api29up]
          ContentResolver resolver = context.getContentResolver();
          ContentValues contentValues = new ContentValues();
          contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
@@ -357,6 +358,7 @@ public class jImageFileManager /*extends ...*/ {
 			// TODO Auto-generated catch block
 			return false;
 		 }
+		 //[endif_api29up]
      } else {
          String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() 
         		            + File.separator + folderName;
