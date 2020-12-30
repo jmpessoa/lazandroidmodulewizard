@@ -160,6 +160,7 @@ type
  jPanel = class(jVisualControl)
    private
      FOnDown: TOnNotify;
+     FOnUp: TOnNotify;
      FOnDoubleClick: TOnNotify;
      FOnFling: TOnFling;
      FOnPinchGesture: TOnPinchZoom;
@@ -193,6 +194,8 @@ type
      procedure RemoveFromViewParent;  override;
 
      procedure GenEvent_OnDown(Obj: TObject);
+     procedure GenEvent_OnUp(Obj: TObject);
+
      procedure GenEvent_OnClick(Obj: TObject);
      procedure GenEvent_OnLongClick(Obj: TObject);
      procedure GenEvent_OnDoubleClick(Obj: TObject);
@@ -231,6 +234,7 @@ type
      property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
 
      property OnDown : TOnNotify read FOnDown write FOnDown;
+     property OnUp : TOnNotify read FOnUp write FOnUp;
      property OnClick : TOnNotify read FOnClick write FOnClick;
      property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
      property OnDoubleClick : TOnNotify read FOnDoubleClick write FOnDoubleClick;
@@ -3049,6 +3053,13 @@ begin
   begin
     jForm(jImageBtn(Obj).Owner).UpdateJNI(gApp);
     jImageBtn(Obj).GenEvent_OnUp(Obj);
+    exit;
+  end
+  else
+  if Obj is jPanel then
+  begin
+    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
+    jPanel(Obj).GenEvent_OnUp(Obj);
     exit;
   end;
 
@@ -13656,6 +13667,11 @@ end;
 procedure jPanel.GenEvent_OnDown(Obj: TObject);
 begin
   if Assigned(FOnDown) then FOnDown(Obj);
+end;
+
+procedure jPanel.GenEvent_OnUp(Obj: TObject);
+begin
+  if Assigned(FOnUp) then FOnUp(Obj);
 end;
 
 Procedure jPanel.GenEvent_OnClick(Obj: TObject);

@@ -1,4 +1,4 @@
-package org.lamw.appcompatnavigationdrawerdemo1;
+package org.lamw.applistviewdemo8;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
@@ -163,6 +163,7 @@ public class jPanel extends RelativeLayout {
 		public boolean onSingleTapUp(MotionEvent e) {
 			//Log.i("Click", "------------");
 			controls.pOnClick(PasObj, Const.Click_Default);
+			controls.pOnUp(PasObj);
 			return true;
 		}
 		
