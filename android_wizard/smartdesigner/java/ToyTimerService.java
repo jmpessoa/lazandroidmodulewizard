@@ -171,7 +171,7 @@ public class ToyTimerService extends Service {
                 notification = new NotificationCompat.Builder(this, "ToyPullTimerService_Channel")
                         .setContentTitle(contentTitle)
                         .setContentText(contentText +": " + String.valueOf(elapsedTimeMilliSec))
-                        .setSmallIcon(R.drawable.ic_lemur32)
+                        .setSmallIcon(R.drawable.ic_launcher)
                         .setOnlyAlertOnce(true) // so when data is updated don't make sound and alert in android 8.0+
                         .setOngoing(true)
                         //.addAction(R.drawable.ic_lemur32, "STOP SERVICE", getPendingAction(this,"STOP_SERVICE")) //TODO
@@ -183,7 +183,7 @@ public class ToyTimerService extends Service {
                 notification = new Notification.Builder(this)
                         .setContentTitle(contentTitle)
                         .setContentText(contentText + ": " + elapsedTimeMilliSec) //String.valueOf(
-                        .setSmallIcon(R.drawable.ic_lemur32)
+                        .setSmallIcon(R.drawable.ic_launcher)
                         .setOngoing(true)
                         //.addAction(R.drawable.ic_lemur32, "STOP SERVICE", getPendingAction(this,"STOP_SERVICE")) //TODO
                         .setContentIntent(resultPendingIntent)
