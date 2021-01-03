@@ -1,25 +1,31 @@
 object AndroidModule1: TAndroidModule1
-  Left = 287
-  Top = 163
-  Width = 320
-  Height = 400
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
+  Left = 287
+  Top = 163
+  Width = 320
+  Height = 400
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 57
-    Top = 5
-    Width = 206
-    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
+    Left = 26
+    Top = 5
+    Width = 267
+    Height = 26
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
@@ -27,22 +33,23 @@ object AndroidModule1: TAndroidModule1
     LayoutParamHeight = lpWrapContent
     Text = 'App Custom ShowMessage Demo1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
-    Id = 6984139
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
-    Left = 2
-    Top = 34
-    Width = 316
-    Height = 40
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
+    Left = 2
+    Top = 40
+    Width = 316
+    Height = 57
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
@@ -53,18 +60,20 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
-    Id = 0
   end
   object jPanel1: jPanel
-    Left = 2
-    Top = 109
-    Width = 312
-    Height = 102
     MarginLeft = 4
     MarginTop = 4
     MarginRight = 4
     MarginBottom = 4
+    Enabled = True
+    Left = 2
+    Top = 109
+    Width = 312
+    Height = 113
     Visible = False
     PosRelativeToAnchor = []
     PosRelativeToParent = []
@@ -73,10 +82,16 @@ object AndroidModule1: TAndroidModule1
     BackgroundColor = colbrLightCyan
     MinPinchZoomFactor = 0.25
     MaxPinchZoomFactor = 4
-    Id = 0
+    AnimationDurationIn = 1500
+    AnimationMode = animNone
     object jImageView1: jImageView
-      Left = 6
-      Top = 7
+      MarginLeft = 0
+      MarginTop = 0
+      MarginRight = 0
+      MarginBottom = 0
+      Enabled = True
+      Left = 0
+      Top = 0
       Width = 48
       Height = 48
       Visible = True
@@ -84,21 +99,24 @@ object AndroidModule1: TAndroidModule1
       PosRelativeToParent = [rpTop, rpLeft]
       LayoutParamWidth = lpWrapContent
       LayoutParamHeight = lpWrapContent
-      ImageIndex = -1
       BackgroundColor = colbrDefault
       ImageIdentifier = 'ic_launcher'
       ImageScaleType = scaleCenter
-      Id = 9575071
+      GravityInParent = lgNone
+      RoundedShape = False
+      AnimationDurationIn = 1500
+      AnimationMode = animNone
     end
     object jTextView2: jTextView
-      Left = 111
-      Top = 5
-      Width = 90
-      Height = 20
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
+      Left = 98
+      Top = 5
+      Width = 115
+      Height = 26
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpCenterHorizontal]
@@ -106,39 +124,44 @@ object AndroidModule1: TAndroidModule1
       LayoutParamHeight = lpWrapContent
       Text = 'Hello World !!  '
       Alignment = taLeft
-      Enabled = True
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
       TextTypeFace = tfNormal
-      Id = 5647856
+      FontSizeUnit = unitDefault
+      GravityInParent = lgNone
     end
     object jDigitalClock1: jDigitalClock
-      Left = 206
-      Top = 7
-      Width = 96
-      Height = 48
       MarginLeft = 10
       MarginTop = 10
       MarginRight = 10
       MarginBottom = 10
+      Enabled = True
+      Left = 206
+      Top = 10
+      Width = 96
+      Height = 48
       Visible = True
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpTop, rpRight]
       LayoutParamWidth = lpWrapContent
       LayoutParamHeight = lpWrapContent
       BackgroundColor = colbrDefault
-      Id = 0
+      FontSize = 0
+      FontColor = colbrDefault
+      GravityInParent = lgNone
+      FontSizeUnit = unitDefault
     end
     object jButton2: jButton
-      Left = 2
-      Top = 62
-      Width = 308
-      Height = 40
       MarginLeft = 2
       MarginTop = 4
       MarginRight = 2
       MarginBottom = 4
+      Enabled = True
+      Left = 2
+      Top = 52
+      Width = 308
+      Height = 57
       Visible = True
       Anchor = jImageView1
       PosRelativeToAnchor = [raBelow]
@@ -149,18 +172,20 @@ object AndroidModule1: TAndroidModule1
       BackgroundColor = colbrDefault
       FontColor = colbrDefault
       FontSize = 0
+      FontSizeUnit = unitDefault
+      GravityInParent = lgNone
       OnClick = jButton2Click
-      Id = 0
     end
     object jCheckBox1: jCheckBox
-      Left = 103
-      Top = 35
-      Width = 105
-      Height = 32
       MarginLeft = 5
       MarginTop = 5
       MarginRight = 5
       MarginBottom = 5
+      Enabled = True
+      Left = 93
+      Top = 41
+      Width = 125
+      Height = 32
       Visible = True
       Anchor = jTextView2
       PosRelativeToAnchor = [raBelow]
@@ -172,8 +197,8 @@ object AndroidModule1: TAndroidModule1
       FontColor = colbrDefault
       FontSize = 0
       Checked = False
+      FontSizeUnit = unitDefault
       OnClick = jCheckBox1Click
-      Id = 0
     end
   end
 end

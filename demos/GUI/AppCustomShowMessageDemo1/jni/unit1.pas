@@ -46,6 +46,7 @@ implementation
 //Note: jPanel1.Visible:= false!
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
+   Self.CancelShowCustomMessage();
    ShowCustomMessage(jPanel1.View, gvBottom);  //gvCenter
 end;
 
@@ -59,6 +60,7 @@ procedure TAndroidModule1.jButton2Click(Sender: TObject);
 begin
    if not FlyingAppTitle then
    begin
+      Self.CancelShowCustomMessage();
       ShowCustomMessage(jTextView1.View, gvCenter);   //  just for fun!
       FlyingAppTitle:= True
    end
@@ -74,7 +76,10 @@ end;
 procedure TAndroidModule1.jCheckBox1Click(Sender: TObject);
 begin
   if jCheckBox1.Checked then
+  begin
+     Self.CancelShowCustomMessage();
      ShowCustomMessage(jTextView2.View, gvCenter)  //just for fun!
+  end
   else
      jTextView2.ViewParent:= jPanel1.View;
 end;

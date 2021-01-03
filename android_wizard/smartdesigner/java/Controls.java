@@ -1,4 +1,4 @@
-package org.lamw.applistviewdemo8;
+package com.example.appcustomshowmessagedemo1;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.1 [AndroidX!!] - 11 November - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -206,6 +206,8 @@ class jForm {
 	private int animationDurationIn = 1500;
 	private int animationDurationOut = 1500;
 	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
+
+	public Toast mCustomToast = null;
 
 	// Constructor
 	public jForm(Controls ctrls, long pasobj) {
@@ -1357,11 +1359,10 @@ class jForm {
 	    } catch (IOException e) {
 	     return "";	
 	    }
-	    
 
-	    // Get the current version pattern sequence 
+	    // Get the current version pattern sequence
 	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
-	    if(null == versionString){ 
+	    if(null == versionString){
 	        return "";
 	    }else{
 	        // get version from "htlgb">X.X.X</span>
@@ -1371,19 +1372,32 @@ class jForm {
 	    return playStoreAppVersion;
 	}
 
+	public void CancelShowCustomMessage() {
+		if (mCustomToast != null) {
+			mCustomToast.cancel();
+			mCustomToast = null;
+		}
+	}
+
 	//android.view.View
 	public void ShowCustomMessage(View _layout, int _gravity) {
 		//controls.pOnShowCustomMessage(PasObj);
-		Toast toast = new Toast(controls.activity);
-		toast.setGravity(_gravity, 0, 0);
-		toast.setDuration(Toast.LENGTH_LONG);
-		RelativeLayout par = (RelativeLayout) _layout.getParent();
-		if (par != null) {
-			par.removeView(_layout);
+
+		//android.view.ViewGroup
+		if (_layout.getParent() instanceof android.widget.RelativeLayout) {
+			android.widget.RelativeLayout par = (android.widget.RelativeLayout) _layout.getParent();
+			if (par != null) {
+				par.removeView(_layout);
+			}
 		}
+
+		mCustomToast = new Toast(controls.activity);
+		mCustomToast.setGravity(_gravity, 0, 0);
+		mCustomToast.setDuration(Toast.LENGTH_LONG);
 		_layout.setVisibility(View.VISIBLE);
-		toast.setView(_layout);
-		toast.show();
+		mCustomToast.setView(_layout);
+		mCustomToast.show();
+
 	}
 
 	private class MyCountDownTimer extends CountDownTimer {
@@ -1408,19 +1422,21 @@ class jForm {
 	}
 
 	public void ShowCustomMessage(View _layout, int _gravity, int _lenghTimeSecond) {
-		Toast toast = new Toast(controls.activity);
-		toast.setGravity(_gravity, 0, 0);
+
+		mCustomToast = new Toast(controls.activity);
+		mCustomToast.setGravity(_gravity, 0, 0);
 		//toast.setDuration(Toast.LENGTH_LONG);
-		RelativeLayout par = (RelativeLayout) _layout.getParent();
+		android.widget.RelativeLayout par = (android.widget.RelativeLayout) _layout.getParent();
 		if (par != null) {
 			par.removeView(_layout);
 		}
 		_layout.setVisibility(View.VISIBLE);//0
-		toast.setView(_layout);
+		mCustomToast.setView(_layout);
 		//it will show the toast for 20 seconds:
 		//(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
-		MyCountDownTimer countDownTimer = new MyCountDownTimer(_lenghTimeSecond * 1000, 1000, toast);
+		MyCountDownTimer countDownTimer = new MyCountDownTimer(_lenghTimeSecond * 1000, 1000, mCustomToast);
 		countDownTimer.start();
+
 	}
 
 	public void SetScreenOrientation(int _orientation) {

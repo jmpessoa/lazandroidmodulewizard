@@ -1278,6 +1278,7 @@ type
 
     procedure ShowCustomMessage(_panel: jObject; _gravity: TGravity);  overload;
     procedure ShowCustomMessage(_layout: jObject; _gravity: TGravity; _lenghTimeSecond: integer); overload;
+    procedure CancelShowCustomMessage();
 
     procedure SetScreenOrientationStyle(_orientation: TScreenStyle);
     function  GetScreenOrientationStyle(): TScreenStyle;
@@ -1678,6 +1679,7 @@ end;
 
   procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer); overload;
   procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer); overload;
+  procedure jForm_CancelShowCustomMessage(env: PJNIEnv; _jform: JObject);
 
   procedure jForm_Vibrate(env: PJNIEnv; _jform: JObject; var _millisecondsPattern: TDynArrayOfInt64);
 
@@ -3983,6 +3985,13 @@ begin
      jForm_ShowCustomMessage(FjEnv, FjObject, _panel, GetGravity(_gravity) );
 end;
 
+procedure jForm.CancelShowCustomMessage();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_CancelShowCustomMessage(FjEnv, FjObject);
+end;
+
 procedure jForm.SetScreenOrientationStyle(_orientation: TScreenStyle);
 begin
   //in designing component state: set value here...
@@ -4865,6 +4874,17 @@ begin
   jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'ShowCustomMessage', '(Landroid/view/View;I)V'); //RelativeLayout
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jForm_CancelShowCustomMessage(env: PJNIEnv; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'CancelShowCustomMessage', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
