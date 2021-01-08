@@ -547,7 +547,10 @@ begin
         //Result:= '3.4.0';
         //gradleVer:= 'Gradle Gradle 5.1.1'
 
-        Result:= '3.1.0'; //just to support minSdk/targetSdk from AndroidManifest!!
+         //Result:= '3.4.1';
+        //gradleVer:= 'Gradle Gradle 6.6.1'
+
+         Result:= '3.1.0'; // just to support minSdk/targetSdk from AndroidManifest!!
     end;
 
   end;
@@ -954,7 +957,7 @@ begin
        end
        else
        begin
-         buildToolApi:= '28';
+         buildToolApi:= '29';
          pluginVersion:= '3.1.0';  //gradle 4.4.1
        end;
 
@@ -1109,12 +1112,6 @@ begin
          strList.Add('    }');
          end;
 
-         {
-         if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) then    //Now [AndroidX] already support Api 29!
-         begin
-           if buildToolApi = '29'  then buildToolApi:= '28';
-         end;
-         }
 
          if Pos('AppCompat', AndroidTheme) > 0 then
          begin
@@ -1591,31 +1588,31 @@ begin
 
       if IsAllCharNumber(PChar(sdkManifestTargetApi))  then
           manifestTargetApi:= StrToInt(sdkManifestTargetApi)
-      else manifestTargetApi:= 28;
+      else manifestTargetApi:= 29;
 
       buildTool:=  GetBuildTool(manifestTargetApi);
 
-      if manifestTargetApi < 28 then
+      if manifestTargetApi < 29 then
       begin
-         queryValue:= '28';
+         queryValue:= '29';
 
-         if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 28',
-                       '[Suggestion] Change Target API to 28'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
+         if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 29',
+                       '[Suggestion] Change Target API to 29'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
          begin
-           if ( IsAllCharNumber(PChar(queryValue)) AND (queryValue <> '28') ) then
+           if ( IsAllCharNumber(PChar(queryValue)) AND (queryValue <> '29') ) then
               begin
                  manifestTargetApi:= StrToInt(queryValue);
                  buildTool:= GetBuildTool(manifestTargetApi);
            end
            else
            begin
-             manifestTargetApi:= 28;
-             buildTool:= GetBuildTool(28);
+             manifestTargetApi:= 29;
+             buildTool:= GetBuildTool(29);
            end;  ;
          end; //if input...
 
       end
-      else //target >= 28
+      else //target >= 29
       begin
         outMaxBuildTool:= FCandidateSdkBuild;
         if not LamwGlobalSettings.KeepManifestTargetApi  then

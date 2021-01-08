@@ -314,7 +314,8 @@ begin
   else if api='25' then Result:= 'Nougat 7.1'
   else if api='26' then Result:= 'Oreo 8.0'
   else if api='27' then Result:= 'Oreo 8.1'
-  else if api='28' then Result:= 'Pie 9.0';
+  else if api='28' then Result:= 'Pie 9.0'
+  else if api='29' then Result:= 'Android 10';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -391,16 +392,11 @@ begin
        FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
     if not IsAllCharNumber(PChar(FTargetApi))  then
-      FTargetApi:= '28';
+      FTargetApi:= '29';
 
     intTarqetApi:= StrToInt(FTargetApi);
-    if intTarqetApi  < 28 then
-       ShowMessage('Warning: remember that "google play" store NOW equires Target Api >= 28 !');
-
-    if (intTarqetApi > 28) and ( Pos('AppCompat', ComboBoxTheme.Text) > 0) then
-    begin
-       FTargetApi:= '28'; //LAMW dont support AndroidX, yet!
-    end;
+    if intTarqetApi  < 29 then
+       ShowMessage('Warning: remember that "google play" store NOW equires Target Api >= 29 !');
 
   end;
 end;
@@ -413,9 +409,9 @@ begin
   begin
    intApi:= StrToInt(ListBoxTargetAPI.Text);
 
-   if intApi < 28  then
+   if intApi < 29  then
    begin
-     ShowMessage('AppCompat theme need Target Api >= 28'+ sLineBreak + '[android-sdk/platforms/android-28]');
+     ShowMessage('AppCompat theme need Target Api >= 29'+ sLineBreak + '[android-sdk/platforms/android-29]');
    end;
 
   end;
@@ -584,15 +580,10 @@ begin
 
   apiTarg:= StrToInt(FTargetApi);
 
-  if (apiTarg > 28) and ( Pos('AppCompat', ComboBoxTheme.Text) > 0) then
-  begin
-     FTargetApi:= '28'; //LAMW dont support AndroidX, yet!
-  end;
-
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
   if not IsAllCharNumber(PChar(FMinApi))  then FMinApi:= '14';
-  if not IsAllCharNumber(PChar(FTargetApi)) then FTargetApi:= '28';
+  if not IsAllCharNumber(PChar(FTargetApi)) then FTargetApi:= '29';
 
   if StrToInt(FMinApi) > apiTarg then FMinApi:= IntToStr(apiTarg);
 
@@ -844,7 +835,7 @@ var
 begin
 
   strTApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 28
+  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 29
   else tApi:= StrToInt(strTApi);
 
   strMApi:= ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex];
@@ -1205,14 +1196,14 @@ begin
 
     CheckBoxSupport.Checked:= True; //inner Supported!!!
 
-    if (FMaxSdkPlatform < 28) or (FPathToGradle = '')   then
+    if (FMaxSdkPlatform < 29) or (FPathToGradle = '')   then
     begin
       ShowMessage('Warning/Recomendation:'+
                sLineBreak+
-               sLineBreak+'[LAMW 0.8.6] "AppCompat" [material] theme need:'+
+               sLineBreak+'[LAMW 0.8.6.1] "AppCompat" [material] theme need:'+
                sLineBreak+' 1. Java JDK 1.8'+
                sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]' +
-               sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
+               sLineBreak+' 3. Android SDK "plataforms" 29 + "build-tools" 29.0.3'+
                sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
                sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
                sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1237,13 +1228,13 @@ begin
 
     intTargetApi:= StrToInt(ListBoxTargetAPI.Text);
 
-    if intTargetApi < 28 then
+    if intTargetApi < 29 then
     begin
-       if Pos('28',ListBoxTargetAPI.Items.Text) > 0 then
+       if Pos('29',ListBoxTargetAPI.Items.Text) > 0 then
        begin
-          index:= ListBoxTargetAPI.Items.IndexOf('28');
+          index:= ListBoxTargetAPI.Items.IndexOf('29');
           ListBoxTargetAPI.ItemIndex:= index;
-          ListBoxTargetAPI.Text:= '28';
+          ListBoxTargetAPI.Text:= '29';
           ListBoxTargetAPICloseUp(Self);
        end;
     end;
@@ -1277,7 +1268,8 @@ begin
       if apiMin < 18 then
       begin
           ListBoxMinSDK.Text:= '18';
-          ShowMessage('warning: Support Library[v4] need device Api >= 18');
+          ShowMessage('warning: Support Library need "Min. Device Api" >= 18');
+          StatusBarInfo.Panels.Items[1].Text:= '[MinSdk] JellyBean 4.3';
       end;
    end;
 end;
@@ -1292,15 +1284,15 @@ begin
   begin
      intApi:= StrToInt(ListBoxTargetAPI.Text);
 
-     if intApi < 28 then
+     if intApi < 29 then
      begin
        flag:= False;
-       if Pos('28',ListBoxTargetAPI.Items.Text) > 0 then
+       if Pos('29',ListBoxTargetAPI.Items.Text) > 0 then
        begin
           flag:= True;
-          index:= ListBoxTargetAPI.Items.IndexOf('28');
+          index:= ListBoxTargetAPI.Items.IndexOf('29');
           ListBoxTargetAPI.ItemIndex:= index;
-          ListBoxTargetAPI.Text:= '28';
+          ListBoxTargetAPI.Text:= '29';
           ListBoxTargetAPICloseUp(Self);
        end;
 
@@ -1317,14 +1309,14 @@ begin
        end;
 
        if not flag then
-          ShowMessage('warning: Support Library need TargetApi >= 28');
+          ShowMessage('warning: Support Library need TargetApi >= 29');
 
      end;
 
      if (cbBuildSystem.Text <> 'Gradle') then
      begin
        cbBuildSystem.Text:= 'Gradle';
-       ShowMessage('Warning: Support Library need Gradle 6.6.1 and Target API >= 28');
+       ShowMessage('Warning: Support Library need Gradle 6.6.1 and Target API >= 29');
      end
   end
 end;
@@ -1348,7 +1340,7 @@ begin
   begin
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then
-      MessageDlg('[LAMW 0.8.6] "AppCompat" [material] theme need JDK 1.8 + Gradle 6.6.1 [or up]!', mtWarning, [mbOk], 0);
+      MessageDlg('[LAMW 0.8.6.1] "AppCompat" [material] theme need JDK 1.8 + Gradle 6.6.1 [or up]!', mtWarning, [mbOk], 0);
   end;
 
 end;
@@ -1401,10 +1393,10 @@ procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.6] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.6.1] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin] or up' +
-           sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
+           sLineBreak+' 3. Android SDK "plataforms" 29 + "build-tools" 29.0.3'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1438,7 +1430,6 @@ begin
              begin
                if HasBuildTools(intApi, outBuildTool) then
                begin
-                  //if intApi <= 28 then //LAMW dont support AndroidX [yet]
                     ListBoxTargetAPI.Items.Add(strApi);
                end;
              end;
@@ -1462,10 +1453,10 @@ procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.6] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.6.1] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3'+
+           sLineBreak+' 3. Android SDK "plataforms" 29 + "build-tools" 29.0.3'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+

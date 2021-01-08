@@ -102,7 +102,7 @@ Version 0.8 - rev 06 - 30 - October - 2020
 
 	Migrate Material Theme/AppCompat to AndroidX [by @ADiV]
 
-	Requires SDK 28 or higher
+	Requires Android SDK 29 or higher
 	and
 	Gradle 6.6.1
  
@@ -113,7 +113,7 @@ Version 0.8 - rev 06 - 30 - October - 2020
 Version 0.8 - rev 05 - 13 - August - 2019
 	
 	NEW! jForm/jPanel/jImageView [effect]  Animation Trasition!!!
-		Add properties:
+		Added properties:
 			Animation {Fade, RightToLeft, LeftToRight)
 			AnimationDuration
 

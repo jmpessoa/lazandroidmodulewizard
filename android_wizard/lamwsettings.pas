@@ -25,7 +25,7 @@ type
 
   TLamwGlobalSettings = class
   public const
-    Version = '0.8.6';
+    Version = '0.8.6.1';
   private const
     IniFileName = 'LAMW.ini';
     IniFileSection = 'NewProject';
@@ -101,7 +101,7 @@ const
 
   AppCompatLibs: TAppCompatLibs = (    //renamed by jmpessoa
     (MinAPI:28;Name:'androidx.appcompat:appcompat:1.2.0'),
-    (MinAPI:28;Name:'com.google.android.material:material:1.0.0')
+    (MinAPI:28;Name:'com.google.android.material:material:1.0.0') //TODO: update to "1.2.1"
   );
 
   SupportLibs: TSupportLibs = (  //refactored by jmpessoa

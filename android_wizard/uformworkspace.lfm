@@ -3,7 +3,7 @@ object FormWorkspace: TFormWorkspace
   Height = 715
   Top = 121
   Width = 511
-  Caption = '[LAMW 0.8.6]  New Project'
+  Caption = '[LAMW 0.8.6.1]  New Project'
   ClientHeight = 715
   ClientWidth = 511
   Color = clGradientInactiveCaption

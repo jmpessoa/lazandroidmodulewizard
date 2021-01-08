@@ -1,11 +1,11 @@
 {
 	"name": "Lazarus Android Module Wizard",
-	"version": "0.8.6",
+	"version": "0.8.6.1",
 	"dependencies":{
 		"gradle": "6.6.1",
 		"android":{
-			"platform": "28",
-			"buildTools" : "28.0.3"
+			"platform": "29",
+			"buildTools" : "29.0.3"
 		}
 	}
 }

@@ -8,8 +8,8 @@
 
 	Linux Install Tutorial:  LAMW folder  "...docs\linux"
 
-	New! LAMW Manager 
-		https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html
+	New! "LAMW Manager" https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html
+
 		https://github.com/DanielOliveiraSouza/LAMW4Linux-installer
 		https://github.com/DanielOliveiraSouza/LAMW4Windows-installer
                   
@@ -51,8 +51,8 @@ I. Infrastructure
 		2)run the command  ">android update sdk"   to open a GUI "SDK Manager"
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
-		6)check "Android SDK Build-Tools 28.0.3"  	
-		8)go to "Android 9.0.0 (API 28)" and check only "SDK Platform"
+		6)check "Android SDK Build-Tools 29.0.3"  	
+		8)go to "Android 10 (API 29)" and check only "SDK Platform"
 		9)go to "Extras" and check: 
 				"Android Support Repository"				
 				"Android Support Library"				
@@ -80,8 +80,8 @@ I. Infrastructure
 	.Option 2) Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
 		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases
 
-	.Option 3) New! LAMW Manager 
-		https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html	
+	.Option 3) New! LAMW Manager https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html
+	
 		https://github.com/DanielOliveiraSouza/LAMW4Linux-installer
 		https://github.com/DanielOliveiraSouza/LAMW4Windows-installer
 	
@@ -151,6 +151,7 @@ I. Infrastructure
 	Simply "extract here" the zip file to produce the folder "gradle-6.6.1" in a convenient location...
 
 	warning: Gradle build process need internet connection!!!
+	Warning: Gradle 6.X  don't support Java > 13!
 
 .Hint [Lazarus Docked Desktop. Nice!]
 	https://github.com/FlKo/LazarusDockedDesktops
@@ -158,7 +159,7 @@ I. Infrastructure
 .[LAMW 0.8.6] "AppCompat" [material design] theme need:'+
 		1. Java JDK 1.8   
 		2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]
-		3. Android SDK "plataforms" 28 + "build-tools" 28.0.3 
+		3. Android SDK "plataforms" 29 + "build-tools" 29.0.3 
 		4. Android SDK/Extra	"Support Repository"
 		5. Android SDK/Extra	"Support Library"
 		6. Android SDK/Extra	"Google Repository"
@@ -219,11 +220,13 @@ III. USING LAMW
 
 		example: 14
 
+		warning: some LAMW component can change/need a more recent MinSdk Api
+
 	2.8-Select Architecture/Instruction: 
 
 		example: ARMv7a + Soft
 		
-		NOTE: 	.Laz4Android2.0.0 support  "ARMv6" and "ARMv7a + Soft"
+		NOTE: 	.Laz4Android2.0.0 support only "ARMv6" and "ARMv7a + Soft"
 			.Fpcupdeluxe support  "ARMv7a + VFPv3" and "Aarch64"
 			.LAMW Manager support  "ARMv7a + VFPv3" and "Aarch64"
 		
