@@ -150,6 +150,8 @@ type
     PathToJNIFolder: string;
     ModuleType: integer;   //-1:gdx 0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
 
+    SmallProjName: string;
+
     constructor Create; override;
 
     function CreateSource(const Filename     : string;
@@ -178,6 +180,8 @@ type
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
     ModuleType: integer;   //-1:gdx 0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
+
+   //FSmallProjName: string;
 
     constructor Create; override;
 
@@ -830,6 +834,7 @@ begin
 
       FPathToJNIFolder := FAndroidProjectName;
       AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+      AndroidFileDescriptor.SmallProjName:=  FSmallProjName;
       AndroidFileDescriptor.ModuleType:= 0;
 
       with TJavaParser.Create(FFullJavaSrcPath + DirectorySeparator+  'Controls.java') do
@@ -1444,7 +1449,7 @@ var
   linuxAndroidProjectName: string;
   linuxPathToGradle: string;
   tempStr: string;
-  auxStr: string;
+  instructionChip, apkName: string;
   linuxPathToAdbBin: string;
   linuxPathToAntBin: string;
   apk_aliaskey, strText: string;
@@ -1605,6 +1610,22 @@ begin
       FAntBuildMode:= frm.AntBuildMode;
       FPackagePrefaceName:= frm.PackagePrefaceName; // ex.: org.lamw  or  example.com
       AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName;
+
+      tempStr:= LowerCase(FInstructionSet);
+      if Length(tempStr)>0 then
+      begin
+      if tempStr = 'armv6'  then instructionChip:='armeabi';
+      if tempStr = 'armv7a' then instructionChip:='armeabi-v7a';
+      if tempStr = 'x86'    then instructionChip:='x86';
+      if tempStr = 'x86_64' then instructionChip:='x86_64';
+      if tempStr = 'mipsel' then instructionChip:='mips';
+      if tempStr = 'armv8'  then instructionChip:='arm64-v8a';
+      end
+      else
+      begin
+        instructionChip:= ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+        instructionChip:= ExtractFileName(instructionChip);
+      end;
 
       try
         if  FProjectModel = 'Ant' then
@@ -1924,15 +1945,22 @@ begin
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch-avd-default.bat');
 
           strList.Clear;
-          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
           strList.Add(FPathToAndroidSDK+'platform-tools'+
-                     DirectorySeparator+'adb install -r '+FSmallProjName+'-'+FAntBuildMode+'.apk');
-          strList.Add('cd ..');
+                     DirectorySeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
+          strList.Add(FPathToAndroidSDK+'platform-tools'+
+                     DirectorySeparator+'adb install -r '+FAndroidProjectName+DirectorySeparator+'bin'+DirectorySeparator+FSmallProjName+'-debug.apk');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'adb-install-'+FAntBuildMode+'.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-adb-install-debug.bat');
 
           strList.Clear;
-          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
+          strList.Add(FPathToAndroidSDK+'platform-tools'+
+                     DirectorySeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
+          strList.Add(FPathToAndroidSDK+'platform-tools'+
+                     DirectorySeparator+'adb install -r '+FAndroidProjectName+DirectorySeparator+'build'+DirectorySeparator+'outputs'+DirectorySeparator+'apk'+DirectorySeparator+'debug'+DirectorySeparator+FSmallProjName+'-'+instructionChip+'-debug.apk');
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'gradle-adb-install-debug.bat');
+
+          strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'adb-uninstall.bat');
@@ -2144,7 +2172,14 @@ begin
           strList.Add('path %JAVA_HOME%'+PathDelim+'bin;%path%');
           strList.Add('cd '+FAndroidProjectName);
           strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'bin'+DirectorySeparator+FSmallProjName+'-release.apk');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jarsigner-verify.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-jarsigner-verify.bat');
+
+          strList.Clear;
+          strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+          strList.Add('path %JAVA_HOME%'+PathDelim+'bin;%path%');
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'build'+DirectorySeparator+'outputs'+DirectorySeparator+'apk'+DirectorySeparator+'release'+DirectorySeparator+FSmallProjName+'-release.apk');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'gradle-jarsigner-verify.bat');
 
           strList.Clear;
 
@@ -2181,7 +2216,7 @@ begin
           strList.Add(' ');
           strList.Add('');
           strList.Add('4 [Gradle]: execute the [project] command "gradle-local-apksigner.bat" [or .sh] to get the [release] signed Apk! (thanks to TR3E!)');
-          strList.Add('            or execute "gradle-local-universal-apksigner.bat" if your are supporting multi-architecture (ex.: armeabi-v7a + arm64-v8a + ...) ');
+          strList.Add('            OR execute "gradle-local-universal-apksigner.bat" [or .sh] if your are supporting multi-architecture (ex.: armeabi-v7a + arm64-v8a + ...) ');
           strList.Add('            hint: look for your generated apk in [project] folder "...\build\outputs\apk\release"');
           strList.Add(' ');
           strList.Add('');
@@ -2282,9 +2317,6 @@ begin
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
 
-          //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r '+linuxDirSeparator+'bin'+linuxDirSeparator+projName+'-'+FAntBuildMode+'.apk');
-          //fix/sugestion by OsvaldoTCF - clear slash from /bin
-
           tempStr:= FAndroidProjectName;
           {$ifdef windows}
           tempStr:= StringReplace(FAndroidProjectName,PathDelim,linuxDirSeparator, [rfReplaceAll]);
@@ -2292,9 +2324,20 @@ begin
           {$endif}
 
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr +
-                                  linuxDirSeparator+ 'bin' + linuxDirSeparator+FSmallProjName+'-'+FAntBuildMode+'.apk');
-          //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'adb-install-'+FAntBuildMode+'.sh');
+                                  linuxDirSeparator+ 'bin' + linuxDirSeparator+FSmallProjName+'-debug.apk');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-adb-install-debug.sh');
+
+          strList.Clear;
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
+          tempStr:= FAndroidProjectName;
+          {$ifdef windows}
+          tempStr:= StringReplace(FAndroidProjectName,PathDelim,linuxDirSeparator, [rfReplaceAll]);
+          tempStr:= Copy(tempStr, 3, MaxInt); //drop C:
+          {$endif}
+          strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr +
+                                  linuxDirSeparator+ 'build'+linuxDirSeparator+'outputs'+linuxDirSeparator+'apk'+linuxDirSeparator+'debug' + linuxDirSeparator+FSmallProjName+'-'+instructionChip+'-debug.apk');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-adb-install-debug.sh');
+
 
           //linux uninstall  - thanks to Stephano!
           strList.Clear;
@@ -2326,7 +2369,13 @@ begin
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'jarsigner-verify.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-jarsigner-verify.sh');
+
+          strList.Clear;
+          strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'build'+linuxDirSeparator+'outputs'+linuxDirSeparator+'apk'+linuxDirSeparator+'release'+linuxDirSeparator+FSmallProjName+'-release.apk');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-jarsigner-verify.sh');
 
           //MacOs
           strList.Clear;
@@ -2334,7 +2383,14 @@ begin
           strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
           strList.Add('cd '+linuxAndroidProjectName);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'jarsigner-verify-macos.sh');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-jarsigner-verify-macos.sh');
+
+          strList.Clear;
+          strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+          strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
+          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'build'+linuxDirSeparator+'outputs'+linuxDirSeparator+'apk'+linuxDirSeparator+'release'+linuxDirSeparator+FSmallProjName+'-release.apk');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-jarsigner-verify-macos.sh');
 
           strList.Clear;
           strList.Add('sdk.dir=' + FPathToAndroidSDK);
@@ -2436,41 +2492,18 @@ begin
                 strList.Add('       abortOnError false');
                 strList.Add('    }');
 
-                tempStr:= LowerCase(FInstructionSet);
-                if Length(tempStr)>0 then
-                begin
-                if tempStr = 'armv6'  then auxStr:='armeabi';
-                if tempStr = 'armv7a' then auxStr:='armeabi-v7a';
-                if tempStr = 'x86'    then auxStr:='x86';
-                if tempStr = 'x86_64' then auxStr:='x86_64';
-                if tempStr = 'mipsel' then auxStr:='mips';
-                if tempStr = 'armv8'  then auxStr:='arm64-v8a';
-                end
-                else
-                begin
-                  auxStr := ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
-                  auxStr := ExtractFileName(auxStr);
-                end;
-
-                if (Length(auxStr)>0) then
+                if (Length(instructionChip)>0) then
                 begin
                 strList.Add('    splits {');
                 strList.Add('        abi {');
                 strList.Add('            enable true');
                 strList.Add('            reset()');
-                strList.Add('            include '''+auxStr+'''');
+                strList.Add('            include '''+instructionChip+'''');
                   //strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
                 strList.Add('            universalApk false');
                 strList.Add('        }');
                 strList.Add('    }');
                 end;
-
-                {
-                if ((Pos('AppCompat', FAndroidTheme) > 0) OR (FSupport)) then
-                begin
-                  if compileSdkVersion = '29'  then compileSdkVersion:= '28';  //LAMW dont support [already!] AndroidX libraries
-                end;
-                }
 
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin
@@ -2658,7 +2691,7 @@ begin
                 strList.Add('             systemProp.https.proxyHost=10.0.16.1');
                 strList.Add('             systemProp.https.proxyPort=3128');
                 strList.Add(' ');
-                strList.Add('        Note 5. Java Jdk 1.8, Android SDK "platform" 26 [or up],  "build-tools" 26.0.2, Android SDK Extra "support library/repository" and "Gradle 4.4.1" are "must have" to support AppCompat material theme in LAMW 0.8.4');
+                strList.Add('        Note 5. Java Jdk 1.8, Android SDK "platform" 29 [or up],  "build-tools" 29.0.3, Android SDK Extra "support library/repository" and "Gradle 6.6.1" are "must have" to support AppCompat material theme in LAMW 0.8.6.1');
                 strList.Add(' ');
                 strList.Add(' ');
                 strList.Add('***SETTING ENVIRONMENT VARIABLES...');
@@ -2879,8 +2912,12 @@ begin
                 strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools;'+FPathToAndroidSDK+'build-tools\'+sdkBuildTools);
                 strList.Add('set GRADLE_HOME='+FPathToGradle);
                 strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release-unsigned-aligned.apk');
+
+                //fixed! thanks do @pasquale!
+                apkName:= FSmallProjName+ '-' + instructionChip;
+
+                strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-apksigner.bat');
 
                 strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
@@ -2919,8 +2956,8 @@ begin
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'build-tools/'+sdkBuildTools+':$PATH');
                 strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release-unsigned-aligned.apk');
+                strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-apksigner.sh');
 
                 strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
@@ -2928,8 +2965,8 @@ begin
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'build-tools/'+sdkBuildTools+':$PATH');
                 strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+FAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.sh');
 
                 strList.Clear;
@@ -3221,8 +3258,9 @@ begin
   if FModuleType <= 0 then  //GUI
     AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI or gdx  controls
 
-  sourceList:= TStringList.Create;
-  sourceList.Add('{hint: save all files to location: ' + projDir + ' }');
+  sourceList:= TStringList.Create;              //FSmallProjName
+  //sourceList.Add('{hint: save all files to location: ' + projDir + ' }');
+  sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+DirectorySeparator+'jni }');
 
   if FModuleType = 2 then  //console executavel
     sourceList.Add('program '+ LowerCase(FSmallProjName) +'; '+ ' //[by LAMW: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']')
@@ -4003,9 +4041,11 @@ begin
    sourceList:= TStringList.Create;
 
    if ModuleType < 2 then
-     sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }')
+     //sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }')
+     sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+SmallProjName+DirectorySeparator+'jni }')
    else
-     sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder +'}');
+     //sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder +'}');
+     sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+SmallProjName+DirectorySeparator +'}');
 
    sourceList.Add('unit '+uName+';');
    sourceList.Add('');
@@ -4087,8 +4127,10 @@ begin
 
    if ModuleType < 2 then
      sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }')
+     //sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+DirectorySeparator+'jni }')
    else
      sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder +'}');
+     //sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+DirectorySeparator+'jni }');
 
    sourceList.Add('unit '+uName+';');
    sourceList.Add('');
