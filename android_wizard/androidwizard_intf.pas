@@ -2183,12 +2183,11 @@ begin
 
           strList.Clear;
 
-          strList.Add('Tutorial: How to get your signed release Apk');
-          strList.Add('          warning: you need a google developer account!');
+          strList.Add('       Tutorial: How to get your "signed" release Apk: '+ FSmallProjName);
           strList.Add(' ');
-          strList.Add('1)Edit/change the project file "keytool_input.txt" to representative information:"');
+          strList.Add('1)Edit/change the project file "keytool_input.txt" to more representative informations:"');
           strList.Add('');
-          strList.Add('.Your  google account keystore password: 123456');
+          strList.Add('.Your keystore password [--ks-pass pass] : 123456');
           strList.Add('.Re-enter/confirm the keystore password: 123456');
           strList.Add(' ');
           strList.Add('.Your first and last name: MyFirstName MyLastName');
@@ -2205,29 +2204,31 @@ begin
           strList.Add('');
           strList.Add('.All correct: y');
           strList.Add('');
-          strList.Add('.Your key password for this Apk alias-key: 123456');
+          strList.Add('.Your key password for this Apk alias [--key-pass pass]: 123456 ');
           strList.Add('');
           strList.Add('');
           strList.Add('2)If you are using "Ant" then edit/change "ant.properties" according, too!');
           strList.Add('');
           strList.Add('');
           strList.Add('3) Execute the [project] command "release-keystore.bat" or "release-keystore.sh" or "release-keystore-macos.sh" to get the "'+Lowercase(FSmallProjName)+'-release.keystore"');
-          strList.Add('            warning: the file "'+Lowercase(FSmallProjName)+'-release.keystore" should be created only once [per application] otherwise it will fail!');
+          strList.Add('           warning: the file "'+Lowercase(FSmallProjName)+'-release.keystore" should be created only once [per application] otherwise it will fail [and NEVER delete it!]');
+          strList.Add(' ');
+          strList.Add('4) [Gradle]: Edit/change the values [123456] "--ks-pass pass:" and "--key-pass pass:" in project file "gradle-local-apksigner.bat" [or .sh]  according "keytool_input.txt" file');
+          strList.Add('             Edit/change the values [123456] "--ks-pass pass:" and "--key-pass pass:" in project file "gradle-local-universal-apksigner.bat" [or .sh]  according "keytool_input.txt" file');
+          strList.Add('');
+          strList.Add('5) [Gradle]: Execute the [project] command "gradle-local-apksigner.bat" [.sh] to get the [release] signed Apk!');
+          strList.Add('             OR execute "gradle-local-universal-apksigner.bat" [.sh] if your are supporting multi-architecture (ex.: armeabi-v7a + arm64-v8a + ...) ');
+          strList.Add('             hint: look for your generated "'+FSmallProjName+'-release.apk" in [project] folder "...\build\outputs\apk\release"');
           strList.Add(' ');
           strList.Add('');
-          strList.Add('4 [Gradle]: execute the [project] command "gradle-local-apksigner.bat" [or .sh] to get the [release] signed Apk! (thanks to TR3E!)');
-          strList.Add('            OR execute "gradle-local-universal-apksigner.bat" [or .sh] if your are supporting multi-architecture (ex.: armeabi-v7a + arm64-v8a + ...) ');
-          strList.Add('            hint: look for your generated apk in [project] folder "...\build\outputs\apk\release"');
-          strList.Add(' ');
-          strList.Add('');
-          strList.Add('4 [Ant]: execute the [project] command "ant-build-release.bat" [.sh] to get the [release] signed Apk!"');
-          strList.Add('         hint: look for your generated apk in [project] folder "...\bin"');
+          strList.Add('6) [Ant]: Execute the [project] command "ant-build-release.bat" [.sh] to get the [release] signed Apk!"');
+          strList.Add('          hint: look for your generated "'+FSmallProjName+'-release.apk" in [project] folder "...\bin"');
           strList.Add('');
           strList.Add('');
-          strList.Add('Success! You can now upload your nice "'+FSmallProjName+'-release.apk" to "Google Play" store!');
+          strList.Add('Success! You can now upload your nice "'+FSmallProjName+'-release.apk" to "Google Play" [or others stores...]!');
           strList.Add('');
           strList.Add('....  Thanks to All!');
-          strList.Add('....  Special thanks to TR3E!');
+          strList.Add('....  Special thanks to ADiV/TR3E!');
           strList.Add('');
           strList.Add('....  by jmpessoa_hotmail_com');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'How_To_Get_Your_Signed_Release_Apk.txt');
@@ -2917,7 +2918,7 @@ begin
                 apkName:= FSmallProjName+ '-' + instructionChip;
 
                 strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-apksigner.bat');
 
                 strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
@@ -2925,7 +2926,7 @@ begin
                 strList.Add('set GRADLE_HOME='+FPathToGradle);
                 strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
                 strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.bat');
 
                 strList.Clear;
@@ -2957,7 +2958,7 @@ begin
                 strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-apksigner.sh');
 
                 strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
@@ -2966,7 +2967,7 @@ begin
                 strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.sh');
 
                 strList.Clear;
