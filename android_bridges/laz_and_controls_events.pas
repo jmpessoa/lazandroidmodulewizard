@@ -8,13 +8,15 @@ uses
    Classes, SysUtils, And_jni;
 
    // AdMob Events
-   procedure Java_Event_pOnAdMobLoaded(env: PJNIEnv; this: jobject; Obj: TObject);
-   procedure Java_Event_pOnAdMobFailedToLoad(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
-   procedure Java_Event_pOnAdMobOpened(env: PJNIEnv; this: jobject; Obj: TObject);
-   procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject);
-   procedure Java_Event_pOnAdMobLeftApplication(env: PJNIEnv; this: jobject; Obj: TObject);
-   procedure Java_Event_pOnAdMobClicked(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnAdMobLoaded(env: PJNIEnv; this: jobject; Obj: TObject; admobType : integer);
+   procedure Java_Event_pOnAdMobFailedToLoad(env: PJNIEnv; this: jobject; Obj: TObject; admobType, errorCode: integer);
+   procedure Java_Event_pOnAdMobOpened(env: PJNIEnv; this: jobject; Obj: TObject; admobType : integer);
+   procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject; admobType : integer);
+   procedure Java_Event_pOnAdMobLeftApplication(env: PJNIEnv; this: jobject; Obj: TObject; admobType : integer);
+   procedure Java_Event_pOnAdMobClicked(env: PJNIEnv; this: jobject; Obj: TObject; admobType : integer);
    procedure Java_Event_pOnAdMobInitializationComplete(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnAdMobRewardedUserEarned(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnAdMobRewardedFailedToShow(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
 
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -709,7 +711,7 @@ begin
   end;
 end;
 
-procedure Java_Event_pOnAdMobLoaded(env: PJNIEnv; this: jobject; Obj: TObject);
+procedure Java_Event_pOnAdMobLoaded(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -717,7 +719,7 @@ begin
   if Obj is jsAdMob then
   begin
      jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
-     jsAdMob(Obj).GenEvent_OnAdMobLoaded(Obj);
+     jsAdMob(Obj).GenEvent_OnAdMobLoaded(Obj, admobType);
   end;
 end;
 
@@ -733,7 +735,7 @@ begin
   end;
 end;
 
-procedure Java_Event_pOnAdMobClicked(env: PJNIEnv; this: jobject; Obj: TObject);
+procedure Java_Event_pOnAdMobClicked(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -741,11 +743,11 @@ begin
   if Obj is jsAdMob then
   begin
      jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
-     jsAdMob(Obj).GenEvent_OnAdMobClicked(Obj);
+     jsAdMob(Obj).GenEvent_OnAdMobClicked(Obj, admobType);
   end;
 end;
 
-procedure Java_Event_pOnAdMobFailedToLoad(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
+procedure Java_Event_pOnAdMobFailedToLoad(env: PJNIEnv; this: jobject; Obj: TObject; admobType, errorCode: integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -753,11 +755,11 @@ begin
   if Obj is jsAdMob then
   begin
      jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
-     jsAdMob(Obj).GenEvent_OnAdMobFailedToLoad(Obj, errorCode);
+     jsAdMob(Obj).GenEvent_OnAdMobFailedToLoad(Obj, admobType, errorCode);
   end;
 end;
 
-procedure Java_Event_pOnAdMobOpened(env: PJNIEnv; this: jobject; Obj: TObject);
+procedure Java_Event_pOnAdMobOpened(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -765,11 +767,11 @@ begin
   if Obj is jsAdMob then
   begin
      jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
-     jsAdMob(Obj).GenEvent_OnAdMobOpened(Obj);
+     jsAdMob(Obj).GenEvent_OnAdMobOpened(Obj, admobType);
   end;
 end;
 
-procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject);
+procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -777,11 +779,11 @@ begin
   if Obj is jsAdMob then
   begin
      jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
-     jsAdMob(Obj).GenEvent_OnAdMobClosed(Obj);
+     jsAdMob(Obj).GenEvent_OnAdMobClosed(Obj, admobType);
   end;
 end;
 
-procedure Java_Event_pOnAdMobLeftApplication(env: PJNIEnv; this: jobject; Obj: TObject);
+procedure Java_Event_pOnAdMobLeftApplication(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -789,7 +791,31 @@ begin
   if Obj is jsAdMob then
   begin
      jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
-     jsAdMob(Obj).GenEvent_OnAdMobLeftApplication(Obj);
+     jsAdMob(Obj).GenEvent_OnAdMobLeftApplication(Obj, admobType);
+  end;
+end;
+
+procedure Java_Event_pOnAdMobRewardedUserEarned(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jsAdMob then
+  begin
+     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
+     jsAdMob(Obj).GenEvent_OnAdMobRewardedUserEarned(Obj);
+  end;
+end;
+
+procedure Java_Event_pOnAdMobRewardedFailedToShow(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if not Assigned(Obj)  then Exit;
+  if Obj is jsAdMob then
+  begin
+     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
+     jsAdMob(Obj).GenEvent_OnAdMobRewardedFailedToShow(Obj, errorCode);
   end;
 end;
 
