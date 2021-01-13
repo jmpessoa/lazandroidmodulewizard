@@ -1,6 +1,4 @@
 object AndroidModule1: TAndroidModule1
-  OnCreate = AndroidModule1Create
-  OnDestroy = AndroidModule1Destroy
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
@@ -18,20 +16,13 @@ object AndroidModule1: TAndroidModule1
   AnimationDurationOut = 1500
   AnimationMode = animNone
   OnRotate = AndroidModule1Rotate
-  OnActivityResult = AndroidModule1ActivityResult
-  OnBackButton = AndroidModule1BackButton
-  OnClose = AndroidModule1Close
   OnShow = AndroidModule1Show
-  OnSpecialKeyDown = AndroidModule1SpecialKeyDown
-  OnPrepareOptionsMenu = AndroidModule1PrepareOptionsMenu
   OnActivityCreate = AndroidModule1ActivityCreate
-  OnActivityPause = AndroidModule1ActivityPause
-  OnActivityResume = AndroidModule1ActivityResume
-  object jButton1: jButton
+  object btBanner: jButton
     MarginLeft = 5
-    MarginTop = 5
+    MarginTop = 0
     MarginRight = 5
-    MarginBottom = 5
+    MarginBottom = 0
     Enabled = True
     Left = 53
     Top = 175
@@ -42,13 +33,13 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpCenterInParent]
     LayoutParamWidth = lpTwoThirdOfParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Run AdMob'
+    Text = 'Run Banner'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
     GravityInParent = lgNone
-    OnClick = jButton1Click
+    OnClick = btBannerClick
   end
   object jsAdMob1: jsAdMob
     MarginLeft = 0
@@ -66,7 +57,16 @@ object AndroidModule1: TAndroidModule1
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
-    AdMobBannerSize = admobAdaptive
+    AdMobBannerSize = admobSmartBanner
+    OnAdMobLoaded = jsAdMob1AdMobLoaded
+    OnAdMobFailedToLoad = jsAdMob1AdMobFailedToLoad
+    OnAdMobOpened = jsAdMob1AdMobOpened
+    OnAdMobClosed = jsAdMob1AdMobClosed
+    OnAdMobLeftApplication = jsAdMob1AdMobLeftApplication
+    OnAdMobClicked = jsAdMob1AdMobClicked
+    OnAdMobInitializationComplete = jsAdMob1AdMobInitializationComplete
+    OnAdMobRewardedUserEarned = jsAdMob1AdMobRewardedUserEarned
+    OnAdMobRewardedFailedToShow = jsAdMob1AdMobRewardedFailedToShow
   end
   object jsAdMob2: jsAdMob
     MarginLeft = 0
@@ -77,14 +77,14 @@ object AndroidModule1: TAndroidModule1
     Left = 0
     Top = 0
     Width = 320
-    Height = 96
+    Height = 40
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     BackgroundColor = colbrDefault
-    AdMobBannerSize = admobAdaptive
+    AdMobBannerSize = admobSmartBanner
   end
   object jButton2: jButton
     MarginLeft = 5
@@ -93,7 +93,7 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Enabled = True
     Left = 107
-    Top = 101
+    Top = 45
     Width = 106
     Height = 50
     Visible = True
@@ -117,11 +117,11 @@ object AndroidModule1: TAndroidModule1
     MarginBottom = 5
     Enabled = True
     Left = 5
-    Top = 235
+    Top = 230
     Width = 310
     Height = 20
     Visible = True
-    Anchor = jButton1
+    Anchor = btBanner
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -134,5 +134,57 @@ object AndroidModule1: TAndroidModule1
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
     GravityInParent = lgNone
+  end
+  object btInter: jButton
+    MarginLeft = 5
+    MarginTop = 0
+    MarginRight = 5
+    MarginBottom = 0
+    Enabled = True
+    Left = 53
+    Top = 125
+    Width = 213
+    Height = 50
+    Visible = True
+    Anchor = btBanner
+    PosRelativeToAnchor = [raAbove]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Run Interstational'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = btInterClick
+    Left = 28
+    Top = 28
+  end
+  object btReward: jButton
+    MarginLeft = 5
+    MarginTop = 0
+    MarginRight = 5
+    MarginBottom = 0
+    Enabled = True
+    Left = 53
+    Top = 75
+    Width = 213
+    Height = 50
+    Visible = True
+    Anchor = btInter
+    PosRelativeToAnchor = [raAbove]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Run Rewarded'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = btRewardClick
+    Left = 56
+    Top = 56
   end
 end
