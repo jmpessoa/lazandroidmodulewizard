@@ -19,13 +19,22 @@ TAdMobBannerSize = (
    admobAdaptive           //6 - Adaptive ad size on the ad view
   );
 
-TOnAdMobLoaded = procedure(Sender: TObject) of Object;
-TOnAdMobFailedToLoad = procedure(Sender: TObject;  errorCode: integer) of Object;
-TOnAdMobOpened = procedure(Sender: TObject) of Object;
-TOnAdMobClosed = procedure(Sender: TObject) of Object;
-TOnAdMobLeftApplication = procedure(Sender: TObject) of Object;
-TOnAdMobClicked = procedure(Sender: TObject) of Object;
+TAdMobType = (
+  adsBanner,
+  adsInterstitial,
+  adsRewarded
+);
+
+TOnAdMobLoaded = procedure(Sender: TObject; admobType: TAdMobType) of Object;
+TOnAdMobFailedToLoad = procedure(Sender: TObject; admobType : TAdMobType; errorCode: integer) of Object;
+TOnAdMobOpened = procedure(Sender: TObject; admobType: TAdMobType) of Object;
+TOnAdMobClosed = procedure(Sender: TObject; admobType: TAdMobType) of Object;
+TOnAdMobLeftApplication = procedure(Sender: TObject; admobType: TAdMobType) of Object;
+TOnAdMobClicked = procedure(Sender: TObject; admobType: TAdMobType) of Object;
 TOnAdMobInitializationComplete = procedure(Sender: TObject) of Object;
+TOnAdMobRewardedUserEarned = procedure(Sender: TObject) of Object;
+TOnAdMobRewardedFailedToShow = procedure(Sender: TObject; errorCode: integer) of Object;
+
 
 {Developed by ADiV for LAMW}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -41,6 +50,9 @@ jsAdMob = class(jVisualControl)
     FOnAdMobLeftApplication: TOnAdMobLeftApplication;
     FOnAdMobClicked:         TOnAdMobClicked;
     FOnAdMobInitializationComplete:  TOnAdMobInitializationComplete;
+    FOnAdMobRewardedUserEarned:      TOnAdMobRewardedUserEarned;
+    FOnAdMobRewardedFailedToShow:    TOnAdMobRewardedFailedToShow;
+
     FAdMobBannerSize:        TAdMobBannerSize;
 
     procedure SetVisible(Value: Boolean);
@@ -53,32 +65,52 @@ jsAdMob = class(jVisualControl)
     procedure UpdateLayout; override;
     
     procedure GenEvent_OnClick(Obj: TObject);
-    procedure GenEvent_OnAdMobLoaded(Obj: TObject);
-    procedure GenEvent_OnAdMobFailedToLoad(Obj: TObject; errorCode: integer);
-    procedure GenEvent_OnAdMobOpened(Obj: TObject);
-    procedure GenEvent_OnAdMobClosed(Obj: TObject);
-    procedure GenEvent_OnAdMobLeftApplication(Obj: TObject);
-    procedure GenEvent_OnAdMobClicked(Obj: TObject);
+    procedure GenEvent_OnAdMobLoaded(Obj: TObject; admobType: integer);
+    procedure GenEvent_OnAdMobFailedToLoad(Obj: TObject; admobType : integer; errorCode: integer);
+    procedure GenEvent_OnAdMobOpened(Obj: TObject; admobType: integer);
+    procedure GenEvent_OnAdMobClosed(Obj: TObject; admobType: integer);
+    procedure GenEvent_OnAdMobLeftApplication(Obj: TObject; admobType: integer);
+    procedure GenEvent_OnAdMobClicked(Obj: TObject; admobType: integer);
     procedure GenEvent_OnAdMobInitializationComplete(Obj: TObject);
+    procedure GenEvent_OnAdMobRewardedUserEarned(Obj: TObject);
+    procedure GenEvent_OnAdMobRewardedFailedToShow(Obj: TObject; errorCode: integer);
 
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetViewParent(): jObject;  override;
     procedure RemoveFromViewParent(); override;
 
-    //LMB
-    procedure AdMobSetBannerSize(_whBannerSize: TAdMobBannerSize);
-    function  AdMobGetBannerSize: TAdMobBannerSize;
-
-    procedure AdMobSetId(_admobid: string);
-    function  AdMobGetId(): string;
     procedure AdMobInit();
     procedure AdMobFree();
-    procedure AdMobRun();
-    procedure AdMobStop();
-    procedure AdMobUpdate();
-    function  AdMobIsLoading(): boolean;
-    function  AdMobGetHeight(): integer;
-    procedure AdMobSetAdativeWidth( _aWidth : integer );
+
+    //--- Banner ---//
+    procedure AdMobBannerSetSize(_whBannerSize: TAdMobBannerSize);
+    function  AdMobBannerGetSize: TAdMobBannerSize;
+
+    procedure AdMobBannerSetId(_admobid: string);
+
+    procedure AdMobBannerRun();
+    procedure AdMobBannerStop();
+    procedure AdMobBannerUpdate();
+    function  AdMobBannerIsLoading(): boolean;
+    function  AdMobBannerGetHeight(): integer;
+    procedure AdMobBannerSetAdativeWidth( _aWidth : integer );
+
+    //--- Inter ---//
+    procedure AdMobInterSetId( _admobid : string );
+    procedure AdMobInterCreateAndLoad();
+    procedure AdMobInterLoad();
+    procedure AdMobInterSetAutoLoadOnClose( _autoLoadOnClose : boolean );
+    function  AdMobInterIsLoaded() : boolean;
+    procedure AdMobInterShow();
+
+    //--- Rewarded ---//
+    procedure AdMobRewardedSetId( _admobid : string );
+    procedure AdMobRewardedCreateAndLoad();
+    procedure AdMobRewardedLoad();
+    function  AdMobRewardedIsLoaded() : boolean;
+    function  AdMobRewardedGetAmount() : integer;
+    function  AdMobRewardedGetType() : string;
+    procedure AdMobRewardedShow();
 
     function GetView(): jObject;  override;
     procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -90,7 +122,7 @@ jsAdMob = class(jVisualControl)
  published
 
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
-    property AdMobBannerSize : TAdMobBannerSize read  AdMobGetBannerSize write AdMobSetBannerSize;
+    property AdMobBannerSize : TAdMobBannerSize read  AdMobBannerGetSize write AdMobBannerSetSize;
 
     property OnAdMobLoaded      :   TOnAdMobLoaded read FOnAdMobLoaded write FOnAdMobLoaded;
     property OnAdMobFailedToLoad:   TOnAdMobFailedToLoad read FOnAdMobFailedToLoad write FOnAdMobFailedToLoad;
@@ -99,6 +131,8 @@ jsAdMob = class(jVisualControl)
     property OnAdMobLeftApplication  :   TOnAdMobLeftApplication read FOnAdMobLeftApplication write FOnAdMobLeftApplication;
     property OnAdMobClicked      :   TOnAdMobClicked read FOnAdMobClicked write FOnAdMobClicked;
     property OnAdMobInitializationComplete :   TOnAdMobInitializationComplete read FOnAdMobInitializationComplete write FOnAdMobInitializationComplete;
+    property OnAdMobRewardedUserEarned     :   TOnAdMobRewardedUserEarned read FOnAdMobRewardedUserEarned write FOnAdMobRewardedUserEarned;
+    property OnAdMobRewardedFailedToShow   :   TOnAdMobRewardedFailedToShow read FOnAdMobRewardedFailedToShow write FOnAdMobRewardedFailedToShow;
 
 end;
 
@@ -157,9 +191,9 @@ begin
 
    SetViewParent( FjPRLayout );
 
-   AdMobSetBannerSize( FAdMobBannerSize );
+   AdMobBannerSetSize( FAdMobBannerSize );
    
-   jni_proc_i(FjEnv, FjObject, 'setId', FId);
+   View_SetId(FjEnv, FjObject, FId);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
@@ -227,9 +261,9 @@ begin
   if Assigned(FOnClick) then FOnClick(Obj);
 end;
 
-procedure jsAdMob.GenEvent_OnAdMobLoaded(Obj: TObject);
+procedure jsAdMob.GenEvent_OnAdMobLoaded(Obj: TObject; admobType: integer);
 begin
-  if Assigned(FOnAdMobLoaded) then FOnAdMobLoaded(Obj);
+  if Assigned(FOnAdMobLoaded) then FOnAdMobLoaded(Obj, TAdMobType(admobType));
 end;
 
 procedure jsAdMob.GenEvent_OnAdMobInitializationComplete(Obj: TObject);
@@ -237,29 +271,39 @@ begin
   if Assigned(FOnAdMobInitializationComplete) then FOnAdMobInitializationComplete(Obj);
 end;
 
-procedure jsAdMob.GenEvent_OnAdMobClicked(Obj: TObject);
+procedure jsAdMob.GenEvent_OnAdMobClicked(Obj: TObject; admobType: integer);
 begin
-  if Assigned(FOnAdMobClicked) then FOnAdMobClicked(Obj);
+  if Assigned(FOnAdMobClicked) then FOnAdMobClicked(Obj, TAdMobType(admobType));
 end;
 
-procedure jsAdMob.GenEvent_OnAdMobFailedToLoad(Obj: TObject; errorCode: integer);
+procedure jsAdMob.GenEvent_OnAdMobFailedToLoad(Obj: TObject; admobType: integer; errorCode: integer);
 begin
-  if Assigned(FOnAdMobFailedToLoad) then FOnAdMobFailedToLoad(Obj, errorCode);
+  if Assigned(FOnAdMobFailedToLoad) then FOnAdMobFailedToLoad(Obj, TAdMobType(admobType), errorCode);
 end;
 
-procedure jsAdMob.GenEvent_OnAdMobOpened(Obj: TObject);
+procedure jsAdMob.GenEvent_OnAdMobOpened(Obj: TObject; admobType: integer);
 begin
-  if Assigned(FOnAdMobOpened) then FOnAdMobOpened(Obj);
+  if Assigned(FOnAdMobOpened) then FOnAdMobOpened(Obj, TAdMobType(admobType));
 end;
 
-procedure jsAdMob.GenEvent_OnAdMobClosed(Obj: TObject);
+procedure jsAdMob.GenEvent_OnAdMobClosed(Obj: TObject; admobType: integer);
 begin
-  if Assigned(FOnAdMobClosed) then FOnAdMobClosed(Obj);
+  if Assigned(FOnAdMobClosed) then FOnAdMobClosed(Obj, TAdMobType(admobType));
 end;
 
-procedure jsAdMob.GenEvent_OnAdMobLeftApplication(Obj: TObject);
+procedure jsAdMob.GenEvent_OnAdMobLeftApplication(Obj: TObject; admobType: integer);
 begin
-  if Assigned(FOnAdMobLeftApplication) then FOnAdMobLeftApplication(Obj);
+  if Assigned(FOnAdMobLeftApplication) then FOnAdMobLeftApplication(Obj, TAdMobType(admobType));
+end;
+
+procedure jsAdMob.GenEvent_OnAdMobRewardedUserEarned(Obj: TObject);
+begin
+  if Assigned(FOnAdMobRewardedUserEarned) then OnAdMobRewardedUserEarned(Obj);
+end;
+
+procedure jsAdMob.GenEvent_OnAdMobRewardedFailedToShow(Obj: TObject; errorCode: integer);
+begin
+  if Assigned(FOnAdMobRewardedFailedToShow) then FOnAdMobRewardedFailedToShow(Obj, errorCode);
 end;
 
 procedure jsAdMob.SetViewParent(_viewgroup: jObject);
@@ -283,57 +327,50 @@ begin
      jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
 end;
 
-procedure jsAdMob.AdMobSetBannerSize(_whBannerSize: TAdMobBannerSize);
+procedure jsAdMob.AdMobBannerSetSize(_whBannerSize: TAdMobBannerSize);
 begin
   FAdMobBannerSize:= _whBannerSize;
   if FjObject <> nil then
-   jni_proc_i(FjEnv, FjObject, 'AdMobSetBannerSize', Ord(_whBannerSize));
+   jni_proc_i(FjEnv, FjObject, 'AdMobBannerSetSize', Ord(_whBannerSize));
 end;
 
-function jsAdMob.AdMobGetBannerSize: TAdMobBannerSize;
+function jsAdMob.AdMobBannerGetSize: TAdMobBannerSize;
 begin
   Result := FAdMobBannerSize;
   if FInitialized then
-    Result := TAdMobBannerSize(jni_func_out_i(FjEnv, FjObject, 'AdMobGetBannerSize'))
+    Result := TAdMobBannerSize(jni_func_out_i(FjEnv, FjObject, 'AdMobBannerGetSize'))
 end;
 
-procedure jsAdMob.AdMobSetId(_admobid: string);
+procedure jsAdMob.AdMobBannerSetId(_admobid: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AdMobSetId', _admobid);
+     jni_proc_t(FjEnv, FjObject, 'AdMobBannerSetId', _admobid);
 end;
 
-procedure jsAdMob.AdMobSetAdativeWidth( _aWidth : integer );
+procedure jsAdMob.AdMobBannerSetAdativeWidth( _aWidth : integer );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAdativeWidth', _aWidth);
+     jni_proc_i(FjEnv, FjObject, 'AdMobBannerSetAdativeWidth', _aWidth);
 end;
 
-function jsAdMob.AdMobIsLoading(): boolean;
+function jsAdMob.AdMobBannerIsLoading(): boolean;
 begin
  result := false;
 
  //in designing component state: result value here...
  if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'AdMobIsLoading');
+   Result:= jni_func_out_z(FjEnv, FjObject, 'AdMobBannerIsLoading');
 end;
 
-function jsAdMob.AdMobGetHeight(): integer;
+function jsAdMob.AdMobBannerGetHeight(): integer;
 begin
  Result := 0;
 
  //in designing component state: result value here...
  if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'AdMobGetHeight');
-end;
-
-function jsAdMob.AdMobGetId(): string;
-begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'AdMobGetId');
+   Result:= jni_func_out_i(FjEnv, FjObject, 'AdMobBannerGetHeight');
 end;
 
 procedure jsAdMob.AdMobInit();
@@ -350,25 +387,25 @@ begin
      jni_proc(FjEnv, FjObject, 'AdMobFree');
 end;
 
-procedure jsAdMob.AdMobStop();
+procedure jsAdMob.AdMobBannerStop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobStop');
+     jni_proc(FjEnv, FjObject, 'AdMobBannerStop');
 end;
 
-procedure jsAdMob.AdMobRun();
+procedure jsAdMob.AdMobBannerRun();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobRun');
+     jni_proc(FjEnv, FjObject, 'AdMobBannerRun');
 end;
 
-procedure jsAdMob.AdMobUpdate();
+procedure jsAdMob.AdMobBannerUpdate();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobUpdate');
+     jni_proc(FjEnv, FjObject, 'AdMobBannerUpdate');
 end;
 
 function jsAdMob.GetView(): jObject;
@@ -426,5 +463,100 @@ begin
   end;
 end;
 
+procedure jsAdMob.AdMobInterCreateAndLoad();
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc(FjEnv, FjObject, 'AdMobInterCreateAndLoad');
+end;
+
+procedure jsAdMob.AdMobInterLoad();
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc(FjEnv, FjObject, 'AdMobInterLoad');
+end;
+
+procedure jsAdMob.AdMobInterSetAutoLoadOnClose( _autoLoadOnClose : boolean );
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc_z(FjEnv, FjObject, 'AdMobInterSetAutoLoadOnClose', _autoLoadOnClose);
+end;
+
+procedure jsAdMob.AdMobInterSetId( _admobid : string );
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc_t(FjEnv, FjObject, 'AdMobInterSetId', _admobid);
+end;
+
+function jsAdMob.AdMobInterIsLoaded( ) : boolean;
+begin
+ result := false;
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  result := jni_func_out_z(FjEnv, FjObject, 'AdMobInterIsLoaded');
+end;
+
+procedure jsAdMob.AdMobInterShow( );
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc(FjEnv, FjObject, 'AdMobInterShow');
+end;
+
+procedure jsAdMob.AdMobRewardedSetId( _admobid : string );
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc_t(FjEnv, FjObject, 'AdMobRewardedSetId', _admobid);
+end;
+
+procedure jsAdMob.AdMobRewardedCreateAndLoad();
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc(FjEnv, FjObject, 'AdMobRewardedLoad');
+end;
+
+procedure jsAdMob.AdMobRewardedLoad();
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc(FjEnv, FjObject, 'AdMobRewardedLoad');
+end;
+
+function  jsAdMob.AdMobRewardedIsLoaded() : boolean;
+begin
+ result := false;
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  result := jni_func_out_z(FjEnv, FjObject, 'AdMobRewardedIsLoaded');
+end;
+
+function  jsAdMob.AdMobRewardedGetAmount() : integer;
+begin
+ result := -1;
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  result := jni_func_out_i(FjEnv, FjObject, 'AdMobRewardedGetAmount');
+end;
+
+
+function  jsAdMob.AdMobRewardedGetType() : string;
+begin
+ result := '';
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  result := jni_func_out_t(FjEnv, FjObject, 'AdMobRewardedGetType');
+end;
+
+procedure jsAdMob.AdMobRewardedShow();
+begin
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  jni_proc(FjEnv, FjObject, 'AdMobRewardedShow');
+end;
 
 end.

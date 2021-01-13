@@ -1,7 +1,9 @@
-public native void pOnAdMobLoaded(long pasobj);
-public native void pOnAdMobFailedToLoad(long pasobj, int errorCode);
-public native void pOnAdMobOpened(long pasobj);
-public native void pOnAdMobClosed(long pasobj);
-public native void pOnAdMobLeftApplication(long pasobj);
-public native void pOnAdMobClicked(long pasobj);
+public native void pOnAdMobLoaded(long pasobj, int admobType);
+public native void pOnAdMobFailedToLoad(long pasobj, int admobType, int errorCode);
+public native void pOnAdMobOpened(long pasobj, int admobType);
+public native void pOnAdMobClosed(long pasobj, int admobType);
+public native void pOnAdMobLeftApplication(long pasobj, int admobType);
+public native void pOnAdMobClicked(long pasobj, int admobType);
 public native void pOnAdMobInitializationComplete(long pasobj);
+public native void pOnAdMobRewardedUserEarned(long pasobj);
+public native void pOnAdMobRewardedFailedToShow(long pasobj, int errorCode);
