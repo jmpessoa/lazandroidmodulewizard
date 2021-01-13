@@ -202,11 +202,10 @@ end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnClickGeneric
-  Signature: (JI)V }
-procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
-  value: JInt); cdecl;
+  Signature: (J)V }
+procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnClickGeneric(PEnv, this, TObject(pasobj), value);
+  Java_Event_pOnClickGeneric(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
@@ -221,20 +220,18 @@ end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnDown
-  Signature: (JI)V }
-procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
-  cdecl;
+  Signature: (J)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnDown(PEnv, this, TObject(pasobj), value);
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnUp
-  Signature: (JI)V }
-procedure pOnUp(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
-  cdecl;
+  Signature: (J)V }
+procedure pOnUp(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnUp(PEnv, this, TObject(pasobj), value);
+  Java_Event_pOnUp(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
@@ -248,20 +245,18 @@ end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnLongClick
-  Signature: (JI)V }
-procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt
-  ); cdecl;
+  Signature: (J)V }
+procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnLongClick(PEnv, this, TObject(pasobj), value);
+  Java_Event_pOnLongClick(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnDoubleClick
-  Signature: (JI)V }
-procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
-  value: JInt); cdecl;
+  Signature: (J)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj), value);
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
@@ -399,53 +394,67 @@ begin
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
-  Method:    pOnAdMobLoaded
-  Signature: (J)V }
-procedure pOnAdMobLoaded(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+  Method:    pOnRunOnUiThread
+  Signature: (JI)V }
+procedure pOnRunOnUiThread(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  tag: JInt); cdecl;
 begin
-  Java_Event_pOnAdMobLoaded(PEnv, this, TObject(pasobj));
+  Java_Event_pOnRunOnUiThread(PEnv, this, TObject(pasobj), tag);
+end;
+
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobLoaded
+  Signature: (JI)V }
+procedure pOnAdMobLoaded(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  admobType: JInt); cdecl;
+begin
+  Java_Event_pOnAdMobLoaded(PEnv, this, TObject(pasobj), admobType);
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnAdMobFailedToLoad
-  Signature: (JI)V }
+  Signature: (JII)V }
 procedure pOnAdMobFailedToLoad(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
-  errorCode: JInt); cdecl;
+  admobType: JInt; errorCode: JInt); cdecl;
 begin
-  Java_Event_pOnAdMobFailedToLoad(PEnv, this, TObject(pasobj), errorCode);
+  Java_Event_pOnAdMobFailedToLoad(PEnv, this, TObject(pasobj), admobType,
+    errorCode);
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnAdMobOpened
-  Signature: (J)V }
-procedure pOnAdMobOpened(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+  Signature: (JI)V }
+procedure pOnAdMobOpened(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  admobType: JInt); cdecl;
 begin
-  Java_Event_pOnAdMobOpened(PEnv, this, TObject(pasobj));
+  Java_Event_pOnAdMobOpened(PEnv, this, TObject(pasobj), admobType);
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnAdMobClosed
-  Signature: (J)V }
-procedure pOnAdMobClosed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+  Signature: (JI)V }
+procedure pOnAdMobClosed(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  admobType: JInt); cdecl;
 begin
-  Java_Event_pOnAdMobClosed(PEnv, this, TObject(pasobj));
+  Java_Event_pOnAdMobClosed(PEnv, this, TObject(pasobj), admobType);
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnAdMobLeftApplication
-  Signature: (J)V }
-procedure pOnAdMobLeftApplication(PEnv: PJNIEnv; this: JObject; pasobj: JLong);
-  cdecl;
+  Signature: (JI)V }
+procedure pOnAdMobLeftApplication(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  admobType: JInt); cdecl;
 begin
-  Java_Event_pOnAdMobLeftApplication(PEnv, this, TObject(pasobj));
+  Java_Event_pOnAdMobLeftApplication(PEnv, this, TObject(pasobj), admobType);
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnAdMobClicked
-  Signature: (J)V }
-procedure pOnAdMobClicked(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+  Signature: (JI)V }
+procedure pOnAdMobClicked(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  admobType: JInt); cdecl;
 begin
-  Java_Event_pOnAdMobClicked(PEnv, this, TObject(pasobj));
+  Java_Event_pOnAdMobClicked(PEnv, this, TObject(pasobj), admobType);
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
@@ -457,7 +466,26 @@ begin
   Java_Event_pOnAdMobInitializationComplete(PEnv, this, TObject(pasobj));
 end;
 
-const NativeMethods: array[0..50] of JNINativeMethod = (
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobRewardedUserEarned
+  Signature: (J)V }
+procedure pOnAdMobRewardedUserEarned(PEnv: PJNIEnv; this: JObject; pasobj: JLong
+  ); cdecl;
+begin
+  Java_Event_pOnAdMobRewardedUserEarned(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobRewardedFailedToShow
+  Signature: (JI)V }
+procedure pOnAdMobRewardedFailedToShow(PEnv: PJNIEnv; this: JObject;
+  pasobj: JLong; errorCode: JInt); cdecl;
+begin
+  Java_Event_pOnAdMobRewardedFailedToShow(PEnv, this, TObject(pasobj), errorCode
+    );
+end;
+
+const NativeMethods: array[0..53] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -526,25 +554,25 @@ const NativeMethods: array[0..50] of JNINativeMethod = (
     signature: '(JIIFFFF)V';
     fnPtr: @pOnTouch; ),
    (name: 'pOnClickGeneric';
-    signature: '(JI)V';
+    signature: '(J)V';
     fnPtr: @pOnClickGeneric; ),
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
    (name: 'pOnDown';
-    signature: '(JI)V';
+    signature: '(J)V';
     fnPtr: @pOnDown; ),
    (name: 'pOnUp';
-    signature: '(JI)V';
+    signature: '(J)V';
     fnPtr: @pOnUp; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
    (name: 'pOnLongClick';
-    signature: '(JI)V';
+    signature: '(J)V';
     fnPtr: @pOnLongClick; ),
    (name: 'pOnDoubleClick';
-    signature: '(JI)V';
+    signature: '(J)V';
     fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
@@ -591,27 +619,36 @@ const NativeMethods: array[0..50] of JNINativeMethod = (
    (name: 'pAppOnRequestPermissionResult';
     signature: '(ILjava/lang/String;I)V';
     fnPtr: @pAppOnRequestPermissionResult; ),
+   (name: 'pOnRunOnUiThread';
+    signature: '(JI)V';
+    fnPtr: @pOnRunOnUiThread; ),
    (name: 'pOnAdMobLoaded';
-    signature: '(J)V';
+    signature: '(JI)V';
     fnPtr: @pOnAdMobLoaded; ),
    (name: 'pOnAdMobFailedToLoad';
-    signature: '(JI)V';
+    signature: '(JII)V';
     fnPtr: @pOnAdMobFailedToLoad; ),
    (name: 'pOnAdMobOpened';
-    signature: '(J)V';
+    signature: '(JI)V';
     fnPtr: @pOnAdMobOpened; ),
    (name: 'pOnAdMobClosed';
-    signature: '(J)V';
+    signature: '(JI)V';
     fnPtr: @pOnAdMobClosed; ),
    (name: 'pOnAdMobLeftApplication';
-    signature: '(J)V';
+    signature: '(JI)V';
     fnPtr: @pOnAdMobLeftApplication; ),
    (name: 'pOnAdMobClicked';
-    signature: '(J)V';
+    signature: '(JI)V';
     fnPtr: @pOnAdMobClicked; ),
    (name: 'pOnAdMobInitializationComplete';
     signature: '(J)V';
-    fnPtr: @pOnAdMobInitializationComplete; )
+    fnPtr: @pOnAdMobInitializationComplete; ),
+   (name: 'pOnAdMobRewardedUserEarned';
+    signature: '(J)V';
+    fnPtr: @pOnAdMobRewardedUserEarned; ),
+   (name: 'pOnAdMobRewardedFailedToShow';
+    signature: '(JI)V';
+    fnPtr: @pOnAdMobRewardedFailedToShow; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
@@ -738,6 +775,8 @@ exports
   pOnLayouting name 'Java_org_lamw_appcompatadmobdemo1_Controls_pOnLayouting',
   pAppOnRequestPermissionResult name 'Java_org_lamw_appcompatadmobdemo1_'
     +'Controls_pAppOnRequestPermissionResult',
+  pOnRunOnUiThread name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
+    +'pOnRunOnUiThread',
   pOnAdMobLoaded name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
     +'pOnAdMobLoaded',
   pOnAdMobFailedToLoad name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
@@ -751,7 +790,11 @@ exports
   pOnAdMobClicked name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
     +'pOnAdMobClicked',
   pOnAdMobInitializationComplete name 'Java_org_lamw_appcompatadmobdemo1_'
-    +'Controls_pOnAdMobInitializationComplete';
+    +'Controls_pOnAdMobInitializationComplete',
+  pOnAdMobRewardedUserEarned name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
+    +'pOnAdMobRewardedUserEarned',
+  pOnAdMobRewardedFailedToShow name 'Java_org_lamw_appcompatadmobdemo1_'
+    +'Controls_pOnAdMobRewardedFailedToShow';
 
 {%endregion}
   

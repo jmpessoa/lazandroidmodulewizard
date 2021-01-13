@@ -1,6 +1,6 @@
 package org.lamw.appcompatadmobdemo1;
 
-//LAMW: Lazarus Android Module Wizard - version 0.8.4.7 [unified!!] - 10 August - 2020 
+//LAMW: Lazarus Android Module Wizard - version 0.8.6.1 [AndroidX!!] - 11 November - 2020 
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -206,6 +206,8 @@ class jForm {
 	private int animationDurationIn = 1500;
 	private int animationDurationOut = 1500;
 	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
+	
+	public Toast mCustomToast = null;
 
 	// Constructor
 	public jForm(Controls ctrls, long pasobj) {
@@ -845,11 +847,30 @@ class jForm {
 		String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
 		return PathDat;
 	}
+	
+	//checks if external storage is available for read and write
+    public boolean IsExternalStorageReadWriteAvailable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    //checks if external storage is available for read
+    public boolean IsExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
 
 	private void copyFileUsingFileStreams(File source, File dest)
 			throws IOException {
 		InputStream input = null;
 		OutputStream output = null;
+		
 		try {
 			input = new FileInputStream(source);
 			output = new FileOutputStream(dest);
@@ -858,9 +879,9 @@ class jForm {
 			while ((bytesRead = input.read(buf)) > 0) {
 				output.write(buf, 0, bytesRead);
 			}
-		} finally {
-			input.close();
-			output.close();
+		} finally {			
+			if (input != null) input.close();
+			if (output != null) output.close();
 		}
 	}
 
@@ -1286,7 +1307,7 @@ class jForm {
 	        //Create a pattern
 	        Pattern pattern = Pattern.compile(patternString);
 	        if (null == pattern) {
-	            return null;
+	            return "";
 	        }
 
 	        //Match the pattern string in provided string
@@ -1300,14 +1321,14 @@ class jForm {
 	        ex.printStackTrace();
 	    }
 
-	    return null;
+	    return "";
 	}
 
 	// by ADiV
 	public String GetVersionPlayStore(String appUrlString) {
 	    final String currentVersion_PatternSeq = "<div[^>]*?>Current\\sVersion</div><span[^>]*?>(.*?)><div[^>]*?>(.*?)><span[^>]*?>(.*?)</span>";
 	    final String appVersion_PatternSeq = "htlgb\">([^<]*)</s";
-	    String playStoreAppVersion = null;
+	    String playStoreAppVersion = "";
 
 	    BufferedReader inReader = null;
 	    URLConnection uc = null;
@@ -1318,13 +1339,13 @@ class jForm {
 	    try{
 	     url = new URL(appUrlString);
 	    } catch (MalformedURLException e) {
-	     return null;
+	     return "";
 	    }
 	    
 	    try{
 	     uc = url.openConnection();
 	     if(uc == null) {
-	       return null;
+	       return "";
 	     }
 	     uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 	     inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
@@ -1336,14 +1357,14 @@ class jForm {
 	     }
 	    
 	    } catch (IOException e) {
-	     return null;	
+	     return "";	
 	    }
 	    
 
 	    // Get the current version pattern sequence 
 	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
 	    if(null == versionString){ 
-	        return null;
+	        return "";
 	    }else{
 	        // get version from "htlgb">X.X.X</span>
 	        playStoreAppVersion = GetAppVersion(appVersion_PatternSeq, versionString);
@@ -1351,20 +1372,31 @@ class jForm {
 
 	    return playStoreAppVersion;
 	}
+	
+	public void CancelShowCustomMessage() {
+		if (mCustomToast != null) {
+			mCustomToast.cancel();
+			mCustomToast = null;
+		}
+	}
 
 	//android.view.View
 	public void ShowCustomMessage(View _layout, int _gravity) {
 		//controls.pOnShowCustomMessage(PasObj);
-		Toast toast = new Toast(controls.activity);
-		toast.setGravity(_gravity, 0, 0);
-		toast.setDuration(Toast.LENGTH_LONG);
-		RelativeLayout par = (RelativeLayout) _layout.getParent();
-		if (par != null) {
-			par.removeView(_layout);
+		//android.view.ViewGroup
+		if (_layout.getParent() instanceof android.widget.RelativeLayout) {
+			android.widget.RelativeLayout par = (android.widget.RelativeLayout) _layout.getParent();
+			if (par != null) {
+				par.removeView(_layout);
+			}
 		}
+
+		mCustomToast = new Toast(controls.activity);
+		mCustomToast.setGravity(_gravity, 0, 0);
+		mCustomToast.setDuration(Toast.LENGTH_LONG);
 		_layout.setVisibility(View.VISIBLE);
-		toast.setView(_layout);
-		toast.show();
+		mCustomToast.setView(_layout);
+		mCustomToast.show();
 	}
 
 	private class MyCountDownTimer extends CountDownTimer {
@@ -1389,18 +1421,19 @@ class jForm {
 	}
 
 	public void ShowCustomMessage(View _layout, int _gravity, int _lenghTimeSecond) {
-		Toast toast = new Toast(controls.activity);
-		toast.setGravity(_gravity, 0, 0);
+		
+		mCustomToast = new Toast(controls.activity);
+		mCustomToast.setGravity(_gravity, 0, 0);
 		//toast.setDuration(Toast.LENGTH_LONG);
-		RelativeLayout par = (RelativeLayout) _layout.getParent();
+		android.widget.RelativeLayout par = (android.widget.RelativeLayout) _layout.getParent();
 		if (par != null) {
 			par.removeView(_layout);
 		}
 		_layout.setVisibility(View.VISIBLE);//0
-		toast.setView(_layout);
+		mCustomToast.setView(_layout);
 		//it will show the toast for 20 seconds:
 		//(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
-		MyCountDownTimer countDownTimer = new MyCountDownTimer(_lenghTimeSecond * 1000, 1000, toast);
+		MyCountDownTimer countDownTimer = new MyCountDownTimer(_lenghTimeSecond * 1000, 1000, mCustomToast);
 		countDownTimer.start();
 	}
 
@@ -1749,7 +1782,7 @@ class jForm {
 		// DhcpInfo  is a simple object for retrieving the results of a DHCP request
 		DhcpInfo dhcp = mWifi.getDhcpInfo();
 		if (dhcp == null) {
-			return null;
+			return "";
 		}
 		int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
 		byte[] quads = new byte[4];
@@ -1881,6 +1914,15 @@ class jForm {
 		main.addCategory(Intent.CATEGORY_HOME);
 		main.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		controls.activity.startActivity(main);
+
+	}
+
+        public void MoveToBack() {
+               controls.activity.moveTaskToBack(true);
+        }
+
+	public void MoveTaskToBack(boolean _nonRoot) {   //the "guide line' is try to mimic java Api ...
+		controls.activity.moveTaskToBack(_nonRoot);
 	}
 
 	public void Restart(int _delay) {
@@ -1993,11 +2035,13 @@ class jForm {
 	
 	//by ADiV
 	public boolean IsInMultiWindowMode(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)	    
-	        if ( ((Activity)controls.activity).isInMultiWindowMode() )	       
-	        	return true;
-		
-		return false;
+		boolean r = false;
+		if (Build.VERSION.SDK_INT >= 24) {
+			//[ifdef_api24up]
+			if (((Activity) controls.activity).isInMultiWindowMode()) r = true;
+			//[endif_api24up]
+		}
+		return r;
 	}
 	
 	//by ADiV
@@ -2005,8 +2049,13 @@ class jForm {
 		DisplayMetrics displaymetrics = new DisplayMetrics();
 		
 		if(displaymetrics == null) return 0;
-		
-		controls.activity.getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			controls.activity.getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics); //need min Api  17
+			//[endif_api17up]
+		}
+
         return displaymetrics.widthPixels;
 	}
 	
@@ -2015,9 +2064,14 @@ class jForm {
 		DisplayMetrics displaymetrics = new DisplayMetrics();
 		
 		if(displaymetrics == null) return 0;
-		
-		controls.activity.getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
-        return displaymetrics.heightPixels;
+
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+		     controls.activity.getWindowManager().getDefaultDisplay().getRealMetrics(displaymetrics);
+			//[endif_api17up]
+		}
+
+		return displaymetrics.heightPixels;
 	}
 
 	//by ADiV
@@ -2147,7 +2201,15 @@ class jForm {
 		} else {
 		 return "";	
 		}	
-	}    
+	}
+
+	public void RunOnUiThread(final int _tag) {
+        controls.activity.runOnUiThread(new Runnable() {
+            public void run() {
+                controls.pOnRunOnUiThread(PasObj, _tag);
+            };
+        });
+    }
 
 }
 //**class entrypoint**//please, do not remove/change this line!
@@ -2198,13 +2260,13 @@ public native void pAppOnCreateContextMenu(ContextMenu menu);
 public native void pAppOnClickContextMenuItem(MenuItem menuItem, int itemID, String itemCaption, boolean checked);
 public native void pOnDraw(long pasobj);
 public native void pOnTouch(long pasobj, int act, int cnt, float x1, float y1, float x2, float y2);
-public native void pOnClickGeneric(long pasobj, int value);
+public native void pOnClickGeneric(long pasobj);
 public native boolean pAppOnSpecialKeyDown(char keyChar, int keyCode, String keyCodeString);
-public native void pOnDown(long pasobj, int value);
-public native void pOnUp(long pasobj, int value);
+public native void pOnDown(long pasobj);
+public native void pOnUp(long pasobj);
 public native void pOnClick(long pasobj, int value);
-public native void pOnLongClick(long pasobj, int value);
-public native void pOnDoubleClick(long pasobj, int value);
+public native void pOnLongClick(long pasobj);
+public native void pOnDoubleClick(long pasobj);
 public native void pOnChange(long pasobj, String txt, int count);
 public native void pOnChanged(long pasobj, String txt, int count);
 public native void pOnEnter(long pasobj);
@@ -2220,6 +2282,7 @@ public native void pOnBeforeDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnAfterDispatchDraw(long pasobj, Canvas canvas, int tag);
 public native void pOnLayouting(long pasobj, boolean changed);
 public native void pAppOnRequestPermissionResult(int requestCode, String permission, int grantResult);
+public native void pOnRunOnUiThread(long pasobj, int tag);
 // -------------------------------------------------------------------------------------------
 //Load Pascal Library - Please, do not edit the static content commented in the template file
 // -------------------------------------------------------------------------------------------
@@ -2520,7 +2583,7 @@ public  String getStrDateTime() {
 //Controls Version Info
 //-------------------------------------------
 //GetControlsVersionFeatures ...  //Controls.java version-revision info! [0.6-04]
-public  String getStrDateTime() {  //hacked by jmpessoa!! sorry, was for a good cause! please, use the  jForm_GetDateTime!!
+public  String GetControlsVersion() {  
   String listVersionInfo = 
 		  "7$0=GetControlsVersionInfo;" +  //added ... etc..
   		  "7$0=getLocale;"; //added ... etc.. 
@@ -3082,13 +3145,15 @@ public  java.lang.Object jButton_Create(long pasobj ) {
 public java.lang.Object jsAdMob_jCreate(long _Self) {
   return (java.lang.Object)(new jsAdMob(this,_Self));
 }
-public native void pOnAdMobLoaded(long pasobj);
-public native void pOnAdMobFailedToLoad(long pasobj, int errorCode);
-public native void pOnAdMobOpened(long pasobj);
-public native void pOnAdMobClosed(long pasobj);
-public native void pOnAdMobLeftApplication(long pasobj);
-public native void pOnAdMobClicked(long pasobj);
+public native void pOnAdMobLoaded(long pasobj, int admobType);
+public native void pOnAdMobFailedToLoad(long pasobj, int admobType, int errorCode);
+public native void pOnAdMobOpened(long pasobj, int admobType);
+public native void pOnAdMobClosed(long pasobj, int admobType);
+public native void pOnAdMobLeftApplication(long pasobj, int admobType);
+public native void pOnAdMobClicked(long pasobj, int admobType);
 public native void pOnAdMobInitializationComplete(long pasobj);
+public native void pOnAdMobRewardedUserEarned(long pasobj);
+public native void pOnAdMobRewardedFailedToShow(long pasobj, int errorCode);
 
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));

@@ -1,6 +1,6 @@
 package org.lamw.appcompatadmobdemo1;
 
-//Lamw: Lazarus Android Module Wizard - version 0.8.4 - 12 March - 2019
+//Lamw: Lazarus Android Module Wizard - version 0.8.6 - 30 October - 2020
 //Form Designer and Components development model!
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
@@ -40,8 +40,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 
 public class App extends AppCompatActivity {
-private Controls       controls;
-    
+
+    private Controls       controls;    
     private int screenOrientation = 0; //For update screen orientation. [by TR3E]
     private boolean rlSizeChanged = false;
     
@@ -183,7 +183,9 @@ private Controls       controls;
  
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-     controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
+        super.onActivityResult(requestCode, resultCode, data);
+
+        controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
     }
 
     // http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar

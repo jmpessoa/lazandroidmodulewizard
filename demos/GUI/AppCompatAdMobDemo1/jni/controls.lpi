@@ -21,13 +21,13 @@
     <CustomData Count="10">
       <Item0 Name="BuildSystem" Value="Gradle"/>
       <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.5"/>
+      <Item2 Name="LamwVersion" Value="0.8.6.1"/>
       <Item3 Name="NdkApi" Value="android-22"/>
       <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r20\"/>
       <Item5 Name="Package" Value="org.lamw.appcompatadmobdemo1"/>
       <Item6 Name="SdkPath" Value="c:\laztoapk\downloads\android-sdk-windows\"/>
       <Item7 Name="StartModule" Value="AndroidModule1"/>
-      <Item8 Name="Support" Value="FALSE"/>
+      <Item8 Name="Support" Value="TRUE"/>
       <Item9 Name="Theme" Value="AppCompat.Light.NoActionBar"/>
     </CustomData>
     <BuildModes Count="1">
@@ -59,7 +59,7 @@
         <HasResources Value="True"/>
         <CustomData Count="2">
           <Item0 Name="fclControls"/>
-          <Item1 Name="jControls" Value="jButton;jsAdMob;jTextView"/>
+          <Item1 Name="jControls" Value="jButton;jForm;jsAdMob;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>

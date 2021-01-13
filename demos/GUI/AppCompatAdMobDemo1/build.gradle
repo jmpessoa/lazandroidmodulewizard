@@ -28,12 +28,12 @@ android {
             universalApk false
         }
     }
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
             minSdkVersion 16
-            targetSdkVersion 28
-            versionCode 3
-            versionName "3.1"
+            targetSdkVersion 29
+            versionCode 1
+            versionName "1.0"
     }
     sourceSets {
         main {
@@ -55,7 +55,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.0.0'
-    implementation 'com.google.android.gms:play-services-ads:18.3.0'
+    implementation 'com.google.android.gms:play-services-ads:19.3.0'
 }
  
 task run(type: Exec, dependsOn: ':installDebug') {
