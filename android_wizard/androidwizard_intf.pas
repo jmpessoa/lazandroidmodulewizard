@@ -1179,6 +1179,8 @@ begin
      25: Result:= 'Nougat-7.1';
      26: Result:= 'Oreo-8.0';
      27: Result:= 'Oreo-8.1';
+     28: Result:= 'Pie';
+     29: Result:= 'Android-10.0';
   end;
 end;
 
@@ -2918,7 +2920,7 @@ begin
                 apkName:= FSmallProjName+ '-' + instructionChip;
 
                 strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+FAndroidProjectName+'\'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-apksigner.bat');
 
                 strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
@@ -2926,7 +2928,7 @@ begin
                 strList.Add('set GRADLE_HOME='+FPathToGradle);
                 strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
                 strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+FAndroidProjectName+'\'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.bat');
 
                 strList.Clear;
@@ -2958,7 +2960,7 @@ begin
                 strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+linuxAndroidProjectName+'/'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-apksigner.sh');
 
                 strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
@@ -2967,7 +2969,7 @@ begin
                 strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+                strList.Add('apksigner sign --ks '+linuxAndroidProjectName+'/'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.sh');
 
                 strList.Clear;
