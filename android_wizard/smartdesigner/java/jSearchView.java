@@ -58,7 +58,7 @@ public class jSearchView extends SearchView /*dummy*/ { //please, fix what GUI o
                 controls.pOnSearchViewFocusChange(pascalObj, hasFocus);
 
                 if (hasFocus)
-                    controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!
+                    controls.pOnClickGeneric(pascalObj); //JNI event onClick!
             }
         });
 

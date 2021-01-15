@@ -47,7 +47,7 @@ public class jToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object 
       this.setNavigationOnClickListener(new View.OnClickListener() {  //trigger only of IsActionBar = false
           @Override
           public void onClick(View v) {
-        	  controls.pOnClickGeneric(pascalObj, Const.Click_Default);
+        	  controls.pOnClickGeneric(pascalObj);
           }          
       });
       
