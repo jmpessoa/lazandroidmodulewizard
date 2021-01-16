@@ -374,6 +374,8 @@ type
     procedure SetResponseTimeout(_timeoutMilliseconds: integer);
     procedure SetConnectionTimeout(_timeoutMilliseconds: integer);
 
+    procedure trustAllCertificates();//By Segator
+
     procedure UploadFile(_url: string; _fullFileName: string; _uploadFormName: string); overload;
     procedure UploadFile(_url: string; _fullFileName: string);  overload;
     procedure SetUploadFormName(_uploadFormName: string);
@@ -7576,6 +7578,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jHttpClient_ClearCookieStore(FjEnv, FjObject);
+end;
+
+procedure jHttpClient.trustAllCertificates();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_trustAllCertificates(FjEnv, FjObject);
 end;
 
 function jHttpClient.AddCookie(_name: string; _value: string): jObject;
