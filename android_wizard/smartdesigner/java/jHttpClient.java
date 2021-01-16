@@ -46,6 +46,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.HttpsURLConnection;
+import java.security.SecureRandom;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 /*Draft java code by "Lazarus Android Module Wizard" [2/16/2015 20:17:59]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl template*/
@@ -116,6 +125,7 @@ public class jHttpClient /*extends ...*/ {
         context = _ctrls.activity;
         pascalObj = _Self;
         controls = _ctrls;
+
 
         cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
 
@@ -1471,5 +1481,37 @@ public class jHttpClient /*extends ...*/ {
         unvaluedName = "SOAPBODY";
     }
 
+    ///By Segator
+    public void trustAllCertificates() {
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public X509Certificate[] getAcceptedIssuers() {
+                            X509Certificate[] myTrustedAnchors = new X509Certificate[0];
+                            return myTrustedAnchors;
+                        }
+
+                        @Override
+                        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String arg0, SSLSession arg1) {
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+        }
+    }
 }
 
