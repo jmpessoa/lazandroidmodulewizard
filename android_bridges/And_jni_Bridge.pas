@@ -931,6 +931,7 @@ function jHttpClient_GetCookiesCount(env: PJNIEnv; _jhttpclient: JObject): integ
 function jHttpClient_GetCookieByIndex(env: PJNIEnv; _jhttpclient: JObject; _index: integer): jObject;
 function jHttpClient_GetCookieAttributeValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject; _attribute: string): string;
 procedure jHttpClient_ClearCookieStore(env: PJNIEnv; _jhttpclient: JObject);
+procedure jHttpClient_trustAllCertificates(env: PJNIEnv; _jhttpclient: JObject);
 function jHttpClient_AddCookie(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string): jObject;  overload;
 function jHttpClient_IsExpired(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): boolean;
 function jHttpClient_IsCookiePersistent(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): boolean;
@@ -9976,6 +9977,17 @@ var
 begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearCookieStore', '()V');
+  env^.CallVoidMethod(env, _jhttpclient, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jHttpClient_trustAllCertificates(env: PJNIEnv; _jhttpclient: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  jMethod:= env^.GetMethodID(env, jCls, 'trustAllCertificates', '()V');
   env^.CallVoidMethod(env, _jhttpclient, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
