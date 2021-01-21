@@ -1196,6 +1196,16 @@ begin
          strList.Add('        debug.setRoot(''build-types/debug'')');
          strList.Add('        release.setRoot(''build-types/release'')');
          strList.Add('    }');
+         strList.Add('    buildTypes {');
+         strList.Add('        debug {');
+         strList.Add('            debuggable true');
+         strList.Add('            jniDebuggable true');
+         strList.Add('        }');
+         strList.Add('        release {');
+         strList.Add('            debuggable false');
+         strList.Add('            jniDebuggable false');
+         strList.Add('        }');
+         strList.Add('    }');
          strList.Add('}');
 
          strList.Add('dependencies {');

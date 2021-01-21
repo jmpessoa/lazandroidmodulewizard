@@ -12,13 +12,15 @@ uses
   uFormGetFPCSource, uformsettingspaths, uFormStartEmulator, ufrmCompCreate, 
   ufrmEditor, uimportcstuff, uimportjavastuff, uimportjavastuffchecked, 
   uregistercompform, uformimportlamwstuff, unitformimportpicture, 
-  uFormComplements, uformimportjarstuff, lamwtoolsoptions, LazarusPackageIntf;
+  uFormComplements, uformimportjarstuff, lamwtoolsoptions, 
+  GDBMIServerDebuggerLAMW, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
   RegisterUnit('amw_ide_menu_items', @amw_ide_menu_items.Register);
+  RegisterUnit('GDBMIServerDebuggerLAMW', @GDBMIServerDebuggerLAMW.Register);
 end;
 
 initialization

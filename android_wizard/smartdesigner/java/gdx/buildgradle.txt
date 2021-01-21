@@ -47,6 +47,16 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
+	buildTypes {
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
+        release {
+            debuggable false
+            jniDebuggable false
+        }
+    }   
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
