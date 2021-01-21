@@ -16,7 +16,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="35">
+    <Files Count="36">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -157,17 +157,25 @@
         <Filename Value="lamwtoolsoptions.pas"/>
         <UnitName Value="lamwtoolsoptions"/>
       </Item35>
+      <Item36>
+        <Filename Value="gdbmiserverdebuggerlamw.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="GDBMIServerDebuggerLAMW"/>
+      </Item36>
     </Files>
-    <RequiredPkgs Count="3">
+    <RequiredPkgs Count="4">
       <Item1>
-        <PackageName Value="LazAndroidWizardPack"/>
+        <PackageName Value="lazdebuggerfpgdbmi"/>
       </Item1>
       <Item2>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="LazAndroidWizardPack"/>
       </Item2>
       <Item3>
-        <PackageName Value="FCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item3>
+      <Item4>
+        <PackageName Value="FCL"/>
+      </Item4>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
