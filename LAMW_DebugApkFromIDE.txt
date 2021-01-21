@@ -1,0 +1,62 @@
+
+
+     Modifid lazandroidmodulewizard-master
+        for use GDB (gdbserver) for 32 bits only (!)
+
+
+   Use Gdb debudgger:
+
+  1) Install modifid versin lazandroidmodulewizard-master and rebuild Lazarus IDE:
+  2) Load or create new LAMW project (for example AppAsyncTaskDemo1)
+  3) Start device emulator
+  4) IDE options/debugger Select debugger type: 'GNU remote debugger (gdbserver) LAMW'
+  5) IDE options/debugger Select debugger path:
+ ...android-ndk-r10e\toolchains\x86-4.9\prebuilt\windows\bin\i686-linux-android-gdb.exe
+                        (for x86 emulator - tested!)
+  6) IDE options/debugger setup remote host name (Title emulator IP) & taget port
+  7) Project/Project Option/Compile options/Debugging: -> generate Dedug information,
+                                                       -> type automatic,
+                                                       -> Disp line numbers,
+                                                       -> use external gdb symb
+  8) Project/Project Option/Compile options/Compilation and Linking:
+                                                       -> No optimization
+  9) [LAMW] Android project options/Build/Chipset      -> x86
+ 10) Run/[LAMW] Build Android Apk and Run
+ 11) Messages:
+      ... Success
+          Start gdbserver --multi :2021
+          Listening on port 2021
+ 12) Run/Attach to program
+ 13) Select program name and PID from dialog
+ 14) Messages:
+       ...
+         Remote debugging from host 192.168.34.2
+         Attached; pid = 1704
+ 15) Set breakpoints
+ 16) Run (F9)
+
+ ....
+
+ 17) Run/Detach from program or Stop (Ctrl-F2)
+ 18) Run/Abort Build
+
+   Tested on
+           OS        : Win10-64,
+           Laz       : laz4android2.0.0,
+           LAMW      : lazandroidmodulewizard-master from 24.12.2020
+           Emulator  : GENIMOTION Version 3.0.0 | Revision 20181218-bd824f9
+                         (Device Samsung Galaxy S8[8.0-API26] & S9 [9.0-API28])
+           JDK       : Java\jdk1.8.0_60
+           ANT       : apache-ant-1.9.7
+           GRADLE    : gradle-4.4.1
+           NDK       : android-ndk-r10e
+           SDK       : android-sdk (platform-tools 28.0.1)
+           Target SDK version : 28
+
+//------------------------------------------------------------------------------
+
+  E:Mail leopreo@gmail.com  Leon Preo
+
+
+
+
