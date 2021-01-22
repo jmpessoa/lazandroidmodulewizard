@@ -13,7 +13,7 @@ uses
 
 const
   cMinAPI = 10;
-  cMaxAPI = 28;
+  cMaxAPI = 30;
 
 type
 
