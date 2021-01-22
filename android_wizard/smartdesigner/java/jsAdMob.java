@@ -30,7 +30,7 @@ import com.google.android.gms.ads.LoadAdError;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Developed by ADiV for LAMW on 2021-01-13
+// Developed by ADiV for LAMW on 2021-01-21
 // Updated for AdMob 19.3.0
 //-------------------------------------------------------------------------
 
@@ -82,10 +82,12 @@ public class jsAdMob extends FrameLayout {
    private InterstitialAd admobInter   = null;
    private String         admobInterId = "ca-app-pub-3940256099942544/1033173712";
    private Boolean		  admobInterAutoLoadOnClose = true;
+   private Boolean		  admobInterIsLoading = false;
    
    //--- Reward ---//
-   private RewardedAd     admobRewarded   = null;
+   private RewardedAd     admobRewarded   = null;   
    private String         admobRewardedId = "ca-app-pub-3940256099942544/5224354917";
+   private Boolean		  admobRewardedIsLoading = false;
 
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
@@ -106,10 +108,12 @@ public class jsAdMob extends FrameLayout {
 
    public void jFree() {
       //free local objects...
-         admobBannerRequest = null;
-         admobBannerView    = null;
+      admobBannerRequest = null;
+      admobBannerView    = null;
+      admobInter   		 = null;
+      admobRewarded   	 = null;
 
-	 LAMWCommon.free();
+	  LAMWCommon.free();
    }
  
    public void SetViewParent(ViewGroup _viewgroup) {
@@ -123,6 +127,59 @@ public class jsAdMob extends FrameLayout {
    public void RemoveFromViewParent() {
   	 LAMWCommon.removeFromViewParent();
    }
+   
+   public View GetView() {
+	      return this;
+   }
+
+   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	      LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
+   }
+
+   public void AddLParamsAnchorRule(int _rule) {
+		 LAMWCommon.addLParamsAnchorRule(_rule);
+   }
+
+   public void AddLParamsParentRule(int _rule) {
+		 LAMWCommon.addLParamsParentRule(_rule);
+   }
+
+   public void SetLayoutAll(int _idAnchor) {
+	  	 LAMWCommon.setLayoutAll(_idAnchor);
+   }
+
+   public void ClearLayoutAll() {
+		 LAMWCommon.clearLayoutAll();
+   }
+   
+   public void BringToFront() {
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();
+   }
+   
+   //--- AdMob ---//
+   
+   public void AdMobInit(){	  	   
+	   
+	   if( admobInit ) return; 
+	   
+	   // Initialize the Mobile Ads SDK.
+       MobileAds.initialize(controls.activity, 
+    	   new OnInitializationCompleteListener() {    	           
+           @Override
+           public void onInitializationComplete(InitializationStatus initializationStatus) {
+        	   controls.pOnAdMobInitializationComplete(pascalObj);
+           }
+       });
+   }
+   
+   public void AdMobFree(){
+	   admobBannerView    = null;
+	   admobBannerRequest = null;
+   }
+   
+   //--- Banner ---//
 
    public void AdMobBannerSetId( String _admobid ) {
 	   admobBannerId = _admobid;      
@@ -165,25 +222,6 @@ public class jsAdMob extends FrameLayout {
 			return AdSize.SMART_BANNER.getHeightInPixels(context);			
 		}
 	}
-   
-   public void AdMobInit(){	  	   
-	   
-	   if( admobInit ) return; 
-	   
-	   // Initialize the Mobile Ads SDK.
-       MobileAds.initialize(controls.activity, 
-    	   new OnInitializationCompleteListener() {    	           
-           @Override
-           public void onInitializationComplete(InitializationStatus initializationStatus) {
-        	   controls.pOnAdMobInitializationComplete(pascalObj);
-           }
-       });
-   }
-   
-   public void AdMobFree(){
-	   admobBannerView    = null;
-	   admobBannerRequest = null;
-   }
    
    //--- BANNER ---//
    
@@ -383,6 +421,7 @@ public class jsAdMob extends FrameLayout {
    public void AdMobInterCreateAndLoad(){
 		if(admobInter != null) return;
 		
+		admobInterIsLoading = true;
 		admobInter = new InterstitialAd(controls.activity);
 		admobInter.setAdUnitId(admobInterId);
 		admobInter.loadAd(new AdRequest.Builder().build());
@@ -392,12 +431,14 @@ public class jsAdMob extends FrameLayout {
 			@Override
 	        public void onAdLoaded() {
 	            // Code to be executed when an ad finishes loading.
+				admobInterIsLoading = false;
 				controls.pOnAdMobLoaded(pascalObj, ADMOB_INTER);
 	        }
 
 	        @Override
 	        public void onAdFailedToLoad(int errorCode) {
 	            // Code to be executed when an ad request fails.
+	        	admobInterIsLoading = false;
 	        	controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_INTER, errorCode);
 	        }
 
@@ -424,8 +465,10 @@ public class jsAdMob extends FrameLayout {
 	        	controls.pOnAdMobClosed(pascalObj, ADMOB_INTER);
 	        	
 	            // Code to be executed when the interstitial ad is closed.
-	        	if(admobInterAutoLoadOnClose)
-	        	 admobInter.loadAd(new AdRequest.Builder().build());
+	        	if(admobInterAutoLoadOnClose){
+	        		admobInterIsLoading = true;
+	        	    admobInter.loadAd(new AdRequest.Builder().build());
+	        	}
 	        }
 	
 
@@ -439,7 +482,12 @@ public class jsAdMob extends FrameLayout {
    public void AdMobInterLoad(){
 	   if(admobInter == null) return;
 	   
+	   admobInterIsLoading = true;
 	   admobInter.loadAd(new AdRequest.Builder().build());
+   }
+   
+   public boolean AdMobInterIsLoading(){
+	   return admobInterIsLoading; 
    }
    
    public boolean AdMobInterIsLoaded(){
@@ -457,12 +505,14 @@ public class jsAdMob extends FrameLayout {
    //--- Rewarded ---//
    
    private RewardedAd createAndLoadRewardedAd() {
+	   admobRewardedIsLoading = true;
        RewardedAd rewardedAd = new RewardedAd(controls.activity, admobRewardedId);
        
        RewardedAdLoadCallback adLoadCallback = new RewardedAdLoadCallback() {
            @Override
            public void onRewardedAdLoaded() {
                // Ad successfully loaded.
+        	   admobRewardedIsLoading = false;
         	   controls.pOnAdMobLoaded(pascalObj, ADMOB_REWARDED);
            }
 
@@ -470,6 +520,7 @@ public class jsAdMob extends FrameLayout {
            public void onRewardedAdFailedToLoad(LoadAdError errorCode) {
            //public void onRewardedAdFailedToLoad(int errorCode) {
                // Ad failed to load.
+        	   admobRewardedIsLoading = false;
         	   controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_REWARDED, errorCode.getCode());
            }
        };
@@ -482,11 +533,19 @@ public class jsAdMob extends FrameLayout {
    }
    
    public void AdMobRewardedCreateAndLoad(){
+	   if (admobRewardedIsLoading) return;
+	   
 	   admobRewarded = createAndLoadRewardedAd();
    }
    
    public void AdMobRewardedLoad(){
+	   if (admobRewardedIsLoading) return;
+	   
 	   admobRewarded = createAndLoadRewardedAd();
+   }
+   
+   public boolean AdMobRewardedIsLoading(){
+	   return admobRewardedIsLoading;
    }
    
    public boolean AdMobRewardedIsLoaded(){
@@ -521,58 +580,31 @@ public class jsAdMob extends FrameLayout {
 	   RewardedAdCallback adCallback = new RewardedAdCallback() {    	  
                @Override
                public void onRewardedAdOpened() {            	   
-                   // Ad opened.
+                   // Ad opened.            	   
             	   controls.pOnAdMobOpened(pascalObj, ADMOB_REWARDED);
                }
 
                @Override
                public void onRewardedAdClosed() {            	   
-                   // Ad closed.
+                   // Ad closed.            	   
             	   controls.pOnAdMobClosed(pascalObj, ADMOB_REWARDED);
                }
 
                @Override
                public void onUserEarnedReward(RewardItem _reward) {
-                   // User earned reward.
-            	  if(_reward == null) return;
-            	  controls.pOnAdMobRewardedUserEarned(pascalObj);
+                   // User earned reward.            	   
+            	   if(_reward == null) return;
+            	   controls.pOnAdMobRewardedUserEarned(pascalObj);
                }
 
                @Override
                public void onRewardedAdFailedToShow(AdError errorCode) {            	   
-                   // Ad failed to display.
+                   // Ad failed to display.            	   
             	   controls.pOnAdMobRewardedFailedToShow(pascalObj, errorCode.getCode());
                }
        };
            
        admobRewarded.show(controls.activity, adCallback);       
-   }
-
-
-   public View GetView() {
-      return this;
-   }
-
-   public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
-      LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
-   }
-
-   public void AddLParamsAnchorRule(int _rule) {
-	 LAMWCommon.addLParamsAnchorRule(_rule);
-   }
-
-   public void AddLParamsParentRule(int _rule) {
-	 LAMWCommon.addLParamsParentRule(_rule);
-   }
-
-   public void SetLayoutAll(int _idAnchor) {
-  	 LAMWCommon.setLayoutAll(_idAnchor);
-   }
-
-   public void ClearLayoutAll() {
-	 LAMWCommon.clearLayoutAll();
-   }
-
-   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...   
+   }   
 
 }

@@ -76,8 +76,19 @@ jsAdMob = class(jVisualControl)
     procedure GenEvent_OnAdMobRewardedFailedToShow(Obj: TObject; errorCode: integer);
 
     procedure SetViewParent(_viewgroup: jObject); override;
-    function GetViewParent(): jObject;  override;
+    function  GetViewParent(): jObject;  override;
     procedure RemoveFromViewParent(); override;
+
+    function  GetView(): jObject;  override;
+    procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
+    procedure AddLParamsAnchorRule(_rule: integer);
+    procedure AddLParamsParentRule(_rule: integer);
+    procedure SetLayoutAll(_idAnchor: integer);
+    procedure ClearLayout();
+
+    procedure BringToFront();
+
+    //--- AdMob ---//
 
     procedure AdMobInit();
     procedure AdMobFree();
@@ -100,6 +111,7 @@ jsAdMob = class(jVisualControl)
     procedure AdMobInterCreateAndLoad();
     procedure AdMobInterLoad();
     procedure AdMobInterSetAutoLoadOnClose( _autoLoadOnClose : boolean );
+    function  AdMobInterIsLoading(): boolean;
     function  AdMobInterIsLoaded() : boolean;
     procedure AdMobInterShow();
 
@@ -107,17 +119,11 @@ jsAdMob = class(jVisualControl)
     procedure AdMobRewardedSetId( _admobid : string );
     procedure AdMobRewardedCreateAndLoad();
     procedure AdMobRewardedLoad();
+    function  AdMobRewardedIsLoading(): boolean;
     function  AdMobRewardedIsLoaded() : boolean;
     function  AdMobRewardedGetAmount() : integer;
     function  AdMobRewardedGetType() : string;
     procedure AdMobRewardedShow();
-
-    function GetView(): jObject;  override;
-    procedure SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-    procedure AddLParamsAnchorRule(_rule: integer);
-    procedure AddLParamsParentRule(_rule: integer);
-    procedure SetLayoutAll(_idAnchor: integer);
-    procedure ClearLayout();
     
  published
 
@@ -426,21 +432,28 @@ procedure jsAdMob.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
+     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jsAdMob.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
+     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jsAdMob.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
+     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+end;
+
+procedure jsAdMob.BringToFront;
+begin
+  //in designing component state: set value here...
+  if FjObject <> nil then
+     View_BringToFront(FjEnv, FjObject);
 end;
 
 procedure jsAdMob.ClearLayout();
@@ -451,15 +464,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc(FjEnv, FjObject, 'ClearLayoutAll');
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-         self.AddLParamsParentRule(GetPositionRelativeToParent(rToP));
+         AddLParamsParentRule(GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-        self.AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
+        AddLParamsAnchorRule(GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -489,6 +502,14 @@ begin
  //in designing component state: set value here...
  if FjObject <> nil then
   jni_proc_t(FjEnv, FjObject, 'AdMobInterSetId', _admobid);
+end;
+
+function  jsAdMob.AdMobInterIsLoading() : boolean;
+begin
+ result := false;
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  result := jni_func_out_z(FjEnv, FjObject, 'AdMobInterIsLoading');
 end;
 
 function jsAdMob.AdMobInterIsLoaded( ) : boolean;
@@ -533,6 +554,14 @@ begin
  //in designing component state: set value here...
  if FjObject <> nil then
   result := jni_func_out_z(FjEnv, FjObject, 'AdMobRewardedIsLoaded');
+end;
+
+function  jsAdMob.AdMobRewardedIsLoading() : boolean;
+begin
+ result := false;
+ //in designing component state: set value here...
+ if FjObject <> nil then
+  result := jni_func_out_z(FjEnv, FjObject, 'AdMobRewardedIsLoading');
 end;
 
 function  jsAdMob.AdMobRewardedGetAmount() : integer;
