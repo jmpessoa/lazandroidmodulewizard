@@ -1,0 +1,198 @@
+object FormApksigner: TFormApksigner
+  Left = 298
+  Height = 490
+  Top = 32
+  Width = 445
+  Caption = 'Apk Signer [KeyTool Inpuy]'
+  ClientHeight = 490
+  ClientWidth = 445
+  DesignTimePPI = 120
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 29
+    Top = 461
+    Width = 445
+    Panels = <>
+  end
+  object Label1: TLabel
+    Left = 176
+    Height = 20
+    Top = 13
+    Width = 89
+    Caption = 'Keytool Input'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 12
+    Height = 20
+    Top = 53
+    Width = 168
+    Caption = '[File] Key Store Password:'
+    ParentColor = False
+  end
+  object EditKeyStorePassword: TEdit
+    Left = 12
+    Height = 28
+    Top = 81
+    Width = 198
+    TabOrder = 1
+    TextHint = '123456'
+  end
+  object EditKeyAliasPassword: TEdit
+    Left = 227
+    Height = 28
+    Top = 360
+    Width = 198
+    Anchors = [akTop, akRight]
+    TabOrder = 2
+    TextHint = '123456'
+  end
+  object Label4: TLabel
+    Left = 12
+    Height = 20
+    Top = 127
+    Width = 107
+    Caption = 'Your First Name:'
+    ParentColor = False
+  end
+  object EditFirstName: TEdit
+    Left = 12
+    Height = 28
+    Top = 152
+    Width = 198
+    TabOrder = 3
+    TextHint = 'MyFirstName'
+  end
+  object Label5: TLabel
+    Left = 232
+    Height = 20
+    Top = 127
+    Width = 106
+    Caption = 'Your Last Name:'
+    ParentColor = False
+  end
+  object EditLastName: TEdit
+    Left = 227
+    Height = 28
+    Top = 152
+    Width = 198
+    TabOrder = 4
+    TextHint = 'MyLastName'
+  end
+  object Label6: TLabel
+    Left = 12
+    Height = 20
+    Top = 200
+    Width = 129
+    Caption = 'Organizational Unit'
+    ParentColor = False
+  end
+  object EditOrgUnit: TEdit
+    Left = 12
+    Height = 28
+    Top = 224
+    Width = 198
+    TabOrder = 5
+    TextHint = 'MyDevelopmentUnit'
+  end
+  object Label7: TLabel
+    Left = 227
+    Height = 20
+    Top = 200
+    Width = 133
+    Caption = 'Organization Name:'
+    ParentColor = False
+  end
+  object EditOrgName: TEdit
+    Left = 227
+    Height = 28
+    Top = 227
+    Width = 198
+    TabOrder = 6
+    TextHint = 'MyCompany'
+  end
+  object Label8: TLabel
+    Left = 12
+    Height = 20
+    Top = 269
+    Width = 101
+    Caption = 'City or Locality:'
+    ParentColor = False
+  end
+  object EditCity: TEdit
+    Left = 12
+    Height = 28
+    Top = 294
+    Width = 198
+    TabOrder = 7
+    TextHint = 'MyCity'
+  end
+  object Label9: TLabel
+    Left = 227
+    Height = 20
+    Top = 269
+    Width = 115
+    Caption = 'State or Province:'
+    ParentColor = False
+  end
+  object EditProvince: TEdit
+    Left = 227
+    Height = 28
+    Top = 294
+    Width = 128
+    TabOrder = 8
+    TextHint = 'MT'
+  end
+  object BitBtn1: TBitBtn
+    Left = 219
+    Height = 38
+    Top = 414
+    Width = 94
+    Anchors = [akRight, akBottom]
+    Default = True
+    DefaultCaption = True
+    GlyphShowMode = gsmAlways
+    Kind = bkOK
+    ModalResult = 1
+    TabOrder = 9
+  end
+  object BitBtn2: TBitBtn
+    Left = 331
+    Height = 38
+    Top = 414
+    Width = 94
+    Anchors = [akRight, akBottom]
+    Cancel = True
+    DefaultCaption = True
+    GlyphShowMode = gsmAlways
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 10
+  end
+  object Label10: TLabel
+    Left = 371
+    Height = 20
+    Top = 269
+    Width = 54
+    Caption = 'Country:'
+    ParentColor = False
+  end
+  object EditCodeCountry: TEdit
+    Left = 371
+    Height = 28
+    Hint = 'two-letter country code'
+    Top = 294
+    Width = 54
+    TabOrder = 11
+    TextHint = 'BR'
+  end
+  object Label3: TLabel
+    Left = 227
+    Height = 20
+    Top = 336
+    Width = 172
+    Anchors = [akTop, akRight]
+    Caption = '[Apk] Key Alias  Password:'
+    ParentColor = False
+  end
+end

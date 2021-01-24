@@ -8,7 +8,8 @@ uses
   Classes, SysUtils, FileUtil, Dialogs, IDECommands, MenuIntf, Forms,
   uformsettingspaths{, lazandroidtoolsexpert}, ufrmEditor, ufrmCompCreate,
   uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked,
-  uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff, unitformimportpicture;
+  uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff,
+  unitformimportpicture, uformapksigner;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);     //By Thierrydijoux!
@@ -29,6 +30,14 @@ implementation
 
 uses LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf,
   ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles, LCLType, PackageIntf{, IDEImagesIntf};
+
+procedure SaveShellScript(script: TStringList; const AFileName: string);
+begin
+    script.SaveToFile(AFileName);
+    {$ifdef Unix}
+    FpChmod(AFileName, &751);
+    {$endif}
+end;
 
 procedure StartFPCTrunkSource(Sender: TObject);
 begin
@@ -209,10 +218,11 @@ begin
   auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.bat');
   {$Endif}
 
-  {$IFDEF unix}
+  {$IFDEF Unix}
   auxList.Add('cd '+pathToProject);
   auxList.Add(pathToNdk+'ndk-build V=1 -B');
-  auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.sh');
+  SaveShellScript(auxList, 'pathToProject+'lib'+libname+'-builder.sh');
+  //auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.sh');
   {$Endif}
 
   auxList.Free;
@@ -278,6 +288,8 @@ begin
         13: Result:= 'android-26';
         14: Result:= 'android-27';
         15: Result:= 'android-28';
+        16: Result:= 'android-29';
+        17: Result:= 'android-30';
      end;
   end;
 end;
@@ -1102,6 +1114,351 @@ begin
   end;
 end;
 
+//StartApksignerStuff
+procedure StartApksignerStuff(Sender: TObject);
+var
+  Project: TLazProject;
+  PathToAndroidProject, SmallProjName, strTemp, strAux: string;
+  p1: integer;
+  auxList: TStringList;
+  isUniversalApk: boolean;
+  instructionChip, ks_pass, key_pass: string;
+  AProcess: TProcess;
+  buildSystem: string;
+  linuxPathToAndroidProject, winPathToAndroidProject: string;
+begin
+  Project := LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  begin
+
+    buildSystem:= Project.CustomData.Values['BuildSystem'];  //Gradle or Ant
+
+    instructionChip:= ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+    instructionChip:= ExtractFileName(instructionChip);
+
+    FormApksigner:=  TFormApksigner.Create(Application);
+
+    p1:= Pos(DirectorySeparator+'jni'+DirectorySeparator, Project.ProjectInfoFile);
+    if p1 > 0 then
+    begin
+      PathToAndroidProject:= Trim(Copy(Project.ProjectInfoFile, 1, p1-1))
+    end
+    else
+    begin
+      PathToAndroidProject:= ExtractFilePath(Project.ProjectInfoFile);
+      PathToAndroidProject:= Copy(PathToAndroidProject,1, Length(PathToAndroidProject)-1);
+    end; //C:\android\workspace\AppLAMWProject10
+
+    linuxPathToAndroidProject:= PathToAndroidProject;
+    {$IFDEF Windows}
+    strAux:= PathToAndroidProject;
+    SplitStr(strAux, ':');
+    linuxPathToAndroidProject:= StringReplace(strAux, '\', '/', [rfReplaceAll]);
+    {$endif}
+
+    winPathToAndroidProject:= PathToAndroidProject;
+    {$IFDEF Linux}
+    strAux:= PathToAndroidProject;
+    winPathToAndroidProject:= 'C:'+ StringReplace(strAux, '/', '\', [rfReplaceAll]);
+    {$endif}
+
+    auxList:= TStringList.Create;
+    auxList.StrictDelimiter:= True;
+    auxList.Delimiter:= DirectorySeparator;
+    auxList.DelimitedText:= TrimChar(PathToAndroidProject, DirectorySeparator);
+    smallProjName:=  auxList.Strings[auxList.Count-1];; //AppLAMWProject10
+
+    auxList.LoadFromFile(PathToAndroidProject +  DirectorySeparator + 'keytool_input.txt');
+    { keytool_input.txt
+      123456           0
+      123456           1
+      MyFirstName MyLastName 2
+      MyDevelopmentUnitName  3
+      MyCompanyName          4
+      MyCity                 5
+      MT                     6
+      BR                     7
+      y                      8
+      123456                 9
+    }                                //firstPart:= SplitStr(aux, ' ');
+    FormApksigner.EditKeyStorePassword.Text:= auxList.Strings[0];   //123456
+
+    strTemp:=auxList.Strings[2];
+    FormApksigner.EditFirstName.Text:= SplitStr(strTemp, ' ');      //MyFirstName
+    FormApksigner.EditLastName.Text:= strTemp;                      //MyLastName
+
+    FormApksigner.EditOrgUnit.Text:= auxList.Strings[3];            //MyDevelopmentUnitName
+    FormApksigner.EditOrgName.Text:= auxList.Strings[4];            //MyCompanyName
+    FormApksigner.EditCity.Text:= auxList.Strings[5];               //MyCity
+    FormApksigner.EditProvince.Text:= auxList.Strings[6];           //MT
+    FormApksigner.EditCodeCountry.Text:= auxList.Strings[7];        //BR
+    FormApksigner.EditKeyAliasPassword.Text:= auxList.Strings[9];   //123456
+
+    isUniversalApk:= True;
+    auxList.LoadFromFile(PathToAndroidProject  +  DirectorySeparator +  'build.gradle');
+    if Pos('universalApk false', auxList.Text) > 0 then
+    begin
+      isUniversalApk:= False;
+    end;
+
+    if buildSystem = 'Gradle' then
+    begin
+      if isUniversalApk then
+      begin
+         if not FileExists(PathToAndroidProject + DirectorySeparator +
+                                                   'build' +DirectorySeparator+
+                                                   'outputs'+DirectorySeparator+
+                                                   'apk'+DirectorySeparator+
+                                                   'release'+DirectorySeparator+
+                                                   smallProjName+'-universal-release-unsigned.apk') then
+         begin
+           ShowMessage('[Gradle] Fail... You need first: '+sLineBreak+'"Run" --> "[LAMW] Build Android Apk and Run" to produce a debug version ...');
+           Exit;
+         end;
+      end
+      else
+      begin
+         if not FileExists(PathToAndroidProject + DirectorySeparator +
+                                                   'build' +DirectorySeparator+
+                                                   'outputs'+DirectorySeparator+
+                                                   'apk'+DirectorySeparator+
+                                                   'release'+DirectorySeparator+
+                                                   smallProjName+'-'+instructionChip+'-release-unsigned.apk') then
+         begin
+           ShowMessage('[Gradle] Fail... You need first: '+sLineBreak+ '"Run" --> "[LAMW] Build Android Apk and Run" '+sLineBreak+'to produce a debug version ...');
+           Exit;
+         end;
+      end;
+    end
+    else // Ant
+    begin
+      If not FileExists(PathToAndroidProject + DirectorySeparator + 'bin'+ DirectorySeparator +
+                        smallProjName+'-debug.apk') then
+      begin
+        ShowMessage('[Ant] Fail... You need first: '+sLineBreak + '"Run" --> "[LAMW] Build Android Apk and Run" '+sLineBreak+'to produce a debug version ...');
+        Exit;
+      end;
+    end;
+
+    if FormApksigner.ShowModal = mrOk then
+    begin
+
+      if FileExists(PathToAndroidProject  +  DirectorySeparator +  SmallProjName+'-release.keystore') then
+      begin
+        ShowMessage('[File'+SmallProjName+'-release.keystore Exists!]'+sLineBreak+' Using existing '+SmallProjName+'-release.keystore" ');
+      end
+      else
+      begin
+        ShowMessage('"warning:'+SmallProjName+'-release.keystore" file should be created only once [per application]');
+
+        auxList.Clear;
+        ks_pass:= FormApksigner.EditKeyStorePassword.Text;
+        key_pass:= FormApksigner.EditKeyAliasPassword.Text;
+        auxList.Add(ks_pass);
+        auxList.Add(ks_pass);  //confirm
+        auxList.Add(FormApksigner.EditFirstName.Text+ ' '+ FormApksigner.EditLastName.Text);
+        auxList.Add(FormApksigner.EditOrgUnit.Text);
+        auxList.Add(FormApksigner.EditOrgName.Text);
+        auxList.Add(FormApksigner.EditCity.Text);
+        auxList.Add(FormApksigner.EditProvince.Text);
+        auxList.Add(FormApksigner.EditCodeCountry.Text);
+        auxList.Add('y');
+        auxList.Add(key_pass);
+        auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'keytool_input.txt');
+
+        { ant.properties
+        key.store=applamwproject9-release.keystore
+        key.alias=applamwproject9.keyalias
+        key.store.password=123456
+        key.alias.password=123456
+        }
+
+        auxList.Clear;
+        auxList.Add('key.store='+ Lowercase(SmallProjName)+'-release.keystore');
+        auxList.Add('key.alias='+ Lowercase(SmallProjName)+'.keyalias');
+        auxList.Add('key.store.password='+ks_pass);
+        auxList.Add('key.alias.password='+key_pass);
+        auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'ant.properties');
+
+        auxList.LoadFromFile(PathToAndroidProject +  DirectorySeparator + 'gradle-local-universal-apksigner.bat');
+        {.bat
+        set Path=%PATH%;C:\android\sdk\platform-tools;C:\android\sdk\build-tools\29.0.2
+        set GRADLE_HOME=C:\android\gradle-6.6.1
+        set PATH=%PATH%;%GRADLE_HOME%\bin
+        zipalign -v -p 4 C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-universal-release-unsigned.apk C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-universal-release-unsigned-aligned.apk
+        apksigner sign --ks C:\android\workspace\AppLAMWProject10\applamwproject10-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-release.apk C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-universal-release-unsigned-aligned.apk
+        }
+
+        strTemp:= 'apksigner sign --ks ' + winPathToAndroidProject + '\' +
+                Lowercase(smallProjName) + '-release.keystore --ks-pass pass:' + ks_pass + ' --key-pass pass:'+key_pass+' --out ' +
+                winPathToAndroidProject + '\build\outputs\apk\release\' +
+                                       smallProjName + '-release.apk ' +
+                winPathToAndroidProject + '\build\outputs\apk\release\'+
+                                       smallProjName + '-universal-release-unsigned-aligned.apk';
+        auxList.Strings[4]:= strTemp;
+        auxList.SaveToFile(PathToAndroidProject + DirectorySeparator + 'gradle-local-universal-apksigner.bat');
+
+        auxList.Clear;
+        auxList.LoadFromFile(PathToAndroidProject +  DirectorySeparator + 'gradle-local-universal-apksigner.sh');
+        {.sh
+        export PATH=/android/sdk/platform-tools:$PATH
+        export PATH=/android/sdk/build-tools/29.0.2:$PATH
+        export GRADLE_HOME=/android/gradle-6.6.1
+        export PATH=$PATH:$GRADLE_HOME/bin
+        zipalign -v -p 4 /android/workspace/AppLAMWProject12/build/outputs/apk/release/AppLAMWProject12-universal-release-unsigned.apk /android/workspace/AppLAMWProject12/build/outputs/apk/release/AppLAMWProject12-universal-release-unsigned-aligned.apk
+        apksigner sign --ks /android/workspace/AppLAMWProject12/applamwproject12-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out /android/workspace/AppLAMWProject12/build/outputs/apk/release/AppLAMWProject12-release.apk /android/workspace/AppLAMWProject12/build/outputs/apk/release/AppLAMWProject12-universal-release-unsigned-aligned.apk
+        }
+        strTemp:='apksigner sign --ks ' + linuxPathToAndroidProject + '/' +
+                Lowercase(smallProjName) + '-release.keystore --ks-pass pass:' + ks_pass + ' --key-pass pass:'+key_pass+' --out ' +
+                linuxPathToAndroidProject + '/build/outputs/apk/release/' +
+                                       smallProjName + '-release.apk ' +
+                linuxPathToAndroidProject + '/build/outputs/apk/release/'+
+                                       smallProjName + '-universal-release-unsigned-aligned.apk';
+        auxList.Strings[5]:= strTemp;
+        SaveShellScript(auxList, PathToAndroidProject+ DirectorySeparator + 'gradle-local-universal-apksigner.sh');
+
+        auxList.Clear;
+        auxList.LoadFromFile(PathToAndroidProject + DirectorySeparator + 'gradle-local-apksigner.bat');
+        { .bat
+        set Path=%PATH%;C:\android\sdk\platform-tools;C:\android\sdk\build-tools\29.0.2
+        set GRADLE_HOME=C:\android\gradle-6.6.1
+        set PATH=%PATH%;%GRADLE_HOME%\bin
+        zipalign -v -p 4 C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-armeabi-v7a-release-unsigned.apk C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-armeabi-v7a-release-unsigned-aligned.apk
+        apksigner sign --ks C:\android\workspace\AppLAMWProject10\applamwproject10-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-release.apk C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-armeabi-v7a-release-unsigned-aligned.apk
+        }
+        strTemp:='apksigner sign --ks '+ winPathToAndroidProject + '\' +
+                 Lowercase(smallProjName) + '-release.keystore --ks-pass pass:' + ks_pass + ' --key-pass pass:' + key_pass + ' --out ' +
+                 winPathToAndroidProject + '\build\outputs\apk\release\' +
+                                        SmallProjName + '-release.apk '+
+                 winPathToAndroidProject + '\build\outputs\apk\release\' +
+                                        SmallProjName+'-' + instructionChip + '-release-unsigned-aligned.apk';
+
+        auxList.Strings[4]:= strTemp;
+        auxList.SaveToFile(PathToAndroidProject + DirectorySeparator + 'gradle-local-apksigner.bat');
+
+        auxList.Clear;
+        auxList.LoadFromFile(PathToAndroidProject + DirectorySeparator + 'gradle-local-apksigner.sh');
+        {.sh
+        export PATH=/android/sdk/platform-tools:$PATH
+        export PATH=/android/sdk/build-tools/29.0.2:$PATH
+        export GRADLE_HOME=/android/gradle-6.6.1
+        export PATH=$PATH:$GRADLE_HOME/bin
+        zipalign -v -p 4 /android/workspace/AppLAMWProject12/build/outputs/apk/release/AppLAMWProject12-armeabi-v7a-release-unsigned.apk /android/workspace/AppLAMWProject12/build/outputs/apk/release/AppLAMWProject12-armeabi-v7a-release-unsigned-aligned.apk
+        apksigner sign --ks /android/workspace/AppLAMWProject12/applamwproject12-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out /android/workspace/AppLAMWProject12/build/outputs/apk/release/AppLAMWProject12-release.apk /android/workspace/AppLAMWProject12/build/outputs/apk/release/AppLAMWProject12-armeabi-v7a-release-unsigned-aligned.apk
+        }
+        strTemp:='apksigner sign --ks '+ linuxPathToAndroidProject + '/' +
+                 Lowercase(smallProjName) + '-release.keystore --ks-pass pass:' + ks_pass + ' --key-pass pass:' + key_pass + ' --out ' +
+                 linuxPathToAndroidProject + '/build/outputs/apk/release/' +
+                                        SmallProjName + '-release.apk '+
+                 linuxPathToAndroidProject + '/build/outputs/apk/release/' +
+                                        SmallProjName+'-' + instructionChip + '-release-unsigned-aligned.apk';
+        auxList.Strings[5]:= strTemp;
+        SaveShellScript(auxList, PathToAndroidProject + DirectorySeparator+'gradle-local-apksigner.sh');
+
+        //release-keystore.bat
+        try
+          AProcess:= TProcess.Create(nil);
+          AProcess.CurrentDirectory:= PathToAndroidProject;
+
+          {$IFDEF Windows}
+          AProcess.Executable := 'c:\windows\system32\cmd.exe';
+          AProcess.Parameters.Add('/c');  //Executes the command(s) in command and then quits.
+          AProcess.Parameters.Add('release-keystore.bat');
+          {$ENDIF Windows}
+
+          {$IFDEF Unix}
+          hProcAProcessess.Executable := '/bin/sh';
+          AProcess.Parameters.Add('-c');
+          AProcess.Parameters.Add('release-keystore.sh');
+          {$ENDIF Unix}
+
+          AProcess.Options:= AProcess.Options + [poWaitOnExit];
+          AProcess.Execute;
+        finally
+          AProcess.Free;
+        end;
+
+      end;
+
+      //gradle apk signer
+      if buildSystem = 'Gradle' then
+      begin
+        try
+          AProcess:= TProcess.Create(nil);
+          AProcess.CurrentDirectory:= PathToAndroidProject;
+          if isUniversalApk then  //gradle-local-universal-apksigner.bat
+          begin
+            {$IFDEF Windows}
+            AProcess.Executable := 'c:\windows\system32\cmd.exe';
+            AProcess.Parameters.Add('/c');  //Executes the command(s) in command and then quits.
+            AProcess.Parameters.Add('gradle-local-universal-apksigner.bat');
+            {$ENDIF Windows}
+
+            {$IFDEF Unix}
+            hProcAProcessess.Executable := '/bin/sh';
+            AProcess.Parameters.Add('-c');
+            AProcess.Parameters.Add('gradle-local-universal-apksigner.sh');
+            {$ENDIF Unix}
+          end
+          else  //gradle-local-apksigner.bat
+          begin
+            {$IFDEF Windows}
+            AProcess.Executable := 'c:\windows\system32\cmd.exe';
+            AProcess.Parameters.Add('/c');  //Executes the command(s) in command and then quits.
+            AProcess.Parameters.Add('gradle-local-apksigner.bat');
+            {$ENDIF Windows}
+
+            {$IFDEF Unix}
+            hProcAProcessess.Executable := '/bin/sh';
+            AProcess.Parameters.Add('-c');
+            AProcess.Parameters.Add('gradle-local-apksigner.sh');
+            {$ENDIF Unix}
+          end;
+          AProcess.Options:= AProcess.Options + [poWaitOnExit];
+          AProcess.Execute;
+        finally
+          AProcess.Free;
+        end;
+
+        ShowMessage('[Gradle] Success!! Look for your signed "'+SmallProjName+'-release.apk" '+sLineBreak+
+                     'in [project] folder "...\build\outputs\apk\release"' );
+      end
+      else
+      begin //Ant
+        try
+          AProcess:= TProcess.Create(nil);
+          AProcess.CurrentDirectory:= PathToAndroidProject;
+
+          {$IFDEF Windows}
+          AProcess.Executable := 'c:\windows\system32\cmd.exe';
+          AProcess.Parameters.Add('/c');  //Executes the command(s) in command and then quits.
+          AProcess.Parameters.Add('ant-build-release.bat');
+          {$ENDIF Windows}
+
+          {$IFDEF Unix}
+          hProcAProcessess.Executable := '/bin/sh';
+          AProcess.Parameters.Add('-c');
+          AProcess.Parameters.Add('ant-build-release.sh');
+          {$ENDIF Unix}
+
+          AProcess.Options:= AProcess.Options + [poWaitOnExit];
+          AProcess.Execute;
+        finally
+          AProcess.Free;
+        end;
+        ShowMessage('[Ant] Success!! Look for your signed "'+SmallProjName+'-release.apk" '+sLineBreak+
+                    'in [project] folder "...\bin"' );
+      end;
+
+    end;
+
+    auxList.Free;
+  end
+  else
+    ShowMessage('The active project not is a LAMW project!');
+end;
+
+
 function GetResSourcePath(fullPathToProjectLFM: string): string;
 var
   p: integer;
@@ -1677,21 +2034,21 @@ begin
   //Adding 13a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportPictureForm', 'Use/Import Image/Picture...', nil, @StartImportPictureStuff);
 
-  //StartImportJARStuff
-
-  // And so on...
-
   //Register submenu AppCompat
   ideSubMnuAppCompat:= RegisterIDESubMenu(ideSubMnuAMW, 'ConvertToAppCompat', 'Convert the Project to AppCompat Theme');
   //Adding first entry
   RegisterIDEMenuCommand(ideSubMnuAppCompat, 'AppCompatDarkActionBar', 'AppCompatDarkActionBar', nil, @StartAppCompatDarkActionBar);
   RegisterIDEMenuCommand(ideSubMnuAppCompat, 'AppCompatNoActionBar', 'AppCompatNoActionBar', nil, @StartAppCompatNoActionBar);
 
+  //Register submenu release apksigner
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToApksignerForm', 'Build Release Signed Apk ...', nil, @StartApksignerStuff);
+
   // Register submenu  Logcat
   ideSubMnuLog:= RegisterIDESubMenu(ideSubMnuAMW, 'Logcatch', 'ADB Logcat');
-  //Adding entry ...
+
   RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcatd', 'Logcat -d [dump]', nil, @StartLogcatDump);
   RegisterIDEMenuCommand(ideSubMnuLog, 'PathToLogcatc', 'Logcat -c [clear]', nil, @StartLogcatClear);
+
 
   //Build apk/Run
    Key := IDEShortCut(VK_F1,[ssCtrl],VK_UNKNOWN,[]);

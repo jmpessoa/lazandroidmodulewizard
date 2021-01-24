@@ -16,7 +16,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="36">
+    <Files Count="38">
       <Item1>
         <Filename Value="amw_ide_menu_items.pas"/>
         <HasRegisterProc Value="True"/>
@@ -162,6 +162,14 @@
         <HasRegisterProc Value="True"/>
         <UnitName Value="GDBMIServerDebuggerLAMW"/>
       </Item36>
+      <Item37>
+        <Filename Value="uformapksigner.lfm"/>
+        <Type Value="LFM"/>
+      </Item37>
+      <Item38>
+        <Filename Value="uformapksigner.pas"/>
+        <UnitName Value="uFormApksigner"/>
+      </Item38>
     </Files>
     <RequiredPkgs Count="4">
       <Item1>
