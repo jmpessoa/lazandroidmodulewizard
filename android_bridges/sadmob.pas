@@ -101,6 +101,8 @@ jsAdMob = class(jVisualControl)
 
     procedure AdMobBannerRun();
     procedure AdMobBannerStop();
+    procedure AdMobBannerPause();
+    procedure AdMobBannerResume();
     procedure AdMobBannerUpdate();
     function  AdMobBannerIsLoading(): boolean;
     function  AdMobBannerGetHeight(): integer;
@@ -398,6 +400,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'AdMobBannerStop');
+end;
+
+procedure jsAdMob.AdMobBannerPause();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'AdMobBannerPause');
+end;
+
+procedure jsAdMob.AdMobBannerResume();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'AdMobBannerResume');
 end;
 
 procedure jsAdMob.AdMobBannerRun();

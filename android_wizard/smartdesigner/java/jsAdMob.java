@@ -30,7 +30,7 @@ import com.google.android.gms.ads.LoadAdError;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Developed by ADiV for LAMW on 2021-01-21
+// Developed by ADiV for LAMW on 2021-01-25
 // Updated for AdMob 19.3.0
 //-------------------------------------------------------------------------
 
@@ -72,7 +72,6 @@ public class jsAdMob extends FrameLayout {
 
    //--- Banner ---//
    private AdView     admobBannerView    = null;
-   private AdRequest  admobBannerRequest = null;
    private String     admobBannerId      = "ca-app-pub-3940256099942544/6300978111";
    private int        admobBannerSize    = 0;  //LMB initialize banner size to SMART_BANNER (0)
    private Boolean    admobBannerStop    = false;
@@ -107,8 +106,7 @@ public class jsAdMob extends FrameLayout {
    } //end constructor
 
    public void jFree() {
-      //free local objects...
-      admobBannerRequest = null;
+      //free local objects...      
       admobBannerView    = null;
       admobInter   		 = null;
       admobRewarded   	 = null;
@@ -175,8 +173,9 @@ public class jsAdMob extends FrameLayout {
    }
    
    public void AdMobFree(){
-	   admobBannerView    = null;
-	   admobBannerRequest = null;
+	   admobBannerView   = null;	   
+	   admobInter   	 = null;
+	   admobRewarded   	 = null;
    }
    
    //--- Banner ---//
@@ -227,9 +226,7 @@ public class jsAdMob extends FrameLayout {
    
    public void AdMobBannerUpdate(){
 	   if( admobBannerIsLoading ) return;
-	   
-	   if( (admobBannerView != null) && (admobBannerWidth == this.getWidth()) ) return;
-	   
+	  	   
 	   AdMobBannerStop();
 	   
 	   if( !admobBannerIsLoading && !admobBannerStop )
@@ -238,17 +235,37 @@ public class jsAdMob extends FrameLayout {
    
    public void AdMobBannerStop(){
 	   
-	   if (admobBannerIsLoading) admobBannerStop = true;
+	   if (admobBannerView == null) return;
 	   
-	   if (admobBannerView == null) return;	        
+	   if (admobBannerIsLoading) { 
+		   admobBannerStop = true; 
+		   return; 
+	   }	   	       
 	   
 	   this.removeView(admobBannerView);
 	   
 	   admobBannerView  = null;
 	   admobBannerWidth = 0;
 	   
-	   admobBannerStop = false;
-	   admobBannerIsLoading = false;
+	   admobBannerStop = false;	   
+   }
+   
+   // Pauses any extra processing associated with this ad view.
+   // This method should be called in the parent Activity's Activity.onPause() method.
+   public void AdMobBannerPause(){
+	   
+	   if (admobBannerView == null) return;
+	   
+	   admobBannerView.pause();
+   }
+   
+   // Resumes an ad view after a previous call to pause(). 
+   // This method should be called in the parent Activity's Activity.onResume() method.
+   public void AdMobBannerResume(){
+	   
+	   if (admobBannerView == null) return;
+	   
+	   admobBannerView.resume();
    }
    
    public boolean AdMobBannerIsLoading(){
@@ -377,13 +394,10 @@ public class jsAdMob extends FrameLayout {
         
         admobBannerView.setAdUnitId(admobBannerId);
 
-        this.addView(admobBannerView);
-
-        if( admobBannerRequest == null )
-         admobBannerRequest = new AdRequest.Builder().build();
+        this.addView(admobBannerView);        
 
         // Start loading the ad in the background.
-        admobBannerView.loadAd(admobBannerRequest);
+        admobBannerView.loadAd(new AdRequest.Builder().build());
         
         admobBannerWidth = this.getWidth();
    }
