@@ -69,13 +69,17 @@ type
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
+
+    procedure SetDebugger_Remote_Hostname(NewHost:String);              virtual;
+    procedure SetDebugger_Remote_Port    (NewPort:String);              virtual;
+
   published
     property Debugger_Remote_Hostname    : String
-                 read FDebugger_Remote_Hostname    write FDebugger_Remote_Hostname;
+                 read FDebugger_Remote_Hostname    write SetDebugger_Remote_Hostname;
     property Debugger_Remote_Port        : String
-                 read FDebugger_Remote_Port        write FDebugger_Remote_Port;
+                 read FDebugger_Remote_Port        write SetDebugger_Remote_Port;
     property Debugger_Remote_DownloadExe : Boolean
-                 read FDebugger_Remote_DownloadExe write FDebugger_Remote_DownloadExe;
+                 read FDebugger_Remote_DownloadExe write   FDebugger_Remote_DownloadExe;
   published
     property Debugger_Startup_Options;
     {$IFDEF UNIX}
@@ -106,6 +110,8 @@ var
   ProjPID_LAMW  : Cardinal =      0;    // LAMW PID
   ProjNameLAMW  : String   =     '';    // LAMW project name
   GdbServerPort : String   = '2021';    // gdbserver current port
+  GdbServerName : String   = '';        // gdbserver current name
+
 
 procedure Register;
 
@@ -196,7 +202,7 @@ end;
 { TGDBMIServerDebuggerCommandAttach }
 
 function  TGDBMIServerDebuggerCommandAttach.DoExecute: Boolean;
-var R:TGDBMIExecResult; DirName:String;
+var R1,R2,R3:TGDBMIExecResult; DirName:String;
 begin
      DirName := ExtractFileDir(FTheDebugger.FileName);
    If PathDelim <> '/' then
@@ -204,7 +210,10 @@ begin
 
      Result := inherited DoExecute;
   If Result and Success
-    then FServSucc:=ExecuteCommand('set solib-search-path '+DirName,R)and(R.State<>dsError)
+    then FServSucc:=
+      ExecuteCommand('set solib-search-path '+DirName,    R1)and(R1.State<>dsError)and
+      ExecuteCommand('handle SIG33 nopass nostop noprint',R2)and(R2.State<>dsError)and
+      ExecuteCommand('handle SIG35 nopass nostop noprint',R3)and(R3.State<>dsError)
     else FServSucc:=False;
 end;
 
@@ -237,6 +246,18 @@ begin
     end;
 end;
 
+
+procedure TGDBMIServerDebuggerPropertiesLAMW.SetDebugger_Remote_Hostname(NewHost:String);
+begin
+  FDebugger_Remote_Hostname := NewHost;
+  GdbServerName             := NewHost;
+end;
+
+procedure TGDBMIServerDebuggerPropertiesLAMW.SetDebugger_Remote_Port    (NewPort:String);
+begin
+  FDebugger_Remote_Port     := NewPort;
+  GdbServerPort             := NewPort;
+end;
 
 { TGDBMIServerDebugger }
 

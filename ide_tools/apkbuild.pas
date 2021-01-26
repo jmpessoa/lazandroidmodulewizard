@@ -27,6 +27,9 @@ type
     FDevice: string;
     FGdbCop: Boolean;
     FApkRun: Boolean;
+    FPackageName: String;
+    FAdbShellOneLine: String;
+
     {$ifdef Emulator}
     procedure BringToFrontEmulator;
     {$endif}
@@ -51,14 +54,21 @@ type
     procedure DoBeforeBuildApk;
     procedure DoAfterRunApk;
 
-    function  GetTargetCpuAbilist                               : Boolean;
+    function  GetTargetCpuAbiList                               : Boolean;
     function  GetPackageName                : String;
     procedure StartGdbServer    (Proj, Port : String);
     function  GetAdbExecutable              : String;
     function  GetGdbSolibSearchPath         : String;
     function  GetLibCtrlsFName (  var  Name : String)           : Boolean;
 
-    function  ScanPIDof         (Proj       : String)           : Boolean;
+    function  DoAdbCommand      (Title      : String;
+                                 Command    : String;
+                                 Parser     : String)           : Boolean;
+
+    function  CheckAdbCommand   (ChkCmd     : String)           : Boolean;
+
+    function  PID_scan_pidof    (Proj       : String)           : Boolean;
+    function  PID_scan_ps       (Proj       : String)           : Boolean;
 
     function  AdbPull           (PullName,
                                  DestPath   :  String)          : Boolean;
@@ -68,6 +78,9 @@ type
     function  CopyGdbServerToLibsDir                            : Boolean;
 
     function  SetHostAppFileName(AppName    : String)           : Boolean;
+
+    function  SetAdbForward        (SrvName    : String;
+                                 SrvPort    : String)           : Boolean;
   public
     constructor Create(AProj: TLazProject);
     function BuildAPK: Boolean;
@@ -1029,15 +1042,28 @@ end;
 
 const
   SubToolPidOf = 'AdbPidOf';
+  SubToolPs    = 'AdbPs';
   SubToolPull  = 'AdbPull';
   SubToolList  = 'AdbList';
   GdbDirLAMW   = 'gdb';
   JniDirLAMW   = 'jni';
 
+  abApkBuilder : TApkBuilder = Nil;
+
   { TAdbShellPidOfParser }
 
 type
   TAdbShellPidOfParser = class(TExtToolParser)
+  public
+    procedure ReadPID (ALine   : String;
+                       AmsgLine: TMessageLine);
+    procedure ReadLine(Line: String; OutputIndex: integer;
+        {$if lcl_fullversion >= 2010000}IsStdErr: boolean;{$endif}
+        var Handled: Boolean);                                         override;
+      class function DefaultSubTool: String;                           override;
+  end;
+
+  TAdbShellPsParser = class(TAdbShellPidOfParser)
   public
     procedure ReadLine(Line: String; OutputIndex: integer;
         {$if lcl_fullversion >= 2010000}IsStdErr: boolean;{$endif}
@@ -1067,25 +1093,32 @@ type
 
 { TAdbShellPidOfParser }
 
+procedure  TAdbShellPidOfParser.ReadPID (ALine   : String;
+                                         AmsgLine: TMessageLine);
+var          PID, Code:Integer;
+begin
+  Val(ALine, PID, Code);
+  If (Code <> 0) and (-1 < PID) then
+    begin
+      AmsgLine.Urgency  := mluError;
+      Tool.ErrorMessage := AmsgLine.Msg;
+      ProjPID_LAMW      := 0;
+    end                         else
+    begin
+      AmsgLine.Urgency  := mluProgress;
+      ProjPID_LAMW      := PID;
+    end;
+end;
+
 procedure  TAdbShellPidOfParser.ReadLine(Line: string; OutputIndex: integer;
       {$if lcl_fullversion >= 2010000}IsStdErr: boolean;{$endif}
       var Handled: boolean);
 var
-  msgLine: TMessageLine;   PID, Code:Integer;
+  msgLine: TMessageLine;
 begin
   msgLine     := CreateMsgLine(OutputIndex);
   msgLine.Msg := Line;
-  Val(Line, PID, Code);
-  If (Code <> 0) and (-1 < PID) then
-    begin
-      msgLine.Urgency   := mluError;
-      Tool.ErrorMessage := Line;
-      ProjPID_LAMW      := 0;
-    end                         else
-    begin
-      msgLine.Urgency   := mluProgress;
-      ProjPID_LAMW      := PID;
-    end;
+  If Line <> '' then ReadPID(Line, msgLine);
   AddMsgLine(msgLine);
   Handled     := True;
 end;
@@ -1094,6 +1127,45 @@ class function TAdbShellPidOfParser.DefaultSubTool: string;
 begin
   Result := SubToolPidOf;
 end;
+
+
+{ TAdbShellPsParser }
+
+procedure  TAdbShellPsParser.ReadLine(Line: string; OutputIndex: integer;
+      {$if lcl_fullversion >= 2010000}IsStdErr: boolean;{$endif}
+      var Handled: boolean);
+var
+  msgLine:TMessageLine; I:Integer; SList:TStringList;
+begin
+  msgLine     := CreateMsgLine(OutputIndex);
+  msgLine.Msg := Line;
+  If Assigned(abApkBuilder) and (Pos(abApkBuilder.PackageName, Line) <> 0) then
+    begin
+      try
+        SList                 := TStringList.Create;
+        SList.Delimiter       := ' ';
+        SList.StrictDelimiter := True;
+        SList.DelimitedText   := Line;
+        For I:=1 to   SList.Count-1 do
+          If          SList.Strings[I] <> '' then
+            begin
+              ReadPID(SList.Strings[I], msgLine);
+              Break;
+            end;
+      finally
+        SList.Free;
+      end;
+    end                                                                    else
+             msgLine.Urgency  := mluProgress;
+  AddMsgLine(msgLine);
+  Handled     := True;
+end;
+
+class function TAdbShellPsParser.DefaultSubTool: string;
+begin
+  Result := SubToolPs;
+end;
+
 
 { TAdbPullParser }
 
@@ -1118,20 +1190,19 @@ end;
 
 { TAdbShellListParser }
 
-var AdbShellListLine : String = '';
-
 procedure TAdbShellListParser.ReadLine(Line: String; OutputIndex: integer;
       {$if lcl_fullversion >= 2010000}IsStdErr: boolean;{$endif}
       var Handled: Boolean);
 var
-  msgLine:TMessageLine;
+  msgLine         : TMessageLine;
 begin
   msgLine         := CreateMsgLine(OutputIndex);
   msgLine.Msg     := Line;
   msgLine.Urgency := mluProgress;
   AddMsgLine(msgLine);
   Handled         := True;
-  AdbShellListLine:= Line;
+  If (Line<>'') and Assigned(abApkBuilder) then
+                             abApkBuilder.FAdbShellOneLine:= Line;
 end;
 
 class function TAdbShellListParser.DefaultSubTool: String;
@@ -1140,18 +1211,23 @@ begin
 end;
 
 
+
 { TApkBuilder (functions for gdb debugger from Lazarus IDE)}
 
 function   TApkBuilder.GetPackageName        : String;
 var              xml:TXMLDocument;
 begin
-  ReadXMLFile   (xml, FProjPath + PathDelim + 'AndroidManifest.xml');
+  If FPackageName <> '' then begin Result := FPackageName; Exit; end
+                        else       Result := '';
   try
-       Result := xml.DocumentElement.AttribStrings['package'];
-    If Result = '' then
-      raise Exception.Create('Cannot determine package name!');
+       ReadXMLFile    (xml, FProjPath + PathDelim + 'AndroidManifest.xml');
+
+       FPackageName := xml.DocumentElement.AttribStrings['package'];
+    If FPackageName = '' then
+      raise Exception.Create('Cannot determine package name!')
+                         else      Result := FPackageName;
   finally
-                 xml.Free;
+                       xml.Free;
   end;
 end;
 
@@ -1161,76 +1237,81 @@ begin
                                                                  'adb$(ExeExt)';
 end;
 
-function   TApkBuilder.ScanPIDof (Proj:String):Boolean;
+function  TApkBuilder.DoAdbCommand(Title   : String;
+                                   Command : String;
+                                   Parser  : String) : Boolean;
 var Tool :  TIDEExternalToolOptions;
 begin
     Tool := TIDEExternalToolOptions.Create;
+    Result             :=  False;
   try
-    Tool.Title         := ' Scan ' + proj + ' PID...';
+    Tool.Title         :=  Title;
     Tool.ResolveMacros :=  True;
     Tool.Executable    :=  AdbExecutable;
-    Tool.CmdLineParams := 'shell pidof '  + Proj;
-    Tool.{%H-}Scanners.Add(SubToolPidOf);
-           Result:=RunExternalTool(Tool) and (ProjPID_LAMW <> 0);
-    If Not Result then raise Exception.Create('Cannot scan ' + Proj + ' PID!')
+    Tool.CmdLineParams :=  Command;
+    Tool.{%H-}Scanners.Add(Parser);
+    Result             := RunExternalTool(Tool);
   finally
     Tool.Free;
   end;
+end;
+
+function   TApkBuilder.CheckAdbCommand(ChkCmd : String) : Boolean;
+begin
+         Result    := DoAdbCommand   ('Check '    + ChkCmd,
+                                      'shell ls ' + ChkCmd, SubToolList   ) and
+                                     (              FAdbShellOneLine <> '');
+  If Not Result then raise
+                     Exception.Create('Cannot check ' + ChkCmd + ' command')
+                else
+         Result    :=                (Pos(ChkCmd,   FAdbShellOneLine) <> 0) and
+                                     (Pos('No such',FAdbShellOneLine) =  0);
+end;
+
+function   TApkBuilder.PID_scan_pidof(Proj:String):Boolean;
+begin
+         Result   := DoAdbCommand    ('Scan '        + Proj + ' PID...',
+                                      'shell pidof ' + Proj, SubToolPidOf) and
+                                     (ProjPID_LAMW <> 0);
+  If Not Result then raise
+                     Exception.Create('Cannot scan ' + Proj + ' PID!  ');
+end;
+
+function  TApkBuilder.PID_scan_ps    (Proj       : String) : Boolean;
+begin
+         Result   := DoAdbCommand    ('Scan '        + Proj + ' PID...',
+                                      'shell ps',              SubToolPs) and
+                                     (ProjPID_LAMW <> 0);
+  If Not Result then raise
+                     Exception.Create('Cannot scan ' + Proj + ' PID!  ')
 end;
 
 procedure  TApkBuilder.StartGdbServer(Proj, Port:String);
-var Tool :  TIDEExternalToolOptions;
 begin
-    Tool := TIDEExternalToolOptions.Create;
-  try
-    Tool.Title         := ' Start gdbserver --multi :' + Port;
-    Tool.ResolveMacros := True;
-    Tool.ShowConsole   := True;
-    Tool.Executable    := AdbExecutable;
-    Tool.CmdLineParams := 'shell /data/data/' + Proj + '/lib/gdbserver --multi :'+Port;
-    Tool.{%H-}Scanners.Add(SubToolDefault);
-    If not RunExternalTool(Tool) then
-      raise Exception.Create('Cannot start gdbserver --multi :' + Port);
-  finally
-    Tool.Free;
-  end;
+  If Not DoAdbCommand
+         ('Start gdbserver --multi :' + Port,
+          'shell /data/data/' + Proj + '/lib/gdbserver --multi :' + Port,
+           SubToolDefault) then raise
+             Exception.Create ('Cannot start gdbserver --multi :' + Port);
 end;
 
 function  TApkBuilder.AdbPull(PullName,DestPath:String):Boolean;
-var Tool :  TIDEExternalToolOptions;
 begin
-    Tool := TIDEExternalToolOptions.Create;
-  try
-    Tool.Title         := ' Pull ' + PullName + ' to ' + DestPath;
-    Tool.ResolveMacros := True;
-    Tool.ShowConsole   := True;
-    Tool.Executable    := AdbExecutable;
-    Tool.CmdLineParams := 'pull '  + PullName +  ' '   + DestPath;
-    Tool.{%H-}Scanners.Add(SubToolPull);
-           Result:=RunExternalTool(Tool);
-    If Not Result then
-      raise Exception.Create('Cannot pull ' + PullName + ' to ' + DestPath);
-  finally
-    Tool.Free;
-  end;
+         Result   := DoAdbCommand   (' Pull '  + PullName + ' to ' + DestPath,
+                                      'pull '  + PullName +  ' '   + DestPath,
+                                      SubToolPull);
+  If Not Result then raise
+              Exception.Create('Cannot pull '  + PullName + ' to ' + DestPath);
 end;
 
-function TApkBuilder.GetTargetCpuAbilist : Boolean;
-var Tool :  TIDEExternalToolOptions;
+function TApkBuilder.GetTargetCpuAbiList : Boolean;
 begin
-    Tool := TIDEExternalToolOptions.Create;
-  try
-    AdbShellListLine   := '';
-    Tool.Title         := ' Get CPU Abilist';
-    Tool.ResolveMacros :=  True;
-    Tool.Executable    :=  AdbExecutable;
-    Tool.CmdLineParams := 'shell getprop ro.product.cpu.abilist';
-    Tool.{%H-}Scanners.Add(SubToolList);
-           Result:=RunExternalTool(Tool) and (AdbShellListLine <> '');
-    If Not Result then raise Exception.Create('Cannot get CPU Abilist');
-  finally
-    Tool.Free;
-  end;
+                                                        FAdbShellOneLine:='';
+         Result   := DoAdbCommand   (' Get CPU Abilist',
+                                     'shell getprop ro.product.cpu.abilist',
+                                      SubToolList) and (FAdbShellOneLine<>'');
+  If Not Result then raise
+              Exception.Create('Cannot get CPU Abilist');
 end;
 
 function TApkBuilder.GetGdbSolibSearchPath:String;
@@ -1241,12 +1322,12 @@ begin
 end;
 
 function  TApkBuilder.GetLibCtrlsFName (var Name : String):Boolean;
-var            Project:TXMLDocument; Child:TDOMNode;
+var              Project:TXMLDocument; Child:TDOMNode;
 begin
         Result:=False;
-  ReadXMLFile (Project, FProjPath + JniDirLAMW + PathDelim + 'controls.lpi');
-       Child:= Project.DocumentElement.FindNode('CompilerOptions');
   try
+    ReadXMLFile (Project, FProjPath + JniDirLAMW + PathDelim + 'controls.lpi');
+         Child:= Project.DocumentElement.FindNode('CompilerOptions');
     If Assigned(Child) then
       begin
         With Child.FindNode('Target').FindNode('Filename') do
@@ -1254,7 +1335,7 @@ begin
         Result:=Name<>'';
       end;
   finally
-               Project.Free;
+                 Project.Free;
   end;
 end;
 
@@ -1348,13 +1429,35 @@ end;
 
 function  TApkBuilder.SetHostAppFileName(AppName : String) : Boolean;
 begin
+  If             FProj.RunParameters.Count>0 then else
+                 FProj.RunParameters.Add('default');
      Result :=   FProj.RunParameters.Count>0;
   If Result then FProj.RunParameters.Modes[0].HostApplicationFilename := AppName
+            else MessageDlg(
+                   'Could not setup Host Application Filename to "'+AppName+'"'+sLineBreak+
+                    'Setup it in Run/Parametrs',
+                    mtWarning, [mbYes, mbCancel], 0);
                                  // for android Gdb
+end;
+
+function  TApkBuilder.SetAdbForward(SrvName : String;
+                                    SrvPort : String) : Boolean;
+begin
+       Result   := SrvName <> '';
+  If   Result then else
+    begin
+       Result   := DoAdbCommand    ('Adb forward tcp:'+SrvPort+' tcp:'+SrvPort,
+                                        'forward tcp:'+SrvPort+' tcp:'+SrvPort,
+                                     SubToolDefault);
+       If Not Result then raise
+            Exception.Create('Cannot Adb forward tcp:'+SrvPort+' tcp:'+SrvPort);
+    end;
 end;
 
 procedure TApkBuilder.DoBeforeBuildApk;
 begin
+     abApkBuilder         := Self;
+     FPackageName         := '';
      FGdbCop              :=
        (FProj.LazBuildModes.Count>0)                                           and
         FProj.LazBuildModes.BuildModes[0].LazCompilerOptions.GenerateDebugInfo and
@@ -1366,28 +1469,29 @@ begin
 end;
 
 procedure TApkBuilder.DoAfterRunApk;
-var                     Package:String;
 begin
   If FGdbCop and FApkRun then else Exit;
                                  // check gdbserver in Apk & Apk is running
-  If GetTargetCpuAbilist then else Exit;
+  If GetTargetCpuAbiList then else Exit;
                                  // adb shell getprop ro.product.cpu.abilist
-  If Pos(bmLibsSubDir[CurBigBuildMode], AdbShellListLine) <> 0 then else
+  If Pos(bmLibsSubDir[CurBigBuildMode], FAdbShellOneLine) <> 0 then else
                                  // Check target ABI
     begin
       MessageDlg(
         'Current LAMW build chipset "'+bmLibsSubDir[CurBigBuildMode]+'"'+sLineBreak+
-        'does not compatible with target ABI "'+AdbShellListLine+'"'    +sLineBreak+
-        'Change it to "' + AdbShellListLine + '"',
+        'does not compatible with target ABI "'+FAdbShellOneLine+'"'    +sLineBreak+
+        'Change it to "' + FAdbShellOneLine + '"',
         mtWarning, [mbYes, mbCancel], 0);  Exit;
     end;
-                        Package:= PackageName;
-                                 // Name of Package
+
      Sleep             (2000);   // Wait 2 seconds for starting program
-  If ScanPIDof         (Package) then
+
+  If(CheckAdbCommand   ('/system/bin/pidof') and PID_scan_pidof (PackageName)) or
+     PID_scan_ps       (PackageName) then
                                  // Scan PID of LAMW proj
     begin
-      ProjNameLAMW   := Package; // For PIDs List in GDBMIServerDebuggerLAMW.pas
+      ProjNameLAMW   := PackageName;
+                                 // For PIDs List in GDBMIServerDebuggerLAMW.pas
 
       If DirectoryExists(FProjPath+GdbDirLAMW) then else
                    MkDir(FProjPath+GdbDirLAMW);
@@ -1403,9 +1507,14 @@ begin
                                  // Copy libcontrols.so & libcontrols.dbg
                                  //   to  GdbDirLAMW
          SetHostAppFileName(FProjPath+
-                      GdbDirLAMW   +PathDelim +'app_process32')        then
+                      GdbDirLAMW   +PathDelim +'app_process32')
                                  // Setup HostApplicationFilename=app_process32
-         StartGdbServer(Package, GdbServerPort);
+                                                                     and
+         SetAdbForward(GdbServerName,GdbServerPort)
+                                 // If GdbServerName='' then
+                                 //   Adb forward tcp:+GdbServerPort+' tcp:'+GdbServerPort
+                                                                     then
+         StartGdbServer(PackageName, GdbServerPort);
                                  // Start gdbserver in mode --multi GdbServerPort
     end;
 end;
@@ -1418,6 +1527,7 @@ begin
   ExternalToolList.RegisterParser(TAdbShellPidOfParser);
   ExternalToolList.RegisterParser(TAdbPullParser);
   ExternalToolList.RegisterParser(TAdbShellListParser);
+  ExternalToolList.RegisterParser(TAdbShellPsParser);
 end;
 
 end.
