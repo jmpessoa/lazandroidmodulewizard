@@ -6,28 +6,32 @@
 
    Use Gdb debudgger:
 
-  1) Install modifid versin lazandroidmodulewizard-master and rebuild Lazarus IDE:
+  1) Install this versin lazandroidmodulewizard-master and rebuild Lazarus IDE:
   2) Load or create new LAMW project (for example AppAsyncTaskDemo1)
   3) Start device emulator
   4) IDE options/debugger Select debugger type: 'GNU remote debugger (gdbserver) LAMW'
   5) IDE options/debugger Select debugger path:
  ...android-ndk-r10e\toolchains\x86-4.9\prebuilt\windows\bin\i686-linux-android-gdb.exe
                         (for x86 emulator - tested!)
-  6) IDE options/debugger setup remote host name (Title emulator IP) & taget port
+ ...android-ndk-r10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin\arm-linux-androideabi-gdb.exe
+                        (for ARMv7a+Soft emulator - tested!)
+
+  6) IDE options/debugger setup remote host name (Title emulator IP or '') & taget port
+    (if remote_host_name = '' then builder call 'adb forward tcp:port tcp:port')
   7) Project/Project Option/Compile options/Debugging: -> generate Dedug information,
                                                        -> type automatic,
                                                        -> Disp line numbers,
                                                        -> use external gdb symb
   8) Project/Project Option/Compile options/Compilation and Linking:
                                                        -> No optimization
-  9) [LAMW] Android project options/Build/Chipset      -> x86
+  9) [LAMW] Android project options/Build/Chipset      -> x86 or ARMv7a+Soft
  10) Run/[LAMW] Build Android Apk and Run
  11) Messages:
       ... Success
           Start gdbserver --multi :2021
           Listening on port 2021
  12) Run/Attach to program
- 13) Select program name and PID from dialog
+ 13) Select program name and PID from IDE dialog
  14) Messages:
        ...
          Remote debugging from host 192.168.34.2
@@ -46,6 +50,10 @@
            LAMW      : lazandroidmodulewizard-master from 24.12.2020
            Emulator  : GENIMOTION Version 3.0.0 | Revision 20181218-bd824f9
                          (Device Samsung Galaxy S8[8.0-API26] & S9 [9.0-API28])
+
+                       AVD Android Emulator (Device Nexus 9 [5.1.1-API22]
+                       Google APIs ARM (armeabi-v7a))
+
            JDK       : Java\jdk1.8.0_60
            ANT       : apache-ant-1.9.7
            GRADLE    : gradle-4.4.1
