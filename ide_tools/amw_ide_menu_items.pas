@@ -1114,18 +1114,19 @@ begin
   end;
 end;
 
-//StartApksignerStuff
-procedure StartApksignerStuff(Sender: TObject);
+//StartApkSignerStuff
+procedure StartApkSignerStuff(Sender: TObject);
 var
   Project: TLazProject;
   PathToAndroidProject, SmallProjName, strTemp, strAux: string;
   p1: integer;
-  auxList: TStringList;
+  auxList, tempList: TStringList;
   isUniversalApk: boolean;
   instructionChip, ks_pass, key_pass: string;
   AProcess: TProcess;
   buildSystem: string;
   linuxPathToAndroidProject, winPathToAndroidProject: string;
+  keystoreExists: boolean;
 begin
   Project := LazarusIDE.ActiveProject;
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
@@ -1134,9 +1135,7 @@ begin
     buildSystem:= Project.CustomData.Values['BuildSystem'];  //Gradle or Ant
 
     instructionChip:= ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
-    instructionChip:= ExtractFileName(instructionChip);
-
-    FormApksigner:=  TFormApksigner.Create(Application);
+    instructionChip:= ExtractFileName(instructionChip); //armeabi-v7a
 
     p1:= Pos(DirectorySeparator+'jni'+DirectorySeparator, Project.ProjectInfoFile);
     if p1 > 0 then
@@ -1162,6 +1161,8 @@ begin
     winPathToAndroidProject:= 'C:'+ StringReplace(strAux, '/', '\', [rfReplaceAll]);
     {$endif}
 
+    tempList:= TStringList.Create;
+
     auxList:= TStringList.Create;
     auxList.StrictDelimiter:= True;
     auxList.Delimiter:= DirectorySeparator;
@@ -1181,6 +1182,11 @@ begin
       y                      8
       123456                 9
     }                                //firstPart:= SplitStr(aux, ' ');
+
+    FormApksigner:=  TFormApksigner.Create(Application);
+    FormApksigner.StatusBar1.SimplePanel:= True;
+    FormApksigner.StatusBar1.SimpleText:= 'Build System: ' + buildSystem;
+
     FormApksigner.EditKeyStorePassword.Text:= auxList.Strings[0];   //123456
 
     strTemp:=auxList.Strings[2];
@@ -1194,9 +1200,13 @@ begin
     FormApksigner.EditCodeCountry.Text:= auxList.Strings[7];        //BR
     FormApksigner.EditKeyAliasPassword.Text:= auxList.Strings[9];   //123456
 
+    //Const
+    FormApksigner.EditApkKeyAlias.Text:= Lowercase(SmallProjName)+'.keyalias';
+    FormApksigner.EditApkKeyAlias.ReadOnly:= True;
+
     isUniversalApk:= True;
-    auxList.LoadFromFile(PathToAndroidProject  +  DirectorySeparator +  'build.gradle');
-    if Pos('universalApk false', auxList.Text) > 0 then
+    tempList.LoadFromFile(PathToAndroidProject  +  DirectorySeparator +  'build.gradle');
+    if Pos('universalApk false', tempList.Text) > 0 then
     begin
       isUniversalApk:= False;
     end;
@@ -1209,21 +1219,21 @@ begin
                                                    'build' +DirectorySeparator+
                                                    'outputs'+DirectorySeparator+
                                                    'apk'+DirectorySeparator+
-                                                   'release'+DirectorySeparator+
-                                                   smallProjName+'-universal-release-unsigned.apk') then
+                                                   'debug'+DirectorySeparator+
+                                                   smallProjName+'-universal-debug.apk') then
          begin
            ShowMessage('[Gradle] Fail... You need first: '+sLineBreak+'"Run" --> "[LAMW] Build Android Apk and Run" to produce a debug version ...');
            Exit;
          end;
       end
       else
-      begin
+      begin                                               //AppLAMWProject5-armeabi-v7a-debug.apk
          if not FileExists(PathToAndroidProject + DirectorySeparator +
                                                    'build' +DirectorySeparator+
                                                    'outputs'+DirectorySeparator+
                                                    'apk'+DirectorySeparator+
-                                                   'release'+DirectorySeparator+
-                                                   smallProjName+'-'+instructionChip+'-release-unsigned.apk') then
+                                                   'debug'+DirectorySeparator+
+                                                   smallProjName+'-'+instructionChip+'-debug.apk') then
          begin
            ShowMessage('[Gradle] Fail... You need first: '+sLineBreak+ '"Run" --> "[LAMW] Build Android Apk and Run" '+sLineBreak+'to produce a debug version ...');
            Exit;
@@ -1240,20 +1250,44 @@ begin
       end;
     end;
 
-    if FormApksigner.ShowModal = mrOk then
+    keystoreExists:= False;
+    if FileExists(PathToAndroidProject  +  DirectorySeparator +  SmallProjName+'-release.keystore') then
     begin
+      ShowMessage('[ File "'+SmallProjName+'-release.keystore" Exists! ]'+sLineBreak+' Using existing "'+SmallProjName+'-release.keystore" ');
+      keystoreExists:= True;
 
-      if FileExists(PathToAndroidProject  +  DirectorySeparator +  SmallProjName+'-release.keystore') then
-      begin
-        ShowMessage('[File'+SmallProjName+'-release.keystore Exists!]'+sLineBreak+' Using existing '+SmallProjName+'-release.keystore" ');
-      end
-      else
-      begin
-        ShowMessage('"warning:'+SmallProjName+'-release.keystore" file should be created only once [per application]');
+      tempList.Clear;
+      tempList.Add('         Credentials Data');
+      tempList.Add(    '"'+SmallProjName+'-release.keystore"');
+      tempList.Add(' ');
+      tempList.Add('[File] Key Store Password: ' + auxList.Strings[0]);
+      strTemp:=auxList.Strings[2];
+      tempList.Add('First Name: '+ SplitStr(strTemp, ' '));
+      tempList.Add('Last Name: ' + strTemp);
+      tempList.Add('Organizational Unit: ' + auxList.Strings[3]);
+      tempList.Add('Organization Name: ' + auxList.Strings[4]);
+      tempList.Add('City or Locality: ' + auxList.Strings[5]);
+      tempList.Add('State or Province: ' + auxList.Strings[6]);
+      tempList.Add('Country: ' + auxList.Strings[7]);
 
-        auxList.Clear;
+      tempList.Add('[Apk] Key Alias: '+Lowercase(SmallProjName)+'.keyalias');
+      tempList.Add('[Apk] Key Alias Password: ' + auxList.Strings[9]);
+      tempList.Add(' ');
+      tempList.Add('                         Project Build System: ' + buildSystem);
+
+      ShowMessage(tempList.Text);
+    end;
+
+    if not keystoreExists then
+    begin
+      if FormApksigner.ShowModal = mrOk then
+      begin
+        ShowMessage('"warning:'+SmallProjName+'-release.keystore" file created only once [per application]');
+
         ks_pass:= FormApksigner.EditKeyStorePassword.Text;
         key_pass:= FormApksigner.EditKeyAliasPassword.Text;
+
+        auxList.Clear;
         auxList.Add(ks_pass);
         auxList.Add(ks_pass);  //confirm
         auxList.Add(FormApksigner.EditFirstName.Text+ ' '+ FormApksigner.EditLastName.Text);
@@ -1280,6 +1314,17 @@ begin
         auxList.Add('key.alias.password='+key_pass);
         auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'ant.properties');
 
+        (*
+        auxList.Clear;
+        auxList.LoadFromFile(PathToAndroidProject +  DirectorySeparator + 'gradle.properties');
+        auxList.Add('RELEASE_STORE_FILE = '+ Lowercase(SmallProjName)+'-release.keystore');
+        auxList.Add('RELEASE_KEY_ALIAS = '+ Lowercase(SmallProjName)+'.keyalias');
+        auxList.Add('RELEASE_STORE_PASSWORD = '+ks_pass);
+        auxList.Add('RELEASE_KEY_PASSWORD = '+key_pass);
+        auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'gradle.properties');
+        *)
+
+        auxList.Clear;
         auxList.LoadFromFile(PathToAndroidProject +  DirectorySeparator + 'gradle-local-universal-apksigner.bat');
         {.bat
         set Path=%PATH%;C:\android\sdk\platform-tools;C:\android\sdk\build-tools\29.0.2
@@ -1288,7 +1333,6 @@ begin
         zipalign -v -p 4 C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-universal-release-unsigned.apk C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-universal-release-unsigned-aligned.apk
         apksigner sign --ks C:\android\workspace\AppLAMWProject10\applamwproject10-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-release.apk C:\android\workspace\AppLAMWProject10\build\outputs\apk\release\AppLAMWProject10-universal-release-unsigned-aligned.apk
         }
-
         strTemp:= 'apksigner sign --ks ' + winPathToAndroidProject + '\' +
                 Lowercase(smallProjName) + '-release.keystore --ks-pass pass:' + ks_pass + ' --key-pass pass:'+key_pass+' --out ' +
                 winPathToAndroidProject + '\build\outputs\apk\release\' +
@@ -1378,8 +1422,13 @@ begin
           AProcess.Free;
         end;
 
-      end;
+        keystoreExists:= True;
 
+      end;//showModal
+    end;
+
+    if keystoreExists then
+    begin
       //gradle apk signer
       if buildSystem = 'Gradle' then
       begin
@@ -1449,15 +1498,316 @@ begin
         ShowMessage('[Ant] Success!! Look for your signed "'+SmallProjName+'-release.apk" '+sLineBreak+
                     'in [project] folder "...\bin"' );
       end;
-
     end;
-
+    tempList.Free;
     auxList.Free;
   end
   else
     ShowMessage('The active project not is a LAMW project!');
 end;
 
+//StartBundleSignerStuff
+procedure StartBundleSignerStuff(Sender: TObject);
+var
+  Project: TLazProject;
+  PathToAndroidProject, smallProjName, strTemp: string;
+  p1: integer;
+  auxList, signList,  tempList: TStringList;
+  instructionChip, ks_pass, key_pass: string;
+  AProcess: TProcess;
+  buildSystem: string;
+  savedGradleProperties, savedBuildGradle: string;
+  keystoreExists, isUniversalApk: boolean;
+begin
+  Project := LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  begin
+
+    buildSystem:= Project.CustomData.Values['BuildSystem'];  //Gradle or Ant
+
+    if buildSystem <> 'Gradle' then
+    begin
+       ShowMessage('Fail...Signed Bundle need Gradle build system ...');
+       Exit;
+    end;
+
+    instructionChip:= ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+    instructionChip:= ExtractFileName(instructionChip);  //armeabi-v7a
+
+    p1:= Pos(DirectorySeparator+'jni'+DirectorySeparator, Project.ProjectInfoFile);
+    if p1 > 0 then
+    begin
+      PathToAndroidProject:= Trim(Copy(Project.ProjectInfoFile, 1, p1-1))
+    end
+    else
+    begin
+      PathToAndroidProject:= ExtractFilePath(Project.ProjectInfoFile);
+      PathToAndroidProject:= Copy(PathToAndroidProject,1, Length(PathToAndroidProject)-1);
+    end; //C:\android\workspace\AppLAMWProject10
+
+
+    auxList:= TStringList.Create;
+    auxList.StrictDelimiter:= True;
+    auxList.Delimiter:= DirectorySeparator;
+    auxList.DelimitedText:= TrimChar(PathToAndroidProject, DirectorySeparator);
+    smallProjName:=  auxList.Strings[auxList.Count-1];; //AppLAMWProject10
+
+    tempList:= TStringList.Create;
+    tempList.LoadFromFile(PathToAndroidProject  +  DirectorySeparator +  'build.gradle');
+
+    isUniversalApk:= True;
+    if Pos('universalApk false', tempList.Text) > 0 then
+    begin
+      isUniversalApk:= False;
+    end;
+
+    if isUniversalApk then
+    begin
+       if not FileExists(PathToAndroidProject + DirectorySeparator +
+                                                 'build' +DirectorySeparator+
+                                                 'outputs'+DirectorySeparator+
+                                                 'apk'+DirectorySeparator+
+                                                 'debug'+DirectorySeparator+
+                                                 smallProjName+'-universal-debug.apk') then
+       begin
+         ShowMessage('[Gradle] Fail... You need first: '+sLineBreak+'"Run" --> "[LAMW] Build Android Apk and Run" to produce a debug version ...');
+         Exit;
+       end;
+    end
+    else
+    begin                                                ////AppLAMWProject5-armeabi-v7a-debug.apk
+       if not FileExists(PathToAndroidProject + DirectorySeparator +
+                                                 'build' +DirectorySeparator+
+                                                 'outputs'+DirectorySeparator+
+                                                 'apk'+DirectorySeparator+
+                                                 'debug'+DirectorySeparator+
+                                                 smallProjName+'-'+instructionChip+'-debug.apk') then
+
+       begin
+         ShowMessage('[Gradle] Fail... You need first: '+sLineBreak+ '"Run" --> "[LAMW] Build Android Apk and Run" '+sLineBreak+'to produce a debug version ...');
+         Exit;
+       end;
+    end;
+
+    auxList.Clear;
+    auxList.LoadFromFile(PathToAndroidProject +  DirectorySeparator + 'keytool_input.txt');
+    { keytool_input.txt
+      123456           0
+      123456           1
+      MyFirstName MyLastName 2
+      MyDevelopmentUnitName  3
+      MyCompanyName          4
+      MyCity                 5
+      MT                     6
+      BR                     7
+      y                      8
+      123456                 9
+    }                                //firstPart:= SplitStr(aux, ' ');
+
+    FormApksigner:=  TFormApksigner.Create(Application);
+    FormApksigner.StatusBar1.SimplePanel:= True;
+    FormApksigner.StatusBar1.SimpleText:= 'Build System: ' + buildSystem;
+
+    FormApksigner.EditKeyStorePassword.Text:= auxList.Strings[0];   //123456
+
+    strTemp:=auxList.Strings[2];
+    FormApksigner.EditFirstName.Text:= SplitStr(strTemp, ' ');      //MyFirstName
+    FormApksigner.EditLastName.Text:= strTemp;                      //MyLastName
+
+    FormApksigner.EditOrgUnit.Text:= auxList.Strings[3];            //MyDevelopmentUnitName
+    FormApksigner.EditOrgName.Text:=  auxList.Strings[4];            //MyCompanyName
+    FormApksigner.EditCity.Text:= auxList.Strings[5];               //MyCity
+    FormApksigner.EditProvince.Text:= auxList.Strings[6];           //MT
+    FormApksigner.EditCodeCountry.Text:= auxList.Strings[7];        //BR
+    FormApksigner.EditKeyAliasPassword.Text:= auxList.Strings[9];   //123456
+
+    //Const
+    FormApksigner.EditApkKeyAlias.Text:= Lowercase(SmallProjName)+'.keyalias';
+    FormApksigner.EditApkKeyAlias.ReadOnly:= True;
+
+    ks_pass:= auxList.Strings[0];
+    key_pass:= auxList.Strings[9];
+
+    keystoreExists:= False;
+    if FileExists(PathToAndroidProject  +  DirectorySeparator +  SmallProjName+'-release.keystore') then
+    begin
+      ShowMessage('[ File "'+SmallProjName+'-release.keystore" Exists!'+sLineBreak+' Using existing "'+SmallProjName+'-release.keystore" ');
+
+      keystoreExists:= True;
+
+      tempList.Clear;
+      tempList.Add('         Credentials Data');
+      tempList.Add(    '"'+SmallProjName+'-release.keystore"');
+      tempList.Add(' ');
+      tempList.Add('[File] Key Store Password: ' + auxList.Strings[0]);
+      strTemp:=auxList.Strings[2];
+      tempList.Add('First Name: '+ SplitStr(strTemp, ' '));
+      tempList.Add('Last Name: ' + strTemp);
+      tempList.Add('Organizational Unit: ' + auxList.Strings[3]);
+      tempList.Add('Organization Name: ' + auxList.Strings[4]);
+      tempList.Add('City or Locality: ' + auxList.Strings[5]);
+      tempList.Add('State or Province: ' + auxList.Strings[6]);
+      tempList.Add('Country: ' + auxList.Strings[7]);
+
+      tempList.Add('[Apk] Key Alias: '+Lowercase(SmallProjName)+'.keyalias');
+      tempList.Add('[Apk] Key Alias Password: ' + auxList.Strings[9]);
+      tempList.Add(' ');
+      tempList.Add('                         Project Build System: ' + buildSystem);
+      ShowMessage(tempList.Text);
+
+    end;
+
+    if not keystoreExists then
+    begin
+      if FormApksigner.ShowModal = mrOk then
+      begin
+
+          ShowMessage('warning: "'+smallProjName+'-release.keystore" file created only once [per application]');
+
+          ks_pass:= FormApksigner.EditKeyStorePassword.Text;
+          key_pass:= FormApksigner.EditKeyAliasPassword.Text;
+
+          auxList.Clear;
+          auxList.Add(ks_pass);
+          auxList.Add(ks_pass);  //confirm
+          auxList.Add(FormApksigner.EditFirstName.Text+ ' '+ FormApksigner.EditLastName.Text);
+          auxList.Add(FormApksigner.EditOrgUnit.Text);
+          auxList.Add(FormApksigner.EditOrgName.Text);
+          auxList.Add(FormApksigner.EditCity.Text);
+          auxList.Add(FormApksigner.EditProvince.Text);
+          auxList.Add(FormApksigner.EditCodeCountry.Text);
+          auxList.Add('y');
+          auxList.Add(key_pass);
+          auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'keytool_input.txt');
+
+          { ant.properties
+          key.store=applamwproject9-release.keystore
+          key.alias=applamwproject9.keyalias
+          key.store.password=123456
+          key.alias.password=123456
+          }
+
+          auxList.Clear;
+          auxList.Add('key.store='+ Lowercase(SmallProjName)+'-release.keystore');
+          auxList.Add('key.alias='+ Lowercase(SmallProjName)+'.keyalias');
+          auxList.Add('key.store.password='+ks_pass);
+          auxList.Add('key.alias.password='+key_pass);
+          auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'ant.properties');
+
+          //release-keystore.bat
+          try
+            AProcess:= TProcess.Create(nil);
+            AProcess.CurrentDirectory:= PathToAndroidProject;
+
+            {$IFDEF Windows}
+            AProcess.Executable := 'c:\windows\system32\cmd.exe';
+            AProcess.Parameters.Add('/c');  //Executes the command(s) in command and then quits.
+            AProcess.Parameters.Add('release-keystore.bat');
+            {$ENDIF Windows}
+
+            {$IFDEF Unix}
+            hProcAProcessess.Executable := '/bin/sh';
+            AProcess.Parameters.Add('-c');
+            AProcess.Parameters.Add('release-keystore.sh');
+            {$ENDIF Unix}
+
+            AProcess.Options:= AProcess.Options + [poWaitOnExit];
+            AProcess.Execute;
+          finally
+            AProcess.Free;
+          end;
+
+          keystoreExists:= True;
+      end;//showForm
+    end;
+
+    if keystoreExists then
+    begin
+
+      //gradle.properties
+      auxList.Clear;
+      auxList.LoadFromFile(PathToAndroidProject +  DirectorySeparator + 'gradle.properties');
+      savedGradleProperties:= auxList.Text;
+
+      auxList.Clear;
+      auxList.Add('RELEASE_STORE_FILE = '+ Lowercase(SmallProjName)+'-release.keystore');
+      auxList.Add('RELEASE_KEY_ALIAS = '+ Lowercase(SmallProjName)+'.keyalias');
+      auxList.Add('RELEASE_STORE_PASSWORD = '+ks_pass);
+      auxList.Add('RELEASE_KEY_PASSWORD = '+key_pass);
+      auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'gradle.properties');
+
+      tempList.Clear;
+      tempList.LoadFromFile(PathToAndroidProject  +  DirectorySeparator +  'build.gradle');
+      savedBuildGradle:= tempList.Text;
+
+      if Pos('signingConfigs', tempList.Text) <= 0 then
+      begin
+        signList:= TStringList.Create;
+        signList.Add('    signingConfigs {');
+        signList.Add('        release {');
+        signList.Add('            storeFile file(RELEASE_STORE_FILE)');
+        signList.Add('            storePassword RELEASE_STORE_PASSWORD');
+        signList.Add('            keyAlias RELEASE_KEY_ALIAS');
+        signList.Add('            keyPassword RELEASE_KEY_PASSWORD');
+        signList.Add('        }');
+        signList.Add('    }');
+        signList.Add('    buildTypes {');
+        signList.Add('        release {');
+        signList.Add('            signingConfig signingConfigs.release');
+        signList.Add('        }');
+        signList.Add('    }');
+        strTemp:= tempList.Text;  //build.gradle
+        p1:= Pos('sourceSets', tempList.Text);
+        Insert(sLineBreak + signList.Text + sLineBreak, strTemp, p1-1);
+        tempList.Clear;
+        tempList.Text:= strTemp;
+        tempList.SaveToFile(PathToAndroidProject  +  DirectorySeparator +  'build.gradle');
+        signList.Free;
+      end;
+
+      //gradle-local-build-bundle.bat
+      try
+          AProcess:= TProcess.Create(nil);
+          AProcess.CurrentDirectory:= PathToAndroidProject;
+
+          {$IFDEF Windows}
+          AProcess.Executable := 'c:\windows\system32\cmd.exe';
+          AProcess.Parameters.Add('/c');  //Executes the command(s) in command and then quits.
+          AProcess.Parameters.Add('gradle-local-build-bundle.bat');
+          {$ENDIF Windows}
+
+          {$IFDEF Unix}
+          hProcAProcessess.Executable := '/bin/sh';
+          AProcess.Parameters.Add('-c');
+          AProcess.Parameters.Add('gradle-local-build-bundle.sh');
+          {$ENDIF Unix}
+
+          AProcess.Options:= AProcess.Options + [poWaitOnExit];
+          AProcess.Execute;
+      finally
+          AProcess.Free;
+      end;
+
+      ShowMessage('[Gradle] Success!! Look for your signed bundle "'+SmallProjName+'.aab" '+sLineBreak+
+                    'in [project] folder "...\build\outputs\bundle\release"' );
+
+      //restore
+      tempList.Clear;
+      tempList.Text:= savedBuildGradle;
+      tempList.SaveToFile(PathToAndroidProject  +  DirectorySeparator +  'build.gradle');
+
+      //restore
+      auxList.Clear;
+      auxList.Text:= savedGradleProperties;
+      auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'gradle.properties');
+
+    end;
+    tempList.Free;
+    auxList.Free;
+  end
+  else
+    ShowMessage('The active project not is a LAMW project!');
+end;
 
 function GetResSourcePath(fullPathToProjectLFM: string): string;
 var
@@ -2041,7 +2391,9 @@ begin
   RegisterIDEMenuCommand(ideSubMnuAppCompat, 'AppCompatNoActionBar', 'AppCompatNoActionBar', nil, @StartAppCompatNoActionBar);
 
   //Register submenu release apksigner
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToApksignerForm', 'Build Release Signed Apk ...', nil, @StartApksignerStuff);
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToApksignerForm', 'Build Release Signed Apk ...', nil, @StartApkSignerStuff);
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToBundlesignerForm', 'Build Release Signed Bundle ...', nil, @StartBundleSignerStuff);
+
 
   // Register submenu  Logcat
   ideSubMnuLog:= RegisterIDESubMenu(ideSubMnuAMW, 'Logcatch', 'ADB Logcat');

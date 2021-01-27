@@ -1849,7 +1849,7 @@ begin
                strList.Add('    package="'+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+'"');
                strList.Add('    android:versionCode="1"');
                strList.Add('    android:versionName="1.0" >');
-               strList.Add('    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="21"/>');
+               strList.Add('    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="29"/>');
                strList.Add('    <application');
                strList.Add('        android:allowBackup="true"');
                strList.Add('        android:icon="@drawable/ic_launcher"');
@@ -2131,10 +2131,10 @@ begin
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant.properties');
 
           strList.Clear;  //if need, hiden info in "build.grade" source
-          //strList.Add('MYAPP_RELEASE_STORE_FILE='+LowerCase(FSmallProjName)+'-release.keystore');
-          //strList.Add('MYAPP_RELEASE_KEY_ALIAS='+apk_aliaskey);
-          //strList.Add('MYAPP_RELEASE_STORE_PASSWORD=123456');
-          //strList.Add('MYAPP_RELEASE_KEY_PASSWORD=123456');
+          //strList.Add('RELEASE_STORE_FILE='+LowerCase(FSmallProjName)+'-release.keystore');
+          //strList.Add('RELEASE_KEY_ALIAS='+apk_aliaskey);
+          //strList.Add('RELEASE_STORE_PASSWORD=123456');
+          //strList.Add('RELEASE_KEY_PASSWORD=123456');
           strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle.properties');  //if need configure proxy here, too
 
           //keytool input [dammy] data!
@@ -2157,7 +2157,7 @@ begin
           strList.Add('set PATH=%JAVA_HOME%'+PathDelim+'bin;%PATH%');
           strList.Add('set JAVA_TOOL_OPTIONS=-Duser.language=en');
           strList.Add('cd '+FAndroidProjectName);
-          strList.Add('if exist "'+Lowercase(FSmallProjName)+'-release.keystore" goto Error');
+          //strList.Add('if exist "'+Lowercase(FSmallProjName)+'-release.keystore" goto Error');
           strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
                       FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
           strList.Add(':Error');
@@ -2185,7 +2185,14 @@ begin
 
           strList.Clear;
 
-          strList.Add('       Tutorial: How to get your "signed" release Apk: '+ FSmallProjName);
+          strList.Add('       Tutorial: How to get your "signed" release Apk ['+ FSmallProjName +']');
+          strList.Add(' ');
+          strList.Add('    NEW! ');
+          strList.Add('    "Tools"  --> "[LAMW] ..." --> "Build Release Signed Apk  ..."');
+          strList.Add('    "Tools"  --> "[LAMW] ..." --> "Build Release Signed Bundle ..."');
+          strList.Add(' ');
+          strList.Add(' ');
+          strList.Add(' OR: ');
           strList.Add(' ');
           strList.Add('1)Edit/change the project file "keytool_input.txt" to more representative informations:"');
           strList.Add('');
@@ -2285,7 +2292,7 @@ begin
           strList.Clear;
           if FPathToAntBin <> '' then //PATH=$PATH:/data/myscripts
           begin
-            strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
+            strList.Add('export PATH='+linuxPathToAntBin+':$PATH');        //export PATH=/usr/bin/ant:PATH
             strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
             strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
             strList.Add('cd '+linuxAndroidProjectName);
@@ -2563,6 +2570,7 @@ begin
                   FVersionName:= '1.0';
                 end;
 
+                if FVersionName = '' then  FVersionName:= '1.0';
                 strList.Add('            versionCode ' + intToStr(FVersionCode));
                 strList.Add('            versionName "' + FVersionName + '"');
                 strList.Add('    }');
@@ -2918,6 +2926,16 @@ begin
                 strList.Add('gradle clean build --info');
                 strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build.bat');
 
+                strList.Clear;
+                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+                if FPathToGradle = '' then
+                  strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+                else
+                  strList.Add('set GRADLE_HOME='+ FPathToGradle);
+                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+                strList.Add('gradle clean bundle --info');
+                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build-bundle.bat');
+
                 //thanks to TR3E!
                 strList.Clear;
                 sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
@@ -2953,16 +2971,25 @@ begin
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-
                 if FPathToGradle = '' then
                   strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
                 else
                   strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
                 strList.Add('source ~/.bashrc');
                 strList.Add('gradle clean build --info');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build.sh');
+
+                strList.Clear;
+                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+                if FPathToGradle = '' then
+                  strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+                else
+                  strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+                strList.Add('source ~/.bashrc');
+                strList.Add('gradle clean bundle --info');
+                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build-bundle.sh');
 
                 strList.Clear;
                 strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');

@@ -15,6 +15,7 @@ type
   TFormApksigner = class(TForm)
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    EditApkKeyAlias: TEdit;
     EditKeyStorePassword: TEdit;
     EditKeyAliasPassword: TEdit;
     EditFirstName: TEdit;
@@ -26,6 +27,7 @@ type
     EditCodeCountry: TEdit;
     Label1: TLabel;
     Label10: TLabel;
+    Label11: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;

@@ -3,7 +3,7 @@ object FormApksigner: TFormApksigner
   Height = 490
   Top = 32
   Width = 445
-  Caption = 'Apk Signer [KeyTool Inpuy]'
+  Caption = 'Apk Signer [KeyTool Input]'
   ClientHeight = 490
   ClientWidth = 445
   DesignTimePPI = 120
@@ -83,8 +83,8 @@ object FormApksigner: TFormApksigner
     Left = 12
     Height = 20
     Top = 200
-    Width = 129
-    Caption = 'Organizational Unit'
+    Width = 132
+    Caption = 'Organizational Unit:'
     ParentColor = False
   end
   object EditOrgUnit: TEdit
@@ -183,6 +183,7 @@ object FormApksigner: TFormApksigner
     Hint = 'two-letter country code'
     Top = 294
     Width = 54
+    MaxLength = 2
     TabOrder = 11
     TextHint = 'BR'
   end
@@ -194,5 +195,21 @@ object FormApksigner: TFormApksigner
     Anchors = [akTop, akRight]
     Caption = '[Apk] Key Alias  Password:'
     ParentColor = False
+  end
+  object Label11: TLabel
+    Left = 12
+    Height = 20
+    Top = 336
+    Width = 178
+    Caption = '[Apk] Key Alias (ReadOnly)'
+    ParentColor = False
+  end
+  object EditApkKeyAlias: TEdit
+    Left = 12
+    Height = 28
+    Top = 360
+    Width = 198
+    Color = clInactiveBorder
+    TabOrder = 12
   end
 end

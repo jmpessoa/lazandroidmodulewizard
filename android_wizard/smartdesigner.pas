@@ -1306,6 +1306,17 @@ begin
     else
       strList.Add('set GRADLE_HOME='+ FPathToGradle);
     strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+    strList.Add('gradle clean bundle --info');
+    strList.SaveToFile(FPathToAndroidProject+'gradle-local-build-bundle.bat');
+
+
+    strList.Clear;
+    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+    if FPathToGradle = '' then
+      strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+    else
+      strList.Add('set GRADLE_HOME='+ FPathToGradle);
+    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
     strList.Add('gradle run');
     strList.SaveToFile(FPathToAndroidProject+'gradle-local-run.bat');
 
@@ -1337,6 +1348,17 @@ begin
     //strList.Add('.\gradle clean build --info');
     strList.Add('gradle clean build --info');
     SaveShellScript(strList, FPathToAndroidProject+'gradle-local-build.sh');
+
+    strList.Clear;
+    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+    if FPathToGradle = '' then
+      strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+    else
+      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+    strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+    strList.Add('source ~/.bashrc');
+    strList.Add('gradle clean bundle --info');
+    SaveShellScript(strList, FPathToAndroidProject + 'gradle-local-build-bundle.sh');
 
     strList.Clear;
     strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
