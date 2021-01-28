@@ -157,6 +157,12 @@ public class jView extends View {
 	public  void Free() {
 		LAMWCommon.free();
 	}
+	
+	public void BringToFront() {
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();
+	}
 
 	public void SetLParamWidth(int _w) {
 		LAMWCommon.setLParamWidth(_w);
