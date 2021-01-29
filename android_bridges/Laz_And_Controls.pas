@@ -221,7 +221,7 @@ type
      procedure RemoveAllViews();
      function GetChildCount(): integer;
      procedure BringChildToFront(_view: jObject);
-     procedure BringToFront();
+     procedure BringToFront;
      procedure SetVisibilityGone();
      procedure SetAnimationDurationIn(_animationDurationIn: integer);
      procedure SetAnimationMode(_animationMode: TAnimationMode);
@@ -1007,7 +1007,7 @@ type
     procedure SetAllCaps(_value: boolean);
     procedure SetTextAsHtml(_htmlText: string);
 
-    procedure BringToFront();
+    procedure BringToFront;
     procedure SetUnderline( _on : boolean ); // by ADiV
 
   published
@@ -1257,7 +1257,7 @@ type
     procedure ResetViewParent();  override;
     procedure SetFocus();
 
-    procedure BringToFront(); // By ADiV
+    procedure BringToFront; // By ADiV
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -1385,7 +1385,7 @@ type
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
 
-    procedure BringToFront();
+    procedure BringToFront;
     procedure SetColors( _color, _colorBack : TARGBColorBridge );
 
   published
@@ -1496,7 +1496,7 @@ type
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
     procedure ResetViewParent();  override;
-    procedure BringToFront();
+    procedure BringToFront;
     procedure SetVisibilityGone();
     function GetDirectBufferAddress(byteBuffer: jObject): PJByte;
     function GetJByteBuffer(_width: integer; _height: integer): jObject;
@@ -1730,7 +1730,7 @@ type
     procedure RemoveFromViewParent;  override;
     procedure ResetViewParent();  override;
     procedure SetFitsSystemWindows(_value: boolean);
-    procedure BringToFront();
+    procedure BringToFront;
     procedure SetVisibilityGone();
 
     procedure SaveToFile(_appInternalFileName: string);
@@ -1881,7 +1881,7 @@ type
     procedure Delete(_index: integer);
     procedure Clear();
 
-    procedure BringToFront();
+    procedure BringToFront;
 
     procedure GenEvent_OnScrollViewInnerItemClick(Sender:TObject;itemId:integer);
     procedure GenEvent_OnScrollViewInnerItemLongClick(Sender:TObject;index:integer;itemId:integer);
@@ -2182,6 +2182,7 @@ type
     function GetHeight: integer; override;
     procedure SetViewParent(Value: jObject);   override;
     procedure RemoveFromViewParent;  override;
+    procedure BringToFront;
 
     procedure ClearLayout();
     Procedure UpdateLayout(); override;
@@ -2248,7 +2249,7 @@ type
     procedure GenEvent_OnDown(Obj: TObject); // by ADiV
     procedure GenEvent_OnUp(Obj: TObject);
 
-    procedure BringToFront(); // By ADiV
+    procedure BringToFront; // By ADiV
     
     procedure Init(refApp: jApp); override;
     procedure SetLGravity(_value: TLayoutGravity);
@@ -4661,7 +4662,7 @@ begin
   jni_proc_z( FjEnv, FjObject, 'SetUnderline', _on);
 end;
 
-procedure jTextView.BringToFront();
+procedure jTextView.BringToFront;
 begin
  //in designing component state: set value here...
  if FInitialized then
@@ -5808,7 +5809,7 @@ begin
      jButton_SetFocus(FjEnv, FjObject);
 end;
 
-procedure jButton.BringToFront();
+procedure jButton.BringToFront;
 begin
  //in designing component state: set value here...
  if FInitialized then
@@ -6459,7 +6460,7 @@ begin
   SetProgress(FProgress);
 end;
 
-procedure jProgressBar.BringToFront();
+procedure jProgressBar.BringToFront;
 begin
  if not FInitialized then Exit;
 
@@ -7122,7 +7123,7 @@ begin
      jImageView_SetScrollFlag(FjEnv, FjObject, Ord(_collapsingScrollFlag));
 end;
 
-procedure jImageView.BringToFront();
+procedure jImageView.BringToFront;
 begin
   //in designing component state: set value here...
   if FInitialized then
@@ -8726,7 +8727,7 @@ begin
   end;
 end;
 
-procedure jListView.BringToFront();
+procedure jListView.BringToFront;
 begin
   //in designing component state: set value here...
   if FInitialized then
@@ -9728,7 +9729,7 @@ begin
      jScrollView_Clear(FjEnv, FjObject);
 end;
 
-procedure jScrollView.BringToFront();
+procedure jScrollView.BringToFront;
 begin
   //in designing component state: set value here...
   if FInitialized then
@@ -11832,6 +11833,12 @@ begin
     jView_SetLayerType(FjEnv, FjObject, Byte(Value));
 end;
 
+procedure jView.BringToFront;
+begin
+  if FInitialized then
+    View_BringToFront(FjEnv, FjObject);
+end;
+
 //------------------------------------------------------------------------------
 // jTimer
 //------------------------------------------------------------------------------
@@ -12387,7 +12394,7 @@ begin
 
 end;
 
-procedure jImageBtn.BringToFront();
+procedure jImageBtn.BringToFront;
 begin
   if FInitialized then
    View_BringToFront(FjEnv, FjObject);
@@ -13642,7 +13649,7 @@ begin
      jPanel_BringChildToFront(FjEnv, FjObject, _view);
 end;
 
-procedure jPanel.BringToFront();
+procedure jPanel.BringToFront;
 begin
   //in designing component state: set value here...
   if FInitialized then
