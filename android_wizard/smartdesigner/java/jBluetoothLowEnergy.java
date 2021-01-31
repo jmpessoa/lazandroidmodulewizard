@@ -96,6 +96,14 @@ public class jBluetoothLowEnergy /*extends ...*/ {
 
     public int mScanMode = ScanSettings.SCAN_MODE_LOW_POWER;
 
+    final private Handler h = new Handler();
+    private Runnable r;
+    int serviceIndex;
+    String[] characteristicUUIDArray;
+    String serviceStrUuid;
+
+    BluetoothGattCharacteristic mGattCharacteristic;
+    String mCharacteristicValue = "";
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jBluetoothLowEnergy(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -171,7 +179,6 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                 mBluetoothLeScanner.startScan(filters, settings, mScanCallback);
             }
         });
-
 
         mHandler = new Handler();
         mHandler.postDelayed(new Runnable() {
@@ -434,13 +441,18 @@ public class jBluetoothLowEnergy /*extends ...*/ {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 log("Connected to device " + gatt.getDevice().getAddress());
                 setConnected(true);
-
                 //int bondstate = gatt.getDevice().getBondState();
                 //BluetoothDevice.BOND_BONDING  //waiting for bonding to complete
                 //BluetoothDevice.BOND_NONE
                 // BluetoothDevice.BOND_BONDED)
-
-                controls.pOnBluetoothLEConnected(pascalObj,gatt.getDevice().getName(), gatt.getDevice().getAddress(), gatt.getDevice().getBondState());
+                r = new Runnable() {
+                    @Override
+                    public void run() {
+                        controls.pOnBluetoothLEConnected(pascalObj,mGatt.getDevice().getName(), mGatt.getDevice().getAddress(), mGatt.getDevice().getBondState());
+                        h.postDelayed(this, 5*1000);  //// do the service push update magic!!!
+                    }
+                };
+                h.post(r);
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 log("Disconnected from device");
@@ -450,7 +462,6 @@ public class jBluetoothLowEnergy /*extends ...*/ {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            int serviceIndex;
             mServicesDiscovered = gatt.getServices();
             mGatt = gatt;
 
@@ -465,12 +476,21 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                     serviceCharacteristicList.add(gattCharacteristic.getUuid().toString());
                 }
                 int count = serviceCharacteristicList.size();
-                String[] characteristicUUIDArray = new String[count];
+                characteristicUUIDArray = new String[count];
                 for (int k = 0; k < count; k++) {
                     characteristicUUIDArray[k] = serviceCharacteristicList.get(k);
                 }
+                serviceStrUuid = service.getUuid().toString();
                 serviceIndex++;
-                controls.pOnBluetoothLEServiceDiscovered(pascalObj,  serviceIndex, service.getUuid().toString(), characteristicUUIDArray);
+                r = new Runnable() {
+                    @Override
+                    public void run() {
+                        controls.pOnBluetoothLEServiceDiscovered(pascalObj,  serviceIndex,serviceStrUuid, characteristicUUIDArray);
+                        h.postDelayed(this, 5*1000);  //// do the service push update magic!!!
+                    }
+                };
+                h.post(r);
+
             }
         }
 
@@ -480,7 +500,8 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                                                  characteristic, int status) {
 
             mGatt = gatt;
-            String strValue = "";
+            mGattCharacteristic = characteristic;
+
             Log.i("onCharacteristicRead", characteristic.toString());
 
             //  https://developer.android.com/guide/topics/connectivity/bluetooth-le
@@ -512,11 +533,19 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                  for (byte byteChar : data) stringBuilder.append(String.format("%02X ", byteChar));
 
                  //intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
-                 strValue = stringBuilder.toString();
+                   mCharacteristicValue = stringBuilder.toString();
                }
             //}
 
-            controls.pOnBluetoothLECharacteristicRead(pascalObj, strValue, characteristic.toString());
+            r = new Runnable() {
+                @Override
+                public void run() {
+                    controls.pOnBluetoothLECharacteristicRead(pascalObj, mCharacteristicValue, mGattCharacteristic.toString());
+                    h.postDelayed(this, 5*1000);  //// do the service push update magic!!!
+                }
+            };
+            h.post(r);
+
             //characteristic.getStringValue(0);
             //characteristic.getValue()
             //pascal event here
@@ -528,7 +557,7 @@ public class jBluetoothLowEnergy /*extends ...*/ {
             super.onCharacteristicChanged(gatt, characteristic);
 
             mGatt = gatt;
-            String strValue = "";
+            mGattCharacteristic = characteristic;
 
             Log.i("onCharacteristicChanged", characteristic.toString());
             //  https://developer.android.com/guide/topics/connectivity/bluetooth-le
@@ -560,11 +589,19 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                 for (byte byteChar : data) stringBuilder.append(String.format("%02X ", byteChar));
 
                 //intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
-                strValue = stringBuilder.toString();
+                mCharacteristicValue = stringBuilder.toString();
             }
             //}
 
-            controls.pOnBluetoothLECharacteristicChanged(pascalObj, strValue, characteristic.toString());
+            r = new Runnable() {
+                @Override
+                public void run() {
+                    controls.pOnBluetoothLECharacteristicChanged(pascalObj, mCharacteristicValue, mGattCharacteristic.toString());
+                    h.postDelayed(this, 5*1000);  //// do the service push update magic!!!
+                }
+            };
+            h.post(r);
+
              //characteristic.getStringValue(0)
             //characteristic.getValue()
             //pascal event here
