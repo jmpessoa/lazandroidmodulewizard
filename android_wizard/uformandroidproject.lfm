@@ -1,13 +1,14 @@
 object FormAndroidProject: TFormAndroidProject
   Left = 318
-  Height = 382
+  Height = 478
   Top = 120
-  Width = 941
+  Width = 1176
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
   Caption = 'Lamw: Lazarus Android Module Wizard '
-  ClientHeight = 362
-  ClientWidth = 941
+  ClientHeight = 478
+  ClientWidth = 1176
+  DesignTimePPI = 120
   FormStyle = fsStayOnTop
   Icon.Data = {
     9E09000000000100010018180000010020008809000016000000280000001800
@@ -95,24 +96,23 @@ object FormAndroidProject: TFormAndroidProject
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.1.0.0'
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 23
-    Top = 339
-    Width = 941
+    Height = 29
+    Top = 449
+    Width = 1176
     Panels = <    
       item
-        Width = 50
+        Width = 62
       end>
     ParentFont = False
     SimplePanel = False
   end
   object Panel1: TPanel
     Left = 0
-    Height = 50
+    Height = 62
     Top = 0
-    Width = 941
+    Width = 1176
     Align = alTop
     BevelOuter = bvNone
     ParentFont = False
@@ -120,21 +120,21 @@ object FormAndroidProject: TFormAndroidProject
   end
   object Panel3: TPanel
     Left = 0
-    Height = 289
-    Top = 50
-    Width = 821
+    Height = 387
+    Top = 62
+    Width = 1026
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel3'
-    ClientHeight = 289
-    ClientWidth = 821
+    ClientHeight = 387
+    ClientWidth = 1026
     ParentFont = False
     TabOrder = 2
     object PageControl1: TPageControl
       Left = 0
-      Height = 289
+      Height = 387
       Top = 0
-      Width = 821
+      Width = 1026
       ActivePage = TabSheet2
       Align = alClient
       ParentFont = False
@@ -143,24 +143,24 @@ object FormAndroidProject: TFormAndroidProject
       OnChange = PageControl1Change
       object TabSheet3: TTabSheet
         Caption = 'App.java'
-        ClientHeight = 256
-        ClientWidth = 797
+        ClientHeight = 354
+        ClientWidth = 1018
         ParentFont = False
         inline SynMemo3: TSynMemo
           Cursor = crIBeam
           Left = 0
-          Height = 256
+          Height = 354
           Top = 0
-          Width = 797
+          Width = 1018
           Align = alClient
-          Font.Height = -13
+          Font.Height = -16
           Font.Name = 'Courier New'
           Font.Pitch = fpFixed
           Font.Quality = fqNonAntialiased
           ParentColor = False
           ParentFont = False
           TabOrder = 0
-          Gutter.Width = 57
+          Gutter.Width = 72
           Gutter.MouseActions = <>
           Highlighter = SynJavaSyn2
           Keystrokes = <          
@@ -600,11 +600,11 @@ object FormAndroidProject: TFormAndroidProject
           SelectedColor.StrikeOutPriority = 50
           inline SynLeftGutterPartList1: TSynGutterPartList
             object SynGutterMarks1: TSynGutterMarks
-              Width = 24
+              Width = 30
               MouseActions = <>
             end
             object SynGutterLineNumber1: TSynGutterLineNumber
-              Width = 17
+              Width = 21
               MouseActions = <>
               MarkupInfo.Background = clBtnFace
               MarkupInfo.Foreground = clNone
@@ -614,18 +614,19 @@ object FormAndroidProject: TFormAndroidProject
               LeadingZeros = False
             end
             object SynGutterChanges1: TSynGutterChanges
-              Width = 4
+              Width = 5
               MouseActions = <>
               ModifiedColor = 59900
               SavedColor = clGreen
             end
             object SynGutterSeparator1: TSynGutterSeparator
-              Width = 2
+              Width = 3
               MouseActions = <>
               MarkupInfo.Background = clWhite
               MarkupInfo.Foreground = clGray
             end
             object SynGutterCodeFolding1: TSynGutterCodeFolding
+              Width = 13
               MouseActions = <>
               MarkupInfo.Background = clNone
               MarkupInfo.Foreground = clGray
@@ -637,24 +638,24 @@ object FormAndroidProject: TFormAndroidProject
       end
       object TabSheet1: TTabSheet
         Caption = 'Java JNI Source'
-        ClientHeight = 256
-        ClientWidth = 797
+        ClientHeight = 354
+        ClientWidth = 1018
         ParentFont = False
         inline SynMemo1: TSynMemo
           Cursor = crIBeam
           Left = 0
-          Height = 256
+          Height = 354
           Top = 0
-          Width = 797
+          Width = 1018
           Align = alClient
-          Font.Height = -13
+          Font.Height = -16
           Font.Name = 'Courier New'
           Font.Pitch = fpFixed
           Font.Quality = fqNonAntialiased
           ParentColor = False
           ParentFont = False
           TabOrder = 0
-          Gutter.Width = 57
+          Gutter.Width = 72
           Gutter.MouseActions = <>
           Highlighter = SynJavaSyn1
           Keystrokes = <          
@@ -1094,11 +1095,11 @@ object FormAndroidProject: TFormAndroidProject
           SelectedColor.StrikeOutPriority = 50
           inline SynLeftGutterPartList1: TSynGutterPartList
             object SynGutterMarks1: TSynGutterMarks
-              Width = 24
+              Width = 30
               MouseActions = <>
             end
             object SynGutterLineNumber1: TSynGutterLineNumber
-              Width = 17
+              Width = 21
               MouseActions = <>
               MarkupInfo.Background = clBtnFace
               MarkupInfo.Foreground = clNone
@@ -1108,18 +1109,19 @@ object FormAndroidProject: TFormAndroidProject
               LeadingZeros = False
             end
             object SynGutterChanges1: TSynGutterChanges
-              Width = 4
+              Width = 5
               MouseActions = <>
               ModifiedColor = 59900
               SavedColor = clGreen
             end
             object SynGutterSeparator1: TSynGutterSeparator
-              Width = 2
+              Width = 3
               MouseActions = <>
               MarkupInfo.Background = clWhite
               MarkupInfo.Foreground = clGray
             end
             object SynGutterCodeFolding1: TSynGutterCodeFolding
+              Width = 13
               MouseActions = <>
               MarkupInfo.Background = clNone
               MarkupInfo.Foreground = clGray
@@ -1131,25 +1133,25 @@ object FormAndroidProject: TFormAndroidProject
       end
       object TabSheet2: TTabSheet
         Caption = 'Pascal JNI Interface'
-        ClientHeight = 261
-        ClientWidth = 813
+        ClientHeight = 354
+        ClientWidth = 1018
         ParentFont = False
         inline SynMemo2: TSynMemo
           Tag = 1
           Cursor = crIBeam
           Left = 0
-          Height = 261
+          Height = 354
           Top = 0
-          Width = 813
+          Width = 1018
           Align = alClient
-          Font.Height = -13
+          Font.Height = -16
           Font.Name = 'Courier New'
           Font.Pitch = fpFixed
           Font.Quality = fqNonAntialiased
           ParentColor = False
           ParentFont = False
           TabOrder = 0
-          Gutter.Width = 57
+          Gutter.Width = 72
           Gutter.MouseActions = <>
           Highlighter = SynFreePascalSyn1
           Keystrokes = <          
@@ -1589,11 +1591,11 @@ object FormAndroidProject: TFormAndroidProject
           SelectedColor.StrikeOutPriority = 50
           inline SynLeftGutterPartList1: TSynGutterPartList
             object SynGutterMarks1: TSynGutterMarks
-              Width = 24
+              Width = 30
               MouseActions = <>
             end
             object SynGutterLineNumber1: TSynGutterLineNumber
-              Width = 17
+              Width = 21
               MouseActions = <>
               MarkupInfo.Background = clBtnFace
               MarkupInfo.Foreground = clNone
@@ -1603,18 +1605,19 @@ object FormAndroidProject: TFormAndroidProject
               LeadingZeros = False
             end
             object SynGutterChanges1: TSynGutterChanges
-              Width = 4
+              Width = 5
               MouseActions = <>
               ModifiedColor = 59900
               SavedColor = clGreen
             end
             object SynGutterSeparator1: TSynGutterSeparator
-              Width = 2
+              Width = 3
               MouseActions = <>
               MarkupInfo.Background = clWhite
               MarkupInfo.Foreground = clGray
             end
             object SynGutterCodeFolding1: TSynGutterCodeFolding
+              Width = 13
               MouseActions = <>
               MarkupInfo.Background = clNone
               MarkupInfo.Foreground = clGray
@@ -1627,21 +1630,21 @@ object FormAndroidProject: TFormAndroidProject
     end
   end
   object Panel4: TPanel
-    Left = 821
-    Height = 289
-    Top = 50
-    Width = 120
+    Left = 1026
+    Height = 387
+    Top = 62
+    Width = 150
     Align = alRight
     BevelOuter = bvNone
-    ClientHeight = 289
-    ClientWidth = 120
+    ClientHeight = 387
+    ClientWidth = 150
     ParentFont = False
     TabOrder = 3
     object BitBtn1: TBitBtn
-      Left = 24
-      Height = 30
-      Top = 192
-      Width = 75
+      Left = 30
+      Height = 38
+      Top = 265
+      Width = 94
       Anchors = [akRight, akBottom]
       Cancel = True
       DefaultCaption = True
@@ -1651,10 +1654,10 @@ object FormAndroidProject: TFormAndroidProject
       TabOrder = 0
     end
     object BitBtn2: TBitBtn
-      Left = 24
-      Height = 30
-      Top = 232
-      Width = 75
+      Left = 30
+      Height = 38
+      Top = 315
+      Width = 94
       Anchors = [akRight, akBottom]
       Caption = 'OK'
       Default = True
@@ -1664,10 +1667,10 @@ object FormAndroidProject: TFormAndroidProject
       TabOrder = 1
     end
     object Image1: TImage
-      Left = 6
-      Height = 289
+      Left = 8
+      Height = 387
       Top = 0
-      Width = 114
+      Width = 142
       Align = alRight
       Picture.Data = {
         1754506F727461626C654E6574776F726B47726170686963768B000089504E47
@@ -2797,8 +2800,8 @@ object FormAndroidProject: TFormAndroidProject
     NumberAttri.Foreground = clBlue
     StringAttri.Foreground = clBlue
     SymbolAttri.Foreground = clRed
-    Left = 472
-    Top = 192
+    left = 590
+    top = 240
   end
   object SynFreePascalSyn1: TSynFreePascalSyn
     Enabled = False
@@ -2810,12 +2813,11 @@ object FormAndroidProject: TFormAndroidProject
     DirectiveAttri.Foreground = clRed
     CompilerMode = pcmObjFPC
     NestedComments = True
-    TypeHelpers = False
-    Left = 632
-    Top = 232
+    left = 790
+    top = 290
   end
   object MainMenu1: TMainMenu
-    Left = 32
+    left = 40
     object MenuItem17: TMenuItem
       Caption = 'Help'
       object MenuItem18: TMenuItem
@@ -2839,7 +2841,7 @@ object FormAndroidProject: TFormAndroidProject
     NumberAttri.Foreground = clBlue
     StringAttri.Foreground = clBlue
     SymbolAttri.Foreground = clRed
-    Left = 360
-    Top = 200
+    left = 450
+    top = 250
   end
 end

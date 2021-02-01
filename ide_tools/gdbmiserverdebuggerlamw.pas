@@ -31,7 +31,7 @@ unit GDBMIServerDebuggerLAMW;
 interface
 
 uses
-  Classes, SysUtils, GDBMIDebugger, GDBMIMiscClasses, DbgIntfDebuggerBase;
+  Classes, SysUtils, GDBMIDebugger, GDBMIMiscClasses, DbgIntfDebuggerBase, LCLVersion;
 
 type
 
@@ -133,7 +133,7 @@ type
 
   TGDBMIServerDebuggerCommandStartDebugging = class(TGDBMIDebuggerCommandStartDebugging)
   protected
-    function GdbRunCommand: String; override;
+    function GdbRunCommand: String;{$if lcl_fullversion<2010000}override;{$endif}
     procedure DetectTargetPid(InAttach: Boolean = False); override;
     function  DoTargetDownload: boolean; override;
   end;

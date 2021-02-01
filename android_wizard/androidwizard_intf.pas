@@ -1138,6 +1138,7 @@ begin
     AndroidFileDescriptor.SyntaxMode:= FSyntaxMode;
 
     FPascalJNIInterfaceCode:= frm.PascalJNIInterfaceCode;
+
     FFullPackageName:= frm.FullPackageName;
     Result := True;
   end;
@@ -3045,7 +3046,7 @@ begin
   end;
 end;
 
-function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;  //No GUI
+function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;
 var
    auxList: TStringList;
    outTag: integer;
@@ -3315,14 +3316,16 @@ begin
 
   sourceList.Add('uses');
 
-  if FModuleType <= 0 then  //GUI or gdx controls
+  if FModuleType <= 1 then  //-1:gdx    0:GUI or   1:noGUI controls
   begin
-
     //https://forum.lazarus.freepascal.org/index.php/topic,45715.msg386317
     sourceList.Add('  {$IFDEF UNIX}{$IFDEF UseCThreads}');
     sourceList.Add('  cthreads,');
     sourceList.Add('  {$ENDIF}{$ENDIF}');
+  end;
 
+  if FModuleType <= 0 then  //-1:gdx    0:GUI or   1:noGUI controls
+  begin
     sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,');
     sourceList.Add('  Laz_And_Controls_Events;');
     sourceList.Add(' ');
@@ -3406,12 +3409,12 @@ begin
     sourceList.Add('  AndroidConsoleApp: TAndroidConsoleApp;');
     sourceList.Add('');
   end
-  else //generic .so library
+  else //generic .so library // FModuleType = 3
   begin
     sourceList.Add('  Unit1;');  //ok
   end;
 
-  if FModuleType <= 0 then //GUI
+  if FModuleType <= 1 then //0:GUI    1:NoGUI    -1:gdx
   begin
     sourceList.Add('{%region /fold ''LAMW generated code''}');
     sourceList.Add('');
@@ -3466,7 +3469,7 @@ begin
      sourceList.Add('  AndroidConsoleApp.CreateForm(TAndroidConsoleDataForm1,AndroidConsoleDataForm1);');
   end
   else
-  begin  //generic library
+  begin  //generic library     // FModuleType = 3
     sourceList.Add(' ');
     sourceList.Add('function Sum(a: longint; b: longint): longint; cdecl;');
     sourceList.Add('begin');

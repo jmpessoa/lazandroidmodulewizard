@@ -786,7 +786,13 @@ begin
 
      if FPascalJNIInterfaceCode =  '' then
      begin
-       PageControl1.ActivePage:= TabSheet2;
+       //PageControl1.ActivePage:= TabSheet2;
+       SynMemo2.ReadOnly:= False;
+       SynMemo2.Lines.Clear;
+       DoJavaParse;
+       SynMemo2.Lines.Add(' ');
+       FPascalJNIInterfaceCode:= SynMemo2.Lines.Text;
+       SynMemo2.ReadOnly:= True;
      end;
 
    end;
@@ -839,7 +845,7 @@ begin
 
    i:= LastPos(DirectorySeparator, FPathToJavaTemplates);
    FPathToWizardCode:= Copy(FPathToJavaTemplates, 1, i-1);
-   ShowMessage('**FPathToWizardCode = ' + FPathToWizardCode);
+   //ShowMessage('**FPathToWizardCode = ' + FPathToWizardCode);
    FPathToJavaClass:= FFullJavaSrcPath+DirectorySeparator+FSmallProjName+'.java';
 
    pathList:= TStringList.Create;

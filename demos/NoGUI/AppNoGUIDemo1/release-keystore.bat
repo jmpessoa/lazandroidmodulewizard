@@ -1,3 +1,12 @@
-set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-cd C:\adt32\eclipse\workspace\AppNoGUIDemo1
-keytool -genkey -v -keystore AppNoGUIDemo1-release.keystore -alias appnoguidemo1aliaskey -keyalg RSA -keysize 2048 -validity 10000 < C:\adt32\eclipse\workspace\AppNoGUIDemo1\keytool_input.txt
+set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_151
+set PATH=%JAVA_HOME%\bin;%PATH%
+set JAVA_TOOL_OPTIONS=-Duser.language=en
+cd C:\android\workspace\AppNoGUIDemo1
+keytool -genkey -v -keystore appnoguidemo1-release.keystore -alias appnoguidemo1.keyalias -keyalg RSA -keysize 2048 -validity 10000 < C:\android\workspace\AppNoGUIDemo1\keytool_input.txt
+:Error
+echo off
+cls
+echo.
+echo Signature file created previously, remember that if you delete this file and it was uploaded to Google Play, you will not be able to upload another app without this signature.
+echo.
+pause

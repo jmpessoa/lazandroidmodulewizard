@@ -1,4 +1,2 @@
-cd C:\adt32\eclipse\workspace\AppNoGUIDemo1\bin
-C:\adt32\sdk\platform-tools\adb logcat
-cd ..
+C:\android\sdk\platform-tools\adb logcat &
 pause
