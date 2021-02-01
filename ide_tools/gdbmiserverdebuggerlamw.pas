@@ -61,25 +61,29 @@ type
 
   { TGDBMIServerDebuggerProperties }
 
+  TGdbServerRun                      = (gsrRunAsPackageName, gsrRunAsCommand);
+
   TGDBMIServerDebuggerPropertiesLAMW = class(TGDBMIDebuggerPropertiesBase)
   private
-    FDebugger_Remote_Hostname     : String;
-    FDebugger_Remote_Port         : String;
-    FDebugger_Remote_DownloadExe  : Boolean;
+    FRemote_HostName   : String;
+    FRemote_Port       : String;
+    FRemote_ServerRun  : TGdbServerRun;
   public
     constructor Create; override;
-    procedure Assign(Source: TPersistent); override;
+    procedure   Assign(Source: TPersistent);                           override;
 
-    procedure SetDebugger_Remote_Hostname(NewHost:String);              virtual;
-    procedure SetDebugger_Remote_Port    (NewPort:String);              virtual;
+    procedure   SetRemote_HostName (NewHost : String);                  virtual;
+    procedure   SetRemote_Port     (NewPort : String);                  virtual;
+    procedure   SetRemote_ServerRun(NewRun  : TGdbServerRun);           virtual;
 
   published
-    property Debugger_Remote_Hostname    : String
-                 read FDebugger_Remote_Hostname    write SetDebugger_Remote_Hostname;
-    property Debugger_Remote_Port        : String
-                 read FDebugger_Remote_Port        write SetDebugger_Remote_Port;
-    property Debugger_Remote_DownloadExe : Boolean
-                 read FDebugger_Remote_DownloadExe write   FDebugger_Remote_DownloadExe;
+    property    Remote_HostName  : String
+                       read FRemote_Hostname     write SetRemote_HostName;
+    property    Remote_Port      : String
+                       read FRemote_Port         write SetRemote_Port;
+    property    Remote_ServerRun : TGdbServerRun
+                       read FRemote_ServerRun    write SetRemote_ServerRun;
+
   published
     property Debugger_Startup_Options;
     {$IFDEF UNIX}
@@ -106,16 +110,49 @@ type
   end;
 
 
-var
-  ProjPID_LAMW  : Cardinal =      0;    // LAMW PID
-  ProjNameLAMW  : String   =     '';    // LAMW project name
-  GdbServerPort : String   = '2021';    // gdbserver current port
-  GdbServerName : String   = '';        // gdbserver current name
+  { TGDBMIServerDebuggerConfig }
 
+  TGDBMIServerDebuggerConfigLAMW = class
+  private
+    FModifid       : Boolean;            // Data Modifid
+    FProjPID       : Cardinal;           // LAMW PID
+    FProjName      : String;             // LAMW project name (package name)
+    FGdbServerPort : String;             // gdbserver remote hostport
+    FGdbServerName : String;             // gdbserver remote hostname
+    FGdbServerRun  : TGdbServerRun;      // gdbserver remote start method
+
+    function    GetGdbServerPort      : String;                         virtual;
+    procedure   SetGdbServerPort(Port : String);                        virtual;
+
+    function    GetGdbServerName      : String;                         virtual;
+    procedure   SetGdbServerName(Name : String);                        virtual;
+
+    function    GetGdbServerRun       : TGdbServerRun;                  virtual;
+    procedure   SetGdbServerRun (SRun : TGdbServerRun);                 virtual;
+  public
+    constructor Create;
+    procedure   LoadDebuggerProperties;
+
+    property    ProjPID       : Cardinal      read FProjPID  write FProjPID;
+    property    ProjName      : String        read FProjName write FProjName;
+
+    property    GdbServerPort : String        read GetGdbServerPort
+                                                             write SetGdbServerPort;
+    property    GdbServerName : String        read GetGdbServerName
+                                                             write SetGdbServerName;
+
+    property    GdbServerRun  : TGdbServerRun read GetGdbServerRun
+                                                             write SetGdbServerRun;
+  end;
+
+
+function  GdbCfg : TGDBMIServerDebuggerConfigLAMW;
 
 procedure Register;
 
 implementation
+
+uses Forms, Laz2_XMLCfg;
 
 resourcestring
   GDBMiSNoAsyncMode = 'GDB does not support async mode';
@@ -133,7 +170,7 @@ type
 
   TGDBMIServerDebuggerCommandStartDebugging = class(TGDBMIDebuggerCommandStartDebugging)
   protected
-    function GdbRunCommand: String;{$if lcl_fullversion<2010000}override;{$endif}
+    function  GdbRunCommand: String;{$if lcl_fullversion<2010000}override;{$endif}
     procedure DetectTargetPid(InAttach: Boolean = False); override;
     function  DoTargetDownload: boolean; override;
   end;
@@ -165,13 +202,6 @@ end;
 function TGDBMIServerDebuggerCommandStartDebugging.DoTargetDownload: boolean;
 begin
   Result := True;
-  if TGDBMIServerDebuggerPropertiesLAMW(DebuggerProperties).FDebugger_Remote_DownloadExe then
-  begin
-    // Called after -file-exec-and-symbols, so gdb knows what file to download
-    // If call sequence is different, then supply binary file name below as parameter
-    Result := ExecuteCommand('-target-download', [], [cfCheckError]);
-    Result := Result and (DebuggerState <> dsError);
-  end;
 end;
 
 { TGDBMIServerDebuggerCommandInitDebugger }
@@ -192,9 +222,9 @@ begin
 
   // TODO: Maybe should be done in CommandStart, But Filename, and Environment will be done before Start
   FSuccess := ExecuteCommand(Format('target extended-remote %s:%s',
-                             [TGDBMIServerDebuggerPropertiesLAMW(DebuggerProperties).FDebugger_Remote_Hostname,
-                              TGDBMIServerDebuggerPropertiesLAMW(DebuggerProperties).Debugger_Remote_Port ]),
-                             R);
+    [TGDBMIServerDebuggerPropertiesLAMW(DebuggerProperties).Remote_Hostname,
+     TGDBMIServerDebuggerPropertiesLAMW(DebuggerProperties).Remote_Port      ]),
+                            R);
   FSuccess := FSuccess and (R.State <> dsError);
 end;
 
@@ -223,40 +253,43 @@ end;
 constructor TGDBMIServerDebuggerPropertiesLAMW.Create;
 begin
   inherited Create;
-      FDebugger_Remote_Hostname    := '192.168.34.101';
-      FDebugger_Remote_Port        := GdbServerPort;
-      FDebugger_Remote_DownloadExe := False;
-      UseAsyncCommandMode          := True;
+      FRemote_Hostname     := '';
+      FRemote_Port         := '2021';
+      FRemote_ServerRun    := Low(TGdbServerRun);
+      UseAsyncCommandMode  := True;
 end;
-
 
 procedure TGDBMIServerDebuggerPropertiesLAMW.Assign(Source: TPersistent);
 begin
   inherited Assign(Source);
   If Source is TGDBMIServerDebuggerPropertiesLAMW then
     begin
-      FDebugger_Remote_Hostname    :=
-        TGDBMIServerDebuggerPropertiesLAMW(Source).FDebugger_Remote_Hostname;
-      FDebugger_Remote_Port        :=
-        TGDBMIServerDebuggerPropertiesLAMW(Source).FDebugger_Remote_Port;
-      FDebugger_Remote_DownloadExe :=
-        TGDBMIServerDebuggerPropertiesLAMW(Source).FDebugger_Remote_DownloadExe;
-      UseAsyncCommandMode          := True;
-      GdbServerPort                := FDebugger_Remote_Port;
+      FRemote_HostName     :=
+        TGDBMIServerDebuggerPropertiesLAMW(Source).FRemote_HostName;
+      FRemote_Port         :=
+        TGDBMIServerDebuggerPropertiesLAMW(Source).FRemote_Port;
+      FRemote_ServerRun    :=
+        TGDBMIServerDebuggerPropertiesLAMW(Source).FRemote_ServerRun;
+      UseAsyncCommandMode  := True;
     end;
 end;
 
-
-procedure TGDBMIServerDebuggerPropertiesLAMW.SetDebugger_Remote_Hostname(NewHost:String);
+procedure TGDBMIServerDebuggerPropertiesLAMW.SetRemote_HostName(NewHost:String);
 begin
-  FDebugger_Remote_Hostname := NewHost;
-  GdbServerName             := NewHost;
+  FRemote_HostName         := NewHost;
+  GdbCfg.GdbServerName     := NewHost;
 end;
 
-procedure TGDBMIServerDebuggerPropertiesLAMW.SetDebugger_Remote_Port    (NewPort:String);
+procedure TGDBMIServerDebuggerPropertiesLAMW.SetRemote_Port    (NewPort:String);
 begin
-  FDebugger_Remote_Port     := NewPort;
-  GdbServerPort             := NewPort;
+  FRemote_Port             := NewPort;
+  GdbCfg.GdbServerPort     := NewPort;
+end;
+
+procedure TGDBMIServerDebuggerPropertiesLAMW.SetRemote_ServerRun(NewRun:TGdbServerRun);
+begin
+  FRemote_ServerRun        := NewRun;
+  GdbCfg.GdbServerRun      := NewRun;
 end;
 
 { TGDBMIServerDebugger }
@@ -304,8 +337,8 @@ end;
 
 function TGDBMIServerDebuggerLAMW.GetProcessList({%H-}AList: TRunningProcessInfoList): boolean;
 begin
-     Result:=(ProjPID_LAMW <> 0) and (ProjNameLAMW <> '');
-  If Result then AList.Add(TRunningProcessInfo.Create(ProjPID_LAMW, ProjNameLAMW));
+     Result:=(GdbCfg.ProjPID <> 0) and (GdbCfg.ProjName <> '');
+  If Result then AList.Add(TRunningProcessInfo.Create(GdbCfg.ProjPID, GdbCfg.ProjName));
 end;{TGDBMIServerDebugger.GetProcessList}
 
 function  TGDBMIServerDebuggerLAMW.RequestCommand(const ACommand : TDBGCommand;
@@ -334,6 +367,90 @@ begin
   Result := False;
 end;
 
+
+{ TGDBMIServerDebuggerConfig }
+
+function    TGDBMIServerDebuggerConfigLAMW.GetGdbServerPort      : String;
+begin
+  LoadDebuggerProperties;
+  Result := FGdbServerPort;
+end;
+
+procedure   TGDBMIServerDebuggerConfigLAMW.SetGdbServerPort(Port : String);
+begin
+  FGdbServerPort := Port;
+  FModifid       := True;
+end;
+
+function    TGDBMIServerDebuggerConfigLAMW.GetGdbServerName      : String;
+begin
+  LoadDebuggerProperties;
+  Result := FGdbServerName;
+end;
+
+procedure   TGDBMIServerDebuggerConfigLAMW.SetGdbServerName(Name : String);
+begin
+  FGdbServerName := Name;
+  FModifid       := True;
+end;
+
+function    TGDBMIServerDebuggerConfigLAMW.GetGdbServerRun       : TGdbServerRun;
+begin
+  LoadDebuggerProperties;
+  Result := FGdbServerRun;
+end;
+
+procedure   TGDBMIServerDebuggerConfigLAMW.SetGdbServerRun (SRun : TGdbServerRun);
+begin
+  FGdbServerRun  := SRun;
+  FModifid       := True;
+end;
+
+constructor TGDBMIServerDebuggerConfigLAMW.Create;
+begin
+  FModifid       := False;                  // Data Modifid
+  FProjPID       := 0;                      // LAMW PID
+  FProjName      := '';                     // LAMW project name (package name)
+  FGdbServerPort := '2021';                 // gdbserver remote hostport
+  FGdbServerName := '';                     // gdbserver remote hostname
+  FGdbServerRun  := Low(TGdbServerRun);     // gdbserver remote start method
+end;
+
+procedure   TGDBMIServerDebuggerConfigLAMW.LoadDebuggerProperties;
+var XMLCfg: TRttiXMLConfig; FileName:String;
+    DDef,Prop: TGDBMIServerDebuggerPropertiesLAMW;
+begin
+  If FModifid then Exit;                    // Read One time on start only
+
+  FileName:=Application.Location+'config'+PathDelim+'environmentoptions.xml';
+  try
+    XMLCfg := TRttiXMLConfig.Create(Filename);
+    Prop   := TGDBMIServerDebuggerPropertiesLAMW.Create;
+    DDef   := TGDBMIServerDebuggerPropertiesLAMW.Create;
+
+    XMLCfg.ReadObject(
+      'EnvironmentOptions/Debugger/ClassTGDBMIServerDebuggerLAMW/Properties/',
+                     Prop, DDef);
+
+    GdbServerPort := Prop.Remote_Port;      // gdbserver remote hostport
+    GdbServerName := Prop.Remote_HostName;  // gdbserver remote hostname
+    GdbServerRun  := Prop.Remote_ServerRun; // gdbserver remote start method
+
+  finally
+    DDef.  Free;
+    Prop.  Free;
+    XMLCfg.Free;
+  end;
+end;
+
+var       GdbCfgLAMW : TGDBMIServerDebuggerConfigLAMW = Nil;
+
+function  GdbCfg     : TGDBMIServerDebuggerConfigLAMW;
+begin
+  If      GdbCfgLAMW = Nil
+    then  GdbCfgLAMW := TGDBMIServerDebuggerConfigLAMW.Create;
+  Result:=GdbCfgLAMW;
+end;
 
 procedure Register;
 begin

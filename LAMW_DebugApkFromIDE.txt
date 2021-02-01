@@ -15,56 +15,89 @@
                         (for x86 emulator - tested!)
  ...android-ndk-r10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin\arm-linux-androideabi-gdb.exe
                         (for ARMv7a+Soft emulator - tested!)
+  6) IDE options/debugger setup
+       - Remote_HostName  = ''   (default) or emulator IP (Window title)
+       - Remote_Port      = 2021 (default)
+       - Remote_ServerRun = gsrRunAsPackageName(default) or gsrRunAsCommand
+       If Remote_HostName  = '' then builder call command:
+           'adb forward tcp:Remote_Port tcp:Remote_Port' before start gdbserver)
+        gsrRunAsPackageName -> start gdbserver by command:
+           'run-as '     + PackageName + ' lib/gdbserver --multi :' + Remote_Port
+        gsrRunAsCommand     -> start gdbserver by command:
+           '/data/data/' + PackageName + '/lib/gdbserver --multi :' + Remote_Port
+           (use gsrRunAsCommand for correct bug "Can't open socket: Permission denied")
 
-  6) IDE options/debugger setup remote host name (Title emulator IP or '') & taget port
-    (if remote_host_name = '' then builder call 'adb forward tcp:port tcp:port')
-  7) Project/Project Option/Compile options/Debugging: -> generate Dedug information,
-                                                       -> type automatic,
-                                                       -> Disp line numbers,
-                                                       -> use external gdb symb
+  7) Project/Project Option/Compile options/Debugging:
+       -> generate Dedug information,
+       -> type automatic,
+       -> Disp line numbers,
+       -> use external gdb symb
   8) Project/Project Option/Compile options/Compilation and Linking:
-                                                       -> No optimization
-  9) [LAMW] Android project options/Build/Chipset      -> x86 or ARMv7a+Soft
+       -> No optimization
+  9) [LAMW] Android project options/Build/Chipset
+       -> x86 or ARMv7a+Soft
+     Android project options/Build/Apk Builder
+       -> Ant or Gradle
  10) Run/[LAMW] Build Android Apk and Run
+     Do not modify debugger setup until stop debugger (Run/Detach from program)
  11) Messages:
-      ... Success
-          Start gdbserver --multi :2021
-          Listening on port 2021
+       ... Success
+       ... gdbserver --multi :2021
+           Listening on port 2021
  12) Run/Attach to program
- 13) Select program name and PID from IDE dialog
- 14) Messages:
+ 13) Select program name (PackageName) & PID from IDE dialog
+ 14) IDE puts fatty dots in editor
+     Messages:
        ...
-         Remote debugging from host 192.168.34.2
-         Attached; pid = 1704
+           Remote debugging from host 127.0.0.1
+           Attached; pid = ...
  15) Set breakpoints
  16) Run (F9)
-
- ....
-
+       ...
  17) Run/Detach from program or Stop (Ctrl-F2)
+ 18) Messages:
+       ...
+           Remote side has terminated connection.  GDBserver will reopen the connection.
+           Listening on port 2021
+
  18) Run/Abort Build
+       ...
+           Fatal: [Exception] Failed: ... (!!!)
 
-   Tested on
-           OS        : Win10-64,
-           Laz       : laz4android2.0.0,
-           LAMW      : lazandroidmodulewizard-master from 24.12.2020
-           Emulator  : GENIMOTION Version 3.0.0 | Revision 20181218-bd824f9
-                         (Device Samsung Galaxy S8[8.0-API26] & S9 [9.0-API28])
+ Tested on
+   OS        : Win10-64,
+   Laz       : laz4android2.0.0,
+   LAMW      : lazandroidmodulewizard-master from 26.01.2021
+   Emulator  :
+       - GENIMOTION Version 3.0.0 | Revision 20181218-bd824f9
+          (Device Samsung Galaxy S8 [8.0-API26] & S9 [9.0-API28])
 
-                       AVD Android Emulator (Device Nexus 9 [5.1.1-API22]
-                       Google APIs ARM (armeabi-v7a))
+       - GENIMOTION Version 3.2.0 | Revision 2101Thu-fb10f6d9a
+          (Device Samsung Galaxy S9 [8.0-API26] & S9 [9.0-API28])
+          (Device Samsung Galaxy S10[10.0-API29])
 
-           JDK       : Java\jdk1.8.0_60
-           ANT       : apache-ant-1.9.7
-           GRADLE    : gradle-4.4.1
-           NDK       : android-ndk-r10e
-           SDK       : android-sdk (platform-tools 28.0.1)
-           Target SDK version : 28
+       - AVD Android Emulator (Device Nexus 9 [5.1.1-API22]
+           Google APIs ARM (armeabi-v7a))
+
+       - AVD Android Emulator (Device Nexus 9 [7.1.1-API25])
+           Google APIs Intel Atom (x86))
+
+   Real Device
+       - Samsung Galaxy j7   sm-j730fm/ds [9.0-API28]
+
+   JDK       : Java\jdk1.8.0_60
+   ANT       : apache-ant-1.9.7
+   GRADLE    : gradle-4.4.1
+   NDK       : android-ndk-r10e
+   SDK       : android-sdk (platform-tools 28.0.1)
+   Target SDK version : 28
 
 //------------------------------------------------------------------------------
 
   E:Mail leopreo@gmail.com  Leon Preo
 
+  Lazarus Forum
+         https://forum.lazarus.freepascal.org/index.php/topic,52970.0.html
 
 
 
