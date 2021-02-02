@@ -70,7 +70,7 @@ public class jAnalogClock extends AnalogClock /*dummy*/ { //please, fix what GUI
 	   LAMWCommon.setLGravity(_g);
    }
 
-   public void setLWeight(float _w) {
+   public void SetLWeight(float _w) {
 	   LAMWCommon.setLWeight(_w);
    }
 

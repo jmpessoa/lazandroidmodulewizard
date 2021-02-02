@@ -1440,7 +1440,6 @@ type
     function IsExternalStorageReadWriteAvailable(): boolean;
     function IsExternalStorageReadable(): boolean;
 
-
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
@@ -1687,9 +1686,9 @@ end;
   function jForm_UriToString(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
 
   function jForm_GetRealPathFromURI(env: PJNIEnv; _jform: JObject; _Uri: jObject): string;
+
   function jForm_IsExternalStorageReadWriteAvailable(env: PJNIEnv; _jform: JObject): boolean;
   function jForm_IsExternalStorageReadable(env: PJNIEnv; _jform: JObject): boolean;
-
 
 //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -1833,6 +1832,8 @@ procedure View_Invalidate             (env:PJNIEnv; view : jObject); overload;
 procedure View_PostInvalidate         (env:PJNIEnv; view : jObject);
 
 procedure View_BringToFront           (env:PJNIEnv; view : jObject);
+procedure View_SetViewParent          (env: PJNIEnv; view: JObject; _viewgroup: jObject);
+procedure View_RemoveFromViewParent   (env: PJNIEnv; view: JObject);
 
 // System Info
 Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject;context : jObject) : TWH;
@@ -4828,6 +4829,8 @@ begin
      jForm_RunOnUiThread(FjEnv, FjObject, _tag);
 end;
 
+{-------- jForm_JNI_Bridge ----------}
+
 function jForm.IsExternalStorageReadWriteAvailable(): boolean;
 begin
   //in designing component state: result value here...
@@ -4846,8 +4849,6 @@ procedure jForm.GenEvent_OnRunOnUiThread(Sender:TObject;tag:integer);
 begin
   if Assigned(FOnRunOnUiThread) then FOnRunOnUiThread(Sender,tag);
 end;
-
-{-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
 var
@@ -4877,17 +4878,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jForm_CancelShowCustomMessage(env: PJNIEnv; _jform: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jform);
-  jMethod:= env^.GetMethodID(env, jCls, 'CancelShowCustomMessage', '()V');
-  env^.CallVoidMethod(env, _jform, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer; _lenghTimeSecond: integer);
 var
   jParams: array[0..2] of jValue;
@@ -4903,6 +4893,16 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jForm_CancelShowCustomMessage(env: PJNIEnv; _jform: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jform);
+  jMethod:= env^.GetMethodID(env, jCls, 'CancelShowCustomMessage', '()V');
+  env^.CallVoidMethod(env, _jform, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 function jForm_GetStringExtra(env: PJNIEnv; _jform: JObject; intentData: jObject; extraName: string): string;
 var
@@ -5457,7 +5457,7 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 begin
-  jCls:= env^.GetObjectClass(env, _jform);
+ jCls:= env^.GetObjectClass(env, _jform);
   jMethod:= env^.GetMethodID(env, jCls, 'IsExternalStorageReadWriteAvailable', '()Z');
   jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
   Result:= boolean(jBoo);
@@ -5477,7 +5477,6 @@ begin
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 //-----{ jApp } ------
 
@@ -7127,6 +7126,30 @@ begin
  _jMethod:= env^.GetMethodID(env, cls, 'BringToFront', '()V');
  env^.CallVoidMethod(env,view,_jMethod);
  env^.DeleteLocalRef(env, cls);
+end;
+
+procedure View_SetViewParent(env: PJNIEnv; view: JObject; _viewgroup: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= _viewgroup;
+  jCls:= env^.GetObjectClass(env, view);
+  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
+  env^.CallVoidMethodA(env, view, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure View_RemoveFromViewParent(env: PJNIEnv; view: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, view);
+  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
+  env^.CallVoidMethod(env, view, jMethod);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 //------------------------------------------------------------------------------

@@ -138,7 +138,7 @@ begin
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
    SetViewParent(FjPRLayout);
-   jni_proc_i(FjEnv, FjObject, 'setId', Self.Id);
+   View_Setid(FjEnv, FjObject, Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
@@ -269,35 +269,35 @@ begin
   //inherited SetViewParent(_viewgroup);
   FjPRLayout:= _viewgroup;
   if FjObject <> nil then
-     jni_proc_vig(FjEnv, FjObject, 'SetViewParent', FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jCustomDialog.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jCustomDialog.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
+     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jCustomDialog.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
+     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jCustomDialog.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
+     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jCustomDialog.ClearLayout();
@@ -308,7 +308,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc(FjEnv, FjObject, 'ClearLayoutAll');
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
