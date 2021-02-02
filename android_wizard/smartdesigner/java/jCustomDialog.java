@@ -21,11 +21,11 @@ import android.graphics.Point;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jVisualControl template*/
 
-// Reviewed by TR3E on 11/26/2019
+// Reviewed by ADiV on 2021/02/02
 
 public class jCustomDialog extends RelativeLayout {
 
- private long       pascalObj = 0;    // Pascal Object
+    private long       pascalObj = 0;    // Pascal Object
 	private Controls   controls  = null; // Control Class for events
 
 	private Context context = null;
@@ -46,6 +46,8 @@ public class jCustomDialog extends RelativeLayout {
 	
 	private int mDialogWidth  = 0;
 	private int mDialogHeight = 0;
+	
+	private boolean mIsVisible = false;
 	
 	private float lweight = 0;
  //[ifdef_api14up]
@@ -245,12 +247,19 @@ public class jCustomDialog extends RelativeLayout {
 	    Show(_title, mIconIdentifier);
 	}
 
-	public void Show(String _title, String _iconIdentifier) {	
+	public void Show(String _title, String _iconIdentifier) {
+		
+		if(mIsVisible) return;
+		
+		mIsVisible = true;
 									
 		mTitle = _title;
 		mIconIdentifier = _iconIdentifier;
 		
 		if (mDialog != null) {
+			
+			//mDialog.setCanceledOnTouchOutside(FCancelable);
+			mDialog.setCancelable(FCancelable);
 			
 			// Update icon if I change [to TR3E]
 			if( mShowTitle ){			
@@ -272,6 +281,9 @@ public class jCustomDialog extends RelativeLayout {
 			}
 						
 			mDialog = new Dialog(this.controls.activity);
+			
+			//mDialog.setCanceledOnTouchOutside(FCancelable);
+			mDialog.setCancelable(FCancelable);
 						
 			if( !mShowTitle ){
 				mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -285,10 +297,7 @@ public class jCustomDialog extends RelativeLayout {
 				
 				mDialog.setTitle(mTitle);
 			 //mDialog.getWindow().setTitleColor(0xFF0000FF); 
-			}
-		
-			//mDialog.setCanceledOnTouchOutside(mCanceledOnTouchOutside);
-			mDialog.setCancelable(FCancelable);
+			}					
 			
 			//fix by @renabor
 			mDialog.setOnKeyListener(new Dialog.OnKeyListener() {
@@ -316,14 +325,21 @@ public class jCustomDialog extends RelativeLayout {
 		        public void onShow(DialogInterface d) {
 		        			            
 		        	updateWH();
-		        	
-		        	controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
-		        	
+		        			    		        
 		        	// Change the size and update the layout                
 		            controls.formNeedLayout = true;
 		            controls.appLayout.requestLayout();
+		            
+		            controls.pOnCustomDialogShow(pascalObj, mDialog, mTitle);
 		        }
 		    });
+			
+			mDialog.setOnDismissListener(new DialogInterface.OnDismissListener(){
+				@Override
+				public void onDismiss(DialogInterface dialog){
+					mIsVisible = false;
+				}
+			});
 						
 			mDialog.show();					
 									
