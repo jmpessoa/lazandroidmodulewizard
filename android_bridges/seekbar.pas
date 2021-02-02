@@ -83,7 +83,6 @@ jSeekBar = class(jVisualControl)
 end;
 
 function jSeekBar_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jSeekBar_SetViewParent(env: PJNIEnv; _jseekbar: JObject; _viewgroup: jObject);
 function jSeekBar_GetView(env: PJNIEnv; _jseekbar: JObject): jObject;
 
 implementation
@@ -144,7 +143,7 @@ begin
    if FGravityInParent <> lgNone then
     SetLGravity(FGravityInParent);
 
-   jSeekBar_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
@@ -243,14 +242,14 @@ procedure jSeekBar.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSeekBar_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 procedure jSeekBar.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jSeekBar.GetView(): jObject;
@@ -264,14 +263,14 @@ procedure jSeekBar.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLParamWidth', _w);
+     View_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jSeekBar.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLParamHeight', _h);
+     View_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 procedure jSeekBar.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -285,21 +284,21 @@ procedure jSeekBar.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
+     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jSeekBar.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
+     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jSeekBar.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
+     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jSeekBar.ClearLayout();
@@ -310,7 +309,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc(FjEnv, FjObject, 'ClearLayoutAll');
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
@@ -356,9 +355,8 @@ end;
 procedure jSeekBar.SetLGravity(_value: TLayoutGravity);
 begin
   //in designing component state: set value here...
-  FGravityInParent:= _value;
-  if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'SetLGravity', Ord(FGravityInParent));
+  if FInitialized then
+   View_SetLGravity(FjEnv, FjObject, Ord(_value));
 end;
 
 procedure jSeekBar.SetScale( _scaleX, _scaleY : single ); // by ADiV
@@ -436,20 +434,6 @@ end;
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-
-procedure jSeekBar_SetViewParent(env: PJNIEnv; _jseekbar: JObject; _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jseekbar, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 
 function jSeekBar_GetView(env: PJNIEnv; _jseekbar: JObject): jObject;
