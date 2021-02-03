@@ -82,7 +82,7 @@ public class jHorizontalScrollView extends HorizontalScrollView {
 		scrollview.setLayoutParams(scrollxywh);
 	}
 
-	public  ViewGroup getView() {
+	public  ViewGroup GetView() {
 		return ( scrollview );
 	}
 

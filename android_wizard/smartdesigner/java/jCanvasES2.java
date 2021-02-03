@@ -125,7 +125,7 @@ public class jCanvasES2 extends GLSurfaceView {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
-	public  void setParent( android.view.ViewGroup _viewgroup ) {		
+	public  void SetParent( android.view.ViewGroup _viewgroup ) {		
 		LAMWCommon.setParent(_viewgroup);
 	}
 
@@ -343,20 +343,20 @@ public class jCanvasES2 extends GLSurfaceView {
 	}
 
 	//by jmpessoa
-	public void setLParamWidth(int _w) {
+	public void SetLParamWidth(int _w) {
 		LAMWCommon.setLParamWidth(_w);
 	}
 
 	//by jmpessoa
-	public void setLParamHeight(int _h) {
+	public void SetLParamHeight(int _h) {
 		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 		
@@ -365,25 +365,25 @@ public class jCanvasES2 extends GLSurfaceView {
 	}
 
 	//by jmpessoa
-	public int getLParamHeight() {
+	public int GetLParamHeight() {
 		return getHeight();
 	}
 
 	//by jmpessoa
-	public int getLParamWidth() {
+	public int GetLParamWidth() {
 		return getWidth();
 	}
 
 	//by jmpessoa
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 	//by jmpessoa
-	public void addLParamsParentRule(int rule) {		
+	public void AddLParamsParentRule(int rule) {		
 		 LAMWCommon.addLParamsParentRule(rule);
 	}
 	//by jmpessoa
-	public void setLayoutAll(int idAnchor) {		
+	public void SetLayoutAll(int idAnchor) {		
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 

@@ -164,7 +164,6 @@ procedure jTextView_SetTextAsLink(env: PJNIEnv; _jtextview: JObject; _linkText: 
 procedure jTextView_SetBackgroundAlpha(env: PJNIEnv; _jtextview: JObject; _alpha: integer);
 procedure jTextView_MatchParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_WrapParent(env: PJNIEnv; _jtextview: JObject);
-procedure jTextView_RemoveFromViewParent(env: PJNIEnv; _jtextview: JObject);
 procedure jTextView_SetAllCaps(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetTextAsHtml(env: PJNIEnv; _jtextview: JObject; _htmlText: string);
 procedure jTextView_BringToFront(env: PJNIEnv; _jtextview: JObject);
@@ -251,7 +250,6 @@ procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _path: strin
 procedure jEditText_LoadFromFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
 procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _path: string; _filename: string);  overload;
 procedure jEditText_SaveToFile(env: PJNIEnv; _jedittext: JObject; _filename: string);  overload;
-procedure jEditText_RemoveFromViewParent(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_SetSoftInputShownOnFocus(env: PJNIEnv; _jedittext: JObject; _show: boolean);
 
 procedure jEditText_SetRoundCorner(env: PJNIEnv; _jedittext: JObject);
@@ -280,7 +278,6 @@ procedure jButton_SetRadiusRoundCorner(env: PJNIEnv; _jbutton: JObject; _radius:
 procedure jButton_SetFontFromAssets(env: PJNIEnv; _jbutton: JObject; _fontName: string);
 procedure jButton_SetEnabled(env: PJNIEnv; _jbutton: JObject; Value: boolean);
 procedure jButton_SetAllCaps(env: PJNIEnv; _jbutton: JObject; _value: Boolean);
-procedure jButton_RemoveFromViewParent(env: PJNIEnv; _jbutton: JObject);
 procedure jButton_SetFocus(env: PJNIEnv; _jbutton: JObject);
 
 // CheckBox
@@ -297,7 +294,6 @@ procedure jCheckBox_SetFontSizeUnit(env: PJNIEnv; _jcheckbox: JObject; _unit: in
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _image: jObject; _side: integer); overload;
 procedure jCheckBox_SetCompoundDrawables(env: PJNIEnv; _jcheckbox: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jCheckBox_SetFontFromAssets(env: PJNIEnv; _jcheckbox: JObject; _fontName: string);
-procedure jCheckBox_RemoveFromViewParent(env: PJNIEnv; _jcheckbox: JObject);
 
 // RadioButton
 
@@ -318,7 +314,6 @@ procedure jRadioButton_SetFontSizeUnit(env: PJNIEnv; _jradiobutton: JObject; _un
 procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _image: jObject; _side: integer); overload;
 procedure jRadioButton_SetCompoundDrawables(env: PJNIEnv; _jradiobutton: JObject; _imageResIdentifier: string; _side: integer);  overload;
 procedure jRadioButton_SetFontFromAssets(env: PJNIEnv; _jradiobutton: JObject; _fontName: string);
-procedure jRadioButton_RemoveFromViewParent(env: PJNIEnv; _jradiobutton: JObject);
 
 // ProgressBar
 Function  jProgressBar_Create          (env:PJNIEnv;  this:jobject; SelfObj: TObject; Style: DWord ): jObject;
@@ -351,7 +346,6 @@ procedure jImageView_SetRadiusRoundCorner(env: PJNIEnv; _jimageview: JObject; _r
 procedure jImageView_SetCollapseMode(env: PJNIEnv; _jimageview: JObject; _mode: integer);
 procedure jImageView_SetFitsSystemWindows(env: PJNIEnv; _jimageview: JObject; _value: boolean);
 procedure jImageView_SetScrollFlag(env: PJNIEnv; _jimageview: JObject; _collapsingScrollFlag: integer);
-procedure jImageView_RemoveFromViewParent(env: PJNIEnv; _jimageview: JObject);
 procedure jImageView_SetVisibilityGone(env: PJNIEnv; _jimageview: JObject);
 
 procedure jImageView_SetRotation(env: PJNIEnv; _jimageview: JObject; angle: integer);
@@ -364,7 +358,6 @@ procedure jImageView_SetRoundedShape(env: PJNIEnv; _jimageview: JObject; _value:
 procedure jImageView_SetImageFromByteBuffer(env: PJNIEnv; _jimageview: JObject; _jbyteBuffer: jObject; _width: integer; _height: integer);
 procedure jImageView_LoadFromURL(env: PJNIEnv; _jimageview: JObject; _url: string);
 procedure jImageView_SaveToFile(env: PJNIEnv; _jimageview: JObject; _filename: string);
-function jImageView_GetView(env: PJNIEnv; _jimageview: JObject): jObject;
 procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; var _items: TDynArrayOfString); overload;
 procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: array of string); overload;
 
@@ -473,7 +466,6 @@ procedure jListView_ClearChecked(env: PJNIEnv; _jlistview: JObject ); // by tr3e
 function  jListView_GetItemsChecked(env: PJNIEnv; _jlistview: JObject): integer; // by tr3e
 procedure jListView_SetItemChecked(env: PJNIEnv; _jlistview: JObject; _index: integer; _value: boolean);
 function jListView_GetCheckedItemPosition(env: PJNIEnv; _jlistview: JObject): integer;
-Procedure jListView_RemoveFromViewParent(env:PJNIEnv; _jlistview: jObject);
 procedure jListView_SetFitsSystemWindows(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 procedure jListView_SetVisibilityGone(env: PJNIEnv; _jlistview: JObject);
 procedure jListView_SaveToFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string);
@@ -494,9 +486,6 @@ function  jScrollView_jCreate(env: PJNIEnv;_Self: int64; _innerLayout: integer; 
 
 Procedure jScrollView_setScrollSize    (env:PJNIEnv;
                                         ScrollView : jObject; size : integer);
-
-Function  jScrollView_getView          (env:PJNIEnv;
-                                        ScrollView : jObject) : jObject;
 
 //thanks to DonAlfredo
 Procedure jScrollView_setFillViewport  (env:PJNIEnv; ScrollView : jObject; fillenabled : boolean);
@@ -529,10 +518,7 @@ procedure jScrollView_Clear(env: PJNIEnv; _jscrollview: JObject);
 { jPanel }
 Function  jPanel_Create           (env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 
-Function  jPanel_getView          (env:PJNIEnv;
-                                        Panel : jObject) : jObject;
 Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject); //clearLayoutAll !!
-Procedure jPanel_RemoveParent(env:PJNIEnv; Panel : jObject);
 procedure jPanel_SetMinZoomFactor(env: PJNIEnv; _jpanel: JObject; _minZoomFactor: single);
 procedure jPanel_SetMaxZoomFactor(env: PJNIEnv; _jpanel: JObject; _maxZoomFactor: single);
 procedure jPanel_CenterInParent(env: PJNIEnv; _jpanel: JObject);
@@ -542,7 +528,6 @@ procedure jPanel_SetRoundCorner(env: PJNIEnv; _jpanel: JObject);
 procedure jPanel_SetRadiusRoundCorner(env: PJNIEnv; _jpanel: JObject; _radius: integer);
 procedure jPanel_SetBackgroundAlpha(env: PJNIEnv; _jpanel: JObject; _alpha: integer);
 procedure jPanel_SetMarginLeftTopRightBottom(env: PJNIEnv; _jpanel: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer);
-function jPanel_GetParent(env: PJNIEnv; _jpanel: JObject): jObject;
 procedure jPanel_AddView(env: PJNIEnv; _jpanel: JObject; _view: jObject);
 procedure jPanel_SetFitsSystemWindows(env: PJNIEnv; _jpanel: JObject; _value: boolean);
 procedure jPanel_RemoveView(env: PJNIEnv; _jpanel: JObject; _view: jObject);
@@ -560,10 +545,6 @@ function jHorizontalScrollView_jCreate(env: PJNIEnv;_Self: int64; _innerLayout: 
 
 Procedure jHorizontalScrollView_setScrollSize (env:PJNIEnv;
                                                ScrollView : jObject; size : integer);
-
-Function  jHorizontalScrollView_getView       (env:PJNIEnv;
-                                               ScrollView : jObject) : jObject;
-
 
 procedure jHorizontalScrollView_ScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
 procedure jHorizontalScrollView_SmoothScrollTo(env: PJNIEnv; _jhorizontalscrollview: JObject; _x: integer; _y: integer);
@@ -818,7 +799,6 @@ Procedure jImageBtn_setButtonUpByRes       (env:PJNIEnv;
                                         ImageBtn : jObject; imgResIdentifief: String);
 Procedure jImageBtn_SetEnabled         (env:PJNIEnv;
                                         ImageBtn : jObject; Active : Boolean);
-procedure jImageBtn_RemoveFromViewParent(env: PJNIEnv; ImageBtn: JObject);
 procedure jImageBtn_SetSleepDown(env: PJNIEnv; _jimagebtn: JObject; _sleepMiliSeconds: integer);
 procedure jImageBtn_SetImageState(env: PJNIEnv; _jimagebtn: JObject; _state: integer);
 
@@ -898,10 +878,6 @@ procedure jSqliteDataAccess_ExecSQLBatchAsync(env: PJNIEnv; _jsqlitedataaccess: 
 
 function jDBListView_jCreate(env: PJNIEnv; _Self: int64; this: JObject): jObject;
 
-function jDBListView_GetView(env: PJNIEnv; _jdblistview: JObject): jObject;
-procedure jDBListView_SetViewParent(env: PJNIEnv; _jdblistview: JObject; _viewgroup: jObject);
-procedure jDBListView_RemoveFromViewParent(env: PJNIEnv; _jdblistview: JObject);
-function jDBListView_GetParent(env: PJNIEnv; _jdblistview: JObject): jObject;
 function jDBListView_GetItemIndex(env: PJNIEnv; _jdblistview: JObject): integer;
 procedure jDBListView_SetSelection(env: PJNIEnv; _jdblistview: JObject; _index: integer);
 procedure jDBListView_SetFontSize(env: PJNIEnv; _jdblistview: JObject; _size: integer);
@@ -931,7 +907,6 @@ function jHttpClient_GetCookiesCount(env: PJNIEnv; _jhttpclient: JObject): integ
 function jHttpClient_GetCookieByIndex(env: PJNIEnv; _jhttpclient: JObject; _index: integer): jObject;
 function jHttpClient_GetCookieAttributeValue(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject; _attribute: string): string;
 procedure jHttpClient_ClearCookieStore(env: PJNIEnv; _jhttpclient: JObject);
-procedure jHttpClient_trustAllCertificates(env: PJNIEnv; _jhttpclient: JObject);
 function jHttpClient_AddCookie(env: PJNIEnv; _jhttpclient: JObject; _name: string; _value: string): jObject;  overload;
 function jHttpClient_IsExpired(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): boolean;
 function jHttpClient_IsCookiePersistent(env: PJNIEnv; _jhttpclient: JObject; _cookie: jObject): boolean;
@@ -1668,17 +1643,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'WrapParent', '()V');
   env^.CallVoidMethod(env, _jtextview, jMethod);
   env^.DeleteLocalRef(env, jCls);
-end;
-
-Procedure jTextView_RemoveFromViewParent(env:PJNIEnv; _jtextview: jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, _jtextview);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
- env^.CallVoidMethod(env,_jtextview,_jMethod);
- env^.DeleteLocalRef(env, cls);
 end;
 
 procedure jTextView_SetAllCaps(env: PJNIEnv; _jtextview: JObject; _value: boolean);
@@ -2486,17 +2450,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jEditText_RemoveFromViewParent(env:PJNIEnv; _jedittext: jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, _jedittext);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
- env^.CallVoidMethod(env,_jedittext,_jMethod);
- env^.DeleteLocalRef(env, cls);
-end;
-
 procedure jEditText_SetSoftInputShownOnFocus(env: PJNIEnv; _jedittext: JObject; _show: boolean);
 var
   jParams: array[0..0] of jValue;
@@ -2834,17 +2787,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jButton_RemoveFromViewParent(env:PJNIEnv; _jbutton: jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, _jbutton);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
- env^.CallVoidMethod(env,_jbutton,_jMethod);
- env^.DeleteLocalRef(env, cls);
-end;
-
 procedure jButton_SetFocus(env: PJNIEnv; _jbutton: JObject);
 var
   jMethod: jMethodID=nil;
@@ -3021,17 +2963,6 @@ env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jCheckBox_RemoveFromViewParent(env:PJNIEnv; _jcheckbox: jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, _jcheckbox);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
- env^.CallVoidMethod(env,_jcheckbox,_jMethod);
- env^.DeleteLocalRef(env, cls);
-end;
-
 //------------------------------------------------------------------------------
 // RadioButton
 //------------------------------------------------------------------------------
@@ -3194,17 +3125,6 @@ begin
   env^.CallVoidMethodA(env, _jradiobutton, jMethod, @jParams);
 env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
-end;
-
-Procedure jRadioButton_RemoveFromViewParent(env:PJNIEnv; _jradiobutton: jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, _jradiobutton);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
- env^.CallVoidMethod(env,_jradiobutton,_jMethod);
- env^.DeleteLocalRef(env, cls);
 end;
 
 //------------------------------------------------------------------------------
@@ -3569,17 +3489,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jImageView_RemoveFromViewParent(env:PJNIEnv; _jimageview: jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, _jimageview);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
- env^.CallVoidMethod(env,_jimageview,_jMethod);
- env^.DeleteLocalRef(env, cls);
-end;
-
 procedure jImageView_SetVisibilityGone(env: PJNIEnv; _jimageview: JObject);
 var
   jMethod: jMethodID=nil;
@@ -3673,17 +3582,6 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SaveToFile', '(Ljava/lang/String;)V');
   env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jImageView_GetView(env: PJNIEnv; _jimageview: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jimageview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jimageview, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -4902,17 +4800,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-Procedure jListView_RemoveFromViewParent(env:PJNIEnv; _jlistview: jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, _jlistview);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
- env^.CallVoidMethod(env,_jlistview,_jMethod);
- env^.DeleteLocalRef(env, cls);
-end;
-
 procedure jListView_SetFitsSystemWindows(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 var
   jParams: array[0..0] of jValue;
@@ -5126,19 +5013,6 @@ Procedure jScrollView_setScrollSize(env:PJNIEnv;
     cls := env^.GetObjectClass(env, ScrollView);
  _jMethod:= env^.GetMethodID(env, cls, 'setScrollSize', '(I)V');
   env^.CallVoidMethodA(env,ScrollView,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
- end;
-
-//
-Function jScrollView_getView(env:PJNIEnv;
-                             ScrollView : jObject) : jObject;
- var
-  _jMethod : jMethodID = nil;
-  cls: jClass;
- begin
-   cls := env^.GetObjectClass(env, ScrollView);
- _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/view/ViewGroup;'); //Landroid/widget/RelativeLayout;
-  Result := env^.CallObjectMethod(env,ScrollView,_jMethod);
   env^.DeleteLocalRef(env, cls);
  end;
 
@@ -5518,19 +5392,6 @@ begin
 end;
 
 //by jmpessoa
-Function jPanel_getView(env:PJNIEnv;
-                             Panel : jObject) : jObject;
-var
-  _jMethod : jMethodID = nil;
-   cls: jClass;
- begin
-   cls := env^.GetObjectClass(env, Panel);
-   _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/widget/RelativeLayout;');
-  Result := env^.CallObjectMethod(env,Panel,_jMethod);
-  env^.DeleteLocalRef(env, cls);
- end;
-
-//by jmpessoa
 Procedure jPanel_resetLParamsRules(env:PJNIEnv; Panel : jObject);  //clearLayoutAll !!
 var
  _jMethod : jMethodID = nil;
@@ -5538,17 +5399,6 @@ var
 begin
    cls := env^.GetObjectClass(env, Panel);
  _jMethod:= env^.GetMethodID(env, cls, 'resetLParamsRules', '()V');
- env^.CallVoidMethod(env,Panel,_jMethod);
- env^.DeleteLocalRef(env, cls);
-end;
-
-Procedure jPanel_RemoveParent(env:PJNIEnv; Panel : jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, Panel);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
  env^.CallVoidMethod(env,Panel,_jMethod);
  env^.DeleteLocalRef(env, cls);
 end;
@@ -5665,17 +5515,6 @@ begin
   jCls:= env^.GetObjectClass(env, _jpanel);
   jMethod:= env^.GetMethodID(env, jCls, 'SetMarginLeftTopRightBottom', '(IIII)V');
   env^.CallVoidMethodA(env, _jpanel, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jPanel_GetParent(env: PJNIEnv; _jpanel: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jpanel);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-  Result:= env^.CallObjectMethod(env, _jpanel, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -5838,19 +5677,6 @@ var
   cls := env^.GetObjectClass(env, ScrollView);
  _jMethod:= env^.GetMethodID(env, cls, 'setScrollSize', '(I)V');
   env^.CallVoidMethodA(env,ScrollView,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
- end;
-
-//
-Function jHorizontalScrollView_getView(env:PJNIEnv;
-                                       ScrollView : jObject) : jObject;
-var
-  _jMethod : jMethodID = nil;
-  cls: jClass;
- begin
-  cls := env^.GetObjectClass(env, ScrollView);
- _jMethod:= env^.GetMethodID(env, cls, 'getView', '()Landroid/view/ViewGroup;'); //Landroid/widget/RelativeLayout;
-  Result := env^.CallObjectMethod(env,ScrollView,_jMethod);
   env^.DeleteLocalRef(env, cls);
  end;
 
@@ -8559,17 +8385,6 @@ var
   env^.DeleteLocalRef(env, cls);
  end;
 
-Procedure jImageBtn_RemoveFromViewParent(env:PJNIEnv; ImageBtn: jObject);
-var
- _jMethod : jMethodID = nil;
- cls: jClass;
-begin
- cls := env^.GetObjectClass(env, ImageBtn);
-_jMethod:= env^.GetMethodID(env, cls, 'RemoveFromViewParent', '()V');
- env^.CallVoidMethod(env,ImageBtn,_jMethod);
- env^.DeleteLocalRef(env, cls);
-end;
-
 procedure jImageBtn_SetSleepDown(env: PJNIEnv; _jimagebtn: JObject; _sleepMiliSeconds: integer);
 var
   jParams: array[0..0] of jValue;
@@ -9504,55 +9319,6 @@ end;
    *)
 
 
-   function jDBListView_GetView(env: PJNIEnv; _jdblistview: JObject): jObject;
-   var
-     jMethod: jMethodID = nil;
-     jCls: jClass = nil;
-   begin
-     jCls := env^.GetObjectClass(env, _jdblistview);
-     jMethod := env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-     Result := env^.CallObjectMethod(env, _jdblistview, jMethod);
-     env^.DeleteLocalRef(env, jCls);
-   end;
-
-
-   procedure jDBListView_SetViewParent(env: PJNIEnv; _jdblistview: JObject; _viewgroup: jObject);
-   var
-     jParams: array[0..0] of jValue;
-     jMethod: jMethodID = nil;
-     jCls: jClass = nil;
-   begin
-     jParams[0].l := _viewgroup;
-     jCls := env^.GetObjectClass(env, _jdblistview);
-     jMethod := env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-     env^.CallVoidMethodA(env, _jdblistview, jMethod, @jParams);
-     env^.DeleteLocalRef(env, jCls);
-   end;
-
-
-   procedure jDBListView_RemoveFromViewParent(env: PJNIEnv; _jdblistview: JObject);
-   var
-     jMethod: jMethodID = nil;
-     jCls: jClass = nil;
-   begin
-     jCls := env^.GetObjectClass(env, _jdblistview);
-     jMethod := env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-     env^.CallVoidMethod(env, _jdblistview, jMethod);
-     env^.DeleteLocalRef(env, jCls);
-   end;
-
-
-   function jDBListView_GetParent(env: PJNIEnv; _jdblistview: JObject): jObject;
-   var
-     jMethod: jMethodID = nil;
-     jCls: jClass = nil;
-   begin
-     jCls := env^.GetObjectClass(env, _jdblistview);
-     jMethod := env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-     Result := env^.CallObjectMethod(env, _jdblistview, jMethod);
-     env^.DeleteLocalRef(env, jCls);
-   end;
-
    //procedure jDBListView_UpdateView(env: PJNIEnv; _jdblistview: JObject);
    //var
    //  jMethod: jMethodID = nil;
@@ -9977,17 +9743,6 @@ var
 begin
   jCls:= env^.GetObjectClass(env, _jhttpclient);
   jMethod:= env^.GetMethodID(env, jCls, 'ClearCookieStore', '()V');
-  env^.CallVoidMethod(env, _jhttpclient, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jHttpClient_trustAllCertificates(env: PJNIEnv; _jhttpclient: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jhttpclient);
-  jMethod:= env^.GetMethodID(env, jCls, 'trustAllCertificates', '()V');
   env^.CallVoidMethod(env, _jhttpclient, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;

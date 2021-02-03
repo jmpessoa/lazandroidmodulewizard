@@ -1390,7 +1390,7 @@ begin
 
    if FjObject = nil then exit;
 
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 

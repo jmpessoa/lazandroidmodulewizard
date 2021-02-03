@@ -30,13 +30,13 @@ begin
  if FParent is jScrollView then
  begin
    if not jVisualControl(FParent).Initialized then jScrollView(FParent).Init(refApp);
-   FjPRLayout:= jScrollView_getView(FjEnv, jScrollView(FParent).jSelf);
+   FjPRLayout:= View_GetViewGroup(FjEnv, jScrollView(FParent).jSelf);
    Result:= True;
  end else
  if FParent is jHorizontalScrollView then
  begin
    if not jVisualControl(FParent).Initialized then jHorizontalScrollView(FParent).Init(refApp);
-   FjPRLayout:= jHorizontalScrollView_getView(FjEnv, jHorizontalScrollView(FParent).jSelf);
+   FjPRLayout:= View_GetViewGroup(FjEnv, jHorizontalScrollView(FParent).jSelf);
    Result:= True;
  end  else
  if FParent is jCustomDialog then

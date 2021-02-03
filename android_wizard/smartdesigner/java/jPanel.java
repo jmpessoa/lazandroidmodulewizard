@@ -110,7 +110,7 @@ public class jPanel extends RelativeLayout {
 	}
 
 	//GetView!-android.widget.RelativeLayout
-	public  RelativeLayout getView() {
+	public  RelativeLayout GetView() {
 		return this;
 	}
 

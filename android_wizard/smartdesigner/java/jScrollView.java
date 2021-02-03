@@ -93,7 +93,7 @@ public class jScrollView extends ScrollView {
         scrollview.setLayoutParams(scrollxywh);
     }
 
-    public ViewGroup getView() {
+    public ViewGroup GetView() {
         return (scrollview);
     }
 

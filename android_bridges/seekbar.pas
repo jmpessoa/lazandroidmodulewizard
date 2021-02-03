@@ -83,7 +83,6 @@ jSeekBar = class(jVisualControl)
 end;
 
 function jSeekBar_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-function jSeekBar_GetView(env: PJNIEnv; _jseekbar: JObject): jObject;
 
 implementation
 
@@ -256,7 +255,7 @@ function jSeekBar.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSeekBar_GetView(FjEnv, FjObject);
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 procedure jSeekBar.SetLParamWidth(_w: integer);
@@ -434,17 +433,5 @@ end;
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-
-function jSeekBar_GetView(env: PJNIEnv; _jseekbar: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jseekbar);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jseekbar, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 end.

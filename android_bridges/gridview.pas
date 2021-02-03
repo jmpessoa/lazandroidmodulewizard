@@ -155,23 +155,6 @@ type
 //procedure GridView_Log ( test : string; text1 : string = ''; value1 : integer = 0 );
 
 function jGridView_jCreate(env: PJNIEnv; _Self: int64; this: jObject): jObject;
-procedure jGridView_jFree(env: PJNIEnv; _jgridview: JObject);
-procedure jGridView_SetViewParent(env: PJNIEnv; _jgridview: JObject;
-  _viewgroup: jObject);
-procedure jGridView_RemoveFromViewParent(env: PJNIEnv; _jgridview: JObject);
-function jGridView_GetView(env: PJNIEnv; _jgridview: JObject): jObject;
-procedure jGridView_SetLParamWidth(env: PJNIEnv; _jgridview: JObject; _w: integer);
-procedure jGridView_SetLParamHeight(env: PJNIEnv; _jgridview: JObject; _h: integer);
-procedure jGridView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv;
-  _jgridview: JObject; _left: integer; _top: integer; _right: integer;
-  _bottom: integer; _w: integer; _h: integer);
-procedure jGridView_AddLParamsAnchorRule(env: PJNIEnv; _jgridview: JObject;
-  _rule: integer);
-procedure jGridView_AddLParamsParentRule(env: PJNIEnv; _jgridview: JObject;
-  _rule: integer);
-procedure jGridView_SetLayoutAll(env: PJNIEnv; _jgridview: JObject; _idAnchor: integer);
-procedure jGridView_ClearLayoutAll(env: PJNIEnv; _jgridview: JObject);
-procedure jGridView_SetId(env: PJNIEnv; _jgridview: JObject; _id: integer);
 procedure jGridView_Add(env: PJNIEnv; _jgridview: JObject; _item: string;
   _imgIdentifier: string);
 procedure jGridView_SetNumColumns(env: PJNIEnv; _jgridview: JObject; _value: integer);
@@ -267,11 +250,11 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jGridView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jGridView_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  jGridView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -280,14 +263,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jGridView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jGridView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
   if Self.Anchor <> nil then
@@ -295,7 +278,7 @@ begin
   else
     Self.AnchorId := -1; //dummy
 
-  jGridView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -433,7 +416,7 @@ procedure jGridView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_jFree(FjEnv, FjObject);
+    jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jGridView.SetViewParent(_viewgroup: jObject);
@@ -441,35 +424,35 @@ begin
   inherited SetViewParent(_viewgroup);
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetViewParent(FjEnv, FjObject, _viewgroup);
+    View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 procedure jGridView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_RemoveFromViewParent(FjEnv, FjObject);
+    View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jGridView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jGridView_GetView(FjEnv, FjObject);
+    Result := View_GetView(FjEnv, FjObject);
 end;
 
 procedure jGridView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetLParamWidth(FjEnv, FjObject, _w);
+    View_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jGridView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetLParamHeight(FjEnv, FjObject, _h);
+    View_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 procedure jGridView.SetLeftTopRightBottomWidthHeight(_left: integer;
@@ -477,7 +460,7 @@ procedure jGridView.SetLeftTopRightBottomWidthHeight(_left: integer;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+    View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
       _left, _top, _right, _bottom, _w, _h);
 end;
 
@@ -485,21 +468,21 @@ procedure jGridView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+    View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jGridView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+    View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jGridView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+    View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jGridView.ClearLayout();
@@ -510,15 +493,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jGridView_clearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jGridView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jGridView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+          View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -1000,175 +983,6 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-
-procedure jGridView_jFree(env: PJNIEnv; _jgridview: JObject);
-var
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jgridview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetViewParent(env: PJNIEnv; _jgridview: JObject;
-  _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].l := _viewgroup;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_RemoveFromViewParent(env: PJNIEnv; _jgridview: JObject);
-var
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jgridview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jGridView_GetView(env: PJNIEnv; _jgridview: JObject): jObject;
-var
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result := env^.CallObjectMethod(env, _jgridview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetLParamWidth(env: PJNIEnv; _jgridview: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _w;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetLParamHeight(env: PJNIEnv; _jgridview: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _h;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv;
-  _jgridview: JObject; _left: integer; _top: integer; _right: integer;
-  _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _left;
-  jParams[1].i := _top;
-  jParams[2].i := _right;
-  jParams[3].i := _bottom;
-  jParams[4].i := _w;
-  jParams[5].i := _h;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_AddLParamsAnchorRule(env: PJNIEnv; _jgridview: JObject;
-  _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _rule;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_AddLParamsParentRule(env: PJNIEnv; _jgridview: JObject;
-  _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _rule;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetLayoutAll(env: PJNIEnv; _jgridview: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _idAnchor;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_ClearLayoutAll(env: PJNIEnv; _jgridview: JObject);
-var
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jgridview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetId(env: PJNIEnv; _jgridview: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _id;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 procedure jGridView_Add(env: PJNIEnv; _jgridview: JObject; _item: string;
   _imgIdentifier: string);

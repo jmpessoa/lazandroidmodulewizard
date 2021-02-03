@@ -137,7 +137,7 @@ begin
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
-   SetViewParent(FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_Setid(FjEnv, FjObject, Self.Id);
   end;
 
