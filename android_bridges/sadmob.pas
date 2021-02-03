@@ -318,21 +318,21 @@ procedure jsAdMob.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_vig(FjEnv, FjObject, 'SetViewParent', _viewgroup);
+     View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 function jsAdMob.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_vig(FjEnv, FjObject, 'GetParent');
+   Result:= View_GetParent(FjEnv, FjObject);
 end;
 
 procedure jsAdMob.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jsAdMob.AdMobBannerSetSize(_whBannerSize: TAdMobBannerSize);
@@ -434,7 +434,7 @@ function jsAdMob.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_viw(FjEnv, FjObject, 'GetView');
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 procedure jsAdMob.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);

@@ -381,56 +381,56 @@ procedure jsRecyclerView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_vig(FjEnv, FjObject, 'SetViewParent', _viewgroup);
+     View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 function jsRecyclerView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_vig(FjEnv, FjObject, 'GetParent');
+   Result:= View_GetParent(FjEnv, FjObject);
 end;
 
 procedure jsRecyclerView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jsRecyclerView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_viw(FjEnv, FjObject, 'GetView');
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 procedure jsRecyclerView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLParamWidth', _w);
+     View_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jsRecyclerView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLParamHeight', _h);
+     View_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 function jsRecyclerView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamWidth');
+   Result:= View_GetLParamWidth(FjEnv, FjObject);
 end;
 
 function jsRecyclerView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamHeight');
+   Result:= View_GetLParamHeight(FjEnv, FjObject);
 end;
 
 procedure jsRecyclerView.SetLGravity(_gravity: TLayoutGravity);
@@ -438,14 +438,14 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'SetLGravity', Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jsRecyclerView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_f(FjEnv, FjObject, 'SetLWeight', _w);
+     View_SetLWeight(FjEnv, FjObject, _w);
 end;
 
 procedure jsRecyclerView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
@@ -459,21 +459,21 @@ procedure jsRecyclerView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsAnchorRule', _rule);
+     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jsRecyclerView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'AddLParamsParentRule', _rule);
+     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jsRecyclerView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'SetLayoutAll', _idAnchor);
+     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jsRecyclerView.ClearLayout();
@@ -484,7 +484,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc(FjEnv, FjObject, 'ClearLayoutAll');
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then

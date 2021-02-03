@@ -213,7 +213,7 @@ type
      procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
      procedure SetMarginLeftTopRightBottom(_left,_top,_right,_bottom: integer);
      procedure SetViewParent(Value: jObject); override;
-     function GetViewParent(): jObject; override;
+     function  GetViewParent(): jObject; override;
      procedure ResetViewParent(); override;
      //procedure AddView(_view: jObject);
      procedure SetFitsSystemWindows(_value: boolean);
@@ -4242,7 +4242,7 @@ begin
    if FGravityInParent <> lgNone then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
@@ -4309,20 +4309,20 @@ procedure jTextView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jTextView.RemoveFromViewParent;
 begin
   if FInitialized then
-     jTextView_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jTextView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jTextView.SetColor(Value: TARGBColorBridge);
@@ -4745,7 +4745,7 @@ begin
    if FGravityInParent <> lgNone then
     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
@@ -4851,20 +4851,20 @@ Procedure jEditText.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jEditText.RemoveFromViewParent;
 begin
 if FInitialized then
-   jEditText_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jEditText.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jEditText.setColor(Value: TARGBColorBridge);
@@ -5514,7 +5514,7 @@ begin
    if FGravityInParent <> lgNone then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
@@ -5577,20 +5577,20 @@ procedure jButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jButton.RemoveFromViewParent;
 begin
 if FInitialized then
-   jButton_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jButton.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jButton.SetAllCaps(AValue: Boolean);
@@ -5872,7 +5872,7 @@ begin
    if FGravityInParent <> lgNone then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -5928,13 +5928,13 @@ Procedure jCheckBox.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jCheckBox.RemoveFromViewParent;
 begin
 if FInitialized then
-   jCheckBox_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 Procedure jCheckBox.SetColor(Value: TARGBColorBridge);
@@ -6131,7 +6131,7 @@ begin
    if FGravityInParent <> lgNone then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetParent(FjEnv, FjObject, FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
@@ -6189,13 +6189,13 @@ Procedure jRadioButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv, FjObject, FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jRadioButton.RemoveFromViewParent;
 begin
 if FInitialized then
-   jRadioButton_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 Procedure jRadioButton.SetColor(Value: TARGBColorBridge);
@@ -6389,7 +6389,7 @@ begin
    if FGravityInParent <> lgNone then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -6435,7 +6435,7 @@ Procedure jProgressBar.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject , FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jProgressBar.RemoveFromViewParent;
@@ -6627,7 +6627,7 @@ begin
    if FGravityInParent <> lgNone then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetParent(FjEnv,FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv,FjObject , FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -6699,26 +6699,26 @@ procedure jImageView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv,FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv,FjObject , FjPRLayout);
 end;
 
 procedure jImageView.RemoveFromViewParent;
 begin
 if FInitialized then
-   jImageView_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jImageView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 function jImageView.GetView(): jObject;
 begin
  if FInitialized then
-   Result:= jImageView_GetView(FjEnv, FjObject);
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 Procedure jImageView.SetColor(Value: TARGBColorBridge);
@@ -7585,7 +7585,7 @@ procedure jHttpClient.trustAllCertificates();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_trustAllCertificates(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'trustAllCertificates');
 end;
 
 function jHttpClient.AddCookie(_name: string; _value: string): jObject;
@@ -8344,7 +8344,7 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
    View_setId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -8487,20 +8487,20 @@ procedure jListView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jListView.RemoveFromViewParent;
 begin
  if FInitialized then
-   jListView_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jListView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jListView.SetColor (Value: TARGBColorBridge);
@@ -9402,7 +9402,7 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -9449,7 +9449,7 @@ procedure jScrollView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jScrollView.RemoveFromViewParent;
@@ -9461,7 +9461,7 @@ end;
 function jScrollView.GetView: jObject;
 begin
     if FInitialized then
-       Result:= jScrollView_getView(FjEnv, FjObject);
+       Result:= View_GetViewGroup(FjEnv, FjObject);
 end;
 
 procedure jScrollView.SetColor(Value: TARGBColorBridge);
@@ -9802,7 +9802,7 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -9846,7 +9846,7 @@ procedure jHorizontalScrollView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jHorizontalScrollView.RemoveFromViewParent;
@@ -9880,7 +9880,7 @@ end;
 function jHorizontalScrollView.GetView: jObject;
 begin
     if FInitialized then
-       Result:= jHorizontalScrollView_getView(FjEnv, FjObject);
+       Result:= View_GetViewGroup(FjEnv, FjObject);
 end;
 
 procedure jHorizontalScrollView.SetColor(Value: TARGBColorBridge);
@@ -10181,7 +10181,7 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -10229,7 +10229,7 @@ procedure jWebView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jWebView.RemoveFromViewParent;
@@ -11628,7 +11628,7 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetParent(FjEnv,FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv,FjObject , FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -11671,7 +11671,7 @@ procedure jView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetParent(FjEnv,FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv,FjObject , FjPRLayout);
 end;
 
 procedure jView.RemoveFromViewParent;
@@ -11836,7 +11836,7 @@ end;
 procedure jView.BringToFront;
 begin
   if FInitialized then
-    View_BringToFront(FjEnv, FjObject);
+   View_BringToFront( FjEnv, FjObject);
 end;
 
 //------------------------------------------------------------------------------
@@ -12173,7 +12173,7 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -12244,13 +12244,13 @@ procedure jImageBtn.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject , FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jImageBtn.RemoveFromViewParent;
 begin
  if FInitialized then
-   jImageBtn_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 // by ADiV
@@ -13426,7 +13426,7 @@ begin
 
     FjPRLayoutHome:= FjPRLayout;
 
-    View_SetParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
     View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
@@ -13605,20 +13605,20 @@ procedure jPanel.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
 end;
 
 procedure jPanel.RemoveFromViewParent;
 begin
 if FInitialized then
-   jPanel_RemoveParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 procedure jPanel.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
 end;
 
 procedure jPanel.RemoveView(_view: jObject);
@@ -13816,7 +13816,7 @@ function jPanel.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPanel_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(FjEnv, FjObject);
 end;
 
 (*
@@ -13926,7 +13926,7 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_setId(FjEnv, FjObject, Self.Id);
   end;
 
@@ -14114,7 +14114,7 @@ function jDBListView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jDBListView_GetView(FjEnv, FjObject);
+    Result := View_GetView(FjEnv, FjObject);
 end;
 
 procedure jDBListView.SetViewParent(_viewgroup: jObject);
@@ -14122,21 +14122,21 @@ begin
   //in designing component state: set value here...
   FjPRLayout:= _viewgroup;
   if FInitialized then
-    jDBListView_SetViewParent(FjEnv, FjObject, _viewgroup);
+    View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 procedure jDBListView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_RemoveFromViewParent(FjEnv, FjObject);
+    View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jDBListView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jDBListView_GetParent(FjEnv, FjObject);
+    Result := View_GetParent(FjEnv, FjObject);
 end;
 
 procedure jDBListView.SetLParamWidth(_w: integer);

@@ -49,7 +49,6 @@ jAnalogClock = class(jVisualControl)
 end;
 
 function jAnalogClock_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-function jAnalogClock_GetView(env: PJNIEnv; _janalogclock: JObject): jObject;
 
 
 implementation
@@ -213,7 +212,7 @@ function jAnalogClock.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAnalogClock_GetView(FjEnv, FjObject);
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 procedure jAnalogClock.SetLParamWidth(_w: integer);
@@ -310,17 +309,6 @@ end;
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-function jAnalogClock_GetView(env: PJNIEnv; _janalogclock: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _janalogclock);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _janalogclock, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 
 end.

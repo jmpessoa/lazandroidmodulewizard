@@ -1805,7 +1805,6 @@ procedure View_AddLParamsParentRule   (env:PJNIEnv; _jobject : jObject; rule: DW
 procedure View_AddLParamsAnchorRule   (env:PJNIEnv; _jobject : jObject; rule: DWord);
 procedure View_SetLGravity            (env: PJNIEnv; _jobject: JObject; _value: integer);
 procedure View_SetLWeight             (env: PJNIEnv; _jobject: JObject; _w: single);
-procedure View_SetParent              (env:PJNIEnv; _jobject : jObject; ViewGroup : jObject);
 procedure View_SetVisible             (env:PJNIEnv;this:jobject; view : jObject; visible : Boolean); overload;
 
 procedure View_SetLParamHeight        (env:PJNIEnv; _jobject : jObject; h: DWord);
@@ -1819,6 +1818,10 @@ procedure View_ClearLayoutAll         (env: PJNIEnv; _jobject : JObject);
 
 procedure View_SetVisible             (env:PJNIEnv; view: jObject; visible : Boolean); overload;
 function  View_GetVisible             (env:PJNIEnv; view: jObject): boolean;
+
+function  View_GetView                (env: PJNIEnv; view: JObject): jObject;
+function  View_GetViewGroup           (env: PJNIEnv; view : jObject): jObject;
+function  View_GetParent              (env: PJNIEnv; view: JObject): jObject;
 
 procedure View_SetId                  (env:PJNIEnv; view : jObject; Id :DWord);
 
@@ -6946,19 +6949,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 end;
 
-procedure View_SetParent(env:PJNIEnv; _jobject : jObject; ViewGroup : jObject);
- var
-  _jMethod : jMethodID = nil;
-  _jParams : array[0..0] of jValue;
-  cls: jClass;
- begin
-  _jParams[0].l := ViewGroup;
-  cls := env^.GetObjectClass(env, _jobject);
-  _jMethod:= env^.GetMethodID(env, cls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jobject,_jMethod,@_jParams);
-  env^.DeleteLocalRef(env, cls);
- end;
-
 Procedure View_SetId(env:PJNIEnv; view : jObject; Id :DWord);
 var
   method: jmethodID;
@@ -7149,6 +7139,39 @@ begin
   jCls:= env^.GetObjectClass(env, view);
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
   env^.CallVoidMethod(env, view, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function View_GetView(env: PJNIEnv; view: JObject): jObject;
+var
+     jMethod: jMethodID = nil;
+     jCls: jClass = nil;
+begin
+     jCls := env^.GetObjectClass(env, view);
+     jMethod := env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
+     Result := env^.CallObjectMethod(env, view, jMethod);
+     env^.DeleteLocalRef(env, jCls);
+end;
+
+function View_GetViewGroup(env:PJNIEnv; view : jObject) : jObject;
+var
+  _jMethod : jMethodID = nil;
+  cls: jClass;
+begin
+   cls := env^.GetObjectClass(env, view);
+ _jMethod:= env^.GetMethodID(env, cls, 'GetView', '()Landroid/view/ViewGroup;'); //Landroid/widget/RelativeLayout;
+  Result := env^.CallObjectMethod(env, view,_jMethod);
+  env^.DeleteLocalRef(env, cls);
+end;
+
+function View_GetParent(env: PJNIEnv; view: JObject): jObject;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, view);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
+  Result:= env^.CallObjectMethod(env, view, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 

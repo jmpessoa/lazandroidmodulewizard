@@ -778,7 +778,7 @@ begin
    inherited Init(refApp);
    FjObject  := jGLSurfaceView_Create1(FjEnv, FjThis, Self, cjOpenGLESv1);
 
-   View_SetParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -791,14 +791,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
 
@@ -1141,7 +1141,7 @@ begin
    if sysIsWidthExactToParent(Self) then
     Result := sysGetWidthOfParent(FParent)
    else
-    Result:= jni_func_out_i(FjEnv, FjObject, 'getLParamWidth' );
+    Result:= View_GetLParamWidth(FjEnv, FjObject );
 end;
 
 function jCanvasES1.GetHeight: integer;
@@ -1152,7 +1152,7 @@ begin
    if sysIsHeightExactToParent(Self) then
     Result := sysGetHeightOfParent(FParent)
    else
-    Result:= jni_func_out_i(FjEnv, FjObject, 'getLParamHeight' );
+    Result:= View_GetLParamHeight(FjEnv, FjObject);
 end;
 
 procedure jCanvasES1.ClearLayout();
