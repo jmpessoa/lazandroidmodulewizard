@@ -79,7 +79,7 @@ public class jBluetoothLowEnergy /*extends ...*/ {
     private Handler mLogHandler;
     private Map<String, BluetoothDevice> mScanResults;
 
-    private boolean mConnected;
+    private boolean mConnected = false;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private ScanCallback mScanCallback;
@@ -445,14 +445,12 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                 //BluetoothDevice.BOND_BONDING  //waiting for bonding to complete
                 //BluetoothDevice.BOND_NONE
                 // BluetoothDevice.BOND_BONDED)
-                r = new Runnable() {
-                    @Override
+                //https://stackoverflow.com/questions/1921514/how-to-run-a-runnable-thread-in-android-at-defined-intervals
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     public void run() {
-                        controls.pOnBluetoothLEConnected(pascalObj,mGatt.getDevice().getName(), mGatt.getDevice().getAddress(), mGatt.getDevice().getBondState());
-                        h.postDelayed(this, 5*1000);  //// do the service push update magic!!!
+                        controls.pOnBluetoothLEConnected(pascalObj, mGatt.getDevice().getName(), mGatt.getDevice().getAddress(), mGatt.getDevice().getBondState());
                     }
-                };
-                h.post(r);
+                }, 1000);
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 log("Disconnected from device");
@@ -482,6 +480,7 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                 }
                 serviceStrUuid = service.getUuid().toString();
                 serviceIndex++;
+                /*
                 r = new Runnable() {
                     @Override
                     public void run() {
@@ -490,7 +489,13 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                     }
                 };
                 h.post(r);
-
+                 */
+                //https://stackoverflow.com/questions/1921514/how-to-run-a-runnable-thread-in-android-at-defined-intervals
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    public void run() {
+                        controls.pOnBluetoothLEServiceDiscovered(pascalObj,  serviceIndex,serviceStrUuid, characteristicUUIDArray);
+                    }
+                }, 1000);
             }
         }
 
@@ -536,7 +541,7 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                    mCharacteristicValue = stringBuilder.toString();
                }
             //}
-
+            /*
             r = new Runnable() {
                 @Override
                 public void run() {
@@ -545,6 +550,13 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                 }
             };
             h.post(r);
+            */
+
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                public void run() {
+                    controls.pOnBluetoothLECharacteristicRead(pascalObj, mCharacteristicValue, mGattCharacteristic.toString());
+                }
+            }, 1000);
 
             //characteristic.getStringValue(0);
             //characteristic.getValue()
@@ -593,6 +605,7 @@ public class jBluetoothLowEnergy /*extends ...*/ {
             }
             //}
 
+            /*
             r = new Runnable() {
                 @Override
                 public void run() {
@@ -601,7 +614,12 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                 }
             };
             h.post(r);
-
+            */
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                public void run() {
+                    controls.pOnBluetoothLECharacteristicChanged(pascalObj, mCharacteristicValue, mGattCharacteristic.toString());
+                }
+            }, 1000);
              //characteristic.getStringValue(0)
             //characteristic.getValue()
             //pascal event here
