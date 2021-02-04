@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Controls, ProjectIntf, Forms, AndroidWidget,
   process, math, SourceChanger, propedits;
 
-// tk min and max API versions for build.xml
+//tk min and max API versions for build.xml
 const
   cMinAPI = 10;
   cMaxAPI = 30;
@@ -1385,8 +1385,9 @@ begin
   strList.Free;
 end;
 
+(*
 //http://forum.lazarus.freepascal.org/index.php/topic,39535.0.html
-//by Jurassic Pork
+//by Jurassic Pork     [and fixed]
 function TLamwSmartDesigner.GetGradleVersionFromGradle(path: string): string;
 var
    Proc: TProcess;
@@ -1456,6 +1457,77 @@ begin
       end
       else
         IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Sorry... Fail to find Gradle version from Gradle path ...');
+
+    end;
+end;
+*)
+
+//by af0815
+//https://forum.lazarus.freepascal.org/index.php/topic,53097.0.html
+{
+With this fix, the old behavior is presaved and new behavior is added. I have to test this more.
+A goo idea is, to test gradle first by hand. Because it is possible to get errors from gradle,
+if something is misconfigured. And the you also get no version information.
+a call to gradle have to give a good result in the terminal/commandline first.
+}
+function TLamwSmartDesigner.GetGradleVersionFromGradle(path: string): string;
+var
+   Proc: TProcess;
+   FN: string;
+   CharBuffer: array [0..511] of char;
+   p, ReadCount: integer;
+   strExt, strTemp: string;
+begin
+    Result:='';
+    if path = '' then Exit;
+    strExt:= '';
+    {$IFDEF WINDOWS}
+    strExt:= '.bat';
+    {$ENDIF}
+
+    try
+      Proc := TProcess.Create(nil);
+      Proc.Options := [poUsePipes];
+      //Proc.Options:= Proc.Options + [poWaitOnExit];
+      Proc.Parameters.Add('-v');
+      FN:= AppendPathDelim(path) + 'gradle' + strExt;
+      if not FileExistsUTF8(FN) then begin
+        FN:= AppendPathDelim(path) + 'bin' + pathDelim + 'gradle' + strExt;
+        if not FileExistsUTF8(FN) then begin
+          FN:= path + 'bin' + pathDelim + 'gradle' + strExt;
+        end;
+      end;
+      Proc.Executable:= FN;
+      IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Info...Used expanded Gradle Path: ' + Proc.Executable);
+      Proc.Execute();
+      while (Proc.Running) or (Proc.Output.NumBytesAvailable > 0) or
+        (Proc.Stderr.NumBytesAvailable > 0) do
+      begin
+        // read stdout and write to our stdout
+        while Proc.Output.NumBytesAvailable > 0 do
+        begin
+          ReadCount := Min(512, Proc.Output.NumBytesAvailable); //Read up to buffer, not more
+          Proc.Output.Read(CharBuffer, ReadCount);
+          strTemp:= Copy(CharBuffer, 0, ReadCount);
+          if Pos('Gradle', strTemp) > 0 then
+          begin
+             Result:= Trim(strTemp);
+             break;
+          end;
+        end;
+        application.ProcessMessages;
+      end;
+      ExitCode := Proc.ExitStatus;
+    finally
+      Proc.Free;
+      if Result <> '' then
+      begin
+        p:= Pos(' ', Result);  //Gradle 3.3
+        Result:= Copy(Result, p+1, MaxInt); //3.3
+        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Success!! Found Gradle version: ' + Result);
+      end
+      else
+        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Sorry... Fail to find Gradle version from Gradle path ... Reason:'+ strTemp);
 
     end;
 end;
