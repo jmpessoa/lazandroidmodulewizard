@@ -28,10 +28,10 @@ android {
             universalApk false
         }
     }
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
             minSdkVersion 21
-            targetSdkVersion 28
+            targetSdkVersion 29
             versionCode 1
             versionName "1.0"
     }
@@ -49,6 +49,16 @@ android {
         }
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
+    }
+    buildTypes {
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
+        release {
+            debuggable false
+            jniDebuggable false
+        }
     }
 }
 dependencies {

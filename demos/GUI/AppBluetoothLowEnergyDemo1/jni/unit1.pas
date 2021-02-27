@@ -60,7 +60,7 @@ implementation
 //https://www.allaboutcircuits.com/projects/how-to-communicate-with-a-custom-ble-using-an-android-app/
 //https://code.tutsplus.com/tutorials/how-to-advertise-android-as-a-bluetooth-le-peripheral--cms-25426
 
-//https://github.com/weliem/blessed-android    OTIMO!!!
+//https://github.com/weliem/blessed-android    very good ref!
 //https://developer.android.com/guide/topics/connectivity/bluetooth-le
 //https://medium.com/@martijn.van.welie/making-android-ble-work-part-3-117d3a8aee23
 
@@ -97,7 +97,6 @@ begin
      jBluetoothLowEnergy1.DiscoverServices();
   end  //bsBonding
   else ShowMessage('[bsBonding] waiting for bonding to complete..');
-
 end;
 
 procedure TAndroidModule1.jBluetoothLowEnergy1CharacteristicRead(
@@ -143,14 +142,14 @@ begin
   if serviceUUID = '7D2EA28A-F7BD-485A-BD9D-92AD6ECFE93E' then  //change here!!! put your data here!!
   begin
     jListView2.Clear;
-    jListView2.Add('['+serviceUUID+']');
+    jListView2.Add('['+serviceUUID+']'); //list item index = 0 -->> the service
     jListView2.SetItemTagString(IntToStr(serviceIndex), 0); //save/hidden serviceIndex  for future use...
 
     count:= Length(characteristicUUIDArray);
     for i:= 0 to count-1 do
     begin
-      jListView2.Add(characteristicUUIDArray[i]);
-      jListView2.SetItemTagString(IntToStr(i), i); //save/hidden characteristic index for future use...
+      jListView2.Add(characteristicUUIDArray[i]);  //list item index > 0 -->> service characteristic
+      jListView2.SetItemTagString(IntToStr(i), i+1); //save/hidden characteristic index for future use...
     end;
   end;
 end;
@@ -180,10 +179,15 @@ var
 
   i, count: integer;
 begin
+   if itemIndex =  0 then
+   begin
+      ShowMessage('Please, click item index > 0');
+      Exit;
+   end;
 
    serviceTag:= jListView2.GetItemTagString(0); //retrieve item tag (serviceIndex)
 
-   characteristicTag:= jListView1.GetItemTagString(itemIndex); //retrieve item tag (characteristicIndex)
+   characteristicTag:= jListView2.GetItemTagString(itemIndex); //retrieve item tag (characteristicIndex)
 
    serviceIndex:= StrToInt(serviceTag);
    characteristicIndex:= StrToInt(characteristicTag);
@@ -197,7 +201,7 @@ begin
    end;
 
    characteristicsArray:= jBluetoothLowEnergy1.GetCharacteristics(serviceIndex);
-   count:= Length(descriptorsArray);
+   count:= Length(characteristicsArray);
    for i:= 0 to count-1 do
    begin
      showMessage(characteristicsArray[i]);
@@ -206,8 +210,13 @@ begin
    charactProperty:= jBluetoothLowEnergy1.GetCharacteristicProperties(serviceIndex, characteristicIndex);
    if charactProperty = cpRead then
    begin
+     ShowMessage('Reading characteristic.....[handled by "OnCharacteristicRead"]');
      //handled by "OnCharacteristicRead"
       jBluetoothLowEnergy1.ReadCharacteristic(serviceIndex, characteristicIndex);
+   end
+   else
+   begin
+      ShowMessage('Sorry... You can not read this characteristic....');
    end;
 
 end;

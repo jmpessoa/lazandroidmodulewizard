@@ -480,22 +480,23 @@ public class jBluetoothLowEnergy /*extends ...*/ {
                 }
                 serviceStrUuid = service.getUuid().toString();
                 serviceIndex++;
-                /*
+
                 r = new Runnable() {
                     @Override
                     public void run() {
                         controls.pOnBluetoothLEServiceDiscovered(pascalObj,  serviceIndex,serviceStrUuid, characteristicUUIDArray);
-                        h.postDelayed(this, 5*1000);  //// do the service push update magic!!!
+                        h.postDelayed(this, 5*1000);
                     }
                 };
                 h.post(r);
-                 */
+                /*
                 //https://stackoverflow.com/questions/1921514/how-to-run-a-runnable-thread-in-android-at-defined-intervals
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     public void run() {
                         controls.pOnBluetoothLEServiceDiscovered(pascalObj,  serviceIndex,serviceStrUuid, characteristicUUIDArray);
                     }
                 }, 1000);
+                 */
             }
         }
 

@@ -18,7 +18,7 @@
     <CustomData Count="9">
       <Item0 Name="BuildSystem" Value="Ant"/>
       <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.6"/>
+      <Item2 Name="LamwVersion" Value="0.8.6.1"/>
       <Item3 Name="NdkApi" Value="android-22"/>
       <Item4 Name="NdkPath" Value="C:\android\ndkr18b\"/>
       <Item5 Name="Package" Value="org.lamw.appbluetoothlowenergydemo1"/>
