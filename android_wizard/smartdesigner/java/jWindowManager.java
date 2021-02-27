@@ -204,6 +204,9 @@ public class jWindowManager /*extends ...*/ {
         mParamsX = _x;
         mParamsY = _y;
         if (mParams == null) initParams();
+        //for change the position after construction by Segator
+        mParams.x = mParamsX;
+        mParams.y = mParamsY;
         if (mLayout != null)
             mWindowManager.updateViewLayout(mLayout, mParams);
     }
