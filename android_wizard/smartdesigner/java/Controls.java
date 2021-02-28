@@ -59,6 +59,7 @@ import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -1925,6 +1926,20 @@ class jForm {
 
 	public void MoveTaskToBack(boolean _nonRoot) {   //the "guide line' is try to mimic java Api ...
 		controls.activity.moveTaskToBack(_nonRoot);
+	}
+
+        public void MoveTaskToFront() {
+                ActivityManager am = (ActivityManager) controls.activity.getSystemService(Context.ACTIVITY_SERVICE);
+                //List<RunningTaskInfo> recentTasks = am.getRunningTasks(Integer.MAX_VALUE);
+
+                //for (int i = 0; i < recentTasks.size(); i++){
+
+                  //if (recentTask.get(i).baseActivity.toShortString().indexOf(this.controls.activity.getPackageName()) > -1) {
+
+		      am.moveTaskToFront(controls.activity.getTaskId(), 0);
+
+                  //}
+                //}
 	}
 
 	public void Restart(int _delay) {
