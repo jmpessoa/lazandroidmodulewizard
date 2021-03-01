@@ -28,7 +28,11 @@ procedure Register;
 
 implementation
 
-uses LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf,
+uses
+  {$ifdef Unix}
+  baseunix,
+  {$endif}
+  LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf,
   ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles, LCLType, PackageIntf{, IDEImagesIntf};
 
 procedure SaveShellScript(script: TStringList; const AFileName: string);
@@ -221,7 +225,7 @@ begin
   {$IFDEF Unix}
   auxList.Add('cd '+pathToProject);
   auxList.Add(pathToNdk+'ndk-build V=1 -B');
-  SaveShellScript(auxList, 'pathToProject+'lib'+libname+'-builder.sh');
+  SaveShellScript(auxList, pathToProject+'lib'+libname+'-builder.sh');
   //auxList.SaveToFile(pathToProject+'lib'+libname+'-builder.sh');
   {$Endif}
 
