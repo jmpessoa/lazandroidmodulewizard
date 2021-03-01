@@ -1346,6 +1346,7 @@ type
     procedure MoveToBack();
     //the "guide line' is try to mimic java Api ...
     procedure MoveTaskToBack(_nonRoot: boolean);
+    procedure MoveTaskToFront();
 
     procedure Restart(_delay: integer);
     procedure HideSoftInput(_view: jObject); overload;
@@ -4482,6 +4483,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jForm_MoveTaskToBack(FjEnv, FjObject, _nonRoot);
+end;
+
+procedure jForm.MoveTaskToFront();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'MoveTaskToFront');
 end;
 
 procedure jForm.Restart(_delay: integer);
