@@ -1415,7 +1415,7 @@ begin
           {$ENDIF Windows}
 
           {$IFDEF Unix}
-          hProcAProcessess.Executable := '/bin/sh';
+          AProcess.Executable := '/bin/sh';
           AProcess.Parameters.Add('-c');
           AProcess.Parameters.Add('release-keystore.sh');
           {$ENDIF Unix}
@@ -1448,7 +1448,7 @@ begin
             {$ENDIF Windows}
 
             {$IFDEF Unix}
-            hProcAProcessess.Executable := '/bin/sh';
+            AProcess.Executable := '/bin/sh';
             AProcess.Parameters.Add('-c');
             AProcess.Parameters.Add('gradle-local-universal-apksigner.sh');
             {$ENDIF Unix}
@@ -1462,7 +1462,7 @@ begin
             {$ENDIF Windows}
 
             {$IFDEF Unix}
-            hProcAProcessess.Executable := '/bin/sh';
+            AProcess.Executable := '/bin/sh';
             AProcess.Parameters.Add('-c');
             AProcess.Parameters.Add('gradle-local-apksigner.sh');
             {$ENDIF Unix}
@@ -1489,7 +1489,7 @@ begin
           {$ENDIF Windows}
 
           {$IFDEF Unix}
-          hProcAProcessess.Executable := '/bin/sh';
+          AProcess.Executable := '/bin/sh';
           AProcess.Parameters.Add('-c');
           AProcess.Parameters.Add('ant-build-release.sh');
           {$ENDIF Unix}
@@ -1710,7 +1710,7 @@ begin
             {$ENDIF Windows}
 
             {$IFDEF Unix}
-            hProcAProcessess.Executable := '/bin/sh';
+            AProcess.Executable := '/bin/sh';
             AProcess.Parameters.Add('-c');
             AProcess.Parameters.Add('release-keystore.sh');
             {$ENDIF Unix}
@@ -1781,7 +1781,7 @@ begin
           {$ENDIF Windows}
 
           {$IFDEF Unix}
-          hProcAProcessess.Executable := '/bin/sh';
+          AProcess.Executable := '/bin/sh';
           AProcess.Parameters.Add('-c');
           AProcess.Parameters.Add('gradle-local-build-bundle.sh');
           {$ENDIF Unix}
