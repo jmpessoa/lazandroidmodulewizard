@@ -27,11 +27,12 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.LoadAdError;
+//import android.widget.Toast;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Developed by ADiV for LAMW on 2021-01-25
-// Updated for AdMob 19.3.0
+// Developed by ADiV for LAMW on 2021-03-02
+// Updated for AdMob 19.6.0
 //-------------------------------------------------------------------------
 
 /* Banner sizes:
@@ -312,11 +313,11 @@ public class jsAdMob extends FrameLayout {
 
 	            @Override
 	            public void onAdFailedToLoad(int errorCode) {
-	            	                      
+	            		            		            	                     
 	            	controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_BANNER, errorCode);
-	                /*showToast(String.format("Ad failed to load with error code %d.", errorCode));
+	                //showToast(String.format("Domain: " + errorDomain + " Message: " + errorMessage + " Error: " + adsError.toString()));
 	                
-	                switch(errorCode){
+	                /*switch(errorCode){
 	                 	case AdRequest.ERROR_CODE_INTERNAL_ERROR: showToast("INTERNAL ERROR"); break; 
 	                 	case AdRequest.ERROR_CODE_INVALID_REQUEST: showToast("INVALID REQUEST"); break;
 	                 	case AdRequest.ERROR_CODE_NETWORK_ERROR: showToast("NETWORK ERROR"); break;
@@ -347,14 +348,7 @@ public class jsAdMob extends FrameLayout {
 	            	// Return to Ads
 	                //showToast("Ad closed.");
 	            	controls.pOnAdMobClosed(pascalObj, ADMOB_BANNER);
-	            }
-
-	            @Override
-	            public void onAdLeftApplication() {
-	            	// After click in Ads
-	                //showToast("Ad left application.");
-	            	controls.pOnAdMobLeftApplication(pascalObj, ADMOB_BANNER);
-	            }
+	            }	            
 	        };
         
         if( (admobListener == null) || (bannerLParams == null) ){
@@ -466,13 +460,7 @@ public class jsAdMob extends FrameLayout {
 	        public void onAdClicked() {
 	            // Code to be executed when the user clicks on an ad.
 	        	controls.pOnAdMobClicked(pascalObj, ADMOB_INTER);
-	        }
-
-	        @Override
-	        public void onAdLeftApplication() {
-	            // Code to be executed when the user has left the app.
-	        	controls.pOnAdMobLeftApplication(pascalObj, ADMOB_INTER);
-	        }
+	        }	        
 
 	        @Override
 	        public void onAdClosed() {
