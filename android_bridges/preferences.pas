@@ -26,11 +26,20 @@ jPreferences = class(jControl)
     procedure Init(refApp: jApp); override;
     function jCreate( _IsShared: boolean): jObject;
     procedure jFree();
-    function GetIntData(_key: string; _defaultValue: integer): integer;
+
+    procedure Clear();
+    procedure Remove(_key: string);
+
+    function  GetIntData(_key: string; _defaultValue: integer): integer;
+    function  GetLongData(_key: string; _defaultValue: int64): int64;
+    function  GetFloatData(_key: string; _defaultValue: single): single;
+    function  GetStringData(_key: string; _defaultValue: string): string;
+    function  GetBoolData(_key: string; _defaultValue: boolean): boolean;
+
     procedure SetIntData(_key: string; _value: integer);
-    function GetStringData(_key: string; _defaultValue: string): string;
+    procedure SetLongData(_key: string; _value: int64);
+    procedure SetFloatData(_key: string; _value: single);
     procedure SetStringData(_key: string; _value: string);
-    function GetBoolData(_key: string; _defaultValue: boolean): boolean;
     procedure SetBoolData(_key: string; _value: boolean);
 
  published
@@ -39,13 +48,6 @@ jPreferences = class(jControl)
 end;
 
 function jPreferences_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _IsShared: boolean): jObject;
-procedure jPreferences_jFree(env: PJNIEnv; _jPreferences: JObject);
-function jPreferences_GetIntData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: integer): integer;
-procedure jPreferences_SetIntData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: integer);
-function jPreferences_GetStringData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: string): string;
-procedure jPreferences_SetStringData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: string);
-function jPreferences_GetBoolData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: boolean): boolean;
-procedure jPreferences_SetBoolData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: boolean);
 
 
 implementation
@@ -95,49 +97,91 @@ procedure jPreferences.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_jFree(FjEnv, FjObject );
+     jni_free(FjEnv, FjObject);
 end;
 
 function jPreferences.GetIntData(_key: string; _defaultValue: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetIntData(FjEnv, FjObject , _key ,_defaultValue);
+   Result:= jni_func_ti_out_i(FjEnv, FjObject, 'GetIntData', _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetIntData(_key: string; _value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetIntData(FjEnv, FjObject , _key ,_value);
+     jni_proc_ti(FjEnv, FjObject, 'SetIntData', _key ,_value);
 end;
 
 function jPreferences.GetStringData(_key: string; _defaultValue: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetStringData(FjEnv, FjObject , _key ,_defaultValue);
+   Result := jni_func_tt_out_t(FjEnv, FjObject, 'GetStringData', _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetStringData(_key: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetStringData(FjEnv, FjObject , _key ,_value);
+   jni_proc_tt(FjEnv, FjObject, 'SetStringData', _key ,_value);
 end;
 
 function jPreferences.GetBoolData(_key: string; _defaultValue: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPreferences_GetBoolData(FjEnv, FjObject , _key ,_defaultValue);
+   Result:= jni_func_tz_out_z(FjEnv, FjObject, 'GetBoolData', _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetBoolData(_key: string; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPreferences_SetBoolData(FjEnv, FjObject , _key ,_value);
+   jni_proc_tz(FjEnv, FjObject, 'SetBoolData', _key ,_value);
+end;
+
+function jPreferences.GetLongData(_key: string; _defaultValue: int64): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_tj_out_j(FjEnv, FjObject, 'GetLongData', _key ,_defaultValue);
+end;
+
+procedure jPreferences.SetLongData(_key: string; _value: int64);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_tj(FjEnv, FjObject, 'SetLongData', _key ,_value);
+end;
+
+function jPreferences.GetFloatData(_key: string; _defaultValue: single): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_tf_out_f(FjEnv, FjObject, 'GetFloatData', _key ,_defaultValue);
+end;
+
+procedure jPreferences.SetFloatData(_key: string; _value: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_tf(FjEnv, FjObject, 'SetFloatData', _key ,_value);
+end;
+
+procedure jPreferences.Clear();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'Clear');
+end;
+
+procedure jPreferences.Remove(_key: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_t(FjEnv, FjObject, 'Remove', _key);
 end;
 
 {-------- jPreferences_JNI_Bridge ----------}
@@ -155,138 +199,5 @@ begin
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
-
-(*
-//Please, you need insert:
-
-   public java.lang.Object jPreferences_jCreate(long _Self, boolean _IsShared) {
-      return (java.lang.Object)(new jPreferences(this,_Self,_IsShared));
-   }
-
-//to end of "public class Controls" in "Controls.java"
-*)
-
-
-procedure jPreferences_jFree(env: PJNIEnv; _jPreferences: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jPreferences);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jPreferences, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jPreferences_GetIntData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: integer): integer;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_key));
-  jParams[1].i:= _defaultValue;
-  jCls:= env^.GetObjectClass(env, _jPreferences);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetIntData', '(Ljava/lang/String;I)I');
-  Result:= env^.CallIntMethodA(env, _jPreferences, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jPreferences_SetIntData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_key));
-  jParams[1].i:= _value;
-  jCls:= env^.GetObjectClass(env, _jPreferences);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetIntData', '(Ljava/lang/String;I)V');
-  env^.CallVoidMethodA(env, _jPreferences, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jPreferences_GetStringData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_key));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_defaultValue));
-  jCls:= env^.GetObjectClass(env, _jPreferences);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetStringData', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jPreferences, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jPreferences_SetStringData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_key));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_value));
-  jCls:= env^.GetObjectClass(env, _jPreferences);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetStringData', '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jPreferences, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jPreferences_GetBoolData(env: PJNIEnv; _jPreferences: JObject; _key: string; _defaultValue: boolean): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_key));
-  jParams[1].z:= JBool(_defaultValue);
-  jCls:= env^.GetObjectClass(env, _jPreferences);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetBoolData', '(Ljava/lang/String;Z)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jPreferences, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jPreferences_SetBoolData(env: PJNIEnv; _jPreferences: JObject; _key: string; _value: boolean);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_key));
-  jParams[1].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jPreferences);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetBoolData', '(Ljava/lang/String;Z)V');
-  env^.CallVoidMethodA(env, _jPreferences, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
 
 end.
