@@ -1956,6 +1956,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure jni_proc_iff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer; _float0, _float1:single);
   procedure jni_proc_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: int64);
   procedure jni_proc_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string);
+  procedure jni_proc_tf(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _single: single);
   procedure jni_proc_ti(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0: integer);
   procedure jni_proc_tii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0, _int1: integer);
   procedure jni_proc_tj(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64);
@@ -2016,11 +2017,15 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string): boolean;
   function jni_func_tt_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string): string;
   function jni_func_tz_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool: boolean): int64;
+  function jni_func_tz_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool: boolean): boolean;
   function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
   function jni_func_tiii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0, _int1, _int2: integer): jObject;
-  function jni_func_ti_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): string;
+  function jni_func_ti_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): integer;
+  function jni_func_ti_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): string;
   function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): boolean;
+  function jni_func_tj_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64): int64;
   function jni_func_tj_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64): boolean;
+  function jni_func_tf_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _float: single): single;
   function jni_func_tf_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _float: single): boolean;
   function jni_func_tii_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int1, _int2: integer): boolean;
 
@@ -7665,6 +7670,23 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jni_proc_tf(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                       _str: string; _single: single);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].f:= _single;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;F)V');
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 procedure jni_proc_ti(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                        _str: string; _int0: integer);
 var
@@ -8471,6 +8493,24 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jni_func_tz_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                           _str: string; _bool: boolean): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].z:= JBool(_bool);
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Z)Z');
+  jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+  Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                              _str: string; _int: integer): jObject;
 var
@@ -8483,6 +8523,22 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)Landroid/graphics/Bitmap;');
   Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_ti_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                           _str: string; _int: integer): integer;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].i:= _int;
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)I');
+  Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -8544,6 +8600,24 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jni_func_tj_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str: string; _long: int64): int64;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].j:= _long;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;J)J');
+  Result:= env^.CallLongMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
 function jni_func_tj_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                             _str: string; _long: int64): boolean;
 var
@@ -8559,6 +8633,24 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;J)Z');
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
   Result:= boolean(jBoo);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jni_func_tf_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                            _str: string; _float: single): single;
+var
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].f:= _float;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;F)F');
+  Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -8,7 +8,10 @@ import android.preference.PreferenceManager;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl template*/
 
-//Reviewed by TR3E on 09/02/2019
+//-------------------------------------------------------------------------
+// jPreferences
+// Developed by ADiV for LAMW on 2021-03-03
+//-------------------------------------------------------------------------
 
 public class jPreferences /*extends ...*/ {
 
@@ -26,13 +29,10 @@ public class jPreferences /*extends ...*/ {
        pascalObj = _Self;
        controls  = _ctrls;
        
-       if (_IsShared) { 
-          mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-       }
-       else {
-          mPreferences = _ctrls.activity.getPreferences(Context.MODE_PRIVATE);
-       }
-       
+       if (_IsShared) 
+          mPreferences = PreferenceManager.getDefaultSharedPreferences(context);       
+       else
+          mPreferences = _ctrls.activity.getPreferences(Context.MODE_PRIVATE);             
     }
 
     public void jFree() {
@@ -57,10 +57,50 @@ public class jPreferences /*extends ...*/ {
 		
 		SharedPreferences.Editor edt = mPreferences.edit();
 		
-		if( edt != null ){
-		 edt.putInt(_key, _value);
-		 edt.commit();
-		}
+		if( edt == null ) return;
+		
+		edt.putInt(_key, _value);
+		edt.commit();		
+	}
+	
+	public long GetLongData(String _key, long _defaultValue) {
+		   
+		   if( mPreferences != null )
+			   return mPreferences.getLong(_key, _defaultValue);
+		   else
+			   return _defaultValue;
+		   
+	}
+
+	public void SetLongData(String _key, long _value) {
+			if( mPreferences == null ) return;
+			
+			SharedPreferences.Editor edt = mPreferences.edit();
+			
+			if( edt == null ) return;
+			
+			edt.putLong(_key, _value);
+			edt.commit();			
+	}
+	
+	public float GetFloatData(String _key, float _defaultValue) {
+		   
+		   if( mPreferences != null )
+			   return mPreferences.getFloat(_key, _defaultValue);
+		   else
+			   return _defaultValue;
+		   
+	}
+
+	public void SetFloatData(String _key, float _value) {
+			if( mPreferences == null ) return;
+			
+			SharedPreferences.Editor edt = mPreferences.edit();
+			
+			if( edt == null ) return;
+			
+			edt.putFloat(_key, _value);
+			edt.commit();			
 	}
 
 	public String GetStringData(String _key, String _defaultValue) {
@@ -78,10 +118,10 @@ public class jPreferences /*extends ...*/ {
 		
 		SharedPreferences.Editor edt = mPreferences.edit();
 		
-		if( edt != null ){
-		 edt.putString(_key, _value);
-		 edt.commit();
-		}
+		if( edt == null ) return;
+		
+		edt.putString(_key, _value);
+		edt.commit();		
 	}
 
 	public boolean GetBoolData(String _key, boolean _defaultValue) {
@@ -98,10 +138,34 @@ public class jPreferences /*extends ...*/ {
 		
 		SharedPreferences.Editor edt = mPreferences.edit();
 		
-		if( edt != null ){
-		 edt.putBoolean(_key, _value);
-		 edt.commit();
-		}
+		if( edt == null ) return;
+		
+		edt.putBoolean(_key, _value);
+		edt.commit();		
+	}
+	
+    public void Clear() {
+		
+		if( mPreferences == null ) return;
+		
+		SharedPreferences.Editor edt = mPreferences.edit();
+		
+		if( edt == null ) return;
+		
+		edt.clear();
+		edt.commit();
+	}
+    
+    public void Remove(String _key) {
+		
+		if( mPreferences == null ) return;
+		
+		SharedPreferences.Editor edt = mPreferences.edit();
+		
+		if( edt == null ) return;
+		
+		edt.remove(_key);
+		edt.commit();		
 	}
 }
 
