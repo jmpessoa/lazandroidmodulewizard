@@ -59,6 +59,7 @@ import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -206,7 +207,7 @@ class jForm {
 	private int animationDurationIn = 1500;
 	private int animationDurationOut = 1500;
 	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
-	
+
 	public Toast mCustomToast = null;
 
 	// Constructor
@@ -847,8 +848,8 @@ class jForm {
 		String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
 		return PathDat;
 	}
-	
-	//checks if external storage is available for read and write
+
+    //checks if external storage is available for read and write
     public boolean IsExternalStorageReadWriteAvailable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -870,16 +871,16 @@ class jForm {
 			throws IOException {
 		InputStream input = null;
 		OutputStream output = null;
-		
 		try {
 			input = new FileInputStream(source);
 			output = new FileOutputStream(dest);
+
 			byte[] buf = new byte[1024];
 			int bytesRead;
 			while ((bytesRead = input.read(buf)) > 0) {
 				output.write(buf, 0, bytesRead);
 			}
-		} finally {			
+		} finally {
 			if (input != null) input.close();
 			if (output != null) output.close();
 		}
@@ -1359,11 +1360,10 @@ class jForm {
 	    } catch (IOException e) {
 	     return "";	
 	    }
-	    
 
-	    // Get the current version pattern sequence 
+	    // Get the current version pattern sequence
 	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
-	    if(null == versionString){ 
+	    if(null == versionString){
 	        return "";
 	    }else{
 	        // get version from "htlgb">X.X.X</span>
@@ -1372,7 +1372,7 @@ class jForm {
 
 	    return playStoreAppVersion;
 	}
-	
+
 	public void CancelShowCustomMessage() {
 		if (mCustomToast != null) {
 			mCustomToast.cancel();
@@ -1383,6 +1383,7 @@ class jForm {
 	//android.view.View
 	public void ShowCustomMessage(View _layout, int _gravity) {
 		//controls.pOnShowCustomMessage(PasObj);
+
 		//android.view.ViewGroup
 		if (_layout.getParent() instanceof android.widget.RelativeLayout) {
 			android.widget.RelativeLayout par = (android.widget.RelativeLayout) _layout.getParent();
@@ -1397,6 +1398,7 @@ class jForm {
 		_layout.setVisibility(View.VISIBLE);
 		mCustomToast.setView(_layout);
 		mCustomToast.show();
+
 	}
 
 	private class MyCountDownTimer extends CountDownTimer {
@@ -1421,7 +1423,7 @@ class jForm {
 	}
 
 	public void ShowCustomMessage(View _layout, int _gravity, int _lenghTimeSecond) {
-		
+
 		mCustomToast = new Toast(controls.activity);
 		mCustomToast.setGravity(_gravity, 0, 0);
 		//toast.setDuration(Toast.LENGTH_LONG);
@@ -1435,6 +1437,7 @@ class jForm {
 		//(20000 milliseconds/1st argument) with interval of 1 second/2nd argument //--> (20 000, 1000)
 		MyCountDownTimer countDownTimer = new MyCountDownTimer(_lenghTimeSecond * 1000, 1000, mCustomToast);
 		countDownTimer.start();
+
 	}
 
 	public void SetScreenOrientation(int _orientation) {
@@ -1923,6 +1926,20 @@ class jForm {
 
 	public void MoveTaskToBack(boolean _nonRoot) {   //the "guide line' is try to mimic java Api ...
 		controls.activity.moveTaskToBack(_nonRoot);
+	}
+
+        public void MoveTaskToFront() {
+                ActivityManager am = (ActivityManager) controls.activity.getSystemService(Context.ACTIVITY_SERVICE);
+                //List<RunningTaskInfo> recentTasks = am.getRunningTasks(Integer.MAX_VALUE);
+
+                //for (int i = 0; i < recentTasks.size(); i++){
+
+                  //if (recentTask.get(i).baseActivity.toShortString().indexOf(this.controls.activity.getPackageName()) > -1) {
+
+		      am.moveTaskToFront(controls.activity.getTaskId(), 0);
+
+                  //}
+                //}
 	}
 
 	public void Restart(int _delay) {
@@ -3149,7 +3166,6 @@ public native void pOnAdMobLoaded(long pasobj, int admobType);
 public native void pOnAdMobFailedToLoad(long pasobj, int admobType, int errorCode);
 public native void pOnAdMobOpened(long pasobj, int admobType);
 public native void pOnAdMobClosed(long pasobj, int admobType);
-public native void pOnAdMobLeftApplication(long pasobj, int admobType);
 public native void pOnAdMobClicked(long pasobj, int admobType);
 public native void pOnAdMobInitializationComplete(long pasobj);
 public native void pOnAdMobRewardedUserEarned(long pasobj);

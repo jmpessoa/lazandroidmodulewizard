@@ -75,6 +75,7 @@ public class jCommons {
 		context = _context;
 		
 		if (aOwnerView != null) {
+			//aOwnerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
 			ViewGroup.LayoutParams lp = aOwnerView.getLayoutParams();
 			if (lp instanceof MarginLayoutParams) {
 				lparams = (MarginLayoutParams)lp;
@@ -604,7 +605,7 @@ public class jCommons {
 
 	public static void ActionBarHide(Controls controls) {
                 if (controls.activity instanceof AppCompatActivity)
-                {
+                {                	
           androidx.appcompat.app.ActionBar actionBar = ((AppCompatActivity) controls.activity).getSupportActionBar();
   		  if (actionBar != null)
 			((AppCompatActivity) controls.activity).getSupportActionBar().hide();

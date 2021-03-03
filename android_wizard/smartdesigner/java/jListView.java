@@ -131,7 +131,7 @@ class jArrayAdapter extends ArrayAdapter {
     
     int mItemImageWidgetSide = 0; // left, right, top, bottom
     
-    int mDrawAplhaBackground = 0x88000000; // Alphablending for background default 53%
+    int mDrawAlphaBackground = 0x57000000; // Alphablending for background default 22%
     // by tr3e
     
     Typeface mWidgetCustomFont = null;
@@ -650,7 +650,7 @@ class jArrayAdapter extends ArrayAdapter {
             //|| ( items.get(position).label.equals("") )
 
 			final int curPosition = position;
-
+			
 			LinearLayout listLayout = new LinearLayout(ctx);
 
 			listLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -1348,14 +1348,14 @@ class jArrayAdapter extends ArrayAdapter {
 			int drawItemBackColor = controls.pOnListViewDrawItemBackgroundColor(PasObj, (int)position);
 
 			if (drawItemBackColor != Color.TRANSPARENT){
-				//itemLayout.setBackgroundColor(drawItemBackColor-mDrawAplhaBackground);
-                listLayout.setBackgroundColor(drawItemBackColor-mDrawAplhaBackground);  // <<--- Fixed by jmpessoa!!!
+				//itemLayout.setBackgroundColor(drawItemBackColor-mDrawAlphaBackground);
+                listLayout.setBackgroundColor(drawItemBackColor-mDrawAlphaBackground);  // <<--- Fixed by jmpessoa!!!
 			}
 			// tr3e            
             			
 			if (items.get(position).highLightColor != Color.TRANSPARENT)
 				itemLayout.setBackgroundColor(items.get(position).highLightColor);
-			
+						
 			listLayout.addView(itemLayout);
 
 			return listLayout;
@@ -2488,7 +2488,7 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 	 else if ( _alpha > 255 )
 		 tmpAlpha = 255;
 		 	 
-	 aadapter.mDrawAplhaBackground = 16777216*tmpAlpha;
+	 aadapter.mDrawAlphaBackground = 16777216*tmpAlpha;
 	 aadapter.notifyDataSetChanged();
 	}
 	// by tr3e end

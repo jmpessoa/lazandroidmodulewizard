@@ -62,7 +62,6 @@ object AndroidModule1: TAndroidModule1
     OnAdMobFailedToLoad = jsAdMob1AdMobFailedToLoad
     OnAdMobOpened = jsAdMob1AdMobOpened
     OnAdMobClosed = jsAdMob1AdMobClosed
-    OnAdMobLeftApplication = jsAdMob1AdMobLeftApplication
     OnAdMobClicked = jsAdMob1AdMobClicked
     OnAdMobInitializationComplete = jsAdMob1AdMobInitializationComplete
     OnAdMobRewardedUserEarned = jsAdMob1AdMobRewardedUserEarned

@@ -440,6 +440,15 @@ begin
 end;
 
 { Class:     org_lamw_appcompatadmobdemo1_Controls
+  Method:    pOnAdMobLeftApplication
+  Signature: (JI)V }
+procedure pOnAdMobLeftApplication(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  admobType: JInt); cdecl;
+begin
+  Java_Event_pOnAdMobLeftApplication(PEnv, this, TObject(pasobj), admobType);
+end;
+
+{ Class:     org_lamw_appcompatadmobdemo1_Controls
   Method:    pOnAdMobClicked
   Signature: (JI)V }
 procedure pOnAdMobClicked(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -476,7 +485,7 @@ begin
     );
 end;
 
-const NativeMethods: array[0..52] of JNINativeMethod = (
+const NativeMethods: array[0..53] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -625,6 +634,9 @@ const NativeMethods: array[0..52] of JNINativeMethod = (
    (name: 'pOnAdMobClosed';
     signature: '(JI)V';
     fnPtr: @pOnAdMobClosed; ),
+   (name: 'pOnAdMobLeftApplication';
+    signature: '(JI)V';
+    fnPtr: @pOnAdMobLeftApplication; ),
    (name: 'pOnAdMobClicked';
     signature: '(JI)V';
     fnPtr: @pOnAdMobClicked; ),
@@ -773,6 +785,8 @@ exports
     +'pOnAdMobOpened',
   pOnAdMobClosed name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
     +'pOnAdMobClosed',
+  pOnAdMobLeftApplication name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
+    +'pOnAdMobLeftApplication',
   pOnAdMobClicked name 'Java_org_lamw_appcompatadmobdemo1_Controls_'
     +'pOnAdMobClicked',
   pOnAdMobInitializationComplete name 'Java_org_lamw_appcompatadmobdemo1_'
