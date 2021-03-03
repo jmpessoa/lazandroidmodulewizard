@@ -41,13 +41,9 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
-    <provider android:name="androidx.core.content.FileProvider" 
-          android:authorities="org.lamw.appcompatadmobdemo1.fileprovider" 
-          android:exported="false" android:grantUriPermissions="true">
-          <meta-data android:name="android.support.FILE_PROVIDER_PATHS" 
-                     android:resource="@xml/support_provider_paths"/>
+    <provider android:name="androidx.core.content.FileProvider" android:authorities="org.lamw.appcompatadmobdemo1.fileprovider" android:exported="false" android:grantUriPermissions="true">
+      <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/support_provider_paths"/>
     </provider>
-
     <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
     <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713"/>
   </application>

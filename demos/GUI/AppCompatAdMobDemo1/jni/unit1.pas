@@ -35,8 +35,6 @@ type
     procedure jsAdMob1AdMobFailedToLoad(Sender: TObject; admobType: TAdMobType;
       errorCode: integer);
     procedure jsAdMob1AdMobInitializationComplete(Sender: TObject);
-    procedure jsAdMob1AdMobLeftApplication(Sender: TObject;
-      admobType: TAdMobType);
     procedure jsAdMob1AdMobLoaded(Sender: TObject; admobType: TAdMobType);
     procedure jsAdMob1AdMobOpened(Sender: TObject; admobType: TAdMobType);
     procedure jsAdMob1AdMobRewardedFailedToShow(Sender: TObject;
@@ -128,17 +126,6 @@ end;
 procedure TAndroidModule1.jsAdMob1AdMobInitializationComplete(Sender: TObject);
 begin
   showmessage('Initialization Complete!');
-end;
-
-procedure TAndroidModule1.jsAdMob1AdMobLeftApplication(Sender: TObject;
-  admobType: TAdMobType);
-begin
-  if admobType = adsBanner then
-   showmessage('AdMobLeftApplication adsBanner')
-  else if admobType = adsInterstitial then
-    showmessage('AdMobLeftApplication adsInterstitial')
-  else
-    showmessage('AdMobLeftApplication adsRewarded');
 end;
 
 procedure TAndroidModule1.jsAdMob1AdMobLoaded(Sender: TObject;
