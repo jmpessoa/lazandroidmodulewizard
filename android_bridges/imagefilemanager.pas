@@ -41,6 +41,7 @@ jImageFileManager = class(jControl)
     function LoadFromUri(_imageUri: jObject): jObject;   overload;
 
     function GetBitmapToGrayscale( _bitmap : jObject ): jObject;
+    function GetBitmapInvert( _bitmap : jObject ): jObject;
 
     function LoadFromFile(_filename: string; _scale: integer): jObject; overload;
     function CreateBitmap(_width: integer; _height: integer): jObject;
@@ -146,6 +147,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'GetBitmapToGrayscale', _bitmap);
+end;
+
+function jImageFileManager.GetBitmapInvert( _bitmap : jObject ): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'GetBitmapInvert', _bitmap);
 end;
 
 function jImageFileManager.LoadFromAssets(filename: string): jObject;
