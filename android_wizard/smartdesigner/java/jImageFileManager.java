@@ -221,9 +221,10 @@ public class jImageFileManager /*extends ...*/ {
      int width  = _bitmapImage.getWidth();    
 
      Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-     bmpGrayscale.setDensity( _bitmapImage.getDensity() );
      
      if(bmpGrayscale == null) return null;
+     
+     bmpGrayscale.setDensity( _bitmapImage.getDensity() );
      
      Canvas c = new Canvas(bmpGrayscale);
      Paint paint = new Paint();
@@ -239,7 +240,40 @@ public class jImageFileManager /*extends ...*/ {
      
      return bmpGrayscale;
  }
+ 
+ public Bitmap GetBitmapInvert(Bitmap _bitmapImage)
+ { 
+		int height = _bitmapImage.getHeight();
+		int width  = _bitmapImage.getWidth();    
 
+		Bitmap bmpInvert = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		
+		if(bmpInvert == null) return null;
+	     
+		bmpInvert.setDensity( _bitmapImage.getDensity() );
+	     
+		Canvas canvas = new Canvas(bmpInvert);
+		Paint paint = new Paint();
+		
+		ColorMatrix matrixGrayscale = new ColorMatrix();
+		matrixGrayscale.setSaturation(0);
+		
+		ColorMatrix matrixInvert = new ColorMatrix();
+		matrixInvert.set(new float[]
+		{
+			-1.0f, 0.0f, 0.0f, 0.0f, 255.0f,
+			0.0f, -1.0f, 0.0f, 0.0f, 255.0f,
+			0.0f, 0.0f, -1.0f, 0.0f, 255.0f,
+			0.0f, 0.0f, 0.0f, 1.0f, 0.0f
+		});
+		matrixInvert.preConcat(matrixGrayscale);
+		
+		ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrixInvert);
+		paint.setColorFilter(filter);
+		
+		canvas.drawBitmap(_bitmapImage, 0, 0, paint);
+		return bmpInvert;
+ }
  
  public Bitmap LoadFromFile(String _filename) {  //InternalAppStorage  !!!	   
 	   Bitmap bmap=null;
