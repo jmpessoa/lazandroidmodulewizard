@@ -54,6 +54,8 @@ public class jEditText extends EditText {
 	private TextWatcher   textwatcher;       // OnChange
 
 	private OnClickListener onClickListener;   // event
+	
+	private EditText mEdit = null;
 
 	String bufStr;
 	private boolean canDispatchChangeEvent = false;
@@ -77,6 +79,9 @@ public class jEditText extends EditText {
 	int mRoundBorderColor = Color.CYAN;
 	int mRoundBorderWidth = 3;
 	int mRoundBackgroundColor= Color.TRANSPARENT;
+	
+	boolean mAllUpperCase = false;
+	boolean mAllLowerCase = false;
 
 	//Constructor
 	public  jEditText(android.content.Context context,
@@ -87,6 +92,8 @@ public class jEditText extends EditText {
 
 		controls = ctrls;
 		LAMWCommon = new jCommons(this,context,pasobj);
+		
+		mEdit = this;
 
 		mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
 
@@ -184,8 +191,24 @@ public class jEditText extends EditText {
 				}
 			}
 			@Override
-			public  void afterTextChanged(Editable s) {
-				//
+			public  void afterTextChanged(Editable et) {
+				  String s=et.toString();
+				  
+				  if(mAllUpperCase)
+			       if(!s.equals(s.toUpperCase()))
+			       {
+			         s=s.toUpperCase();
+			         mEdit.setText(s);
+			         mEdit.setSelection(mEdit.length()); //fix reverse texting
+			       }
+				  
+				  if(mAllLowerCase)
+				       if(!s.equals(s.toLowerCase()))
+				       {
+				         s=s.toLowerCase();
+				         mEdit.setText(s);
+				         mEdit.setSelection(mEdit.length()); //fix reverse texting
+				       }
 			}
 		};
 
@@ -264,6 +287,15 @@ public class jEditText extends EditText {
 	public View GetView() {
 	   return this;
     }
+	
+	public void SetAllLowerCase( boolean _lowercase ){
+		mAllLowerCase = _lowercase;
+	}
+	
+	public void SetAllUpperCase( boolean _uppercase ){
+		mAllUpperCase = _uppercase;
+	}
+	
 	//CURRENCY   
 	public  void SetInputTypeEx(String str) {  
 		bufStr = new String(str.toString());

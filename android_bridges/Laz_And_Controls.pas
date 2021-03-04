@@ -1159,12 +1159,14 @@ type
     procedure ResetViewParent();  override;
     procedure SetSoftInputShownOnFocus(_show: boolean);
 
-
     procedure SetRoundCorner();
     procedure SetRoundRadiusCorner(_radius: integer);
     procedure SetRoundBorderColor(_color: TARGBColorBridge);
     procedure SetRoundBorderWidth(_strokeWidth: integer);
     procedure SetRoundBackgroundColor(_color: TARGBColorBridge);
+
+    procedure SetAllLowerCase( _lowercase : boolean );
+    procedure SetAllUpperCase( _uppercase : boolean );
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -1343,6 +1345,8 @@ type
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
+
+    procedure SetRoundColor( _color: TARGBColorBridge );
 
   published
     property Text: string read GetText write SetText;
@@ -2257,6 +2261,8 @@ type
     procedure RemoveFromViewParent;  override;
     procedure SetSleepDown(_sleepMiliSeconds: integer);
 
+    procedure SetImageUp( _bmp : jObject );
+    procedure SetImageDown( _bmp : jObject );
     procedure SetImageDownScale(Value: single); // by ADiV
     procedure SetAlpha( Value : integer ); // by ADiV
     procedure SetSaturation(Value: single); // by ADiV
@@ -4887,6 +4893,18 @@ begin
      Result:= jni_func_out_t(FjEnv, FjObject, 'GetText');;
 end;
 
+procedure jEditText.SetAllLowerCase( _lowercase : boolean );
+begin
+ if FInitialized then
+     jni_proc_z(FjEnv, FjObject, 'SetAllLowerCase', _lowercase);
+end;
+
+procedure jEditText.SetAllUpperCase( _uppercase : boolean );
+begin
+ if FInitialized then
+     jni_proc_z(FjEnv, FjObject, 'SetAllUpperCase', _uppercase);
+end;
+
 procedure jEditText.SetText(Value: string);
 begin
   inherited SetText(Value);
@@ -6327,6 +6345,12 @@ begin
   FGravityInParent:=  _value;
   if FInitialized then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
+
+procedure jRadioButton.SetRoundColor( _color: TARGBColorBridge );
+begin
+  if FInitialized  then
+     jni_proc_i(FjEnv, FjObject, 'SetRoundColor', GetARGB(FCustomColor, _color));
 end;
 
 //------------------------------------------------------------------------------
@@ -12303,6 +12327,28 @@ begin
 end;
 
 // by ADiV
+procedure jImageBtn.SetImageUp( _bmp : jObject );
+begin
+   if not FInitialized then exit;
+
+   SetImageUpByRes('');
+   SetImageUpByIndex(-1);
+
+   jni_proc_bmp(FjEnv, FjObject, 'SetImageUp', _bmp);
+end;
+
+// by ADiV
+procedure jImageBtn.SetImageDown( _bmp : jObject );
+begin
+  if not FInitialized then exit;
+
+  SetImageDownByRes('');
+  SetImageDownByIndex(-1);
+
+  jni_proc_bmp(FjEnv, FjObject, 'SetImageDown', _bmp);
+end;
+
+// by ADiV
 Procedure jImageBtn.SetImageDownScale(Value: single);
 begin
 
@@ -12312,8 +12358,8 @@ begin
    begin
     if value > 1 then value := 1;
 
-    self.SetImageDownByRes('');
-    self.SetImageDownByIndex(-1);
+    SetImageDownByRes('');
+    SetImageDownByIndex(-1);
 
     jni_proc_f(FjEnv, FjObject, 'SetImageDownScale', value);
    end;

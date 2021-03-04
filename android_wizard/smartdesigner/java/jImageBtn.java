@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 
 //-------------------------------------------------------------------------
 //jImageBtn
-//Reviewed by ADiV on 2020/10/04
+//Reviewed by ADiV on 2021/03/04
 //-------------------------------------------------------------------------
 
 public class jImageBtn extends ImageView {
@@ -59,7 +59,7 @@ public class jImageBtn extends ImageView {
 	}
 	
 	public  boolean onTouchEvent( MotionEvent event) {
-	        //by TR3E
+	        //by ADiV
 			if (enabled == false) return false;
 			
 			int actType = event.getAction()&MotionEvent.ACTION_MASK;
@@ -171,6 +171,20 @@ public class jImageBtn extends ImageView {
 		
 		bmpDn = Bitmap.createScaledBitmap(b, b.getWidth(), b.getHeight(), true);
 		
+	}
+	
+	public  void SetImageUp(Bitmap _bmp) {   		
+		bmpUp = _bmp;
+		
+        this.setImageResource(android.R.color.transparent);
+		
+		this.setImageBitmap(bmpUp);
+		
+		this.invalidate();
+	}
+	
+	public  void SetImageDown(Bitmap _bmp) {   		
+		bmpDn = _bmp;		
 	}
 	
 	public void SetImageDownScale( float _scale ) {

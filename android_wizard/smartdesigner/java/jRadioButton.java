@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.view.Gravity;
+import android.content.res.ColorStateList;
 
 public class jRadioButton extends RadioButton {
 	//Java-Pascal Interface
@@ -167,5 +168,13 @@ public class jRadioButton extends RadioButton {
         Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
         this.setTypeface(customfont);
     }
-
+	
+	public void SetRoundColor( int _color ){
+		
+		 if(android.os.Build.VERSION.SDK_INT>=21){		   
+		    this.setButtonTintList(ColorStateList.valueOf(_color));		    
+		    this.invalidate(); //could not be necessary
+		 }
+		 
+	}
 }
