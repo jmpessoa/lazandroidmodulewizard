@@ -243,6 +243,8 @@ public class jImageFileManager /*extends ...*/ {
  
  public Bitmap GetBitmapInvert(Bitmap _bitmapImage)
  { 
+	    if( _bitmapImage == null ) return null;
+	 
 		int height = _bitmapImage.getHeight();
 		int width  = _bitmapImage.getWidth();    
 
