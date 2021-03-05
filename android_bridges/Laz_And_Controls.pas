@@ -652,7 +652,16 @@ type
     Procedure SetFontSize( fontSize : integer ); // by ADiV
     procedure SetTitleAlign( _titleAlign : TTextAlign ); // by ADiV
 
+    procedure SetColorBackground(_color: TARGBColorBridge); // by ADiV
+    procedure SetColorBackgroundTitle(_color: TARGBColorBridge); // by ADiV
+    procedure SetColorTitle(_color: TARGBColorBridge); // by ADiV
+    procedure SetColorText(_color: TARGBColorBridge);  // by ADiV
+    procedure SetColorNegative(_color: TARGBColorBridge);// by ADiV
+    procedure SetColorPositive(_color: TARGBColorBridge);// by ADiV
+    procedure SetColorNeutral(_color: TARGBColorBridge); // by ADiV
+
     property Parent   : jForm     read FParent   write FParent;
+    property CustomColor: DWord read FCustomColor write FCustomColor;
   published
     property Title: string read FTitle write FTitle;
     property Msg: string read FMsg write FMsg;
@@ -12008,6 +12017,55 @@ begin
 
   if FInitialized then
      jDialogYN_SetTitleAlign( FjEnv, FjObject, ord(FTitleAlign) );
+end;
+
+procedure jDialogYN.SetColorBackground(_color: TARGBColorBridge);
+begin
+
+  if (FInitialized = True) then
+    jni_proc_i(FjEnv, FjObject, 'SetColorBackground', GetARGB(FCustomColor, _color));
+end;
+
+procedure jDialogYN.SetColorBackgroundTitle(_color: TARGBColorBridge); // by ADiV
+begin
+
+  if (FInitialized = True) then
+    jni_proc_i(FjEnv, FjObject, 'SetColorBackgroundTitle', GetARGB(FCustomColor, _color));
+end;
+
+procedure jDialogYN.SetColorTitle(_color: TARGBColorBridge);
+begin
+
+  if (FInitialized = True) then
+    jni_proc_i(FjEnv, FjObject, 'SetColorTitle', GetARGB(FCustomColor, _color));
+end;
+
+procedure jDialogYN.SetColorText(_color: TARGBColorBridge);
+begin
+
+  if (FInitialized = True) then
+    jni_proc_i(FjEnv, FjObject, 'SetColorText', GetARGB(FCustomColor, _color));
+end;
+
+procedure jDialogYN.SetColorNegative(_color: TARGBColorBridge);
+begin
+
+  if (FInitialized = True) then
+    jni_proc_i(FjEnv, FjObject, 'SetColorNegative', GetARGB(FCustomColor, _color));
+end;
+
+procedure jDialogYN.SetColorPositive(_color: TARGBColorBridge);
+begin
+
+  if (FInitialized = True) then
+    jni_proc_i(FjEnv, FjObject, 'SetColorPositive', GetARGB(FCustomColor, _color));
+end;
+
+procedure jDialogYN.SetColorNeutral(_color: TARGBColorBridge);
+begin
+
+  if (FInitialized = True) then
+    jni_proc_i(FjEnv, FjObject, 'SetColorNeutral', GetARGB(FCustomColor, _color));
 end;
 
 // Event : Java -> Pascal

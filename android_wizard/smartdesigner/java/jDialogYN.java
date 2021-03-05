@@ -7,8 +7,12 @@ import android.widget.Button;
 import android.view.Gravity;
 import android.graphics.Typeface;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 
-//--- Revised 2020/09/09 [by ADiV] ---//
+//-------------------------------------------------------------------------
+// jDialogYN
+// Developed by ADiV for LAMW on 2021-03-05
+//-------------------------------------------------------------------------
 
 public class jDialogYN {
  //Java-Pascal Interface
@@ -21,8 +25,17 @@ public class jDialogYN {
  private String          dlgNo;
  private String          dlgNeutral;
  
- private int 			 mFontSize;   // by tr3e
- private int			 mTitleAlign; // by tr3e
+ private int 			 mFontSize;   // by ADiV
+ private int			 mTitleAlign; // by ADiV
+ 
+ private int			 mColorBackground      = Color.WHITE;
+ private int			 mColorBackgroundTitle = 0;
+ private int			 mColorTitle      = Color.BLACK;
+ private int			 mColorText       = Color.BLACK;
+ private int			 mColorPositive   = 0;
+ private int			 mColorNegative   = 0;
+ private int			 mColorNeutral    = 0;
+ 
  //
  private DialogInterface.OnClickListener onClickListener = null;
  private AlertDialog dialog = null;
@@ -69,8 +82,14 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 	if( title != null ){
      title.setText(dlgTitle);
      title.setPadding(30, 10, 30, 10);
-     title.setTextColor(Color.BLACK);
+     title.setTextColor(mColorTitle);
      title.setTypeface(null, Typeface.BOLD);
+     
+     if(android.os.Build.VERSION.SDK_INT < 21)
+      if(mColorBackgroundTitle != 0)
+    	  title.setBackgroundColor(mColorBackgroundTitle);
+      else
+    	  title.setBackgroundColor(mColorBackground);
     
      //title.setBackgroundResource(R.drawable.gradient);
      //title.setTextColor(0xFF0000FF);
@@ -96,25 +115,41 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 
 	dialog.show();
 	
+	if(android.os.Build.VERSION.SDK_INT >= 21)	    
+	    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(mColorBackground));	  
+	 
 	if( mFontSize != 0){
 		  dialog.getWindow().getAttributes();		  
 			 
-		  TextView tvMessage = (TextView) dialog.findViewById(android.R.id.message);
+		  TextView tvMessage = (TextView) dialog.findViewById(android.R.id.message);		 		 
 		  
 		  if( tvMessage != null ){
+		   tvMessage.setTextColor(mColorText);   
 		   tvMessage.setPadding(30, 10, 30, 10);
 		   tvMessage.setTextSize(mFontSize);
+		   
+		   if(android.os.Build.VERSION.SDK_INT < 21)
+			   tvMessage.setBackgroundColor(mColorBackground);
 		  }
 		 
-		  Button btNegative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+		  Button btNegative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);		  
 		  
-		  if( btNegative != null )
+		  if( btNegative != null ){
+		   if(mColorNegative != 0) btNegative.setTextColor(mColorNegative);
 		   btNegative.setTextSize(mFontSize);
+		   
+		   if(android.os.Build.VERSION.SDK_INT < 21)
+		    btNegative.setBackgroundColor(mColorBackground);
+		  }
 		 
 		  Button btPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
 		  
 		  if( btPositive != null )
+		   if(mColorPositive != 0) btPositive.setTextColor(mColorPositive);
 		   btPositive.setTextSize(mFontSize);
+		   
+		   if(android.os.Build.VERSION.SDK_INT < 21)
+		    btPositive.setBackgroundColor(mColorBackground);
 		 }
 }
 
@@ -137,8 +172,14 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 	if( title != null ){
      title.setText(dlgTitle);
      title.setPadding(30, 10, 30, 10);
-     title.setTextColor(Color.BLACK);
+     title.setTextColor(mColorTitle);
      title.setTypeface(null, Typeface.BOLD);
+     
+     if(android.os.Build.VERSION.SDK_INT < 21)
+         if(mColorBackgroundTitle != 0)
+       	  title.setBackgroundColor(mColorBackgroundTitle);
+         else
+       	  title.setBackgroundColor(mColorBackground);
  
      //title.setBackgroundResource(R.drawable.gradient);
      //title.setTextColor(0xFF0000FF);
@@ -166,30 +207,51 @@ public  void show(String titleText, String msgText, String yesText, String noTex
 
 	dialog.show();
 	
+	if(android.os.Build.VERSION.SDK_INT >= 21)
+		 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(mColorBackground));
+	
 	if( mFontSize != 0){
 		  dialog.getWindow().getAttributes();		  
 			 
 		  TextView tvMessage = (TextView) dialog.findViewById(android.R.id.message);
 		  
 		  if( tvMessage != null ){
+		   tvMessage.setTextColor(mColorText);
 		   tvMessage.setPadding(30, 10, 30, 10);
 		   tvMessage.setTextSize(mFontSize);
+		   
+		   if(android.os.Build.VERSION.SDK_INT < 21)
+			   tvMessage.setBackgroundColor(mColorBackground);
 		  }
 		 
 		  Button btNegative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
 		  
-		  if( btNegative != null )
-		   btNegative.setTextSize(mFontSize);
+		  if( btNegative != null ){
+			  if(mColorNegative != 0) btNegative.setTextColor(mColorNegative);
+			  btNegative.setTextSize(mFontSize);
+			  
+			  if(android.os.Build.VERSION.SDK_INT < 21)
+				  btNegative.setBackgroundColor(mColorBackground);
+		  }
 		 
 		  Button btPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
 		  
-		  if( btPositive != null )
-		   btPositive.setTextSize(mFontSize);
+		  if( btPositive != null ){
+			  if(mColorPositive != 0) btPositive.setTextColor(mColorPositive);
+			  btPositive.setTextSize(mFontSize);
+			  
+			  if(android.os.Build.VERSION.SDK_INT < 21)
+				  btPositive.setBackgroundColor(mColorBackground);
+		  }
 		  
           Button btNeutral = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
 		  
 		  if( btNeutral != null )
+			  if(mColorNeutral != 0) btNeutral.setTextColor(mColorNeutral);
 			  btNeutral.setTextSize(mFontSize);
+			  
+			  if(android.os.Build.VERSION.SDK_INT < 21)
+				  btNeutral.setBackgroundColor(mColorBackground);
 		 }
 }
 
@@ -205,8 +267,14 @@ public void ShowOK(String titleText, String msgText, String _OkText) {
 	if( title != null ){
      title.setText(dlgTitle);
      title.setPadding(30, 10, 30, 10);
-     title.setTextColor(Color.BLACK);
+     title.setTextColor(mColorTitle);
      title.setTypeface(null, Typeface.BOLD);
+     
+     if(android.os.Build.VERSION.SDK_INT < 21)
+         if(mColorBackgroundTitle != 0)
+       	  title.setBackgroundColor(mColorBackgroundTitle);
+         else
+       	  title.setBackgroundColor(mColorBackground);
     
      switch( mTitleAlign ){ 
       case 0 : title.setGravity(Gravity.LEFT); break;
@@ -229,32 +297,79 @@ public void ShowOK(String titleText, String msgText, String _OkText) {
 	
 	dialog.show();
 	
+	if(android.os.Build.VERSION.SDK_INT >= 21)   	 
+		 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(mColorBackground));
+	
 	if( mFontSize != 0){
 		  dialog.getWindow().getAttributes();
 		    		  			
 		  TextView tvMessage = (TextView) dialog.findViewById(android.R.id.message);
 		  
 		  if( tvMessage != null ){
+		   tvMessage.setTextColor(mColorText);
 		   tvMessage.setPadding(30, 10, 30, 10);
 		   tvMessage.setTextSize(mFontSize);
+		   
+		   if(android.os.Build.VERSION.SDK_INT < 21)
+			   tvMessage.setBackgroundColor(mColorBackground);
 		  }
 		 
 		  Button btPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
 		  
 		  if( btPositive != null)
-		   btPositive.setTextSize(mFontSize);		 		 
+			  if(mColorPositive != 0) btPositive.setTextColor(mColorPositive);
+		   	  btPositive.setTextSize(mFontSize);
+		   	  
+		   	  if(android.os.Build.VERSION.SDK_INT < 21)
+		   		btPositive.setBackgroundColor(mColorBackground);
 		 }
 }
 
-// by tr3e
+// by ADiV
 public void SetFontSize( int _fontSize ){
 	mFontSize = _fontSize;
 }
 
-// by tr3e
+// by ADiV
 public void SetTitleAlign( int _titleAlign ){
 	mTitleAlign = _titleAlign;
 }
+
+// by ADiV
+public void SetColorBackground( int _color ){	
+	mColorBackground      = _color;
+}
+
+//by ADiV
+public void SetColorBackgroundTitle( int _color ){
+	mColorBackgroundTitle = _color;
+}
+
+//by ADiV
+public void SetColorTitle( int _color ){
+	mColorTitle = _color;
+}
+
+//by ADiV
+public void SetColorText( int _color ){
+	mColorText = _color;
+}
+
+//by ADiV
+public void SetColorNegative( int _color ){
+	mColorNegative = _color;
+}
+
+//by ADiV
+public void SetColorPositive( int _color ){
+	mColorPositive = _color;
+}
+
+//by ADiV
+public void SetColorNeutral( int _color ){
+	mColorNeutral = _color;
+}
+
 
 public  void Free() {
  onClickListener = null;
