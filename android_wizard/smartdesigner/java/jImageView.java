@@ -51,7 +51,7 @@ import java.io.File;
 
 //-------------------------------------------------------------------------
 // jImageView
-// Reviewed by TR3E on 17/10/2019
+// Reviewed by ADiV on 2021-03-09
 //-------------------------------------------------------------------------
 
 public class jImageView extends ImageView {
@@ -191,6 +191,12 @@ public class jImageView extends ImageView {
 
 	public void SetBitmapImage(Bitmap _bitmap, int _width, int _height) {
 		
+		if( _bitmap == null ){
+			this.setImageBitmap(null);
+			bmp = null;
+			return;
+		}
+		
 		this.setImageResource(android.R.color.transparent);
 		
 		bmp = Bitmap.createScaledBitmap(_bitmap, _width, _height, true);
@@ -209,6 +215,12 @@ public class jImageView extends ImageView {
 
 	//http://stackoverflow.com/questions/10271020/bitmap-too-large-to-be-uploaded-into-a-texture
 	public void SetBitmapImage(Bitmap bm) {
+		
+		if( bm == null ){
+			this.setImageBitmap(null);
+			bmp = null;
+			return;
+		}
 
 		this.setImageResource(android.R.color.transparent);  //erase image ??....
 
@@ -226,8 +238,7 @@ public class jImageView extends ImageView {
 				this.setImageBitmap(bmp);
 			else
 				this.setImageBitmap(GetRoundedShape(bmp, 0));			
-		}
-		else{
+		}else{
 			// for bitmaps with dimensions that lie within the limits, load the image normally
 			if (Build.VERSION.SDK_INT >= 16) {  // why??
 				BitmapDrawable ob = new BitmapDrawable(this.getResources(), bm);
@@ -237,14 +248,13 @@ public class jImageView extends ImageView {
 				//this.setImageBitmap(bm);
 				bmp = bm;
 
-			} else {
-
-				if (!mRounded)
-					this.setImageBitmap(bm);
-				else
-					this.setImageBitmap(GetRoundedShape(bm, 0));
-
-				bmp = bm;
+			} else {			
+			 bmp = bm;
+					
+			 if (!mRounded)
+				this.setImageBitmap(bmp);
+			 else
+				this.setImageBitmap(GetRoundedShape(bmp, 0));			
 			}
 		}
 		this.invalidate();
