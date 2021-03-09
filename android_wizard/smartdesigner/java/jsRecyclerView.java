@@ -51,9 +51,128 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.view.MotionEvent;
 
 
-/*interface OnItemSelecteListener {  
-    public void onItemSelected(View v, int position, String[] content);  
-} */
+//-------------------------------------------------------------------------
+// jsRecyclerView
+// Review by ADiV for LAMW on 2021-03-09
+//-------------------------------------------------------------------------
+
+class IdObjects{
+	
+	static final String VIEW_TEXT     = "Text";
+	static final String VIEW_IMAGE    = "Image";
+	static final String VIEW_CHECK    = "Check";
+	static final String VIEW_RATING   = "Rating";
+	static final String VIEW_SWITCH   = "Switch";
+	static final String VIEW_PROGRESS = "Progress";
+	static final String VIEW_PANEL    = "Panel";
+	
+	public int[] idLabel;
+	public int[] idImage;
+	public int[] idCheck;
+	public int[] idRating;
+	public int[] idSwitch;
+	public int[] idProgress;
+	public int[] idPanel;
+	
+	public int countLabel = 0;
+	public int countImage = 0;
+	public int countCheck = 0;
+	public int countRating = 0;
+	public int countSwitch = 0;
+	public int countProgress = 0;
+	public int countPanel = 0;
+	
+	public IdObjects(String holderItemFormat) {		
+		   countLabel = countSubString(holderItemFormat, VIEW_TEXT);  //mContentFormat = "jTextView:300|jTextView:301|IMAGE:200";
+		   idLabel = new int[countLabel];	
+			
+	       countImage= countSubString(holderItemFormat, VIEW_IMAGE);  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		   idImage = new int[countImage];
+
+		   countCheck = countSubString(holderItemFormat, VIEW_CHECK);  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		   idCheck = new int[countCheck];
+
+		   countRating= countSubString(holderItemFormat, VIEW_RATING);  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		   idRating = new int[countRating];
+
+		   countSwitch = countSubString(holderItemFormat, VIEW_SWITCH);  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		   idSwitch = new int[countSwitch];
+		   
+		   countProgress = countSubString(holderItemFormat, VIEW_PROGRESS);  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		   idProgress = new int[countProgress];
+		   
+		   countPanel= countSubString(holderItemFormat, VIEW_PANEL);  //mContentFormat = "TEXT:300|TEXT:301|IMAGE:200";
+		   idPanel = new int[countPanel];
+
+		   int indexLabel = 0;
+		   int indexImage = 0;
+		   int indexCheck = 0;
+		   int indexRating = 0;
+		   int indexSwitch = 0;
+		   int indexProgress  = 0;
+		   int indexPanel = 0;
+
+		   String delimiter = "|";
+		   String[] words = holderItemFormat.split(Pattern.quote(delimiter));
+		   int countAll =  words.length;
+		   delimiter = ":";		   		   
+		   		 
+		   for (int i=0; i < countAll; i++) {	   
+		    if ( words[i].contains(VIEW_TEXT) )	{		    	    												 
+				String[] nameValueText = words[i].split(Pattern.quote(delimiter));
+				idLabel[indexLabel] = Integer.valueOf(nameValueText[1]);				
+				indexLabel++;
+		    }
+		    
+		    if ( words[i].contains(VIEW_IMAGE) )	{		    	    												 
+				String[] nameValueText = words[i].split(Pattern.quote(delimiter));
+				idImage[indexImage] = Integer.valueOf(nameValueText[1]);				
+				indexImage++;
+		    }
+		    
+		    if ( words[i].contains(VIEW_CHECK) )	{		    	    												 
+				String[] nameValueText = words[i].split(Pattern.quote(delimiter));
+				idCheck[indexCheck] = Integer.valueOf(nameValueText[1]);				
+				indexCheck++;
+		    }
+		    
+		    if ( words[i].contains(VIEW_RATING) )	{		    	    												 
+				String[] nameValueText = words[i].split(Pattern.quote(delimiter));
+				idRating[indexRating] = Integer.valueOf(nameValueText[1]);				
+				indexRating++;
+		    }
+		    
+		    if ( words[i].contains(VIEW_SWITCH) )	{		    	    												 
+				String[] nameValueText = words[i].split(Pattern.quote(delimiter));
+				idSwitch[indexSwitch] = Integer.valueOf(nameValueText[1]);				
+				indexSwitch++;
+		    }
+		    
+		    if ( words[i].contains(VIEW_PROGRESS) )	{		    	    												 
+				String[] nameValueText = words[i].split(Pattern.quote(delimiter));
+				idProgress[indexProgress] = Integer.valueOf(nameValueText[1]);				
+				indexProgress++;
+		    }
+		    
+		    if ( words[i].contains(VIEW_PANEL) )	{		    	    												 
+				String[] nameValueText = words[i].split(Pattern.quote(delimiter));
+				idPanel[indexPanel] = Integer.valueOf(nameValueText[1]);				
+				indexPanel++;
+		    }
+		   }					
+	}
+	
+	//http://www.java2s.com/Code/Java/Data-Type/Countthenumberofinstancesofsubstringwithinastring.htm
+    public int countSubString(final String string, final String substring) {
+       int count = 0;
+       int idx = 0;
+       while ((idx = string.indexOf(substring, idx)) != -1) {
+          idx++;
+          count++;
+       }
+       return count;
+    }
+}
 
 class ItemObject {
 
@@ -93,7 +212,7 @@ class ItemObject {
 
 	//public int position;
 
-    public ItemObject(String content, String format,  String delimiter, int pos) {
+    public ItemObject(String content, String format,  String delimiter, int pos, IdObjects idObjects) {
 		//position = pos;
     	String upperFormat = format.toUpperCase();
 
@@ -144,50 +263,84 @@ class ItemObject {
 
 			if ( formats[i].startsWith("TEXT") )	{
 				label[indexText] =  contents[i];
-				labelTextColor[indexText] = -1;
+				labelTextColor[indexText] = 0;
 				idLabel[indexText] = -1;
+				
+				if(idObjects != null)
+					if( indexText < idObjects.countLabel )
+						idLabel[indexText] = idObjects.idLabel[indexText];
+								
 				indexText++;
 			}
 							
 			if ( formats[i].startsWith("IMAGE") )	{								
 				image[indexImage] = contents[i];  //data@location
 				idImage[indexImage] = -1;
+				
+				if(idObjects != null)
+					if( indexImage < idObjects.countImage )
+						idImage[indexImage] = idObjects.idImage[indexImage];
+				
 				indexImage++;
 			}
 
 			if ( formats[i].startsWith("CHECK") )	{  //visited@0   or visited@1
 				check[indexCheck] =  contents[i]; //caption@value
-				checkTextColor[indexCheck] = -1;
+				checkTextColor[indexCheck] = 0;
 				idCheck[indexCheck] = -1;
+				
+				if(idObjects != null)
+					if( indexCheck < idObjects.countCheck )
+						idCheck[indexCheck] = idObjects.idCheck[indexCheck];
+				
 				indexCheck++;
 			}
 
 			if ( formats[i].startsWith("RATING") )	{  //value  ex: 2 or 3.5
 				rating[indexRating] =  contents[i];
 				idRating[indexRating] = -1;
+				
+				if(idObjects != null)
+					if( indexRating < idObjects.countRating )
+						idRating[indexRating] = idObjects.idRating[indexRating];
+				
 				indexRating++;
 			}
 
 
 			if ( formats[i].startsWith("SWITCH") )	{  //value  ex: OFF:ON@0  OFF:ON@1   //1=checked
 				switchbtn[indexSwitchbtn] =  contents[i];
-				switchTextColor[indexSwitchbtn] = -1;
+				switchTextColor[indexSwitchbtn] = 0;
 				idSwitch[indexSwitchbtn] = -1;
+				
+				if(idObjects != null)
+					if( indexSwitchbtn < idObjects.countSwitch )
+						idSwitch[indexSwitchbtn] = idObjects.idSwitch[indexSwitchbtn];
+				
 				indexSwitchbtn++;
 			}
 			
 			if ( formats[i].startsWith("PROGRESS") )	{  //value  ex: OFF:ON@0  OFF:ON@1   //1=checked
 				progress[indexProgress] =  contents[i];
 				idProgress[indexProgress] = -1;
+				
+				if(idObjects != null)
+					if( indexProgress < idObjects.countProgress )
+						idProgress[indexProgress] = idObjects.idProgress[indexProgress];
+				
 				indexProgress++;
 			}
 			
 			if ( formats[i].startsWith("PANEL") )	{  //value  ex: color@cornerRadiusRound
 				panel[indexPanel] =  contents[i];				
 				idPanel[indexPanel] = -1;
+				
+				if(idObjects != null)
+					if( indexPanel < idObjects.countPanel )
+						idPanel[indexPanel] = idObjects.idPanel[indexPanel];
+				
 				indexPanel++;
 			}
-
 		}              
     }
     
@@ -250,6 +403,7 @@ class LoadImageTask extends AsyncTask <String, Void, Bitmap> {
 
 class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.RecyclerViewHolders>  {
 
+	public IdObjects idObjects = null;
     public List<ItemObject> itemList;
     public String mItemContentDictionary; // = "TEXT|TEXT|DRAWABLE";    
     public String mItemContentDelimiter; // = "|";
@@ -297,15 +451,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     		
     		//--- TextColor
     		int textColor    = itemList.get(position).labelTextColor[i];
-    		int currentColor = holderView.label[i].getCurrentTextColor();
     		
-    		if( textColor != -1 ){
-    		 if( textColor != currentColor ){
-    		  itemList.get(position).labelTextColor[i] = textColor;
-    		  holderView.label[i].setTextColor( textColor );
-    		 }
-    		}   		     		
-    		    		    	
+    		if( textColor != 0 )    		  
+    		  holderView.label[i].setTextColor( textColor );    		     		   		     		    		    		    	
     	}
 
 		for (int i=0; i < countcheck; i++) {
@@ -322,13 +470,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
             
             //--- TextColor
     		int textColor    = itemList.get(position).checkTextColor[i];
-    		int currentColor = holderView.check[i].getCurrentTextColor();
     		
-    		if( textColor != -1 ){
-    			if( textColor != currentColor )
+    		if( textColor != 0 )
     			 holderView.check[i].setTextColor( textColor );
-    		}else
-    			itemList.get(position).checkTextColor[i] = currentColor;
 		}
 
 		for (int i=0; i < countswitchbtn; i++) {
@@ -359,13 +503,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 			
 			//--- TextColor
     		int textColor    = itemList.get(position).switchTextColor[i];
-    		int currentColor = holderView.switchbtn[i].getCurrentTextColor();
     		
-    		if( textColor != -1 ){
-    			if( textColor != currentColor )
-    			 holderView.switchbtn[i].setTextColor( textColor );
-    		}else
-    			itemList.get(position).switchTextColor[i] = currentColor;
+    		if( textColor != 0 )
+    			 holderView.switchbtn[i].setTextColor( textColor );    		
 		}
 
 		for (int i=0; i < countrating; i++) {
@@ -480,7 +620,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     
     public void add(String content) {    	    	
     	int position = this.itemList.size();
-    	itemList.add(position, new ItemObject(content, mItemContentDictionary, mItemContentDelimiter, position) );
+    	itemList.add(position, new ItemObject(content, mItemContentDictionary, mItemContentDelimiter, position, idObjects) );
         notifyItemInserted(position);
     }
 
@@ -794,8 +934,11 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     
     public void setlayoutView(View draftlayoutView, boolean cardStyle) {    	
     	mCardStyle = cardStyle;
-	    mDraftLayoutView = draftlayoutView;	    
-		mFormat = getholderContentFormat(draftlayoutView);
+	    mDraftLayoutView = draftlayoutView;
+	    // "jTextView:5|jTextView:6|jImageView:7";    
+		mFormat = getAllChildrenBFS(draftlayoutView);
+		
+		idObjects = new IdObjects(mFormat);
     }
         
     public int countSubString(final String string, final String substring) {
@@ -945,7 +1088,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 				label[indexText].setPadding(Integer.valueOf(paddingValues[0]), Integer.valueOf(paddingValues[1]), 
 						                    Integer.valueOf(paddingValues[2]), Integer.valueOf(paddingValues[3]));
 				
-				label[indexText].setTextColor(drafTextView.getCurrentTextColor());
+				label[indexText].setTextColor(drafTextView.getCurrentTextColor());								
 				
 				float defaultInPixel = drafTextView.getTextSize();  //default in pixel!!!
 				if (defaultInPixel != 42) { //Pascal font = 0!				      				       				     
@@ -1225,11 +1368,6 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 	   }	   
 	   else return layout;
 	   
-    }
-
-    public String getholderContentFormat(View v) {    	
-        // "jTextView:5|jTextView:6|jImageView:7";    	
-    	return 	getAllChildrenBFS(v);    		  
     }
     
   //https://stackoverflow.com/questions/18668897/android-get-all-children-elements-of-a-viewgroup
