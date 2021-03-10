@@ -255,10 +255,7 @@ public class jImageFileManager /*extends ...*/ {
 		bmpInvert.setDensity( _bitmapImage.getDensity() );
 	     
 		Canvas canvas = new Canvas(bmpInvert);
-		Paint paint = new Paint();
-		
-		ColorMatrix matrixGrayscale = new ColorMatrix();
-		matrixGrayscale.setSaturation(0);
+		Paint paint = new Paint();		
 		
 		ColorMatrix matrixInvert = new ColorMatrix();
 		matrixInvert.set(new float[]
@@ -268,7 +265,6 @@ public class jImageFileManager /*extends ...*/ {
 			0.0f, 0.0f, -1.0f, 0.0f, 255.0f,
 			0.0f, 0.0f, 0.0f, 1.0f, 0.0f
 		});
-		matrixInvert.preConcat(matrixGrayscale);
 		
 		ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrixInvert);
 		paint.setColorFilter(filter);
