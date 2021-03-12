@@ -7277,7 +7277,7 @@ begin
        Class_ := env^.NewGlobalRef(env, tmpClass);  //<< -------- jmpessoa fix!
     end;
   end;
-  if Method_ = nil then
+  if (Method_ = nil) and (Class_ <> nil) then
   begin       //a jmethodID is not an object. So don't need to convert it to a GlobalRef!
     Method_:= env^.GetMethodID( env, Class_ , FuncName, FuncSig);
   end;
