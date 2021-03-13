@@ -295,6 +295,14 @@ public class jTelephonyManager /*extends ...*/ {
     return TrafficStats.getTotalTxBytes();
     }
 
+    public long GetMobileRxBytes(){
+    return TrafficStats.getTotalRxBytes();
+    }
+
+    public long GetMobileTxBytes(){
+    return TrafficStats.getTotalTxBytes();
+    }
+
     public boolean IsNetworkRoaming() {
         boolean isRoaming = false;
         if(isListenerRemoved)
