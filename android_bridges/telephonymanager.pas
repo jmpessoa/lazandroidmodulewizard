@@ -39,6 +39,8 @@ jTelephonyManager = class(jControl)
     function GetNetworkType(): string;
     function GetTotalRxBytes():int64;
     function GetTotalTxBytes():int64;
+    function GetMobileRxBytes():int64;
+    function GetMobileTxBytes():int64;
     function IsNetworkRoaming(): boolean;
     function GetLine1Number(): string;
     function GetNetworkOperatorName(): string;
@@ -62,6 +64,8 @@ function jTelephonyManager_GetPhoneType(env: PJNIEnv; _jtelephonymanager: JObjec
 function jTelephonyManager_GetNetworkType(env: PJNIEnv; _jtelephonymanager: JObject): string;
 function jTelephonyManager_GetTotalRxBytes(env: PJNIEnv; _jtelephonymanager: JObject): int64;
 function jTelephonyManager_GetTotalTxBytes(env: PJNIEnv; _jtelephonymanager: JObject): int64;
+function jTelephonyManager_GetMobileRxBytes(env: PJNIEnv; _jtelephonymanager: JObject): int64;
+function jTelephonyManager_GetMobileTxBytes(env: PJNIEnv; _jtelephonymanager: JObject): int64;
 function jTelephonyManager_IsNetworkRoaming(env: PJNIEnv; _jtelephonymanager: JObject): boolean;
 function jTelephonyManager_GetLine1Number(env: PJNIEnv; _jtelephonymanager: JObject): string;
 function jTelephonyManager_GetNetworkOperatorName(env: PJNIEnv; _jtelephonymanager: JObject): string;
@@ -191,6 +195,20 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jTelephonyManager_GetTotalTxBytes(FjEnv, FjObject);
+end;
+
+function jTelephonyManager.GetMobileRxBytes(): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTelephonyManager_GetMobileRxBytes(FjEnv, FjObject);
+end;
+
+function jTelephonyManager.GetMobileTxBytes(): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTelephonyManager_GetMobileTxBytes(FjEnv, FjObject);
 end;
 
 function jTelephonyManager.IsNetworkRoaming(): boolean;
@@ -443,6 +461,28 @@ var
 begin
   jCls:= env^.GetObjectClass(env, _jtelephonymanager);
   jMethod:= env^.GetMethodID(env, jCls, 'GetTotalTxBytes', '()J');
+  Result:= env^.CallLongMethod(env, _jtelephonymanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jTelephonyManager_GetMobileRxBytes(env: PJNIEnv; _jtelephonymanager: JObject): int64;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtelephonymanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetMobileRxBytes', '()J');
+  Result:= env^.CallLongMethod(env, _jtelephonymanager, jMethod);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+function jTelephonyManager_GetMobileTxBytes(env: PJNIEnv; _jtelephonymanager: JObject): int64;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtelephonymanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetMobileTxBytes', '()J');
   Result:= env^.CallLongMethod(env, _jtelephonymanager, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
