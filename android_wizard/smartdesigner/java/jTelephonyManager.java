@@ -296,11 +296,11 @@ public class jTelephonyManager /*extends ...*/ {
     }
 
     public long GetMobileRxBytes(){
-    return TrafficStats.getTotalRxBytes();
+    return TrafficStats.getMobileRxBytes();
     }
 
     public long GetMobileTxBytes(){
-    return TrafficStats.getTotalTxBytes();
+    return TrafficStats.getMobileTxBytes();
     }
 
     public boolean IsNetworkRoaming() {
