@@ -4313,7 +4313,6 @@ begin
 
    SetFontFace(FFontFace);
    SetTextTypeFace(FTextTypeFace);
-   //jTextView_setFontAndTextTypeFace(FjEnv, FjThis, Ord(FFontFace), Ord(FTextTypeFace));
 
    View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
   end;

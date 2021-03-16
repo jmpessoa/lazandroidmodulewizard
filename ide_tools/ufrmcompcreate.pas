@@ -2321,14 +2321,14 @@ begin
     strList.Add('  jCls:= Get_gjClass(env);');
     strList.Add('  if jCls = nil then exit;');
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+'_jCreate'+''', '''+jniSignature+'''); ');
-    strList.Add('  if jMethod = nil then exit;');
+    strList.Add('  if jni_ExceptionOccurred(env) then exit;');
   end
   else
   begin
     strList.Add('  jCls:= env^.GetObjectClass(env, _'+LowerCase(FJavaClassName)+');');
     strList.Add('  if jCls = nil then exit;');
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+''', '''+jniSignature+'''); ');
-    strList.Add('  if jMethod = nil then exit;');
+    strList.Add('  if jni_ExceptionOccurred(env) then exit;');
   end;
 
   if Pos('()', jniSignature) = 0 then //has params

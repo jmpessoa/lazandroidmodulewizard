@@ -362,7 +362,9 @@ begin
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFilename));
   jCls:= env^.GetObjectClass(env, _jcanvases2);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetBmpIntArray', '(Ljava/lang/String;)[I');
+  if jni_ExceptionOccurred(env) then exit;
   jResultArray:= env^.CallObjectMethodA(env, _jcanvases2, jMethod,  @jParams);
 
   Size:= env^.GetArrayLength(env, jResultArray);
