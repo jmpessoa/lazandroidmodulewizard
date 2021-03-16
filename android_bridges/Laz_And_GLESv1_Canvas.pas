@@ -778,6 +778,8 @@ begin
    inherited Init(refApp);
    FjObject  := jGLSurfaceView_Create1(FjEnv, FjThis, Self, cjOpenGLESv1);
 
+   if FjObject = nil then exit;
+
    View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
@@ -811,7 +813,7 @@ begin
   begin
    FInitialized:= True;
 
-   jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
+   SetAutoRefresh(FAutoRefresh);
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   end;
 end;
@@ -831,14 +833,15 @@ end;
 procedure jCanvasES1.Refresh;
 begin
    if FInitialized then
-      jGLSurfaceView_Refresh(FjEnv, FjObject );
+      jni_proc(FjEnv, FjObject, 'Refresh' );
 end;
 
 Procedure jCanvasES1.SetAutoRefresh(Value: boolean);
 begin
   FAutoRefresh := Value;
-  if FInitialized then
-     jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetAutoRefresh', FAutoRefresh);
 end;
 
 //
@@ -1096,7 +1099,7 @@ end;
 Procedure jCanvasES1.Request_GLThread;
 begin
  if FInitialized then
-    jGLSurfaceView_requestGLThread(FjEnv, FjObject);
+    jni_proc(FjEnv, FjObject, 'glThread');
 end;
 
 //

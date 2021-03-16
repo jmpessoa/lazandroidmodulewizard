@@ -49,7 +49,10 @@ public class jTextView extends TextView {
 
     private ClipboardManager mClipBoard = null;
     private ClipData mClipData = null;
-    private int mRadius = 20;    
+    private int mRadius = 20;
+    
+    private int mFontFace     = 0; // Normal
+    private int mFontTypeFace = 0; // Normal
     
     int mTextAlignment;
         	    
@@ -219,10 +222,6 @@ public class jTextView extends TextView {
     	mEnabled = value;
         this.setEnabled(value);
     }
-
-    public void SetTextTypeFace(int _typeface) {
-        this.setTypeface(null, _typeface);
-    }
     
     public void SetUnderline(boolean _on){
         if( _on )
@@ -242,16 +241,30 @@ public class jTextView extends TextView {
     public void AppendTab() {
         this.append("\t");
     }
-
-    public void SetFontAndTextTypeFace(int fontFace, int fontStyle) {
-        Typeface t = null;
-        switch (fontFace) {
+    
+    private void SetFontAndTypeFace(){
+    	Typeface t = null;
+        switch (mFontFace) {
             case 0: t = Typeface.DEFAULT; break;
             case 1: t = Typeface.SANS_SERIF; break;
             case 2: t = Typeface.SERIF; break;
             case 3: t = Typeface.MONOSPACE; break;
         }
-        this.setTypeface(t, fontStyle);
+        this.setTypeface(t, mFontTypeFace);
+    }
+    
+    public void SetFontFace( int _fontFace ){
+    	
+    	mFontFace = _fontFace;
+    	
+    	SetFontAndTypeFace();        
+    }
+    
+    public void SetTextTypeFace(int _typeface) {
+    	
+    	mFontTypeFace = _typeface;
+    	
+    	SetFontAndTypeFace();    
     }
 
     public void SetTextSize(float size) {

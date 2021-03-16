@@ -1390,7 +1390,7 @@ begin
 
    if FjObject = nil then exit;
 
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject , Self.Id);
   end;
 
@@ -1423,7 +1423,7 @@ begin
   if not FInitialized then
   begin
    FInitialized:= True;
-   jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
+   SetAutoRefresh(FAutoRefresh);
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
    // IsFirstInit:= True;
@@ -1445,14 +1445,15 @@ end;
 Procedure jCanvasES2.Refresh;
 begin
   if FInitialized then
-    jGLSurfaceView_Refresh(FjEnv, FjObject );
+    jni_proc(FjEnv, FjObject, 'Refresh' );
 end;
 
 Procedure jCanvasES2.SetAutoRefresh(Value: boolean);
 begin
   FAutoRefresh := Value;
-  if FInitialized then
-     jGLSurfaceView_SetAutoRefresh(FjEnv, FjObject , FAutoRefresh);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetAutoRefresh', FAutoRefresh);
 end;
 
 //
@@ -2146,7 +2147,7 @@ end;
 Procedure jCanvasES2.Request_GLThread;
 begin
   if FInitialized then
-     jGLSurfaceView_requestGLThread(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'glThread');
 end;
 
 //
@@ -2239,35 +2240,35 @@ procedure jCanvasES2.Pause();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGLSurfaceView_Pause(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Pause');
 end;
 
 procedure jCanvasES2.Resume();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGLSurfaceView_Resume(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Resume');
 end;
 
 procedure jCanvasES2.DispatchTouchDown(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGLSurfaceView_DispatchTouchDown(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchTouchDown', _value);
 end;
 
 procedure jCanvasES2.DispatchTouchMove(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGLSurfaceView_DispatchTouchMove(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchTouchMove', _value);
 end;
 
 procedure jCanvasES2.DispatchTouchUp(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGLSurfaceView_DispatchTouchUp(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchTouchUp', _value);
 end;
 
 end.

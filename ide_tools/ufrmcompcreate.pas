@@ -568,7 +568,7 @@ begin
      strList.Add('       onClickListener = new OnClickListener(){');
      strList.Add('       /*.*/public void onClick(View view){     // *.* is a mask to future parse...;');
      strList.Add('               if (enabled) {');
-     strList.Add('                  controls.pOnClickGeneric(pascalObj, Const.Click_Default); //JNI event onClick!');
+     strList.Add('                  controls.pOnClickGeneric(pascalObj); //JNI event onClick!');
      strList.Add('               }');
      strList.Add('            };');
      strList.Add('       };');
@@ -642,7 +642,7 @@ begin
      strList.Add('    }');
      strList.Add(' ');
      strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
-     strList.Add('    public void SetIid(int _id) {');  //need by code generation....
+     strList.Add('    public void SetId(int _id) {');  //need by code generation....
      strList.Add('       this.setId(_id)');
      strList.Add('    }');
      strList.Add(' ');
@@ -1855,7 +1855,7 @@ begin
         strList.Add('       onClickListener = new OnClickListener(){');
         strList.Add('       /*.*/public void onClick(View view){     // *.* is a mask to future parse...;');
         strList.Add('               if (enabled) {');
-        strList.Add('                  controls.pOnClickGeneric(pasobj, Const.Click_Default); //JNI event onClick!');
+        strList.Add('                  controls.pOnClickGeneric(pasobj); //JNI event onClick!');
         strList.Add('               }');
         strList.Add('            };');
         strList.Add('       };');
@@ -2319,12 +2319,16 @@ begin
   if funcResult = 'constructor' then  //constructor
   begin
     strList.Add('  jCls:= Get_gjClass(env);');
+    strList.Add('  if jCls = nil then exit;');
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+'_jCreate'+''', '''+jniSignature+'''); ');
+    strList.Add('  if jMethod = nil then exit;');
   end
   else
   begin
     strList.Add('  jCls:= env^.GetObjectClass(env, _'+LowerCase(FJavaClassName)+');');
+    strList.Add('  if jCls = nil then exit;');
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+''', '''+jniSignature+'''); ');
+    strList.Add('  if jMethod = nil then exit;');
   end;
 
   if Pos('()', jniSignature) = 0 then //has params
