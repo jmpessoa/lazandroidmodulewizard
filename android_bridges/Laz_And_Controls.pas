@@ -2523,9 +2523,7 @@ end;
 // outFile  '/data/data/com/kredix/files/test.txt'
 Function  Asset_SaveToFile(srcFile, outFile : String) : Boolean;
  begin
-  Result := True;
-
-  jAsset_SaveToFile(gApp.Jni.jEnv,gApp.Jni.jThis,srcFile,outFile);
+  Result := jni_func_tt_out_z(gApp.Jni.jEnv,gApp.Jni.jThis, 'assetSaveToFile', srcFile, outFile);
 
   Result := FileExists(outFile);
  end;
@@ -4292,30 +4290,31 @@ begin
    FInitialized:= True;
 
    if  FFontColor <> colbrDefault then
-    jTextView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+    SetFontColor(FFontColor);
 
     if FAllCaps <> False then
-     jTextView_SetAllCaps(FjEnv, FjObject, FAllCaps);
+     SetAllCaps(FAllCaps);
 
    if FFontSizeUnit <> unitDefault then
-     jTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+     SetFontSizeUnit(FFontSizeUnit);
 
    if FFontSize > 0 then
-    jTextView_setTextSize(FjEnv, FjObject , FFontSize);
+    SetFontSize(FFontSize);
 
-   jTextView_setText(FjEnv, FjObject , FText);
+   SetText(FText);
 
-   jTextView_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
+   SetTextAlignment(FTextAlignment);
 
    if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
    if FEnabled = False then
-     jTextView_setEnabled(FjEnv, FjObject , False);
+     SetEnabled(False);
 
-   jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   SetFontFace(FFontFace);
+   SetTextTypeFace(FTextTypeFace);
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
   end;
 
 end;
@@ -4350,50 +4349,57 @@ end;
 procedure jTextView.SetEnabled(Value: Boolean);
 begin
   FEnabled := Value;
-  if FInitialized then
-    jTextView_setEnabled(FjEnv, FjObject , FEnabled);
+  if FjObject = nil then exit;
+  jni_proc_z(FjEnv, FjObject, 'SetEnabled', FEnabled);
 end;
 
 function jTextView.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jTextView_getText(FjEnv, FjObject );
+     Result:= jni_func_out_h(FjEnv, FjObject, 'getText' );
 end;
 
 procedure jTextView.SetText(Value: string);
 begin
   inherited SetText(Value);
-  if FInitialized then
-    jTextView_setText(FjEnv, FjObject , Value);
+  if FjObject = nil then exit;
+
+  jni_proc_h(FjEnv, FjObject, 'setText', Value);
 end;
 
 procedure jTextView.SetFontColor(Value: TARGBColorBridge);
 begin
  FFontColor:= Value;
- if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jTextView_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor))
+ if FjObject = nil then exit;
+
+ if (FFontColor <> colbrDefault) then
+  jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor))
 end;
 
 procedure jTextView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
-  if FInitialized and  (FFontSize > 0) then
-    jTextView_setTextSize(FjEnv, FjObject , FFontSize);
+  if FjObject = nil then exit;
+
+  if(FFontSize > 0) then
+    jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 procedure jTextView.SetFontFace(AValue: TFontFace); 
 begin
  FFontFace:= AValue;
- if(FInitialized) then 
-   jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
+ if FjObject = nil then exit;
+
+ jni_proc_i(FjEnv, FjObject, 'SetFontFace', Ord(FFontFace));
 end;
 
 procedure jTextView.SetTextTypeFace(Value: TTextTypeFace);
 begin
   FTextTypeFace:= Value ;
-  if(FInitialized) then 
-    jTextView_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetTextTypeFace', Ord(FTextTypeFace));
 end;
 
 procedure jTextView.UpdateLayout();
@@ -4411,8 +4417,9 @@ end;
 procedure jTextView.SetTextAlignment(Value: TTextAlignment);
 begin
   FTextAlignment:= Value;
-  if FInitialized then
-    jTextView_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetTextAlignment', Ord(FTextAlignment));
 end;
 
 procedure jTextView.Refresh;
@@ -4436,36 +4443,37 @@ procedure jTextView.Append(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_Append(FjEnv, FjObject, _txt);
+   jni_proc_t(FjEnv, FjObject, 'Append', _txt);
 end;
 
 procedure jTextView.AppendLn(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_AppendLn(FjEnv, FjObject, _txt);
+     jni_proc_t(FjEnv, FjObject, 'AppendLn', _txt);
 end;
 
 procedure jTextView.CopyToClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_CopyToClipboard(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'CopyToClipboard');
 end;
 
 procedure jTextView.PasteFromClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_PasteFromClipboard(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'PasteFromClipboard');
 end;
 
 procedure jTextView.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
   FFontSizeUnit:=_unit;
-  if FInitialized then
-     jTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 Procedure jTextView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
@@ -4509,28 +4517,28 @@ procedure jTextView.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawab
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetCompoundDrawables(FjEnv, FjObject, _image, Ord(_side));
+     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
 end;
 
 procedure jTextView.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jTextView.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetRoundCorner(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jTextView.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+     jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
 end;
 
 procedure jTextView.SetShadowLayer(_radius: single; _dx: single; _dy: single; _color: TARGBColorBridge);
@@ -4544,56 +4552,56 @@ procedure jTextView.SetShaderLinearGradient(_startColor: TARGBColorBridge; _endC
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetShaderLinearGradient(FjEnv, FjObject, GetARGB(FCustomColor, _startColor) ,GetARGB(FCustomColor, _endColor));
+     jni_proc_ii(FjEnv, FjObject, 'SetShaderLinearGradient', GetARGB(FCustomColor, _startColor) ,GetARGB(FCustomColor, _endColor));
 end;
 
 procedure jTextView.SetShaderRadialGradient(_centerColor: TARGBColorBridge; _edgeColor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetShaderRadialGradient(FjEnv, FjObject, GetARGB(FCustomColor, _centerColor) ,GetARGB(FCustomColor, _edgeColor));
+     jni_proc_ii(FjEnv, FjObject, 'SetShaderRadialGradient', GetARGB(FCustomColor, _centerColor) ,GetARGB(FCustomColor, _edgeColor));
 end;
 
 procedure jTextView.SetShaderSweepGradient(_color1: TARGBColorBridge; _color2: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetShaderSweepGradient(FjEnv, FjObject, GetARGB(FCustomColor, _color1) ,GetARGB(FCustomColor, _color2));
+     jni_proc_ii(FjEnv, FjObject, 'SetShaderSweepGradient', GetARGB(FCustomColor, _color1) ,GetARGB(FCustomColor, _color2));
 end;
 
 procedure jTextView.SetTextDirection(_textDirection: TTextDirection);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetTextDirection(FjEnv, FjObject, Ord(_textDirection));
+     jni_proc_i(FjEnv, FjObject, 'SetTextDirection', Ord(_textDirection));
 end;
 
 procedure jTextView.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetFontFromAssets(FjEnv, FjObject, _fontName);
+     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jTextView.SetTextIsSelectable(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetTextIsSelectable(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetTextIsSelectable', _value);
 end;
 
 procedure jTextView.SetScrollingText();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetScrollingText(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetScrollingText');
 end;
 
 procedure jTextView.SetTextAsLink(_linkText: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetTextAsLink(FjEnv, FjObject, _linkText);
+     jni_proc_t(FjEnv, FjObject, 'SetTextAsLink', _linkText);
 end;
 
 //use: SetTextAsLink('<a href=''http://www.google.com''>Go to Google</a>', colbrRed);
@@ -4601,28 +4609,28 @@ procedure jTextView.SetTextAsLink(_linkText: string; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetTextAsLink(FjEnv, FjObject, _linkText , GetARGB(FCustomColor, _color));
+     jni_proc_ti(FjEnv, FjObject, 'SetTextAsLink', _linkText , GetARGB(FCustomColor, _color));
 end;
 
 procedure jTextView.SetBackgroundAlpha(_alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetBackgroundAlpha(FjEnv, FjObject, _alpha);
+     jni_proc_i(FjEnv, FjObject, 'SetBackgroundAlpha', _alpha);
 end;
 
 procedure jTextView.MatchParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_MatchParent(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'MatchParent');
 end;
 
 procedure jTextView.WrapParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_WrapParent(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'WrapParent');
 end;
 
 procedure jTextView.ClearLayout();
@@ -4659,15 +4667,16 @@ procedure jTextView.SetAllCaps(_value: boolean);
 begin
   //in designing component state: set value here...
   FAllCaps:= _value;
-  if FInitialized then
-     jTextView_SetAllCaps(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetAllCaps', _value);
 end;
 
 procedure jTextView.SetTextAsHtml(_htmlText: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetTextAsHtml(FjEnv, FjObject, _htmlText);
+     jni_proc_t(FjEnv, FjObject, 'SetTextAsHtml', _htmlText);
 end;
 
 procedure jTextView.SetUnderline( _on : boolean );
@@ -4797,59 +4806,59 @@ begin
    jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
    if  FHint <> '' then
-    jEditText_setHint(FjEnv, FjObject , FHint);
+    SetHint(FHint);
 
    if FFontColor <> colbrDefault then
-    jEditText_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+    SetFontColor(FFontColor);
 
    if FFontSizeUnit <> unitDefault then
-     jEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+     SetFontSizeUnit(FFontSizeUnit);
 
    if FFontSize > 0 then
-    jEditText_setTextSize(FjEnv, FjObject , FFontSize);
+    SetFontSize(FFontSize);
 
-   jEditText_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
+   SetTextAlignment(FTextAlignment);
 
    if FMaxTextLength >= 0 then
-    jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
+    SetTextMaxLength(FMaxTextLength);
 
-   jEditText_setScroller(FjEnv, FjObject );
+   jni_proc(FjEnv, FjObject, 'setScrollerEx' );
 
-   jEditText_setHorizontalScrollBarEnabled(FjEnv, FjObject , FHorizontalScrollBar);
-   jEditText_setVerticalScrollBarEnabled(FjEnv, FjObject , FVerticalScrollBar);
+   SetHorizontalScrollBar(FHorizontalScrollBar);
+   SetVerticalScrollBar(FVerticalScrollBar);
 
-   jEditText_setHorizontallyScrolling(FjEnv, FjObject , FWrappingLine);
+   jni_proc_z(FjEnv, FjObject, 'setHorizontallyScrolling', FWrappingLine);
 
    if FCapSentence then
-    jEditText_SetCapSentence(FjEnv, FjObject, FCapSentence);
+    SetCapSentence(FCapSentence);
 
    if FCaptureBackPressed then
-    jEditText_SetCaptureBackPressed(FjEnv, FjObject, FCaptureBackPressed);
+    SetCaptureBackPressed(FCaptureBackPressed);
 
-   jEditText_setSingleLine(FjEnv, FjObject , True);
+   SetSingleLine(True);
 
    if FText <> '' then
-     jEditText_setText(FjEnv, FjObject , FText);
+     SetText(FText);
 
    if FEditable = False then
-     jEditText_SetEditable(FjEnv, FjObject, FEditable);
+     SetEditable(FEditable);
 
    if FHintTextColor <> colbrDefault then
-     jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
+     SetHintTextColor(FHintTextColor);
 
    if not FCloseSoftInputOnEnter then
-    jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
+    SetCloseSoftInputOnEnter(FCloseSoftInputOnEnter);
 
-   jEditText_editInputType2(FjEnv, FjObject , InputTypeToStrEx(FInputTypeEx));
+   SetInputTypeEx(FInputTypeEx);
 
    if FInputTypeEx = itxMultiLine then
    begin
-    jEditText_setSingleLine(FjEnv, FjObject , False);
+    SetSingleLine(False);
     if FMaxLines = 1 then  FMaxLines:= 3;   // visibles lines!
-    jEditText_setMaxLines(FjEnv, FjObject , FMaxLines);
+    SetMaxLines(FMaxLines);
 
     if FScrollBarStyle <> scrNone then
-         jEditText_setScrollBarStyle(FjEnv, FjObject , GetScrollBarStyle(FScrollBarStyle));
+         SetScrollBarStyle(FScrollBarStyle);
    end;
 
    if FColor <> colbrDefault then
@@ -4857,8 +4866,8 @@ begin
 
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
-   jEditText_DispatchOnChangeEvent(FjEnv, FjObject , True);
-   jEditText_DispatchOnChangedEvent(FjEnv, FjObject , True);
+   DispatchOnChangeEvent(True);
+   DispatchOnChangedEvent(True);
   end;
 end;
 
@@ -4918,21 +4927,29 @@ procedure jEditText.SetText(Value: string);
 begin
   inherited SetText(Value);
   if FInitialized then
-     jEditText_setText(FjEnv, FjObject , Value);
+
+  if Value <> '' then
+   jni_proc_h(FjEnv, FjObject, 'setText', Value)
+  else
+   self.Clear;
 end;
 
 procedure jEditText.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
-  if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jEditText_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+  if FjObject = nil then exit;
+
+  if(FFontColor <> colbrDefault) then
+   jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jEditText.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
-  if FInitialized and (FFontSize > 0) then
-     jEditText_setTextSize(FjEnv, FjObject , FFontSize);
+  if FjObject = nil then exit;
+
+  if(FFontSize > 0) then
+   jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 procedure jEditText.SetFontFace(AValue: TFontFace); 
@@ -4955,22 +4972,24 @@ procedure jEditText.SetHintTextColor(Value: TARGBColorBridge);
 begin
  //inherited SetHintTextColor(Value);
  FHintTextColor:= Value;
- if FInitialized then
-    jEditText_setHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
+ if FjObject = nil then exit;
+
+ jni_proc_i(FjEnv, FjObject, 'setHintTextColor', GetARGB(FCustomColor, FHintTextColor));
 end;
 
 Procedure jEditText.SetHint(Value : String);
 begin
   FHint:= Value;
-  if FInitialized then
-     jEditText_setHint(FjEnv, FjObject , FHint);
+  if FjObject = nil then exit;
+
+  jni_proc_h(FjEnv, FjObject, 'setHint', FHint);
 end;
 
 // LORDMAN - 2013-07-26
 Procedure jEditText.SetFocus;
 begin
   if FInitialized then
-     jEditText_SetFocus(FjEnv, FjObject  );
+     jni_proc(FjEnv, FjObject, 'SetFocus' );
 end;
 
 {
@@ -4983,14 +5002,14 @@ mgr.hideSoftInputFromWindow(myView.getWindowToken(), 0);
 Procedure jEditText.ImmShow;
 begin
   if FInitialized then
-     jEditText_immShow(FjEnv, FjObject  );
+     jni_proc(FjEnv, FjObject, 'InputMethodShow' );
 end;
 
 // LORDMAN - 2013-07-26
 Procedure jEditText.ImmHide;
 begin
   if FInitialized then
-      jEditText_immHide(FjEnv, FjObject  );
+      jni_proc(FjEnv, FjObject, 'InputMethodHide' );
 end;
 
 Procedure jEditText.ShowSoftInput();
@@ -5006,8 +5025,9 @@ end;
 Procedure jEditText.SetInputTypeEx(Value : TInputTypeEx);
 begin
   FInputTypeEx:= Value;
-  if FInitialized then
-     jEditText_editInputType2(FjEnv, FjObject ,InputTypeToStrEx(FInputTypeEx));
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetInputTypeEx', InputTypeToStrEx(FInputTypeEx));
 end;
 
 // LORDMAN - 2013-07-26
@@ -5015,67 +5035,68 @@ Procedure jEditText.SetTextMaxLength(Value: integer);
 begin
   FMaxTextLength:= Value;
   if FMaxTextLength < -1 then  FMaxTextLength:= -1; // reset/default: no limited !!
-  if FInitialized then
-        jEditText_maxLength(FjEnv, FjObject , FMaxTextLength);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'MaxLength', FMaxTextLength);
 end;
 
 Procedure jEditText.SetMaxLines(Value: DWord);
 begin
   FMaxLines:= Value;
-  if FInitialized then
-  begin
-     jEditText_setMaxLines(FjEnv, FjObject , Value);
-     if FMaxLines < 2 then
-        jEditText_setSingleLine(FjEnv, FjObject , True);
-  end;
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'setMaxLines', Value);
+
+  if FMaxLines < 2 then
+     SetSingleLine(True);
 end;
 
 procedure jEditText.SetSingleLine(Value: boolean);
 begin
   FSingleLine:= Value;
-  if FInitialized then
-  begin
-     jEditText_setSingleLine(FjEnv, FjObject , Value);
-     jEditText_setMaxLines(FjEnv, FjObject , 1);
-  end;
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setSingleLine', Value);
+  jni_proc_i(FjEnv, FjObject, 'setMaxLines', 1);
 end;
 
 procedure jEditText.SetScrollBarStyle(Value: TScrollBarStyle);
 begin
   FScrollBarStyle:= Value;
-  if FInitialized then
-  begin
-    if Value <> scrNone then
-    begin
-       jEditText_setScrollBarStyle(FjEnv, FjObject , GetScrollBarStyle(Value));
-    end;
-  end;
+  if FjObject = nil then exit;
+
+  if Value <> scrNone then
+   jni_proc_i(FjEnv, FjObject, 'setScrollBarStyle', GetScrollBarStyle(Value));
+
 end;
 
 procedure jEditText.SetHorizontalScrollBar(Value: boolean);
 begin
   FHorizontalScrollBar:= Value;
-  if FInitialized then
-    jEditText_setHorizontalScrollBarEnabled(FjEnv, FjObject , Value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setHorizontalScrollBarEnabled', Value);
 end;
 
 procedure jEditText.SetVerticalScrollBar(Value: boolean);
 begin
   FVerticalScrollBar:= Value;
-  if FInitialized then
-    jEditText_setVerticalScrollBarEnabled(FjEnv, FjObject , Value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setVerticalScrollBarEnabled', Value);
 end;
 
 procedure jEditText.SetScrollBarFadingEnabled(Value: boolean);
 begin
-  if FInitialized then
-    jEditText_setScrollbarFadingEnabled(FjEnv, FjObject , Value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setScrollbarFadingEnabled', Value);
 end;
 
 procedure jEditText.SetMovementMethod;
 begin
   if FInitialized then ;
-    jEditText_setMovementMethod(FjEnv, FjObject );
+    jni_proc(FjEnv, FjObject, 'SetMovementMethod' );
 end;
 
 // LORDMAN - 2013-07-26
@@ -5091,15 +5112,16 @@ end;
 Procedure jEditText.SetCursorPos(Value: TXY);
 begin
   if FInitialized then
-     jEditText_SetCursorPos(FjEnv, FjObject , Value.X,Value.Y);
+     jni_proc_ii(FjEnv, FjObject, 'setCursorPos', Value.X,Value.Y);
 end;
 
 // LORDMAN 2013-08-12
 Procedure jEditText.setTextAlignment(Value: TTextAlignment);
 begin
   FTextAlignment:= Value;
-  if FInitialized then
-     jEditText_setTextAlignment(FjEnv, FjObject , Ord(FTextAlignment));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetTextAlignment', Ord(FTextAlignment));
 end;
 
 // Event : Java -> Pascal
@@ -5157,40 +5179,42 @@ end;
 procedure jEditText.AllCaps;
 begin
   if FInitialized then
-    jEditText_AllCaps(FjEnv, FjObject);
+    jni_proc(FjEnv, FjObject, 'AllCaps');
 end;
 
 procedure jEditText.DispatchOnChangeEvent(value: boolean);
 begin
-  if FInitialized then
-    jEditText_DispatchOnChangeEvent(FjEnv, FjObject, value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'DispatchOnChangeEvent', value);
 end;
 
 procedure jEditText.DispatchOnChangedEvent(value: boolean);
 begin
-  if FInitialized then
-    jEditText_DispatchOnChangedEvent(FjEnv, FjObject, value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'DispatchOnChangedEvent', value);
 end;
 
 procedure jEditText.Append(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_Append(FjEnv, FjObject, _txt);
+     jni_proc_t(FjEnv, FjObject, 'Append', _txt);
 end;
 
 procedure jEditText.AppendLn(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_AppendLn(FjEnv, FjObject, _txt);
+     jni_proc_t(FjEnv, FjObject, 'AppendLn', _txt);
 end;
 
 procedure jEditText.AppendTab();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_AppendTab(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'AppendTab');
 end;
 
 
@@ -5198,7 +5222,7 @@ procedure jEditText.SetImeOptions(_imeOption: TImeOptions);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetImeOptions(FjEnv, FjObject, Ord(_imeOption));
+     jni_proc_i(FjEnv, FjObject, 'SetImeOptions', Ord(_imeOption));
 end;
 
 procedure jEditText.SetSoftInputOptions(_imeOption: TImeOptions);
@@ -5210,42 +5234,46 @@ procedure jEditText.SetEditable(enabled: boolean);
 begin
   //in designing component state: set value here...
   FEditable:= enabled;
-  if FInitialized then
-     jEditText_SetEditable(FjEnv, FjObject, enabled);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetEditable', enabled);
 end;
 
 procedure jEditText.SetAcceptSuggestion(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetAcceptSuggestion(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetAcceptSuggestion', _value);
 end;
 
 procedure jEditText.CopyToClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_CopyToClipboard(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'CopyToClipboard');
 end;
 
 procedure jEditText.PasteFromClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_PasteFromClipboard(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'PasteFromClipboard');
 end;
 
 procedure jEditText.Clear;
 begin
-  jEditText_setText(FjEnv, FjObject , '');
+  if FjObject = nil then exit;
+
+  jni_proc(FjEnv, FjObject , 'Clear');
 end;
 
 procedure jEditText.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
   FFontSizeUnit:= _unit;
-  if FInitialized then
-     jEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 // by ADiV
@@ -5253,56 +5281,56 @@ procedure jEditText.SetSelection(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetSelection(FjEnv, FjObject, _value);
+     jni_proc_i(FjEnv, FjObject, 'SetSelection', _value);
 end;
 
 procedure jEditText.SetSelectAllOnFocus(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetSelectAllOnFocus(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetSelectAllOnFocus', _value);
 end;
 
 procedure jEditText.SelectAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SelectAll(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SelectAll');
 end;
 
 procedure jEditText.SetBackgroundByResIdentifier(_imgResIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetBackgroundByResIdentifier(FjEnv, FjObject, _imgResIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
 end;
 
 procedure jEditText.SetBackgroundByImage(_image: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetBackgroundByImage(FjEnv, FjObject, _image);
+     jni_proc_bmp(FjEnv, FjObject, 'SetBackgroundByImage', _image);
 end;
 
 procedure jEditText.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetCompoundDrawables(FjEnv, FjObject, _image,Ord(_side));
+     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image,Ord(_side));
 end;
 
 procedure jEditText.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jEditText.SetTextDirection(_textDirection: TTextDirection);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetTextDirection(FjEnv, FjObject, Ord(_textDirection));
+     jni_proc_i(FjEnv, FjObject, 'SetTextDirection', Ord(_textDirection));
 end;
 
 Procedure jEditText.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
@@ -5346,30 +5374,32 @@ procedure jEditText.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetFontFromAssets(FjEnv, FjObject, _fontName);
+     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jEditText.RequestFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_RequestFocus(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'RequestFocus');
 end;
 
 procedure jEditText.SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
 begin
   //in designing component state: set value here...
-   FCloseSoftInputOnEnter:= _closeSoftInput;
-  if FInitialized then
-     jEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, _closeSoftInput);
+  FCloseSoftInputOnEnter:= _closeSoftInput;
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetCloseSoftInputOnEnter', _closeSoftInput);
 end;
 
 procedure jEditText.SetCapSentence(_capSentence: boolean);
 begin
   //in designing component state: set value here...
-   FCapSentence:= _capSentence;
-  if FInitialized then
-     jEditText_SetCapSentence(FjEnv, FjObject, _capSentence);
+  FCapSentence:= _capSentence;
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetCapSentence', _capSentence);
   // activate above setting
   SetInputTypeEx(FInputTypeEx);
 end;
@@ -5380,37 +5410,37 @@ begin
   //in designing component state: set value here...
   FCaptureBackPressed:= _capBackPressed;
 
-  if FInitialized then
-     jEditText_SetCaptureBackPressed(FjEnv, FjObject, _capBackPressed);
+  if FjObject = nil then exit;
 
+  jni_proc_z(FjEnv, FjObject, 'SetCaptureBackPressed', _capBackPressed);
 end;
 
 procedure jEditText.LoadFromFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_LoadFromFile(FjEnv, FjObject, _path, _filename);
+     jni_proc_tt(FjEnv, FjObject, 'LoadFromFile', _path, _filename);
 end;
 
 procedure jEditText.LoadFromFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_LoadFromFile(FjEnv, FjObject, _filename);
+     jni_proc_t(FjEnv, FjObject, 'LoadFromFile', _filename);
 end;
 
 procedure jEditText.SaveToFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SaveToFile(FjEnv, FjObject, _path ,_filename);
+     jni_proc_tt(FjEnv, FjObject, 'SaveToFile', _path ,_filename);
 end;
 
 procedure jEditText.SaveToFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SaveToFile(FjEnv, FjObject, _filename);
+     jni_proc_t(FjEnv, FjObject, 'SaveToFile', _filename);
 end;
 
 procedure jEditText.ClearLayout();
@@ -5447,42 +5477,42 @@ procedure jEditText.SetSoftInputShownOnFocus(_show: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetSoftInputShownOnFocus(FjEnv, FjObject, _show);
+     jni_proc_z(FjEnv, FjObject, 'SetSoftInputShownOnFocus', _show);
 end;
 
 procedure jEditText.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetRoundCorner(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jEditText.SetRoundRadiusCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetRoundRadiusCorner(FjEnv, FjObject, _radius);
+     jni_proc_i(FjEnv, FjObject, 'SetRoundRadiusCorner', _radius);
 end;
 
 procedure jEditText.SetRoundBorderColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetRoundBorderColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jni_proc_i(FjEnv, FjObject, 'SetRoundBorderColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jEditText.SetRoundBorderWidth(_strokeWidth: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetRoundBorderWidth(FjEnv, FjObject, _strokeWidth);
+     jni_proc_i(FjEnv, FjObject, 'SetRoundBorderWidth', _strokeWidth);
 end;
 
 procedure jEditText.SetRoundBackgroundColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_SetRoundBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jni_proc_i(FjEnv, FjObject, 'SetRoundBackgroundColor', GetARGB(FCustomColor, _color));
 end;
 
 //------------------------------------------------------------------------------
@@ -5577,18 +5607,18 @@ begin
    FInitialized:= True;
    
    if FFontColor <> colbrDefault then
-     jButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+     SetFontColor(FFontColor);
 
    if FFontSizeUnit <> unitDefault then
-     jButton_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+     SetFontSizeUnit(FFontSizeUnit);
 
    if FFontSize > 0 then //not default...
-     jButton_setTextSize(FjEnv, FjObject , FFontSize);
+     SetFontSize(FFontSize);
 
    if AllCaps <> false then
-      jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
+      SetAllCaps(FAllCaps);
 
-   jButton_setText(FjEnv, FjObject , FText);
+   SetText(FText);
 
    if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -5596,7 +5626,7 @@ begin
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
 
    if FEnabled = False then
-     jButton_SetEnabled(FjEnv, FjObject , False);
+     SetEnabled(False);
   end;
 end;
 
@@ -5623,8 +5653,9 @@ end;
 procedure jButton.SetAllCaps(AValue: Boolean);
 begin
   FAllCaps := AValue;
-  if(FInitialized) then
-    jButton_SetAllCaps(FjEnv, FjObject, FAllCaps);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetAllCaps', FAllCaps);
 end;
 
 procedure jButton.SetColor(Value: TARGBColorBridge);
@@ -5644,28 +5675,33 @@ function jButton.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jButton_getText(FjEnv, FjObject );
+     Result:= jni_func_out_h(FjEnv, FjObject, 'getText');
 end;
 
 procedure jButton.SetText(Value: string);
 begin
   inherited SetText(Value); //by thierry
-  if FInitialized then
-    jButton_setText(FjEnv, FjObject , Value{FText}); //by thierry
+  if FjObject = nil then exit;
+
+  jni_proc_h(FjEnv, FjObject, 'setText', Value{FText}); //by thierry
 end;
 
 procedure jButton.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
-  if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+  if FjObject = nil then exit;
+
+  if(FFontColor <> colbrDefault) then
+     jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 end;
 
 procedure jButton.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
-  if FInitialized and (FFontSize > 0) then
-     jButton_setTextSize(FjEnv, FjObject , FFontSize);
+  if FjObject = nil then exit;
+
+  if(FFontSize > 0) then
+     jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 procedure jButton.UpdateLayout();
@@ -5683,8 +5719,9 @@ procedure jButton.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
   FFontSizeUnit:=_unit;
-  if FInitialized then
-     jButton_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 
@@ -5692,28 +5729,28 @@ procedure jButton.PerformClick();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_PerformClick(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'PerformClick');
 end;
 
 procedure jButton.PerformLongClick();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_PerformLongClick(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'PerformLongClick');
 end;
 
 procedure jButton.SetBackgroundByResIdentifier(_imgResIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_SetBackgroundByResIdentifier(FjEnv, FjObject, _imgResIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
 end;
 
 procedure jButton.SetBackgroundByImage(_image: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_SetBackgroundByImage(FjEnv, FjObject, _image);
+     jni_proc_bmp(FjEnv, FjObject, 'SetBackgroundByImage', _image);
 end;
 
 // Event : Java -> Pascal
@@ -5760,43 +5797,44 @@ procedure jButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawable
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_SetCompoundDrawables(FjEnv, FjObject, _image, Ord(_side));
+     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
 end;
 
 procedure jButton.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jButton.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_SetRoundCorner(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jButton.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+     jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
 end;
 
 procedure jButton.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
+     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jButton.SetEnabled(Value: boolean);
 begin
     //in designing component state: set value here...
   FEnabled:= Value;
-  if FInitialized then
-     jButton_SetEnabled(FjEnv, FjObject, Value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetEnabled', Value);
 end;
 
 procedure jButton.ClearLayout();
@@ -5833,7 +5871,7 @@ procedure jButton.SetFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_SetFocus(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetFocus');
 end;
 
 procedure jButton.BringToFront;
@@ -5930,24 +5968,24 @@ begin
   if not FInitialized then
   begin
    FInitialized:= True;
-   jCheckBox_setText(FjEnv, FjObject , FText);
+   SetText(FText);
 
    if FFontColor <> colbrDefault then
-     jCheckBox_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+     SetFontColor(FFontColor);
 
    if FFontSizeUnit <> unitDefault then
-      jCheckBox_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+      SetFontSizeUnit(FFontSizeUnit);
 
    if FFontSize > 0 then
-     jCheckBox_setTextSize(FjEnv, FjObject , FFontSize);
+     SetFontSize(FFontSize);
 
-   jCheckBox_setText(FjEnv, FjObject , FText);
+   SetText(FText);
 
    if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
-   jCheckBox_setChecked(FjEnv, FjObject, FChecked);
+   SetChecked(FChecked);
   end;
 end;
 
@@ -5981,42 +6019,48 @@ Function jCheckBox.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jCheckBox_getText(FjEnv, FjObject );
+     Result:= jni_func_out_h(FjEnv, FjObject, 'getText' );
 end;
 
 Procedure jCheckBox.SetText(Value: string);
 begin
   inherited SetText(Value);
-  if FInitialized then //by thierry
-     jCheckBox_setText(FjEnv, FjObject , Value);
+  if FjObject = nil then exit;
+
+  jni_proc_h(FjEnv, FjObject, 'setText', Value);
 end;
 
 Procedure jCheckBox.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
-  if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jCheckBox_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+  if FjObject = nil then exit;
+
+  if(FFontColor <> colbrDefault) then
+     jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jCheckBox.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
-  if FInitialized and (FFontSize > 0) then
-     jCheckBox_setTextSize(FjEnv, FjObject , FFontSize);
+  if FjObject = nil then exit;
+
+  if(FFontSize > 0) then
+   jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 Function jCheckBox.GetChecked: boolean;
 begin
   Result := FChecked;
   if FInitialized then
-     Result:= jCheckBox_isChecked(FjEnv, FjObject );
+     Result:= jni_func_out_z(FjEnv, FjObject, 'isChecked' );
 end;
 
 Procedure jCheckBox.SetChecked(Value: boolean);
 begin
   FChecked:= Value;
-  if FInitialized then
-     jCheckBox_setChecked(FjEnv, FjObject , FChecked);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setChecked', FChecked);
 end;
 
 procedure jCheckBox.UpdateLayout();
@@ -6034,8 +6078,9 @@ procedure jCheckBox.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
   FFontSizeUnit:=_unit;
-  if FInitialized then
-     jCheckBox_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 // Event Java -> Pascal
@@ -6048,21 +6093,21 @@ procedure jCheckBox.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawab
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCheckBox_SetCompoundDrawables(FjEnv, FjObject, _image, Ord(_side));
+     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
 end;
 
 procedure jCheckBox.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCheckBox_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jCheckBox.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCheckBox_SetFontFromAssets(FjEnv, FjObject, _fontName);
+     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jCheckBox.ClearLayout();
@@ -6193,17 +6238,17 @@ begin
    FInitialized:= True;
 
    if FFontColor <> colbrDefault then
-     jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+     SetFontColor(FFontColor);
 
    if FFontSizeUnit <> unitDefault then
-      jRadioButton_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+      SetFontSizeUnit(FFontSizeUnit);
 
    if FFontSize > 0 then
-     jRadioButton_setTextSize(FjEnv, FjObject , FFontSize);
+     SetFontSize(FFontSize);
 
-   jRadioButton_setText(FjEnv, FjObject , FText);
+   SetText(FText);
 
-   jRadioButton_setChecked(FjEnv, FjObject , FChecked);
+   SetChecked(FChecked);
 
    if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -6242,42 +6287,48 @@ Function jRadioButton.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jRadioButton_getText(FjEnv, FjObject );
+     Result:= jni_func_out_h(FjEnv, FjObject, 'getText' );
 end;
 
 Procedure jRadioButton.SetText(Value: string);
 begin
-   inherited SetText(Value);
-  if FInitialized then   //by thierry
-     jRadioButton_setText(FjEnv, FjObject ,Value{ FText});
+  inherited SetText(Value);
+  if FjObject = nil then exit;
+
+  jni_proc_h(FjEnv, FjObject, 'setText', Value{ FText});
 end;
 
 Procedure jRadioButton.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
-  if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jRadioButton_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+  if FjObject = nil then exit;
+
+  if (FFontColor <> colbrDefault) then
+   jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jRadioButton.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
-  if FInitialized and (FFontSize > 0) then
-     jRadioButton_setTextSize(FjEnv, FjObject , FFontSize);
+  if FjObject = nil then exit;
+
+  if (FFontSize > 0) then
+   jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 Function jRadioButton.GetChecked: boolean;
 begin
   Result:= FChecked;
   if FInitialized then
-     Result:= jRadioButton_isChecked(FjEnv, FjObject );
+     Result:= jni_func_out_z(FjEnv, FjObject, 'isChecked' );
 end;
 
 Procedure jRadioButton.SetChecked(Value: boolean);
 begin
   FChecked:= Value;
-  if FInitialized then
-     jRadioButton_setChecked(FjEnv, FjObject , FChecked);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setChecked', FChecked);
 end;
 
 procedure jRadioButton.UpdateLayout();
@@ -6295,8 +6346,9 @@ procedure jRadioButton.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
   FFontSizeUnit:=_unit;
-  if FInitialized then
-     jRadioButton_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 // Event Java -> Pascal
@@ -6309,21 +6361,21 @@ procedure jRadioButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDra
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioButton_SetCompoundDrawables(FjEnv, FjObject, _image, Ord(_side));
+     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
 end;
 
 procedure jRadioButton.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioButton_SetCompoundDrawables(FjEnv, FjObject, _imageResIdentifier, Ord(_side));
+     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jRadioButton.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioButton_SetFontFromAssets(FjEnv, FjObject, _fontName);
+     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jRadioButton.ClearLayout();
@@ -6454,8 +6506,8 @@ begin
   if not FInitialized then
   begin
    FInitialized:= True;
-   jProgressBar_setProgress(FjEnv, FjObject , FProgress);
-   jProgressBar_setMax(FjEnv, FjObject , FMax);  //by jmpessoa
+   SetProgress(FProgress);
+   SetMax(FMax);  //by jmpessoa
 
    if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -6525,7 +6577,7 @@ Function jProgressBar.GetProgress: integer;
 begin
   Result:= FProgress;
   if FInitialized then
-     Result:= jProgressBar_getProgress(FjEnv, FjObject );
+     Result:= jni_func_out_i(FjEnv, FjObject, 'getProgress' );
 end;
 
 Procedure jProgressBar.SetProgress(Value: integer);
@@ -6535,18 +6587,18 @@ begin
   else
     FProgress:= 0;
 
-  if not FInitialized then Exit;
+  if FjObject = nil then exit;
 
-  if  FjObject <> nil then
-     jProgressBar_setProgress(FjEnv, FjObject , FProgress);
+  jni_proc_i(FjEnv, FjObject, 'setProgress', FProgress);
 end;
 
 //by jmpessoa
 Procedure jProgressBar.SetMax(Value: integer);
 begin
   if Value > FProgress  then FMax:= Value;
-  if FInitialized then
-     jProgressBar_setMax(FjEnv, FjObject , FMax);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'setMax', FMax);
 end;
 
 //by jmpessoa
@@ -6554,7 +6606,7 @@ Function jProgressBar.GetMax: integer;
 begin
   Result:= FMax;
   if FInitialized then
-     Result:= jProgressBar_getMax(FjEnv, FjObject );
+     Result:= jni_func_out_i(FjEnv, FjObject, 'getMax' );
 end;
 
 procedure jProgressBar.ClearLayout();
@@ -6691,17 +6743,17 @@ begin
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
   if FRoundedShape <> False then
-    jImageView_SetRoundedShape(FjEnv, FjObject , FRoundedShape);
+    SetRoundedShape(FRoundedShape);
 
   if(FImageIndex < 0) or (FImagelist = nil) then
    if (FImageName <> '') then
-     jImageView_SetImageByResIdentifier(FjEnv, FjObject, FImageName);
+     SetImageByResIdentifier(FImageName);
 
   if FAnimationDurationIn <> 1500 then
-     jImageView_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
+     SetAnimationDurationIn(FAnimationDurationIn);
 
   if FAnimationMode <> animNone then
-    jImageView_SetAnimationMode(FjEnv, FjObject, Ord(FAnimationMode) );
+    SetAnimationMode(FAnimationMode);
 
   if FImageList <> nil then
   begin
@@ -6713,7 +6765,7 @@ begin
   end;
 
   if  FImageScaleType <> scaleCenter  then
-    jImageView_SetScaleType(FjEnv, FjObject, Ord(FImageScaleType));;
+    SetScaleType(FImageScaleType);
 
   View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
@@ -6799,21 +6851,21 @@ procedure jImageView.SetRotation(angle: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetRotation(FjEnv, FjObject, angle);
+     jni_proc_i(FjEnv, FjObject, 'SetRotation', angle);
 end;
 
 function jImageView.SaveToJPG(filePath: string; cuality: integer; angle: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageView_SaveToJPG(FjEnv, FjObject, filePath ,cuality ,angle);
+   Result:= jni_func_tii_out_z(FjEnv, FjObject, 'SaveToJPG', filePath ,cuality ,angle);
 end;
 
 function jImageView.SaveToPNG(filePath: string; cuality: integer; angle: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageView_SaveToPNG(FjEnv, FjObject, filePath ,cuality ,angle);
+   Result:= jni_func_tii_out_z(FjEnv, FjObject, 'SaveToPNG', filePath ,cuality ,angle);
 end;
 
 Procedure jImageView.SetImageByIndex(Value: integer);
@@ -6861,20 +6913,21 @@ end;
 procedure jImageView.SetImageBitmap(bitmap: jObject); //deprecated..
 begin
   if FInitialized then
-     jImageView_setBitmapImage(FjEnv, FjObject , bitmap);
+     SetImage(bitmap);
 end;
 
 procedure jImageView.SetImage(bitmap: jObject);
 begin
   if FInitialized then
-     jImageView_setBitmapImage(FjEnv, FjObject , bitmap);
+     jni_proc_bmp(FjEnv, FjObject, 'SetBitmapImage', bitmap);
 end;
 
 procedure jImageView.SetImageByResIdentifier(_imageResIdentifier: string);
 begin
   FImageName:= _imageResIdentifier;
-  if FInitialized then
-     jImageView_SetImageByResIdentifier(FjEnv, FjObject , _imageResIdentifier);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetImageByResIdentifier', _imageResIdentifier);
 end;
 
 procedure jImageView.SetParamHeight(Value: TLayoutParams);
@@ -6988,14 +7041,14 @@ function jImageView.GetBitmapHeight: integer;
 begin
  Result:= 0;
  if FInitialized then
-   Result:= jImageView_GetBitmapHeight(FjEnv, FjObject );
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBitmapHeight' );
 end;
 
 function jImageView.GetBitmapWidth: integer;
 begin
  Result:= 0;
  if FInitialized then
-   Result:= jImageView_GetBitmapWidth(FjEnv, FjObject );
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBitmapWidth' );
 end;
 
 procedure jImageView.SetScale(_scaleX: single; _scaleY: single);
@@ -7052,8 +7105,9 @@ procedure jImageView.SetScaleType(_scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   FImageScaleType:= _scaleType;
-  if FInitialized then
-     jImageView_SetScaleType(FjEnv, FjObject, Ord(_scaleType));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetScaleType', Ord(_scaleType));
 end;
 
 function jImageView.GetBitmapImage(): jObject; //deprecated ...
@@ -7103,28 +7157,28 @@ procedure jImageView.SetImageBitmap(_bitmap: jObject; _width: integer; _height: 
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetBitmapImage(FjEnv, FjObject, _bitmap ,_width ,_height);
+     SetImage(_bitmap ,_width ,_height);
 end;
 
 procedure jImageView.SetImage(_bitmap: jObject; _width: integer; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetBitmapImage(FjEnv, FjObject, _bitmap ,_width ,_height);
+     jni_proc_bmp_ii(FjEnv, FjObject, 'SetBitmapImage', _bitmap ,_width ,_height);
 end;
 
 procedure jImageView.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetRoundCorner(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jImageView.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+     jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
 end;
 
 procedure jImageView.SetLGravity(_value: TLayoutGravity);
@@ -7139,21 +7193,21 @@ procedure jImageView.SetCollapseMode(_collapsemode: TCollapsingMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetCollapseMode(FjEnv, FjObject, Ord(_collapsemode) );
+     jni_proc_i(FjEnv, FjObject, 'SetCollapseMode', Ord(_collapsemode) );
 end;
 
 procedure jImageView.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jImageView.SetScrollFlag(_collapsingScrollFlag: TCollapsingScrollflag);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetScrollFlag(FjEnv, FjObject, Ord(_collapsingScrollFlag));
+     jni_proc_i(FjEnv, FjObject, 'SetScrollFlag', Ord(_collapsingScrollFlag));
 end;
 
 procedure jImageView.BringToFront;
@@ -7167,7 +7221,7 @@ procedure jImageView.SetVisibilityGone();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetVisibilityGone(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetVisibilityGone');
 end;
 
 function jImageView.GetJByteBuffer(_width: integer; _height: integer): jObject;
@@ -7193,8 +7247,9 @@ procedure jImageView.SetRoundedShape(_value: boolean);
 begin
   //in designing component state: set value here...
   FRoundedShape:= _value;
-  if FInitialized then
-     jImageView_SetRoundedShape(FjEnv, FjObject, FRoundedShape);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetRoundedShape', FRoundedShape);
 end;
 
 procedure jImageView.SetImageFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer);
@@ -7208,14 +7263,14 @@ procedure jImageView.LoadFromURL(_url: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_LoadFromURL(FjEnv, FjObject, _url);
+     jni_proc_t(FjEnv, FjObject, 'LoadFromURL', _url);
 end;
 
 procedure jImageView.SaveToFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SaveToFile(FjEnv, FjObject, _filename);
+     jni_proc_t(FjEnv, FjObject, 'SaveToFile', _filename);
 end;
 
 procedure jImageView.ShowPopupMenu(var _items: TDynArrayOfString);
@@ -7236,23 +7291,25 @@ procedure jImageView.SetAnimationDurationIn(_animationDurationIn: integer);
 begin
   //in designing component state: set value here...
   FAnimationDurationIn:= _animationDurationIn;
-  if FInitialized then
-     jImageView_SetAnimationDurationIn(FjEnv, FjObject, _animationDurationIn);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
 end;
 
 procedure jImageView.SetAnimationMode(_animationMode: TAnimationMode);
 begin
   //in designing component state: set value here...
   FAnimationMode:= _animationMode;
-  if FInitialized then
-     jImageView_SetAnimationMode(FjEnv, FjObject, Ord(_animationMode) );
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode) );
 end;
 
 procedure jImageView.SetImageFromAssets(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetImageFromAssets(FjEnv, FjObject, _filename);
+     jni_proc_t(FjEnv, FjObject, 'SetImageFromAssets', _filename);
 end;
 
 procedure jImageView.SetImageDrawable(_imageAnimation: jObject);
@@ -7266,7 +7323,7 @@ procedure jImageView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_Clear(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Clear');
 end;
 
 procedure jImageView.GenEvent_OnImageViewPopupItemSelected(Sender:TObject;caption:string);
@@ -7382,7 +7439,7 @@ begin
      if (imageIndex < FImages.Count) and (imageIndex >= 0) then
      begin
          path:= GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[imageIndex]);
-         Result:= jImageList_LoadFromFile(FjEnv, FjObject, path);
+         Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'LoadFromFile', path);
      end;
   end;
 end;
@@ -7433,13 +7490,13 @@ begin
   FjObject:= jCreate(); if FjObject = nil then exit;
 
   if FResponseTimeout <> 15000 then
-     jHttpClient_SetResponseTimeout(FjEnv, FjObject, FResponseTimeout);
+     SetResponseTimeout(FResponseTimeout);
 
   if FConnectionTimeout <> 15000 then
-     jHttpClient_SetConnectionTimeout(FjEnv, FjObject, FConnectionTimeout);
+     SetConnectionTimeout(FConnectionTimeout);
 
   if FUploadFormName <> '' then
-      jHttpClient_SetUploadFormName(FjEnv, FjObject, FUploadFormName);
+      SetUploadFormName(FUploadFormName);
 
   FInitialized:= True;
   SetUrlByIndex(FIndexUrl);
@@ -7461,7 +7518,7 @@ procedure jHttpClient.SetAuthenticationUser(_userName: string; _password: string
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_SetAuthenticationUser(FjEnv, FjObject, _userName ,_password);
+     jni_proc_tt(FjEnv, FjObject, 'SetAuthenticationUser', _userName ,_password);
 end;
 
 procedure jHttpClient.SetAuthenticationMode(_authenticationMode: THttpClientAuthenticationMode);
@@ -7469,7 +7526,7 @@ begin
   //in designing component state: set value here...
   FAuthenticationMode:= _authenticationMode;
   if FInitialized then
-     jHttpClient_SetAuthenticationMode(FjEnv, FjObject, Ord(_authenticationMode));
+     jni_proc_i(FjEnv, FjObject, 'SetAuthenticationMode', Ord(_authenticationMode));
 end;
 
 
@@ -7477,7 +7534,7 @@ procedure jHttpClient.SetAuthenticationHost(_hostName: string; _port: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_SetAuthenticationHost(FjEnv, FjObject, _hostName ,_port);
+     jni_proc_ti(FjEnv, FjObject, 'SetAuthenticationHost', _hostName ,_port);
 end;
 
 procedure jHttpClient.SetUrls(Value: TStrings);
@@ -7507,14 +7564,14 @@ procedure jHttpClient.GetAsync;
 begin
  if not FInitialized then Exit;
  if  FUrl <> '' then
-   jHttpClient_GetAsync(FjEnv, FjObject, FUrl);
+   GetAsync(FUrl);
 end;
 
 procedure jHttpClient.GetAsync(_stringUrl: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-      jHttpClient_GetAsync(FjEnv, FjObject, _stringUrl);
+      jni_proc_t(FjEnv, FjObject, 'GetAsync', _stringUrl);
 end;
 
 procedure jHttpClient.GetAsyncGooglePlayVersion(_stringUrl: string);
@@ -7546,12 +7603,12 @@ end;
 
 procedure jHttpClient.ClearNameValueData; //ClearPost2Values;
 begin
-  if(FInitialized) then jHTTPClient_ClearPost2Values(FjEnv, FjObject);
+  if(FInitialized) then jni_proc(FjEnv, FjObject, 'ClearPost2Values');
 end;
 
 procedure jHttpClient.AddNameValueData(_name, _value: string); //AddValueForPost2
 begin
-  if(FInitialized) then jHTTPClient_AddValueForPost2(FjEnv, FjObject, _name, _value);
+  if(FInitialized) then jni_proc_tt(FjEnv, FjObject, 'AddValueForPost2', _name, _value);
 end;
 
 function jHttpClient.Post(_stringUrl: string): string;
@@ -7569,7 +7626,7 @@ procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jHttpClient_PostNameValueDataAsync(FjEnv, FjObject, _stringUrl);
+    jni_proc_t(FjEnv, FjObject, 'PostNameValueDataAsync', _stringUrl);
 end;
 
 procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string; _name: string; _value: string);
@@ -7583,14 +7640,14 @@ procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string; _listNameValue:
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jHttpClient_PostNameValueDataAsync(FjEnv, FjObject, _stringUrl ,_listNameValue);
+    jni_proc_tt(FjEnv, FjObject, 'PostNameValueDataAsync', _stringUrl ,_listNameValue);
 end;
 
 function jHttpClient.GetCookiesCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetCookiesCount(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetCookiesCount');
 end;
 
 function jHttpClient.GetCookieByIndex(_index: integer): jObject;
@@ -7611,7 +7668,7 @@ procedure jHttpClient.ClearCookieStore();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_ClearCookieStore(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ClearCookieStore');
 end;
 
 procedure jHttpClient.trustAllCertificates();
@@ -7703,21 +7760,21 @@ procedure jHttpClient.AddClientHeader(_name: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_AddClientHeader(FjEnv, FjObject, _name ,_value);
+     jni_proc_tt(FjEnv, FjObject, 'AddClientHeader', _name ,_value);
 end;
 
 procedure jHttpClient.ClearClientHeader(_name: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_ClearClientHeader(FjEnv, FjObject, _name ,_value);
+     jni_proc_tt(FjEnv, FjObject, 'ClearClientHeader', _name ,_value);
 end;
 
 function jHttpClient.DeleteStateful(_url: string; _value:string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_DeleteStateful(FjEnv, FjObject, _url, _value);
+   Result:= jni_func_tt_out_t(FjEnv, FjObject, 'DeleteStateful', _url, _value);
 end;
 
 procedure jHttpClient.GenEvent_OnHttpClientContentResult(Obj: TObject; content: RawByteString);
@@ -7744,7 +7801,7 @@ function jHttpClient.UrlExist(_urlString: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_UrlExist(FjEnv, FjObject, _urlString);
+   Result:= jni_func_t_out_z(FjEnv, FjObject, 'UrlExist', _urlString);
 end;
 
 function jHttpClient.GetCookies(_urlString: string; _nameValueSeparator: string): TDynArrayOfString;
@@ -7835,7 +7892,7 @@ function jHttpClient.GetResponseCode(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetResponseCode(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetResponseCode');
 end;
 
 function jHttpClient.GetDefaultConnection(): jObject;
@@ -7849,16 +7906,18 @@ procedure jHttpClient.SetResponseTimeout(_timeoutMilliseconds: integer);
 begin
   //in designing component state: set value here...
   FResponseTimeout:= _timeoutMilliseconds;
-  if FInitialized then
-     jHttpClient_SetResponseTimeout(FjEnv, FjObject, _timeoutMilliseconds);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetResponseTimeout', _timeoutMilliseconds);
 end;
 
 procedure jHttpClient.SetConnectionTimeout(_timeoutMilliseconds: integer);
 begin
   //in designing component state: set value here...
   FConnectionTimeout:= _timeoutMilliseconds;
-  if FInitialized then
-     jHttpClient_SetConnectionTimeout(FjEnv, FjObject, _timeoutMilliseconds);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetConnectionTimeout', _timeoutMilliseconds);
 end;
 
 function jHttpClient.GetResponseTimeout(): integer;
@@ -7866,7 +7925,7 @@ begin
   //in designing component state: result value here...
   Result:= FResponseTimeout;
   if FInitialized then
-   Result:= jHttpClient_GetResponseTimeout(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetResponseTimeout');
 end;
 
 function jHttpClient.GetConnectionTimeout(): integer;
@@ -7874,7 +7933,7 @@ begin
   //in designing component state: result value here...
   Result:= FConnectionTimeout;
   if FInitialized then
-   Result:= jHttpClient_GetConnectionTimeout(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetConnectionTimeout');
 end;
 
 
@@ -7882,43 +7941,44 @@ procedure jHttpClient.UploadFile(_url: string; _fullFileName: string; _uploadFor
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_UploadFile(FjEnv, FjObject, _url ,_fullFileName ,_uploadFormName);
+     jni_proc_ttt(FjEnv, FjObject, 'UploadFile', _url ,_fullFileName ,_uploadFormName);
 end;
 
 procedure jHttpClient.UploadFile(_url: string; _fullFileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_UploadFile(FjEnv, FjObject, _url ,_fullFileName);
+     jni_proc_tt(FjEnv, FjObject, 'UploadFile', _url ,_fullFileName);
 end;
 
 procedure jHttpClient.SetUploadFormName(_uploadFormName: string);
 begin
   //in designing component state: set value here...
   FUploadFormName:=_uploadFormName;
-  if FInitialized then
-     jHttpClient_SetUploadFormName(FjEnv, FjObject, _uploadFormName);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetUploadFormName', _uploadFormName);
 end;
 
 procedure jHttpClient.SetUnvaluedNameData(_unvaluedName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_SetUnvaluedNameData(FjEnv, FjObject, _unvaluedName);
+     jni_proc_t(FjEnv, FjObject, 'SetUnvaluedNameData', _unvaluedName);
 end;
 
 procedure jHttpClient.SetEncodeValueData(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_SetEncodeValueData(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetEncodeValueData', _value);
 end;
 
 procedure jHttpClient.PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_PostSOAPDataAsync(FjEnv, FjObject, _SOAPData ,_stringUrl);
+     jni_proc_tt(FjEnv, FjObject, 'PostSOAPDataAsync', _SOAPData ,_stringUrl);
 end;
 
 { jSMTPClient }
@@ -8262,43 +8322,43 @@ begin
     if FjObject = nil then exit;
 
     if FWidgetTextColor <> colbrDefault then
-        jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
+        SetWidgetTextColor(FWidgetTextColor);
 
     if FFontColor <> colbrDefault then
        jListView_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
     if FFontSizeUnit <> unitDefault then
-        jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+        SetFontSizeUnit(FFontSizeUnit);
 
     if FFontSize > 0 then
        jListView_setTextSize(FjEnv, FjObject , FFontSize);
 
     if FFontFace <> ffNormal then
-       jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
+       SetFontFace(FFontFace);
 
     if FColor <> colbrDefault then
        View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
     if FItemPaddingTop <> 10 then
-      jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
+      SetItemPaddingTop(FItemPaddingTop);
 
     if FItemPaddingBottom <> 10 then
-      jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+      SetItemPaddingBottom(FItemPaddingBottom);
 
     if FItemPaddingLeft <> 10 then // by ADiV
-      jListView_SetItemPaddingLeft(FjEnv, FjObject, FItemPaddingLeft);
+      SetItemPaddingLeft(FItemPaddingLeft);
 
     if FItemPaddingRight <> 10 then
-      jListView_SetItemPaddingRight(FjEnv, FjObject, FItemPaddingRight);
+      SetItemPaddingRight(FItemPaddingRight);
 
     if FTextMarginLeft <> 10 then // by ADiV
-      jListView_SetTextMarginLeft(FjEnv, FjObject, FTextMarginLeft);
+      SetTextMarginLeft(FTextMarginLeft);
 
     if FTextMarginRight <> 10 then // by ADiV
-      jListView_SetTextMarginRight(FjEnv, FjObject, FTextMarginRight);
+      SetTextMarginRight(FTextMarginRight);
 
     if FTextMarginInner <> 10 then // by ADiV
-      jListView_SetTextMarginInner(FjEnv, FjObject, FTextMarginInner);
+      SetTextMarginInner(FTextMarginInner);
 
     for i:= 0 to FItems.Count-1 do
     begin
@@ -8317,46 +8377,46 @@ begin
     if FjObject = nil then exit;
 
     if FWidgetTextColor <> colbrDefault then
-      jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FWidgetTextColor));
+      SetWidgetTextColor(FWidgetTextColor);
 
     if FFontColor <> colbrDefault then
       jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
     if FFontSizeUnit <> unitDefault then
-      jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+      SetFontSizeUnit(FFontSizeUnit);
 
     if FFontSize > 0 then
       jListView_setTextSize(FjEnv, FjObject , FFontSize);
 
     if FFontFace <> ffNormal then
-      jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
+      SetFontFace(FFontFace);
 
     if FColor <> colbrDefault then
       View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
 
     if FImageItemIdentifier <> '' then    //ic_launcher
-        jListView_SetImageByResIdentifier(FjEnv, FjObject, FImageItemIdentifier);
+        SetImageByResIdentifier(FImageItemIdentifier);
 
     if FItemPaddingTop <> 10 then
-      jListView_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
+      SetItemPaddingTop(FItemPaddingTop);
 
     if FItemPaddingBottom <> 10 then
-      jListView_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+      SetItemPaddingBottom(FItemPaddingBottom);
 
     if FItemPaddingLeft <> 10 then // by ADiV
-      jListView_SetItemPaddingLeft(FjEnv, FjObject, FItemPaddingLeft);
+      SetItemPaddingLeft(FItemPaddingLeft);
 
     if FItemPaddingRight <> 10 then
-      jListView_SetItemPaddingRight(FjEnv, FjObject, FItemPaddingRight);
+      SetItemPaddingRight(FItemPaddingRight);
 
     if FTextMarginLeft <> 10 then // by ADiV
-      jListView_SetTextMarginLeft(FjEnv, FjObject, FTextMarginLeft);
+      SetTextMarginLeft(FTextMarginLeft);
 
     if FTextMarginRight <> 10 then // by ADiV
-      jListView_SetTextMarginRight(FjEnv, FjObject, FTextMarginRight);
+      SetTextMarginRight(FTextMarginRight);
 
     if FTextMarginInner <> 10 then // by ADiV
-      jListView_SetTextMarginInner(FjEnv, FjObject, FTextMarginInner);
+      SetTextMarginInner(FTextMarginInner);
 
     for i:= 0 to FItems.Count-1 do
     begin
@@ -8366,11 +8426,11 @@ begin
 
    end;
 
-   jListView_SetWordWrap(FjEnv, FjObject, FTextWordWrap);
+   SetTextWordWrap(FTextWordWrap);
 
-   jListView_SetEnableOnClickTextLeft(FjEnv, FjObject, FEnableOnClickTextLeft);
-   jListView_SetEnableOnClickTextCenter(FjEnv, FjObject, FEnableOnClickTextCenter);
-   jListView_SetEnableOnClickTextRight(FjEnv, FjObject, FEnableOnClickTextRight);
+   SetEnableOnClickTextLeft(FEnableOnClickTextLeft);
+   SetEnableOnClickTextCenter(FEnableOnClickTextCenter);
+   SetEnableOnClickTextRight(FEnableOnClickTextRight);
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -8435,7 +8495,7 @@ end;
 procedure jListView.SetWidgetByIndex(Value: TWidgetItem; index: integer);
 begin
     if FInitialized then
-     jListView_setWidgetItem2(FjEnv, FjObject , ord(Value), index);
+     jni_proc_ii(FjEnv, FjObject, 'setWidgetItem', ord(Value), index);
 end;
 
 procedure jListView.SetWidgetByIndex(Value: TWidgetItem; txt: string; index: integer);
@@ -8447,58 +8507,58 @@ end;
 procedure jListView.SetWidgetTextByIndex(txt: string; index: integer);
 begin
    if FInitialized then
-      jListView_setWidgetText(FjEnv,FjObject ,txt,index);
+      jni_proc_ti(FjEnv,FjObject, 'setWidgetText', txt,index);
 end;
 
 procedure jListView.SetTextDecoratedByIndex(Value: TTextDecorated; index: integer);
 begin
   if FInitialized then
-   jListView_setTextDecorated(FjEnv, FjObject , ord(Value), index);
+   jni_proc_ii(FjEnv, FjObject, 'setTextDecorated', ord(Value), index);
 end;
 
 procedure jListView.SetTextSizeDecoratedByIndex(value: TTextSizeDecorated; index: integer);
 begin
   if FInitialized then
-   jListView_setTextSizeDecorated(FjEnv, FjObject , Ord(value), index);
+   jni_proc_ii(FjEnv, FjObject, 'setTextSizeDecorated', Ord(value), index);
 end;
 
 procedure jListView.SetLayoutByIndex(Value: TItemLayout; index: integer);
 begin
   if FInitialized then
-   jListView_setItemLayout(FjEnv, FjObject , ord(Value), index);
+   jni_proc_ii(FjEnv, FjObject, 'setItemLayout', ord(Value), index);
 end;
 
 procedure jListView.SetImageByIndex(Value: jObject; index: integer);
 begin
   if FInitialized then
-     jListView_SetImageItem(FjEnv, FjObject , Value, index);
+     jni_proc_bmp_i(FjEnv, FjObject, 'setImageItem', Value, index);
 end;
 
 procedure jListView.SetImageByIndex(imgResIdentifier: string; index: integer);  overload;
 begin
   if FInitialized then
-     jListView_SetImageItem(FjEnv, FjObject , imgResIdentifier, index);
+     jni_proc_ti(FjEnv, FjObject, 'setImageItem', imgResIdentifier, index);
 end;
 
 
 procedure jListView.SetTextAlignByIndex(Value: TTextAlign; index: integer);
 begin
   if FInitialized then
-    jListView_setTextAlign(FjEnv, FjObject , ord(Value), index);
+    jni_proc_ii(FjEnv, FjObject, 'setTextAlign', ord(Value), index);
 end;
 
 // by ADiV
 procedure jListView.SetTextPositionByIndex(Value: TTextPosition; index: integer);
 begin
   if FInitialized then
-    jListView_setTextPosition(FjEnv, FjObject , ord(Value), index);
+    jni_proc_ii(FjEnv, FjObject, 'setTextPosition', ord(Value), index);
 end;
 
 // by ADiV
 procedure jListView.ClearChecked;
 begin
   if FInitialized then
-    jListView_ClearChecked(FjEnv, FjObject );
+    jni_proc(FjEnv, FjObject, 'ClearChecked' );
 end;
 
 // by ADiV
@@ -8507,13 +8567,13 @@ begin
   Result:= 0;
 
   if FInitialized then
-    result := jListView_GetItemsChecked(FjEnv, FjObject);
+    result := jni_func_out_i(FjEnv, FjObject, 'GetItemsChecked');
 end;
 
 function jListView.IsItemChecked(index: integer): boolean;
 begin
   if FInitialized then
-    Result:= jListView_IsItemChecked(FjEnv, FjObject , index);
+    Result:= jni_func_i_out_z(FjEnv, FjObject, 'isItemChecked', index);
 end;
 
 procedure jListView.SetViewParent(Value: jObject);
@@ -8546,10 +8606,7 @@ end;
 Procedure jListView.Refresh;
 begin
   if FInitialized then
-  begin
-     jListView_Refresh(FjEnv, FjObject ); // by ADiV
-     //View_Invalidate(FjEnv, FjObject );
-  end;
+     jni_proc(FjEnv, FjObject, 'Refresh' ); // by ADiV
 end;
 
 Procedure jListView.SetFontColor(Value: TARGBColorBridge);
@@ -8564,28 +8621,28 @@ Procedure jListView.SetFontColorByIndex(Value: TARGBColorBridge; index: integer)
 begin
   //FFontColor:= Value;
   if FInitialized  and (Value <> colbrDefault) then
-     jListView_setTextColor2(FjEnv, FjObject , GetARGB(FCustomColor, Value), index);
+   jni_proc_ii(FjEnv, FjObject, 'setTextColor2', GetARGB(FCustomColor, Value), index);
 end;
 
 Procedure jListView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
-    jListView_setTextSizeAll(FjEnv, FjObject, FFontSize);
+    jni_proc_i(FjEnv, FjObject, 'setTextSizeAll', FFontSize);
 end;
 
 Procedure jListView.SetFontSizeByIndex(Value: DWord; index: integer);
 begin
   //FFontSize:= Value;
   if FInitialized and (Value > 0) then
-     jListView_setTextSize2(FjEnv, FjObject , Value, index);
+     jni_proc_ii(FjEnv, FjObject, 'setTextSize2', Value, index);
 end;
 
 // by ADiV
 function jListView.GetFontSizeByIndex(index: Integer): integer;
 begin
   if FInitialized then
-    Result:= jListView_GetFontSizeByIndex(FjEnv, FjObject, index);
+    Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetFontSizeByIndex', index);
 end;
 
 // by ADiV
@@ -8593,14 +8650,14 @@ procedure jListView.SetDrawAlphaBackground(_alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetDrawAlphaBackground(FjEnv, FjObject, _alpha);
+     jni_proc_i(FjEnv, FjObject, 'SetDrawAlphaBackground', _alpha);
 end;
 
 // LORDMAN 2013-08-07
 Procedure jListView.SetItemPosition(Value: TXY);
 begin
   if FInitialized then
-     jListView_setItemPosition(FjEnv, FjObject , Value.X, Value.Y);
+     jni_proc_ii(FjEnv, FjObject, 'setItemPosition', Value.X, Value.Y);
 end;
 
 Procedure jListView.Add(item: string; delim: string);
@@ -8645,7 +8702,7 @@ function jListView.GetCount: integer;
 begin
   Result:= Self.Items.Count;
   if FInitialized then
-    Result:= jListView_GetCount(FjEnv, FjObject );
+    Result:= jni_func_out_i(FjEnv, FjObject, 'GetSize' );
 end;
 
 Procedure jListView.Delete(index: Integer);
@@ -8654,7 +8711,7 @@ begin
   begin
      FItems.Delete(index);
      if FInitialized then
-       jListView_delete(FjEnv, FjObject , index);
+       jni_proc_i(FjEnv, FjObject, 'delete', index);
   end;
 end;
 
@@ -8662,7 +8719,7 @@ Procedure jListView.Clear;
 begin
   FItems.Clear;
   if FInitialized then
-    jListView_clear(FjEnv, FjObject );
+    jni_proc(FjEnv, FjObject, 'clear' );
 end;
 
 procedure jListView.SetItems(Value: TStrings);
@@ -8771,7 +8828,7 @@ procedure jListView.SetVisibilityGone();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetVisibilityGone(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetVisibilityGone');
 end;
 
 // Event : Java -> Pascal
@@ -8916,14 +8973,14 @@ begin
   //in designing component state: set value here...
   FHighLightSelectedItemColor:= _color;
   if FInitialized then
-     jListView_SetHighLightSelectedItemColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jni_proc_i(FjEnv, FjObject, 'SetHighLightSelectedItemColor', GetARGB(FCustomColor, _color));
 end;
 
 function jListView.GetItemIndex(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_GetItemIndex(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetItemIndex');
 end;
 
 function jListView.GetItemCaption(): string;
@@ -8937,29 +8994,31 @@ procedure jListView.DispatchOnDrawItemTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetDispatchOnDrawItemTextColor(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemTextColor', _value);
 end;
 
 procedure jListView.DispatchOnDrawItemBitmap(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemBitmap', _value);
 end;
 
 procedure jListView.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
   FFontSizeUnit:=_unit;
-  if FInitialized then
-     jListView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 procedure jListView.SetFontFace(AValue: TFontFace);
 begin
  FFontFace:= AValue;
- if(FInitialized) then
-   jListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
+ if FjObject = nil then exit;
+
+ jni_proc_i(FjEnv, FjObject, 'SetFontFace', Ord(FFontFace));
 end;
 
 procedure jListView.SetItemLayout( _itemLayout : TItemLayout);
@@ -8998,14 +9057,14 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-   result := jListView_getWidgetCheck(FjEnv, FjObject, _index);
+   result := jni_func_i_out_z(FjEnv, FjObject, 'getWidgetCheck', _index);
 end;
 
 procedure jListView.SetItemTagString(_tagString: string; _index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_setItemTagString(FjEnv, FjObject, _tagString ,_index);
+     jni_proc_ti(FjEnv, FjObject, 'setItemTagString', _tagString ,_index);
 end;
 
 
@@ -9043,7 +9102,7 @@ begin
   Result:= FHeight;
   if FInitialized then
   begin
-    result:=jListView_getTotalHeight(FjEnv, FjObject);
+    result:=jni_func_out_i(FjEnv, FjObject, 'getTotalHeight');
   end;
 end;
 
@@ -9052,7 +9111,7 @@ begin
   result:=0;
   if FInitialized then
   begin
-    result:=jListView_getItemHeight(FjEnv, FjObject, aItemIndex);
+    result:=jni_func_i_out_i(FjEnv, FjObject, 'getItemHeight', aItemIndex);
   end;
 end;
 
@@ -9060,22 +9119,23 @@ procedure jListView.SetImageByResIdentifier(_imageResIdentifier: string);
 begin
   //in designing component state: set value here...
   FImageItemIdentifier:= _imageResIdentifier;
-  if FInitialized then
-     jListView_SetImageByResIdentifier(FjEnv, FjObject, _imageResIdentifier);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetImageByResIdentifier', _imageResIdentifier);
 end;
 
 procedure jListView.SetLeftDelimiter(_leftDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetLeftDelimiter(FjEnv, FjObject, _leftDelimiter);
+     jni_proc_t(FjEnv, FjObject, 'SetLeftDelimiter', _leftDelimiter);
 end;
 
 procedure jListView.SetRightDelimiter(_rightDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetRightDelimiter(FjEnv, FjObject, _rightDelimiter);
+     jni_proc_t(FjEnv, FjObject, 'SetRightDelimiter', _rightDelimiter);
 end;
 
 function jListView.GetCenterItemCaption(_fullItemCaption: string): string;
@@ -9103,30 +9163,32 @@ function jListView.GetLongPressSelectedItem(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_GetLongPressSelectedItem(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLongPressSelectedItem');
 end;
 
 procedure jListView.SetAllPartsOnDrawItemTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetAllPartsOnDrawItemTextColor(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetAllPartsOnDrawItemTextColor', _value);
 end;
 
 procedure jListView.SetItemPaddingTop(_ItemPaddingTop: integer);
 begin
   //in designing component state: set value here...
   FItemPaddingTop:= _ItemPaddingTop;
-  if FInitialized then
-     jListView_SetItemPaddingTop(FjEnv, FjObject, _ItemPaddingTop);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetItemPaddingTop', _ItemPaddingTop);
 end;
 
 procedure jListView.SetItemPaddingBottom(_itemPaddingBottom: integer);
 begin
   //in designing component state: set value here...
   FItemPaddingBottom:= _itemPaddingBottom;
-  if FInitialized then
-     jListView_SetItemPaddingBottom(FjEnv, FjObject, _itemPaddingBottom);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetItemPaddingBottom', _itemPaddingBottom);
 end;
 
 // by ADiV
@@ -9134,55 +9196,61 @@ procedure jListView.SetItemPaddingLeft(_itemPaddingLeft: integer);
 begin
   //in designing component state: set value here...
   FItemPaddingLeft := _itemPaddingLeft;
-  if FInitialized then
-     jListView_SetItemPaddingLeft(FjEnv, FjObject, _itemPaddingLeft);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetItemPaddingLeft', _itemPaddingLeft);
 end;
 
 procedure jListView.SetItemPaddingRight(_itemPaddingRight: integer);
 begin
   //in designing component state: set value here...
   FItemPaddingRight := _itemPaddingRight;
-  if FInitialized then
-     jListView_SetItemPaddingRight(FjEnv, FjObject, _itemPaddingRight);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetItemPaddingRight', _itemPaddingRight);
 end;
 
 procedure jListView.SetTextMarginLeft(_left: integer);
 begin
   //in designing component state: set value here...
   FTextMarginLeft := _left;
-  if FInitialized then
-     jListView_SetTextMarginLeft(FjEnv, FjObject, _left);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetTextMarginLeft', _left);
 end;
 
 procedure jListView.SetTextMarginRight(_right: integer);
 begin
   //in designing component state: set value here...
   FTextMarginRight := _right;
-  if FInitialized then
-     jListView_SetTextMarginRight(FjEnv, FjObject, _right);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetTextMarginRight', _right);
 end;
 
 procedure jListView.SetTextMarginInner(_inner: integer);
 begin
   //in designing component state: set value here...
   FTextMarginInner := _inner;
-  if FInitialized then
-     jListView_SetTextMarginInner(FjEnv, FjObject, _inner);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetTextMarginInner', _inner);
 end;
 
 procedure jListView.SetWidgetImageSide(_side: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetWidgetImageSide(FjEnv, FjObject, _side);
+     jni_proc_i(FjEnv, FjObject, 'SetWidgetImageSide', _side);
 end;
 
 procedure jListView.SetTextWordWrap(_value: boolean);
 begin
   //in designing component state: set value here...
   FTextWordWrap := _value;
-  if FInitialized then
-     jListView_SetWordWrap(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetItemCenterWordWrap', _value);
 end;
 
 // by ADiV
@@ -9190,8 +9258,9 @@ procedure jListView.SetEnableOnClickTextLeft(_value: boolean);
 begin
   //in designing component state: set value here...
   FEnableOnClickTextLeft := _value;
-  if FInitialized then
-     jListView_SetEnableOnClickTextLeft(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetEnableOnClickTextLeft', _value);
 end;
 
 // by ADiV
@@ -9199,8 +9268,9 @@ procedure jListView.SetEnableOnClickTextCenter(_value: boolean);
 begin
   //in designing component state: set value here...
   FEnableOnClickTextCenter := _value;
-  if FInitialized then
-     jListView_SetEnableOnClickTextCenter(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetEnableOnClickTextCenter', _value);
 end;
 
 // by ADiV
@@ -9208,15 +9278,16 @@ procedure jListView.SetEnableOnClickTextRight(_value: boolean);
 begin
   //in designing component state: set value here...
   FEnableOnClickTextRight := _value;
-  if FInitialized then
-     jListView_SetEnableOnClickTextRight(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetEnableOnClickTextRight', _value);
 end;
 
 // by ADiV
 procedure jListView.SetItemText(txt: string; index: integer);
 begin
   if FInitialized then
-     jListView_SetItemText(FjEnv, FjObject , txt, index);
+     jni_proc_ti(FjEnv, FjObject, 'setItemTextByIndex', txt, index);
 end;
 
 // by ADiV
@@ -9231,50 +9302,51 @@ procedure jListView.SetWidgetTextColor(_textcolor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   FWidgetTextColor:= _textcolor;
-  if FInitialized then
-      jListView_SetWidgetTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, _textcolor));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetWidgetTextColor', GetARGB(FCustomColor, _textcolor));
 end;
 
 procedure jListView.SetDispatchOnDrawItemWidgetTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetDispatchOnDrawItemWidgetTextColor(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetDispatchOnDrawItemWidgetTextColor', _value);
 end;
 
 procedure jListView.SetDispatchOnDrawItemWidgetText(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetDispatchOnDrawItemWidgetText(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetDispatchOnDrawItemWidgetText', _value);
 end;
 
 procedure jListView.SetWidgetInputTypeIsCurrency(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetWidgetInputTypeIsCurrency(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetWidgetInputTypeIsCurrency', _value);
 end;
 
 procedure jListView.SetWidgetFontFromAssets(_customFontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetWidgetFontFromAssets(FjEnv, FjObject, _customFontName);
+     jni_proc_t(FjEnv, FjObject, 'SetWidgetFontFromAssets', _customFontName);
 end;
 
 procedure jListView.DispatchOnDrawWidgetItemWidgetTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_DispatchOnDrawWidgetItemWidgetTextColor(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawWidgetItemWidgetTextColor', _value);
 end;
 
 procedure jListView.DispatchOnDrawItemWidgetImage(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_DispatchOnDrawItemWidgetImage(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemWidgetImage', _value);
 end;
 
 function jListView.SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
@@ -9288,35 +9360,35 @@ procedure jListView.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetSelection(FjEnv, FjObject, _index);
+     jni_proc_i(FjEnv, FjObject, 'SetSelection', _index);
 end;
 
 procedure jListView.SmoothScrollToPosition(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SmoothScrollToPosition(FjEnv, FjObject, _index);
+     jni_proc_i(FjEnv, FjObject, 'SmoothScrollToPosition', _index);
 end;
 
 procedure jListView.SetItemChecked(_index: integer; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetItemChecked(FjEnv, FjObject, _index ,_value);
+     jni_proc_iz(FjEnv, FjObject, 'SetItemChecked', _index ,_value);
 end;
 
 function jListView.GetCheckedItemPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_GetCheckedItemPosition(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetCheckedItemPosition');
 end;
 
 procedure jListView.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jListView.DisableScroll(_disable : boolean);
@@ -9337,7 +9409,7 @@ procedure jListView.SaveToFile(_appInternalFileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SaveToFile(FjEnv, FjObject, _appInternalFileName);
+     jni_proc_t(FjEnv, FjObject, 'SaveToFile', _appInternalFileName);
 end;
 
 procedure jListView.LoadFromFile(_appInternalFileName: string);
@@ -9352,35 +9424,35 @@ procedure jListView.SetFilterQuery(_query: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetFilterQuery(FjEnv, FjObject, _query);
+     jni_proc_t(FjEnv, FjObject, 'SetFilterQuery', _query);
 end;
 
 procedure jListView.SetFilterQuery(_query: string; _filterMode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetFilterQuery(FjEnv, FjObject, _query ,_filterMode);
+     jni_proc_ti(FjEnv, FjObject, 'SetFilterQuery', _query ,_filterMode);
 end;
 
 procedure jListView.SetFilterMode(_filterMode: TFilterMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetFilterMode(FjEnv, FjObject, Ord(_filterMode));
+     jni_proc_i(FjEnv, FjObject, 'SetFilterMode', Ord(_filterMode));
 end;
 
 procedure jListView.ClearFilterQuery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_ClearFilterQuery(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ClearFilterQuery');
 end;
 
 procedure jListView.SetDrawItemBackColorAlpha(_alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_SetDrawItemBackColorAlpha(FjEnv, FjObject, _alpha);
+     jni_proc_i(FjEnv, FjObject, 'SetDrawItemBackColorAlpha', _alpha);
 end;
 
 //------------------------------------------------------------------------------
@@ -9466,10 +9538,10 @@ begin
   if not FInitialized then
   begin
    FInitialized:= True;
-   jScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
+   SetScrollSize(FScrollSize);
 
    if FFillViewportEnabled then
-      jScrollView_setFillViewport(FjEnv, FjObject, FFillViewportEnabled);
+      SetFillViewport(FFillViewportEnabled);
 
    if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -9513,8 +9585,9 @@ end;
 procedure jScrollView.SetScrollSize(Value: integer);
 begin
   FScrollSize:= Value;
-  if FInitialized then
-     jScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv,FjObject, 'setScrollSize', FScrollSize);
 end;
 
 procedure jScrollView.SetInnerLayout(layout: TScrollInnerLayout);
@@ -9560,8 +9633,9 @@ procedure jScrollView.SetFillViewport(fillenabled: boolean);
 begin
   //in designing component state: set value here...
   FFillViewportEnabled:= fillenabled;
-  if FInitialized then
-     jScrollView_setFillViewport(FjEnv, FjObject, fillenabled);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setFillViewport', fillenabled);
 end;
 
 
@@ -9569,63 +9643,63 @@ procedure jScrollView.ScrollTo(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_ScrollTo(FjEnv, FjObject, _x ,_y);
+     jni_proc_ii(FjEnv, FjObject, 'ScrollTo', _x ,_y);
 end;
 
 procedure jScrollView.SmoothScrollTo(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_SmoothScrollTo(FjEnv, FjObject, _x ,_y);
+     jni_proc_ii(FjEnv, FjObject, 'SmoothScrollTo', _x ,_y);
 end;
 
 procedure jScrollView.SmoothScrollBy(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_SmoothScrollBy(FjEnv, FjObject, _x ,_y);
+     jni_proc_ii(FjEnv, FjObject, 'SmoothScrollBy', _x ,_y);
 end;
 
 function jScrollView.GetScrollX(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jScrollView_GetScrollX(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollX');
 end;
 
 function jScrollView.GetScrollY(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jScrollView_GetScrollY(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollY');
 end;
 
 function jScrollView.GetBottom(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jScrollView_GetBottom(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBottom');
 end;
 
 function jScrollView.GetTop(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jScrollView_GetTop(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetTop');
 end;
 
 function jScrollView.GetLeft(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jScrollView_GetLeft(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLeft');
 end;
 
 function jScrollView.GetRight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jScrollView_GetRight(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRight');
 end;
 
 function jScrollView.GetWidth: integer;
@@ -9654,7 +9728,7 @@ procedure jScrollView.DispatchOnScrollChangedEvent(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_DispatchOnScrollChangedEvent(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchOnScrollChangedEvent', _value);
 end;
 
 procedure jScrollView.AddView(_view: jObject);
@@ -9668,28 +9742,28 @@ procedure jScrollView.AddImage(_bitmap: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImage(FjEnv, FjObject, _bitmap);
+     jni_proc_bmp(FjEnv, FjObject, 'AddImage', _bitmap);
 end;
 
 procedure jScrollView.AddImageFromFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename);
+     jni_proc_tt(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename);
 end;
 
 procedure jScrollView.AddImageFromAssets(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImageFromAssets(FjEnv, FjObject, _filename);
+     jni_proc_t(FjEnv, FjObject, 'AddImageFromAssets', _filename);
 end;
 
 procedure jScrollView.AddImage(_bitmap: jObject; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImage(FjEnv, FjObject, _bitmap ,_itemId);
+     jni_proc_bmp_i(FjEnv, FjObject, 'AddImage', _bitmap ,_itemId);
 end;
 
 procedure jScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer);
@@ -9703,21 +9777,21 @@ procedure jScrollView.AddImageFromAssets(_filename: string; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId);
+     jni_proc_ti(FjEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId);
 end;
 
 procedure jScrollView.AddText(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddText(FjEnv, FjObject, _text);
+     jni_proc_t(FjEnv, FjObject, 'AddText', _text);
 end;
 
 procedure jScrollView.AddImage(_bitmap: jObject; _itemId: integer; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImage(FjEnv, FjObject, _bitmap ,_itemId ,Ord(_scaleType));
+     jni_proc_bmp_ii(FjEnv, FjObject, 'AddImage', _bitmap ,_itemId ,Ord(_scaleType));
 end;
 
 procedure jScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer; _scaleType: TImageScaleType);
@@ -9731,35 +9805,35 @@ procedure jScrollView.AddImageFromAssets(_filename: string; _itemId: integer; _s
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId , Ord(_scaleType));
+     jni_proc_tii(FjEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId , Ord(_scaleType));
 end;
 
 function jScrollView.GetInnerItemId(_index: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jScrollView_GetInnerItemId(FjEnv, FjObject, _index);
+   Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemId', _index);
 end;
 
 function jScrollView.GetInnerItemIndex(_itemId: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jScrollView_GetInnerItemIndex(FjEnv, FjObject, _itemId);
+   Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemIndex', _itemId);
 end;
 
 procedure jScrollView.Delete(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_Delete(FjEnv, FjObject, _index);
+     jni_proc_i(FjEnv, FjObject, 'Delete', _index);
 end;
 
 procedure jScrollView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_Clear(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Clear');
 end;
 
 procedure jScrollView.BringToFront;
@@ -9867,7 +9941,7 @@ begin
   if not FInitialized then
   begin
    FInitialized:= True;
-   jHorizontalScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
+   SetScrollSize(FScrollSize);
    if FColor <> colbrDefault then
      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
@@ -9932,8 +10006,9 @@ end;
 procedure jHorizontalScrollView.SetScrollSize(Value: integer);
 begin
   FScrollSize := Value;
-  if FInitialized then
-     jHorizontalScrollView_setScrollSize(FjEnv,FjObject , FScrollSize);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv,FjObject, 'setScrollSize', FScrollSize);
 end;
 
 procedure jHorizontalScrollView.SetInnerLayout(layout: TScrollInnerLayout);
@@ -9979,133 +10054,133 @@ procedure jHorizontalScrollView.ScrollTo(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_ScrollTo(FjEnv, FjObject, _x ,_y);
+     jni_proc_ii(FjEnv, FjObject, 'ScrollTo', _x ,_y);
 end;
 
 procedure jHorizontalScrollView.SmoothScrollTo(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_SmoothScrollTo(FjEnv, FjObject, _x ,_y);
+     jni_proc_ii(FjEnv, FjObject, 'SmoothScrollTo', _x ,_y);
 end;
 
 procedure jHorizontalScrollView.SmoothScrollBy(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_SmoothScrollBy(FjEnv, FjObject, _x ,_y);
+     jni_proc_ii(FjEnv, FjObject, 'SmoothScrollBy', _x ,_y);
 end;
 
 function jHorizontalScrollView.GetScrollX(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHorizontalScrollView_GetScrollX(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollX');
 end;
 
 function jHorizontalScrollView.GetScrollY(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHorizontalScrollView_GetScrollY(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollY');
 end;
 
 function jHorizontalScrollView.GetBottom(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHorizontalScrollView_GetBottom(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBottom');
 end;
 
 function jHorizontalScrollView.GetTop(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHorizontalScrollView_GetTop(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetTop');
 end;
 
 function jHorizontalScrollView.GetLeft(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHorizontalScrollView_GetLeft(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLeft');
 end;
 
 function jHorizontalScrollView.GetRight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHorizontalScrollView_GetRight(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRight');
 end;
 
 procedure jHorizontalScrollView.DispatchOnScrollChangedEvent(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_DispatchOnScrollChangedEvent(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchOnScrollChangedEvent', _value);
 end;
 
 procedure jHorizontalScrollView.AddView(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddView(FjEnv, FjObject, _view);
+     jni_proc_viw(FjEnv, FjObject, 'AddView', _view);
 end;
 
 procedure jHorizontalScrollView.AddImage(_bitmap: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImage(FjEnv, FjObject, _bitmap);
+     jni_proc_bmp(FjEnv, FjObject, 'AddImage', _bitmap);
 end;
 
 procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename);
+     jni_proc_tt(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename);
 end;
 
 procedure jHorizontalScrollView.AddImageFromAssets(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImageFromAssets(FjEnv, FjObject, _filename);
+     jni_proc_t(FjEnv, FjObject, 'AddImageFromAssets', _filename);
 end;
 
 procedure jHorizontalScrollView.AddImage(_bitmap: jObject; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImage(FjEnv, FjObject, _bitmap ,_itemId);
+     jni_proc_bmp_i(FjEnv, FjObject, 'AddImage', _bitmap ,_itemId);
 end;
 
 procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename ,_itemId);
+     jni_proc_tti(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId);
 end;
 
 procedure jHorizontalScrollView.AddImageFromAssets(_filename: string; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId);
+     jni_proc_ti(FjEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId);
 end;
 
 procedure jHorizontalScrollView.AddText(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddText(FjEnv, FjObject, _text);
+     jni_proc_t(FjEnv, FjObject, 'AddText', _text);
 end;
 
 procedure jHorizontalScrollView.AddImage(_bitmap: jObject; _itemId: integer; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImage(FjEnv, FjObject, _bitmap ,_itemId ,Ord(_scaleType));
+     jni_proc_bmp_ii(FjEnv, FjObject, 'AddImage', _bitmap ,_itemId ,Ord(_scaleType));
 end;
 
 procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer; _scaleType: TImageScaleType);
@@ -10119,35 +10194,35 @@ procedure jHorizontalScrollView.AddImageFromAssets(_filename: string; _itemId: i
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImageFromAssets(FjEnv, FjObject, _filename ,_itemId ,Ord(_scaleType));
+     jni_proc_tii(FjEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId ,Ord(_scaleType));
 end;
 
 function jHorizontalScrollView.GetInnerItemId(_index: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHorizontalScrollView_GetInnerItemId(FjEnv, FjObject, _index);
+   Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemId', _index);
 end;
 
 function jHorizontalScrollView.GetInnerItemIndex(_itemId: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHorizontalScrollView_GetInnerItemIndex(FjEnv, FjObject, _itemId);
+   Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemIndex', _itemId);
 end;
 
 procedure jHorizontalScrollView.Delete(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_Delete(FjEnv, FjObject, _index);
+     jni_proc_i(FjEnv, FjObject, 'Delete', _index);
 end;
 
 procedure jHorizontalScrollView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_Clear(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Clear');
 end;
 
 procedure jHorizontalScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer;  scrolldiff: integer);
@@ -10223,7 +10298,7 @@ begin
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
                   
-  jWebView_SetZoomControl(FjEnv, FjObject, FZoomControl);
+  SetZoomControl(FZoomControl);
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -10248,7 +10323,7 @@ begin
   if not FInitialized then
   begin
    FInitialized:= True;
-   jWebView_SetJavaScript(FjEnv, FjObject , FJavaScript);
+   SetJavaScript(FJavaScript);
 
    if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -10287,8 +10362,9 @@ Procedure jWebView.Refresh;
 Procedure jWebView.SetJavaScript(Value : Boolean);
 begin
   FJavaScript:= Value;
-  if FInitialized then
-     jWebView_SetJavaScript(FjEnv, FjObject , FJavaScript);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setJavaScript', FJavaScript);
 end;
 
 procedure jWebView.SetZoomControl(Value: Boolean);
@@ -10296,14 +10372,17 @@ begin
   if(Value <> FZoomControl) then
   begin
     FZoomControl := Value;
-    if FInitialized then jWebView_SetZoomControl(FjEnv, FjObject, FZoomControl);
+    if FjObject = nil then exit;
+
+    jni_proc_z(FjEnv, FjObject, 'setZoomControl', FZoomControl);
   end;
 end;
 
 Procedure jWebView.Navigate(url: string);
 begin
-  if not FInitialized then Exit;
-  jWebView_loadURL(FjEnv, FjObject , url);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'loadUrl', url);
 end;
 
 Procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
@@ -10315,7 +10394,7 @@ procedure jWebView.LoadFromHtmlString(_htmlString: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_LoadFromHtmlString(FjEnv, FjObject, _htmlString);
+     jni_proc_t(FjEnv, FjObject, 'LoadFromHtmlString', _htmlString);
 end;
 
 procedure jWebView.ClearHistory();  // By ADiV
@@ -10336,42 +10415,42 @@ function jWebView.CanGoBack(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWebView_CanGoBack(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'CanGoBack');
 end;
 
 function jWebView.CanGoBackOrForward(_steps: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWebView_CanGoBackOrForward(FjEnv, FjObject, _steps);
+   Result:= jni_func_i_out_z(FjEnv, FjObject, 'CanGoBackOrForward', _steps);
 end;
 
 function jWebView.CanGoForward(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWebView_CanGoForward(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'CanGoForward');
 end;
 
 procedure jWebView.GoBack();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_GoBack(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'GoBack');
 end;
 
 procedure jWebView.GoBackOrForward(steps: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_GoBackOrForward(FjEnv, FjObject, steps);
+     jni_proc_i(FjEnv, FjObject, 'GoBackOrForward', steps);
 end;
 
 procedure jWebView.GoForward();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_GoForward(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'GoForward');
 end;
 
 procedure jWebView.ClearLayout();
@@ -10425,14 +10504,14 @@ end;
 procedure jWebView.ScrollTo(_x, _y: integer);
 begin
   if FInitialized then
-     jWebView_ScrollTo(FjEnv, FjObject, _x, _y);
+     jni_proc_ii(FjEnv, FjObject, 'scrollTo', _x, _y);
 end;
 
 //LMB
 function jWebView.ScrollY: integer;
 begin
   if FInitialized then
-     result := jWebView_GetScrollY(FjEnv, FjObject)
+     result := jni_func_out_i(FjEnv, FjObject, 'getScrollY')
   else
     result := 0
 end;
@@ -10449,28 +10528,28 @@ end;
 procedure jWebView.FindAll(_s: string);
 begin
   if FInitialized then
-     jWebView_FindAll(FjEnv, FjObject, _s);
+     jni_proc_t(FjEnv, FjObject, 'findAllAsync', _s);
 end;
 
 //LMB
 procedure jWebView.FindNext(_forward: boolean);
 begin
   if FInitialized then
-     jWebView_FindNext(FjEnv, FjObject, _forward);
+     jni_proc_z(FjEnv, FjObject, 'findNext', _forward);
 end;
 
 //LMB
 procedure jWebView.ClearMatches();
 begin
   if FInitialized then
-     jWebView_ClearMatches(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'clearMatches');
 end;
 
 //LMB
 function jWebView.GetFindIndex: integer;
 begin
   if FInitialized then
-     result := jWebView_GetFindIndex(FjEnv, FjObject)
+     result := jni_func_out_i(FjEnv, FjObject, 'getFindIndex')
   else
     result := 0;
 end;
@@ -10479,7 +10558,7 @@ end;
 function jWebView.GetFindCount: integer;
 begin
   if FInitialized then
-     result := jWebView_GetFindCount(FjEnv, FjObject)
+     result := jni_func_out_i(FjEnv, FjObject, 'getFindCount')
   else
     result := 0;
 end;
@@ -10492,7 +10571,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jWebView_getWidth(FjEnv, FjObject );
+   Result:= jni_func_out_i(FjEnv, FjObject, 'getWidth' );
 end;
 
 function jWebView.GetHeight: integer;
@@ -10503,7 +10582,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jWebView_getHeight(FjEnv, FjObject );
+   Result:= jni_func_out_i(FjEnv, FjObject, 'getHeight' );
 end;
 
 //by segator
@@ -10511,7 +10590,7 @@ procedure jWebView.CallEvaluateJavascript(_jsInnerCode: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_CallEvaluateJavascript(FjEnv, FjObject, _jsInnerCode);
+     jni_proc_t(FjEnv, FjObject, 'CallEvaluateJavascript', _jsInnerCode);
 end;
 
 //by segator
@@ -10612,7 +10691,7 @@ Procedure jBitmap.LoadFromRes(imgResIdentifier: String);  // ..res/drawable
 begin
    if FInitialized then
    begin
-       jBitmap_loadRes(FjEnv, FjObject , imgResIdentifier);
+       jni_proc_t(FjEnv, FjObject, 'loadRes', imgResIdentifier);
        FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
        FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
    end;
@@ -10626,7 +10705,7 @@ begin
   begin
     FWidth  := w;
     FHeight := h;
-    jBitmap_createBitmap(FjEnv, FjObject , FWidth, FHeight);
+    jni_proc_ii(FjEnv, FjObject, 'createBitmap', FWidth, FHeight);
   end;
 end;
 
@@ -11048,14 +11127,14 @@ procedure jBitmap.SaveToFileJPG(_fullPathFile: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBitmap_SaveToFileJPG(FjEnv, FjObject, _fullPathFile);
+     jni_proc_t(FjEnv, FjObject, 'SaveToFileJPG', _fullPathFile);
 end;
 
 procedure jBitmap.SaveToFileJPG(_bitmapImage: jObject; _Path: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBitmap_SaveToFileJPG(FjEnv, FjObject, _bitmapImage ,_Path);
+     jni_proc_bmp_t(FjEnv, FjObject, 'SaveToFileJPG', _bitmapImage ,_Path);
 end;
 
 procedure jBitmap.SetImage(_bitmapImage: jObject);
@@ -11063,7 +11142,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jBitmap_SetImage(FjEnv, FjObject, _bitmapImage);
+     jni_proc_bmp(FjEnv, FjObject, 'SetImage', _bitmapImage);
      FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
      FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
   end;
@@ -11094,7 +11173,7 @@ function jBitmap.GetThumbnailImage(_fullPathFile: string; _thumbnailSize: intege
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _fullPathFile ,_thumbnailSize);
+   Result:= jni_func_ti_out_bmp(FjEnv, FjObject, 'GetThumbnailImage', _fullPathFile ,_thumbnailSize);
 end;
 
 function jBitmap.GetThumbnailImage(_bitmap: jObject; _thumbnailSize: integer): jObject;
@@ -11115,21 +11194,21 @@ function jBitmap.GetThumbnailImageFromAssets(_fileName: string; thumbnailSize: i
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetThumbnailImageFromAssets(FjEnv, FjObject, _fileName ,thumbnailSize);
+   Result:= jni_func_ti_out_bmp(FjEnv, FjObject, 'GetThumbnailImageFromAssets', _fileName ,thumbnailSize);
 end;
 
 function jBitmap.GetThumbnailImage(_fullPathFile: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _fullPathFile ,_width ,_height);
+   Result:= jni_func_tii_out_bmp(FjEnv, FjObject, 'GetThumbnailImage', _fullPathFile ,_width ,_height);
 end;
 
 function jBitmap.GetThumbnailImageFromAssets(_filename: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetThumbnailImageFromAssets(FjEnv, FjObject, _filename ,_width ,_height);
+   Result:= jni_func_tii_out_bmp(FjEnv, FjObject, 'GetThumbnailImageFromAssets', _filename ,_width ,_height);
 end;
 
 procedure jBitmap.LoadFromStream(Stream: TMemoryStream);
@@ -11150,7 +11229,7 @@ function jBitmap.GetImageFromBase64String(_imageBase64String: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetImageFromBase64String(FjEnv, FjObject, _imageBase64String);
+   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetImageFromBase64String', _imageBase64String);
 end;
 
 function jBitmap.GetBase64StringFromImageFile(_fullPathToImageFile: string): string;
@@ -11195,10 +11274,10 @@ begin
 
   if FjObject = nil then exit;
 
-  jCanvas_setStrokeWidth(FjEnv, FjObject ,FPaintStrokeWidth);
-  jCanvas_setStyle(FjEnv, FjObject ,ord(FPaintStyle));
-  jCanvas_setColor(FjEnv, FjObject ,GetARGB(FCustomColor, FPaintColor));
-  jCanvas_setTextSize(FjEnv, FjObject ,FPaintTextSize);
+  SetStrokeWidth(FPaintStrokeWidth);
+  SetStyle(FPaintStyle);
+  SetColor(FPaintColor);
+  SetTextSize(FPaintTextSize);
   FInitialized:= True;
 
   // PaintShader new! //by kordal
@@ -11209,39 +11288,43 @@ end;
 Procedure jCanvas.SetStrokeWidth(Value : single );
 begin
   FPaintStrokeWidth:= Value;
-  if FInitialized then
-     jCanvas_setStrokeWidth(FjEnv, FjObject ,FPaintStrokeWidth);
+  if FjObject = nil then exit;
+
+  jni_proc_f(FjEnv, FjObject, 'setStrokeWidth', FPaintStrokeWidth);
 end;
 
 Procedure jCanvas.SetStyle(Value : TPaintStyle);
 begin
   FPaintStyle:= Value;
-  if FInitialized then
-     jCanvas_setStyle(FjEnv, FjObject ,Ord(FPaintStyle));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'setStyle', Ord(FPaintStyle));
 end;
 
 Procedure jCanvas.SetColor(Value : TARGBColorBridge);
 begin
   FPaintColor:= Value;
 
-  if not FInitialized then Exit;
+  if FjObject = nil then exit;
 
-  jCanvas_setColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
+  jni_proc_i(FjEnv, FjObject, 'setColor', GetARGB(FCustomColor, FPaintColor));
 end;
 
 Procedure jCanvas.SetTextSize(Value: single);
 begin
   FPaintTextSize:= Value;
-  if FInitialized then
-     jCanvas_setTextSize(FjEnv, FjObject ,FPaintTextSize);
+  if FjObject = nil then exit;
+
+  jni_proc_f(FjEnv, FjObject, 'setTextSize', FPaintTextSize);
 end;
 
 procedure jCanvas.SetTypeface(Value: TFontFace);
 begin
   //in designing component state: set value here...
   FTypeFace:= Value;
-  if FInitialized then
-     jCanvas_SetTypeface(FjEnv, FjObject, Ord(FTypeFace));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'setTypeface', Ord(FTypeFace));
 end;
 
 procedure jCanvas.SetPaintShader(Value: jPaintShader);
@@ -11263,7 +11346,7 @@ begin
   OldRotation:=FPaintRotation;
   FPaintRotation:= Value;
   if FInitialized then
-     jCanvas_rotate(FjEnv, FjObject ,FPaintRotation-OldRotation);
+     jni_proc_f(FjEnv, FjObject, 'rotate', FPaintRotation-OldRotation);
 end;
 
 procedure jCanvas.Notification(AComponent: TComponent; Operation: TOperation);
@@ -11287,7 +11370,7 @@ end;
 Procedure jCanvas.DrawLine(x1,y1,x2,y2 : single);
 begin
   if FInitialized then
-     jCanvas_drawLine(FjEnv, FjObject ,x1,y1,x2,y2);
+     jni_proc_ffff(FjEnv, FjObject, 'drawLine', x1,y1,x2,y2);
 end;
 
 procedure jCanvas.DrawLine(var _points: TDynArrayOfSingle);
@@ -11300,7 +11383,7 @@ end;
 Procedure jCanvas.DrawPoint(x1,y1 : single);
 begin
   if FInitialized then
-     jCanvas_drawPoint(FjEnv, FjObject ,x1,y1);
+     jni_proc_ff(FjEnv, FjObject, 'drawPoint', x1,y1);
 end;
 
 procedure jCanvas.drawCircle(_cx: single; _cy: single; _radius: single);
@@ -11312,19 +11395,19 @@ end;
 procedure jCanvas.drawOval(_left, _top, _right, _bottom: single);
 begin
   if FInitialized then
-     jCanvas_drawOval(FjEnv, FjObject , _left, _top, _right, _bottom);
+     jni_proc_ffff(FjEnv, FjObject, 'drawOval', _left, _top, _right, _bottom);
 end;
 
 procedure jCanvas.drawBackground(_color: integer);
 begin
   if FInitialized then
-     jCanvas_drawBackground(FjEnv, FjObject ,_color);
+     jni_proc_i(FjEnv, FjObject, 'drawBackground', _color);
 end;
 
 procedure jCanvas.drawRect(_left, _top, _right, _bottom: single);
 begin
   if FInitialized then
-     jCanvas_drawRect(FjEnv, FjObject , _left, _top, _right, _bottom);
+     jni_proc_ffff(FjEnv, FjObject, 'drawRect', _left, _top, _right, _bottom);
 end;
 
 procedure jCanvas.drawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
@@ -11396,13 +11479,13 @@ end;
 function jCanvas.GetDensity(): Single;
 begin
   if FInitialized then
-    Result := jCanvas_GetDensity(FjEnv, FjObject);
+    Result := jni_func_out_f(FjEnv, FjObject, 'GetDensity');
 end;
 
 procedure jCanvas.ClipRect(Left, Top, Right, Bottom: Single);
 begin
   if FInitialized then
-    jCanvas_ClipRect(FjEnv, FjObject, Left, Top, Right, Bottom);
+    jni_proc_ffff(FjEnv, FjObject, 'ClipRect', Left, Top, Right, Bottom);
 end;
 
 procedure jCanvas.DrawGrid(Left, Top, Width, Height: Single; cellsX, cellsY: Integer);
@@ -11522,21 +11605,21 @@ procedure jCanvas.SetDensityScale(_scale: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_SetDensityScale(FjEnv, FjObject, _scale);
+     jni_proc_z(FjEnv, FjObject, 'SetDensityScale', _scale);
 end;
 
 procedure jCanvas.SetBitmap(_bitmap: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_SetBitmap(FjEnv, FjObject, _bitmap);
+     jni_proc_bmp(FjEnv, FjObject, 'SetBitmap', _bitmap);
 end;
 
 procedure jCanvas.SetBitmap(_bitmap: jObject; _width: integer; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_SetBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
+     jni_proc_bmp_ii(FjEnv, FjObject, 'SetBitmap', _bitmap,_width ,_height);
 end;
 
 procedure jCanvas.DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);
@@ -11578,14 +11661,14 @@ procedure jCanvas.Clear( _color : TARGBColorBridge );
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jCanvas_Clear(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+    Clear(GetARGB(FCustomColor, _color));
 end;
 
 procedure jCanvas.Clear(_color: DWord);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_Clear(FjEnv, FjObject, _color);
+     jni_proc_i(FjEnv, FjObject, 'Clear', _color);
 end;
 
 function jCanvas.GetJInstance(): jObject;
@@ -11599,7 +11682,7 @@ procedure jCanvas.SaveBitmapJPG(_fullPathFileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_SaveBitmapJPG(FjEnv, FjObject, _fullPathFileName);
+     jni_proc_t(FjEnv, FjObject, 'SaveBitmapJPG', _fullPathFileName);
 end;
 
 //------------------------------------------------------------------------------
@@ -11908,7 +11991,7 @@ begin
 
   if FjObject = nil then exit;
 
-  jTimer_SetInterval(FjEnv, FjObject , FInterval);
+  SetInterval(FInterval);
   FInitialized:= True;
 end;
 
@@ -11917,14 +12000,15 @@ begin
   FEnabled:= False;
   if not (csDesigning in ComponentState) then FEnabled:= Value;
   if FInitialized then
-     jTimer_SetEnabled(FjEnv, FjObject , Value);
+     jni_proc_z(FjEnv, FjObject, 'SetEnabled', Value);
 end;
 
 Procedure jTimer.SetInterval(Value: integer);
 begin
   FInterval:= Value;
-  if FInitialized then
-     jTimer_SetInterval(FjEnv, FjObject , FInterval);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetInterval', FInterval);
 end;
 
 //------------------------------------------------------------------------------
@@ -11966,7 +12050,7 @@ begin
   if FjObject = nil then exit;
 
   if FTitleAlign <> alLeft then
-   jDialogYN_SetTitleAlign( FjEnv, FjObject, ord(FTitleAlign) );
+   SetTitleAlign( FTitleAlign );
 
   FInitialized:= True;
 end;
@@ -12008,15 +12092,16 @@ end;
 Procedure jDialogYN.SetFontSize( fontSize : integer );
 begin
   if FInitialized then
-     jDialogYN_SetFontSize( FjEnv, FjObject, fontSize );
+     jni_proc_i( FjEnv, FjObject, 'SetFontSize', fontSize );
 end;
 
 Procedure jDialogYN.SetTitleAlign( _titleAlign : TTextAlign );
 begin
   FTitleAlign := _titleAlign;
 
-  if FInitialized then
-     jDialogYN_SetTitleAlign( FjEnv, FjObject, ord(FTitleAlign) );
+  if FjObject = nil then exit;
+
+  jni_proc_i( FjEnv, FjObject, 'SetTitleAlign', ord(FTitleAlign) );
 end;
 
 procedure jDialogYN.SetColorBackground(_color: TARGBColorBridge);
@@ -12148,7 +12233,7 @@ procedure jDialogProgress.Show(_title: string; _msg: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDialogProgress_Show(FjEnv, FjObject, _title ,_msg);
+     jni_proc_tt(FjEnv, FjObject, 'Show', _title ,_msg);
 end;
 
 procedure jDialogProgress.Show(_layout: jObject);
@@ -12164,7 +12249,7 @@ begin
   FMsg:= _msg;
   if not FInitialized then  Exit;
      if FjObject <> nil then
-        jDialogProgress_SetMessage(FjEnv, FjObject, _msg);
+        jni_proc_t(FjEnv, FjObject, 'SetMessage', _msg);
 end;
 
 procedure jDialogProgress.SetTitle(_title: string);
@@ -12172,14 +12257,14 @@ begin
   //in designing component state: set value here...
   FTitle:= _title;
   if FInitialized then
-     jDialogProgress_SetTitle(FjEnv, FjObject, _title);
+     jni_proc_t(FjEnv, FjObject, 'SetTitle', _title);
 end;
 
 procedure jDialogProgress.SetCancelable(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDialogProgress_SetCancelable(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetCancelable', _value);
 end;
 
 //------------------------------------------------------------------------------
@@ -12283,15 +12368,15 @@ begin
   else Self.AnchorId:= -1;
 
   if not FInitialized then
-   jImageBtn_SetEnabled(FjEnv, FjObject, FEnabled);
+   SetEnabled(FEnabled);
 
   if (FImageDownIndex < 0) or (FImageList = nil) then
    if (FImageDownName <> '') then
-     jImageBtn_setButtonDownByRes(FjEnv, FjObject, FImageDownName);
+     SetImageDownByRes(FImageDownName);
 
   if (FImageUpIndex < 0) or (FImageList = nil) then
     if (FImageUpName <> '') then
-     jImageBtn_setButtonUpByRes(FjEnv, FjObject, FImageUpName);
+     SetImageUpByRes(FImageUpName);
 
   if FImageList <> nil then
   begin
@@ -12306,7 +12391,7 @@ begin
   View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
 
   if FSleepDown > 0 then
-     jImageBtn_SetSleepDown(FjEnv, FjObject, FSleepDown);
+     SetSleepDown(FSleepDown);
 
   if not FInitialized then
   begin
@@ -12374,8 +12459,9 @@ end;
 procedure jImageBtn.SetEnabled(Value : Boolean);
 begin
   FEnabled:= Value;
-  if FInitialized then
-     jImageBtn_SetEnabled(FjEnv, FjObject , FEnabled);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'setEnabled', FEnabled);
 end;
 
 procedure jImageBtn.Refresh;
@@ -12434,7 +12520,7 @@ begin
       FImageDownName:= Trim(FImageList.Images.Strings[Value]);
       if  FImageDownName <> '' then
       begin
-        jImageBtn_setButtonDown(FjEnv, FjObject , GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageDownName);
+        jni_proc_t(FjEnv, FjObject, 'setButtonDown', GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageDownName);
       end;
    end;
 
@@ -12450,7 +12536,7 @@ begin
       FImageUpName:= Trim(FImageList.Images.Strings[Value]);
       if  FImageUpName <> '' then
       begin
-        jImageBtn_setButtonUp(FjEnv, FjObject ,GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageUpName);
+        jni_proc_t(FjEnv, FjObject, 'setButtonUp', GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageUpName);
       end;
    end;
    
@@ -12460,16 +12546,18 @@ procedure jImageBtn.SetImageDownByRes(imgResIdentifief: string);
 begin
    FImageDownName:= imgResIdentifief;
 
-   if FInitialized then
-     jImageBtn_setButtonDownByRes(FjEnv, FjObject , imgResIdentifief);
+   if FjObject = nil then exit;
+
+   jni_proc_t(FjEnv, FjObject, 'setButtonDownByRes', imgResIdentifief);
 end;
 
 procedure jImageBtn.SetImageUpByRes(imgResIdentifief: string);
 begin
   FImageUpName:=  imgResIdentifief;
 
-  if FInitialized then
-    jImageBtn_setButtonUpByRes(FjEnv, FjObject , imgResIdentifief);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'setButtonUpByRes', imgResIdentifief);
 end;
 
 // by ADiV
@@ -12587,16 +12675,18 @@ begin
   //in designing component state: set value here...
   FSleepDown:= _sleepMiliSeconds;
   
-  if FInitialized then
-     jImageBtn_SetSleepDown(FjEnv, FjObject, _sleepMiliSeconds);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetSleepDown', _sleepMiliSeconds);
 end;
 
 
 procedure jImageBtn.SetImageState(_imageState: TImageBtnState);
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jImageBtn_SetImageState(FjEnv, FjObject, Ord(_imageState));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetImageState', Ord(_imageState));
 end;
 
 //------------------------------------------------------------------------------
@@ -12648,7 +12738,7 @@ begin
   begin
     Self.UpdateJNI(gApp);
     FRunning:= True;
-    jAsyncTask_Execute(FjEnv, FjObject);
+    jni_proc(FjEnv, FjObject, 'Execute');
   end;
 end;
 
@@ -12806,11 +12896,11 @@ begin
 
   if (not FInitialized) then exit;
 
-  rowCount := jSqliteCursor_GetRowCount(FjEnv, FjObject );
+  rowCount := GetRowCount;
 
   if (rowCount=POSITION_UNKNOWN) or (rowCount =0) then Exit;
 
-  Result := (jSqliteCursor_GetPosition(FjEnv, FjObject) = rowCount);
+  Result := (GetPosition = rowCount);
 end;
 
 function jSqliteCursor.GetBOF: Boolean;
@@ -12821,11 +12911,11 @@ begin
 
   if (not FInitialized) then exit;
 
-  rowCount := jSqliteCursor_GetRowCount(FjEnv, FjObject );
+  rowCount := GetRowCount;
 
   if (rowCount=POSITION_UNKNOWN) or (rowCount =0) then Exit;
 
-  Result := (jSqliteCursor_GetPosition(FjEnv, FjObject) = -1);
+  Result := (GetPosition = -1);
 end;
 
 procedure jSqliteCursor.UnRegisterObserver(AObserver: jVisualControl);
@@ -12888,38 +12978,38 @@ end;
 procedure jSqliteCursor.MoveToFirst;
 begin
    if not FInitialized  then Exit;
-   jSqliteCursor_MoveToFirst(FjEnv, FjObject );
+   jni_proc(FjEnv, FjObject, 'MoveToFirst' );
 end;
 
 procedure jSqliteCursor.MoveToNext;
 begin
   if not FInitialized  then Exit;
-  jSqliteCursor_MoveToNext(FjEnv, FjObject );
+  jni_proc(FjEnv, FjObject, 'MoveToNext' );
 end;
 
 procedure jSqliteCursor.MoveToPrev;
 begin
   if not FInitialized  then Exit;
-  jSqliteCursor_MoveToPrev(FjEnv, FjObject );
+  jni_proc(FjEnv, FjObject, 'MoveToPrev' );
 end;
 
 procedure jSqliteCursor.MoveToLast;
 begin
   if not FInitialized  then Exit;
-  jSqliteCursor_MoveToLast(FjEnv, FjObject );
+  jni_proc(FjEnv, FjObject, 'MoveToLast' );
 end;
 
 procedure jSqliteCursor.MoveToPosition(position: integer);
 begin
   if not FInitialized  then Exit;
-  jSqliteCursor_MoveToPosition(FjEnv, FjObject , position);
+  jni_proc_i(FjEnv, FjObject, 'MoveToPosition', position);
 end;
 
 function jSqliteCursor.GetRowCount: integer;
 begin
 
    if FInitialized  then
-    result:= jSqliteCursor_GetRowCount(FjEnv, FjObject )
+    result:= jni_func_out_i(FjEnv, FjObject, 'GetRowCount' )
    else
     result := 0;
 end;
@@ -12928,7 +13018,7 @@ function jSqliteCursor.GetColumnCount: integer;
 begin
 
   if FInitialized  then
-   Result := jSqliteCursor_GetColumnCount(FjEnv, FjObject )
+   Result := jni_func_out_i(FjEnv, FjObject, 'GetColumnCount' )
   else
    result := 0;
 end;
@@ -12937,7 +13027,7 @@ function jSqliteCursor.GetColumnIndex(colName: string): integer;
 begin
 
    if FInitialized  then
-    result:= jSqliteCursor_GetColumnIndex(FjEnv, FjObject , colName)
+    result:= jni_func_t_out_i(FjEnv, FjObject, 'GetColumnIndex', colName)
    else
     result := -1;
 end;
@@ -12965,7 +13055,7 @@ begin
 
    if not FInitialized  then Exit;
 
-   colType:= jSqliteCursor_GetColType(FjEnv, FjObject , columnIndex);
+   colType:= jni_func_i_out_i(FjEnv, FjObject, 'GetColType', columnIndex);
 
    case colType of
      0: Result:= ftNull;
@@ -12998,7 +13088,7 @@ function jSqliteCursor.GetValueAsBitmap(columnIndex: integer): jObject;
 begin
 
   if FInitialized  then
-   result:= jSqliteCursor_GetValueAsBitmap(FjEnv, FjObject , columnIndex)
+   result:= jni_func_i_out_bmp(FjEnv, FjObject, 'GetValueAsBitmap', columnIndex)
   else
    result := nil;
 end;
@@ -13016,7 +13106,7 @@ function jSqliteCursor.GetValueAsInteger(columnIndex: integer): integer;
 begin
 
   if FInitialized  then
-   result := jSqliteCursor_GetValueAsInteger(FjEnv, FjObject , columnIndex)
+   result := jni_func_i_out_i(FjEnv, FjObject, 'GetValueAsInteger', columnIndex)
   else
    result := -1;
 end;
@@ -13088,7 +13178,7 @@ function jSqliteCursor.GetPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   result := jSqliteCursor_GetPosition(FjEnv, FjObject)
+   result := jni_func_out_i(FjEnv, FjObject, 'GetPosition')
   else
    result := -1;
 end;
@@ -13145,7 +13235,7 @@ begin
   end;
 
   if not FReturnHeaderOnSelect then
-      jSqliteDataAccess_SetReturnHeaderOnSelect(FjEnv, FjObject, FReturnHeaderOnSelect);
+      SetReturnHeaderOnSelect(FReturnHeaderOnSelect);
 
   FFullPathDataBaseName:= GetFilePath(fpathDataBase) + '/' + FDataBaseName;
 
@@ -13155,7 +13245,7 @@ end;
 function jSqliteDataAccess.ExecSQL(execQuery: string) : boolean;
 begin
    if FInitialized then
-    result := jSqliteDataAccess_ExecSQL(FjEnv, FjObject, execQuery)
+    result := jni_func_t_out_z(FjEnv, FjObject, 'ExecSQL', execQuery)
    else
     result := false;
 end;
@@ -13170,7 +13260,7 @@ begin                      {/data/data/com.example.program/databases}
   if not FInitialized then Exit;
 
   fullPathDB:=  GetFilePath(fpathDataBase) + '/' + databaseName;
-  Result:= jSqliteDataAccess_CheckDataBaseExists(FjEnv, FjObject , fullPathDB);
+  Result:= jni_func_t_out_z(FjEnv, FjObject, 'CheckDataBaseExists', fullPathDB);
 end;
 
 procedure jSqliteDataAccess.OpenOrCreate(dataBaseName: string);
@@ -13178,20 +13268,20 @@ begin
   if not FInitialized then Exit;
   FDataBaseName:= dataBaseName;
   if dataBaseName = '' then Exit;
-  jSqliteDataAccess_OpenOrCreate(FjEnv, FjObject , FDataBaseName);
+  jni_proc_t(FjEnv, FjObject, 'OpenOrCreate', FDataBaseName);
 end;
 
 procedure jSqliteDataAccess.SetVersion(version :integer); //renabor
 begin
   if not FInitialized then Exit;
-  jSqliteDataAccess_SetVersion(FjEnv, FjObject , version);
+  jni_proc_i(FjEnv, FjObject, 'SetVersion', version);
 end;
 
 function jSqliteDataAccess.GetVersion():integer; // renabor
 begin
   Result := -1;
   if not FInitialized then Exit;
-  Result:=jSqliteDataAccess_GetVersion(FjEnv, FjObject);
+  Result:=jni_func_out_i(FjEnv, FjObject, 'GetVersion');
 end;
 
 procedure jSqliteDataAccess.AddTable(tableName: string; createTableQuery: string);
@@ -13205,7 +13295,7 @@ end;
 procedure jSqliteDataAccess.CreateAllTables;
 begin
   if not FInitialized then Exit;
-  jSqliteDataAccess_CreateAllTables(FjEnv, FjObject );
+  jni_proc(FjEnv, FjObject, 'CreateAllTables' );
 end;
 
 function jSqliteDataAccess.Select(selectQuery: string): string;
@@ -13225,7 +13315,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result:= jSqliteDataAccess_Select(FjEnv, FjObject, selectQuery ,moveToLast);
+  Result:= jni_func_tz_out_z(FjEnv, FjObject, 'Select', selectQuery ,moveToLast);
 
   if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
@@ -13252,7 +13342,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jSqliteDataAccess_CreateTable(FjEnv, FjObject , createQuery);
+  Result := jni_func_t_out_z(FjEnv, FjObject, 'ExecSQL', createQuery);
 end;
 
 function jSqliteDataAccess.DropTable(tableName: string) : boolean;
@@ -13261,7 +13351,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jSqliteDataAccess_DropTable(FjEnv, FjObject , tableName);
+  Result := jni_func_t_out_z(FjEnv, FjObject, 'DropTable', tableName);
 end;
 
 //ex: "INSERT INTO TABLE1 (NAME, PLACE) VALUES('BRASILIA','CENTRO OESTE')"
@@ -13271,7 +13361,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jSqliteDataAccess_InsertIntoTable(FjEnv, FjObject , insertQuery);
+  Result := jni_func_t_out_z(FjEnv, FjObject, 'InsertIntoTable', insertQuery);
 end;
 
 //ex: "DELETE FROM TABLE1  WHERE PLACE = 'BR'";
@@ -13281,7 +13371,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jSqliteDataAccess_DeleteFromTable(FjEnv, FjObject , deleteQuery);
+  Result := jni_func_t_out_z(FjEnv, FjObject, 'DeleteFromTable', deleteQuery);
 end;
 
 //ex: "UPDATE TABLE1 SET NAME = 'MAX' WHERE PLACE = 'BR'"
@@ -13291,7 +13381,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jSqliteDataAccess_UpdateTable(FjEnv, FjObject , updateQuery);
+  Result := jni_func_t_out_z(FjEnv, FjObject, 'UpdateTable', updateQuery);
 end;
 
 function jSqliteDataAccess.UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string;imageValue: jObject;keyValue: integer) : boolean;
@@ -13307,7 +13397,7 @@ end;
 procedure jSqliteDataAccess.Close;
 begin
   if not FInitialized then Exit;
-  jSqliteDataAccess_Close(FjEnv, FjObject );
+  jni_proc(FjEnv, FjObject, 'Close');
 end;
 
 procedure jSqliteDataAccess.Notification(AComponent: TComponent; Operation: TOperation);
@@ -13342,21 +13432,21 @@ procedure jSqliteDataAccess.SetForeignKeyConstraintsEnabled(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSqliteDataAccess_SetForeignKeyConstraintsEnabled(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetForeignKeyConstraintsEnabled', _value);
 end;
 
 procedure jSqliteDataAccess.SetDefaultLocale();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSqliteDataAccess_SetDefaultLocale(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetDefaultLocale');
 end;
 
 procedure jSqliteDataAccess.DeleteDatabase(_dbName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSqliteDataAccess_DeleteDatabase(FjEnv, FjObject, _dbName);
+     jni_proc_t(FjEnv, FjObject, 'DeleteDatabase', _dbName);
 end;
 
 function jSqliteDataAccess.UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean;
@@ -13406,7 +13496,7 @@ begin
 
   if not FInitialized then exit;
 
-  Result:= jSqliteDataAccess_CheckDataBaseExistsByName(FjEnv, FjObject, _dbName);
+  Result:= jni_func_t_out_z(FjEnv, FjObject, 'CheckDataBaseExistsByName', _dbName);
 end;
 
 procedure jSqliteDataAccess.UpdateImageBatch(var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
@@ -13421,7 +13511,7 @@ begin
   //in designing component state: set value here...
   FDatabaseName:= _dbName;
   if FInitialized then
-     jSqliteDataAccess_SetDataBaseName(FjEnv, FjObject, _dbName);
+     jni_proc_t(FjEnv, FjObject, 'SetDataBaseName', _dbName);
 end;
 
 function jSqliteDataAccess.GetFullPathDataBaseName(): string;
@@ -13440,22 +13530,23 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jSqliteDataAccess_DatabaseExists(FjEnv, FjObject, _databaseName);
+   Result:= jni_func_t_out_z(FjEnv, FjObject, 'DatabaseExists', _databaseName);
 end;
 
 procedure jSqliteDataAccess.SetAssetsSearchFolder(_folderName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSqliteDataAccess_SetAssetsSearchFolder(FjEnv, FjObject, _folderName);
+     jni_proc_t(FjEnv, FjObject, 'SetAssetsSearchFolder', _folderName);
 end;
 
 procedure jSqliteDataAccess.SetReturnHeaderOnSelect(_returnHeader: boolean);
 begin
   //in designing component state: set value here...
   FReturnHeaderOnSelect:= _returnHeader;
-  if FInitialized then
-     jSqliteDataAccess_SetReturnHeaderOnSelect(FjEnv, FjObject, _returnHeader);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetReturnHeaderOnSelect', _returnHeader);
 end;
 
 procedure jSqliteDataAccess.SetBatchAsyncTaskType(_batchAsyncTaskType: TBatchAsyncTaskType);
@@ -13463,7 +13554,7 @@ begin
   //in designing component state: set value here...
   FBatchAsyncTaskType:= _batchAsyncTaskType;
   if FInitialized then
-     jSqliteDataAccess_SetBatchAsyncTaskType(FjEnv, FjObject, Ord(_batchAsyncTaskType));
+     jni_proc_i(FjEnv, FjObject, 'SetBatchAsyncTaskType', Ord(_batchAsyncTaskType));
 end;
 
 procedure jSqliteDataAccess.ExecSQLBatchAsync(var _execSql: TDynArrayOfString);
@@ -13562,8 +13653,8 @@ begin
 
   if not FInitialized then
   begin
-   if FMinZoomFactor <> 0.25 then jPanel_SetMinZoomFactor(FjEnv, FjObject, FMinZoomFactor);
-   if FMaxZoomFactor <> 4.00 then jPanel_SetMaxZoomFactor(FjEnv, FjObject, FMaxZoomFactor);
+   if FMinZoomFactor <> 0.25 then SetMinZoomFactor(FMinZoomFactor);
+   if FMaxZoomFactor <> 4.00 then SetMaxZoomFactor(FMaxZoomFactor);
   end;
 
   View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
@@ -13572,10 +13663,10 @@ begin
   begin
 
    if FAnimationMode <> animNone then //default
-     jPanel_SetAnimationMode(FjEnv, FjObject, Ord(FAnimationMode));
+     SetAnimationMode(FAnimationMode);
 
    if FAnimationDurationIn <> 1500 then //default
-     jPanel_SetAnimationDurationIn(FjEnv, FjObject, FAnimationDurationIn);
+     SetAnimationDurationIn(FAnimationDurationIn);
 
    FInitialized:= True;
    if FColor <> colbrDefault then
@@ -13680,7 +13771,7 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  jPanel_resetLParamsRules(FjEnv, FjObject );
+  jni_proc(FjEnv, FjObject, 'resetLParamsRules' );
 
   for rToP := rpBottom to rpCenterVertical do
   begin
@@ -13729,28 +13820,28 @@ procedure jPanel.RemoveView(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_RemoveView(FjEnv, FjObject, _view);
+     jni_proc_viw(FjEnv, FjObject, 'RemoveView', _view);
 end;
 
 procedure jPanel.RemoveAllViews();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_RemoveAllViews(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'RemoveAllViews');
 end;
 
 function jPanel.GetChildCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jPanel_GetChildCount(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetChildCount');
 end;
 
 procedure jPanel.BringChildToFront(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_BringChildToFront(FjEnv, FjObject, _view);
+     jni_proc_viw(FjEnv, FjObject, 'BringChildToFront', _view);
 end;
 
 procedure jPanel.BringToFront;
@@ -13764,7 +13855,7 @@ procedure jPanel.SetVisibilityGone();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_SetVisibilityGone(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetVisibilityGone');
 end;
 
 procedure jPanel.SetAnimationDurationIn(_animationDurationIn: integer);
@@ -13772,7 +13863,7 @@ begin
   //in designing component state: set value here...
   FAnimationDurationIn:= _animationDurationIn;
   if FInitialized then
-     jPanel_SetAnimationDurationIn(FjEnv, FjObject, _animationDurationIn);
+     jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
 end;
 
 procedure jPanel.SetAnimationMode(_animationMode: TAnimationMode);
@@ -13780,7 +13871,7 @@ begin
   //in designing component state: set value here...
   FAnimationMode:= _animationMode;
   if FInitialized then
-     jPanel_SetAnimationMode(FjEnv, FjObject, Ord(_animationMode));
+     jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
 end;
 
 // Event : Java -> Pascal
@@ -13851,58 +13942,60 @@ procedure jPanel.SetMinZoomFactor(_minZoomFactor: single);
 begin
   //in designing component state: set value here...
   FMinZoomFactor:= _minZoomFactor;
-  if FInitialized then
-     jPanel_SetMinZoomFactor(FjEnv, FjObject, _minZoomFactor);
+  if FjObject = nil then exit;
+
+  jni_proc_f(FjEnv, FjObject, 'SetMinZoomFactor', _minZoomFactor);
 end;
 
 procedure jPanel.SetMaxZoomFactor(_maxZoomFactor: single);
 begin
   //in designing component state: set value here...
   FMaxZoomFactor:= _maxZoomFactor;
-  if FInitialized then
-     jPanel_SetMaxZoomFactor(FjEnv, FjObject, _maxZoomFactor);
+  if FjObject = nil then exit;
+
+  jni_proc_f(FjEnv, FjObject, 'SetMaxZoomFactor', _maxZoomFactor);
 end;
 
 procedure jPanel.CenterInParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_CenterInParent(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'CenterInParent');
 end;
 
 procedure jPanel.MatchParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_MatchParent(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'MatchParent');
 end;
 
 procedure jPanel.WrapContent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_WrapContent(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'WrapContent');
 end;
 
 procedure jPanel.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_SetRoundCorner(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jPanel.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+     jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
 end;
 
 procedure jPanel.SetBackgroundAlpha(_alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_SetBackgroundAlpha(FjEnv, FjObject, _alpha);
+     jni_proc_i(FjEnv, FjObject, 'SetBackgroundAlpha', _alpha);
 end;
 
 procedure jPanel.SetMarginLeftTopRightBottom(_left,_top,_right,_bottom: integer);
@@ -13912,7 +14005,7 @@ begin
   FMarginRight:= _right;
   FMarginBottom:= _bottom;
   if FInitialized then
-      jPanel_SetMarginLeftTopRightBottom(FjEnv, FjObject ,
+      jni_proc_iiii(FjEnv, FjObject, 'SetMarginLeftTopRightBottom',
                                           _left,_top,_right,_bottom);
 end;
 
@@ -13935,7 +14028,7 @@ procedure jPanel.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 {---------  jDBListView  --------------}
@@ -13997,13 +14090,13 @@ begin
    if FjObject = nil then exit;
 
    if FFontColor <> colbrDefault then
-    jDBListView_setFontColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+    SetFontColor(FFontColor);
 
    if FFontSizeUnit <> unitDefault then
-    jDBListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+    SetFontSizeUnit(FFontSizeUnit);
 
    if FFontSize > 0 then
-    jDBListView_setFontSize(FjEnv, FjObject , FFontSize);
+    SetFontSize(FFontSize);
 
    weights := nil;
 
@@ -14340,7 +14433,7 @@ function jDBListView.GetItemIndex(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jDBListView_GetItemIndex(FjEnv, FjObject);
+    Result := jni_func_out_i(FjEnv, FjObject, 'GetItemIndex');
 end;
 
 function jDBListView.GetItemCaption(): string;
@@ -14354,45 +14447,34 @@ procedure jDBListView.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetSelection(FjEnv, FjObject, _index);
-end;
-(*
-procedure jDBListView.DispatchOnDrawItemTextColor(_value: boolean);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-    jDBListView_DispatchOnDrawItemTextColor(FjEnv, FjObject, _value);
+    jni_proc_i(FjEnv, FjObject, 'SetSelection', _index);
 end;
 
-procedure jDBListView.DispatchOnDrawItemBitmap(_value: boolean);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-    jDBListView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
-end;
-*)
 procedure jDBListView.SetFontSize(_size: DWord);
 begin
   //in designing component state: set value here...
   FFontSize := _size;
-  if FInitialized then
-    jDBListView_SetFontSize(FjEnv, FjObject, _size);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSize', _size);
 end;
 
 procedure jDBListView.SetFontColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   FFontColor := _color;
-  if FInitialized then
-    jDBListView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jDBListView.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
   FFontSizeUnit := _unit;
-  if FInitialized then
-    jDBListView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 procedure jDBListView.ChangeCursor(NewCursor: jSqliteCursor);

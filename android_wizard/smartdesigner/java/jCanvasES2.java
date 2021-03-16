@@ -123,9 +123,9 @@ public class jCanvasES2 extends GLSurfaceView {
 	
 	public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {		
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
-	}
-
-	public  void SetParent( android.view.ViewGroup _viewgroup ) {		
+	}	
+	
+	public  void SetViewParent(ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
 

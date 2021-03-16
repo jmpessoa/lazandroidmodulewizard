@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,26 +30,51 @@ public class jView extends View {
 		//this.setWillNotDraw(false);  //fire onDraw ... thanks to tintinux
 	}
 
+	/* deprecated
 	public Bitmap getBitmap(){
 		this.setDrawingCacheEnabled(true);  //thanks to tintinux
 		Bitmap b = Bitmap.createBitmap(this.getDrawingCache());
 		this.setDrawingCacheEnabled(false);
 		return b;
 	}
+	*/
 
-	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	//updated by Tomash
+	public Bitmap getBitmap(){
+		try {
+ 	    	Bitmap bitmap = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
+  	    	Canvas canvas = new Canvas(bitmap);
+   			Drawable background = this.getBackground();
+    		if (background != null) {
+				background.draw(canvas);
+			}
+			this.draw(canvas);
+			return bitmap;
+		}
+		catch (Exception e) 
+		{
+			//Log.e("jView_getBitmap", "Exception: "+ e.toString() );
+			return null;
+		}			
+    }	
+
+	public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
+	public void SetViewParent( android.view.ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
 
 	//
-	public  void setjCanvas(java.lang.Object canvas) {
+	public void setjCanvas(java.lang.Object canvas) {
 		jcanvas = (jCanvas)canvas;
 	}
-
+	
+	public void SetLayerType(byte _value) {
+		setLayerType(_value/*View.LAYER_TYPE_SOFTWARE*/, null);
+	}	
+	
 	//
 	@Override
 	public  boolean onTouchEvent( MotionEvent event) {
@@ -131,46 +157,52 @@ public class jView extends View {
 	public  void Free() {
 		LAMWCommon.free();
 	}
+	
+	public void BringToFront() {
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();
+	}
 
-	public void setLParamWidth(int _w) {
+	public void SetLParamWidth(int _w) {
 		LAMWCommon.setLParamWidth(_w);
 	}
 
-	public void setLParamHeight(int _h) {
+	public void SetLParamHeight(int _h) {
 		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public int getLParamHeight() {
+	public int GetLParamHeight() {
 		//return getHeight();
 		return  LAMWCommon.getLParamHeight();
 	}
 
-	public int getLParamWidth() {
+	public int GetLParamWidth() {
 		//return getWidth();
 		return LAMWCommon.getLParamWidth();
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int _idAnchor) {
+	public void SetLayoutAll(int _idAnchor) {
 		LAMWCommon.setLayoutAll(_idAnchor);
 	}
 
-	public void clearLayoutAll() {
+	public void ClearLayoutAll() {
 		LAMWCommon.clearLayoutAll();
 	}
 }

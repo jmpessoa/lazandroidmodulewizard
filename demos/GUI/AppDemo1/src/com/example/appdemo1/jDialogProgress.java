@@ -42,7 +42,17 @@ public class jDialogProgress {
 	  public void Show() {
 		if (dialog != null) dialog.dismiss();
 		dialog = null;	  
-		dialog = new ProgressDialog(controls.activity);
+		dialog = new ProgressDialog(controls.activity) {
+				//by Tomash
+				@Override
+                public void onBackPressed() {
+				  if (mCancelable) { 
+                  dialog.dismiss();
+
+		          }
+                  controls.pOnBackPressed(PasObj); // Pascal Event
+
+                }};
 		
 		if (!mMsg.equals("")) dialog.setMessage(mMsg);		 
 		if (!mTitle.equals("")) 
@@ -50,9 +60,9 @@ public class jDialogProgress {
 		 else 
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-		if (mCancelable)
-	       dialog.setCancelable(true);
-	    else   
+//		if (mCancelable)
+//	       dialog.setCancelable(true);
+//	    else   
 	    	dialog.setCancelable(false);
 		
 	    dialog.show();

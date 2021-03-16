@@ -63,6 +63,7 @@ begin
 
   gApp.CreateForm(TAndroidModule2, AndroidModule2);
   AndroidModule2.InitShowing(gapp);
+  //AndroidModule2.Show;
 end;
 
 procedure TAndroidModule1.AndroidModule1Init(Sender: TObject);

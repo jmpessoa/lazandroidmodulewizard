@@ -1,1 +1,1 @@
-/adt32/sdk/platform-tools/adb uninstall com.example.appdemo1
+/laztoapk/downloads/android-sdk-windows/platform-tools/adb uninstall com.example.appdemo1

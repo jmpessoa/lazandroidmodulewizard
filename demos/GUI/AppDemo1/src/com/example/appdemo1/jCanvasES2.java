@@ -59,25 +59,10 @@ public class jCanvasES2 extends GLSurfaceView {
 	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
 	private GLRenderer       renderer;
 	private GL10            savGL;
-
-	//by jmpessoa
-	private int lparamsAnchorRule[] = new int[30];
-	int countAnchorRule = 0;
-
-	private int lparamsParentRule[] = new int[30];
-	int countParentRule = 0;
-
-	int lparamH = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-	int lparamW = android.view.ViewGroup.LayoutParams.MATCH_PARENT; //w
-	int marginLeft = 5;
-	int marginTop = 5;
-	int marginRight = 5;
-	int marginBottom = 5;
-	private int lgravity = Gravity.TOP | Gravity.START;
-	private float lweight = 0;
 	
-	private boolean mflag = false;
+	private jCommons LAMWCommon;
 	
+	private boolean mflag = false;	
 	
 	private boolean mDispatchTouchDown = true;
 	private boolean mDispatchTouchMove = true;
@@ -124,8 +109,7 @@ public class jCanvasES2 extends GLSurfaceView {
 		PasObj   = pasobj;
 		controls = ctrls;
 		
-		lparams = new ViewGroup.MarginLayoutParams(lparamW, lparamH);     // W,H
-		lparams.setMargins(marginLeft,marginTop,marginRight,marginBottom); // L,T,R,B
+		LAMWCommon = new jCommons(this,context,pasobj);
 			
 		renderer = new GLRenderer();
 		if (version != 1) {setEGLContextClientVersion(2); };				
@@ -137,39 +121,12 @@ public class jCanvasES2 extends GLSurfaceView {
 		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);				
 	}
 	
-	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
-		marginLeft = left;
-		marginTop = top;
-		marginRight = right;
-		marginBottom = bottom;
-		lparamH = h;
-		lparamW = w;
-	}
-
-	private static MarginLayoutParams newLayoutParams(ViewGroup _aparent, ViewGroup.MarginLayoutParams _baseparams) {
-		if (_aparent instanceof FrameLayout) {
-			return new FrameLayout.LayoutParams(_baseparams);
-		} else if (_aparent instanceof RelativeLayout) {
-			return new RelativeLayout.LayoutParams(_baseparams);
-		} else if (_aparent instanceof ViewGroup) {
-			return new  RelativeLayout.LayoutParams(_baseparams);						
-		} else if (_aparent instanceof LinearLayout) {
-			return new LinearLayout.LayoutParams(_baseparams);
-		} else if (_aparent == null) {
-			throw new NullPointerException("Parent is null");
-		} else {
-			throw new IllegalArgumentException("Parent is neither FrameLayout or RelativeLayout or LinearLayout: "
-					+ _aparent.getClass().getName());
-		}
-	}
-
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-
-		parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		lparams = null;
-		lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
+	public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {		
+		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
+	}	
+	
+	public  void SetViewParent(ViewGroup _viewgroup ) {
+		LAMWCommon.setParent(_viewgroup);
 	}
 
 	/*
@@ -386,67 +343,48 @@ public class jCanvasES2 extends GLSurfaceView {
 	}
 
 	//by jmpessoa
-	public void setLParamWidth(int w) {
-		lparamW = w;
+	public void SetLParamWidth(int _w) {
+		LAMWCommon.setLParamWidth(_w);
 	}
 
 	//by jmpessoa
-	public void setLParamHeight(int h) {
-		lparamH = h;
+	public void SetLParamHeight(int _h) {
+		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public void setLGravity(int _g) {
-		lgravity = _g;
+	public void SetLGravity(int _g) {
+		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
-		lweight = _w;
+	public void SetLWeight(float _w) {
+		LAMWCommon.setLWeight(_w);
+	}
+		
+	public void ClearLayoutAll() {
+		  LAMWCommon.clearLayoutAll();
 	}
 
 	//by jmpessoa
-	public int getLParamHeight() {
+	public int GetLParamHeight() {
 		return getHeight();
 	}
 
 	//by jmpessoa
-	public int getLParamWidth() {
+	public int GetLParamWidth() {
 		return getWidth();
 	}
 
 	//by jmpessoa
-	public void addLParamsAnchorRule(int rule) {
-		lparamsAnchorRule[countAnchorRule] = rule;
-		countAnchorRule = countAnchorRule + 1;
+	public void AddLParamsAnchorRule(int rule) {
+		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 	//by jmpessoa
-	public void addLParamsParentRule(int rule) {
-		lparamsParentRule[countParentRule] = rule;
-		countParentRule = countParentRule + 1;
+	public void AddLParamsParentRule(int rule) {		
+		 LAMWCommon.addLParamsParentRule(rule);
 	}
 	//by jmpessoa
-	public void setLayoutAll(int idAnchor) {
-		lparams.width  = lparamW;
-		lparams.height = lparamH;
-		lparams.setMargins(marginLeft, marginTop,marginRight,marginBottom);
-
-		if (lparams instanceof RelativeLayout.LayoutParams) {
-			if (idAnchor > 0) {
-				for (int i = 0; i < countAnchorRule; i++) {
-					((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], idAnchor);
-				}
-			}
-			for (int j = 0; j < countParentRule; j++) {
-				((RelativeLayout.LayoutParams)lparams).addRule(lparamsParentRule[j]);
-			}
-		}
-		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
-		}
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
-		}
-		//
-		setLayoutParams(lparams);
+	public void SetLayoutAll(int idAnchor) {		
+		LAMWCommon.setLayoutAll(idAnchor);
 	}
 
 	//by jmpessoa

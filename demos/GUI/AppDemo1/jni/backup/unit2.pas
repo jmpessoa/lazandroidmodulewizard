@@ -32,6 +32,8 @@ type
       jTextView1: jTextView;
       jTextView2: jTextView;
 
+      procedure AndroidModule2ActivityCreate(Sender: TObject;
+        intentData: jObject);
       procedure AndroidModule2BackButton(Sender: TObject);
       procedure AndroidModule2Close(Sender: TObject);
       procedure AndroidModule2CloseQuery(Sender: TObject; var CanClose: boolean);

@@ -39,14 +39,14 @@ public class jCheckBox extends CheckBox {
 		setOnClickListener(onClickListener);
 	}
 
-	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		String tag = ""+left+"|"+top+"|"+right+"|"+bottom;
 		this.setTag(tag); //nedd by jsRecyclerView.java
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 
 	
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
+	public  void SetViewParent( android.view.ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
 
@@ -57,11 +57,11 @@ public class jCheckBox extends CheckBox {
 		LAMWCommon.free();
 	}
 
-	public void setLParamWidth(int w) {
+	public void SetLParamWidth(int w) {
 		LAMWCommon.setLParamWidth(w);
 	}
 
-	public void setLParamHeight(int h) {
+	public void SetLParamHeight(int h) {
 		LAMWCommon.setLParamHeight(h);
 	}
 
@@ -69,29 +69,25 @@ public class jCheckBox extends CheckBox {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
 
-	public void setLayoutAll(int idAnchor) {  
+	public void SetLayoutAll(int idAnchor) {  
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 
 	public void ClearLayoutAll() {		//TODO Pascal
 		LAMWCommon.clearLayoutAll();
-	}
-	
-	public void setIdEx(int id) {
-		setId(id);
 	}
 
 	public void setTextColor2(int value) {
@@ -137,26 +133,15 @@ public class jCheckBox extends CheckBox {
 		this.setText(t);
 	}
 	
-	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null; // by tr3e
-		
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+				
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -170,13 +155,14 @@ public class jCheckBox extends CheckBox {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier,int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
 		
-		if( id == 0 ) return; // by tr3e
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
-		Drawable d = GetDrawableResourceById(id);
-		
-		if( d == null ) return; // by tr3e
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
 		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
