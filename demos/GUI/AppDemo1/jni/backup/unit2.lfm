@@ -20,6 +20,7 @@ object AndroidModule2: TAndroidModule2
   OnCloseQuery = AndroidModule2CloseQuery
   OnBackButton = AndroidModule2BackButton
   OnClose = AndroidModule2Close
+  OnActivityCreate = AndroidModule2ActivityCreate
   object jTextView1: jTextView
     MarginLeft = 10
     MarginTop = 10

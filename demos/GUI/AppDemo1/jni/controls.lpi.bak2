@@ -18,17 +18,15 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <CustomData Count="10">
+    <CustomData Count="8">
       <Item0 Name="BuildSystem" Value="Ant"/>
       <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.6.1"/>
+      <Item2 Name="LamwVersion" Value="0.8.4"/>
       <Item3 Name="NdkApi" Value="android-22"/>
-      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r20\"/>
+      <Item4 Name="NdkPath" Value="C:\android\ndkr18b\"/>
       <Item5 Name="Package" Value="com.example.appdemo1"/>
-      <Item6 Name="SdkPath" Value="c:\laztoapk\downloads\android-sdk-windows\"/>
-      <Item7 Name="StartModule" Value="AndroidModule1"/>
-      <Item8 Name="Support" Value="FALSE"/>
-      <Item9 Name="Theme" Value="DeviceDefault"/>
+      <Item6 Name="SdkPath" Value="C:\adt32\sdk\"/>
+      <Item7 Name="Theme" Value="DeviceDefault"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -148,7 +146,7 @@
         <ComponentName Value="AndroidModule10"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView;jTimer"/>
+          <Item0 Name="jControls" Value="jButton;jCanvasES1;jForm;jImageList;jTextView;jTimer"/>
         </CustomData>
       </Unit10>
       <Unit11>
@@ -204,7 +202,7 @@
       <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r20\platforms\android-22\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
+      <Libraries Value="C:\android\ndkr18b\platforms\android-22\arch-arm\usr\lib\;C:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
@@ -228,7 +226,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\android\ndkr18b\\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

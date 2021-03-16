@@ -1,56 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <ProjectOptions>
-    <Version Value="11"/>
+  <ProjectSession>
     <PathDelim Value="\"/>
-    <General>
-      <Flags>
-        <MainUnitHasCreateFormStatements Value="False"/>
-        <MainUnitHasTitleStatement Value="False"/>
-        <LRSInOutputDirectory Value="False"/>
-      </Flags>
-      <SessionStorage Value="InProjectDir"/>
-      <MainUnit Value="0"/>
-      <Title Value="controls"/>
-      <UseAppBundle Value="False"/>
-      <ResourceType Value="res"/>
-    </General>
-    <i18n>
-      <EnableI18N LFM="False"/>
-    </i18n>
-    <CustomData Count="10">
-      <Item0 Name="BuildSystem" Value="Ant"/>
-      <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.6.1"/>
-      <Item3 Name="NdkApi" Value="android-22"/>
-      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r20\"/>
-      <Item5 Name="Package" Value="com.example.appdemo1"/>
-      <Item6 Name="SdkPath" Value="c:\laztoapk\downloads\android-sdk-windows\"/>
-      <Item7 Name="StartModule" Value="AndroidModule1"/>
-      <Item8 Name="Support" Value="FALSE"/>
-      <Item9 Name="Theme" Value="DeviceDefault"/>
-    </CustomData>
-    <BuildModes Count="1">
-      <Item1 Name="Default" Default="True"/>
-    </BuildModes>
-    <PublishOptions>
-      <Version Value="2"/>
-    </PublishOptions>
-    <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="1">
-        <Mode0 Name="default"/>
-      </Modes>
-    </RunParams>
-    <RequiredPackages Count="1">
-      <Item1>
-        <PackageName Value="tfpandroidbridge_pack"/>
-      </Item1>
-    </RequiredPackages>
-    <Units Count="16">
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="19">
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="33" Y="8"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -61,6 +23,13 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jImageList;jImageView;jTextView;jTimer"/>
         </CustomData>
+        <EditorIndex Value="1"/>
+        <TopLine Value="50"/>
+        <CursorPos X="36" Y="65"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit1>
       <Unit2>
         <Filename Value="unit2.pas"/>
@@ -71,6 +40,11 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jImageList;jImageView;jTextView"/>
         </CustomData>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="173"/>
+        <CursorPos X="3" Y="176"/>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit2>
       <Unit3>
         <Filename Value="unit3.pas"/>
@@ -81,6 +55,8 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCheckBox;jDialogProgress;jDialogYN;jEditText;jImageList;jImageView;jProgressBar;jRadioButton;jTextView;jTimer"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit4.pas"/>
@@ -91,6 +67,11 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jEditText;jScrollView;jTextView"/>
         </CustomData>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="12"/>
+        <CursorPos X="52" Y="55"/>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit4>
       <Unit5>
         <Filename Value="unit5.pas"/>
@@ -101,6 +82,8 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jEditText;jPanel;jTextView;jWebView"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit5>
       <Unit6>
         <Filename Value="unit6.pas"/>
@@ -111,6 +94,8 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jBitmap;jButton;jEditText;jImageList;jListView;jTextView"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit6>
       <Unit7>
         <Filename Value="unit7.pas"/>
@@ -121,6 +106,8 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jImageBtn;jImageList;jImageView;jScrollView;jTextView"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit7>
       <Unit8>
         <Filename Value="unit8.pas"/>
@@ -131,6 +118,8 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jBitmap;jButton;jCanvas;jImageList;jImageView;jTextView;jView"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit8>
       <Unit9>
         <Filename Value="unit9.pas"/>
@@ -141,6 +130,8 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jBitmap;jButton;jCanvas;jImageList;jTextView;jView"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit9>
       <Unit10>
         <Filename Value="unit10.pas"/>
@@ -150,6 +141,8 @@
         <CustomData Count="1">
           <Item0 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView;jTimer"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit10>
       <Unit11>
         <Filename Value="unit11.pas"/>
@@ -160,6 +153,11 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCanvasES2;jImageList;jTextView;jTimer"/>
         </CustomData>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="205"/>
+        <CursorPos X="5" Y="216"/>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit11>
       <Unit12>
         <Filename Value="unit12.pas"/>
@@ -170,6 +168,8 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit12>
       <Unit13>
         <Filename Value="unit13.pas"/>
@@ -180,6 +180,8 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCanvasES2;jTextView;jTimer"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit13>
       <Unit14>
         <Filename Value="unit14.pas"/>
@@ -190,58 +192,55 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCheckBox;jEditText;jHttpClient;jProgressBar;jScrollView;jTextView;jTimer"/>
         </CustomData>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit14>
       <Unit15>
         <Filename Value="unitglobal.pas"/>
         <IsPartOfProject Value="True"/>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit15>
+      <Unit16>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="7064"/>
+        <CursorPos X="57" Y="7076"/>
+        <UsageCount Value="11"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11209"/>
+        <CursorPos X="40" Y="11280"/>
+        <UsageCount Value="10"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_GLESv2_Canvas.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1376"/>
+        <CursorPos X="38" Y="1393"/>
+        <UsageCount Value="10"/>
+      </Unit18>
     </Units>
-  </ProjectOptions>
-  <CompilerOptions>
-    <Version Value="11"/>
-    <PathDelim Value="\"/>
-    <Target>
-      <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
-    </Target>
-    <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r20\platforms\android-22\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
-      <UnitOutputDirectory Value="..\obj\controls"/>
-    </SearchPaths>
-    <Parsing>
-      <SyntaxOptions>
-        <SyntaxMode Value="Delphi"/>
-        <CStyleMacros Value="True"/>
-      </SyntaxOptions>
-    </Parsing>
-    <CodeGeneration>
-      <TargetCPU Value="arm"/>
-      <TargetOS Value="android"/>
-    </CodeGeneration>
-    <Linking>
-      <Debugging>
-        <GenerateDebugInfo Value="False"/>
-        <StripSymbols Value="True"/>
-      </Debugging>
-      <LinkSmart Value="True"/>
-      <Options>
-        <ExecutableType Value="Library"/>
-      </Options>
-    </Linking>
-    <Other>
-      <CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
-    </Other>
-  </CompilerOptions>
-  <Debugging>
-    <Exceptions Count="3">
-      <Item1>
-        <Name Value="EAbort"/>
-      </Item1>
-      <Item2>
-        <Name Value="ECodetoolError"/>
-      </Item2>
-      <Item3>
-        <Name Value="EFOpenError"/>
-      </Item3>
-    </Exceptions>
-  </Debugging>
+    <JumpHistory Count="3" HistoryIndex="2">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="98" Column="3" TopLine="80"/>
+      </Position1>
+      <Position2>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="108" Column="23" TopLine="86"/>
+      </Position2>
+      <Position3>
+        <Filename Value="controls.lpr"/>
+        <Caret Line="8" Column="33"/>
+      </Position3>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode="default"/>
+    </RunParams>
+  </ProjectSession>
 </CONFIG>
