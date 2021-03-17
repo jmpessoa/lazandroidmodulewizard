@@ -83,8 +83,6 @@ jsRecyclerView = class(jVisualControl)
     procedure GenEvent_OnRecyclerViewItemWidgetTouchDown(Obj: TObject; itemIndex: integer;
                                                      widget: TItemContentFormat; widgetId: integer);
 
-    function jCreate( _mode: integer; _direction: integer; _cols: integer): jObject;
-    procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetParent(): jObject;
     procedure RemoveFromViewParent(); override;
@@ -204,7 +202,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -223,7 +221,7 @@ begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    //FjObject := jCreate(); if FjObject = nil then exit;
-   FjObject:= jCreate(Ord(FLayoutModel), Ord(FLayoutOrientation), FColumns); //jSelf !
+   FjObject:= jsRecyclerView_jCreate(FjEnv, int64(Self), Ord(FLayoutModel), Ord(FLayoutOrientation), FColumns, FjThis);
 
    if FjObject = nil then exit;
 
@@ -231,7 +229,6 @@ begin
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
 
    FjPRLayoutHome:= FjPRLayout;
-
 
    if FGravityInParent <> lgNone then
      SetLGravity(FGravityInParent);
@@ -357,24 +354,6 @@ procedure jsRecyclerView.GenEvent_OnRecyclerViewItemWidgetTouchDown(Obj: TObject
                                                  widget: TItemContentFormat; widgetId: integer);
 begin
   if Assigned(FOnItemWidgetTouchDown) then FOnItemWidgetTouchDown(Obj, itemIndex, widget, widgetId);
-end;
-
-{
-function jsRecyclerView.jCreate(): jObject;
-begin
-   Result:= jsRecyclerView_jCreate(FjEnv, int64(Self), FjThis);
-end;
-}
-function jsRecyclerView.jCreate( _mode: integer; _direction: integer; _cols: integer): jObject;
-begin
-   Result:= jsRecyclerView_jCreate(FjEnv, int64(Self), _mode ,_direction ,_cols, FjThis);
-end;
-
-procedure jsRecyclerView.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jsRecyclerView.SetViewParent(_viewgroup: jObject);
@@ -744,7 +723,9 @@ begin
   jParams[2].i:= _direction;
   jParams[3].i:= _cols;
   jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'jsRecyclerView_jCreate', '(JIII)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
@@ -758,7 +739,9 @@ var
 begin
   jParams[0].l:= _itemViewLayout;
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemViewLayout', '(Landroid/view/View;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -772,7 +755,9 @@ begin
   jParams[0].l:= _itemViewLayout;
   jParams[1].z:= JBool(_forceCardStyle);
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemViewLayout', '(Landroid/view/View;Z)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -23,7 +23,6 @@ jSpeechToText = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    procedure jFree();
     function SpeakIn() : boolean;  overload;
     function SpeakIn(_promptMessage: string) : boolean; overload;
     procedure SetPromptMessage(_promptMessage: string);
@@ -40,6 +39,7 @@ jSpeechToText = class(jControl)
 
 end;
 
+function jSpeechToText_jCreate(env: PJNIEnv; _Self: int64; this: jObject): jObject;
 
 implementation
 
@@ -60,7 +60,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -74,7 +74,7 @@ begin
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
 
-  FjObject := jni_create(FjEnv, FjThis, Self, 'jSpeechToText_jCreate');
+  FjObject := jSpeechToText_jCreate(FjEnv, int64(Self), FjThis);
 
   if FjObject = nil then exit;
 
@@ -89,13 +89,6 @@ begin
   if FSpeechLanguage <> slDefault then
     SetLanguage(FSpeechLanguage);
 
-end;
-
-procedure jSpeechToText.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 function jSpeechToText.SpeakIn() : boolean;
@@ -154,6 +147,23 @@ begin
   FSpeechLanguage:= _language;
   if FInitialized then
      jni_proc_i(FjEnv, FjObject, 'SetLanguage', Ord(_language));
+end;
+
+{-------- jSpeechToText_JNI_Bridge ----------}
+
+function jSpeechToText_jCreate(env: PJNIEnv; _Self: int64; this: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID = nil;
+  jCls: jClass = nil;
+begin
+  jParams[0].j := _Self;
+  jCls := Get_gjClass(env);
+  if jCls = nil then exit;
+  jMethod := env^.GetMethodID(env, jCls, 'jSpeechToText_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
+  Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result := env^.NewGlobalRef(env, Result);
 end;
 
 end.

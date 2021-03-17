@@ -88,8 +88,6 @@ type
     procedure GenEvent_OnClickGridItem(Obj: TObject; position: integer; Caption: string);
     procedure GenEvent_OnLongClickGridItem(Obj: TObject; position: integer;
       Caption: string);
-    function jCreate(): jObject;
-    procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     procedure RemoveFromViewParent();  override;
     function GetView(): jObject; override;
@@ -155,33 +153,6 @@ type
 //procedure GridView_Log ( test : string; text1 : string = ''; value1 : integer = 0 );
 
 function jGridView_jCreate(env: PJNIEnv; _Self: int64; this: jObject): jObject;
-procedure jGridView_Add(env: PJNIEnv; _jgridview: JObject; _item: string;
-  _imgIdentifier: string);
-procedure jGridView_SetNumColumns(env: PJNIEnv; _jgridview: JObject; _value: integer);
-procedure jGridView_SetColumnWidth(env: PJNIEnv; _jgridview: JObject; _value: integer);
-procedure jGridView_Clear(env: PJNIEnv; _jgridview: JObject);
-procedure jGridView_Delete(env: PJNIEnv; _jgridview: JObject; _index: integer);
-procedure jGridView_SetItemsLayout(env: PJNIEnv; _jgridview: JObject; _value: integer);
-function jGridView_GetItemIndex(env: PJNIEnv; _jgridview: JObject): integer;
-function jGridView_GetItemCaption(env: PJNIEnv; _jgridview: JObject): string;
-
-procedure jGridView_DispatchOnDrawItemTextColor(env: PJNIEnv;
-  _jgridview: JObject; _value: boolean);
-procedure jGridView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jgridview: JObject;
-  _value: boolean);
-procedure jGridView_SetFontSize(env: PJNIEnv; _jgridview: JObject; _size: integer);
-procedure jGridView_SetFontColor(env: PJNIEnv; _jgridview: JObject; _color: integer);
-procedure jGridView_SetFontSizeUnit(env: PJNIEnv; _jgridview: JObject; _unit: integer);
-procedure jGridView_UpdateItemTitle(env: PJNIEnv; _jgridview: JObject;
-  _index: integer; _title: string);
-
-procedure jGridView_SetHorizontalSpacing(env: PJNIEnv; _jgridview: JObject;
-  _horizontalSpacingPixels: integer);
-procedure jGridView_SetVerticalSpacing(env: PJNIEnv; _jgridview: JObject;
-  _verticalSpacingPixels: integer);
-procedure jGridView_SetSelection(env: PJNIEnv; _jgridview: JObject; _index: integer);
-procedure jGridView_SetStretchMode(env: PJNIEnv; _jgridview: JObject;
-  _stretchMode: integer);
 
 implementation
 
@@ -217,7 +188,7 @@ begin
   begin
     if FjObject <> nil then
     begin
-      jFree();
+      jni_proc(FjEnv, FjObject, 'jFree');
       FjObject := nil;
     end;
   end;
@@ -243,7 +214,9 @@ begin
   if not FInitialized then
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-   FjObject := jCreate(); //jSelf !
+   FjObject := jGridView_jCreate(FjEnv, int64(Self), FjThis); //jSelf !
+
+   if FjObject = nil then exit;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -288,19 +261,19 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFontColor <> colbrDefault then
-    jGridView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+    SetFontColor(FFontColor);
 
    if FFontSizeUnit <> unitDefault then
-    jGridView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+    SetFontSizeUnit(FFontSizeUnit);
 
    if FFontSize <> 0 then
-    jGridView_SetFontSize(FjEnv, FjObject, FFontSize);
+    SetFontSize(FFontSize);
 
    if FItemsLayout <> ilImageText then
-    jGridView_SetItemsLayout(FjEnv, FjObject, Ord(FItemsLayout));
+    SetItemsLayout(FItemsLayout);
 
    if FColCount <> -1 then
-    jGridView_SetNumColumns(FjEnv, FjObject, FColCount);
+    SetNumColumns(FColCount);
 
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
@@ -407,18 +380,6 @@ begin
     FOnLongClickGridItem(Obj, position, Caption);
 end;
 
-function jGridView.jCreate(): jObject;
-begin
-  Result := jGridView_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jGridView.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-    jni_proc(FjEnv, FjObject, 'jFree');
-end;
-
 procedure jGridView.SetViewParent(_viewgroup: jObject);
 begin
   inherited SetViewParent(_viewgroup);
@@ -512,7 +473,7 @@ begin
     // workaround because adding empty _item does nothing
     if (_item = '') and (_imgIdentifier = '') then
       _item := ' ';
-    jGridView_Add(FjEnv, FjObject, _item, _imgIdentifier);
+    jni_proc_tt(FjEnv, FjObject, 'Add', _item, _imgIdentifier);
     inc(FItemCount);
   end;
 end;
@@ -521,22 +482,23 @@ procedure jGridView.SetNumColumns(_value: integer);
 begin
   //in designing component state: set value here...
   FColCount := _value;
-  if FInitialized then
-    jGridView_SetNumColumns(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetNumColumns', _value);
 end;
 
 procedure jGridView.SetColumnWidth(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetColumnWidth(FjEnv, FjObject, _value);
+    jni_proc_i(FjEnv, FjObject, 'SetColumnWidth', _value);
 end;
 
 procedure jGridView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_Clear(FjEnv, FjObject);
+    jni_proc(FjEnv, FjObject, 'Clear');
 end;
 
 procedure jGridView.Delete(_index: integer);
@@ -544,7 +506,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
     begin
-    jGridView_Delete(FjEnv, FjObject, _index);
+    jni_proc_i(FjEnv, FjObject, 'Delete', _index);
     Dec(FItemCount);
     end;
 end;
@@ -553,36 +515,37 @@ procedure jGridView.SetItemsLayout(_value: TGridItemLayout);
 begin
   //in designing component state: set value here...
   FItemsLayout := _value;
-  if FInitialized then
-    jGridView_SetItemsLayout(FjEnv, FjObject, Ord(_value));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetItemsLayout', Ord(_value));
 end;
 
 function jGridView.GetItemIndex(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jGridView_GetItemIndex(FjEnv, FjObject);
+    Result := jni_func_out_i(FjEnv, FjObject, 'GetItemIndex');
 end;
 
 function jGridView.GetItemCaption(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jGridView_GetItemCaption(FjEnv, FjObject);
+    Result := jni_func_out_t(FjEnv, FjObject, 'GetItemCaption');
 end;
 
 procedure jGridView.DispatchOnDrawItemTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_DispatchOnDrawItemTextColor(FjEnv, FjObject, _value);
+    jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemTextColor', _value);
 end;
 
 procedure jGridView.DispatchOnDrawItemBitmap(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
+    jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemBitmap', _value);
 end;
 
 procedure jGridView.SetFontSize(_size: Dword);
@@ -590,23 +553,25 @@ begin
   //in designing component state: set value here...
   FFontSize := _size;
   if FInitialized then
-    jGridView_SetFontSize(FjEnv, FjObject, _size);
+    jni_proc_i(FjEnv, FjObject, 'SetFontSize', _size);
 end;
 
 procedure jGridView.SetFontColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   FFontColor := _color;
-  if FInitialized then
-    jGridView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jGridView.SetFontSizeUnit(_unit: TFontSizeUnit);
 begin
   //in designing component state: set value here...
   FFontSizeUnit := _unit;
-  if FInitialized then
-    jGridView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 procedure jGridView.GenEvent_OnDrawItemCaptionColor(Obj: TObject;
@@ -639,35 +604,35 @@ procedure jGridView.UpdateItemTitle(_index: integer; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_UpdateItemTitle(FjEnv, FjObject, _index, _title);
+    jni_proc_it(FjEnv, FjObject, 'UpdateItemTitle', _index, _title);
 end;
 
 procedure jGridView.SetHorizontalSpacing(_horizontalSpacingPixels: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetHorizontalSpacing(FjEnv, FjObject, _horizontalSpacingPixels);
+    jni_proc_i(FjEnv, FjObject, 'SetHorizontalSpacing', _horizontalSpacingPixels);
 end;
 
 procedure jGridView.SetVerticalSpacing(_verticalSpacingPixels: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetVerticalSpacing(FjEnv, FjObject, _verticalSpacingPixels);
+    jni_proc_i(FjEnv, FjObject, 'SetVerticalSpacing', _verticalSpacingPixels);
 end;
 
 procedure jGridView.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetSelection(FjEnv, FjObject, _index);
+    jni_proc_i(FjEnv, FjObject, 'SetSelection', _index);
 end;
 
 procedure jGridView.SetStretchMode(_stretchMode: TGridStretchMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jGridView_SetStretchMode(FjEnv, FjObject, Ord(_stretchMode));
+    jni_proc_i(FjEnv, FjObject, 'SetStretchMode', Ord(_stretchMode));
 end;
 
 ///----  Added by tintinux
@@ -844,7 +809,7 @@ begin
   RestoreItems( Col );
   // to avoid use of deprecated Columns setter
   FColCount := NbCols;
-  jGridView_SetNumColumns(FjEnv, FjObject, NbCols);
+  SetNumColumns(NbCols);
 end;
 
 //------------------------------------------------------------------------------
@@ -908,7 +873,7 @@ begin
   DeleteItems ( Start);
   RestoreItems(Start);
   FColCount := NbCols;
-  jGridView_SetNumColumns(FjEnv, FjObject, NbCols);
+  SetNumColumns(NbCols);
 end;
 
 // To have the same property name as in StringGrid
@@ -968,7 +933,9 @@ var
 begin
   jParams[0].j := _Self;
   jCls := Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'jGridView_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result := env^.NewGlobalRef(env, Result);
 end;
@@ -983,267 +950,6 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-
-procedure jGridView_Add(env: PJNIEnv; _jgridview: JObject; _item: string;
-  _imgIdentifier: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].l := env^.NewStringUTF(env, PChar(_item));
-  jParams[1].l := env^.NewStringUTF(env, PChar(_imgIdentifier));
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'Add',
-    '(Ljava/lang/String;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jParams[0].l);
-  env^.DeleteLocalRef(env, jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jGridView_SetNumColumns(env: PJNIEnv; _jgridview: JObject; _value: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _value;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetNumColumns', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetColumnWidth(env: PJNIEnv; _jgridview: JObject; _value: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _value;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetColumnWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_Clear(env: PJNIEnv; _jgridview: JObject);
-var
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'Clear', '()V');
-  env^.CallVoidMethod(env, _jgridview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_Delete(env: PJNIEnv; _jgridview: JObject; _index: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _index;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'Delete', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jGridView_SetItemsLayout(env: PJNIEnv; _jgridview: JObject; _value: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _value;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetItemsLayout', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jGridView_GetItemIndex(env: PJNIEnv; _jgridview: JObject): integer;
-var
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'GetItemIndex', '()I');
-  Result := env^.CallIntMethod(env, _jgridview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jGridView_GetItemCaption(env: PJNIEnv; _jgridview: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'GetItemCaption', '()Ljava/lang/String;');
-  jStr := env^.CallObjectMethod(env, _jgridview, jMethod);
-  case jStr = nil of
-    True: Result := '';
-    False:
-    begin
-      jBoo := JNI_False;
-      Result := string(env^.GetStringUTFChars(env, jStr, @jBoo));
-    end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jGridView_DispatchOnDrawItemTextColor(env: PJNIEnv;
-  _jgridview: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].z := JBool(_value);
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'DispatchOnDrawItemTextColor', '(Z)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_DispatchOnDrawItemBitmap(env: PJNIEnv; _jgridview: JObject;
-  _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].z := JBool(_value);
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'DispatchOnDrawItemBitmap', '(Z)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetFontSize(env: PJNIEnv; _jgridview: JObject; _size: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _size;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetFontSize', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetFontColor(env: PJNIEnv; _jgridview: JObject; _color: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _color;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetFontColor', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jGridView_SetFontSizeUnit(env: PJNIEnv; _jgridview: JObject; _unit: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _unit;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetFontSizeUnit', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jGridView_UpdateItemTitle(env: PJNIEnv; _jgridview: JObject;
-  _index: integer; _title: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _index;
-  jParams[1].l := env^.NewStringUTF(env, PChar(_title));
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'UpdateItemTitle', '(ILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jGridView_SetHorizontalSpacing(env: PJNIEnv; _jgridview: JObject;
-  _horizontalSpacingPixels: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _horizontalSpacingPixels;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetHorizontalSpacing', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetVerticalSpacing(env: PJNIEnv; _jgridview: JObject;
-  _verticalSpacingPixels: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _verticalSpacingPixels;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetVerticalSpacing', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetSelection(env: PJNIEnv; _jgridview: JObject; _index: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _index;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetSelection', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jGridView_SetStretchMode(env: PJNIEnv; _jgridview: JObject;
-  _stretchMode: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID = nil;
-  jCls: jClass = nil;
-begin
-  jParams[0].i := _stretchMode;
-  jCls := env^.GetObjectClass(env, _jgridview);
-  jMethod := env^.GetMethodID(env, jCls, 'SetStretchMode', '(I)V');
-  env^.CallVoidMethodA(env, _jgridview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 
 end.
