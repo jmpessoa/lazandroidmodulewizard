@@ -37,8 +37,6 @@ jIntentManager = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate(): jObject;
-    procedure jFree();
     procedure NewIntent(); // by ADiV
     function GetIntent(): jObject;
     function GetActivityStartedIntent(): jObject;
@@ -211,7 +209,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -224,23 +222,13 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jCreate(); if FjObject = nil then exit;
+  FjObject := jIntentManager_jCreate(FjEnv, int64(Self), FjThis);
+
+  if FjObject = nil then exit;
+
   FInitialized:= True;
   if FIntentAction <> iaNone then
       jni_proc_i(FjEnv, FjObject, 'SetAction', Ord(FIntentAction));
-end;
-
-
-function jIntentManager.jCreate(): jObject;
-begin
-   Result:= jIntentManager_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jIntentManager.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 function jIntentManager.GetIntent(): jObject;
@@ -967,7 +955,9 @@ var
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'jIntentManager_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
@@ -989,7 +979,9 @@ var
   jCls: jClass=nil;
 begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetIntent', '()Landroid/content/Intent;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1001,7 +993,9 @@ var
   jCls: jClass=nil;
 begin
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetActivityStartedIntent', '()Landroid/content/Intent;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethod(env, _jintentmanager, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1017,7 +1011,9 @@ var
 begin
   jParams[0].l:= _intent;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetAction', '(Landroid/content/Intent;)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -1040,7 +1036,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'HasExtra', '(Landroid/content/Intent;Ljava/lang/String;)Z');
+  if jni_ExceptionOccurred(env) then exit;
   jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[1].l);
@@ -1056,7 +1054,9 @@ var
 begin
   jParams[0].l:= _bundleExtra;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraBundle', '(Landroid/os/Bundle;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1070,7 +1070,9 @@ var
 begin
   jParams[0].l:= _intent;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraBundle', '(Landroid/content/Intent;)Landroid/os/Bundle;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1088,7 +1090,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraDoubleArray', '(Landroid/content/Intent;Ljava/lang/String;)[D');
+  if jni_ExceptionOccurred(env) then exit;
   jResultArray:= env^.CallObjectMethodA(env, _jintentmanager, jMethod,  @jParams);
   if jResultArray <> nil then
   begin
@@ -1115,7 +1119,9 @@ begin
   env^.SetDoubleArrayRegion(env, jNewArray0, 0 , newSize0, @_values[0] {source});
   jParams[1].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraDoubleArray', '(Ljava/lang/String;[D)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
@@ -1132,7 +1138,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraDouble', '(Landroid/content/Intent;Ljava/lang/String;)D');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallDoubleMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1148,7 +1156,9 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_dataName));
   jParams[1].d:= _value;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraDouble', '(Ljava/lang/String;D)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1167,7 +1177,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraFloatArray', '(Landroid/content/Intent;Ljava/lang/String;)[F');
+  if jni_ExceptionOccurred(env) then exit;
   jResultArray:= env^.CallObjectMethodA(env, _jintentmanager, jMethod,  @jParams);
   if jResultArray <> nil then
   begin
@@ -1194,7 +1206,9 @@ begin
   env^.SetFloatArrayRegion(env, jNewArray0, 0 , newSize0, @_values[0] {source});
   jParams[1].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraFloatArray', '(Ljava/lang/String;[F)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
@@ -1211,7 +1225,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraFloat', '(Landroid/content/Intent;Ljava/lang/String;)F');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallFloatMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1227,7 +1243,9 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_dataName));
   jParams[1].f:= _value;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraFloat', '(Ljava/lang/String;F)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1246,7 +1264,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraIntArray', '(Landroid/content/Intent;Ljava/lang/String;)[I');
+  if jni_ExceptionOccurred(env) then exit;
   jResultArray:= env^.CallObjectMethodA(env, _jintentmanager, jMethod,  @jParams);
   if jResultArray <> nil then
   begin
@@ -1273,7 +1293,9 @@ begin
   env^.SetIntArrayRegion(env, jNewArray0, 0 , newSize0, @_values[0] {source});
   jParams[1].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraIntArray', '(Ljava/lang/String;[I)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
@@ -1290,7 +1312,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraInt', '(Landroid/content/Intent;Ljava/lang/String;)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallIntMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1312,7 +1336,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraStringArray', '(Landroid/content/Intent;Ljava/lang/String;)[Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jResultArray:= env^.CallObjectMethodA(env, _jintentmanager, jMethod,  @jParams);
   if jResultArray <> nil then
   begin
@@ -1353,7 +1379,9 @@ begin
   end;
   jParams[1].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraStringArray', '(Ljava/lang/String;[Ljava/lang/String;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
@@ -1372,7 +1400,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraString', '(Landroid/content/Intent;Ljava/lang/String;)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -1394,7 +1424,9 @@ var
 begin
   jParams[0].l:= _dataUri;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'SetDataUri', '(Landroid/net/Uri;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1408,7 +1440,9 @@ var
 begin
   jParams[0].l:= _intent;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetDataUri', '(Landroid/content/Intent;)Landroid/net/Uri;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1424,7 +1458,9 @@ var
 begin
   jParams[0].l:= _intent;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetDataUriAsString', '(Landroid/content/Intent;)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -1454,7 +1490,9 @@ begin
   end;
   jParams[0].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMailCCs', '([Ljava/lang/String;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1478,7 +1516,9 @@ begin
   end;
   jParams[0].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMailBCCs', '([Ljava/lang/String;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1502,7 +1542,9 @@ begin
   end;
   jParams[0].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraMailTos', '([Ljava/lang/String;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1526,7 +1568,9 @@ begin
   end;
   jParams[0].l:= jNewArray0;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraPhoneNumbers', '([Ljava/lang/String;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1541,7 +1585,9 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'ParseUri', '(Ljava/lang/String;)Landroid/net/Uri;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1556,7 +1602,9 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_email));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetMailtoUri', '(Ljava/lang/String;)Landroid/net/Uri;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1571,7 +1619,9 @@ var
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_telNumber));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetTelUri', '(Ljava/lang/String;)Landroid/net/Uri;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1586,7 +1636,9 @@ var
 begin
   jParams[0].l:= _uri;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'PutExtraFile', '(Landroid/net/Uri;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -1602,7 +1654,9 @@ var
 begin
   jParams[0].l:= _contactUri;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetContactNumber', '(Landroid/net/Uri;)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -1625,7 +1679,9 @@ var
 begin
   jParams[0].l:= _contactUri;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetContactEmail', '(Landroid/net/Uri;)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -1651,7 +1707,9 @@ begin
   Result := nil;
   jParams[0].l:= _intent;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetBundleContent', '(Landroid/content/Intent;)[Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jResultArray:= env^.CallObjectMethodA(env, _jintentmanager, jMethod,  @jParams);
   if jResultArray <> nil then
   begin
@@ -1681,7 +1739,9 @@ var
 begin
   jParams[0].l:= _intent;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'IsCallable', '(Landroid/content/Intent;)Z');
+  if jni_ExceptionOccurred(env) then exit;
   jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env, jCls);
@@ -1697,7 +1757,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_intentAction));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'IsActionEqual', '(Landroid/content/Intent;Ljava/lang/String;)Z');
+  if jni_ExceptionOccurred(env) then exit;
   jBoo:= env^.CallBooleanMethodA(env, _jintentmanager, jMethod, @jParams);
   Result:= boolean(jBoo);
   env^.DeleteLocalRef(env,jParams[1].l);
@@ -1713,7 +1775,9 @@ begin
   jParams[0].l:= _uriData;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_mimeType));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'SetDataAndType', '(Landroid/net/Uri;Ljava/lang/String;)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
@@ -1730,7 +1794,9 @@ begin
   jParams[0].l:= _intent;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_addressBodyDelimiter));
   jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetExtraSMS', '(Landroid/content/Intent;Ljava/lang/String;)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';

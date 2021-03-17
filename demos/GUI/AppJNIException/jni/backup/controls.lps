@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="4">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jForm;jTextView"/>
+        </CustomData>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="33"/>
+        <CursorPos Y="42"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="934"/>
+        <CursorPos X="5" Y="942"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="5578"/>
+        <CursorPos X="11" Y="5553"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
+    </Units>
+    <JumpHistory Count="11" HistoryIndex="9">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+      </Position1>
+      <Position2>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="41" Column="3"/>
+      </Position2>
+      <Position3>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="42" Column="4" TopLine="23"/>
+      </Position3>
+      <Position4>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="44" Column="41" TopLine="29"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="45" Column="58" TopLine="37"/>
+      </Position5>
+      <Position6>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="41" Column="15" TopLine="30"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="40" Column="6" TopLine="32"/>
+      </Position7>
+      <Position8>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="20" Column="5" TopLine="9"/>
+      </Position8>
+      <Position9>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <Caret Line="950" Column="3" TopLine="12125"/>
+      </Position9>
+      <Position10>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_Controls.pas"/>
+        <Caret Line="5553" Column="11" TopLine="5551"/>
+      </Position10>
+      <Position11>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\androidwidget.pas"/>
+        <Caret Line="942" Column="5" TopLine="934"/>
+      </Position11>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

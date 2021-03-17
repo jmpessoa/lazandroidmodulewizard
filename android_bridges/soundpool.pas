@@ -24,8 +24,6 @@ jSoundPool = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate(): jObject;
-    procedure jFree();
     function  SoundLoad(_path: string; _filename: string): integer; overload;
     function  SoundLoad(_path: string): integer; overload;
     procedure SoundUnload(soundId: integer);
@@ -46,6 +44,7 @@ jSoundPool = class(jControl)
    property OnLoadComplete: TOnLoadComplete read FOnLoadComplete write FOnLoadComplete;
 end;
 
+function  jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 function  jSoundPool_SoundPlay(env: PJNIEnv; _jsoundpool: JObject; soundId: integer; _leftVolume: single; _rightVolume: single; _priority: integer; _loop: integer; _rate: single): integer;
 
 
@@ -67,7 +66,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -81,13 +80,10 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jCreate(); if FjObject = nil then exit;
-  FInitialized:= True;
-end;
+  FjObject := jSoundPool_jCreate(FjEnv, int64(Self), FjThis);
 
-function jSoundPool.jCreate(): jObject;
-begin
-   Result:= jni_create_i(FjEnv, FjThis, Self, 'jSoundPool_jCreate', FMaxStreams);
+  if FjObject = nil then exit;
+  FInitialized:= True;
 end;
 
 
@@ -199,13 +195,6 @@ begin
      jni_proc(FjEnv, FjObject, 'ResumeAll');
 end;
 
-procedure jSoundPool.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
-end;
-
 procedure jSoundPool.GenEvent_OnLoadComplete(Obj: jObject; soundId: integer; status: integer);
 begin
 
@@ -214,6 +203,22 @@ begin
 end;
 
 {-------- jSoundPool_JNI_Bridge ----------}
+
+function jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
+  jMethod:= env^.GetMethodID(env, jCls, 'jSoundPool_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+end;
+
 
 function jSoundPool_SoundPlay(env: PJNIEnv; _jsoundpool: JObject; soundId: integer; _leftVolume: single; _rightVolume: single; _priority: integer; _loop: integer; _rate: single): integer;
 var
@@ -228,7 +233,9 @@ begin
   jParams[4].i:= _loop;
   jParams[5].f:= _rate;
   jCls:= env^.GetObjectClass(env, _jsoundpool);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'SoundPlay', '(IFFIIF)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallIntMethodA(env, _jsoundpool, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

@@ -119,7 +119,7 @@ class jBundlerManager/*extends ...*/ {
       controls  = _ctrls;
    }
  
-   public void jFree() {
+   public void Free() {
      //free local objects...
    }
  

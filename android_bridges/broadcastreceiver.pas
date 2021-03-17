@@ -45,8 +45,6 @@ jBroadcastReceiver = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate(): jObject;
-    procedure jFree();
 
     procedure RegisterIntentActionFilter(_intentActionFilter: string); overload;
     procedure RegisterIntentActionFilter(_intentActionFilter: TIntentActionFiter); overload;
@@ -68,15 +66,10 @@ jBroadcastReceiver = class(jControl)
     property OnReceiver: TOnReceiver read FOnReceiver write FOnReceiver;
 end;
 
-function jBroadcastReceiver_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jBroadcastReceiver_jFree(env: PJNIEnv; _jbroadcastreceiver: JObject);
-procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: string); overload;
-procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: integer);  overload;
-procedure jBroadcastReceiver_Unregister(env: PJNIEnv; _jbroadcastreceiver: JObject);
+function  jBroadcastReceiver_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: integer);
 
-function jBroadcastReceiver_GetResultCode(env: PJNIEnv; _jbroadcastreceiver: JObject): integer;
-function jBroadcastReceiver_GetResultData(env: PJNIEnv; _jbroadcastreceiver: JObject): string;
-function jBroadcastReceiver_GetResultExtras(env: PJNIEnv; _jbroadcastreceiver: JObject): jObject;
+function  jBroadcastReceiver_GetResultExtras(env: PJNIEnv; _jbroadcastreceiver: JObject): jObject;
 
 
 
@@ -99,7 +92,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_free(FjEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -112,7 +105,10 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jCreate(); if FjObject = nil then exit;
+  FjObject := jBroadcastReceiver_jCreate(FjEnv, int64(Self), FjThis);
+
+  if FjObject = nil then exit;
+
   FInitialized:= True;
   if FIntentActionFilter <> afNone then
   begin
@@ -121,26 +117,13 @@ begin
   end;
 end;
 
-
-function jBroadcastReceiver.jCreate(): jObject;
-begin
-  Result:= jBroadcastReceiver_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jBroadcastReceiver.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jBroadcastReceiver_jFree(FjEnv, FjObject);
-end;
-
 procedure jBroadcastReceiver.RegisterIntentActionFilter(_intentActionFilter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
   begin
      FRegistered:= True;
-     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, _intentActionFilter);
+     jni_proc_t(FjEnv, FjObject, 'RegisterIntentActionFilter', _intentActionFilter);
   end;
 end;
 
@@ -172,7 +155,7 @@ begin
   begin
      if FRegistered then
      begin
-       jBroadcastReceiver_Unregister(FjEnv, FjObject);
+       jni_proc(FjEnv, FjObject, 'Unregister');
        FRegistered:= False;
      end;
   end;
@@ -189,7 +172,7 @@ begin
   Result:= RESULT_CANCELED;
   if FInitialized then
   begin
-     Result:= TAndroidResult(jBroadcastReceiver_GetResultCode(FjEnv, FjObject));
+     Result:= TAndroidResult(jni_func_out_i(FjEnv, FjObject, 'GetResultCode'));
   end;
 end;
 
@@ -197,7 +180,7 @@ function jBroadcastReceiver.GetResultData(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBroadcastReceiver_GetResultData(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetResultData');
 end;
 
 function jBroadcastReceiver.GetResultExtras(): jObject;
@@ -217,46 +200,11 @@ var
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'jBroadcastReceiver_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
-end;
-
-(*
-//Please, you need insert:
-
-   public java.lang.Object jBroadcastReceiver_jCreate(long _Self) {
-      return (java.lang.Object)(new jBroadcastReceiver(this,_Self));
-   }
-
-//to end of "public class Controls" in "Controls.java"
-*)
-
-
-procedure jBroadcastReceiver_jFree(env: PJNIEnv; _jbroadcastreceiver: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jbroadcastreceiver, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_intentAction));
-  jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
-  jMethod:= env^.GetMethodID(env, jCls, 'RegisterIntentActionFilter', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jbroadcastreceiver, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jBroadcastReceiver_RegisterIntentActionFilter(env: PJNIEnv; _jbroadcastreceiver: JObject; _intentAction: integer);
@@ -267,38 +215,11 @@ var
 begin
   jParams[0].i:= _intentAction;
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterIntentActionFilter', '(I)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jbroadcastreceiver, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jBroadcastReceiver_Unregister(env: PJNIEnv; _jbroadcastreceiver: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
-  jMethod:= env^.GetMethodID(env, jCls, 'Unregister', '()V');
-  env^.CallVoidMethod(env, _jbroadcastreceiver, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jBroadcastReceiver_GetResultCode(env: PJNIEnv; _jbroadcastreceiver: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetResultCode', '()I');
-  Result:= env^.CallIntMethod(env, _jbroadcastreceiver, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jBroadcastReceiver_GetResultData(env: PJNIEnv; _jbroadcastreceiver: JObject): string;
-begin
-  Result:= jni_func_out_t(env, _jbroadcastreceiver, 'GetResultData');
 end;
 
 
@@ -308,7 +229,9 @@ var
   jCls: jClass=nil;
 begin
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetResultExtras', '()Landroid/os/Bundle;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethod(env, _jbroadcastreceiver, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;

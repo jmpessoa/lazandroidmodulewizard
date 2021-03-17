@@ -24,8 +24,6 @@ jPreferences = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate( _IsShared: boolean): jObject;
-    procedure jFree();
 
     procedure Clear();
     procedure Remove(_key: string);
@@ -67,7 +65,7 @@ begin
   begin
         if FjObject  <> nil then
         begin
-           jFree();
+           jni_free(FjEnv, FjObject);
            FjObject := nil;
         end;
   end;
@@ -80,24 +78,11 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject := jCreate(FIsShared);
+  FjObject := jPreferences_jCreate(FjEnv, FjThis , int64(Self), FIsShared);
 
   if FjObject = nil then exit;
   
   FInitialized:= True;
-end;
-
-
-function jPreferences.jCreate( _IsShared: boolean): jObject;
-begin
-   Result:= jPreferences_jCreate(FjEnv, FjThis , int64(Self) ,_IsShared);
-end;
-
-procedure jPreferences.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_free(FjEnv, FjObject);
 end;
 
 function jPreferences.GetIntData(_key: string; _defaultValue: integer): integer;
@@ -195,7 +180,9 @@ begin
   jParams[0].j:= _Self;
   jParams[1].z:= JBool(_IsShared);
   jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'jPreferences_jCreate', '(JZ)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;

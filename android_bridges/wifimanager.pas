@@ -21,8 +21,6 @@ jWifiManager = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate(): jObject;
-    procedure jFree();
     procedure SetWifiEnabled(_value: boolean);
     function Scan(): TDynArrayOfString;
     function Connect(_networkSSID: string; _password: string): boolean;
@@ -51,28 +49,7 @@ jWifiManager = class(jControl)
 end;
 
 function jWifiManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jWifiManager_jFree(env: PJNIEnv; _jwifimanager: JObject);
-procedure jWifiManager_SetWifiEnabled(env: PJNIEnv; _jwifimanager: JObject; _value: boolean);
 function jWifiManager_Scan(env: PJNIEnv; _jwifimanager: JObject): TDynArrayOfString;
-function jWifiManager_Connect(env: PJNIEnv; _jwifimanager: JObject; _networkSSID: string; _password: string): boolean;
-function jWifiManager_ConnectWEP(env: PJNIEnv; _jwifimanager: JObject; _networkSSID: string; _password: string): boolean;
-function jWifiManager_ConnectWPA(env: PJNIEnv; _jwifimanager: JObject; _networkSSID: string; _password: string): boolean;
-function jWifiManager_GetSSID(env: PJNIEnv; _jwifimanager: JObject; _scanResultIndex: integer): string;
-function jWifiManager_GetCapabilities(env: PJNIEnv; _jwifimanager: JObject; _scanResultIndex: integer): string;
-procedure jWifiManager_RequestLocationServices(env: PJNIEnv; _jwifimanager: JObject);
-function jWifiManager_IsLocationServicesON(env: PJNIEnv; _jwifimanager: JObject): boolean;
-function jWifiManager_IsLocationServicesNeed(env: PJNIEnv; _jwifimanager: JObject): boolean;
-function jWifiManager_RequestLocationServicesDenied(env: PJNIEnv; _jwifimanager: JObject): boolean;
-
-function jWifiManager_NeedWriteSettingsPermission(env: PJNIEnv; _jwifimanager: JObject): boolean;
-procedure jWifiManager_RequestWriteSettingsPermission(env: PJNIEnv; _jwifimanager: JObject);
-procedure jWifiManager_SetWifiHotspotOn(env: PJNIEnv; _jwifimanager: JObject);
-procedure jWifiManager_SetWifiHotspotOff(env: PJNIEnv; _jwifimanager: JObject);
-function jWifiManager_IsWifiHotspotEnable(env: PJNIEnv; _jwifimanager: JObject): boolean;
-function jWifiManager_CreateNewWifiNetwork(env: PJNIEnv; _jwifimanager: JObject): boolean; overload;
-function jWifiManager_CreateNewWifiNetwork(env: PJNIEnv; _jwifimanager: JObject; _ssid: string; _password: string): boolean; overload;
-function jWifiManager_GetCurrentHotspotSSID(env: PJNIEnv; _jwifimanager: JObject): string;
-function jWifiManager_GetCurrentHotspotPassword(env: PJNIEnv; _jwifimanager: JObject): string;
 
 
 implementation
@@ -91,7 +68,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -105,28 +82,17 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jCreate(); if FjObject = nil then exit;
+  FjObject := jWifiManager_jCreate(FjEnv, int64(Self), FjThis);
+
+  if FjObject = nil then exit;
   FInitialized:= True;
-end;
-
-
-function jWifiManager.jCreate(): jObject;
-begin
-   Result:= jWifiManager_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jWifiManager.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jWifiManager_jFree(FjEnv, FjObject);
 end;
 
 procedure jWifiManager.SetWifiEnabled(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWifiManager_SetWifiEnabled(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetWifiEnabled', _value);
 end;
 
 function jWifiManager.Scan(): TDynArrayOfString;
@@ -140,126 +106,126 @@ function jWifiManager.Connect(_networkSSID: string; _password: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_Connect(FjEnv, FjObject, _networkSSID ,_password);
+   Result:= jni_func_tt_out_z(FjEnv, FjObject, 'Connect', _networkSSID ,_password);
 end;
 
 function jWifiManager.ConnectWEP(_networkSSID: string; _password: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_ConnectWEP(FjEnv, FjObject, _networkSSID ,_password);
+   Result:= jni_func_tt_out_z(FjEnv, FjObject, 'ConnectWEP', _networkSSID ,_password);
 end;
 
 function jWifiManager.ConnectWPA(_networkSSID: string; _password: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_ConnectWPA(FjEnv, FjObject, _networkSSID ,_password);
+   Result:= jni_func_tt_out_z(FjEnv, FjObject, 'ConnectWPA', _networkSSID ,_password);
 end;
 
 function jWifiManager.GetSSID(_scanResultIndex: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_GetSSID(FjEnv, FjObject, _scanResultIndex);
+   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetSSID', _scanResultIndex);
 end;
 
 function jWifiManager.GetCapabilities(_scanResultIndex: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_GetCapabilities(FjEnv, FjObject, _scanResultIndex);
+   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetCapabilities', _scanResultIndex);
 end;
 
 procedure jWifiManager.RequestLocationServices();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWifiManager_RequestLocationServices(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'RequestLocationServices');
 end;
 
 function jWifiManager.IsLocationServicesON(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_IsLocationServicesON(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsLocationServicesON');
 end;
 
 function jWifiManager.IsLocationServicesNeed(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_IsLocationServicesNeed(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsLocationServicesNeed');
 end;
 
 function jWifiManager.RequestLocationServicesDenied(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_RequestLocationServicesDenied(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'RequestLocationServicesDenied');
 end;
 
 function jWifiManager.NeedWriteSettingsPermission(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_NeedWriteSettingsPermission(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'NeedWriteSettingsPermission');
 end;
 
 procedure jWifiManager.RequestWriteSettingsPermission();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWifiManager_RequestWriteSettingsPermission(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'RequestWriteSettingsPermission');
 end;
 
 procedure jWifiManager.SetWifiHotspotOn();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWifiManager_SetWifiHotspotOn(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetWifiHotspotOn');
 end;
 
 procedure jWifiManager.SetWifiHotspotOff();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWifiManager_SetWifiHotspotOff(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetWifiHotspotOff');
 end;
 
 function jWifiManager.IsWifiHotspotEnable(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_IsWifiHotspotEnable(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsWifiHotspotEnable');
 end;
 
 function jWifiManager.CreateNewWifiNetwork(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_CreateNewWifiNetwork(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'CreateNewWifiNetwork');
 end;
 
 function jWifiManager.CreateNewWifiNetwork(_ssid: string; _password: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_CreateNewWifiNetwork(FjEnv, FjObject, _ssid ,_password);
+   Result:= jni_func_tt_out_z(FjEnv, FjObject, 'CreateNewWifiNetwork', _ssid ,_password);
 end;
 
 function jWifiManager.GetCurrentHotspotSSID(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_GetCurrentHotspotSSID(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetCurrentHotspotSSID');
 end;
 
 function jWifiManager.GetCurrentHotspotPassword(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWifiManager_GetCurrentHotspotPassword(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetCurrentHotspotPassword');
 end;
 
 {-------- jWifiManager_JNI_Bridge ----------}
@@ -277,30 +243,6 @@ begin
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
-procedure jWifiManager_jFree(env: PJNIEnv; _jwifimanager: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jwifimanager, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jWifiManager_SetWifiEnabled(env: PJNIEnv; _jwifimanager: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetWifiEnabled', '(Z)V');
-  env^.CallVoidMethodA(env, _jwifimanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
 function jWifiManager_Scan(env: PJNIEnv; _jwifimanager: JObject): TDynArrayOfString;
 var
   jStr: JString;
@@ -313,7 +255,9 @@ var
 begin
   Result := nil;
   jCls:= env^.GetObjectClass(env, _jwifimanager);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'Scan', '()[Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jresultArray:= env^.CallObjectMethod(env, _jwifimanager, jMethod);
   if jResultArray <> nil then
   begin
@@ -330,293 +274,6 @@ begin
                  end;
       end;
     end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jWifiManager_Connect(env: PJNIEnv; _jwifimanager: JObject; _networkSSID: string; _password: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_networkSSID));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_password));
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'Connect', '(Ljava/lang/String;Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jwifimanager, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jWifiManager_ConnectWEP(env: PJNIEnv; _jwifimanager: JObject; _networkSSID: string; _password: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_networkSSID));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_password));
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'ConnectWEP', '(Ljava/lang/String;Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jwifimanager, jMethod, @jParams);
-  Result:= boolean(jBoo);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jWifiManager_ConnectWPA(env: PJNIEnv; _jwifimanager: JObject; _networkSSID: string; _password: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_networkSSID));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_password));
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'ConnectWPA', '(Ljava/lang/String;Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jwifimanager, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jWifiManager_GetSSID(env: PJNIEnv; _jwifimanager: JObject; _scanResultIndex: integer): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _scanResultIndex;
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetSSID', '(I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jwifimanager, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jWifiManager_GetCapabilities(env: PJNIEnv; _jwifimanager: JObject; _scanResultIndex: integer): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _scanResultIndex;
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCapabilities', '(I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jwifimanager, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jWifiManager_RequestLocationServices(env: PJNIEnv; _jwifimanager: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestLocationServices', '()V');
-  env^.CallVoidMethod(env, _jwifimanager, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jWifiManager_IsLocationServicesON(env: PJNIEnv; _jwifimanager: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsLocationServicesON', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jwifimanager, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jWifiManager_IsLocationServicesNeed(env: PJNIEnv; _jwifimanager: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsLocationServicesNeed', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jwifimanager, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jWifiManager_RequestLocationServicesDenied(env: PJNIEnv; _jwifimanager: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestLocationServicesDenied', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jwifimanager, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jWifiManager_NeedWriteSettingsPermission(env: PJNIEnv; _jwifimanager: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'NeedWriteSettingsPermission', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jwifimanager, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jWifiManager_RequestWriteSettingsPermission(env: PJNIEnv; _jwifimanager: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestWriteSettingsPermission', '()V');
-  env^.CallVoidMethod(env, _jwifimanager, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jWifiManager_SetWifiHotspotOn(env: PJNIEnv; _jwifimanager: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetWifiHotspotOn', '()V');
-  env^.CallVoidMethod(env, _jwifimanager, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jWifiManager_SetWifiHotspotOff(env: PJNIEnv; _jwifimanager: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetWifiHotspotOff', '()V');
-  env^.CallVoidMethod(env, _jwifimanager, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jWifiManager_IsWifiHotspotEnable(env: PJNIEnv; _jwifimanager: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsWifiHotspotEnable', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jwifimanager, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jWifiManager_CreateNewWifiNetwork(env: PJNIEnv; _jwifimanager: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'CreateNewWifiNetwork', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jwifimanager, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jWifiManager_CreateNewWifiNetwork(env: PJNIEnv; _jwifimanager: JObject; _ssid: string; _password: string): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_ssid));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_password));
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'CreateNewWifiNetwork', '(Ljava/lang/String;Ljava/lang/String;)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jwifimanager, jMethod, @jParams);
-  Result:= boolean(jBoo);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jWifiManager_GetCurrentHotspotSSID(env: PJNIEnv; _jwifimanager: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCurrentHotspotSSID', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jwifimanager, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jWifiManager_GetCurrentHotspotPassword(env: PJNIEnv; _jwifimanager: JObject): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jwifimanager);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetCurrentHotspotPassword', '()Ljava/lang/String;');
-  jStr:= env^.CallObjectMethod(env, _jwifimanager, jMethod);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
   end;
   env^.DeleteLocalRef(env, jCls);
 end;
