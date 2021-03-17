@@ -29,7 +29,6 @@ TOnAdMobLoaded = procedure(Sender: TObject; admobType: TAdMobType) of Object;
 TOnAdMobFailedToLoad = procedure(Sender: TObject; admobType : TAdMobType; errorCode: integer) of Object;
 TOnAdMobOpened = procedure(Sender: TObject; admobType: TAdMobType) of Object;
 TOnAdMobClosed = procedure(Sender: TObject; admobType: TAdMobType) of Object;
-TOnAdMobLeftApplication = procedure(Sender: TObject; admobType: TAdMobType) of Object;
 TOnAdMobClicked = procedure(Sender: TObject; admobType: TAdMobType) of Object;
 TOnAdMobInitializationComplete = procedure(Sender: TObject) of Object;
 TOnAdMobRewardedUserEarned = procedure(Sender: TObject) of Object;
@@ -47,7 +46,6 @@ jsAdMob = class(jVisualControl)
     FOnAdMobFailedToLoad:    TOnAdMobFailedToLoad;
     FOnAdMobOpened:          TOnAdMobOpened;
     FOnAdMobClosed:          TOnAdMobClosed;
-    FOnAdMobLeftApplication: TOnAdMobLeftApplication;
     FOnAdMobClicked:         TOnAdMobClicked;
     FOnAdMobInitializationComplete:  TOnAdMobInitializationComplete;
     FOnAdMobRewardedUserEarned:      TOnAdMobRewardedUserEarned;
@@ -69,7 +67,6 @@ jsAdMob = class(jVisualControl)
     procedure GenEvent_OnAdMobFailedToLoad(Obj: TObject; admobType : integer; errorCode: integer);
     procedure GenEvent_OnAdMobOpened(Obj: TObject; admobType: integer);
     procedure GenEvent_OnAdMobClosed(Obj: TObject; admobType: integer);
-    procedure GenEvent_OnAdMobLeftApplication(Obj: TObject; admobType: integer);
     procedure GenEvent_OnAdMobClicked(Obj: TObject; admobType: integer);
     procedure GenEvent_OnAdMobInitializationComplete(Obj: TObject);
     procedure GenEvent_OnAdMobRewardedUserEarned(Obj: TObject);
@@ -136,13 +133,14 @@ jsAdMob = class(jVisualControl)
     property OnAdMobFailedToLoad:   TOnAdMobFailedToLoad read FOnAdMobFailedToLoad write FOnAdMobFailedToLoad;
     property OnAdMobOpened      :   TOnAdMobOpened read FOnAdMobOpened write FOnAdMobOpened;
     property OnAdMobClosed      :   TOnAdMobClosed read FOnAdMobClosed write FOnAdMobClosed;
-    property OnAdMobLeftApplication  :   TOnAdMobLeftApplication read FOnAdMobLeftApplication write FOnAdMobLeftApplication;
     property OnAdMobClicked      :   TOnAdMobClicked read FOnAdMobClicked write FOnAdMobClicked;
     property OnAdMobInitializationComplete :   TOnAdMobInitializationComplete read FOnAdMobInitializationComplete write FOnAdMobInitializationComplete;
     property OnAdMobRewardedUserEarned     :   TOnAdMobRewardedUserEarned read FOnAdMobRewardedUserEarned write FOnAdMobRewardedUserEarned;
     property OnAdMobRewardedFailedToShow   :   TOnAdMobRewardedFailedToShow read FOnAdMobRewardedFailedToShow write FOnAdMobRewardedFailedToShow;
 
 end;
+
+function jsAdMob_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 
 implementation
 
@@ -190,7 +188,9 @@ begin
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject := jni_create(FjEnv, FjThis, Self, 'jsAdMob_jCreate'); if FjObject = nil then exit;
+   FjObject := jsAdMob_jCreate(FjEnv, int64(Self), FjThis);
+
+   if FjObject = nil then exit;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -297,11 +297,6 @@ end;
 procedure jsAdMob.GenEvent_OnAdMobClosed(Obj: TObject; admobType: integer);
 begin
   if Assigned(FOnAdMobClosed) then FOnAdMobClosed(Obj, TAdMobType(admobType));
-end;
-
-procedure jsAdMob.GenEvent_OnAdMobLeftApplication(Obj: TObject; admobType: integer);
-begin
-  if Assigned(FOnAdMobLeftApplication) then FOnAdMobLeftApplication(Obj, TAdMobType(admobType));
 end;
 
 procedure jsAdMob.GenEvent_OnAdMobRewardedUserEarned(Obj: TObject);
@@ -602,6 +597,23 @@ begin
  //in designing component state: set value here...
  if FjObject <> nil then
   jni_proc(FjEnv, FjObject, 'AdMobRewardedShow');
+end;
+
+{-------- jsAdMob_JNI_Bridge ----------}
+
+function jsAdMob_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
+  jMethod:= env^.GetMethodID(env, jCls, 'jsAdMob_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
 end;
 
 end.

@@ -68,6 +68,8 @@ jImageFileManager = class(jControl)
 
 end;
 
+function jImageFileManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+
 implementation
 
 {---------  jImageFileManager  --------------}
@@ -98,7 +100,7 @@ begin
   inherited Init(refApp);
   //your code here: set/initialize create params....
 
-  FjObject := jni_create(FjEnv, FjThis, Self, 'jImageFileManager_jCreate');
+  FjObject := jImageFileManager_jCreate(FjEnv, int64(Self), FjThis);
 
   if FjObject = nil then exit;
 
@@ -351,6 +353,21 @@ begin
 end;
 
 {-------- jImageFileManager_JNI_Bridge ----------}
+
+function jImageFileManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jParams[0].j:= _Self;
+  jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
+  jMethod:= env^.GetMethodID(env, jCls, 'jImageFileManager_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+end;
 
 (*
 //Please, you need insert:

@@ -280,7 +280,7 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     	LAMWCommon.setLayoutAll(_idAnchor);
     }
 
-    public void clearLayoutAll() {
+    public void ClearLayoutAll() {
     	LAMWCommon.clearLayoutAll();
     }
 

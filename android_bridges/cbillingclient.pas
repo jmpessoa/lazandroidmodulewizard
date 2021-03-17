@@ -484,7 +484,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Init(refApp: jApp); override;
-    procedure jFree();
     procedure Retry;
     procedure GenEvent_OnBillingClientEvent(const xml: string); // called by Java side Callback
     procedure ShowMessage(msg: string);
@@ -635,8 +634,10 @@ var
   jCls: jClass;
 begin
   jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
   jParams[0].j := Int64(SelfObj);
   jMethod:= env^.GetMethodID(env, jCls, 'jcBillingClient_Create', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result := env^.NewGlobalRef(env, Result);
 end;
@@ -1001,7 +1002,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -2205,13 +2206,6 @@ begin
   if FjObject = nil then exit;
   //DBG := 'Dbg2';
   FInitialized:= True;
-end;
-
-procedure jcBillingClient.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jcBillingClient.Retry;

@@ -45,7 +45,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp; Paint: JObject); reintroduce;
-    procedure jFree();
     procedure Bind(const ID: Integer);
     procedure Clear();
     procedure Combine(shdrA, shdrB: Integer; Mode: TPorterDuff; dstID: Integer);
@@ -76,12 +75,7 @@ type
   end;
 
   function  jPaintShader_jCreate (env: PJNIEnv;_Self: int64; _Paint, this: jObject): jObject;
-  procedure jPaintShader_jFree   (env: PJNIEnv; _jpaintshader: JObject);
   procedure jPaintShader_SetPaint(env: PJNIEnv; _jpaintshader, _Paint: JObject);
-  procedure jPaintShader_SetCount(env: PJNIEnv; _jpaintshader: JObject; _Value: Integer);
-  procedure jPaintShader_SetIndex(env: PJNIEnv; _jpaintshader: JObject; _Value: Integer);
-  function  jPaintShader_GetColor(env: PJNIEnv; _jpaintshader: JObject): Integer;
-  procedure jPaintShader_Bind    (env: PJNIEnv; _jpaintshader: JObject; _ID: Integer);
   procedure jPaintShader_Combine (env: PJNIEnv; _jpaintshader: JObject; _shdrA, _shdrB: Integer; _Mode: JByte; _dstID: Integer);
   // gradients, bitmap shaders
   function  jPaintShader_NewBitmapShader  (env: PJNIEnv; _jpaintshader: JObject; _Bitmap: JOBject; _tileX, _tileY: JByte; _ID: Integer): Integer; overload;
@@ -95,8 +89,6 @@ type
   function  jPaintShader_NewSweepGradient (env: PJNIEnv; _jpaintshader: JObject; _cX, _cY: Single; _Color0, _Color1, _ID: Integer): Integer; overload;
   function  jPaintShader_NewSweepGradient (env: PJNIEnv; _jpaintshader: JObject; _cX, _cY: Single; _Colors: TGradientColors; _Positions: TGradientPositions; _ID: Integer): Integer; overload;
   // transformation
-  procedure jPaintShader_SetIdentity  (env: PJNIEnv; _jpaintshader: JObject; _ID: Integer);
-  procedure jPaintShader_SetZeroCoords(env: PJNIEnv; _jpaintshader: JObject; _ID: Integer);
   procedure jPaintShader_SetMatrix    (env: PJNIEnv; _jpaintshader: JObject; _X, _Y, _scaleX, _scaleY, _Rotate: Single; _ID: Integer);
   procedure jPaintShader_SetRotate    (env: PJNIEnv; _jpaintshader: JObject; _Degree: Single; _ID: Integer); overload;
   procedure jPaintShader_SetRotate    (env: PJNIEnv; _jpaintshader: JObject; _Degree, _PointX, _PointY: Single; _ID: Integer); overload;
@@ -130,7 +122,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -146,12 +138,6 @@ begin
   FInitialized := True;
 end;
 
-procedure JPaintShader.jFree();
-begin
-  if FInitialized then
-    jPaintShader_jFree(FjEnv, FjObject);
-end;
-
 procedure JPaintShader.SetPaint(Value: JObject);
 begin
   if FInitialized then
@@ -163,20 +149,20 @@ begin
   if FInitialized then
   begin
     FShaderCount := Value;
-    jPaintShader_SetCount(FjEnv, FjObject, Value);
+    jni_proc_i(FjEnv, FjObject, 'SetCount', Value);
   end;
 end;
 
 procedure JPaintShader.SetIndex(Value: Integer);
 begin
   if FInitialized then
-    jPaintShader_SetIndex(FjEnv, FjObject, Value);
+    jni_proc_i(FjEnv, FjObject, 'SetIndex', Value);
 end;
 
 function JPaintShader.GetColor(): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_GetColor(FjEnv, FjObject);
+    Result := jni_func_out_i(FjEnv, FjObject, 'GetColor');
 end;
 
 procedure JPaintShader.Clear();
@@ -194,7 +180,7 @@ end;
 procedure JPaintShader.Bind(const ID: Integer);
 begin
   if FInitialized then
-    jPaintShader_Bind(FjEnv, FjObject, ID);
+    jni_proc_i(FjEnv, FjObject, 'Bind', ID);
 end;
 
 procedure jPaintShader.Disable();
@@ -205,13 +191,13 @@ end;
 procedure JPaintShader.SetIdentity(ID: Integer);
 begin
   if FInitialized then
-    jPaintShader_SetIdentity(FjEnv, FjObject, ID);
+    jni_proc_i(FjEnv, FjObject, 'SetIdentity', ID);
 end;
 
 procedure JPaintShader.SetZeroCoords(ID: Integer);
 begin
   if FInitialized then
-    jPaintShader_SetZeroCoords(FjEnv, FjObject, ID);
+    jni_proc_i(FjEnv, FjObject, 'SetZeroCoords', ID);
 end;
 
 procedure JPaintShader.SetMatrix(X, Y, scaleX, scaleY, Rotate: Single; ID: Integer);
@@ -315,20 +301,11 @@ begin
   jParams[0].j := _Self;
   jParams[1].l := _Paint;
   jCls := Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'jPaintShader_jCreate', '(JLjava/lang/Object;)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result := env^.NewGlobalRef(env, Result);
-end;
-
-procedure jPaintShader_jFree(env: PJNIEnv; _jpaintshader: JObject);
-var
-  jMethod: JMethodID = nil;
-  jCls   : JClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jpaintshader);
-  jMethod := env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jpaintshader, jMethod);
-  env^.DeleteLocalRef(env, jCls);
 end;
 
 procedure jPaintShader_SetPaint(env: PJNIEnv; _jpaintshader, _Paint: JObject);
@@ -339,45 +316,10 @@ var
 begin
   jParams[0].l := _Paint;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'SetPaint', '(Landroid/graphics/Paint;)V'); // '(Ljava/lang/Object;)V'
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jPaintShader_SetCount(env: PJNIEnv; _jpaintshader: JObject; _Value: Integer);
-var
-  jParams: array[0..0] of JValue;
-  jMethod: JMethodID = nil;
-  jCls   : JClass = nil;
-begin
-  jParams[0].i := _Value;
-  jCls := env^.GetObjectClass(env, _jpaintshader);
-  jMethod := env^.GetMethodID(env, jCls, 'SetCount', '(I)V');
-  env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jPaintShader_SetIndex(env: PJNIEnv; _jpaintshader: JObject; _Value: Integer);
-var
-  jParams: array[0..0] of JValue;
-  jMethod: JMethodID = nil;
-  jCls   : JClass = nil;
-begin
-  jParams[0].i := _Value;
-  jCls := env^.GetObjectClass(env, _jpaintshader);
-  jMethod := env^.GetMethodID(env, jCls, 'SetIndex', '(I)V');
-  env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jPaintShader_GetColor(env: PJNIEnv; _jpaintshader: JObject): Integer;
-var
-  jMethod: JMethodID = nil;
-  jCls   : JClass = nil;
-begin
-  jCls := env^.GetObjectClass(env, _jpaintshader);
-  jMethod := env^.GetMethodID(env, jCls, 'GetColor', '()I');
-  Result := env^.CallIntMethod(env, _jpaintshader, jMethod);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -392,20 +334,9 @@ begin
   jParams[2].b := _Mode;
   jParams[3].i := _dstID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'Combine', '(IIBI)V');
-  env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jPaintShader_Bind(env: PJNIEnv; _jpaintshader: JObject; _ID: Integer);
-var
-  jParams: array[0..0] of JValue;
-  jMethod: JMethodID = nil;
-  jCls   : JClass = nil;
-begin
-  jParams[0].i := _ID;
-  jCls := env^.GetObjectClass(env, _jpaintshader);
-  jMethod := env^.GetMethodID(env, jCls, 'Bind', '(I)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -421,7 +352,9 @@ begin
   jParams[2].b := _tileY;
   jParams[3].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewBitmapShader', '(Landroid/graphics/Bitmap;BBI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -440,7 +373,9 @@ begin
   jParams[5].f := _Rotate;
   jParams[6].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewBitmapShader', '(Landroid/graphics/Bitmap;BBFFFI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -460,7 +395,9 @@ begin
   jParams[6].b := _tMode;
   jParams[7].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewLinearGradient', '(FFFFIIBI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -489,7 +426,9 @@ begin
   jParams[6].b := _tMode;
   jParams[7].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewLinearGradient', '(FFFF[I[FBI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jParams[4].l);
   env^.DeleteLocalRef(env, jParams[5].l);
@@ -512,7 +451,9 @@ begin
   jParams[7].b := _tMode;
   jParams[8].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewLinearGradient', '(FFFFFIIBI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -542,7 +483,9 @@ begin
   jParams[7].b := _tMode;
   jParams[8].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewLinearGradient', '(FFFFF[I[FBI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jParams[5].l);
   env^.DeleteLocalRef(env, jParams[6].l);
@@ -563,7 +506,9 @@ begin
   jParams[5].b:= _tMode;
   jParams[6].i:= _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewRadialGradient', '(FFFIIBI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -591,7 +536,9 @@ begin
   jParams[5].b:= _tMode;
   jParams[6].i:= _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewRadialGradient', '(FFF[I[FBI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jParams[3].l);
   env^.DeleteLocalRef(env, jParams[4].l);
@@ -610,7 +557,9 @@ begin
   jParams[3].i := _Color1;
   jParams[4].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewSweepGradient', '(FFIII)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -636,36 +585,12 @@ begin
   jParams[3].l := posArray;
   jParams[4].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'NewSweepGradient', '(FF[I[FI)I');
+  if jni_ExceptionOccurred(env) then exit;
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jParams[2].l);
   env^.DeleteLocalRef(env, jParams[3].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jPaintShader_SetIdentity(env: PJNIEnv; _jpaintshader: JObject; _ID: Integer);
-var
-  jParams: array[0..0] of JValue;
-  jMethod: JMethodID = nil;
-  jCls   : JClass = nil;
-begin
-  jParams[0].i := _ID;
-  jCls := env^.GetObjectClass(env, _jpaintshader);
-  jMethod := env^.GetMethodID(env, jCls, 'SetIdentity', '(I)V');
-  env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jPaintShader_SetZeroCoords(env: PJNIEnv; _jpaintshader: JObject; _ID: Integer);
-var
-  jParams: array[0..0] of JValue;
-  jMethod: JMethodID = nil;
-  jCls   : JClass = nil;
-begin
-  jParams[0].i := _ID;
-  jCls := env^.GetObjectClass(env, _jpaintshader);
-  jMethod := env^.GetMethodID(env, jCls, 'SetZeroCoords', '(I)V');
-  env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -682,7 +607,9 @@ begin
   jParams[0].f := _Rotate;
   jParams[0].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'SetMatrix', '(FFFFFI)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -696,7 +623,9 @@ begin
   jParams[0].f := _Degree;
   jParams[1].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'SetRotate', '(FI)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -712,7 +641,9 @@ begin
   jParams[2].f := _PointY;
   jParams[3].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'SetRotate', '(FFFI)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -727,7 +658,9 @@ begin
   jParams[1].f := _Y;
   jParams[2].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'SetScale', '(FFI)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;
@@ -742,7 +675,9 @@ begin
   jParams[1].f := _Y;
   jParams[2].i := _ID;
   jCls := env^.GetObjectClass(env, _jpaintshader);
+  if jCls = nil then exit;
   jMethod := env^.GetMethodID(env, jCls, 'SetTranslate', '(FFI)V');
+  if jni_ExceptionOccurred(env) then exit;
   env^.CallVoidMethodA(env, _jpaintshader, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
 end;

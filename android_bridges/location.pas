@@ -64,7 +64,6 @@ jLocation = class(jControl)
     procedure Init(refApp: jApp); override;
 
     function jCreate( _TimeForUpdates: int64; _DistanceForUpdates: int64; _CriteriaAccuracy: integer; _MapType: integer): jObject;
-    procedure jFree();
     function StartTracker(): boolean;  overload;
     function StartTracker( lastKnownLocation: boolean ): boolean;  overload;
     function StartTrackerSingle(): boolean;
@@ -183,7 +182,7 @@ begin
   begin
         if FjObject  <> nil then
         begin
-           jFree();
+           jni_proc(FjEnv, FjObject, 'jFree' );
            FjObject := nil;
         end;
   end;
@@ -216,13 +215,6 @@ function jLocation.GPSCreate(): boolean;
 begin
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjThis, 'GPSCreate');
-end;
-
-procedure jLocation.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree' );
 end;
 
 function jLocation.StartTracker(): boolean;
@@ -652,7 +644,9 @@ begin
   jParams[3].i:= _CriteriaAccuracy;
   jParams[4].i:= _MapType;
   jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'jLocation_jCreate', '(JJJII)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
@@ -668,7 +662,9 @@ begin
   Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_locationAddress));
   jCls:= env^.GetObjectClass(env, _jlocation);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetLatitudeLongitude', '(Ljava/lang/String;)[D');
+  if jni_ExceptionOccurred(env) then exit;
   jResultArray:= env^.CallObjectMethodA(env, _jlocation, jMethod,  @jParams);
   if jResultArray <> nil then
   begin
@@ -702,7 +698,9 @@ begin
   env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
   jParams[1].l:= jNewArray1;
   jCls:= env^.GetObjectClass(env, _jlocation);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[D)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -738,7 +736,9 @@ begin
   jParams[1].l:= jNewArray1;
   jParams[2].i:= _pathFlag;
   jCls:= env^.GetObjectClass(env, _jlocation);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[DI)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -775,7 +775,9 @@ begin
   jParams[2].i:= _pathFlag;
   jParams[3].i:= _markerHighlightIndex;
   jCls:= env^.GetObjectClass(env, _jlocation);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[DII)Ljava/lang/String;');
+  if jni_ExceptionOccurred(env) then exit;
   jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';

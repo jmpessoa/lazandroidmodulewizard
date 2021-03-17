@@ -21,11 +21,9 @@ jBrightness = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate(): jObject;
     function getBrightness(): single;
     function isBrightnessManual(): boolean;
     procedure setBrightness(_brightness: single);
-    procedure jFree();
 
  published
 
@@ -51,7 +49,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -64,14 +62,8 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jCreate(); if FjObject = nil then exit;
+  FjObject := jBrightness_jCreate(FjEnv, int64(Self), FjThis); if FjObject = nil then exit;
   FInitialized:= True;
-end;
-
-
-function jBrightness.jCreate(): jObject;
-begin
-   Result:= jBrightness_jCreate(FjEnv, int64(Self), FjThis);
 end;
 
 function jBrightness.getBrightness(): single;
@@ -95,13 +87,6 @@ begin
      jni_proc_f(FjEnv, FjObject, 'setBrightness', _brightness);
 end;
 
-procedure jBrightness.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
-end;
-
 {-------- jBrightness_JNI_Bridge ----------}
 
 function jBrightness_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -112,7 +97,9 @@ var
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'jBrightness_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;

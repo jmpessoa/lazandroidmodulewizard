@@ -27,8 +27,6 @@ jAnalogClock = class(jVisualControl)
     procedure UpdateLayout; override;
     
     procedure GenEvent_OnClick(Obj: TObject);
-    function jCreate(): jObject;
-    procedure jFree();
     procedure SetViewParent(_viewgroup: jObject);  override;
     procedure RemoveFromViewParent();   override;
     function GetView(): jObject;  override;
@@ -79,7 +77,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -96,7 +94,9 @@ begin
   begin
    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject := jCreate(); if FjObject = nil then exit;
+   FjObject := jAnalogClock_jCreate(FjEnv, int64(Self), FjThis);
+
+   if FjObject = nil then exit;
 
    if FParent <> nil then
     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
@@ -180,18 +180,6 @@ end;
 procedure jAnalogClock.GenEvent_OnClick(Obj: TObject);
 begin
   if Assigned(FOnClick) then FOnClick(Obj);
-end;
-
-function jAnalogClock.jCreate(): jObject;
-begin
-   Result:= jAnalogClock_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jAnalogClock.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jAnalogClock.SetViewParent(_viewgroup: jObject);
@@ -295,7 +283,9 @@ var
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
+  if jCls = nil then exit;
   jMethod:= env^.GetMethodID(env, jCls, 'jAnalogClock_jCreate', '(J)Ljava/lang/Object;');
+  if jni_ExceptionOccurred(env) then exit;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
 end;
