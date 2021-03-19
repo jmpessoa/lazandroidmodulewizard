@@ -636,7 +636,9 @@ function jLocation_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _TimeForUpd
 var
   jParams: array[0..4] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].j:= _Self;
   jParams[1].j:= _TimeForUpdates;
@@ -644,11 +646,13 @@ begin
   jParams[3].i:= _CriteriaAccuracy;
   jParams[4].i:= _MapType;
   jCls:= Get_gjClass(env);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jLocation_jCreate', '(JJJII)Ljava/lang/Object;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
+  Result:= env^.NewGlobalRef(env, Result);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function jLocation_GetLatitudeLongitude(env: PJNIEnv; _jlocation: JObject; _locationAddress: string): TDynArrayOfDouble;
@@ -657,14 +661,16 @@ var
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;   
+label
+  _exceptionOcurred;
 begin
   Result := nil;
   jParams[0].l:= env^.NewStringUTF(env, PChar(_locationAddress));
   jCls:= env^.GetObjectClass(env, _jlocation);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetLatitudeLongitude', '(Ljava/lang/String;)[D');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jResultArray:= env^.CallObjectMethodA(env, _jlocation, jMethod,  @jParams);
   if jResultArray <> nil then
   begin
@@ -673,7 +679,9 @@ begin
     env^.GetDoubleArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   end;
    env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);     
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -687,7 +695,9 @@ var
   newSize0: integer;
   jNewArray0: jObject=nil;
   newSize1: integer;
-  jNewArray1: jObject=nil;
+  jNewArray1: jObject=nil; 
+label
+  _exceptionOcurred;
 begin
   newSize0:= Length(_latitude);
   jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
@@ -698,9 +708,9 @@ begin
   env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
   jParams[1].l:= jNewArray1;
   jCls:= env^.GetObjectClass(env, _jlocation);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[D)Ljava/lang/String;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -711,7 +721,9 @@ begin
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);    
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer): string;
@@ -724,7 +736,9 @@ var
   newSize0: integer;
   jNewArray0: jObject=nil;
   newSize1: integer;
-  jNewArray1: jObject=nil;
+  jNewArray1: jObject=nil; 
+label
+  _exceptionOcurred;
 begin
   newSize0:= Length(_latitude);
   jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
@@ -736,9 +750,9 @@ begin
   jParams[1].l:= jNewArray1;
   jParams[2].i:= _pathFlag;
   jCls:= env^.GetObjectClass(env, _jlocation);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[DI)Ljava/lang/String;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -749,7 +763,9 @@ begin
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);    
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer; _markerHighlightIndex: integer): string;
@@ -762,7 +778,9 @@ var
   newSize0: integer;
   jNewArray0: jObject=nil;
   newSize1: integer;
-  jNewArray1: jObject=nil;
+  jNewArray1: jObject=nil;  
+label
+  _exceptionOcurred;
 begin
   newSize0:= Length(_latitude);
   jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
@@ -775,9 +793,9 @@ begin
   jParams[2].i:= _pathFlag;
   jParams[3].i:= _markerHighlightIndex;
   jCls:= env^.GetObjectClass(env, _jlocation);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[DII)Ljava/lang/String;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jStr:= env^.CallObjectMethodA(env, _jlocation, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -788,7 +806,9 @@ begin
   end;
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 {

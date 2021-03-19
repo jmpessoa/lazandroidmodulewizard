@@ -631,15 +631,19 @@ Function jcBillingClient_Create(env:PJNIEnv; this:jobject; SelfObj: TObject): jO
 var
   jMethod: jMethodID = nil;
   jParams: array[0..0] of jValue;
-  jCls: jClass;
+  jCls: jClass;            
+label
+  _exceptionOcurred;
 begin
   jCls:= Get_gjClass(env);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jParams[0].j := Int64(SelfObj);
   jMethod:= env^.GetMethodID(env, jCls, 'jcBillingClient_Create', '(J)Ljava/lang/Object;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result := env^.NewGlobalRef(env, Result);
+  Result := env^.NewGlobalRef(env, Result);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 { TConsumedItem }

@@ -1052,16 +1052,18 @@ var
   w,h  : Integer;
   Pixel : DWord;
   PixelFormat: DWord;
-  _jBoolean  : jBoolean;
+  _jBoolean  : jBoolean; 
+label
+  _exceptionOcurred;
 begin
 
   gVM^.AttachCurrentThread(gVm,@env,nil);
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFilename));
   jCls:= env^.GetObjectClass(env, _jcanvases2);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetBmpIntArray', '(Ljava/lang/String;)[I');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jResultArray:= env^.CallObjectMethodA(env, _jcanvases2, jMethod,  @jParams);
 
   Size:= env^.GetArrayLength(env, jResultArray);
@@ -1119,6 +1121,8 @@ begin
   env^.DeleteLocalRef(env, jCls);
 
   Result := True;
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 
 end;
 

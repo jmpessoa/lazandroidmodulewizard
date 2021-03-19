@@ -6787,7 +6787,7 @@ label
   _exceptionOcurred;
 begin
  _cls:= Get_gjClass(env);
- if _cls = nil then exit;
+ if _cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, _cls, 'jForm_Create', '(J)Ljava/lang/Object;');
  if jMethod = nil then goto _exceptionOcurred;
  _jParam.j := Int64(SelfObj);
@@ -6892,7 +6892,7 @@ begin
   _jParams[0].l:= _srcUri;
   _jParams[1].l:= env^.NewStringUTF(env, pchar(_destDir) );
   _jCls := env^.GetObjectClass(env, _jform);
-  if _jCls = nil then exit;
+  if _jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, _jCls, 'CopyFileFromUri', '(Landroid/net/Uri;Ljava/lang/String;)Ljava/lang/String;');
   if jMethod = nil then goto _exceptionOcurred;
   _jString:= env^.CallObjectMethodA(env, _jform, jMethod,@_jParams);
@@ -7854,7 +7854,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)V');
-  if jMethod = nil then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   //if jMethod = nil then goto _exceptionOcurred;
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls); 

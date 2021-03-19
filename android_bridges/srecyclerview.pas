@@ -716,18 +716,22 @@ function jsRecyclerView_jCreate(env: PJNIEnv;_Self: int64; _mode: integer; _dire
 var
   jParams: array[0..3] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].j:= _Self;
   jParams[1].i:= _mode;
   jParams[2].i:= _direction;
   jParams[3].i:= _cols;
   jCls:= Get_gjClass(env);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jsRecyclerView_jCreate', '(JIII)Ljava/lang/Object;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -735,15 +739,19 @@ procedure jsRecyclerView_SetlayoutView(env: PJNIEnv; _jsrecyclerview: JObject; _
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;   
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _itemViewLayout;
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemViewLayout', '(Landroid/view/View;)V');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 procedure jsRecyclerView_SetItemViewLayout(env: PJNIEnv; _jsrecyclerview: JObject; _itemViewLayout: jObject; _forceCardStyle: boolean);
@@ -751,15 +759,19 @@ var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _itemViewLayout;
   jParams[1].z:= JBool(_forceCardStyle);
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemViewLayout', '(Landroid/view/View;Z)V');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   env^.CallVoidMethodA(env, _jsrecyclerview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
