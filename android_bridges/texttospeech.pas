@@ -5,7 +5,7 @@ unit texttospeech;
 interface
 
 uses
-  Classes, SysUtils, AndroidWidget;
+  Classes, SysUtils, And_jni, AndroidWidget;
 
 type
 
@@ -34,6 +34,8 @@ jTextToSpeech = class(jControl)
     property SpeechLanguage: TSpeechLanguage read FSpeechLanguage write SetLanguage;
 
 end;
+
+function jTextToSpeech_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 
 implementation
 
@@ -65,7 +67,9 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jni_create(FjEnv, FjThis, Self, 'jTextToSpeech_jCreate'); if FjObject = nil then exit;
+  FjObject := jTextToSpeech_jCreate(FjEnv, int64(Self), FjThis);
+
+  if FjObject = nil then exit;
 
   if FSpeechLanguage <>  slDefault then
       SetLanguage(FSpeechLanguage);
@@ -137,6 +141,25 @@ begin
 end;
 
 {-------- jTextToSpeech_JNI_Bridge ----------}
+
+function jTextToSpeech_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  jParams[0].j:= _Self;
+  jCls:= Get_gjClass(env);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'jTextToSpeech_jCreate', '(J)Ljava/lang/Object;');
+  if jMethod = nil then goto _exceptionOcurred;
+  Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+  Result:= env^.NewGlobalRef(env, Result);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 (*
 //Please, you need insert:
