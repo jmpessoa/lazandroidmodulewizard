@@ -341,15 +341,19 @@ function jSensorManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObje
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil; 
+label
+  _exceptionOcurred;
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jSensorManager_jCreate', '(J)Ljava/lang/Object;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
+  Result:= env^.NewGlobalRef(env, Result);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 (*
@@ -368,13 +372,15 @@ var
   resultSize: integer;
   jResultArray: jObject;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   Result := nil;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceSensorsTypes', '()[I');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jresultArray:= env^.CallObjectMethod(env, _jsensormanager, jMethod);
   if jresultArray <> nil then
   begin
@@ -382,7 +388,9 @@ begin
     SetLength(Result, resultsize);
     env^.GetIntArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
   end;
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -394,13 +402,15 @@ var
   jResultArray: jObject;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
-  i: integer;
+  i: integer;   
+label
+  _exceptionOcurred;
 begin
   Result := nil;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceSensorsNames', '()[Ljava/lang/String;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jresultArray:= env^.CallObjectMethod(env, _jsensormanager, jMethod);
   if jresultArray <> nil then
   begin
@@ -418,7 +428,9 @@ begin
       end;
     end;
   end;
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls); 
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -431,14 +443,16 @@ var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
-  i: integer;
+  i: integer;   
+label
+  _exceptionOcurred;
 begin
   Result := nil;
   jParams[0].i:= _sensorType;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorsNames', '(I)[Ljava/lang/String;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jResultArray:= env^.CallObjectMethodA(env, _jsensormanager, jMethod,  @jParams);
   if jresultArray <> nil then
   begin
@@ -456,7 +470,9 @@ begin
       end;
     end;
   end;
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -464,15 +480,19 @@ function jSensorManager_GetSensor(env: PJNIEnv; _jsensormanager: JObject; _senso
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;   
+label
+  _exceptionOcurred;
 begin
   jParams[0].i:= _sensorType;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensor', '(I)Landroid/hardware/Sensor;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -480,15 +500,19 @@ function jSensorManager_GetSensorMaximumRange(env: PJNIEnv; _jsensormanager: JOb
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;    
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorMaximumRange', '(Landroid/hardware/Sensor;)F');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);    
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -498,13 +522,15 @@ var
   jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorVendor', '(Landroid/hardware/Sensor;)Ljava/lang/String;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jStr:= env^.CallObjectMethodA(env, _jsensormanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -513,7 +539,9 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -521,15 +549,19 @@ function jSensorManager_GetSensorMinDelay(env: PJNIEnv; _jsensormanager: JObject
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorMinDelay', '(Landroid/hardware/Sensor;)I');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallIntMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);    
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -539,13 +571,15 @@ var
   jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorName', '(Landroid/hardware/Sensor;)Ljava/lang/String;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jStr:= env^.CallObjectMethodA(env, _jsensormanager, jMethod, @jParams);
   case jStr = nil of
      True : Result:= '';
@@ -554,7 +588,9 @@ begin
               Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
             end;
   end;
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -562,15 +598,19 @@ function jSensorManager_GetSensorType(env: PJNIEnv; _jsensormanager: JObject; _s
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorType', '(Landroid/hardware/Sensor;)I');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallIntMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);     
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -578,30 +618,38 @@ procedure jSensorManager_UnregisterListenerSensor(env: PJNIEnv; _jsensormanager:
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'UnregisterListenerSensor', '(Landroid/hardware/Sensor;)V');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   env^.CallVoidMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function jSensorManager_GetAltitude(env: PJNIEnv; _jsensormanager: JObject; _localPressure: single): single;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].f:= _localPressure;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetAltitude', '(F)F');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);    
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -609,93 +657,117 @@ function jSensorManager_GetAltitude(env: PJNIEnv; _jsensormanager: JObject; _pre
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].f:= _pressureAtSeaLevel;
   jParams[1].f:= _localPressure;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetAltitude', '(FF)F');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function jSensorManager_GetSensorPower(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject): single;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;   
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorPower', '(Landroid/hardware/Sensor;)F');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function jSensorManager_GetSensorResolution(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject): single;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;   
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensorResolution', '(Landroid/hardware/Sensor;)F');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallFloatMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 procedure jSensorManager_RegisterListeningSensor(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;    
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterListeningSensor', '(Landroid/hardware/Sensor;)V');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   env^.CallVoidMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls); 
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 procedure jSensorManager_RegisterListeningSensor(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject; _delayType: integer);
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;   
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= _sensor;
   jParams[1].i:= _delayType;
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterListeningSensor', '(Landroid/hardware/Sensor;I)V');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   env^.CallVoidMethodA(env, _jsensormanager, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function jSensorManager_GetSensor(env: PJNIEnv; _jsensormanager: JObject; _sensorName: string): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;    
+label
+  _exceptionOcurred;
 begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_sensorName));
   jCls:= env^.GetObjectClass(env, _jsensormanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetSensor', '(Ljava/lang/String;)Landroid/hardware/Sensor;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, _jsensormanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 end.

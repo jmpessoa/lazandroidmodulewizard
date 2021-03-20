@@ -2244,7 +2244,25 @@ begin
   if auxCount <> 0 then
      strList.Add('  i: integer;');
 
+  strList.Add('label');
+  strList.Add('  _exceptionOcurred;');
   strList.Add('begin');
+
+  if funcResult = 'constructor' then  //constructor
+  begin
+    strList.Add('  jCls:= Get_gjClass(env);');
+    strList.Add('  if jCls = nil then goto _exceptionOcurred;');
+    strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+'_jCreate'+''', '''+jniSignature+'''); ');
+    strList.Add('  if jMethod = nil then goto _exceptionOcurred;');
+  end
+  else
+  begin
+    strList.Add('  jCls:= env^.GetObjectClass(env, _'+LowerCase(FJavaClassName)+');');
+    strList.Add('  if jCls = nil then goto _exceptionOcurred;');
+    strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+''', '''+jniSignature+'''); ');
+    strList.Add('  if jMethod = nil then goto _exceptionOcurred;');
+  end;
+
   if paramCount = 1 then
   begin
      if Pos('[', paramType) > 0 then
@@ -2315,20 +2333,6 @@ begin
 
        strList.Add('  jParams['+IntToStr(i-ix)+'].'+GetJParamHack(paramType)+':= '+paramName +';');
     end;
-  end;
-  if funcResult = 'constructor' then  //constructor
-  begin
-    strList.Add('  jCls:= Get_gjClass(env);');
-    strList.Add('  if jCls = nil then exit;');
-    strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+'_jCreate'+''', '''+jniSignature+'''); ');
-    strList.Add('  if jni_ExceptionOccurred(env) then exit;');
-  end
-  else
-  begin
-    strList.Add('  jCls:= env^.GetObjectClass(env, _'+LowerCase(FJavaClassName)+');');
-    strList.Add('  if jCls = nil then exit;');
-    strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+''', '''+jniSignature+'''); ');
-    strList.Add('  if jni_ExceptionOccurred(env) then exit;');
   end;
 
   if Pos('()', jniSignature) = 0 then //has params
@@ -2457,6 +2461,8 @@ begin
   if funcResult <> 'constructor' then
      strList.Add('  env^.DeleteLocalRef(env, jCls);');
 
+  strList.Add(' ');
+  strList.Add('  _exceptionOcurred: jni_ExceptionOccurred(env);');
   strList.Add('end;');
 
   if funcResult = 'constructor' then

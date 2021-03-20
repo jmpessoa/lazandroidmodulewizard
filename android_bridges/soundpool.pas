@@ -208,15 +208,19 @@ function jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil; 
+label
+  _exceptionOcurred;
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jSoundPool_jCreate', '(J)Ljava/lang/Object;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
+  Result:= env^.NewGlobalRef(env, Result);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -224,7 +228,9 @@ function jSoundPool_SoundPlay(env: PJNIEnv; _jsoundpool: JObject; soundId: integ
 var
   jParams: array[0..5] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;   
+label
+  _exceptionOcurred;
 begin
   jParams[0].i:= soundId;
   jParams[1].f:= _leftVolume;
@@ -233,11 +239,13 @@ begin
   jParams[4].i:= _loop;
   jParams[5].f:= _rate;
   jCls:= env^.GetObjectClass(env, _jsoundpool);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SoundPlay', '(IFFIIF)I');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallIntMethodA(env, _jsoundpool, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls); 
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 

@@ -4374,7 +4374,9 @@ begin
  if FjObject = nil then exit;
 
  if (FFontColor <> colbrDefault) then
-  jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor))
+ begin
+  jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
+ end;
 end;
 
 procedure jTextView.SetFontSize(Value: DWord);
@@ -4464,7 +4466,9 @@ procedure jTextView.PasteFromClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
+  begin
      jni_proc(FjEnv, FjObject, 'PasteFromClipboard');
+  end;
 end;
 
 procedure jTextView.SetFontSizeUnit(_unit: TFontSizeUnit);

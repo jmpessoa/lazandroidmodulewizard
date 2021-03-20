@@ -175,16 +175,20 @@ function jPreferences_jCreate(env: PJNIEnv; this: JObject;_Self: int64; _IsShare
 var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].j:= _Self;
   jParams[1].z:= JBool(_IsShared);
   jCls:= Get_gjClass(env);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jPreferences_jCreate', '(JZ)Ljava/lang/Object;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
+  Result:= env^.NewGlobalRef(env, Result);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 end.

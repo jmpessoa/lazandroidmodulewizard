@@ -209,12 +209,15 @@ public class jTextView extends TextView {
     }
     public void CopyToClipboard() {
         mClipData = ClipData.newPlainText("text", this.getText().toString());
+        if( mClipData == null) return;
         mClipBoard.setPrimaryClip(mClipData);
     }
 
     public void PasteFromClipboard() {
         ClipData cdata = mClipBoard.getPrimaryClip();
+        if(cdata == null) return;
         ClipData.Item item = cdata.getItemAt(0);
+        if(item == null) return;
         this.setText(item.getText().toString());
     }
 
@@ -303,7 +306,7 @@ public class jTextView extends TextView {
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 		
-		// by TR3E
+		// by ADiV
 		if( d == null ){
 			this.setCompoundDrawables(null, null, null, null);
 			return;
@@ -325,7 +328,7 @@ public class jTextView extends TextView {
 		
 		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
-		// by TR3E
+		// by ADiV
 		if( d == null ){
 			this.setCompoundDrawables(null, null, null, null);
 			return;
@@ -346,9 +349,11 @@ public class jTextView extends TextView {
 	public void SetRoundCorner() {
 		   if (this != null) {  		
 			        PaintDrawable  shape =  new PaintDrawable();
+			        if(shape == null) return;
 			        shape.setCornerRadius(mRadius);                
 			        int color = Color.TRANSPARENT;
-			        Drawable background = this.getBackground();        
+			        Drawable background = this.getBackground();
+			        if(background == null) return;
 			        if (background instanceof ColorDrawable) {
 			          color = ((ColorDrawable)this.getBackground()).getColor();
 				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
@@ -472,15 +477,15 @@ public class jTextView extends TextView {
 	public void SetTextAsLink(String _linkText) {
 
                //[ifdef_api24up]
-	       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
-	           this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));
-               }else //[endif_api24up]
-		   this.setText(Html.fromHtml(_linkText));
+	       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+	        this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));
+           else //[endif_api24up]
+		    this.setText(Html.fromHtml(_linkText));
 
                this.setMovementMethod(LinkMovementMethod.getInstance());
 	}
 
-	public void SetTextAsLink(String _linkText, int _color) {  //by TR3E
+	public void SetTextAsLink(String _linkText, int _color) {  //by ADiV
 		//[ifdef_api24up]
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
 			this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));

@@ -234,13 +234,17 @@ function jWifiManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
   jMethod:= env^.GetMethodID(env, jCls, 'jWifiManager_jCreate', '(J)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
-  Result:= env^.NewGlobalRef(env, Result);
+  Result:= env^.NewGlobalRef(env, Result);    
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function jWifiManager_Scan(env: PJNIEnv; _jwifimanager: JObject): TDynArrayOfString;
@@ -252,12 +256,14 @@ var
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
   i: integer;
+label
+  _exceptionOcurred;
 begin
   Result := nil;
   jCls:= env^.GetObjectClass(env, _jwifimanager);
-  if jCls = nil then exit;
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'Scan', '()[Ljava/lang/String;');
-  if jni_ExceptionOccurred(env) then exit;
+  if jMethod = nil then goto _exceptionOcurred;
   jresultArray:= env^.CallObjectMethod(env, _jwifimanager, jMethod);
   if jResultArray <> nil then
   begin
@@ -275,7 +281,9 @@ begin
       end;
     end;
   end;
-  env^.DeleteLocalRef(env, jCls);
+  env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
