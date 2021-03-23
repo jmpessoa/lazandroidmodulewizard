@@ -288,7 +288,8 @@ class jForm {
 	public void SetEnabled(boolean enabled) {
 		for (int i = 0; i < layout.getChildCount(); i++) {
 			View child = layout.getChildAt(i);
-			child.setEnabled(enabled);
+			if(child != null)
+			 child.setEnabled(enabled);
 		}
 	}
 
@@ -354,6 +355,7 @@ class jForm {
 	/// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
 	private void fadeInAnimation(final View view, int duration) {
 		Animation fadeIn = new AlphaAnimation(0, 1);
+		if(fadeIn == null) return;
 		fadeIn.setInterpolator(new DecelerateInterpolator());
 		fadeIn.setDuration(duration);
 		fadeIn.setAnimationListener(new Animation.AnimationListener() {
@@ -376,6 +378,7 @@ class jForm {
 
 	private void fadeOutAnimation(final View view, int duration) {
 		Animation fadeOut = new AlphaAnimation(1, 0);
+		if(fadeOut == null) return;
 		fadeOut.setInterpolator(new AccelerateInterpolator());
 		fadeOut.setStartOffset(duration);
 		fadeOut.setDuration(duration);
@@ -406,6 +409,7 @@ class jForm {
 		} else {
 			animate = new TranslateAnimation(view.getWidth(), 0, 0, 0); // View for animation
 		}
+		if(animate == null) return;
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
 		view.startAnimation(animate);
@@ -422,7 +426,7 @@ class jForm {
 		} else {
 			animate = new TranslateAnimation(0, view.getWidth(), 0, 0); // View for animation
 		}
-
+		if(animate == null) return;
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
 		view.startAnimation(animate);
@@ -440,7 +444,7 @@ class jForm {
 			animate = new TranslateAnimation(0, -parent.getWidth(),
 					0, 0); // View for animation
 		}
-
+		if(animate == null) return;
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
 		view.startAnimation(animate);
@@ -457,7 +461,7 @@ class jForm {
 		} else {
 			animate = new TranslateAnimation(-parent.getWidth(), 0, 0, 0); // View for animation
 		}
-
+		if(animate == null) return;
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
 		view.startAnimation(animate);
@@ -640,12 +644,14 @@ class jForm {
 
 	public String GetDateTime() {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+		if(formatter == null) return "";
 		return (formatter.format(new Date()));
 	}
 	
 	// by ADiV
 	public String GetDateTime(long millisDateTime) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		if(formatter == null) return "";
 		return (formatter.format(millisDateTime));
 	}
 	
@@ -657,6 +663,7 @@ class jForm {
 	//by ADiV
 	public String GetTimeHHssSS( long millisTime ) {
 		  SimpleDateFormat formatter = new SimpleDateFormat ( "mm:ss:SS" );
+		  if(formatter == null) return "";
 		  return( formatter.format ( new Date (millisTime) ) );	
 	}
 	
@@ -747,6 +754,7 @@ class jForm {
 	public boolean SetWifiEnabled(boolean _status) {
 		//WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
 		WifiManager wifiManager = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+		if(wifiManager == null) return(false);
 
 		return wifiManager.setWifiEnabled(_status);
 	}
@@ -754,16 +762,20 @@ class jForm {
 	public boolean IsWifiEnabled() {
 		//WifiManager wifiManager = (WifiManager)this.controls.activity.getSystemService(Context.WIFI_SERVICE);
 		WifiManager wifiManager = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
+		if(wifiManager == null) return(false);
+		
 		return wifiManager.isWifiEnabled();
 	}
 
 	public boolean IsMobileDataEnabled() {
 		boolean mobileDataEnabled = false; // Assume disabled
 		ConnectivityManager cm = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(cm == null) return(false);
+		
 		try {
 			final Class<?> cmClass = Class.forName(cm.getClass().getName());
 			Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
+			if(method == null) return(false);
 			method.setAccessible(true); // Make the method callable
 			// get the setting for "mobile data"
 			mobileDataEnabled = (Boolean) method.invoke(cm);
@@ -938,8 +950,9 @@ class jForm {
 	public void DeleteFile(String _fileFull) {
 		   File file = new File(_fileFull);
 		   
-		   if( file.isFile() )
-		    file.delete();
+		   if(file != null)
+		    if( file.isFile() )
+		     file.delete();
 	}
 
 	public void DeleteFile(String _fullPath, String _filename) {
@@ -949,14 +962,20 @@ class jForm {
 		} else {
 			file = new File(_fullPath + "/" + _filename);
 		}
-		file.delete();
+		
+		if(file != null)
+		  if( file.isFile() )
+		     file.delete();
 	}
 
 	public void DeleteFile(int _environmentDir, String _filename) {
 		String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
 		if (!baseDir.equalsIgnoreCase("")) {
 			File file = new File(baseDir, _filename);
-			file.delete();
+			
+			if(file != null)
+			   if( file.isFile() )
+			     file.delete();
 		}
 	}
 
@@ -971,13 +990,16 @@ class jForm {
 		String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
 		if (!baseDir.equalsIgnoreCase("")) {
 			File file = new File(baseDir, _dirName);
+			if(file == null) return "";
 			file.mkdirs();
 			return file.getPath();
-		} else return "";
+		} else 
+			return "";
 	}
 
 	public String CreateDir(String _fullPath, String _dirName) {
 		File file = new File(_fullPath, _dirName);
+		if(file == null) return "";
 		file.mkdirs();
 		return file.getPath();
 	}
@@ -1111,6 +1133,8 @@ class jForm {
 			mImageBackground.setScaleType(ImageView.ScaleType.MATRIX);
 
 		Matrix matrix = new Matrix();
+		
+		if(matrix == null) return;
 
 		matrix.setRotate(_degress, _centerX, _centerY);
 		matrix.postScale(_scaleX, _scaleY, _centerX * _scaleX, _centerY * _scaleY);
@@ -1159,6 +1183,7 @@ class jForm {
 	    } else {
 
 	         IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+	         if(iFilter == null) return ret;
 	         Intent batteryStatus = this.controls.activity.registerReceiver(null, iFilter);
 
 	         int level = batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) : -1;
@@ -1270,6 +1295,7 @@ class jForm {
 
 	public boolean IsPackageInstalled(String _packagename) {
 		PackageManager pm = controls.activity.getPackageManager();
+		if(pm == null) return false;
 		try {
 			pm.getPackageInfo(_packagename, PackageManager.GET_ACTIVITIES);
 			return true;
@@ -1281,7 +1307,7 @@ class jForm {
 	// By ADiV
 	public int GetVersionCode(){
 		PackageManager pm = controls.activity.getPackageManager();
-		
+		if(pm == null) return 0;
 	    try {
 	    	PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
 	        return pinfo.versionCode;
@@ -1293,7 +1319,7 @@ class jForm {
 	//By ADiV
 	public String GetVersionName(){
 		PackageManager pm = controls.activity.getPackageManager();
-		
+		if(pm == null) return "";
 	    try {
 	    	PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
 	        return pinfo.versionName;
@@ -1393,6 +1419,7 @@ class jForm {
 		}
 
 		mCustomToast = new Toast(controls.activity);
+		if(mCustomToast == null) return;
 		mCustomToast.setGravity(_gravity, 0, 0);
 		mCustomToast.setDuration(Toast.LENGTH_LONG);
 		_layout.setVisibility(View.VISIBLE);
@@ -1425,6 +1452,7 @@ class jForm {
 	public void ShowCustomMessage(View _layout, int _gravity, int _lenghTimeSecond) {
 
 		mCustomToast = new Toast(controls.activity);
+		if(mCustomToast == null) return;
 		mCustomToast.setGravity(_gravity, 0, 0);
 		//toast.setDuration(Toast.LENGTH_LONG);
 		android.widget.RelativeLayout par = (android.widget.RelativeLayout) _layout.getParent();
@@ -1472,6 +1500,7 @@ class jForm {
 	public int GetScreenDpi() {
 		String r= "";
 		DisplayMetrics metrics = new DisplayMetrics();
+		if(metrics == null) return 0;
 		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		return metrics.densityDpi;
 	}
@@ -1479,6 +1508,7 @@ class jForm {
 	public String GetScreenDensity() {
 		String r = "";
 		DisplayMetrics metrics = new DisplayMetrics();
+		if(metrics == null) return "";
 		controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		int density = metrics.densityDpi;
 //[ifdef_api16up]
@@ -1520,6 +1550,7 @@ class jForm {
 
 	public void Vibrate(int _milliseconds) {
 		Vibrator vib = (Vibrator) controls.activity.getSystemService(Context.VIBRATOR_SERVICE);
+		if(vib == null) return;
 		if (vib.hasVibrator()) {
 			vib.vibrate(_milliseconds);
 		}
@@ -1527,6 +1558,7 @@ class jForm {
 
 	public void Vibrate(long[] _millisecondsPattern) {
 		Vibrator vib = (Vibrator) controls.activity.getSystemService(Context.VIBRATOR_SERVICE);
+		if(vib == null) return;
 		if (vib.hasVibrator()) {
 			vib.vibrate(_millisecondsPattern, -1);
 		}
@@ -1612,6 +1644,7 @@ class jForm {
 	public Bitmap GetImageFromAssetsFile(String _assetsImageFileName) {
 		String path = LoadFromAssets(_assetsImageFileName);
 		BitmapFactory.Options bo = new BitmapFactory.Options();
+		if(bo == null) return null;
 		bo.inScaled = false;
 		return BitmapFactory.decodeFile(path, bo);
 	}
@@ -1631,21 +1664,25 @@ class jForm {
 
 	public void ToggleSoftInput() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		if(imm == null) return;
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
 	public void HideSoftInput() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		if(imm == null) return;
 		imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
 	}
 
 	public void HideSoftInput(View _view) {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		if(imm == null) return;
 		imm.hideSoftInputFromWindow(_view.getWindowToken(), 0);
 	}
 
 	public void ShowSoftInput() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		if(imm == null) return;
 		imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
 	}
 
@@ -1715,6 +1752,7 @@ class jForm {
 		boolean MOBILE = false;
 		int r = 0; //NOT_CONNECTED
 		ConnectivityManager CM = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(CM == null) return 0;
 		NetworkInfo[] networkInfo = CM.getAllNetworkInfo();
 		for (NetworkInfo netInfo : networkInfo) {
 			if (netInfo.getTypeName().equalsIgnoreCase("WIFI"))
@@ -1763,6 +1801,7 @@ class jForm {
 	public String GetDeviceWifiIPAddress() {
 		//WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
 		WifiManager mWifi = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+		if(mWifi == null) return "";
 
 		//String ip = Formatter.formatIpAddress(
 		int ipAddress = mWifi.getConnectionInfo().getIpAddress();
@@ -1782,6 +1821,7 @@ class jForm {
 		String r = null;
 		//WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
 		WifiManager mWifi = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+		if(mWifi == null) return "";
 		// DhcpInfo  is a simple object for retrieving the results of a DHCP request
 		DhcpInfo dhcp = mWifi.getDhcpInfo();
 		if (dhcp == null) {
@@ -1876,12 +1916,16 @@ class jForm {
 		ArrayList<String> Folders = new ArrayList<String>();
 
 		File f = new File(_envPath);
-		File[] files = f.listFiles();
-		for (File fFile : files) {
+		
+		if(f != null){
+		 File[] files = f.listFiles();
+		 for (File fFile : files) {
 			if (fFile.isDirectory()) {
 				Folders.add(fFile.getName());
 			}
+		 }
 		}
+		
 		String sFolders[] = Folders.toArray(new String[Folders.size()]);
 		return sFolders;
 	}
@@ -1892,28 +1936,41 @@ class jForm {
 		ArrayList<String> Folders = new ArrayList<String>();
 
 		File f = new File(_envPath);
-		File[] files = f.listFiles();
-		for (File fFile : files) {
+		
+		if(f != null){
+		 File[] files = f.listFiles();
+		 for (File fFile : files) {
 			if (fFile.isFile()) {
 				Folders.add(fFile.getName());
 			}
+		 }
 		}
+		
 		String sFolders[] = Folders.toArray(new String[Folders.size()]);
 		return sFolders;
 	}
 
 	public boolean FileExists(String _fullFileName) {
-		return new File(_fullFileName).isFile();
+		File f = new File(_fullFileName);
+		
+		if(f == null) return false;
+		
+		return f.isFile();
 	}
 
-	public boolean DirectoryExists(String _fullDirectoryName) {
-		return new File(_fullDirectoryName).isDirectory();
+	public boolean DirectoryExists(String _fullDirectoryName) {		
+        File f = new File(_fullDirectoryName);
+		
+		if(f == null) return false;
+		
+		return f.isDirectory();
 	}
 
 
 	//http://blog.scriptico.com/category/dev/java/android/
 	public void Minimize() {
 		Intent main = new Intent(Intent.ACTION_MAIN);
+		if(main == null) return;
 		main.addCategory(Intent.CATEGORY_HOME);
 		main.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		controls.activity.startActivity(main);
@@ -1930,6 +1987,7 @@ class jForm {
 
         public void MoveTaskToFront() {
                 ActivityManager am = (ActivityManager) controls.activity.getSystemService(Context.ACTIVITY_SERVICE);
+                if(am == null) return;
                 //List<RunningTaskInfo> recentTasks = am.getRunningTasks(Integer.MAX_VALUE);
 
                 //for (int i = 0; i < recentTasks.size(); i++){
@@ -1946,7 +2004,9 @@ class jForm {
 		PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0,
 				new Intent(controls.activity.getIntent()),
 				controls.activity.getIntent().getFlags());
+		if(intent == null) return;
 		AlarmManager manager = (AlarmManager) controls.activity.getSystemService(Context.ALARM_SERVICE);
+		if(manager == null) return;
 		manager.set(AlarmManager.RTC, System.currentTimeMillis() + _delay, intent);
 		System.exit(2);
 	}
@@ -2145,6 +2205,7 @@ class jForm {
 		String sel = MediaStore.Images.Media._ID + "=?";
 		Cursor cursor = controls.activity.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 				column, sel, new String[]{ id }, null);
+		if(cursor == null) return "";
 		int columnIndex = cursor.getColumnIndex(column[0]);
 		if (cursor.moveToFirst()) {
 			filePath = cursor.getString(columnIndex);
@@ -2168,7 +2229,9 @@ class jForm {
    //refactored by jmpessoa
    public void StartDefaultActivityForFile(String _filePath, String _mimeType) {
 	   File file = new File(_filePath);
+	   if(file == null) return;
 	   Intent intent = new Intent(Intent.ACTION_VIEW);
+	   if(intent == null) return;
 	   Uri newUri = jSupported.FileProviderGetUriForFile(controls, file);
 	   if  (jSupported.IsAppSupportedProject()) {
 		   intent.setDataAndType(newUri, _mimeType);
@@ -2186,8 +2249,9 @@ class jForm {
 	
 		String fileName = "";
 		ContentResolver cr = controls.activity.getContentResolver();
+		if(cr == null) return "";
     	String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
-    	Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);
+    	Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);    	
     	if (metaCursor != null) {
             try {
                 if (metaCursor.moveToFirst()) {
@@ -2425,6 +2489,7 @@ public void ShowAlert(String _title, String _message, String _btnText) {
 	
 	AlertDialog dialog = null;
 	AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
+	if(builder == null) return;
 	builder.setMessage       (_message)
 	       .setCancelable    (false)	       
 	       .setNeutralButton(_btnText, null);
@@ -2531,6 +2596,7 @@ public  boolean assetSaveToFile(String src, String tgt) {
   FileOutputStream fos = null;
   String path = '/' + tgt.substring(1,tgt.lastIndexOf("/"));
   File outDir = new File(path);
+  if(outDir == null) return false;
   outDir.mkdirs();
   try {
     is = this.activity.getAssets().open(src);
@@ -2554,14 +2620,17 @@ public  boolean assetSaveToFile(String src, String tgt) {
 // -------------------------------------------------------------------------
 
 public  void view_SetVisible(View view, int state) {
+  if(view == null) return;
   view.setVisibility(state);
 }
 
 public  void view_SetBackGroundColor(View view, int color) {
+  if(view == null) return;
   view.setBackgroundColor(color);
 }
 
 public  void view_Invalidate(View view) {
+  if(view == null) return;
   view.invalidate();
 }
 
@@ -2612,16 +2681,20 @@ public  String GetControlsVersion() {
 public String[] getAssetContentList(String Path) throws IOException { 
 	ArrayList<String> Folders = new ArrayList<String>(); 
 
-	Resources r = this.activity.getResources();  
-	AssetManager am = r.getAssets(); 
-	String fileList[] = am.list(Path); 
-	if (fileList != null) 
-	{    
-		for (int i = 0; i < fileList.length; i++) 
-		{ 
+	AssetManager am = null;
+			
+	Resources r = this.activity.getResources();
+		
+    if(r != null)
+	 am = r.getAssets();
+	
+	if(am != null){
+	 String fileList[] = am.list(Path); 
+	 if (fileList != null) 
+	  	for (int i = 0; i < fileList.length; i++) 
 			Folders.add(fileList[i]); 
-		} 
-	} 
+    }
+	
 	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
 	return sFolders; 
 } 
@@ -2661,12 +2734,16 @@ public String[] getFolderList(String Path) {
 	ArrayList<String> Folders = new ArrayList<String>(); 
 
 	File f = new File(Path);
-	File[] files = f.listFiles();
-	for (File fFile : files) {
+	
+	if(f != null){
+	 File[] files = f.listFiles();
+	 for (File fFile : files) {
 	    if (fFile.isDirectory()) {
 			Folders.add(fFile.getName());
 	    }
-	}	
+	 }
+	}
+	
 	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
 	return sFolders; 
 } 
@@ -2677,12 +2754,16 @@ public String[] getFileList(String Path) {
 	ArrayList<String> Folders = new ArrayList<String>(); 
 
 	File f = new File(Path);
-	File[] files = f.listFiles();
-	for (File fFile : files) {
+	
+	if(f != null){
+	 File[] files = f.listFiles();
+	 for (File fFile : files) {
 	    if (fFile.isFile()) {
 			Folders.add(fFile.getName());
 	    }
-	}	
+	 }
+	}
+	
 	String sFolders[] = Folders.toArray(new String[Folders.size()]);    	   
 	return sFolders; 
 } 
@@ -2721,8 +2802,10 @@ public  String getPathExt() {
 
 // Result : /storage/emulated/0/DCIM
 public  String getPathDCIM() {
-  File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);  
-  return ( FileDCIM.getPath() );
+  File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+  if(FileDCIM == null) return "";
+  
+  return FileDCIM.getPath();
 }
 
 //by jmpessoa
@@ -2882,6 +2965,7 @@ public void jSend_Email(
 {
     try {
 	Intent email = new Intent(Intent.ACTION_SEND);
+	if(email == null) return;
     email.putExtra(Intent.EXTRA_EMAIL, to);
     email.putExtra(Intent.EXTRA_CC, cc);
     email.putExtra(Intent.EXTRA_BCC, bcc);
@@ -2902,7 +2986,8 @@ public void jSend_Email(
 //http://www.techrepublic.com/blog/software-engineer/how-to-send-a-text-message-from-within-your-android-app/
 
 	public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
-	SmsManager sms = SmsManager.getDefault();	
+	SmsManager sms = SmsManager.getDefault();
+	if(sms == null) return 0;
 	try {
 		//SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
 		if (multipartMessage) {
@@ -2927,6 +3012,7 @@ public void jSend_Email(
 		String SMS_DELIVERED = packageDeliveredAction;
 		PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
 		SmsManager sms = SmsManager.getDefault();
+		if(sms == null) return 0;
 		int partsCount = 1;
 		try {
 			if (multipartMessage)
@@ -2991,6 +3077,7 @@ public String jContact_getMobileNumberByDisplayName(String contactName){
 	   username = username.toLowerCase(); 
 	   
 	   Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+	   if(phones == null) return "";
 	
 	   while (phones.moveToNext())
 	   {
@@ -3016,6 +3103,8 @@ public String jContact_getMobileNumberByDisplayName(String contactName){
 public String jContact_getDisplayNameList(char delimiter){	  
 	   String nameList = "";
 	   Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+	   if(phones == null) return "";
+	   
 	   while (phones.moveToNext())
 	   {
 	     String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
@@ -3032,6 +3121,7 @@ public String jContact_getDisplayNameList(char delimiter){
 // -------------------------------------------------------------------------
 public  int[] getBmpArray(String file) {
   Bitmap bmp = BitmapFactory.decodeFile(file);
+  if(bmp == null) return null;
   int   length = bmp.getWidth()*bmp.getHeight();
   int[] pixels = new int[length+2];
   bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
@@ -3093,8 +3183,10 @@ public String jCamera_takePhoto(String path, String filename, int requestCode, b
 	      //StrictMode.setVmPolicy(builder.build()); //by Guser97
 
           Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+          if(intent == null) return "";
           //String  image_path = (path+File.separator+filename);
           File newfile = new File(path, File.separator+filename);
+          if(newfile == null) return "";
 	      File dirAsFile;
 
           if (newfile!=null) {
@@ -3145,6 +3237,7 @@ public String jCamera_takePhoto(String path, String filename, int requestCode) {
 
 	public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		if(intent == null) return;
 		Uri mImageCaptureUri = Uri.fromFile(new File("", filename));
 		intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
 		intent.putExtra("return-data", true);
