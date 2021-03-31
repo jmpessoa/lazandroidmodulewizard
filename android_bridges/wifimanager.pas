@@ -240,7 +240,9 @@ label
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jWifiManager_jCreate', '(J)Ljava/lang/Object;');
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);    
 

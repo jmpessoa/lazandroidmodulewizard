@@ -33,8 +33,6 @@ jcMail = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate(): jObject;
-    procedure jFree();
 
     procedure SetProtocol(_protocol: TMailProtocol);
     procedure SetHostName(_host: string);
@@ -66,21 +64,6 @@ jcMail = class(jControl)
 end;
 
 function jcMail_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jcMail_jFree(env: PJNIEnv; _jcmail: JObject);
-
-procedure jcMail_SetProtocol(env: PJNIEnv; _jcmail: JObject; _protocol: integer);
-procedure jcMail_SetHostName(env: PJNIEnv; _jcmail: JObject; _host: string);
-procedure jcMail_SetHostPort(env: PJNIEnv; _jcmail: JObject; _port: integer);
-procedure jcMail_SetUserName(env: PJNIEnv; _jcmail: JObject; _user: string);
-procedure jcMail_SetPassword(env: PJNIEnv; _jcmail: JObject; _password: string);
-
-procedure jcMail_SetAttachmentsSaveDirectory(env: PJNIEnv; _jcmail: JObject; _envDirectory: string);
-function jcMail_GetInBoxCount(env: PJNIEnv; _jcmail: JObject): integer;
-function jcMail_GetInBoxMessage(env: PJNIEnv; _jcmail: JObject; _index: integer; _partsDelimiter: string): string;
-
-procedure jcMail_GetInBoxCountAsync(env: PJNIEnv; _jcmail: JObject);
-procedure jcMail_GetInBoxMessageAsync(env: PJNIEnv; _jcmail: JObject; _index: integer; _partsDelimiter: string);
-procedure jcMail_GetInBoxMessagesAsync(env: PJNIEnv; _jcmail: JObject; _startIndex: integer; _count: integer; _partsDelimiter: string);
 
 implementation
 
@@ -98,7 +81,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -112,119 +95,112 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jCreate(); if FjObject = nil then exit;
+  FjObject := jcMail_jCreate(FjEnv, int64(Self), FjThis);
+  if FjObject = nil then exit;
   FInitialized:= True;
 
   if FProtocol <> mpImap then
-     jcMail_SetProtocol(FjEnv, FjObject, Ord(FProtocol));
+     SetProtocol(FProtocol);
 
   if FHostName <> '' then
-     jcMail_SetHostName(FjEnv, FjObject, FHostName);
+     SetHostName(FHostName);
 
   if FHostPort <> 0 then
-     jcMail_SetHostPort(FjEnv, FjObject, FHostPort);
+     SetHostPort(FHostPort);
 
   if FUserName <>  '' then
-     jcMail_SetUserName(FjEnv, FjObject, FUserName);
+     SetUserName(FUserName);
 
   if FPassword <> '' then
-     jcMail_SetPassword(FjEnv, FjObject, FPassword);
+     SetPassword(FPassword);
 
-end;
-
-
-function jcMail.jCreate(): jObject;
-begin
-   Result:= jcMail_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jcMail.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jcMail_jFree(FjEnv, FjObject);
 end;
 
 procedure jcMail.SetProtocol(_protocol: TMailProtocol);
 begin
   //in designing component state: set value here...
   FProtocol:= _protocol;
-  if FInitialized then
-     jcMail_SetProtocol(FjEnv, FjObject, Ord(_protocol));
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetProtocol', Ord(_protocol));
 end;
 
 procedure jcMail.SetHostName(_host: string);
 begin
   //in designing component state: set value here...
   FHostName:= _host;
-  if FInitialized then
-     jcMail_SetHostName(FjEnv, FjObject, _host);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetHostName', _host);
 end;
 
 procedure jcMail.SetHostPort(_port: integer);
 begin
   //in designing component state: set value here...
   FHostPort:= _port;
-  if FInitialized then
-     jcMail_SetHostPort(FjEnv, FjObject, _port);
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetHostPort', _port);
 end;
 
 procedure jcMail.SetUserName(_user: string);
 begin
   //in designing component state: set value here...
   FUserName:= _user;
-  if FInitialized then
-     jcMail_SetUserName(FjEnv, FjObject, _user);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetUserName', _user);
 end;
 
 procedure jcMail.SetPassword(_password: string);
 begin
   //in designing component state: set value here...
   FPassword:= _password;
-  if FInitialized then
-     jcMail_SetPassword(FjEnv, FjObject, _password);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetPassword', _password);
 end;
 
 procedure jcMail.SetAttachmentsSaveDirectory(_envDirectory: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcMail_SetAttachmentsSaveDirectory(FjEnv, FjObject, _envDirectory);
+     jni_proc_t(FjEnv, FjObject, 'SetAttachmentsSaveDirectory', _envDirectory);
 end;
 
 function jcMail.GetInBoxCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMail_GetInBoxCount(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetInBoxCount');
 end;
 
 function jcMail.GetInBoxMessage(_index: integer; _partsDelimiter: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMail_GetInBoxMessage(FjEnv, FjObject, _index ,_partsDelimiter);
+   Result:= jni_func_it_out_t(FjEnv, FjObject, 'GetInBoxMessage', _index ,_partsDelimiter);
 end;
 
 procedure jcMail.GetInBoxCountAsync();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcMail_GetInBoxCountAsync(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'GetInBoxCountAsync');
 end;
 
 procedure jcMail.GetInBoxMessageAsync(_index: integer; _partsDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcMail_GetInBoxMessageAsync(FjEnv, FjObject, _index ,_partsDelimiter);
+     jni_proc_it(FjEnv, FjObject, 'GetInBoxMessageAsync', _index ,_partsDelimiter);
 end;
 
 procedure jcMail.GetInBoxMessagesAsync(_startIndex: integer; _count: integer; _partsDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcMail_GetInBoxMessagesAsync(FjEnv, FjObject, _startIndex ,_count ,_partsDelimiter);
+     jni_proc_iit(FjEnv, FjObject, 'GetInBoxMessagesAsync', _startIndex ,_count ,_partsDelimiter);
 end;
 
 procedure jcMail.GenEvent_OnMailMessagesCount(Sender:TObject;count:integer);
@@ -244,189 +220,19 @@ var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
   jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jcMail_jCreate', '(J)Ljava/lang/Object;');
+  if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
-
-procedure jcMail_jFree(env: PJNIEnv; _jcmail: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jcmail, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jcMail_SetProtocol(env: PJNIEnv; _jcmail: JObject; _protocol: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _protocol;
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetProtocol', '(I)V');
-  env^.CallVoidMethodA(env, _jcmail, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jcMail_SetHostName(env: PJNIEnv; _jcmail: JObject; _host: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_host));
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetHostName', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcmail, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jcMail_SetHostPort(env: PJNIEnv; _jcmail: JObject; _port: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _port;
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetHostPort', '(I)V');
-  env^.CallVoidMethodA(env, _jcmail, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jcMail_SetUserName(env: PJNIEnv; _jcmail: JObject; _user: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_user));
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetUserName', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcmail, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jcMail_SetPassword(env: PJNIEnv; _jcmail: JObject; _password: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_password));
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetPassword', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcmail, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jcMail_GetInBoxCount(env: PJNIEnv; _jcmail: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetInBoxCount', '()I');
-  Result:= env^.CallIntMethod(env, _jcmail, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jcMail_GetInBoxMessage(env: PJNIEnv; _jcmail: JObject; _index: integer; _partsDelimiter: string): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _index;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_partsDelimiter));
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetInBoxMessage', '(ILjava/lang/String;)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jcmail, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jcMail_SetAttachmentsSaveDirectory(env: PJNIEnv; _jcmail: JObject; _envDirectory: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_envDirectory));
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetAttachmentsSaveDirectory', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcmail, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jcMail_GetInBoxCountAsync(env: PJNIEnv; _jcmail: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetInBoxCountAsync', '()V');
-  env^.CallVoidMethod(env, _jcmail, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jcMail_GetInBoxMessageAsync(env: PJNIEnv; _jcmail: JObject; _index: integer; _partsDelimiter: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _index;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_partsDelimiter));
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetInBoxMessageAsync', '(ILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcmail, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jcMail_GetInBoxMessagesAsync(env: PJNIEnv; _jcmail: JObject; _startIndex: integer; _count: integer; _partsDelimiter: string);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _startIndex;
-  jParams[1].i:= _count;
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_partsDelimiter));
-  jCls:= env^.GetObjectClass(env, _jcmail);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetInBoxMessagesAsync', '(IILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jcmail, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[2].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 end.
