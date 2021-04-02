@@ -1,4 +1,4 @@
-package org.lamw.appsearchviewdemo1;
+package com.example.appgridviewdemo1;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -52,7 +52,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
 	                RadioButton rb = (RadioButton) group.findViewById(checkedId);
 	                	               
 	                if (rb != null) {
-		                String checkedCaption = (String) rb.getText();
+	                    String checkedCaption = "" + rb.getText();
 		
 		                for (int i = 0; i < GetChildCount(); i++) {
 		                    rb = (RadioButton) GetChildAt(i);
@@ -65,7 +65,7 @@ public class jRadioGroup extends RadioGroup /*dummy*/ { //please, fix what GUI o
 		                    }
 		                }	
 		                
-		                if (checkedIndex > -1) 
+		                if (checkedIndex > -1)
 		                  controls.pRadioGroupCheckedChanged(pascalObj, checkedIndex, checkedCaption); //JNI event onClick!
 	                }
 	                else {
