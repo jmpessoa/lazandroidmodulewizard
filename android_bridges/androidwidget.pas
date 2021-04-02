@@ -1697,6 +1697,7 @@ function Get_jObjGlobalRef(jObj: jObject): jObject;
 function Create_jObjectLocalRef(cls: JClass): JObject;
 function Create_jObjectLocalRefA(cls: JClass;
                         paramFullSignature: string; paramValues: array of jValue): JObject;
+function Get_jMethodID(cls: jClass; funcName, funcSignature : string): jMethodID; //fixed missing...
 function Get_jStaticMethodID(cls: jClass; funcName, funcSignature : string): jMethodID;
 function Call_jIntMethodA(jObj:jObject; method: jMethodID; var jParams: array of jValue): integer;
 function Call_jIntMethod(jObj:jObject; method: jMethodID): integer;
@@ -6326,6 +6327,14 @@ begin
     //a jmethodID is not an object. So don't need to convert it to a GlobalRef!
   Result:= gApp.Jni.jEnv^.GetStaticMethodID( gApp.Jni.jEnv, cls , PChar(funcName), PChar(funcSignature));
 end;
+
+//fixed missing...
+function Get_jMethodID(cls: jClass; funcName, funcSignature : string): jMethodID;
+begin
+    //a jmethodID is not an object. So don't need to convert it to a GlobalRef!
+  Result:= gApp.Jni.jEnv^.GetMethodID( gApp.Jni.jEnv, cls , PChar(funcName), PChar(funcSignature));
+end;
+
 
 function Call_jIntMethodA(jObj:jObject; method: jMethodID; var jParams:array of jValue): integer;
 begin
