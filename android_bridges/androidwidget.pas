@@ -1347,6 +1347,10 @@ type
     //the "guide line' is try to mimic java Api ...
     procedure MoveTaskToBack(_nonRoot: boolean);
     procedure MoveTaskToFront();
+    function isUsageStatsAllowed():boolean;
+    procedure RequestUsageStatsPermission();
+    function GetTaskInFront():string;
+    function GetApplicationIcon(_package:string):jObject;
 
     procedure Restart(_delay: integer);
     procedure HideSoftInput(_view: jObject); overload;
@@ -2010,6 +2014,8 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_ti_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): string;
   function jni_func_ti_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): boolean;
   function jni_func_tj_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64): int64;
+  function jni_func_i_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): int64;
+  function jni_func_jji_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long0, _long1:int64; _int: integer): int64;
   function jni_func_tj_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _long: int64): boolean;
   function jni_func_tf_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _float: single): single;
   function jni_func_tf_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _float: single): boolean;
@@ -4484,6 +4490,34 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'MoveTaskToFront');
+end;
+
+function jForm.isUsageStatsAllowed(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_z(FjEnv, FjObject, 'isUsageStatsAllowed');
+end;
+
+procedure jForm.RequestUsageStatsPermission();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'RequestUsageStatsPermission');
+end;
+
+function jForm.GetTaskInFront(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetTaskInFront');
+end;
+
+function jForm.GetApplicationIcon(_package:string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetApplicationIcon', _package);
 end;
 
 procedure jForm.Restart(_delay: integer);
@@ -9455,6 +9489,49 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+//by Segator
+function jni_func_i_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): int64;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  jParams[0].i:= _int;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)J');
+  if jMethod = nil then goto _exceptionOcurred;
+  Result:= env^.CallLongMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jni_func_jji_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long0, _long1:int64; _int: integer): int64;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  jParams[0].j:= _long0;
+  jParams[1].j:= _long1;
+  jParams[2].i:= _int;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(JJI)J');
+  if jMethod = nil then goto _exceptionOcurred;
+  Result:= env^.CallLongMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 function jni_func_tj_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                             _str: string; _long: int64): boolean;
 var
@@ -9927,4 +10004,3 @@ begin
 end;
 
 end.
-
