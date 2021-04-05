@@ -62,8 +62,11 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.AppOpsManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -87,6 +90,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Process;
 import android.os.Vibrator;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -133,9 +137,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.lang.reflect.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -1999,6 +2008,104 @@ class jForm {
                   //}
                 //}
 	}
+
+        public String GetTaskInFront() {
+                String taskid = "";
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                // intentionally using string value as Context.USAGE_STATS_SERVICE was
+                // strangely only added in API 22 (LOLLIPOP_MR1)
+                @SuppressWarnings("WrongConstant")
+                UsageStatsManager usm = (UsageStatsManager) controls.activity.getSystemService(Context.USAGE_STATS_SERVICE);
+                long time = System.currentTimeMillis();
+                List<UsageStats> appList = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,
+                                time - 1000 * 1000, time);
+                if (appList != null && appList.size() > 0) {
+                    SortedMap<Long, UsageStats> mySortedMap = new TreeMap<Long, UsageStats>();
+                    for (UsageStats usageStats : appList) {
+                        mySortedMap.put(usageStats.getLastTimeUsed(),
+                                usageStats);
+                    }
+                    if (mySortedMap != null && !mySortedMap.isEmpty()) {
+                        taskid = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
+                    }
+                }
+                } else {
+                ActivityManager am = (ActivityManager) controls.activity.getSystemService(Context.ACTIVITY_SERVICE);
+                List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+
+                taskid = taskInfo.get(0).topActivity.getPackageName();
+                }
+            return taskid;
+	}
+
+        public Bitmap GetApplicationIcon(String packageName){
+            Bitmap dw = null;
+            try{
+                dw = drawableToBitmap (this.controls.activity.getPackageManager().getApplicationIcon(packageName));
+            }catch (PackageManager.NameNotFoundException e){
+                Log.i("GetApplicationIcon","NameNotFoundException");
+                // Get a default icon
+                if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
+			dw = drawableToBitmap (this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher));
+		}
+
+		//[ifdef_api21up]
+		if (Build.VERSION.SDK_INT >= 21) {
+			dw = drawableToBitmap (this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher, null));
+		}//[endif_api21up]
+            }
+            return dw;
+        }
+
+
+        //https://stackoverflow.com/questions/3035692/how-to-convert-a-drawable-to-a-bitmap
+        public static Bitmap drawableToBitmap (Drawable drawable) {
+            Bitmap bitmap = null;
+
+            if (drawable instanceof BitmapDrawable) {
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+                if(bitmapDrawable.getBitmap() != null) {
+                    return bitmapDrawable.getBitmap();
+                }
+            }
+
+            if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+                bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+            } else {
+                bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            }
+
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+            return bitmap;
+        }
+
+
+
+
+        //RequestRuntimePermission
+        public void RequestUsageStatsPermission() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                controls.activity.startActivity(intent);
+            }
+        }
+
+        //Check USAGE_STATS permission
+        public boolean isUsageStatsAllowed() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                return true;
+            }else {
+            AppOpsManager appOps = (AppOpsManager) controls.activity.getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), this.controls.activity.getPackageName());
+            if (mode == AppOpsManager.MODE_ALLOWED) {
+              return true;
+            }
+            else
+              return false;
+            }
+        }
 
 	public void Restart(int _delay) {
 		PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0,
