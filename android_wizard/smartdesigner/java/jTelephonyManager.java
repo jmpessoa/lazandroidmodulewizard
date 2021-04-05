@@ -4,8 +4,14 @@ package org.lamw.apptelephonymanagerdemo1;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jControl LAMW template*/
 
+import android.app.usage.NetworkStats;
+import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,8 +21,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
 import android.util.Log;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Objects;
+import java.util.List;
 
 //http://danielthat.blogspot.com/2013/06/android-make-phone-call-with-speaker-on.html
 //https://www.mkyong.com/android/how-to-make-a-phone-call-in-android/
@@ -27,6 +39,7 @@ public class jTelephonyManager /*extends ...*/ {
     private Context context   = null;
 
     TelephonyManager mTelephonyManager;
+    NetworkStatsManager networkStatsManager;
 
     StatePhoneReceiver myPhoneStateListener;
     AudioManager audioManager;
@@ -295,6 +308,139 @@ public class jTelephonyManager /*extends ...*/ {
     return TrafficStats.getTotalTxBytes();
     }
 
+    public int GetUidFromPackage(String _package) {
+        int puid = 0;
+
+       try {
+            puid = controls.activity.getPackageManager().getApplicationInfo(_package, 0).uid;
+            } catch (PackageManager.NameNotFoundException ex) {
+            return -2;
+           }
+            return puid;
+    }
+
+    //https://github.com/MuntashirAkon/AppManager/
+    public long GetUidRxBytes(long _startTime, long _endTime, int _uid) {
+       long totalRx = 0;
+       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
+        //UsageUtils.TimeInterval range = UsageUtils.getTimeInterval(intervalType);
+        try {
+            if (networkStatsManager != null) {
+                for (int networkId = 0; networkId < 2; ++networkId) {
+                    NetworkStats networkStats = networkStatsManager.querySummary(networkId, null,
+                            _startTime, _endTime);
+                    if (networkStats != null) {
+                        while (networkStats.hasNextBucket()) {
+                            NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+                            networkStats.getNextBucket(bucket);
+                            if (bucket.getUid() == _uid) {
+                                totalRx += bucket.getRxBytes();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+          return -1;
+        }
+              return totalRx;
+       }else{
+
+       return TrafficStats.getUidRxBytes(_uid);
+       }
+    }
+
+    public long GetUidTxBytes(long _startTime, long _endTime, int _uid) {
+        long totalTx = 0;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
+        try {
+            if (networkStatsManager != null) {
+                for (int networkId = 0; networkId < 2; ++networkId) {
+                    NetworkStats networkStats = networkStatsManager.querySummary(networkId, null,
+                            _startTime, _endTime);
+                    if (networkStats != null) {
+                        while (networkStats.hasNextBucket()) {
+                            NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+                            networkStats.getNextBucket(bucket);
+                            if (bucket.getUid() == _uid) {
+                                totalTx += bucket.getTxBytes();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+          return -1;
+        }
+              return totalTx;
+       }else{
+
+       return TrafficStats.getUidTxBytes(_uid);
+       }
+    }
+
+    public long GetUidTotalBytes(long _startTime, long _endTime, int _uid) {
+        long total = 0;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
+        try {
+            if (networkStatsManager != null) {
+                for (int networkId = 0; networkId < 2; ++networkId) {
+                    NetworkStats networkStats = networkStatsManager.querySummary(networkId, null,
+                            _startTime, _endTime);
+                    if (networkStats != null) {
+                        while (networkStats.hasNextBucket()) {
+                            NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+                            networkStats.getNextBucket(bucket);
+                            if (bucket.getUid() == _uid) {
+                                total += bucket.getTxBytes()+bucket.getRxBytes();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+          return -1;
+        }
+              return total;
+       }else{
+
+       return TrafficStats.getUidTxBytes(_uid)+TrafficStats.getUidRxBytes(_uid);
+       }
+    }
+
+    public long GetUidTotalMobileBytes(long _startTime, long _endTime, int _uid) {
+        long total = 0;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
+        try {
+            if (networkStatsManager != null) {
+                //for (int networkId = 0; networkId < 2; ++networkId) {
+                    NetworkStats networkStats = networkStatsManager.querySummary(ConnectivityManager.TYPE_MOBILE, null,
+                            _startTime, _endTime);
+                    if (networkStats != null) {
+                        while (networkStats.hasNextBucket()) {
+                            NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+                            networkStats.getNextBucket(bucket);
+                            if (bucket.getUid() == _uid) {
+                                total += bucket.getTxBytes()+bucket.getRxBytes();
+                            }
+                        }
+                    }
+                //}
+            }
+        } catch (Exception ex) {
+          return -1;
+        }
+              return total;
+       }else{
+
+       return TrafficStats.getUidTxBytes(_uid)+TrafficStats.getUidRxBytes(_uid);
+       }
+    }
+
     public long GetMobileRxBytes(){
     return TrafficStats.getMobileRxBytes();
     }
@@ -302,6 +448,7 @@ public class jTelephonyManager /*extends ...*/ {
     public long GetMobileTxBytes(){
     return TrafficStats.getMobileTxBytes();
     }
+
 
     public boolean IsNetworkRoaming() {
         boolean isRoaming = false;
@@ -335,6 +482,25 @@ public class jTelephonyManager /*extends ...*/ {
             data = mTelephonyManager.getNetworkOperatorName();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_OperName", "Sorry... Not Permission granted!!");
+        }
+        return data;
+    }
+
+    public String GetSubscriberId() {
+        String data = "";
+        if(Build.VERSION.SDK_INT >= 30){
+           SubscriptionManager sm = SubscriptionManager.from(context);
+           List<SubscriptionInfo> sis = sm.getActiveSubscriptionInfoList();
+           SubscriptionInfo si = sis.get(0);
+           data = si.getIccId();
+        } else {
+        if(isListenerRemoved)
+            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+        try {
+            data = mTelephonyManager.getSubscriberId();
+        } catch (SecurityException securityException) {
+            Log.d("jTelephonyMgr_SubsId", "Sorry... Not Permission granted!!");
+        }
         }
         return data;
     }
