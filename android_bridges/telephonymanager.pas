@@ -37,10 +37,16 @@ jTelephonyManager = class(jControl)
     function GetNetworkType(): string;
     function GetTotalRxBytes():int64;
     function GetTotalTxBytes():int64;
+    function GetUidRxBytes(_startTime, _endTime:int64; _uid: integer):int64;
+    function GetUidTxBytes(_startTime, _endTime:int64; _uid: integer):int64;
+    function GetUidTotalBytes(_startTime, _endTime:int64; _uid: integer):int64;
+    function GetUidTotalMobileBytes(_startTime, _endTime:int64; _uid: integer):int64;
     function GetMobileRxBytes():int64;
     function GetMobileTxBytes():int64;
+    function GetUidFromPackage(_package: string):integer;
     function IsNetworkRoaming(): boolean;
     function GetLine1Number(): string;
+    function GetSubscriberId():string;
     function GetNetworkOperatorName(): string;
     function IsWifiEnabled(): boolean;
 
@@ -179,6 +185,41 @@ begin
    Result:= jni_func_out_j(FjEnv, FjObject, 'GetMobileTxBytes');
 end;
 
+function jTelephonyManager.GetUidTxBytes(_startTime, _endTime:int64; _uid: integer): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTxBytes', _startTime, _endTime, _uid);
+end;
+
+function jTelephonyManager.GetUidRxBytes(_startTime, _endTime:int64; _uid: integer): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidRxBytes', _startTime, _endTime, _uid);
+end;
+
+function jTelephonyManager.GetUidTotalBytes(_startTime, _endTime:int64; _uid:integer): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTotalBytes', _startTime, _endTime, _uid);
+end;
+
+function jTelephonyManager.GetUidTotalMobileBytes(_startTime, _endTime:int64; _uid: integer): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTotalMobileBytes', _startTime, _endTime, _uid);
+end;
+
+function jTelephonyManager.GetUidFromPackage(_package: string): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetUidFromPackage', _package);
+end;
+
 function jTelephonyManager.IsNetworkRoaming(): boolean;
 begin
   //in designing component state: result value here...
@@ -191,6 +232,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetLine1Number');
+end;
+
+function jTelephonyManager.GetSubscriberId(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_t(FjEnv, FjObject, 'GetSubscriberId');
 end;
 
 function jTelephonyManager.GetNetworkOperatorName(): string;
