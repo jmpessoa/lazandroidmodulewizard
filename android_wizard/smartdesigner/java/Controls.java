@@ -2144,6 +2144,7 @@ class jForm {
         public void RequestUsageStatsPermission() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                if(intent == null) return;
                 controls.activity.startActivity(intent);
             }
         }
