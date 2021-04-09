@@ -654,14 +654,24 @@ class jForm {
 	public String GetDateTime() {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 		if(formatter == null) return "";
-		return (formatter.format(new Date()));
+		
+		String r = formatter.format(new Date());
+		
+		if(r == null) return "";
+		
+		return r;
 	}
 	
 	// by ADiV
 	public String GetDateTime(long millisDateTime) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		if(formatter == null) return "";
-		return (formatter.format(millisDateTime));
+		
+		String r = formatter.format(millisDateTime);
+		
+		if(r == null) return "";
+				
+		return r;
 	}
 	
 	// by ADiV
@@ -673,7 +683,12 @@ class jForm {
 	public String GetTimeHHssSS( long millisTime ) {
 		  SimpleDateFormat formatter = new SimpleDateFormat ( "mm:ss:SS" );
 		  if(formatter == null) return "";
-		  return( formatter.format ( new Date (millisTime) ) );	
+		  
+		  String r = formatter.format ( new Date (millisTime) );
+		  
+		  if(r == null) return "";
+					
+		  return r;
 	}
 	
 	//by ADiV
@@ -722,11 +737,13 @@ class jForm {
 
 	//http://startandroid.ru/en/lessons/complete-list/250-lesson-29-invoking-activity-and-getting-a-result-startactivityforresult-method.html
 	public String GetStringExtra(Intent data, String extraName) {
-		String valueStr;
-		valueStr = "";
-		if (data != null) {
+		String valueStr = "";
+		
+		if (data != null)
 			valueStr = data.getStringExtra(extraName);
-		}
+		
+		if(valueStr == null) return "";
+		
 		return valueStr;
 	}
 
@@ -861,12 +878,17 @@ class jForm {
 				absPath = filePath.getPath();
 			}
 		}
+		
+		if(absPath == null) return "";
 
 		return absPath;
 	}
 	
 	public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath
 		String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
+		
+		if(PathDat == null) return "";
+		
 		return PathDat;
 	}
 
@@ -991,6 +1013,7 @@ class jForm {
 	public String CreateDir(String _dirName) {
 		this.controls.activity.getDir(_dirName, 0); //if not exist -->> CREATE!
 		String absPath = this.controls.activity.getFilesDir().getPath();
+		if(absPath == null) return "";
 		absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/" + _dirName;
 		return absPath;
 	}
@@ -1064,7 +1087,8 @@ class jForm {
 	}
 
 	public String GetStringResourceById(int _resID) {
-		return (String) (this.controls.activity.getResources().getText(_resID));
+		String r = "" + this.controls.activity.getResources().getText(_resID);		
+		return r;
 	}
 
 	public int GetDrawableResourceId(String _resName) {
@@ -1161,14 +1185,20 @@ class jForm {
 	//by  thierrydijoux
 	public String GetQuantityStringByName(String _resName, int _quantity) {
 		int id = this.controls.activity.getResources().getIdentifier(_resName, "plurals", this.controls.activity.getPackageName());
-		String value = id == 0 ? "" : (String) this.controls.activity.getResources().getQuantityString(id, _quantity, _quantity);
+		if(id == 0) return "";
+		String value = this.controls.activity.getResources().getQuantityString(id, _quantity, _quantity);
+		
+		if(value == null) return "";
+		
 		return value;
 	}
 
 	//by thierrydijoux
 	public String GetStringResourceByName(String _resName) {
 		int id = this.controls.activity.getResources().getIdentifier(_resName, "string", this.controls.activity.getPackageName());
-		String value = id == 0 ? "" : (String) this.controls.activity.getResources().getText(id);
+		if(id == 0) return "";
+		
+		String value = "" + this.controls.activity.getResources().getText(id);				
 		return value;
 	}
 
@@ -1349,7 +1379,11 @@ class jForm {
 	        //Match the pattern string in provided string
 	        Matcher matcher = pattern.matcher(inputString);
 	        if (null != matcher && matcher.find()) {
-	            return matcher.group(1);
+	            String r = matcher.group(1);
+	            
+	            if(r == null) return "";
+	            
+	            return r;
 	        }
 
 	    }catch (PatternSyntaxException ex) {
@@ -1364,8 +1398,7 @@ class jForm {
 	public String GetVersionPlayStore(String appUrlString) {
 	    final String currentVersion_PatternSeq = "<div[^>]*?>Current\\sVersion</div><span[^>]*?>(.*?)><div[^>]*?>(.*?)><span[^>]*?>(.*?)</span>";
 	    final String appVersion_PatternSeq = "htlgb\">([^<]*)</s";
-	    String playStoreAppVersion = "";
-
+	    
 	    BufferedReader inReader = null;
 	    URLConnection uc = null;
 	    StringBuilder urlData = new StringBuilder();
@@ -1398,14 +1431,11 @@ class jForm {
 
 	    // Get the current version pattern sequence
 	    String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
-	    if(null == versionString){
-	        return "";
-	    }else{
-	        // get version from "htlgb">X.X.X</span>
-	        playStoreAppVersion = GetAppVersion(appVersion_PatternSeq, versionString);
-	    }
-
-	    return playStoreAppVersion;
+	    
+	    if(versionString == "") return "";
+	    
+	    // get version from "htlgb">X.X.X</span>	    	    
+	    return GetAppVersion(appVersion_PatternSeq, versionString);
 	}
 
 	public void CancelShowCustomMessage() {
@@ -1603,11 +1633,13 @@ class jForm {
 
 	public String GetTitleActionBar() {
 		ActionBar actionBar = this.controls.activity.getActionBar();
+		if(actionBar == null) return "";
 		return (String) actionBar.getTitle();
 	}
 
 	public String GetSubTitleActionBar() {
 		ActionBar actionBar = this.controls.activity.getActionBar();
+		if(actionBar == null) return "";
 		return (String) actionBar.getSubtitle();
 	}
 
@@ -1642,12 +1674,15 @@ class jForm {
 	//by ADiV
 	public String GetStripAccents(String _str) {
 		_str = Normalizer.normalize(_str, Normalizer.Form.NFD);
+		if(_str == null) return "";
 		_str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
 		return _str;
 	}
 
 	public String GetPathFromAssetsFile(String _assetsFileName) {
-		return LoadFromAssets(_assetsFileName);
+		String r = LoadFromAssets(_assetsFileName);
+		if(r == null) return "";
+		return r;
 	}
 
 	public Bitmap GetImageFromAssetsFile(String _assetsImageFileName) {
@@ -1752,7 +1787,9 @@ class jForm {
 	}
 
 	public String UriToString(Uri _uri) {
-		return _uri.toString();
+		String r = _uri.toString();
+		if(r == null) return "";
+		return r;
 	}
 
 	// ref. http://www.android-examples.com/get-display-ip-address-of-android-phone-device-programmatically/
@@ -1783,6 +1820,7 @@ class jForm {
 	}
 
 	public String GetDeviceDataMobileIPAddress() {
+		String strIp = "";
 		String r = "";
 		try {
 			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
@@ -1791,11 +1829,19 @@ class jForm {
 				for (Enumeration<InetAddress> enumIpAddr = networkinterface.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
 					InetAddress inetAddress = enumIpAddr.nextElement();
 					if (!inetAddress.isLoopbackAddress()) {
-						boolean isIPv4 = inetAddress.getHostAddress().indexOf(':') < 0;
-						if (isIPv4) return r = inetAddress.getHostAddress();
+						strIp = inetAddress.getHostAddress();
+						
+						if(strIp == null) return "";
+						
+						boolean isIPv4 = strIp.indexOf(':') < 0;
+						if (isIPv4) return strIp;
 						if (!isIPv4) {
-							int delim = inetAddress.getHostAddress().indexOf('%'); // drop ip6 zone suffix
-							r = delim < 0 ? inetAddress.getHostAddress().toUpperCase() : inetAddress.getHostAddress().substring(0, delim).toUpperCase();
+							int delim = strIp.indexOf('%'); // drop ip6 zone suffix
+							
+							if(delim < 0)
+								r = strIp.toUpperCase();
+							else
+								r = strIp.substring(0, delim).toUpperCase();							
 						}
 					}
 				}
@@ -1819,6 +1865,9 @@ class jForm {
 				(ipAddress >> 8 & 0xff),
 				(ipAddress >> 16 & 0xff),
 				(ipAddress >> 24 & 0xff));
+		
+		if(sIP == null) return "";
+		
 		return sIP;
 	}
 
@@ -1833,9 +1882,9 @@ class jForm {
 		if(mWifi == null) return "";
 		// DhcpInfo  is a simple object for retrieving the results of a DHCP request
 		DhcpInfo dhcp = mWifi.getDhcpInfo();
-		if (dhcp == null) {
-			return "";
-		}
+		
+		if (dhcp == null) return "";
+		
 		int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
 		byte[] quads = new byte[4];
 		for (int k = 0; k < 4; k++)
@@ -1843,7 +1892,9 @@ class jForm {
 		// Returns the InetAddress corresponding to the array of bytes.
 		// The high order byte is quads[0].
 		r = InetAddress.getByAddress(quads).getHostAddress();
-		if (r == null) r = "";
+		
+		if (r == null) return "";
+		
 		return r;
 	}
 
@@ -1866,6 +1917,8 @@ class jForm {
 			// set result to TextView
 			str = new String(buffer);
 			//Log.i("loadFromAssets", ":: "+ str);
+			if (str == null) return "";
+			
 			return str.toString();
 		} catch (IOException ex) {
 			//Log.i("loadFromAssets", "error!");
@@ -2035,7 +2088,10 @@ class jForm {
 
                 taskid = taskInfo.get(0).topActivity.getPackageName();
                 }
-            return taskid;
+                
+                if(taskid == null) return "";
+                
+                return taskid;
 	}
 
         public Bitmap GetApplicationIcon(String packageName){
@@ -2088,6 +2144,7 @@ class jForm {
         public void RequestUsageStatsPermission() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                if(intent == null) return;
                 controls.activity.startActivity(intent);
             }
         }
@@ -2119,7 +2176,9 @@ class jForm {
 	}
 
 	public String UriEncode(String _message) {
-		return Uri.encode(_message);
+		String r = Uri.encode(_message);
+		if(r == null) return "";
+		return r;
 	}
 
 	//http://www.viralandroid.com/2015/12/how-to-use-font-awesome-icon-in-android-application.html
@@ -2292,6 +2351,9 @@ class jForm {
 				cursor.close();
 			}
 		}
+		
+		if(path == null) return "";
+				
 		return path;
 	}
 
@@ -2304,7 +2366,8 @@ class jForm {
 			wholeID = DocumentsContract.getDocumentId(uri);
 		//[endif_api19up]
 
-		if (wholeID.equals("")) return "";
+		if(wholeID == null) return "";
+		if(wholeID.equals("")) return "";
 
 		String id = wholeID.split(":")[1];
 		String[] column = { MediaStore.Images.Media.DATA };
@@ -2318,6 +2381,9 @@ class jForm {
 			filePath = cursor.getString(columnIndex);
 		}
 		cursor.close();
+		
+		if(filePath == null) return "";
+		
 		return filePath;
 	}
 
@@ -2328,6 +2394,8 @@ class jForm {
            	 path = getRealPathFromURI(_Uri);
 		   else
 		     path = getRealPathFromURI_API19(_Uri);
+           
+           if(path == null) return "";
 
 		   return path;
 	}
@@ -2356,21 +2424,25 @@ class jForm {
 	
 		String fileName = "";
 		ContentResolver cr = controls.activity.getContentResolver();
+		
 		if(cr == null) return "";
+		
     	String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
-    	Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);    	
-    	if (metaCursor != null) {
-            try {
-                if (metaCursor.moveToFirst()) {
-                    fileName = metaCursor.getString(0);
-                }
-            } finally {
+    	Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);
+    	
+    	if (metaCursor == null) return "";
+    	
+        try {
+                if (metaCursor.moveToFirst())
+                    fileName = metaCursor.getString(0);                
+        } finally {
                 metaCursor.close();
-            }
-    	}	
+        }
+    		
 	
-		if (fileName != "") {
-		 try {	
+		if (fileName == "") return "";
+		
+		try {	
  			InputStream input = cr.openInputStream(_srcUri);
  			OutputStream output = new FileOutputStream(new File(_outputDir + "/" + fileName));
 			byte[] buf = new byte[1024];
@@ -2381,14 +2453,12 @@ class jForm {
   	    	input.close();
    	    	output.close();
 	        return fileName;
-		 } catch (IOException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "";
-		 }
-		} else {
-		 return "";	
-		}	
+		}
+			
 	}
 
 	public void RunOnUiThread(final int _tag) {
@@ -2667,14 +2737,17 @@ public int GetNavigationHeight() {
 //by  thierrydijoux
 public String getQuantityStringByName(String _resName, int _quantity) {
 	int id = this.activity.getResources().getIdentifier(_resName, "plurals", this.activity.getPackageName());
-    String value = id == 0 ? "" : (String) this.activity.getResources().getQuantityString(id, _quantity, _quantity);
+	if(id == 0) return "";
+    String value = this.activity.getResources().getQuantityString(id, _quantity, _quantity);
+    if(value == null) return "";
 	return value;
 }
 
 //by thierrydijoux
 public String getStringResourceByName(String _resName) {
 	int id = this.activity.getResources().getIdentifier(_resName, "string", this.activity.getPackageName());
-    String value = id == 0 ? "" : (String) this.activity.getResources().getText(id);
+	if(id == 0) return "";
+    String value = "" + this.activity.getResources().getText(id);    
 	return value;
 }   
 // -------------------------------------------------------------------------
@@ -2887,29 +2960,40 @@ public long getTick() {
 // Result : /data/app/com.kredix-1.apk
 public  String getPathApp (android.content.Context context,String pkgName) {
   String PathApp = "";
+  
   try {
    PathApp = context.getPackageManager().getApplicationInfo( pkgName, 0 ).sourceDir;
   }
   catch ( NameNotFoundException e ) {}
-  return ( PathApp );
+  
+  if(PathApp == null) return "";
+  
+  return PathApp;
 }
 
 // Result : /data/data/com/kredix/files
 public  String getPathDat (android.content.Context context) {
   //String version = Build.VERSION.RELEASE;
-  String PathDat = context.getFilesDir().getAbsolutePath();  
+  String PathDat = context.getFilesDir().getAbsolutePath();
+  
+  if(PathDat == null) return "";
+  
   return ( PathDat );
 }
 
 // Result : /storage/emulated/0
 public  String getPathExt() {
   File FileExt = Environment.getExternalStorageDirectory();
+  
+  if(FileExt == null) return "";
+  
   return ( FileExt.getPath() );
 }
 
 // Result : /storage/emulated/0/DCIM
 public  String getPathDCIM() {
   File FileDCIM =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+  
   if(FileDCIM == null) return "";
   
   return FileDCIM.getPath();
@@ -2918,6 +3002,9 @@ public  String getPathDCIM() {
 //by jmpessoa
 public  String getPathDataBase(android.content.Context context) {
    String destPath = context.getFilesDir().getAbsolutePath();
+   
+   if(destPath == null) return "";
+   
    destPath = destPath.substring(0, destPath.lastIndexOf("/")) + "/databases";
    return destPath;
 }
@@ -2927,7 +3014,7 @@ public  String getPathDataBase(android.content.Context context) {
 // -------------------------------------------------------------------------
 // thierrydijoux - get locale info
 public String getLocale(int localeType) {
-        Context context = this.activity;
+    Context context = this.activity;
   	String value = "";	
    	switch (localeType) {
    		case 0: value = context.getResources().getConfiguration().locale.getCountry();
@@ -2947,6 +3034,8 @@ public String getLocale(int localeType) {
    		case 7: value = context.getResources().getConfiguration().locale.getVariant();
 				break;
    	}
+   	
+   	if(value == null) return "";
 
    	return value;
 }
@@ -2955,7 +3044,7 @@ public String getLocale(int localeType) {
 // -------------------------------------------------------------------------
 // Result: Phone Number - LORDMAN
 public  String getDevPhoneNumber() {
-	String f = "";
+  String f = "";
 
   TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
   if (telephony!=null) {
@@ -2965,6 +3054,9 @@ public  String getDevPhoneNumber() {
 		  Log.e("getDevPhoneNumber", ex.getMessage());
 	  }
   }
+  
+  if(f == null) return "";
+  
   return f;
 }
 
@@ -2976,21 +3068,22 @@ public String getDevDeviceID() {
   String devid = "";
   try {
     TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-    if (telephony != null) {
-        devid = telephony.getDeviceId();
+    
+    if(telephony == null) return "";
+    
+    devid = telephony.getDeviceId();
     	
-    	if (devid==null) {   //tk+
-    		devid="";    		
-    	}
-    } else {
-    	devid="";
-    }
-    if (devid=="") {	
+    if(devid == null) return "";
+    
+    if(devid == "")	
         devid = Secure.getString(activity.getContentResolver(),Secure.ANDROID_ID);
-    }    	
+        	
   }
   catch (SecurityException e) //ExceptionExceptionException
       { e.printStackTrace(); }
+  
+  if(devid == null) return "";
+  
   return devid;
 }
 // -------------------------------------------------------------------------
@@ -3188,9 +3281,9 @@ public String jContact_getMobileNumberByDisplayName(String contactName){
 	
 	   while (phones.moveToNext())
 	   {
-	     String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+	     String name        = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
 	     String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-	     String phoneType = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+	     String phoneType   = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
 	     
 	     name = name.toLowerCase();
 	     
@@ -3214,8 +3307,9 @@ public String jContact_getDisplayNameList(char delimiter){
 	   
 	   while (phones.moveToNext())
 	   {
-	     String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+	     String name      = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
 	     String phoneType = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+	     
 	     if ( phoneType.equals("2")) { //mobile
 	    	 nameList = nameList + delimiter  + name;
 	     }
@@ -3254,6 +3348,9 @@ private String getRealPathFromURI(Uri contentURI) {
             }
             cursor.close();
         }
+        
+        if(result == null) return "";
+        
         return result;
 }
 
