@@ -7656,6 +7656,9 @@ begin
     mid  := env^.GetMethodID(env, clazz, 'getMessage', '()Ljava/lang/String;');
     jStr := env^.CallObjectMethod(env, exc, mid);
 
+    env^.DeleteLocalRef(env, clazz);
+    env^.DeleteLocalRef(env, jlc);
+
     exceptionCount := exceptionCount + 1;
     exceptionInfo  := exceptionInfo + ': ' + GetPStringAndDeleteLocalRef(env, jStr);
 
@@ -9786,19 +9789,21 @@ function jni_func_t_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
-  jCls: jClass=nil; 
+  jCls: jClass=nil;
 label
   _exceptionOcurred;
 begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
-
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
+
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)I');
   if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
   Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);     
+  env^.DeleteLocalRef(env, jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;

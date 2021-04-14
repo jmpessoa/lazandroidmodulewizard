@@ -95,15 +95,15 @@ public class jSoundPool implements SoundPool.OnLoadCompleteListener {
 			 AssetFileDescriptor afd;
 			 
 			 try {
-			  afd = controls.activity.getAssets().openFd(_path);
-			 
-			  if( afd != null )
-				 // Priority not effect, set 1 for compatibility
-				 soundId = soundPool.load(afd, 1); //    "/sdcard/music/tarck1.mp3
-			  
+			  afd = controls.activity.getAssets().openFd(_path);			 			  			 
 			 } catch (IOException e1) {				 
-				//e1.printStackTrace();				
+				e1.printStackTrace();
+				return 0;
 			 }
+			 
+			 if( afd != null )
+				 // Priority not effect, set 1 for compatibility
+				 soundId = soundPool.load(afd, 1); //    "/sdcard/music/tarck1.mp3*/
 		 }
 		 		 		 
 		 return soundId;

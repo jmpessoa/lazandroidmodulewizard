@@ -2250,6 +2250,7 @@ begin
 
   if funcResult = 'constructor' then  //constructor
   begin
+    strList.Add('  Result := nil;');
     strList.Add('  jCls:= Get_gjClass(env);');
     strList.Add('  if jCls = nil then goto _exceptionOcurred;');
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+'_jCreate'+''', '''+jniSignature+'''); ');
@@ -2462,7 +2463,12 @@ begin
      strList.Add('  env^.DeleteLocalRef(env, jCls);');
 
   strList.Add(' ');
-  strList.Add('  _exceptionOcurred: jni_ExceptionOccurred(env);');
+
+  if funcResult = 'constructor' then
+   strList.Add('  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;')
+  else
+   strList.Add('  _exceptionOcurred: jni_ExceptionOccurred(env);');
+
   strList.Add('end;');
 
   if funcResult = 'constructor' then
