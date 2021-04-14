@@ -44,7 +44,7 @@ jSoundPool = class(jControl)
    property OnLoadComplete: TOnLoadComplete read FOnLoadComplete write FOnLoadComplete;
 end;
 
-function  jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function  jSoundPool_jCreate(env: PJNIEnv;_Self: int64; _maxstreams : integer; this: jObject): jObject;
 function  jSoundPool_SoundPlay(env: PJNIEnv; _jsoundpool: JObject; soundId: integer; _leftVolume: single; _rightVolume: single; _priority: integer; _loop: integer; _rate: single): integer;
 
 
@@ -80,9 +80,10 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jSoundPool_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject := jSoundPool_jCreate(FjEnv, int64(Self), FMaxStreams, FjThis);
 
   if FjObject = nil then exit;
+
   FInitialized:= True;
 end;
 
@@ -96,6 +97,7 @@ end;
 
 function jSoundPool.SoundLoad(_path: string): integer;
 begin
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_i(FjEnv, FjObject, 'SoundLoad', _path);
@@ -204,23 +206,27 @@ end;
 
 {-------- jSoundPool_JNI_Bridge ----------}
 
-function jSoundPool_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function jSoundPool_jCreate(env: PJNIEnv;_Self: int64; _maxstreams : integer; this: jObject): jObject;
 var
-  jParams: array[0..0] of jValue;
+  jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil; 
 label
   _exceptionOcurred;
 begin
+  Result := nil;
+
   jParams[0].j:= _Self;
+  jParams[1].i:= _maxstreams;
+
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'jSoundPool_jCreate', '(J)Ljava/lang/Object;');
+  jMethod:= env^.GetMethodID(env, jCls, 'jSoundPool_jCreate', '(JI)Ljava/lang/Object;');
   if jMethod = nil then goto _exceptionOcurred;
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);  
 
-  _exceptionOcurred: jni_ExceptionOccurred(env);
+  _exceptionOcurred: if jni_ExceptionOccurred(env) then Result := nil;
 end;
 
 
@@ -232,6 +238,8 @@ var
 label
   _exceptionOcurred;
 begin
+  Result := 0;
+
   jParams[0].i:= soundId;
   jParams[1].f:= _leftVolume;
   jParams[2].f:= _rightVolume;
@@ -245,7 +253,7 @@ begin
   Result:= env^.CallIntMethodA(env, _jsoundpool, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls); 
 
-  _exceptionOcurred: jni_ExceptionOccurred(env);
+  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := 0;
 end;
 
 
