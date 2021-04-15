@@ -12481,8 +12481,8 @@ procedure jImageBtn.SetImageUp( _bmp : jObject );
 begin
    if not FInitialized then exit;
 
-   //SetImageUpByRes('');
-   //SetImageUpByIndex(-1);
+   SetImageUpByRes('');
+   SetImageUpByIndex(-1);
 
    jni_proc_bmp(FjEnv, FjObject, 'SetImageUp', _bmp);
 end;
