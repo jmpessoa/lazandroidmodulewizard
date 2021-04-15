@@ -141,6 +141,8 @@ public class jImageBtn extends ImageView {
 	}
 
 	public  void setButtonUpByRes(String resup) {   // ..res/drawable
+		
+		if( resup == null ) return;
 			
         Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(resup));
 		
@@ -161,6 +163,8 @@ public class jImageBtn extends ImageView {
 
 	public  void setButtonDownByRes(String resdn) {   // ..res/drawable
 		
+		if( resdn == null ) return;
+		
         Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(resdn));
 		
 		if( d == null ) return;
@@ -173,7 +177,7 @@ public class jImageBtn extends ImageView {
 		
 	}
 	
-	public  void SetImageUp(Bitmap _bmp) {   		
+	public  void SetImageUp(Bitmap _bmp) {
 		bmpUp = _bmp;
 		
         this.setImageResource(android.R.color.transparent);
@@ -196,9 +200,9 @@ public class jImageBtn extends ImageView {
 		
 		Bitmap bmpScale = Bitmap.createScaledBitmap( bmpUp, newWidth, newHeight, true );
 		
-		bmpScale.setDensity( bmpUp.getDensity() );
-		
 		if( bmpScale == null ) return;
+		
+		bmpScale.setDensity( bmpUp.getDensity() );				
 		
 		int posLeft = (bmpUp.getWidth() - bmpScale.getWidth()) / 2;
 		int posTop  = (bmpUp.getHeight() - bmpScale.getHeight()) / 2;				

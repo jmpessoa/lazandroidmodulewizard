@@ -300,6 +300,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := nil;
+
   jCls := Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'jPaintShader_jCreate', '(JLjava/lang/Object;)Ljava/lang/Object;');
@@ -311,7 +313,7 @@ begin
   Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result := env^.NewGlobalRef(env, Result);  
 
-  _exceptionOcurred: jni_ExceptionOccurred(env);
+  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
 
 procedure jPaintShader_SetPaint(env: PJNIEnv; _jpaintshader, _Paint: JObject);

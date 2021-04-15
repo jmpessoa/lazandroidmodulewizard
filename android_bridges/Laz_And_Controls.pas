@@ -11143,6 +11143,8 @@ end;
 
 procedure jBitmap.SetImage(_bitmapImage: jObject);
 begin
+  if _bitmapImage = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
   begin
