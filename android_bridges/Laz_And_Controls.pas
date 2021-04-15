@@ -11143,6 +11143,8 @@ end;
 
 procedure jBitmap.SetImage(_bitmapImage: jObject);
 begin
+  if _bitmapImage = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
   begin
@@ -12479,8 +12481,8 @@ procedure jImageBtn.SetImageUp( _bmp : jObject );
 begin
    if not FInitialized then exit;
 
-   SetImageUpByRes('');
-   SetImageUpByIndex(-1);
+   //SetImageUpByRes('');
+   //SetImageUpByIndex(-1);
 
    jni_proc_bmp(FjEnv, FjObject, 'SetImageUp', _bmp);
 end;

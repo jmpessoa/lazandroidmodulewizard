@@ -635,6 +635,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := nil;
+
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jParams[0].j := Int64(SelfObj);
@@ -643,7 +645,7 @@ begin
   Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result := env^.NewGlobalRef(env, Result);  
 
-  _exceptionOcurred: jni_ExceptionOccurred(env);
+  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
 
 { TConsumedItem }

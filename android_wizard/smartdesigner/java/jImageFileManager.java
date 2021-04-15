@@ -255,7 +255,9 @@ public class jImageFileManager /*extends ...*/ {
 		bmpInvert.setDensity( _bitmapImage.getDensity() );
 	     
 		Canvas canvas = new Canvas(bmpInvert);
-		Paint paint = new Paint();		
+		Paint paint   = new Paint();
+		
+		if( (canvas == null) || (paint == null)) return null;
 		
 		ColorMatrix matrixInvert = new ColorMatrix();
 		matrixInvert.set(new float[]
