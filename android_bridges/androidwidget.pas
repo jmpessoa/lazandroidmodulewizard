@@ -1886,8 +1886,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function sysGetHeightOfParent(FParent: TAndroidWidget) : integer;
   function sysIsWidthExactToParent(widget: jVisualControl) : boolean;
   function sysGetWidthOfParent(FParent: TAndroidWidget) : integer;
-  function GetPString(env: PJNIEnv; jstr: JString): string;
-  function GetPStringAndDeleteLocalRef(env: PJNIEnv; jStr: jString): string;
+  function GetPStringAndDeleteLocalRef(env: PJNIEnv; var jStr: jString): string;
 
   (*
    Abbreviation for variable types for "jni_func" or "jni_proc"
@@ -2037,38 +2036,23 @@ var
 implementation
 
 
-function GetPString(env: PJNIEnv; jstr: JString): string;
-var
- _jBoolean: JBoolean;
-begin
-    Result := '';
-    if jstr <> nil then
-    begin
-      _jBoolean:= JNI_False;
-      Result:= string(env^.GetStringUTFChars(env,jstr,@_jBoolean) );
-    end;
-end;
-
 //by Tomash
-function GetPStringAndDeleteLocalRef(env: PJNIEnv; jStr: jString): string;
+function GetPStringAndDeleteLocalRef(env: PJNIEnv; var jStr: jString): string;
 var
  jBoo: jBoolean;
  pch: pchar;
 begin
- if jStr = nil then
-   Result:= ''
- else
-         begin
-              jBoo := JNI_False;
-              pch := env^.GetStringUTFChars(env, jStr, @jBoo);
-              Result := string(pch);
+ if jStr = nil then Result:= '';
 
-              //IMPORTANT if function is executed more than 512 times in one call - App crash with error:
-			        //JNI ERROR (app bug): local reference table overflow (max=512)
-              //In single calls java garbage collector it does
-              env^.ReleaseStringUTFChars(env, jStr, pch);
-              env^.DeleteLocalRef(env, jStr);
-         end;
+ jBoo   := JNI_False;
+ pch    := env^.GetStringUTFChars(env, jStr, @jBoo);
+ Result := string(pch);
+
+ //IMPORTANT if function is executed more than 512 times in one call - App crash with error:
+ //JNI ERROR (app bug): local reference table overflow (max=512)
+ //In single calls java garbage collector it does
+ env^.ReleaseStringUTFChars(env, jStr, pch);
+ env^.DeleteLocalRef(env, jStr);
 end;
 
 function sysIsHeightExactToParent(widget: jVisualControl) : boolean;

@@ -4189,7 +4189,7 @@ begin
   if Sender is jSqliteDataAccess then
   begin
     jForm(jSqliteDataAccess(Sender).Owner).UpdateJNI(gApp);
-    jSqliteDataAccess(Sender).GenEvent_OnSqliteDataAccessAsyncPostExecute(Sender,count,GetPString(env,msgResult));
+    jSqliteDataAccess(Sender).GenEvent_OnSqliteDataAccessAsyncPostExecute(Sender,count,GetPStringAndDeleteLocalRef(env,msgResult));
   end;
 end;
 
@@ -7352,7 +7352,7 @@ begin
   if Sender is jImageView then
   begin
     jForm(jImageView(Sender).Owner).UpdateJNI(gApp);
-    jImageView(Sender).GenEvent_OnImageViewPopupItemSelected(Sender,GetPString(env,caption));
+    jImageView(Sender).GenEvent_OnImageViewPopupItemSelected(Sender,GetPStringAndDeleteLocalRef(env,caption));
   end;
 end;
 
