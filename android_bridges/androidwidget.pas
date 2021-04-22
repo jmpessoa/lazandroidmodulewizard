@@ -5157,7 +5157,6 @@ end;
 function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
@@ -5200,7 +5199,6 @@ end;
 function jForm_GetDriverList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jMethod: jMethodID=nil;
@@ -5237,7 +5235,6 @@ end;
 function jForm_GetFolderList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
@@ -5280,7 +5277,6 @@ end;
 function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
@@ -6681,7 +6677,6 @@ function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TD
   DataArray: JObject;
   JParams: array[0..0] of JValue;
   StrX: JString;
-  ResB: JBoolean;
   SizeArr, i: Integer;
 label
   _exceptionOcurred;
@@ -6720,7 +6715,6 @@ function jApp_GetDriverList(env: PJNIEnv; this: JObject): TDynArrayOfString;
   JMethod: JMethodID = nil;
   DataArray: JObject;
   StrX: JString;
-  ResB: JBoolean;
   SizeArr, i: Integer;
 label
   _exceptionOcurred;
@@ -6757,7 +6751,6 @@ function jApp_GetFolderList(env: PJNIEnv; this: JObject; Path: string): TDynArra
   DataArray: JObject;
   JParams: array[0..0] of JValue;
   StrX: JString;
-  ResB: JBoolean;
   SizeArr, i: Integer;
 label
   _exceptionOcurred;
@@ -6797,7 +6790,6 @@ function jApp_GetFileList(env: PJNIEnv; this: JObject; Path: string): TDynArrayO
   DataArray: JObject;
   JParams: array[0..0] of JValue;
   StrX: JString;
-  ResB: JBoolean;
   SizeArr, i: Integer;
 label
   _exceptionOcurred;
@@ -8950,7 +8942,6 @@ function jni_func_out_h(env: PJNIEnv; _jobject: JObject; javaFuncion : string) :
 var
   jMethod : jMethodID = nil;
   _jString : jString;
-  _jBoolean: jBoolean;
   cls: jClass;
 label
   _exceptionOcurred;

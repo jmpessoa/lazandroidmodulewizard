@@ -1426,7 +1426,6 @@ end;
 function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..1] of jValue;
@@ -1470,14 +1469,12 @@ end;
 function jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
   i: integer;
-  tmp:pchar;
 label
   _exceptionOcurred;
 begin
@@ -4865,7 +4862,6 @@ end;
 function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _nameValueSeparator: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
@@ -4906,7 +4902,6 @@ end;
 function jHttpClient_GetCookies(env: PJNIEnv; _jhttpclient: JObject; _urlString: string; _nameValueSeparator: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..1] of jValue;
@@ -5059,7 +5054,6 @@ end;
 function jHttpClient_GetHeaderFields(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;

@@ -404,7 +404,6 @@ end;
 function jSensorManager_GetDeviceSensorsNames(env: PJNIEnv; _jsensormanager: JObject): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jMethod: jMethodID=nil;
@@ -440,7 +439,6 @@ end;
 function jSensorManager_GetSensorsNames(env: PJNIEnv; _jsensormanager: JObject; _sensorType: integer): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
@@ -529,7 +527,6 @@ end;
 function jSensorManager_GetSensorVendor(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;  
@@ -580,9 +577,8 @@ end;
 
 function jSensorManager_GetSensorName(env: PJNIEnv; _jsensormanager: JObject; _sensor: jObject): string;
 var
-  jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
+  jStr: JString;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;  
 label
@@ -595,6 +591,8 @@ begin
   if jMethod = nil then goto _exceptionOcurred;
 
   jParams[0].l:= _sensor;
+
+  jStr:= env^.CallObjectMethodA(env, _jsensormanager, jMethod, @jParams);
 
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);   

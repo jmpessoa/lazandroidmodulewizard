@@ -256,7 +256,6 @@ end;
 function jWifiManager_Scan(env: PJNIEnv; _jwifimanager: JObject): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jMethod: jMethodID=nil;

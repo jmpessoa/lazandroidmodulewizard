@@ -1024,7 +1024,6 @@ end;
 function jIntentManager_GetAction(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;     
@@ -1458,7 +1457,6 @@ end;
 function jIntentManager_GetExtraStringArray(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _dataName: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..1] of jValue;
@@ -1537,7 +1535,6 @@ end;
 function jIntentManager_GetExtraString(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _dataName: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;  
@@ -1613,7 +1610,6 @@ end;
 function jIntentManager_GetDataUriAsString(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;    
@@ -1875,7 +1871,6 @@ end;
 function jIntentManager_GetContactNumber(env: PJNIEnv; _jintentmanager: JObject; _contactUri: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;    
@@ -1902,7 +1897,6 @@ end;
 function jIntentManager_GetContactEmail(env: PJNIEnv; _jintentmanager: JObject; _contactUri: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;    
@@ -1928,7 +1922,6 @@ end;
 function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
@@ -2045,7 +2038,6 @@ end;
 function jIntentManager_GetExtraSMS(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _addressBodyDelimiter: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;   

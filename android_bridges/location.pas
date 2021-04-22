@@ -698,7 +698,6 @@ end;
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -738,7 +737,6 @@ end;
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -779,7 +777,6 @@ end;
 function jLocation_GetGoogleMapsUrl(env: PJNIEnv; _jlocation: JObject; var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _pathFlag: integer; _markerHighlightIndex: integer): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..3] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
