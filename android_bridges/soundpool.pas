@@ -216,14 +216,16 @@ label
 begin
   Result := nil;
 
-  jParams[0].j:= _Self;
-  jParams[1].i:= _maxstreams;
-
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jSoundPool_jCreate', '(JI)Ljava/lang/Object;');
   if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].j:= _Self;
+  jParams[1].i:= _maxstreams;
+
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);  
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then Result := nil;
@@ -240,17 +242,20 @@ label
 begin
   Result := 0;
 
+  jCls:= env^.GetObjectClass(env, _jsoundpool);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SoundPlay', '(IFFIIF)I');
+  if jMethod = nil then goto _exceptionOcurred;
+
   jParams[0].i:= soundId;
   jParams[1].f:= _leftVolume;
   jParams[2].f:= _rightVolume;
   jParams[3].i:= _priority;
   jParams[4].i:= _loop;
   jParams[5].f:= _rate;
-  jCls:= env^.GetObjectClass(env, _jsoundpool);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'SoundPlay', '(IFFIIF)I');
-  if jMethod = nil then goto _exceptionOcurred;
+
   Result:= env^.CallIntMethodA(env, _jsoundpool, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jCls); 
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := 0;

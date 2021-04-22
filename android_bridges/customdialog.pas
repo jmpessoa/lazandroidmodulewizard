@@ -420,13 +420,16 @@ label
 begin
   result := nil;
 
-  jParams[0].j:= _Self;
-  jParams[1].z:= JBool(_showTitle);
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jCustomDialog_jCreate', '(JZ)Ljava/lang/Object;');
   if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].j:= _Self;
+  jParams[1].z:= JBool(_showTitle);
+
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);  
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;

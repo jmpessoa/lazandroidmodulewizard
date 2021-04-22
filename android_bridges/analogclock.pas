@@ -285,26 +285,19 @@ label
 begin
   result := nil;
 
-  jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jAnalogClock_jCreate', '(J)Ljava/lang/Object;');
   if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].j:= _Self;
+
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);  
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
-
-(*
-//Please, you need insert:
-
-   public java.lang.Object jAnalogClock_jCreate(long _Self) {
-      return (java.lang.Object)(new jAnalogClock(this,_Self));
-   }
-
-//to end of "public class Controls" in "Controls.java"
-*)
 
 
 end.

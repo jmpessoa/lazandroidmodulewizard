@@ -2248,9 +2248,11 @@ begin
   strList.Add('  _exceptionOcurred;');
   strList.Add('begin');
 
+  strList.Add('  ');
   if funcResult = 'constructor' then  //constructor
   begin
     strList.Add('  Result := nil;');
+    strList.Add('  ');
     strList.Add('  jCls:= Get_gjClass(env);');
     strList.Add('  if jCls = nil then goto _exceptionOcurred;');
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+'_jCreate'+''', '''+jniSignature+'''); ');
@@ -2263,6 +2265,7 @@ begin
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+''', '''+jniSignature+'''); ');
     strList.Add('  if jMethod = nil then goto _exceptionOcurred;');
   end;
+  strList.Add('  ');
 
   if paramCount = 1 then
   begin
@@ -2338,23 +2341,30 @@ begin
 
   if Pos('()', jniSignature) = 0 then //has params
   begin
+     strList.Add('  ');
+
      if funcResult = 'constructor' then
      begin
         strList.Add('  Result:= env^.Call'+GetMethodNameHack(funcResult)+'MethodA(env, this, jMethod, @jParams);');
+        strList.Add('  ');
         strList.Add('  Result:= env^.NewGlobalRef(env, Result);');
      end
      else if funcResult = 'void' then
-        strList.Add('  env^.CallVoidMethodA(env, _'+LowerCase(FJavaClassName)+', jMethod, @jParams);')
+     begin
+        strList.Add('  env^.CallVoidMethodA(env, _'+LowerCase(FJavaClassName)+', jMethod, @jParams);');
+     end
      else
      begin
        if Pos('boolean',funcResult) > 0 then
        begin
          strList.Add('  jBoo:= env^.Call'+GetMethodNameHack(funcResult)+'MethodA(env, _'+LowerCase(FJavaClassName)+', jMethod, @jParams);');
+         strList.Add('  ');
          strList.Add('  Result:= boolean(jBoo);')
        end
        else if Pos('char',funcResult) > 0 then
        begin
          strList.Add('  jCh:= env^.Call'+GetMethodNameHack(funcResult)+'MethodA(env, _'+LowerCase(FJavaClassName)+', jMethod, @jParams);');
+         strList.Add('  ');
          strList.Add('  Result:= char(jCh);');
        end
        else if Pos('[',funcResult) > 0 then
@@ -2369,13 +2379,7 @@ begin
              strList.Add('    for i:= 0 to resultsize - 1 do');
              strList.Add('    begin');
              strList.Add('      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);');
-             strList.Add('      case jStr = nil of');
-             strList.Add('         True : Result[i]:= '''';');
-             strList.Add('         False: begin');
-             strList.Add('                  jBoo:= JNI_False;');
-             strList.Add('                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));');
-             strList.Add('                end;');
-             strList.Add('      end;');
+             strList.Add('      Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);');
              strList.Add('    end;');
          end
          else
@@ -2386,16 +2390,16 @@ begin
        end
        else if Pos('String',funcResult) > 0 then
        begin
+         strList.Add('  ');
          strList.Add('  jStr:= env^.Call'+GetMethodNameHack(funcResult)+'MethodA(env, _'+LowerCase(FJavaClassName)+', jMethod, @jParams);');
-         strList.Add('  case jStr = nil of');
-         strList.Add('     True : Result:= '''';');
-         strList.Add('     False: begin');
-         strList.Add('              jBoo:= JNI_False;');
-         strList.Add('              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));');
-         strList.Add('            end;');
-         strList.Add('  end;');
+         strList.Add('  ');
+         strList.Add('  Result:= GetPStringAndDeleteLocalRef(env, jStr);');
        end
-       else strList.Add('  Result:= env^.Call'+GetMethodNameHack(funcResult)+'MethodA(env, _'+LowerCase(FJavaClassName)+', jMethod, @jParams);');
+       else
+       begin
+         strList.Add('  ');
+         strList.Add('  Result:= env^.Call'+GetMethodNameHack(funcResult)+'MethodA(env, _'+LowerCase(FJavaClassName)+', jMethod, @jParams);');
+       end;
      end
   end
   else //no params
@@ -2407,11 +2411,13 @@ begin
       if Pos('boolean',funcResult) > 0 then
       begin
          strList.Add('  jBoo:= env^.Call'+GetMethodNameHack(funcResult)+'Method(env, _'+LowerCase(FJavaClassName)+', jMethod);');
+         strList.Add('  ');
          strList.Add('  Result:= boolean(jBoo);');
       end
       else if Pos('char',funcResult) > 0 then
       begin
          strList.Add('  jCh:= env^.Call'+GetMethodNameHack(funcResult)+'Method(env, _'+LowerCase(FJavaClassName)+', jMethod);');
+         strList.Add('  ');
          strList.Add('  Result:= boolean(jCh);');
       end
       else if Pos('[',funcResult) > 0 then
@@ -2426,13 +2432,7 @@ begin
             strList.Add('    for i:= 0 to resultsize - 1 do');
             strList.Add('    begin');
             strList.Add('      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);');
-            strList.Add('      case jStr = nil of');
-            strList.Add('         True : Result[i]:= '''';');
-            strList.Add('         False: begin');
-            strList.Add('                  jBoo:= JNI_False;');
-            strList.Add('                  Result[i]:= string( env^.GetStringUTFChars(env, jStr, @jBoo));');
-            strList.Add('                 end;');
-            strList.Add('      end;');
+            strList.Add('      Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);');
             strList.Add('    end;');
         end
         else
@@ -2444,13 +2444,8 @@ begin
       else if Pos('String',funcResult) > 0 then
       begin
          strList.Add('  jStr:= env^.Call'+GetMethodNameHack(funcResult)+'Method(env, _'+LowerCase(FJavaClassName)+', jMethod);');
-         strList.Add('  case jStr = nil of');
-         strList.Add('     True : Result:= '''';');
-         strList.Add('     False: begin');
-         strList.Add('              jBoo:= JNI_False;');
-         strList.Add('              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));');
-         strList.Add('            end;');
-         strList.Add('  end;');
+         strList.Add('  ');
+         strList.Add('  Result := GetPStringAndDeleteLocalRef(env, jStr);');
       end
       else strList.Add('  Result:= env^.Call'+GetMethodNameHack(funcResult)+'Method(env, _'+LowerCase(FJavaClassName)+', jMethod);');
     end;
@@ -2460,7 +2455,10 @@ begin
      strList.Add(Trim(listDeleteLocalRef.Text));
 
   if funcResult <> 'constructor' then
+  begin
+     strList.Add('  ');
      strList.Add('  env^.DeleteLocalRef(env, jCls);');
+  end;
 
   strList.Add(' ');
 
