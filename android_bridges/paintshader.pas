@@ -541,6 +541,7 @@ begin
   jParams[8].i := _ID;
 
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jParams[5].l);
   env^.DeleteLocalRef(env, jParams[6].l);
   env^.DeleteLocalRef(env, jCls);    
@@ -606,6 +607,7 @@ begin
   jParams[6].i:= _ID;
 
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jParams[3].l);
   env^.DeleteLocalRef(env, jParams[4].l);
   env^.DeleteLocalRef(env, jCls);     
@@ -667,6 +669,7 @@ begin
   jParams[4].i := _ID;
 
   Result := env^.CallIntMethodA(env, _jpaintshader, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jParams[2].l);
   env^.DeleteLocalRef(env, jParams[3].l);
   env^.DeleteLocalRef(env, jCls);     

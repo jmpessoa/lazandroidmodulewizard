@@ -674,11 +674,13 @@ label
 begin
   result := nil;
 
-  jParams[0].j:= _Self;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jSpinner_jCreate', '(J)Ljava/lang/Object;');
   if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].j:= _Self;
+
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
   Result:= env^.NewGlobalRef(env, Result);  
 
@@ -703,12 +705,15 @@ var
 label
   _exceptionOcurred;
 begin
-  jParams[0].i:= _fontFace;
-  jParams[1].i:= _fontStyle;
+
   jCls:= env^.GetObjectClass(env, _jspinner);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetFontAndTextTypeFace', '(II)V');
   if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _fontFace;
+  jParams[1].i:= _fontStyle;
+
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);   
 
@@ -723,15 +728,19 @@ var
 label
   _exceptionOcurred;
 begin
-  jParams[0].i:= _index;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_item));
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_strTag));
+
   jCls:= env^.GetObjectClass(env, _jspinner);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetItem', '(ILjava/lang/String;Ljava/lang/String;)V');
   if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _index;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_item));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_strTag));
+
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
+
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);   
 

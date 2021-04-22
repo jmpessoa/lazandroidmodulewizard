@@ -639,10 +639,13 @@ begin
 
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
-  jParams[0].j := Int64(SelfObj);
   jMethod:= env^.GetMethodID(env, jCls, 'jcBillingClient_Create', '(J)Ljava/lang/Object;');
   if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].j := Int64(SelfObj);
+
   Result := env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result := env^.NewGlobalRef(env, Result);  
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
