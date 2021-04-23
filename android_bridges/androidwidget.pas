@@ -1351,7 +1351,7 @@ type
     procedure RequestUsageStatsPermission();
     function GetTaskInFront():string;
     function GetApplicationIcon(_package:string):jObject;
-
+    function GetInstalledAppList(): TDynArrayOfString;
     procedure Restart(_delay: integer);
     procedure HideSoftInput(_view: jObject); overload;
     function UriEncode(_message: string): string;
@@ -1782,6 +1782,7 @@ procedure jForm_SetBackgroundImageMatrix(env: PJNIEnv; _jform: JObject;
 
 function jForm_GetJByteBuffer(env: PJNIEnv; _jform: JObject; _width: integer; _height: integer): jObject;
 function jForm_GetByteBufferFromImage(env: PJNIEnv; _jform: JObject; _bitmap: jObject): jObject;
+function jForm_GetInstalledAppList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
 
 //------------------------------------------------------------------------------
 // View  - Generics
@@ -2042,17 +2043,19 @@ var
  jBoo: jBoolean;
  pch: pchar;
 begin
- if jStr = nil then Result:= '';
+ if jStr = nil then Result:= ''
+ else
+ begin
+   jBoo   := JNI_False;
+   pch    := env^.GetStringUTFChars(env, jStr, @jBoo);
+   Result := string(pch);
 
- jBoo   := JNI_False;
- pch    := env^.GetStringUTFChars(env, jStr, @jBoo);
- Result := string(pch);
-
- //IMPORTANT if function is executed more than 512 times in one call - App crash with error:
- //JNI ERROR (app bug): local reference table overflow (max=512)
- //In single calls java garbage collector it does
- env^.ReleaseStringUTFChars(env, jStr, pch);
- env^.DeleteLocalRef(env, jStr);
+   //IMPORTANT if function is executed more than 512 times in one call - App crash with error:
+   //JNI ERROR (app bug): local reference table overflow (max=512)
+   //In single calls java garbage collector it does
+   env^.ReleaseStringUTFChars(env, jStr, pch);
+ end;
+   env^.DeleteLocalRef(env, jStr);
 end;
 
 function sysIsHeightExactToParent(widget: jVisualControl) : boolean;
@@ -4504,6 +4507,13 @@ begin
    Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetApplicationIcon', _package);
 end;
 
+function jForm.GetInstalledAppList(): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetInstalledAppList(FjEnv, FjObject);
+end;
+
 procedure jForm.Restart(_delay: integer);
 begin
   //in designing component state: set value here...
@@ -5552,6 +5562,41 @@ begin
 
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env, jCls);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jForm_GetInstalledAppList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
+var
+  jStr: JString;
+  resultSize: integer;
+  jResultArray: jObject;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+label
+  _exceptionOcurred;
+begin
+  Result := nil;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetInstalledAppList', '()[Ljava/lang/String;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jresultArray:= env^.CallObjectMethod(env, _jform, jMethod);
+
+  if jResultArray <> nil then
+  begin
+    resultsize:= env^.GetArrayLength(env, jresultArray);
+    SetLength(Result, resultsize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+
+      Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);
+    end;
+  end;
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
