@@ -2113,6 +2113,17 @@ class jForm {
             return dw;
         }
 
+        public String[] GetInstalledAppList() {
+            ArrayList<String> Packages = new ArrayList<String>();
+            PackageManager pm = this.controls.activity.getPackageManager();
+            List<PackageInfo> packs = this.controls.activity.getPackageManager().getInstalledPackages(0);
+            for (int i = 0; i <packs.size(); i++){
+                PackageInfo p =packs.get(i);
+                Packages.add(p.applicationInfo.packageName);
+            }
+            String sPackages[] = Packages.toArray(new String[Packages.size()]);
+	    return sPackages;
+        }
 
         //https://stackoverflow.com/questions/3035692/how-to-convert-a-drawable-to-a-bitmap
         public static Bitmap drawableToBitmap (Drawable drawable) {
