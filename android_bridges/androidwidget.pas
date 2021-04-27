@@ -2043,19 +2043,19 @@ var
  jBoo: jBoolean;
  pch: pchar;
 begin
- if jStr = nil then Result:= ''
- else
- begin
-   jBoo   := JNI_False;
-   pch    := env^.GetStringUTFChars(env, jStr, @jBoo);
-   Result := string(pch);
+ Result:= '';
 
-   //IMPORTANT if function is executed more than 512 times in one call - App crash with error:
-   //JNI ERROR (app bug): local reference table overflow (max=512)
-   //In single calls java garbage collector it does
-   env^.ReleaseStringUTFChars(env, jStr, pch);
- end;
-   env^.DeleteLocalRef(env, jStr);
+ if jStr = nil then exit;
+
+ jBoo   := JNI_False;
+ pch    := env^.GetStringUTFChars(env, jStr, @jBoo);
+ Result := string(pch);
+
+ //IMPORTANT if function is executed more than 512 times in one call - App crash with error:
+ //JNI ERROR (app bug): local reference table overflow (max=512)
+ //In single calls java garbage collector it does
+ env^.ReleaseStringUTFChars(env, jStr, pch);
+ env^.DeleteLocalRef(env, jStr);
 end;
 
 function sysIsHeightExactToParent(widget: jVisualControl) : boolean;
