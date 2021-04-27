@@ -572,7 +572,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     		//https://www.learn2crack.com/2014/06/android-load-image-from-internet.html
     		//https://inducesmile.com/android-tutorials-for-nigerian-developer/android-load-image-from-url/
     		else if 	(namevalue[1].startsWith("http") ) {    			
-    			new LoadImageTask(holderView.image[i]).execute(namevalue[1]);
+    			new LoadImageTask(holderView.image[i]).execute(namevalue[0]);
     		}    		    		
     		else if 	(namevalue[1].startsWith("download") ) {    			    			
     			holderView.image[i].setImageBitmap( LoadFromFile(namevalue[0]) );
