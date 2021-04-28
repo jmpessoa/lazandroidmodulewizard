@@ -55,7 +55,7 @@ class jListItemRow {
 	int    id;
 	int widget = 0;   //there is not a widget!
 	View jWidget;     //fixed RadioButton Group default behavior: thanks to Leledumbo.
-	String widgetText;
+	String widgetText = "";
 	int widgetTextColor;
 	//int widgetInputType = -1;  //
 	
@@ -2372,7 +2372,7 @@ public String GetCenterItemCaption(String _fullItemCaption) {
 		String d = _delimiter;
 		String[] lines = _centerItemCaption.split(Pattern.quote(d));
 		return lines;
-	}	
+	}
 	
 public String GetLeftItemCaption(String _fullItemCaption) {
 		
@@ -2560,7 +2560,7 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 			 }
 			 DoHighlight(_index,  highLightColor);
 			 lastSelectedItem = (int) _index;
-		}
+		}			
 	}
 
 	public void SetItemChecked(int _index, boolean _value) {
