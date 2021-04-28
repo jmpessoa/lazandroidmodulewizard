@@ -47,8 +47,8 @@ public class jLocation /*extends ...*/ {
     private Criteria mCriteria;
     private String mProvider;
 
-    private String mAddress;
-    private String mStatus;
+    private String mAddress="";
+    private String mStatus="";
 
     //The minimum distance to change Updates in meters
     private long mDistanceForUpdates;

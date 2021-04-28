@@ -2823,13 +2823,17 @@ begin
 
   _jIntArray:= env^.CallObjectMethodA(env,bmap,jMethod, @jParams);
 
-  _jBoolean  := JNI_False;
-  PInt       := env^.GetIntArrayElements(env,_jIntArray,_jBoolean);
-  PIntSav    := PInt;
-  w          := PInt^; Inc(PInt);
-  h          := PInt^; Inc(PInt);
+  if _jIntArray <> nil then
+  begin
+   _jBoolean  := JNI_False;
+   PInt       := env^.GetIntArrayElements(env,_jIntArray,_jBoolean);
+   PIntSav    := PInt;
+   w          := PInt^; Inc(PInt);
+   h          := PInt^; Inc(PInt);
 
-  env^.ReleaseIntArrayElements(env,_jIntArray,PIntSav,0);
+   env^.ReleaseIntArrayElements(env,_jIntArray,PIntSav,0);
+  end;
+
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, cls);
 
@@ -3516,16 +3520,20 @@ begin
 
   _jIntArray := env^.CallObjectMethodA(env,this,jMethod,@_jParam);
 
-  Size := env^.GetArrayLength(env,_jIntArray);
+  if _jIntArray <> nil then
+  begin
+   Size := env^.GetArrayLength(env,_jIntArray);
 
-  //dbg('Size: ' + IntToStr(Size) );
-  _jBoolean  := JNI_False;
-  PInt := env^.GetIntArrayElements(env,_jIntArray,_jBoolean);
-  PIntS:= PInt;
-  Inc(PIntS,Size-2);
-  //dbg('width:'  + IntToStr(PintS^)); Inc(PintS);
-  //dbg('height:' + IntToStr(PintS^));
-  env^.ReleaseIntArrayElements(env,_jIntArray,PInt,0);
+   //dbg('Size: ' + IntToStr(Size) );
+   _jBoolean  := JNI_False;
+   PInt := env^.GetIntArrayElements(env,_jIntArray,_jBoolean);
+   PIntS:= PInt;
+   Inc(PIntS,Size-2);
+   //dbg('width:'  + IntToStr(PintS^)); Inc(PintS);
+   //dbg('height:' + IntToStr(PintS^));
+   env^.ReleaseIntArrayElements(env,_jIntArray,PInt,0);
+  end;
+
   //dbg('Here...');
   env^.DeleteLocalRef(env,_jParam.l);
 

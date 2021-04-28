@@ -81,9 +81,17 @@ public class jSpeechToText /*extends ...*/ {
 	   return SPEECH_T0_TEXT_REQUEST_CODE;
    }
    
-   public String SpeakOut(Intent _intentData) {	   
+   public String SpeakOut(Intent _intentData) {
+	   if(_intentData == null) return "";
+	   
 	   ArrayList<String> result = _intentData.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-	   return  result.get(0);
+	   
+	   String strOut = "";
+	   
+	   if(result != null) 
+		   strOut = result.get(0);
+	   
+	   return strOut;
    }
    
    

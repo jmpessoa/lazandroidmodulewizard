@@ -948,10 +948,11 @@ class jForm {
 
 		String pathRes = "";
 
-		InputStream is = null;
-		FileOutputStream fos = null;
-		String PathDat = controls.activity.getFilesDir().getAbsolutePath();
 		try {
+			InputStream is = null;
+			FileOutputStream fos = null;
+			String PathDat = controls.activity.getFilesDir().getAbsolutePath();
+			
 			File outfile = new File(PathDat, _filename);
 
 			fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name										
@@ -1411,6 +1412,8 @@ class jForm {
 	     return "";
 	    }
 	    
+	    if(url == null) return "";
+	    
 	    try{
 	     uc = url.openConnection();
 	     if(uc == null) {
@@ -1648,8 +1651,11 @@ class jForm {
 		InputStream is = null;
 		FileOutputStream fos = null;			
 		String PathDat = controls.activity.getFilesDir().getAbsolutePath();
-		String _filename2 = _filename.substring(_filename.lastIndexOf("/")+1); //by Tomash - add support for folders in assets
-		try {		   		     			
+		String _filename2 = "";
+		
+		try {
+			_filename2 = _filename.substring(_filename.lastIndexOf("/")+1); //by Tomash - add support for folders in assets
+			
 			File outfile = new File(PathDat+"/"+_filename2);								
 			// if file doesnt exists, then create it
 			if (!outfile.exists()) {
@@ -1668,6 +1674,9 @@ class jForm {
 			// Log.i("ShareFromAssets","fail!!");
 		     e.printStackTrace();			     
 		}
+		
+		if(PathDat == null) return "";
+		
 		return PathDat + "/" +_filename2;
 	}
 
@@ -1787,8 +1796,12 @@ class jForm {
 	}
 
 	public String UriToString(Uri _uri) {
+		if(_uri == null) return "";
+		
 		String r = _uri.toString();
+		
 		if(r == null) return "";
+		
 		return r;
 	}
 
@@ -2349,6 +2362,8 @@ class jForm {
 	}
 
 	private String getRealPathFromURI(Uri contentUri) {
+		if(contentUri == null) return "";
+		
 		String path = "";
 		Cursor cursor = null;
 		try {
@@ -2369,6 +2384,8 @@ class jForm {
 	}
 
 	private String getRealPathFromURI_API19(Uri uri){
+		if(uri == null) return "";
+		
 		String filePath = "";
 		String wholeID ="";
 
@@ -2399,6 +2416,8 @@ class jForm {
 	}
 
 	public String GetRealPathFromURI(Uri _Uri) {
+		   if(_Uri == null) return "";
+		
 		   String path = "";
 
            if (Build.VERSION.SDK_INT < 19)
@@ -2432,6 +2451,7 @@ class jForm {
    }
 
 	public String CopyFileFromUri(Uri _srcUri, String _outputDir) {
+		if(_srcUri == null) return "";
 	
 		String fileName = "";
 		ContentResolver cr = controls.activity.getContentResolver();
@@ -2970,6 +2990,8 @@ public long getTick() {
 // -------------------------------------------------------------------------
 // Result : /data/app/com.kredix-1.apk
 public  String getPathApp (android.content.Context context,String pkgName) {
+  if(context == null) return "";
+  
   String PathApp = "";
   
   try {
@@ -2984,6 +3006,8 @@ public  String getPathApp (android.content.Context context,String pkgName) {
 
 // Result : /data/data/com/kredix/files
 public  String getPathDat (android.content.Context context) {
+  if(context == null) return "";
+  
   //String version = Build.VERSION.RELEASE;
   String PathDat = context.getFilesDir().getAbsolutePath();
   
@@ -3012,6 +3036,8 @@ public  String getPathDCIM() {
 
 //by jmpessoa
 public  String getPathDataBase(android.content.Context context) {
+   if(context == null) return "";
+	
    String destPath = context.getFilesDir().getAbsolutePath();
    
    if(destPath == null) return "";
@@ -3025,7 +3051,10 @@ public  String getPathDataBase(android.content.Context context) {
 // -------------------------------------------------------------------------
 // thierrydijoux - get locale info
 public String getLocale(int localeType) {
-    Context context = this.activity;
+	if(this.activity == null) return "";
+	
+    Context context = this.activity;    
+    
   	String value = "";	
    	switch (localeType) {
    		case 0: value = context.getResources().getConfiguration().locale.getCountry();
