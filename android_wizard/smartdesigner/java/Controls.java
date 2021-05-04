@@ -1721,10 +1721,15 @@ class jForm {
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
-	public void HideSoftInput() {
-		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		if(imm == null) return;
-		imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
+	public void HideSoftInput() {			
+	    InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+	    if(imm == null) return;
+	    
+	    if (controls.activity.getCurrentFocus() != null) {
+	    	imm.hideSoftInputFromWindow(controls.activity.getCurrentFocus().getWindowToken(), 0);
+	    	imm.hideSoftInputFromInputMethod(controls.activity.getCurrentFocus().getWindowToken(), 0);
+	    }
+	    
 	}
 
 	public void HideSoftInput(View _view) {
