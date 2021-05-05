@@ -38,7 +38,6 @@ jsTabLayout = class(jVisualControl)
     procedure GenEvent_OnSTabSelected(Obj: TObject;  position: integer; title: string);
 
     function jCreate(): jObject;
-    procedure jFree();
     procedure SetViewParent(_viewgroup: jObject); override;
     function GetParent(): jObject;
     procedure RemoveFromViewParent();  override;
@@ -83,44 +82,8 @@ jsTabLayout = class(jVisualControl)
 end;
 
 function jsTabLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jsTabLayout_jFree(env: PJNIEnv; _jstablayout: JObject);
-procedure jsTabLayout_SetViewParent(env: PJNIEnv; _jstablayout: JObject; _viewgroup: jObject);
-function jsTabLayout_GetParent(env: PJNIEnv; _jstablayout: JObject): jObject;
-procedure jsTabLayout_RemoveFromViewParent(env: PJNIEnv; _jstablayout: JObject);
-function jsTabLayout_GetView(env: PJNIEnv; _jstablayout: JObject): jObject;
-procedure jsTabLayout_SetLParamWidth(env: PJNIEnv; _jstablayout: JObject; _w: integer);
-procedure jsTabLayout_SetLParamHeight(env: PJNIEnv; _jstablayout: JObject; _h: integer);
-function jsTabLayout_GetLParamWidth(env: PJNIEnv; _jstablayout: JObject): integer;
-function jsTabLayout_GetLParamHeight(env: PJNIEnv; _jstablayout: JObject): integer;
-procedure jsTabLayout_SetLGravity(env: PJNIEnv; _jstablayout: JObject; _g: integer);
-procedure jsTabLayout_SetLWeight(env: PJNIEnv; _jstablayout: JObject; _w: single);
-procedure jsTabLayout_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jstablayout: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jsTabLayout_AddLParamsAnchorRule(env: PJNIEnv; _jstablayout: JObject; _rule: integer);
-procedure jsTabLayout_AddLParamsParentRule(env: PJNIEnv; _jstablayout: JObject; _rule: integer);
-procedure jsTabLayout_SetLayoutAll(env: PJNIEnv; _jstablayout: JObject; _idAnchor: integer);
-procedure jsTabLayout_ClearLayoutAll(env: PJNIEnv; _jstablayout: JObject);
-procedure jsTabLayout_SetId(env: PJNIEnv; _jstablayout: JObject; _id: integer);
-procedure jsTabLayout_SetupWithViewPager(env: PJNIEnv; _jstablayout: JObject; _viewPage: jObject);
-procedure jsTabLayout_SetFitsSystemWindows(env: PJNIEnv; _jstablayout: JObject; _value: boolean);
-
-function jsTabLayout_AddTab(env: PJNIEnv; _jstablayout: JObject; _title: string): integer;
-
-function jsTabLayout_GetTabCount(env: PJNIEnv; _jstablayout: JObject): integer;
-procedure jsTabLayout_SetTabTextColors(env: PJNIEnv; _jstablayout: JObject; _normalColor: integer; _selectedColor: integer);
-procedure jsTabLayout_SetIcon(env: PJNIEnv; _jstablayout: JObject; _position: integer; _iconIdentifier: string);
-procedure jsTabLayout_SetPosition(env: PJNIEnv; _jstablayout: JObject; _position: integer);
-function jsTabLayout_GetPosition(env: PJNIEnv; _jstablayout: JObject): integer;
-function jsTabLayout_IsSelected(env: PJNIEnv; _jstablayout: JObject; _position: integer): boolean;
 procedure jsTabLayout_SetCustomView(env: PJNIEnv; _jstablayout: JObject; _position: integer; _view: jObject);
-procedure jsTabLayout_SetText(env: PJNIEnv; _jstablayout: JObject; _position: integer; _title: string);
-function jsTabLayout_GetText(env: PJNIEnv; _jstablayout: JObject; _position: integer): string;
-procedure jsTabLayout_SetTabMode(env: PJNIEnv; _jstablayout: JObject; _tabmode: integer);
 function jsTabLayout_GetTabAt(env: PJNIEnv; _jstablayout: JObject; _position: integer): jObject;
-procedure jsTabLayout_SetSelectedTabIndicatorColor(env: PJNIEnv; _jstablayout: JObject; _color: integer);
-procedure jsTabLayout_SetSelectedTabIndicatorHeight(env: PJNIEnv; _jstablayout: JObject; _height: integer);
-procedure jsTabLayout_SetTabGravity(env: PJNIEnv; _jstablayout: JObject; _tabGravity: integer);
-procedure jsTabLayout_SetElevation(env: PJNIEnv; _jstablayout: JObject; _value: integer);
-procedure jsTabLayout_SetBackgroundToPrimaryColor(env: PJNIEnv; _jstablayout: JObject);
 
 
 implementation
@@ -151,7 +114,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_proc(FjEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -175,34 +138,27 @@ begin
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jsTabLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsTabLayout_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  jsTabLayout_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-      jsTabLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
+      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+
   for rToP := rpBottom to rpCenterVertical do
-  begin
     if rToP in FPositionRelativeToParent then
-    begin
-      jsTabLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
-    end;
-  end;
+      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsTabLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -212,7 +168,7 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFitsSystemWindows  then
-     jsTabLayout_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+     SetFitsSystemWindows(FFitsSystemWindows);
 
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
@@ -265,109 +221,105 @@ begin
    Result:= jsTabLayout_jCreate(FjEnv, int64(Self), FjThis);
 end;
 
-procedure jsTabLayout.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jsTabLayout_jFree(FjEnv, FjObject);
-end;
-
 procedure jsTabLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 function jsTabLayout.GetParent(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(FjEnv, FjObject);
 end;
 
 procedure jsTabLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jsTabLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_GetView(FjEnv, FjObject);
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 procedure jsTabLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jsTabLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 function jsTabLayout.GetLParamWidth(): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_GetLParamWidth(FjEnv, FjObject);
+   Result:= View_GetLParamWidth(FjEnv, FjObject);
 end;
 
 function jsTabLayout.GetLParamHeight(): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_GetLParamHeight(FjEnv, FjObject);
+   Result:= View_GetLParamHeight(FjEnv, FjObject);
 end;
 
 procedure jsTabLayout.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetLGravity(FjEnv, FjObject, _g);
+     View_SetLGravity(FjEnv, FjObject, _g);
 end;
 
 procedure jsTabLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetLWeight(FjEnv, FjObject, _w);
+     View_SetLWeight(FjEnv, FjObject, _w);
 end;
 
 procedure jsTabLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsTabLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jsTabLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jsTabLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jsTabLayout.ClearLayout();
@@ -378,80 +330,85 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsTabLayout_clearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsTabLayout_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsTabLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
 function jsTabLayout.AddTab(_title: string): integer;
 begin
+  Result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_AddTab(FjEnv, FjObject, _title);
+   Result:= jni_func_t_out_i(FjEnv, FjObject, 'AddTab', _title);
 end;
 
 procedure jsTabLayout.SetupWithViewPager(_viewPage: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetupWithViewPager(FjEnv, FjObject, _viewPage);
+     jni_proc_viw(FjEnv, FjObject, 'SetupWithViewPager', _viewPage);
 end;
 
 procedure jsTabLayout.SetFitsSystemWindows(_value: boolean);
 begin
+  if FjObject = nil then exit;
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
-  if FInitialized then
-     jsTabLayout_SetFitsSystemWindows(FjEnv, FjObject, _value);
+
+  jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 function jsTabLayout.GetTabCount(): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_GetTabCount(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetTabCount');
 end;
 
 procedure jsTabLayout.SetTabTextColors(_normalColor: TARGBColorBridge; _selectedColor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetTabTextColors(FjEnv, FjObject, GetARGB(FCustomColor, _normalColor), GetARGB(FCustomColor, _selectedColor));
+     jni_proc_ii(FjEnv, FjObject, 'SetTabTextColors', GetARGB(FCustomColor, _normalColor), GetARGB(FCustomColor, _selectedColor));
 end;
 
 procedure jsTabLayout.SetIcon(_position: integer; _iconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetIcon(FjEnv, FjObject, _position ,_iconIdentifier);
+     jni_proc_it(FjEnv, FjObject, 'SetIcon', _position ,_iconIdentifier);
 end;
 
 procedure jsTabLayout.SetPosition(_position: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetPosition(FjEnv, FjObject, _position);
+     jni_proc_i(FjEnv, FjObject, 'SetPosition', _position);
 end;
 
 function jsTabLayout.GetPosition(): integer;
 begin
+  Result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_GetPosition(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetPosition');
 end;
 
 function jsTabLayout.IsSelected(_position: integer): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_IsSelected(FjEnv, FjObject, _position);
+   Result:= jni_func_i_out_z(FjEnv, FjObject, 'IsSelected', _position);
 end;
 
 procedure jsTabLayout.SetCustomView(_position: integer; _view: jObject);
@@ -465,21 +422,22 @@ procedure jsTabLayout.SetTitle(_position: integer; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetText(FjEnv, FjObject, _position ,_title);
+     jni_proc_it(FjEnv, FjObject, 'SetTitle', _position ,_title);
 end;
 
 function jsTabLayout.GetTitle(_position: integer): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_GetText(FjEnv, FjObject, _position);
+   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetTitle', _position);
 end;
 
 procedure jsTabLayout.SetTabMode(_tabMode: TTabMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetTabMode(FjEnv, FjObject, Ord(_tabmode) );
+     jni_proc_i(FjEnv, FjObject, 'SetTabMode', Ord(_tabmode) );
 end;
 
 function jsTabLayout.GetTabAt(_position: integer): jObject;
@@ -493,35 +451,35 @@ procedure jsTabLayout.SetSelectedTabIndicatorColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetSelectedTabIndicatorColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jni_proc_i(FjEnv, FjObject, 'SetSelectedTabIndicatorColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jsTabLayout.SetSelectedTabIndicatorHeight(_height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetSelectedTabIndicatorHeight(FjEnv, FjObject, _height);
+     jni_proc_i(FjEnv, FjObject, 'SetSelectedTabIndicatorHeight', _height);
 end;
 
 procedure jsTabLayout.SetTabGravity(_tabGravity: TTabGravity);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetTabGravity(FjEnv, FjObject, Ord(_tabGravity) );
+     jni_proc_i(FjEnv, FjObject, 'SetTabGravity', Ord(_tabGravity) );
 end;
 
 procedure jsTabLayout.SetElevation(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetElevation(FjEnv, FjObject, _value);
+     jni_proc_i(FjEnv, FjObject, 'SetElevation', _value);
 end;
 
 procedure jsTabLayout.SetBackgroundToPrimaryColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetBackgroundToPrimaryColor(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'SetBackgroundToPrimaryColor');
 end;
 
 {-------- jsTabLayout_JNI_Bridge ----------}
@@ -531,366 +489,23 @@ var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
-  jParams[0].j:= _Self;
+  result := nil;
+
   jCls:= Get_gjClass(env);
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jsTabLayout_jCreate', '(J)Ljava/lang/Object;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].j:= _Self;
+
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);
-end;
 
-
-procedure jsTabLayout_jFree(env: PJNIEnv; _jstablayout: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetViewParent(env: PJNIEnv; _jstablayout: JObject; _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsTabLayout_GetParent(env: PJNIEnv; _jstablayout: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-  Result:= env^.CallObjectMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_RemoveFromViewParent(env: PJNIEnv; _jstablayout: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsTabLayout_GetView(env: PJNIEnv; _jstablayout: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetLParamWidth(env: PJNIEnv; _jstablayout: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetLParamHeight(env: PJNIEnv; _jstablayout: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsTabLayout_GetLParamWidth(env: PJNIEnv; _jstablayout: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsTabLayout_GetLParamHeight(env: PJNIEnv; _jstablayout: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetLGravity(env: PJNIEnv; _jstablayout: JObject; _g: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _g;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetLWeight(env: PJNIEnv; _jstablayout: JObject; _w: single);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _w;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLWeight', '(F)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jstablayout: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_AddLParamsAnchorRule(env: PJNIEnv; _jstablayout: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_AddLParamsParentRule(env: PJNIEnv; _jstablayout: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetLayoutAll(env: PJNIEnv; _jstablayout: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_ClearLayoutAll(env: PJNIEnv; _jstablayout: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetId(env: PJNIEnv; _jstablayout: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jsTabLayout_AddTab(env: PJNIEnv; _jstablayout: JObject; _title: string): integer;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_title));
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddTab', '(Ljava/lang/String;)I');
-  Result:= env^.CallIntMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetupWithViewPager(env: PJNIEnv; _jstablayout: JObject; _viewPage: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewPage;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetupWithViewPager', '(Landroid/view/View;)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsTabLayout_SetFitsSystemWindows(env: PJNIEnv; _jstablayout: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jsTabLayout_GetTabCount(env: PJNIEnv; _jstablayout: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetTabCount', '()I');
-  Result:= env^.CallIntMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetTabTextColors(env: PJNIEnv; _jstablayout: JObject; _normalColor: integer; _selectedColor: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _normalColor;
-  jParams[1].i:= _selectedColor;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTabTextColors', '(II)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetIcon(env: PJNIEnv; _jstablayout: JObject; _position: integer; _iconIdentifier: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _position;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetIcon', '(ILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetPosition(env: PJNIEnv; _jstablayout: JObject; _position: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _position;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetPosition', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsTabLayout_GetPosition(env: PJNIEnv; _jstablayout: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetPosition', '()I');
-  Result:= env^.CallIntMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsTabLayout_IsSelected(env: PJNIEnv; _jstablayout: JObject; _position: integer): boolean;
-var
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _position;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsSelected', '(I)Z');
-  jBoo:= env^.CallBooleanMethodA(env, _jstablayout, jMethod, @jParams);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
+  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
 
 
@@ -899,65 +514,23 @@ var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+
+  jCls:= env^.GetObjectClass(env, _jstablayout);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetCustomView', '(ILandroid/view/View;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
   jParams[0].i:= _position;
   jParams[1].l:= _view;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetCustomView', '(ILandroid/view/View;)V');
+
   env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jCls);
-end;
 
-
-procedure jsTabLayout_SetText(env: PJNIEnv; _jstablayout: JObject; _position: integer; _title: string);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _position;
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_title));
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetText', '(ILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsTabLayout_GetText(env: PJNIEnv; _jstablayout: JObject; _position: integer): string;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _position;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetText', '(I)Ljava/lang/String;');
-  jStr:= env^.CallObjectMethodA(env, _jstablayout, jMethod, @jParams);
-  case jStr = nil of
-     True : Result:= '';
-     False: begin
-              jBoo:= JNI_False;
-              Result:= string( env^.GetStringUTFChars(env, jStr, @jBoo));
-            end;
-  end;
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsTabLayout_SetTabMode(env: PJNIEnv; _jstablayout: JObject; _tabmode: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _tabmode;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTabMode', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -966,78 +539,24 @@ var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
-  jParams[0].i:= _position;
+
   jCls:= env^.GetObjectClass(env, _jstablayout);
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetTabAt', '(I)UNKNOWN');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _position;
+
   Result:= env^.CallObjectMethodA(env, _jstablayout, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
-
-procedure jsTabLayout_SetSelectedTabIndicatorColor(env: PJNIEnv; _jstablayout: JObject; _color: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _color;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetSelectedTabIndicatorColor', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsTabLayout_SetSelectedTabIndicatorHeight(env: PJNIEnv; _jstablayout: JObject; _height: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _height;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetSelectedTabIndicatorHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsTabLayout_SetTabGravity(env: PJNIEnv; _jstablayout: JObject; _tabGravity: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _tabGravity;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTabGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsTabLayout_SetElevation(env: PJNIEnv; _jstablayout: JObject; _value: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _value;
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetElevation', '(I)V');
-  env^.CallVoidMethodA(env, _jstablayout, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsTabLayout_SetBackgroundToPrimaryColor(env: PJNIEnv; _jstablayout: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jstablayout);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundToPrimaryColor', '()V');
-  env^.CallVoidMethod(env, _jstablayout, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 
 end.

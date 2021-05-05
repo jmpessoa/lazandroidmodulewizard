@@ -7,9 +7,10 @@ import android.view.ViewGroup;
 import com.google.android.material.tabs.TabLayout;
 import androidx.viewpager.widget.ViewPager;
 
-/*Draft java code by "Lazarus Android Module Wizard" [1/3/2018 18:45:40]*/
-/*https://github.com/jmpessoa/lazandroidmodulewizard*/
-/*jVisualControl LAMW template*/
+//-------------------------------------------------------------------------
+// jsTabLayout
+// Review by ADiV for LAMW on 2021-05-05
+//-------------------------------------------------------------------------
  
 /*
  *
@@ -45,11 +46,15 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
       setOnClickListener(onClickListener);
       */
       //http://abhiandroid.com/materialdesign/tablayout-example-android-studio.html
-      this.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+      this.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {      
     	    @Override
     	    public void onTabSelected(TabLayout.Tab tab) {
+    	    	
     	        // while selecting the tab ::  tab.getPosition()
-    	    	controls.pOnSTabSelected(pascalObj, tab.getPosition(), tab.getText().toString());
+    	    	//if(tab != null)
+    	    		//controls.pOnSTabSelected(pascalObj, 0, "test");		
+    	    	 controls.pOnSTabSelected(pascalObj, tab.getPosition(), tab.getText().toString());
+    	    	 
     	    }
     	 
     	    @Override
@@ -136,9 +141,15 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
       
    public int AddTab(String _title) {
-	  Tab t =  this.newTab().setText(_title);
-      this.addTab(t);      
-      return  t.getPosition();       
+	  Tab t =  this.newTab();
+	  
+	  if(t == null) return -1;
+	  
+	  t.setText(_title);
+	  
+      this.addTab(t);
+      
+      return  t.getPosition();	  
    }
    
    public void SetupWithViewPager(View _viewpage) {	   
@@ -168,13 +179,23 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
   }
     
   public void SetIcon(int _position, String _iconIdentifier) {
-	  Tab t =this.getTabAt(_position);	  
+	  if( (_position < 0) || (_position >=this.getTabCount()) ) return;
+	  
+	  Tab t =this.getTabAt(_position);
+	  
+	  if(t == null) return;	  
+	  
 	  int resId = context.getResources().getIdentifier(_iconIdentifier, "drawable", context.getPackageName() );    		
 	  t.setIcon(resId);
   }	  
   
-  public void SetPosition(int _position) {	  	  	 
+  public void SetPosition(int _position) {
+	  if( (_position < 0) || (_position >=this.getTabCount()) ) return;
+	  
 	  Tab t =this.getTabAt(_position);
+	  
+	  if(t == null) return;
+	  
 	  t.select();	  	 
   }	  
   
@@ -182,23 +203,43 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
 	  return this.getSelectedTabPosition();
   }
 	
-  public boolean IsSelected(int _position) { 
+  public boolean IsSelected(int _position) {
+	  if( (_position < 0) || (_position >=this.getTabCount()) ) return false;
+	  
 	  Tab t =this.getTabAt(_position);
+	  
+	  if(t == null) return false;
+	  
       return t.isSelected();
   }	  
   
   public void SetCustomView(int _position, View _view) {
-	   Tab t =this.getTabAt(_position);
-	   t.setCustomView(_view);	
+	  if( (_position < 0) || (_position >=this.getTabCount()) ) return;
+	  
+	  Tab t =this.getTabAt(_position);
+	  
+	  if(t == null) return;
+	   
+	  t.setCustomView(_view);	
   }	   
   
   public void SetText(int _position,  String _title) {
+	  if( (_position < 0) || (_position >=this.getTabCount()) ) return;
+	  
 	  Tab t =this.getTabAt(_position);
+	  
+	  if(t == null) return;
+	  
 	  t.setText(_title); 
   }
 
   public String GetText(int _position) {
+	  if( (_position < 0) || (_position >=this.getTabCount()) ) return "";
+	  
 	  Tab t = this.getTabAt(_position);
+	  
+	  if(t == null) return "";
+	  
 	  return t.getText().toString();
   }   
   
@@ -210,8 +251,13 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
 	  }	  
   }
   
-  public Tab GetTabAt(int _position) {
-	 Tab t =this.getTabAt(_position);	
+  public Tab GetTabAt(int _position) {	
+	 if( (_position < 0) || (_position >=this.getTabCount()) ) return null;
+	  
+	 Tab t =this.getTabAt(_position);
+	 
+	 if(t == null) return null;
+	 
 	 return t;
   }
   
