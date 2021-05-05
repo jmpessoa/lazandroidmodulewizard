@@ -2948,7 +2948,7 @@ begin
 
   MemoLines.Add('begin');
   MemoLines.Add('  gApp.Jni.jEnv:= env;');
-  MemoLines.Add('  gApp.Jni.jThis:= this;');
+  MemoLines.Add('  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;');
 
   if outPascalReturnType <> '' then
   begin

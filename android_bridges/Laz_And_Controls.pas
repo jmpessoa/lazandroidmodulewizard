@@ -2563,8 +2563,10 @@ Function IntToWebViewStatus( EventType : Integer ) : TWebViewStatus;
 Function Java_Event_pAppOnScreenStyle(env: PJNIEnv; this: jobject): JInt;
 begin
   Result:= 1;
-  gApp.Jni.jEnv:= env;
+
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
+
   case gApp.Screen.Style of
     ssSensor    : Result := 0;
     ssPortrait  : Result := 1;
@@ -2576,7 +2578,7 @@ Procedure Java_Event_pAppOnNewIntent(env: PJNIEnv; this: jObject; intent: jobjec
 {var
   Form: jForm;}
 begin
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
   { //TODO
   Form := gApp.Forms.Stack[gApp.TopIndex].Form;
@@ -2589,7 +2591,7 @@ end;
 // The activity is about to be destroyed.
 Procedure Java_Event_pAppOnDestroy(env: PJNIEnv; this: jobject);
 begin
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
 end;
 
@@ -2606,8 +2608,9 @@ Procedure Java_Event_pAppOnPause(env: PJNIEnv; this: jobject);
 var
   Form: jForm;
 begin
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
+
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
@@ -2618,7 +2621,7 @@ end;
 
 Procedure Java_Event_pAppOnRestart(env: PJNIEnv; this: jobject);
 begin
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
 end;
 
@@ -2630,8 +2633,9 @@ Procedure Java_Event_pAppOnResume(env: PJNIEnv; this: jobject);
 var
   Form: jForm;
 begin
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
+
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
@@ -2644,8 +2648,9 @@ Procedure Java_Event_pAppOnStart(env: PJNIEnv; this: jObject);
 var
   Form: jForm;
 begin
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
+
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
@@ -2665,8 +2670,9 @@ Procedure Java_Event_pAppOnStop(env: PJNIEnv; this: jobject);
 var
   Form: jForm;
 begin
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
+
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
@@ -2680,7 +2686,7 @@ var
   Form: jForm;
   CanClose: boolean;
 begin
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
 
   if gApp.TopIndex < 0 then Exit;
@@ -2715,7 +2721,7 @@ var
   Form: jForm; //jForm;  //gdx change
 begin
 
-  gApp.Jni.jEnv:= env;
+  gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
 
   Form := jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
@@ -3026,7 +3032,8 @@ Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject;
                              Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   if Obj is jView  then
   begin
@@ -3041,7 +3048,7 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jImageBtn then
   begin
@@ -3063,7 +3070,7 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jImageBtn then
   begin
@@ -3086,7 +3093,7 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jPanel then
   begin
@@ -3102,7 +3109,7 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   //------------------------------------------------------
 
   if not (Assigned(Obj)) then Exit;
@@ -3172,7 +3179,7 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   //------------------------------------------------------
 
   if not (Assigned(Obj)) then Exit;
@@ -3203,7 +3210,8 @@ end;
 procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject;tag:integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Sender is jForm then
   begin
     jForm(jForm(Sender).Owner).UpdateJNI(gApp);
@@ -3219,7 +3227,8 @@ end;
 Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jListView then
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
@@ -3231,7 +3240,8 @@ end;
 procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jListView then
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
@@ -3242,7 +3252,8 @@ end;
 procedure Java_Event_pOnBeforeDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jListView then
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
@@ -3277,7 +3288,8 @@ end;
 procedure Java_Event_pOnAfterDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jListView then
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
@@ -3312,7 +3324,8 @@ end;
 procedure Java_Event_pOnLayouting(env: PJNIEnv; this: jobject; Obj: TObject; changed: JBoolean);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jTextView then
   begin
     jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
@@ -3333,7 +3346,7 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
@@ -3355,7 +3368,7 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
@@ -3377,7 +3390,7 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
@@ -3399,7 +3412,7 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
@@ -3421,7 +3434,7 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
@@ -3443,7 +3456,8 @@ var
   outColor: dword;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   outColor:= 0;
   if Obj is jListVIew then
   begin
@@ -3466,7 +3480,8 @@ var
   outColor: dword;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   outColor:= 0;
   if Obj is jListVIew then
   begin
@@ -3489,7 +3504,8 @@ var
   outText: string;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   outText:= '';
   if Obj is jListVIew then
   begin
@@ -3511,7 +3527,8 @@ var
   outColor: dword;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   outColor:= 0;
   if Obj is jListVIew then
   begin
@@ -3528,7 +3545,8 @@ var
   outBitmap: JObject;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   outBitmap:= nil;
   if Obj is jListVIew then
   begin
@@ -3551,7 +3569,8 @@ var
   outBitmap: JObject;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   outBitmap:= nil;
   if Obj is jListVIew then
   begin
@@ -3570,7 +3589,8 @@ end;
 procedure Java_Event_pOnListViewScrollStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: JBoolean);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jListVIew then
   begin
     jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
@@ -3584,7 +3604,7 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
@@ -3605,7 +3625,8 @@ var
  _jBoolean: jBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   pasTxt:='';
   if txt <> nil then
@@ -3626,7 +3647,8 @@ var
   _jBoolean: jBoolean;
 begin
  gApp.Jni.jEnv:= env;
- gApp.Jni.jThis:= this;
+ if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
  if not Assigned(Obj) then Exit;
  pasTxt:='';
  if txt <> nil then
@@ -3645,7 +3667,7 @@ end;
 Procedure Java_Event_pOnEnter(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
 
@@ -3676,7 +3698,7 @@ end;
 Procedure Java_Event_pOnBackPressed(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
 
@@ -3718,7 +3740,7 @@ Var
   Timer : jTimer;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if App_IsLock then Exit;
 
@@ -3742,7 +3764,8 @@ procedure Java_Event_pOnTouch(env: PJNIEnv; this: jobject;
                               act,cnt: integer; x1,y1,x2,y2 : single);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj)  then Exit;
   if Obj is jGLViewEvent  then
   begin
@@ -3767,7 +3790,8 @@ end;
 procedure Java_Event_pOnGLRenderer(env: PJNIEnv; this: jobject; Obj: TObject; EventType, w, h: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   if Obj is jGLViewEvent  then
   begin
@@ -3779,7 +3803,8 @@ end;
 procedure Java_Event_pOnGLRenderer1(env: PJNIEnv; this: jobject; Obj: TObject; EventType, w, h: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   if Obj is jGLViewEvent  then
   begin
@@ -3791,7 +3816,8 @@ end;
 procedure Java_Event_pOnGLRenderer2(env: PJNIEnv; this: jobject; Obj: TObject; EventType, w, h: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   if Obj is jGLViewEvent  then
   begin
@@ -3812,7 +3838,7 @@ var
 begin
 
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   Result     := cjWebView_Act_Continue;
   pasWebView := jWebView(webview);
@@ -3839,7 +3865,8 @@ var
   pasWebView : jWebView;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   pasWebView := jWebView(webview);
   if not Assigned(pasWebView) then Exit;
   if not Assigned(pasWebView.OnFindResult) then Exit;
@@ -3850,7 +3877,8 @@ end;
 procedure Java_Event_pOnWebViewEvaluateJavascriptResult(env:PJNIEnv;this:JObject;Sender:TObject;data:jString);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Sender is jWebView then
   begin
     jForm(jWebView(Sender).Owner).UpdateJNI(gApp);
@@ -3888,7 +3916,7 @@ var
 begin
   doing:= True;  //doing!
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
@@ -3907,7 +3935,8 @@ var
 begin
   progressUpdate:= Progress + 1;
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
@@ -3925,7 +3954,8 @@ var
 begin
   startProgress:= 0;
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
@@ -3940,7 +3970,8 @@ end;
 procedure Java_Event_pOnAsyncEventPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; Progress: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
@@ -3959,7 +3990,7 @@ var
   i:integer;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
 
@@ -3985,7 +4016,8 @@ end;
 procedure Java_Event_pOnHttpClientUploadProgress(env: PJNIEnv; this: jobject; Obj: TObject; progress: int64);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if not Assigned(Obj) then Exit;
   if Obj is jHttpClient then
   begin
@@ -4002,7 +4034,7 @@ var
   _jBoolean  : jBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   //
   if not Assigned(Obj) then Exit;
 
@@ -4031,7 +4063,7 @@ var
   _jBoolean  : jBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   //
   if not Assigned(Obj) then Exit;
 
@@ -4054,7 +4086,7 @@ var
   _jBoolean  : jBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   //
   if not Assigned(Obj) then Exit;
 
@@ -4098,7 +4130,7 @@ end;
 procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   //
   if not Assigned(Obj) then Exit;
   if Obj is jHttpClient then
@@ -4115,7 +4147,8 @@ procedure Java_Event_pOnScrollViewChanged(env: PJNIEnv; this: jobject; Obj: TObj
                                                                                       onPosition: integer;scrolldiff: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jScrollView then
   begin
     jForm(jScrollView(Obj).Owner).UpdateJNI(gApp);
@@ -4130,7 +4163,8 @@ procedure Java_Event_pOnHorScrollViewChanged(env: PJNIEnv; this: jobject; Obj: T
                                                                                       onPosition: integer;scrolldiff: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jHorizontalScrollView then
   begin
     jForm(jHorizontalScrollView(Obj).Owner).UpdateJNI(gApp);
@@ -4141,7 +4175,8 @@ end;
 procedure Java_Event_pOnScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Sender is jScrollView then
   begin
     jForm(jScrollView(Sender).Owner).UpdateJNI(gApp);
@@ -4152,7 +4187,8 @@ end;
 procedure Java_Event_pOnScrollViewInnerItemLongClick(env:PJNIEnv;this:JObject;Sender:TObject;index:integer;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Sender is jScrollView then
   begin
     jForm(jScrollView(Sender).Owner).UpdateJNI(gApp);
@@ -4163,7 +4199,8 @@ end;
 procedure Java_Event_pOnHorScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Sender is jHorizontalScrollView then
   begin
     jForm(jHorizontalScrollView(Sender).Owner).UpdateJNI(gApp);
@@ -4174,7 +4211,8 @@ end;
 procedure Java_Event_pOnHorScrollViewInnerItemLongClick(env:PJNIEnv;this:JObject;Sender:TObject;index:integer;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Sender is jHorizontalScrollView then
   begin
     jForm(jHorizontalScrollView(Sender).Owner).UpdateJNI(gApp);
@@ -4185,7 +4223,8 @@ end;
 procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Sender is jSqliteDataAccess then
   begin
     jForm(jSqliteDataAccess(Sender).Owner).UpdateJNI(gApp);
@@ -7347,8 +7386,9 @@ end;
 
 procedure Java_Event_pOnImageViewPopupItemSelected(env:PJNIEnv;this:JObject;Sender:TObject;caption:jString);
 begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  gApp.Jni.jEnv := env;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis:= this;
+
   if Sender is jImageView then
   begin
     jForm(jImageView(Sender).Owner).UpdateJNI(gApp);
@@ -13914,7 +13954,8 @@ end;
 Procedure Java_Event_pOnFlingGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; direction: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jPanel then
   begin
     jPanel(Obj).UpdateJNI(gApp);
@@ -13935,7 +13976,8 @@ end;
 Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jPanel then
   begin
     jPanel(Obj).UpdateJNI(gApp);
@@ -14496,7 +14538,8 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jDBListView then
   begin
     jForm(jDBListView(Obj).Owner).UpdateJNI(gApp);
@@ -14516,7 +14559,8 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jDBListView then
   begin
     jForm(jDBListView(Obj).Owner).UpdateJNI(gApp);
