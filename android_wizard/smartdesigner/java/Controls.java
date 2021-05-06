@@ -177,7 +177,7 @@ import java.util.regex.PatternSyntaxException;
 
 import java.text.ParseException;
 import java.text.DateFormat;
-import java.util.Calendar; 
+import java.util.Calendar;
 
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
@@ -3190,12 +3190,6 @@ public  void Image_save(Bitmap bmp, String filename) {
 //
 public  void jToast( String str ) {
    Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
-}
-
-boolean IsEmailValid(String email) {
-	if(email == null) return false;
-	
-	return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
 }
 
 //by jmpessoa
