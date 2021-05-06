@@ -8087,11 +8087,44 @@ begin
 end;
 
 function jSMTPClient.IsEmailValid(_email : string) : boolean;
+const
+  charslist = ['_', '-', '.', '0'..'9', 'A'..'Z', 'a'..'z'];
+var
+  Arobasc, lastpoint : boolean;
+  i, n : integer;
+  c : char;
 begin
  Result := false;
 
- if FInitialized then
-  Result := jni_func_t_out_z( gApp.Jni.jEnv, gApp.Jni.jThis, 'IsEmailValid', _email);
+ if not FInitialized then exit;
+
+ n := length(_email);
+
+ if n = 0 then exit;
+
+ i := 1;
+ Arobasc := false;
+ lastpoint := false;
+
+ while (i <= n) do
+ begin
+    c := _email[i];
+
+    if c = '@' then
+    begin
+      if Arobasc or (i = 0) then exit;  // Only 1 Arobasc
+
+      Arobasc := true;
+    end else if (c = '.') and Arobasc then  // at least 1 . after arobasc
+    begin
+      lastpoint := true;
+    end else if not(c in charslist) then exit;  // valid chars
+
+    inc(i);
+ end;
+
+ if lastpoint and (_email[n] <> '.')then  // not finish by . and have a . after arobasc
+    result := true;
 end;
 
 procedure jSMTPClient.Send(mTo: string; subject: string; msg: string);
