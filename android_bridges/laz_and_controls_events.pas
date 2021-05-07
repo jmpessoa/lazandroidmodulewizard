@@ -2525,6 +2525,7 @@ Procedure Java_Event_pOnGetUidTotalMobileBytesFinished(env: PJNIEnv; this: jobje
 begin
   gApp.Jni.jEnv:= env;
   if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jTelephonyManager then
   begin
     jForm(jTelephonyManager(Obj).Owner).UpdateJNI(gApp);
@@ -2535,7 +2536,8 @@ end;
 Procedure Java_Event_pOnGetUidTotalWifiBytesFinished(env: PJNIEnv; this: jobject; Obj: TObject; bytesResult: JLong; uid: integer);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
   if Obj is jTelephonyManager then
   begin
     jForm(jTelephonyManager(Obj).Owner).UpdateJNI(gApp);
