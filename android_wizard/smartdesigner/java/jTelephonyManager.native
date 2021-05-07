@@ -1,1 +1,3 @@
 public native void pOnTelephonyCallStateChanged(long pasobj, int state, String phoneNumber);
+public native void pOnGetUidTotalMobileBytesFinished(long pasobj, long bytesResult, int uid);
+public native void pOnGetUidTotalWifiBytesFinished(long pasobj, long bytesResult, int uid);
