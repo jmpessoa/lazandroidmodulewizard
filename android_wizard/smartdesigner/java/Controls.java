@@ -70,6 +70,7 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PackageInfo;
@@ -2131,9 +2132,23 @@ class jForm {
             return dw;
         }
 
+        public String GetApplicationName(String packageName){
+            String appname = "";
+            ApplicationInfo ai;
+            try{
+                PackageManager pm = this.controls.activity.getPackageManager();
+                ai = pm.getApplicationInfo(packageName, 0);
+                appname = (String) pm.getApplicationLabel(ai);
+               }catch (PackageManager.NameNotFoundException e){
+                   Log.i("GetApplicationIcon","NameNotFoundException");
+                   return  "";
+               }
+            return  appname;
+        }
+
         public String[] GetInstalledAppList() {
             ArrayList<String> Packages = new ArrayList<String>();
-            PackageManager pm = this.controls.activity.getPackageManager();
+            //PackageManager pm = this.controls.activity.getPackageManager();
             List<PackageInfo> packs = this.controls.activity.getPackageManager().getInstalledPackages(0);
             for (int i = 0; i <packs.size(); i++){
                 PackageInfo p =packs.get(i);
