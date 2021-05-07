@@ -13,6 +13,8 @@ type
 
 TTelephonyCallState = (csIdle, csRinging, csOffHook);
 TOnCallStateChanged = procedure(Sender: TObject; state: TTelephonyCallState; phoneNumber: string) of object;
+TOnGetUidTotalMobileBytesFinished = procedure(Sender: TObject; totalbytes: int64; uid:integer) of Object;
+TOnGetUidTotalWifiBytesFinished = procedure(Sender: TObject; totalbytes: int64; uid:integer) of Object;
 
 {Draft Component code by "Lazarus Android Module Wizard" [10/21/2018 14:02:44]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
@@ -22,6 +24,8 @@ TOnCallStateChanged = procedure(Sender: TObject; state: TTelephonyCallState; pho
 jTelephonyManager = class(jControl)
  private
     FOnCallStateChanged: TOnCallStateChanged;
+    FOnGetUidTotalMobileBytesFinished: TOnGetUidTotalMobileBytesFinished;
+    FOnGetUidTotalWifiBytesFinished: TOnGetUidTotalWifiBytesFinished;
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -41,6 +45,7 @@ jTelephonyManager = class(jControl)
     function GetUidTxBytes(_startTime, _endTime:int64; _uid: integer):int64;
     function GetUidTotalBytes(_startTime, _endTime:int64; _uid: integer):int64;
     function GetUidTotalMobileBytes(_startTime, _endTime:int64; _uid: integer):int64;
+    function GetUidTotalWifiBytes(_startTime, _endTime:int64; _uid: integer):int64;
     function GetMobileRxBytes():int64;
     function GetMobileTxBytes():int64;
     function GetUidFromPackage(_package: string):integer;
@@ -49,13 +54,21 @@ jTelephonyManager = class(jControl)
     function GetSubscriberId():string;
     function GetNetworkOperatorName(): string;
     function IsWifiEnabled(): boolean;
+    procedure GetUidTotalMobileBytesAsync(_startTime, _endTime:int64; _uid: integer);
+    procedure GetUidTotalWifiBytesAsync(_startTime, _endTime:int64; _uid: integer);
 
     procedure GenEvent_OnTelephonyCallStateChanged(Sender: TObject; state: TTelephonyCallState; phoneNumber: string);
+    procedure GenEvent_OnGetUidTotalMobileBytesFinished(Sender: TObject; totalbytes: int64 ; uid: integer);
+    procedure GenEvent_OnGetUidTotalWifiBytesFinished(Sender: TObject; totalbytes: int64 ; uid: integer);
  published
     property OnCallStateChanged: TOnCallStateChanged read FOnCallStateChanged write FOnCallStateChanged;
+    property OnGetUidTotalMobileBytesFinished: TOnGetUidTotalMobileBytesFinished read FOnGetUidTotalMobileBytesFinished write FOnGetUidTotalMobileBytesFinished;
+    property OnGetUidTotalWifiBytesFinished: TOnGetUidTotalWifiBytesFinished read FOnGetUidTotalWifiBytesFinished write FOnGetUidTotalWifiBytesFinished;
 end;
 
 function jTelephonyManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+procedure jTelephonyManager_GetUidTotalMobileBytesAsync(env: PJNIEnv; _jtelephonymanager: JObject; _startTime, _endTime:int64; _uid: integer);
+procedure jTelephonyManager_GetUidTotalWifiBytesAsync(env: PJNIEnv; _jtelephonymanager: JObject; _startTime, _endTime:int64; _uid: integer);
 
 implementation
 
@@ -213,6 +226,27 @@ begin
    Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTotalMobileBytes', _startTime, _endTime, _uid);
 end;
 
+procedure jTelephonyManager.GetUidTotalMobileBytesAsync(_startTime, _endTime:int64; _uid: integer);
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+    jTelephonyManager_GetUidTotalMobileBytesAsync(FjEnv, FjObject, _startTime, _endTime,  _uid);
+end;
+
+procedure jTelephonyManager.GetUidTotalWifiBytesAsync(_startTime, _endTime:int64; _uid: integer);
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+    jTelephonyManager_GetUidTotalWifiBytesAsync(FjEnv, FjObject, _startTime, _endTime,  _uid);
+end;
+
+function jTelephonyManager.GetUidTotalWifiBytes(_startTime, _endTime:int64; _uid: integer): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTotalWifiBytes', _startTime, _endTime, _uid);
+end;
+
 function jTelephonyManager.GetUidFromPackage(_package: string): integer;
 begin
   //in designing component state: result value here...
@@ -260,6 +294,16 @@ begin
   if Assigned(FOnCallStateChanged) then  FOnCallStateChanged(Sender, state, phoneNumber);
 end;
 
+procedure jTelephonyManager.GenEvent_OnGetUidTotalMobileBytesFinished(Sender: TObject; totalbytes: int64; uid:integer);
+begin
+  if Assigned(FOnGetUidTotalMobileBytesFinished) then  FOnGetUidTotalMobileBytesFinished(Sender, totalbytes, uid);
+end;
+
+procedure jTelephonyManager.GenEvent_OnGetUidTotalWifiBytesFinished(Sender: TObject; totalbytes: int64; uid:integer);
+begin
+  if Assigned(FOnGetUidTotalWifiBytesFinished) then  FOnGetUidTotalWifiBytesFinished(Sender, totalbytes, uid);
+end;
+
 {-------- jTelephonyManager_JNI_Bridge ----------}
 
 function jTelephonyManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -283,6 +327,36 @@ begin
   Result:= env^.NewGlobalRef(env, Result);  
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
+end;
+
+procedure jTelephonyManager_GetUidTotalMobileBytesAsync(env: PJNIEnv; _jtelephonymanager: JObject; _startTime, _endTime:int64; _uid: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtelephonymanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetUidTotalMobileBytesAsync', '(JJI)V');
+  jParams[0].j:= _startTime;
+  jParams[1].j:= _endTime;
+  jParams[2].i:= _uid;
+  env^.CallVoidMethodA(env, _jtelephonymanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jTelephonyManager_GetUidTotalWifiBytesAsync(env: PJNIEnv; _jtelephonymanager: JObject; _startTime, _endTime:int64; _uid: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+begin
+  jCls:= env^.GetObjectClass(env, _jtelephonymanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'GetUidTotalWifiBytesAsync', '(JJI)V');
+  jParams[0].j:= _startTime;
+  jParams[1].j:= _endTime;
+  jParams[2].i:= _uid;
+  env^.CallVoidMethodA(env, _jtelephonymanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.
