@@ -190,6 +190,8 @@ uses
    procedure Java_Event_pOnClickX(env:PJNIEnv;this:JObject;Sender:TObject);
 
    Procedure Java_Event_pOnTelephonyCallStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; state: integer; phoneNumber: JString );
+   Procedure Java_Event_pOnGetUidTotalMobileBytesFinished(env: PJNIEnv; this: jobject; Obj: TObject; bytesResult: jLong; uid:integer );
+   Procedure Java_Event_pOnGetUidTotalWifiBytesFinished(env: PJNIEnv; this: jobject; Obj: TObject; bytesResult: jLong; uid:integer );
 
    Procedure Java_Event_pOnRecyclerViewItemWidgetClick(env: PJNIEnv; this: jobject; Obj: TObject;
                                                        itemIndex: integer; widgetClass: integer;
@@ -2519,6 +2521,30 @@ begin
   end;
 end;
 
+Procedure Java_Event_pOnGetUidTotalMobileBytesFinished(env: PJNIEnv; this: jobject; Obj: TObject; bytesResult: JLong; uid: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
+  if Obj is jTelephonyManager then
+  begin
+    jForm(jTelephonyManager(Obj).Owner).UpdateJNI(gApp);
+    jTelephonyManager(Obj).GenEvent_OnGetUidTotalMobileBytesFinished(Obj, int64(bytesResult), uid);
+  end;
+end;
+
+Procedure Java_Event_pOnGetUidTotalWifiBytesFinished(env: PJNIEnv; this: jobject; Obj: TObject; bytesResult: JLong; uid: integer);
+begin
+  gApp.Jni.jEnv:= env;
+  if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
+
+  if Obj is jTelephonyManager then
+  begin
+    jForm(jTelephonyManager(Obj).Owner).UpdateJNI(gApp);
+    jTelephonyManager(Obj).GenEvent_OnGetUidTotalWifiBytesFinished(Obj, int64(bytesResult), uid);
+  end;
+end;
+
 
 // UPDATED by [ADiV]
 Procedure Java_Event_pOnRecyclerViewItemWidgetClick(env: PJNIEnv; this: jobject; Obj: TObject;
@@ -3257,4 +3283,3 @@ begin
 end;
 
 end.
-
