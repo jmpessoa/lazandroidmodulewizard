@@ -1351,6 +1351,7 @@ type
     procedure RequestUsageStatsPermission();
     function GetTaskInFront():string;
     function GetApplicationIcon(_package:string):jObject;
+    function GetApplicationName(_package:string): string;
     function GetInstalledAppList(): TDynArrayOfString;
     procedure Restart(_delay: integer);
     procedure HideSoftInput(_view: jObject); overload;
@@ -4505,6 +4506,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetApplicationIcon', _package);
+end;
+
+function jForm.GetApplicationName(_package:string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetApplicationName', _package);
 end;
 
 function jForm.GetInstalledAppList(): TDynArrayOfString;
