@@ -17,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.TrafficStats;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
@@ -26,9 +27,15 @@ import android.telephony.SubscriptionManager;
 import android.util.Log;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.List;
+
+import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
+import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
 
 //http://danielthat.blogspot.com/2013/06/android-make-phone-call-with-speaker-on.html
 //https://www.mkyong.com/android/how-to-make-a-phone-call-in-android/
@@ -48,6 +55,11 @@ public class jTelephonyManager /*extends ...*/ {
     boolean callFromOffHook=false; // To control the change to idle state is from the app call
     boolean isPhoneCalling=false;
     boolean isListenerRemoved = false;
+
+    Long mGuidToalMobileBytesStartTime = 0L;
+    Long mGuidTotalMobileBytesEndTime = 0L;
+    Long mGuidToalWifiBytesStartTime = 0L;
+    Long mGuidTotalWifiBytesEndTime = 0L;
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jTelephonyManager(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -412,13 +424,44 @@ public class jTelephonyManager /*extends ...*/ {
     }
 
     public long GetUidTotalMobileBytes(long _startTime, long _endTime, int _uid) {
+        long total = 0L;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+        NetworkStats networkStats;
+        List<String> subscriberIds;
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) controls.activity.getSystemService(Context.NETWORK_STATS_SERVICE);
+        try {
+              if(Build.VERSION.SDK_INT <26)
+                subscriberIds = getSubscriberIds(controls.activity, TRANSPORT_CELLULAR);
+              else
+                subscriberIds = Collections.singletonList(null);
+              for (String subscriberId : subscriberIds) {
+                  networkStats = networkStatsManager.querySummary(TRANSPORT_CELLULAR, subscriberId, _startTime, _endTime);
+                  while (networkStats.hasNextBucket()) {
+                      NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+                      networkStats.getNextBucket(bucket);
+                      if (bucket.getUid() == _uid) {
+                          total += bucket.getTxBytes()+bucket.getRxBytes();
+                      }
+                    }
+                 }
+
+        } catch (Exception ex) {
+          return 0L;
+        }
+              return total;
+       }else{
+
+       return TrafficStats.getUidTxBytes(_uid)+TrafficStats.getUidRxBytes(_uid);
+       }
+    }
+
+    public long GetUidTotalWifiBytes(long _startTime, long _endTime, int _uid) {
         long total = 0;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
         NetworkStatsManager networkStatsManager = (NetworkStatsManager) context.getSystemService(Context.NETWORK_STATS_SERVICE);
         try {
             if (networkStatsManager != null) {
-                //for (int networkId = 0; networkId < 2; ++networkId) {
-                    NetworkStats networkStats = networkStatsManager.querySummary(ConnectivityManager.TYPE_MOBILE, null,
+                    NetworkStats networkStats = networkStatsManager.querySummary(ConnectivityManager.TYPE_WIFI, null,
                             _startTime, _endTime);
                     if (networkStats != null) {
                         while (networkStats.hasNextBucket()) {
@@ -429,7 +472,6 @@ public class jTelephonyManager /*extends ...*/ {
                             }
                         }
                     }
-                //}
             }
         } catch (Exception ex) {
           return -1;
@@ -449,6 +491,61 @@ public class jTelephonyManager /*extends ...*/ {
     return TrafficStats.getMobileTxBytes();
     }
 
+    public void GetUidTotalMobileBytesAsync(long _startTime, long _endTime, int _uid) {
+        mGuidToalMobileBytesStartTime = _startTime;
+        mGuidTotalMobileBytesEndTime = _endTime;
+	new AsyncGetUidTM().execute(_uid);
+    }
+
+    public void GetUidTotalWifiBytesAsync(long _startTime, long _endTime, int _uid) {
+        mGuidToalWifiBytesStartTime = _startTime;
+        mGuidTotalWifiBytesEndTime = _endTime;
+	new AsyncGetUidTW().execute(_uid);
+    }
+
+    private class AsyncGetUidTM extends AsyncTask<Integer, Long, Long> {
+       long _startTime = 0L;
+       long _endTime = 0L;
+       int _uid = 0;
+       long bytesResult = 0L;
+
+       @Override
+       protected Long doInBackground(Integer... uid) {
+         _startTime = mGuidToalMobileBytesStartTime;
+         _endTime = mGuidTotalMobileBytesEndTime;
+         _uid = uid[0];
+         bytesResult = GetUidTotalMobileBytes(_startTime, _endTime, _uid);
+         return  bytesResult;
+       }
+
+       @Override
+       protected void onPostExecute(Long bytesResult) {
+         controls.pOnGetUidTotalMobileBytesFinished(pascalObj, bytesResult, _uid);
+         super.onPostExecute(bytesResult);
+       }
+    }
+
+    private class AsyncGetUidTW extends AsyncTask<Integer, Long, Long> {
+       long _startTime = 0L;
+       long _endTime = 0L;
+       int _uid = 0;
+       long bytesResult = 0L;
+
+       @Override
+       protected Long doInBackground(Integer... uid) {
+         _startTime = mGuidToalWifiBytesStartTime;
+         _endTime = mGuidTotalWifiBytesEndTime;
+         _uid = uid[0];
+         bytesResult = GetUidTotalWifiBytes(_startTime, _endTime, _uid);
+         return  bytesResult;
+       }
+
+       @Override
+       protected void onPostExecute(Long bytesResult) {
+         controls.pOnGetUidTotalWifiBytesFinished(pascalObj, bytesResult, _uid);
+         super.onPostExecute(bytesResult);
+       }
+    }
 
     public boolean IsNetworkRoaming() {
         boolean isRoaming = false;
@@ -488,19 +585,11 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetSubscriberId() {
         String data = "";
-        if(Build.VERSION.SDK_INT >= 30){
-           SubscriptionManager sm = SubscriptionManager.from(context);
-           List<SubscriptionInfo> sis = sm.getActiveSubscriptionInfoList();
-           SubscriptionInfo si = sis.get(0);
-           data = si.getIccId();
-        } else {
-        if(isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        try {
-            data = mTelephonyManager.getSubscriberId();
-        } catch (SecurityException securityException) {
-            Log.d("jTelephonyMgr_SubsId", "Sorry... Not Permission granted!!");
-        }
+        List<String> subscriberIds;
+        subscriberIds = getSubscriberIds(controls.activity, TRANSPORT_CELLULAR);
+        for (String subscriberId : subscriberIds) {
+          if (subscriberId!="")
+            data = subscriberId;
         }
         return data;
     }
@@ -512,6 +601,41 @@ public class jTelephonyManager /*extends ...*/ {
         return (mgrConn.getActiveNetworkInfo() != null &&
                 mgrConn.getActiveNetworkInfo().getState() == NetworkInfo.State.CONNECTED) ||
                 mTelephonyManager.getNetworkType() == 3;
+    }
+
+    //https://github.com/MuntashirAkon/AppManager
+    private static List<String> getSubscriberIds(Context context, int networkType) {
+        if (networkType != TRANSPORT_CELLULAR) {
+            return Collections.singletonList(null);
+        }
+        try {
+            SubscriptionManager sm = (SubscriptionManager) context.getSystemService(Context
+                    .TELEPHONY_SUBSCRIPTION_SERVICE);
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+            List<SubscriptionInfo> subscriptionInfoList = sm.getActiveSubscriptionInfoList();
+            List<String> subscriberIds = new ArrayList<>();
+            for (SubscriptionInfo info : subscriptionInfoList) {
+                int subscriptionId = info.getSubscriptionId();
+                try {
+                    @SuppressWarnings("JavaReflectionMemberAccess")
+                    Method getSubscriberId = TelephonyManager.class.getMethod("getSubscriberId", int.class);
+                    String subscriberId = (String) getSubscriberId.invoke(tm, subscriptionId);
+                    subscriberIds.add(subscriberId);
+                } catch (Exception e) {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            subscriberIds.add(tm.createForSubscriptionId(subscriptionId).getSubscriberId());
+                        }
+                    } catch (Exception e2) {
+                        subscriberIds.add(tm.getSubscriberId());
+                    }
+                }
+            }
+            return  subscriberIds;
+        } catch (SecurityException e) {
+            return Collections.singletonList(null);
+        }
     }
 
 }
