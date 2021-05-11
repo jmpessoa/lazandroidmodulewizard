@@ -73,6 +73,9 @@ jsTabLayout = class(jVisualControl)
     procedure SetElevation(_value: integer);
     procedure SetBackgroundToPrimaryColor();
 
+    procedure RemoveAllTabs();
+    procedure RemoveTabAt(_position : integer);
+
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property FitsSystemWindows: boolean read FFitsSystemWindows write SetFitsSystemWindows;
@@ -480,6 +483,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'SetBackgroundToPrimaryColor');
+end;
+
+procedure jsTabLayout.RemoveAllTabs();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'RemoveAllTabs');
+end;
+
+procedure jsTabLayout.RemoveTabAt(_position : integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'RemoveTabAt', _position);
 end;
 
 {-------- jsTabLayout_JNI_Bridge ----------}

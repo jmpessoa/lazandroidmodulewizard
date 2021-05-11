@@ -6,6 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.google.android.material.tabs.TabLayout;
 import androidx.viewpager.widget.ViewPager;
+import android.widget.TextView;
+import android.widget.LinearLayout;
+import android.util.TypedValue;
+import android.graphics.Typeface;
 
 //-------------------------------------------------------------------------
 // jsTabLayout
@@ -21,7 +25,7 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
    private Controls controls  = null; //Java/Pascal [events] Interface ...
    private jCommons LAMWCommon;
    private Context context = null;
-
+   
   // private OnClickListener onClickListener;   // click event
    private Boolean enabled  = true;           // click-touch enabled!
    
@@ -31,7 +35,7 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
       super(_ctrls.activity);
       context   = _ctrls.activity;
       pascalObj = _Self;
-      controls  = _ctrls;
+      controls  = _ctrls;      
 
       LAMWCommon = new jCommons(this,context,pascalObj);      
 
@@ -49,7 +53,7 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
       this.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {      
     	    @Override
     	    public void onTabSelected(TabLayout.Tab tab) {
-    	    	
+    	    	    	    	    	    	
     	        // while selecting the tab ::  tab.getPosition()
     	    	//if(tab != null)
     	    		//controls.pOnSTabSelected(pascalObj, 0, "test");		
@@ -59,7 +63,8 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
     	 
     	    @Override
     	    public void onTabUnselected(TabLayout.Tab tab) {
-    	        // while unselect the Tab    	 
+    	        // while unselect the Tab
+    	    	
     	    }
     	 
     	    @Override
@@ -170,7 +175,7 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
 	LAMWCommon.setFitsSystemWindows(_value);
   }
 
-  public int GetTabCount() {
+  public int GetTabCount() {	  
 	  return this.getTabCount();	  	 
   }
    
@@ -230,7 +235,7 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
 	  
 	  if(t == null) return;
 	  
-	  t.setText(_title); 
+	  t.setText(_title);
   }
 
   public String GetText(int _position) {
@@ -241,6 +246,16 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
 	  if(t == null) return "";
 	  
 	  return t.getText().toString();
+	  
+      /*LinearLayout tabLayout = (LinearLayout)((ViewGroup) this.getChildAt(0)).getChildAt(_position);
+	  
+	  if(tabLayout == null) return t.getText().toString(); 
+		  
+      TextView tabTextView = (TextView) tabLayout.getChildAt(1);
+      
+      if(tabTextView == null) return t.getText().toString();       
+	  
+	  return tabTextView.getText().toString();*/
   }   
   
   public void SetTabMode(int _tabmode) { 
@@ -288,7 +303,16 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
   public void SetBackgroundToPrimaryColor() {	   
 	   this.setBackgroundColor(LAMWCommon.getColorFromResources(context, R.color.primary)); 
   }
-
+  
+  public void RemoveAllTabs(){
+	  this.removeAllTabs();
+  }
+  
+  public void RemoveTabAt(int _position) {	
+		 if( (_position < 0) || (_position >=this.getTabCount()) ) return;
+		  
+		 this.removeTabAt(_position);
+  }
   
 }
  
