@@ -173,12 +173,12 @@ begin
   begin
       if FjObject  <> nil then
       begin
-         jni_proc(FjEnv, FjObject, 'jFree');
+         jni_free(FjEnv, FjObject);
          FjObject := nil;
       end;
   end;
   //you others free code here...'
-  FItems.Free;
+  if FItems <> nil then FItems.Free;
   inherited Destroy;
 end;
 
@@ -258,21 +258,22 @@ begin
    SetTextAlignment(FTextAlignment);
    jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
-   for i:= 0 to FItems.Count-1 do
+   if FItems <> nil then
    begin
+    for i:= 0 to FItems.Count-1 do
      jni_proc_ttz( FjEnv, FjObject, 'Add', FItems.Strings[i], '0', false);
-   end;
 
-   if FItems.Count > 0 then
-   begin
+    if FItems.Count > 0 then
+    begin
      if FSelectedIndex <= -1  then  FSelectedIndex:= 0;
      if FSelectedIndex >= FItems.Count then FSelectedIndex:= FItems.Count-1;
-   end;
+    end;
 
-   if FLastItemAsPrompt then
-   begin
+    if FLastItemAsPrompt then
+    begin
      SetLastItemAsPrompt(FLastItemAsPrompt);
      if (FSelectedIndex <> FItems.Count-1) then FSelectedIndex:= FItems.Count-1;
+    end;
    end;
 
    if FSelectedPaddingTop <> 15 then
@@ -405,6 +406,8 @@ end;
 
 procedure jSpinner.Add(_item: string);
 begin
+  if FItems = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
   begin
@@ -415,6 +418,7 @@ end;
 
 procedure jSpinner.Clear; 
 begin
+  if FItems = nil then exit;
   FItems.Clear;
   jni_proc(FjEnv, FjObject, 'Clear');
 end; 
@@ -453,6 +457,9 @@ end;
 
 function jSpinner.GetSize(): integer;
 begin
+  Result := 0;
+
+  if FItems = nil then exit;
   //in designing component state: result value here...
   Result:= FItems.Count;
   if FInitialized then
@@ -461,10 +468,16 @@ end;
 
 procedure jSpinner.Delete(_index: integer);
 begin
+  if FItems = nil then exit;
   //in designing component state: set value here...
-  FItems.Delete(_index);
-  if FInitialized then
+
+  if (_index >= 0) and (_index < FItems.Count) then
+  begin
+   FItems.Delete(_index);
+
+   if FInitialized then
      jni_proc_i(FjEnv, FjObject, 'Delete', _index);
+  end;
 end;
 
 procedure jSpinner.SetSelection(_index: integer);
@@ -476,14 +489,23 @@ end;
 
 procedure jSpinner.SetItem(_index: integer; _item: string);
 begin
+  if FItems = nil then exit;
   //in designing component state: set value here...
-  FItems.Strings[_index]:= _item;
-  if FInitialized then
+
+  if (_index >= 0) and (_index < FItems.Count) then
+  begin
+   FItems.Strings[_index]:= _item;
+
+   if FInitialized then
      jni_proc_it(FjEnv, FjObject, 'SetItem', _index ,_item);
+  end;
 end;
 
 procedure jSpinner.SetItems(Value: TStrings);
 begin
+  if FItems = nil then exit;
+  if Value = nil then exit;
+
   FItems.Assign(Value);
 end;
 
@@ -491,6 +513,10 @@ function jSpinner.GetItems(_delimiter: char): string;
 var
   saveDelimiter: char;
 begin
+  Result := '';
+
+  if FItems = nil then exit;
+
   saveDelimiter:= FItems.Delimiter;
   FItems.Delimiter:= _delimiter;
   Result:= FItems.DelimitedText;
@@ -590,13 +616,18 @@ end;
 
 procedure jSpinner.SetItem(_index: integer; _item: string; _strTag: string);
 begin
+  if FItems = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
+   if (_index >= 0) and (_index < FItems.Count) then
      jSpinner_SetItem(FjEnv, FjObject, _index ,_item ,_strTag);
 end;
 
 procedure jSpinner.Add(_item: string; _strTag: string);
 begin
+  if FItems = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
   begin
@@ -607,15 +638,21 @@ end;
 
 function jSpinner.GetItemTagString(_index: integer): string;
 begin
+  if FItems = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetItemTagString', _index);
+   if (_index >= 0) and (_index < FItems.Count) then
+    Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetItemTagString', _index);
 end;
 
 procedure jSpinner.SetItemTagString(_index: integer; _strTag: string);
 begin
+  if FItems = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
+   if (_index >= 0) and (_index < FItems.Count) then
      jni_proc_it(FjEnv, FjObject, 'SetItemTagString', _index ,_strTag);
 end;
 
