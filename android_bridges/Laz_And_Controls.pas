@@ -254,8 +254,6 @@ type
     destructor Destroy; override;
 
     procedure Init(refApp: jApp) override;
-    function jCreate(): jObject;
-    procedure jFree();
 
     function GetImageByIndex(index: integer): string;
     function GetImageExByIndex(index: integer): string;
@@ -306,8 +304,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    function jCreate(): jObject;
-    procedure jFree();
 
     procedure GetAsync(_stringUrl: string); overload;
     procedure GetAsync; overload;
@@ -4969,7 +4965,7 @@ end;
 procedure jEditText.SetText(Value: string);
 begin
   inherited SetText(Value);
-  if FInitialized then
+  if not FInitialized then exit;
 
   if Value <> '' then
    jni_proc_h(FjEnv, FjObject, 'setText', Value)
@@ -5057,11 +5053,13 @@ end;
 
 Procedure jEditText.ShowSoftInput();
 begin
+ if FInitialized then
   Self.ImmShow();
 end;
 
 procedure jEditText.HideSoftInput();
 begin
+ if FInitialized then
   Self.ImmHide();
 end;
 
@@ -5138,7 +5136,7 @@ end;
 
 procedure jEditText.SetMovementMethod;
 begin
-  if FInitialized then ;
+  if FInitialized then
     jni_proc(FjEnv, FjObject, 'SetMovementMethod' );
 end;
 
@@ -5270,6 +5268,7 @@ end;
 
 procedure jEditText.SetSoftInputOptions(_imeOption: TImeOptions);
 begin
+  if FInitialized then
    Self.SetImeOptions(_imeOption);
 end;
 
@@ -5711,7 +5710,8 @@ end;
 procedure jButton.Refresh;
 begin
   if not FInitialized then Exit;
-     View_Invalidate(FjEnv, FjObject );
+
+  View_Invalidate(FjEnv, FjObject );
 end;
 
 function jButton.GetText: string;
@@ -6323,6 +6323,7 @@ end;
 Procedure jRadioButton.Refresh;
 begin
   if not FInitialized then Exit;
+
   View_Invalidate(FjEnv, FjObject );
 end;
 
@@ -6613,7 +6614,8 @@ end;
 Procedure jProgressBar.Refresh;
 begin
   if not FInitialized then Exit;
-     View_Invalidate(FjEnv, FjObject );
+
+  View_Invalidate(FjEnv, FjObject );
 end;
 
 Function jProgressBar.GetProgress: integer;
@@ -6867,7 +6869,7 @@ var
   i: integer;
   foundIndex: integer;
 begin
-   If not Self.Initialized then Exit;
+   if FjObject = nil then exit;
    if FImageList = nil then Exit;
    if Value = '' then Exit;
 
@@ -6886,7 +6888,7 @@ end;
 
 Procedure jImageView.SetImage(_fullFilename: string);
 begin
-   if Initialized then
+   if FInitialized then
       jImageView_setImage(FjEnv, FjObject , _fullFilename);
 end;
 
@@ -6913,7 +6915,7 @@ end;
 
 Procedure jImageView.SetImageByIndex(Value: integer);
 begin
-
+   if FjObject = nil then exit;
    if FImageList = nil then Exit;
 
    if (Value >= 0) and (Value < FImageList.Images.Count) then
@@ -6928,6 +6930,10 @@ end;
 
 function jImageView.GetCount: integer;
 begin
+  if FjObject = nil then exit;
+
+  if FImageList = nil then Exit;
+
   Result:= FImageList.Images.Count;
 end;
 
@@ -6939,6 +6945,7 @@ end;
 
 procedure jImageView.SetImageIndex(Value: TImageListIndex);
 begin
+
   FImageIndex:= Value;
 
   if FImageList <> nil then
@@ -6968,6 +6975,7 @@ end;
 procedure jImageView.SetImageByResIdentifier(_imageResIdentifier: string);
 begin
   FImageName:= _imageResIdentifier;
+
   if FjObject = nil then exit;
 
   jni_proc_t(FjEnv, FjObject, 'SetImageByResIdentifier', _imageResIdentifier);
@@ -7055,28 +7063,25 @@ end;
 procedure jImageView.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
+
   if Operation = opRemove then
-  begin
       if AComponent = FImageList then
-      begin
         FImageList:= nil;
-      end
-  end;
 end;
 
 procedure jImageView.SetImages(Value: jImageList);
 begin
+
   if Value <> FImageList then
   begin
-    if Assigned(FImageList) then
-    begin
+    if FImageList <> nil then
+     if Assigned(FImageList) then
        FImageList.RemoveFreeNotification(Self); //remove free notification...
-    end;
+
     FImageList:= Value;
+
     if Value <> nil then  //re- add free notification...
-    begin
        Value.FreeNotification(self);
-    end;
   end;
 end;
 
@@ -7114,7 +7119,6 @@ end;
 // by ADiV
 procedure jImageView.SetSaturation(Value: single);
 begin
-
   if not FInitialized then exit;
 
   jni_proc_f(FjEnv, FjObject, 'SetSaturation', Value);
@@ -7283,6 +7287,7 @@ end;
 
 function jImageView.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
 begin
+  if FInitialized then
    Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
 end;
 
@@ -7413,12 +7418,13 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_free(FjEnv, FjObject);
        FjObject:= nil;
      end;
   end;
   //you others free code here...
-  FImages.Free;
+  if FImages <> nil then FImages.Free;
+
   inherited Destroy;
 end;
 
@@ -7428,56 +7434,66 @@ var
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
-  FjObject:= jCreate(); if FjObject = nil then exit;
+  FjObject:= jImageList_jCreate(FjEnv, int64(Self), FjThis);
+
+  if FjObject = nil then exit;
+
   FInitialized:= True;
-  for i:= 0 to FImages.Count - 1 do
-  begin
+
+  if FImages <> nil then
+   for i:= 0 to FImages.Count - 1 do
      if Trim(FImages.Strings[i]) <> '' then
         Asset_SaveToFile(Trim(FImages.Strings[i]),GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[i]));
-  end;
-end;
 
-function jImageList.jCreate(): jObject;
-begin
-   Result:= jImageList_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jImageList.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_free(FjEnv, FjObject);
 end;
 
 procedure jImageList.SetImages(Value: TStrings);
 begin
+  if value = nil then exit;
+  if FImages = nil then exit;
+
   FImages.Assign(Value);
 end;
 
 function jImageList.GetCount: integer;
 begin
+  Result := 0;
+
+  if FImages = nil then exit;
+
   Result:= FImages.Count;
 end;
 
 function jImageList.GetImageByIndex(index: integer): string;
 begin
-  if index < FImages.Count then
+  Result := '';
+
+  if FImages = nil then exit;
+
+  if (index >= 0) and (index < FImages.Count) then
      Result:= Trim(FImages.Strings[index]);
 end;
 
 function jImageList.GetImageExByIndex(index: integer): string;
 begin
-  if Initialized then
-  begin
-     if (index < FImages.Count) and (index >= 0) then
-        Result:= GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[index]);
-  end;
+  Result := '';
+
+  if FImages = nil then exit;
+  if not FInitialized then exit;
+
+  if (index < FImages.Count) and (index >= 0) then
+     Result:= GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[index]);
+
 end;
 
 function jImageList.GetBitmap(imageIndex: integer): jObject;
 var
   path: string;
 begin
+  Result := nil;
+
+  if FImages = nil then exit;
+
   if Initialized then
   begin
      if (imageIndex < FImages.Count) and (imageIndex >= 0) then
@@ -7517,7 +7533,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jFree();
+       jni_free(FjEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -7531,7 +7547,9 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp);
   //your code here: set/initialize create params....
-  FjObject:= jCreate(); if FjObject = nil then exit;
+  FjObject:= jHttpClient_jCreate(FjEnv, int64(Self), FjThis);
+
+  if FjObject = nil then exit;
 
   if FResponseTimeout <> 15000 then
      SetResponseTimeout(FResponseTimeout);
@@ -7544,18 +7562,6 @@ begin
 
   FInitialized:= True;
   SetUrlByIndex(FIndexUrl);
-end;
-
-function jHttpClient.jCreate(): jObject;
-begin
-   Result:= jHttpClient_jCreate(FjEnv, int64(Self), FjThis);
-end;
-
-procedure jHttpClient.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_free(FjEnv, FjObject);
 end;
 
 procedure jHttpClient.SetAuthenticationUser(_userName: string; _password: string);
@@ -7583,20 +7589,28 @@ end;
 
 procedure jHttpClient.SetUrls(Value: TStrings);
 begin
+  if value = nil then exit;
+  if FUrls = nil then exit;
+
   FUrls.Assign(Value);
 end;
 
 procedure jHttpClient.SetUrlByIndex(Value: integer);
 begin
-   FUrl:='';
-   if (Value >= 0) and (Value < FUrls.Count) then
-      FUrl:= Trim(FUrls.Strings[Value]);
+  if FUrls = nil then exit;
+
+  FUrl:='';
+
+  if (Value >= 0) and (Value < FUrls.Count) then
+     FUrl:= Trim(FUrls.Strings[Value]);
 end;
 
 procedure jHttpClient.SetIndexUrl(Value: integer);
 begin
+  if not FInitialized then exit;
+
   FIndexUrl:= Value;
-  if FInitialized then SetUrlByIndex(Value);
+  SetUrlByIndex(Value);
 end;
 
 procedure jHttpClient.SetCharSet(AValue: string);
@@ -7607,6 +7621,7 @@ end;
 procedure jHttpClient.GetAsync;
 begin
  if not FInitialized then Exit;
+
  if  FUrl <> '' then
    GetAsync(FUrl);
 end;
@@ -7628,12 +7643,11 @@ end;
 
 function jHttpClient.Get(_stringUrl: string): string;
 begin
+  Result := '';
+  if not FInitialized then Exit;
 
-  if FInitialized then
-  begin
-    jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
-    Result := jni_func_t_out_t(FjEnv, FjObject, 'Get', _stringUrl);
-  end else Result := '';
+  jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
+  Result := jni_func_t_out_t(FjEnv, FjObject, 'Get', _stringUrl);
 end;
 
 function jHttpClient.Get(): string;
@@ -7657,13 +7671,11 @@ end;
 
 function jHttpClient.Post(_stringUrl: string): string;
 begin
+  Result := '';
+  if not FInitialized then Exit;
 
-  if(FInitialized) then
-  begin
-
-    jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
-    Result := jni_func_t_out_t(FjEnv, FjObject, 'GetStateful', _stringUrl);
-  end else Result := '';
+  jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
+  Result := jni_func_t_out_t(FjEnv, FjObject, 'GetStateful', _stringUrl);
 end;
 
 procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string);
@@ -8047,8 +8059,10 @@ begin
  begin
    //
  end;
- FMails.Free;
- FMailMessage.Free;
+
+ if FMails <> nil then FMails.Free;
+ if FMailMessage <> nil then FMailMessage.Free;
+
  inherited Destroy;
 end;
 
@@ -8067,12 +8081,18 @@ end;
 
 procedure jSMTPClient.SetMails(Value: TStrings);
 begin
-  FMails.Assign(Value);
+ if value = nil then exit;
+ if FMails = nil then exit;
+
+ FMails.Assign(Value);
 end;
 
 procedure jSMTPClient.SetMailMessage(Value: TStrings);
 begin
-  FMailMessage.Assign(Value);
+ if value = nil then exit;
+ if FMailMessage = nil then exit;
+
+ FMailMessage.Assign(Value);
 end;
 
 procedure jSMTPClient.Send;
@@ -8162,8 +8182,10 @@ begin
  begin
      //
  end;
- FSMSMessage.Free;
- FContactList.Free;
+
+ if FSMSMessage  <> nil then FSMSMessage.Free;
+ if FContactList <> nil then FContactList.Free;
+
  inherited Destroy;
 end;
 
@@ -8171,24 +8193,37 @@ procedure jSMS.Init(refApp: jApp);
 begin
  if FInitialized  then Exit;
  inherited Init(refApp);
- if FLoadMobileContacts then GetContactList;
+
  FInitialized:= True;
+
+ if FLoadMobileContacts then GetContactList;
 end;
 
 function jSMS.GetContactList: string;
 begin
- if FInitialized then
-   FContactList.DelimitedText:= jContact_getDisplayNameList(gApp.Jni.jEnv, gApp.Jni.jThis, FContactListDelimiter);
-  Result:=FContactList.DelimitedText;
+ Result := '';
+
+ if FContactList = nil then exit;
+
+ if not FInitialized then exit;
+
+ FContactList.DelimitedText:= jContact_getDisplayNameList(gApp.Jni.jEnv, gApp.Jni.jThis, FContactListDelimiter);
+
+ Result:=FContactList.DelimitedText;
 end;
 
 procedure jSMS.SetSMSMessage(Value: TStrings);
 begin
-  FSMSMessage.Assign(Value);
+ if value = nil then exit;
+ if FSMSMessage = nil then exit;
+
+ FSMSMessage.Assign(Value);
 end;
 
 function jSMS.Send(multipartMessage: Boolean): integer;
 begin
+  if FSMSMessage = nil then exit;
+
   if FInitialized then
   begin
     if (FMobileNumber = '') and (FContactName <> '') then
@@ -8203,6 +8238,8 @@ end;
 
 function jSMS.Send(toName: string; multipartMessage: Boolean): integer;
 begin
+  if FSMSMessage = nil then exit;
+
   if FInitialized then
   begin
     if toName<> '' then
@@ -8374,7 +8411,9 @@ begin
       FjObject := nil;
     end;
   end;
-  FItems.Free;
+
+  if FItems <> nil then FItems.Free;
+
   inherited Destroy;
 end;
 
@@ -8437,11 +8476,10 @@ begin
     if FTextMarginInner <> 10 then // by ADiV
       SetTextMarginInner(FTextMarginInner);
 
-    for i:= 0 to FItems.Count-1 do
-    begin
+    if FItems <> nil then
+     for i:= 0 to FItems.Count-1 do
       if FItems.Strings[i] <> '' then
         jListView_add22(FjEnv, FjObject , FItems.Strings[i], FDelimiter, FImageItem.GetImage);
-    end;
 
    end
    else
@@ -8495,11 +8533,10 @@ begin
     if FTextMarginInner <> 10 then // by ADiV
       SetTextMarginInner(FTextMarginInner);
 
-    for i:= 0 to FItems.Count-1 do
-    begin
+    if FItems <> nil then
+     for i:= 0 to FItems.Count-1 do
        if FItems.Strings[i] <> '' then
          jListView_add2(FjEnv, FjObject , FItems.Strings[i], FDelimiter);
-    end;
 
    end;
 
@@ -8739,6 +8776,8 @@ end;
 
 Procedure jListView.Add(item: string; delim: string);
 begin
+  if FItems = nil then exit;
+
   if item <> '' then
   begin
     FItems.Add(item);
@@ -8749,6 +8788,8 @@ end;
 
 Procedure jListView.Add(item: string);
 begin
+  if FItems = nil then exit;
+
   if item <> '' then
   begin
     FItems.Add(item);
@@ -8760,6 +8801,8 @@ end;
 Procedure jListView.Add(item: string; delim: string; fontColor: TARGBColorBridge; fontSize: integer; hasWidget:
                                       TWidgetItem; widgetText: string; image: jObject);
 begin
+  if FItems = nil then exit;
+
   if item <> '' then
   begin
      FItems.Add(item);
@@ -8777,13 +8820,20 @@ end;
 
 function jListView.GetCount: integer;
 begin
-  Result:= Self.Items.Count;
+  Result := 0;
+
+  if FItems = nil then exit;
+
+  Result:= FItems.Count;
+
   if FInitialized then
     Result:= jni_func_out_i(FjEnv, FjObject, 'GetSize' );
 end;
 
 Procedure jListView.Delete(index: Integer);
 begin
+  if FItems = nil then exit;
+
   if (index >= 0) and (index < FItems.Count) then
   begin
      FItems.Delete(index);
@@ -8794,15 +8844,20 @@ end;
 
 Procedure jListView.Clear;
 begin
+  if not FInitialized then exit;
+  if FItems = nil then exit;
+
   FItems.Clear;
-  if FInitialized then
-    jni_proc(FjEnv, FjObject, 'clear' );
+  jni_proc(FjEnv, FjObject, 'clear' );
 end;
 
 procedure jListView.SetItems(Value: TStrings);
 var
   i: integer;
 begin
+  if value = nil then exit;
+  if FItems = nil then exit;
+
   FItems.Assign(Value);
 
   if FInitialized then
@@ -8880,17 +8935,17 @@ end;
 
 procedure jListView.SetImage(Value: jBitmap);
 begin
+
   if Value <> FImageItem then
   begin
-    if Assigned(FImageItem) then
-    begin
+    if FImageItem <> nil then
+     if Assigned(FImageItem) then
        FImageItem.RemoveFreeNotification(Self); //remove free notification...
-    end;
+
     FImageItem:= Value;
+
     if Value <> nil then  //re- add free notification...
-    begin
        Value.FreeNotification(self);
-    end;
   end;
 end;
 
@@ -10464,6 +10519,8 @@ end;
 
 Procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
 begin;
+   if FjObject = nil then exit;
+
    Navigate('file://'+environmentDirectoryPath+'/'+htmlFileName);
 end;
 
@@ -10813,6 +10870,8 @@ end;
 
 procedure jBitmap.GetBitmapSizeFromFile(_fullPathFile: string; var w, h :integer);
 begin
+  if not FInitialized then exit;
+
   jBitmap_GetBitmapSizeFromFile(FjEnv, FjObject, _fullPathFile, w, h);
 end;
 
@@ -10823,6 +10882,9 @@ var
   w, h: integer;
 begin
   Result:= 0;
+
+  if not FInitialized then exit;
+
   if Self.GetInfo then
   begin
 
@@ -10875,23 +10937,24 @@ end;
 
 procedure jBitmap.SetImages(Value: jImageList);
 begin
+
   if Value <> FImageList then
   begin
-    if Assigned(FImageList) then
-    begin
+    if FImageList <> nil then
+     if Assigned(FImageList) then
        FImageList.RemoveFreeNotification(Self); //remove free notification...
-    end;
+
     FImageList:= Value;
+
     if Value <> nil then  //re- add free notification...
-    begin
        Value.FreeNotification(self);
-    end;
   end;
+
 end;
 
 Procedure jBitmap.SetImageByIndex(Value: integer);
 begin
-   if not Self.Initialized then Exit;
+   if FjObject = nil then exit;
 
    if FImageList = nil then Exit;
 
@@ -10909,6 +10972,9 @@ end;
 procedure jBitmap.SetImageIndex(Value: TImageListIndex);
 begin
   FImageIndex:= Value;
+
+  if FImageList = nil then Exit;
+
   if FInitialized then
   begin
     if  FImageList <> nil then
@@ -10978,7 +11044,9 @@ end;
 function jBitmap.GetRatio: Single;
 begin
   Result:= 1;  //dummy
-  if Self.GetInfo then Result:= Round(Self.Width/Self.Height);
+
+  if FInitialized then
+   if Self.GetInfo then Result:= Round(Self.Width/Self.Height);
 end;
 
 //TODO: http://stackoverflow.com/questions/13583451/how-to-use-scanline-property-for-24-bit-bitmaps
@@ -10986,6 +11054,7 @@ procedure jBitmap.ScanPixel(PBytePixel: PScanByte; notByteIndex: integer);
 var
   row, col, k, notFlag: integer;
 begin
+    if not FInitialized then exit;
 
     if (notByteIndex < 0) or (notByteIndex > 4) then
         notFlag:= 4
@@ -11057,6 +11126,8 @@ procedure jBitmap.ScanPixel(PDWordPixel: PScanLine);
 var
   k: integer;
 begin
+    if not FInitialized then exit;
+
     Self.LockPixels(PDWordPixel); //ok    ...API LockPixels... parameter is "PScanLine"
     for k:= 0 to Self.Width*Self.Height-1 do
         PDWordPixel^[k]:= not PDWordPixel^[k];  //ok
@@ -11065,6 +11136,7 @@ end;
 
 function jBitmap.ClockWise(_bmp: jObject ): jObject;
 begin
+  if _bmp = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'ClockWise', _bmp);
@@ -11072,6 +11144,7 @@ end;
 
 function jBitmap.AntiClockWise(_bmp: jObject ): jObject;
 begin
+  if _bmp = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'AntiClockWise', _bmp);
@@ -11079,6 +11152,8 @@ end;
 
 function jBitmap.SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
 begin
+  if _bmp = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_ff_out_bmp(FjEnv, FjObject, 'SetScale', _bmp ,_scaleX ,_scaleY);
@@ -11100,12 +11175,16 @@ end;
 
 procedure jBitmap.LoadFromBuffer(buffer: Pointer; size: Integer);
 begin
+  if buffer = nil then exit;
+
   if FInitialized then
     jBitmap_LoadFromBuffer(FjEnv, FjObject, buffer, size);
 end;
 
 function jBitmap.LoadFromBuffer(var buffer: TDynArrayOfJByte): jObject;
 begin
+  if buffer = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_LoadFromBuffer(FjEnv, FjObject, buffer);
@@ -11113,6 +11192,8 @@ end;
 
 function jBitmap.GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject;
 begin
+  if _bmp = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject, _bmp ,_newWidth ,_newHeight);
@@ -11141,6 +11222,8 @@ end;
 
 function jBitmap.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
 begin
+  if _jbyteBuffer = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetBitmapFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
@@ -11148,6 +11231,8 @@ end;
 
 function jBitmap.GetBitmapFromJByteArray(var _image: TDynArrayOfJByte): jObject;
 begin
+  if _image = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetBitmapFromByteArray(FjEnv, FjObject, _image);
@@ -11155,11 +11240,16 @@ end;
 
 function jBitmap.GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
 begin
+  if jbyteBuffer = nil then exit;
+
+  if FInitialized then
    Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,jbyteBuffer));
 end;
 
 function jBitmap.GetJByteBufferFromImage(_bmap: jObject): jObject;
 begin
+  if _bmap = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject, _bmap);
@@ -11181,6 +11271,8 @@ end;
 
 function jBitmap.GetRoundedShape(_bitmapImage: jObject): jObject;
 begin
+  if _bitmapImage = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetRoundedShape(FjEnv, FjObject, _bitmapImage);
@@ -11188,6 +11280,8 @@ end;
 
 function jBitmap.GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject;
 begin
+  if _bitmapImage = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetRoundedShape(FjEnv, FjObject, _bitmapImage ,_diameter);
@@ -11195,6 +11289,8 @@ end;
 
 function jBitmap.DrawText(_bitmapImage: jObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;
 begin
+  if _bitmapImage = nil then exit;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_DrawText(FjEnv, FjObject, _bitmapImage ,_text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
@@ -11209,6 +11305,8 @@ end;
 
 procedure jBitmap.SaveToFileJPG(_bitmapImage: jObject; _Path: string);
 begin
+  if _bitmapImage = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_bmp_t(FjEnv, FjObject, 'SaveToFileJPG', _bitmapImage ,_Path);
@@ -11236,6 +11334,7 @@ end;
 
 function jBitmap.DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
 begin
+  if _bitmapImageIn = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
     Result:= jBitmap_DrawBitmap(FjEnv, FjObject, _bitmapImageIn ,_left ,_top);
@@ -11257,6 +11356,7 @@ end;
 
 function jBitmap.GetThumbnailImage(_bitmap: jObject; _thumbnailSize: integer): jObject;
 begin
+  if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _bitmap ,_thumbnailSize);
@@ -11264,6 +11364,7 @@ end;
 
 function jBitmap.GetThumbnailImage(_bitmap: jObject; _width: integer; _height: integer): jObject;
 begin
+  if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _bitmap ,_width ,_height);
@@ -11299,6 +11400,7 @@ procedure jBitmap.LoadFromStream(Stream: TMemoryStream);
 
 function jBitmap.GetBase64StringFromImage(_bitmap: jObject; _compressFormat: TBitmapCompressFormat): string;
 begin
+  if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetBase64StringFromImage(FjEnv, FjObject, _bitmap ,Ord(_compressFormat));
@@ -11408,14 +11510,19 @@ end;
 
 procedure jCanvas.SetPaintShader(Value: jPaintShader);
 begin
+
   if Value <> FPaintShader then
   begin
-    if Assigned(FPaintShader) then
+    if FPaintShader <> nil then
+     if Assigned(FPaintShader) then
        FPaintShader.RemoveFreeNotification(Self); // remove free notification...
+
     FPaintShader := Value;
+
     if Value <> nil then  // re- add free notification...
        Value.FreeNotification(Self);
   end;
+
 end;
 
 Procedure jCanvas.SetRotation(Value: single);
@@ -11521,6 +11628,8 @@ Procedure jCanvas.DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single)
 var
   r1, t1: integer;
 begin
+  if bmp = nil then exit;
+
   r1:= size-10;
   t1:= Round((size-10)*(1/ratio));
   if FInitialized then
@@ -11529,6 +11638,7 @@ end;
 
 procedure jCanvas.DrawBitmap(_bitmap: jObject; _width: integer; _height: integer);
 begin
+  if _bitmap = nil then exit;
   //in designing component state: set value here...
   if FInitialized then
      jCanvas_drawBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
@@ -11537,12 +11647,16 @@ end;
 // by Kordal
 procedure jCanvas.DrawBitmap(bitMap: jBitmap; srcL, srcT, srcR, srcB: Integer; dstL, dstT, dstR, dstB: Single);
 begin
+  if bitMap = nil then exit;
+
   if FInitialized then
     jCanvas_DrawBitmap(FjEnv, FjObject, bitMap.GetImage, srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB);
 end;
 
 procedure jCanvas.DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH: Integer; X, Y, Wh, Ht, rotateDegree: Single);
 begin
+  if bitMap = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
      jCanvas_DrawFrame(FjEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, Wh, Ht, rotateDegree);
@@ -11550,6 +11664,8 @@ end;
 
 procedure jCanvas.DrawFrame(bitMap: jObject; X, Y: Single; Index, Size: Integer; scaleFactor, rotateDegree: Single);
 begin
+  if bitMap = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
      jCanvas_DrawFrame(FjEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
@@ -11598,9 +11714,8 @@ begin
   end;
 
   if FInitialized then
-  begin
      jCanvas_drawTextAligned(FjEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer );
-  end;
+
 end;
 
 function jCanvas.GetNewPath(var _points: TDynArrayOfSingle): jObject;
@@ -11689,6 +11804,8 @@ end;
 
 procedure jCanvas.SetBitmap(_bitmap: jObject);
 begin
+  if _bitmap = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_bmp(FjEnv, FjObject, 'SetBitmap', _bitmap);
@@ -11696,6 +11813,8 @@ end;
 
 procedure jCanvas.SetBitmap(_bitmap: jObject; _width: integer; _height: integer);
 begin
+  if _bitmap = nil then exit;
+
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_bmp_ii(FjEnv, FjObject, 'SetBitmap', _bitmap,_width ,_height);
@@ -11993,18 +12112,19 @@ end;
 
 procedure jView.SetjCanvas(Value: jCanvas);
 begin
+
   if Value <> FjCanvas then
   begin
-    if Assigned(FjCanvas) then
-    begin
+    if FjCanvas <> nil then
+     if Assigned(FjCanvas) then
        FjCanvas.RemoveFreeNotification(Self); //remove free notification...
-    end;
+
     FjCanvas:= Value;
+
     if Value <> nil then  //re- add free notification...
-    begin
        Value.FreeNotification(self);
-    end;
   end;
+
 end;
 
 function jView.GetDrawingCache(): jObject;
@@ -12327,8 +12447,9 @@ begin
   //in designing component state: set value here...
   FMsg:= _msg;
   if not FInitialized then  Exit;
-     if FjObject <> nil then
-        jni_proc_t(FjEnv, FjObject, 'SetMessage', _msg);
+
+  if FjObject <> nil then
+    jni_proc_t(FjEnv, FjObject, 'SetMessage', _msg);
 end;
 
 procedure jDialogProgress.SetTitle(_title: string);
@@ -12552,7 +12673,7 @@ end;
 // by ADiV
 procedure jImageBtn.SetImageUp( _bmp : jObject );
 begin
-   if not FInitialized then exit;
+   if FjObject = nil then exit;
 
    SetImageUpByRes('');
    SetImageUpByIndex(-1);
@@ -12563,7 +12684,7 @@ end;
 // by ADiV
 procedure jImageBtn.SetImageDown( _bmp : jObject );
 begin
-  if not FInitialized then exit;
+  if FjObject = nil then exit;
 
   SetImageDownByRes('');
   SetImageDownByIndex(-1);
@@ -12575,7 +12696,7 @@ end;
 Procedure jImageBtn.SetImageDownScale(Value: single);
 begin
 
-   if not FInitialized then exit;
+   if FjObject = nil then exit;
 
    if (Value > 0) then
    begin
@@ -12591,8 +12712,10 @@ end;
 
 Procedure jImageBtn.SetImageDownByIndex(Value: integer);
 begin
-
    FImageDownIndex:= Value;
+
+   if FjObject = nil then exit;
+   if FImageList = nil then exit;
 
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
@@ -12609,6 +12732,9 @@ Procedure jImageBtn.SetImageUpByIndex(Value: integer);
 begin
 
    FImageUpIndex:= Value;
+
+   if FjObject = nil then exit;
+   if FImageList = nil then exit;
 
    if (Value >= 0) and (Value < FImageList.Images.Count) then
    begin
@@ -12642,27 +12768,21 @@ end;
 // by ADiV
 procedure jImageBtn.SetImageUpIndex(Value: TImageListIndex);
 begin
-
   FImageUpIndex:= Value;
 
-  if FImageList = nil then exit;
+  if FjObject = nil then exit;
 
-  if FInitialized then
-   SetImageUpByIndex(Value);
-
+  SetImageUpByIndex(Value);
 end;
 
 // by ADiV
 procedure jImageBtn.SetImageDownIndex(Value: TImageListIndex);
 begin
-
   FImageDownIndex:= Value;
 
-  if FImageList = nil then exit;
+  if FjObject = nil then exit;
 
-  if FInitialized then
-   SetImageDownByIndex(Value);
-
+  SetImageDownByIndex(Value);
 end;
 
 procedure jImageBtn.BringToFront;
@@ -12718,18 +12838,19 @@ end;
 
 procedure jImageBtn.SetImages(Value: jImageList);
 begin
+
   if Value <> FImageList then
   begin
-    if Assigned(FImageList) then
-    begin
+    if FImageList <> nil then
+     if Assigned(FImageList) then
        FImageList.RemoveFreeNotification(Self); //remove free notification...
-    end;
+
     FImageList:= Value;
+
     if Value <> nil then  //re- add free notification...
-    begin
        Value.FreeNotification(self);
-    end;
   end;
+
 end;
 
 
@@ -13001,6 +13122,8 @@ procedure jSqliteCursor.UnRegisterObserver(AObserver: jVisualControl);
 var
   i: integer = 0;
 begin
+    if FObservers = nil then exit;
+
     while i < FObserverCount do
     begin
       if AObserver = FObservers[i] then break;
@@ -13020,6 +13143,8 @@ procedure jSqliteCursor.RegisterObserver(AObserver: jVisualControl);
 var
   i: integer = 0;
 begin
+  if FObservers = nil then exit;
+
   if FObserverCount < MAXOBSERVERS then
   begin
     while i < FObserverCount do
@@ -13040,6 +13165,7 @@ var
   i: integer;
 begin
   if not FInitialized then Exit;
+  if FObservers = nil then exit;
 
   jSqliteCursor_SetCursor(FjEnv, FjObject, Value);
 
@@ -13286,8 +13412,10 @@ begin
       FjObject := nil;
     end;
   end;
-  FTableName.Free;
-  FCreateTableQuery.Free;
+
+  if FTableName <> nil then FTableName.Free;
+  if FCreateTableQuery <> nil then FCreateTableQuery.Free;
+
   inherited Destroy;
 end;
 
@@ -13303,15 +13431,13 @@ begin
 
   FInitialized:= True;
 
-  for i:= 0 to FTableName.Count-1 do
-  begin
+  if FTableName <> nil then
+   for i:= 0 to FTableName.Count-1 do
      jSqliteDataAccess_AddTableName(FjEnv, FjObject , FTableName.Strings[i]);
-  end;
 
-  for i:= 0 to FCreateTableQuery.Count-1 do
-  begin
+  if FCreateTableQuery <> nil then
+   for i:= 0 to FCreateTableQuery.Count-1 do
      jSqliteDataAccess_AddCreateTableQuery(FjEnv, FjObject , FCreateTableQuery.Strings[i]);
-  end;
 
   if not FReturnHeaderOnSelect then
       SetReturnHeaderOnSelect(FReturnHeaderOnSelect);
@@ -13493,18 +13619,19 @@ end;
 
 procedure jSqliteDataAccess.SetjSqliteCursor(Value: jSqliteCursor);
 begin
+
   if Value <> FjSqliteCursor then
   begin
-    if Assigned(FjSqliteCursor) then
-    begin
+    if FjSqliteCursor <> nil then
+     if Assigned(FjSqliteCursor) then
        FjSqliteCursor.RemoveFreeNotification(Self); //remove free notification...
-    end;
+
     FjSqliteCursor:= Value;
+
     if Value <> nil then  //re- add free notification...
-    begin
        Value.FreeNotification(self);
-    end;
   end;
+
 end;
 
 procedure jSqliteDataAccess.SetForeignKeyConstraintsEnabled(_value: boolean);
@@ -14147,10 +14274,10 @@ begin
     end;
   end;
   //you others free code here...'
-  if FjSqliteCursor <> nil then
-    FjSqliteCursor.UnRegisterObserver(self);
-  FColNames.Free;
-  FColWeights.Free;
+  if FjSqliteCursor <> nil then FjSqliteCursor.UnRegisterObserver(self);
+  if FColNames <> nil then FColNames.Free;
+  if FColWeights <> nil then FColWeights.Free;
+
   inherited Destroy;
 end;
 
@@ -14280,6 +14407,9 @@ var
   i: integer;
   weights: TDynArrayOfSingle;
 begin
+  if Value = nil then exit;
+  if FColWeights = nil then exit;
+
   if FColWeights <> Value then
      FColWeights.Assign(Value);
 
@@ -14299,6 +14429,9 @@ var
   i: integer;
   names: TDynArrayOfString;
 begin
+  if Value = nil then exit;
+  if FColNames = nil then exit;
+
   if FColNames <> Value then
      FColNames.Assign(Value);
 
@@ -14316,17 +14449,21 @@ end;
 
 procedure jDBListView.SetCursor(Value: jSqliteCursor);
 begin
+
   //DBListView_Log ('Entering SetCursor ...');
   if Value <> FjSqliteCursor then
   begin
-    if Assigned(FjSqliteCursor) then
-    begin
+    if FjSqliteCursor <> nil then
+     if Assigned(FjSqliteCursor) then
+     begin
       //DBListView_Log ('... phase 1 ...');
       FjSqliteCursor.UnRegisterObserver(Self);
       FjSqliteCursor.RemoveFreeNotification(Self); //remove free notification...
-    end;
+     end;
+
     //DBListView_Log ('... phase 2 ...');
     FjSqliteCursor:= Value;
+
     if Value <> nil then  //re- add free notification...
     begin
       //DBListView_Log ('... phase 3 ...');
