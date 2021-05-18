@@ -1048,7 +1048,11 @@ var
 begin
   if not FInitialized then Exit;
   if TexturesCount > 0 then Texture_Clear;
-  if FImageList <> nil then FImageList.Init(gApp);  //***
+
+  if FImageList = nil then exit;
+
+  FImageList.Init(gApp);  //***
+
   for i:= 0 to FImageList.Images.Count - 1 do
   begin
      if (FImageList.Images.Strings[i] <> '') and (FImageList.Images.Strings[i] <> 'null') then
@@ -1130,15 +1134,14 @@ procedure jCanvasES1.SetImages(Value: jImageList);
 begin
   if Value <> FImageList then
   begin
-    if Assigned(FImageList) then
-    begin
+    if FImageList <> nil then
+     if Assigned(FImageList) then
        FImageList.RemoveFreeNotification(Self); //remove free notification...
-    end;
+
     FImageList:= Value;
+
     if Value <> nil then  //re- add free notification...
-    begin
        Value.FreeNotification(self);
-    end;
   end;
 end;
 
