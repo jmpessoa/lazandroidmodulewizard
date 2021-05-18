@@ -25,7 +25,6 @@ jImageFileManager = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
-    procedure jFree();
     function  SaveToSdCard(_image: jObject; _filename: string) : boolean;
     procedure ShowImagesFromGallery();
     function LoadFromSdCard(_filename: string): jObject;
@@ -86,7 +85,7 @@ begin
   begin
         if FjObject <> nil then
         begin
-           jFree();
+           jni_free(FjEnv, FjObject);
            FjObject:= nil;
         end;
   end;
@@ -105,13 +104,6 @@ begin
   if FjObject = nil then exit;
 
   FInitialized:= True;
-end;
-
-procedure jImageFileManager.jFree();
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 function jImageFileManager.SaveToSdCard(_image: jObject; _filename: string) : boolean;
@@ -249,6 +241,7 @@ end;
 
 function jImageFileManager.LoadFromFile(_filename: string; _scale: integer): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_ti_out_bmp(FjEnv, FjObject, 'LoadFromFile', _filename ,_scale);
@@ -256,6 +249,7 @@ end;
 
 function jImageFileManager.CreateBitmap(_width: integer; _height: integer): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_ii_out_bmp(FjEnv, FjObject, 'CreateBitmap', _width ,_height);
@@ -263,6 +257,7 @@ end;
 
 function jImageFileManager.GetBitmapWidth(_bitmap: jObject): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_out_i(FjEnv, FjObject, 'GetBitmapWidth', _bitmap);
@@ -270,6 +265,7 @@ end;
 
 function jImageFileManager.GetBitmapHeight(_bitmap: jObject): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_out_i(FjEnv, FjObject, 'GetBitmapHeight', _bitmap);
@@ -277,6 +273,7 @@ end;
 
 function jImageFileManager.GetByteArrayFromBitmap(_bitmap: jObject; _compressFormat: string): TDynArrayOfJByte;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
      Result:= jni_func_bmp_t_out_dab(FjEnv, FjObject, 'GetByteArrayFromBitmap', _bitmap ,_compressFormat);
@@ -284,6 +281,7 @@ end;
 
 function jImageFileManager.SetByteArrayToBitmap(var _imageArray: TDynArrayOfJByte): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_dab_out_bmp(FjEnv, FjObject, 'SetByteArrayToBitmap', _imageArray);
@@ -318,6 +316,7 @@ end;
 
 function jImageFileManager.SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_bmp_ff_out_bmp(FjEnv, FjObject, 'SetScale', _bmp,_scaleX ,_scaleY);
@@ -325,6 +324,7 @@ end;
 
 function jImageFileManager.GetBitmapFromDecodedFile(_imagePath: string): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetBitmapFromDecodedFile', _imagePath);
@@ -332,6 +332,7 @@ end;
 
 function jImageFileManager.GetBitmapFromIntentResult(_intentData: jObject): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_int_out_bmp(FjEnv, FjObject, 'GetBitmapFromIntentResult', _intentData);
@@ -340,6 +341,7 @@ end;
 
 function jImageFileManager.GetBitmapThumbnailFromCamera(_intentData: jObject): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_int_out_bmp(FjEnv, FjObject, 'GetBitmapThumbnailFromCamera', _intentData);
@@ -347,6 +349,7 @@ end;
 
 function jImageFileManager.LoadFromUri(_uriAsString: string): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'LoadFromUri', _uriAsString);

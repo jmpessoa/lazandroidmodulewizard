@@ -182,7 +182,7 @@ begin
   begin
         if FjObject  <> nil then
         begin
-           jni_proc(FjEnv, FjObject, 'jFree' );
+           jni_free(FjEnv, FjObject);
            FjObject := nil;
         end;
   end;

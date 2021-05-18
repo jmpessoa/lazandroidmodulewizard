@@ -49,7 +49,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_proc(FjEnv, FjObject, 'jFree');
+       jni_free(FjEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -62,7 +62,8 @@ begin
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jBrightness_jCreate(FjEnv, int64(Self), FjThis); if FjObject = nil then exit;
+  FjObject := jBrightness_jCreate(FjEnv, int64(Self), FjThis);
+  if FjObject = nil then exit;
   FInitialized:= True;
 end;
 

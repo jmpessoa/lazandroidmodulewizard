@@ -209,7 +209,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_proc(FjEnv, FjObject, 'jFree');
+       jni_free(FjEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -315,6 +315,7 @@ end;
 
 function jIntentManager.GetAction(_intent: jObject): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetAction(FjEnv, FjObject, _intent);
@@ -322,6 +323,7 @@ end;
 
 function jIntentManager.HasExtra(_intent: jObject; _dataName: string): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_HasExtra(FjEnv, FjObject, _intent ,_dataName);
@@ -336,6 +338,7 @@ end;
 
 function jIntentManager.GetExtraBundle(_intent: jObject): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraBundle(FjEnv, FjObject, _intent);
@@ -343,6 +346,7 @@ end;
 
 function jIntentManager.GetExtraDoubleArray(_intent: jObject; _dataName: string): TDynArrayOfDouble;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraDoubleArray(FjEnv, FjObject, _intent ,_dataName);
@@ -357,6 +361,7 @@ end;
 
 function jIntentManager.GetExtraDouble(_intent: jObject; _dataName: string): double;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraDouble(FjEnv, FjObject, _intent ,_dataName);
@@ -385,6 +390,7 @@ end;
 
 function jIntentManager.GetExtraFloatArray(_intent: jObject; _dataName: string): TDynArrayOfSingle;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraFloatArray(FjEnv, FjObject, _intent ,_dataName);
@@ -399,6 +405,7 @@ end;
 
 function jIntentManager.GetExtraFloat(_intent: jObject; _dataName: string): single;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraFloat(FjEnv, FjObject, _intent ,_dataName);
@@ -413,6 +420,7 @@ end;
 
 function jIntentManager.GetExtraIntArray(_intent: jObject; _dataName: string): TDynArrayOfInteger;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraIntArray(FjEnv, FjObject, _intent ,_dataName);
@@ -427,6 +435,7 @@ end;
 
 function jIntentManager.GetExtraInt(_intent: jObject; _dataName: string): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraInt(FjEnv, FjObject, _intent ,_dataName);
@@ -449,6 +458,7 @@ end;
 
 function jIntentManager.GetExtraStringArray(_intent: jObject; _dataName: string): TDynArrayOfString;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraStringArray(FjEnv, FjObject, _intent ,_dataName);
@@ -463,6 +473,7 @@ end;
 
 function jIntentManager.GetExtraString(_intent: jObject; _dataName: string): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraString(FjEnv, FjObject, _intent ,_dataName);
@@ -484,6 +495,7 @@ end;
 
 function jIntentManager.GetDataUri(_intent: jObject): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetDataUri(FjEnv, FjObject, _intent);
@@ -491,6 +503,7 @@ end;
 
 function jIntentManager.GetDataUriAsString(_intent: jObject): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetDataUriAsString(FjEnv, FjObject, _intent);
@@ -561,6 +574,7 @@ end;
 
 function jIntentManager.GetAudioExternContentUri(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_uri(FjEnv, FjObject, 'GetAudioExternContentUri');
@@ -568,6 +582,7 @@ end;
 
 function jIntentManager.GetFilesExternContentUri(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_uri(FjEnv, FjObject, 'GetFilesExternContentUri');
@@ -575,6 +590,7 @@ end;
 
 function jIntentManager.GetImagesExternContentUri(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_uri(FjEnv, FjObject, 'GetImagesExternContentUri');
@@ -582,6 +598,7 @@ end;
 
 function jIntentManager.GetVideoExternContentUri(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_uri(FjEnv, FjObject, 'GetVideoExternContentUri');
@@ -589,6 +606,7 @@ end;
 
 function jIntentManager.ParseUri(_uriAsString: string): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_ParseUri(FjEnv, FjObject, _uriAsString);
@@ -596,6 +614,7 @@ end;
 
 function jIntentManager.GetActionViewAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionViewAsString');
@@ -603,6 +622,7 @@ end;
 
 function jIntentManager.GetActionPickAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionPickAsString');
@@ -610,6 +630,7 @@ end;
 
 function jIntentManager.GetActionSendtoAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionSendtoAsString');
@@ -617,6 +638,7 @@ end;
 
 function jIntentManager.GetActionSendAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionSendAsString');
@@ -624,6 +646,7 @@ end;
 
 function jIntentManager.GetActionEditAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionEditAsString');
@@ -631,6 +654,7 @@ end;
 
 function jIntentManager.GetActionDialAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionDialAsString');
@@ -638,6 +662,7 @@ end;
 
 function jIntentManager.GetActionCallButtonAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionCallButtonAsString');
@@ -645,6 +670,7 @@ end;
 
 function jIntentManager.ResolveActivity(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'ResolveActivity');
@@ -652,6 +678,7 @@ end;
 
 function jIntentManager.GetMailtoUri(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_uri(FjEnv, FjObject, 'GetMailtoUri');
@@ -659,6 +686,7 @@ end;
 
 function jIntentManager.GetMailtoUri(_email: string): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetMailtoUri(FjEnv, FjObject, _email);
@@ -666,6 +694,7 @@ end;
 
 function jIntentManager.GetTelUri(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_uri(FjEnv, FjObject, 'GetTelUri');
@@ -673,6 +702,7 @@ end;
 
 function jIntentManager.GetTelUri(_telNumber: string): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetTelUri(FjEnv, FjObject, _telNumber);
@@ -680,6 +710,7 @@ end;
 
 function jIntentManager.GetActionGetContentUri(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionGetContentUri');
@@ -751,6 +782,7 @@ end;
 
 function jIntentManager.GetActionCallAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionCallAsString');
@@ -758,6 +790,7 @@ end;
 
 function jIntentManager.GetContactNumber(_contactUri: jObject): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetContactNumber(FjEnv, FjObject, _contactUri);
@@ -765,6 +798,7 @@ end;
 
 function jIntentManager.GetContactEmail(_contactUri: jObject): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetContactEmail(FjEnv, FjObject, _contactUri);
@@ -772,6 +806,7 @@ end;
 
 function jIntentManager.GetBundleContent(_intent: jObject): TDynArrayOfString;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetBundleContent(FjEnv, FjObject, _intent);
@@ -779,6 +814,7 @@ end;
 
 function jIntentManager.IsCallable(_intent: jObject): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_IsCallable(FjEnv, FjObject, _intent);
@@ -786,6 +822,7 @@ end;
 
 function jIntentManager.IsCallable(_intentAction: string): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsCallable', _intentAction);
@@ -793,6 +830,7 @@ end;
 
 function jIntentManager.IsActionEqual(_intent: jObject; _intentAction: string): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_IsActionEqual(FjEnv, FjObject, _intent ,_intentAction);
@@ -807,6 +845,7 @@ end;
 
 function jIntentManager.GetActionCameraCropAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionCameraCropAsString');
@@ -884,6 +923,7 @@ end;
 
 function jIntentManager.IsPackageInstalled(_packageName: string): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsPackageInstalled', _packageName);
@@ -891,6 +931,7 @@ end;
 
 function jIntentManager.GetActionMainAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionMainAsString');
@@ -919,6 +960,7 @@ end;
 
 function jIntentManager.HasLaunchIntentForPackage(_packageName: string): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_z(FjEnv, FjObject, 'HasLaunchIntentForPackage', _packageName);
@@ -926,6 +968,7 @@ end;
 
 function jIntentManager.GetExtraSMS(_intent: jObject; _addressBodyDelimiter: string): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetExtraSMS(FjEnv, FjObject, _intent ,_addressBodyDelimiter);
@@ -933,6 +976,7 @@ end;
 
 function jIntentManager.GetActionInstallPackageAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionInstallPackageAsString');
@@ -940,6 +984,7 @@ end;
 
 function jIntentManager.GetActionDeleteAsString(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionDeleteAsString');

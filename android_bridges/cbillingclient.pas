@@ -1015,10 +1015,10 @@ begin
        FjObject:= nil;
      end;
   end;
-  ClearList(fConsumedList, True);
-  ClearList(fPurchaseList, True);
-  ClearList(fInappList, True);
-  ClearList(fSubsList, True);
+  if fConsumedList = nil then ClearList(fConsumedList, True);
+  if fPurchaseList = nil then ClearList(fPurchaseList, True);
+  if fInappList = nil then ClearList(fInappList, True);
+  if fSubsList = nil then ClearList(fSubsList, True);
   Logs.Free;
   inherited Destroy;
 end;
@@ -1042,12 +1042,21 @@ end;
 
 function jcBillingClient.GetInappCount: integer;
 begin
+  result := 0;
+
+  if fInappList = nil then exit;
+
   result := fInappList.Count
 end;
 
 function jcBillingClient.GetConsumed(i: integer): TConsumedItem;
 begin
-  result := TConsumedItem(fConsumedList[i])
+  result := nil;
+
+  if fConsumedList = nil then exit;
+
+  if (i >=0) and (i < fConsumedList.Count) then
+   result := TConsumedItem(fConsumedList[i])
 end;
 
 procedure jcBillingClient.SetConsumedData(const AValue: string);
@@ -1102,6 +1111,10 @@ end;
 
 function jcBillingClient.GetSubsCount: integer;
 begin
+  result := 0;
+
+  if fSubsList = nil then exit;
+
   result := fSubsList.Count
 end;
 
@@ -1216,6 +1229,8 @@ procedure jcBillingClient.AddConsumed(APurchase: TPurchaseItem;
   CStatus: TConsumedStatus);
 var i: integer;
 begin
+  if fConsumedList = nil then exit;
+
   // make sure we don't add duplicates.
   for i := 0 to ConsumedCount-1 do
     if Consumed[i].IsSameOrder(APurchase) then
@@ -1243,27 +1258,50 @@ end;
 
 function jcBillingClient.GetInapp(index: integer): TBillingItem;
 begin
-  result := TBillingItem(fInappList[index]);
+  result := nil;
+
+  if fInappList = nil then exit;
+
+  if (index >=0) and (index < fInappList.Count) then
+   result := TBillingItem(fInappList[index]);
 end;
 
 function jcBillingClient.GetSubs(index: integer): TBillingItem;
 begin
-  result := TBillingItem(fSubsList[index]);
+  result := nil;
+
+  if fSubsList = nil then exit;
+
+  if (index >=0) and (index < fSubsList.Count) then
+   result := TBillingItem(fSubsList[index]);
 end;
 
 function jcBillingClient.GetPurchaseCount: integer;
 begin
+  result := 0;
+
+  if fPurchaseList = nil then exit;
+
   result := fPurchaseList.Count
 end;
 
 function jcBillingClient.GetConsumedCount: integer;
 begin
+  result := 0;
+
+  if fConsumedList = nil then exit;
+
   result := fConsumedList.Count;
 end;
 
 function jcBillingClient.GetPurchase(index: integer): TPurchaseItem;
 begin
-  result := TPurchaseItem(fPurchaseList[index]);
+  result := nil;
+
+  if fPurchaseList = nil then exit;
+
+  if (index >=0) and (index < fPurchaseList.Count) then
+   result := TPurchaseItem(fPurchaseList[index]);
 end;
 
 function jcBillingClient.GetInappSkus: string;
@@ -1503,23 +1541,27 @@ end;
 function jcBillingClient.FindInapp(const sku: string): TBillingItem;
 var i: integer;
 begin
+  result := nil;
+
+  if fInappList = nil then exit;
+
   for i := 0 to fInappList.Count-1 do begin
     result := TBillingItem(fInappList[i]);
     if result.productId = sku then exit;
   end;
-
-  result := nil;
 end;
 
 function jcBillingClient.FindSubs(const sku: string): TBillingItem;
 var i: integer;
 begin
+  result := nil;
+
+  if fSubsList = nil then exit;
+
   for i := 0 to fSubsList.Count-1 do begin
     result := TBillingItem(fSubsList[i]);
     if result.productId = sku then exit;
   end;
-
-  result := nil;
 end;
 
 function jcBillingClient.DoCmd(cmd, Param1, Param2: string): boolean;
