@@ -2087,6 +2087,7 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     procedure Init(refApp: jApp); override;
+    procedure InitPaintShader(refApp: jApp);
 
     Procedure DrawLine(x1, y1, x2, y2: single); overload;
     procedure DrawLine(var _points: TDynArrayOfSingle);  overload;
@@ -11461,6 +11462,14 @@ begin
   SetTextSize(FPaintTextSize);
   FInitialized:= True;
 
+  // PaintShader new! //by kordal
+  if FPaintShader <> nil then
+    FPaintShader.Init(refApp, GetPaint);
+end;
+
+procedure jCanvas.InitPaintShader(refApp: jApp);
+begin
+  if FjObject = nil then exit;
   // PaintShader new! //by kordal
   if FPaintShader <> nil then
     FPaintShader.Init(refApp, GetPaint);
