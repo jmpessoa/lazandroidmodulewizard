@@ -1072,27 +1072,6 @@ class jForm {
 		return listVersionInfo;
 	}
 
-	/*
-	 *Given that you can access R.java just fine normally in code.
-	 *As long as you are retrieving data from your application's R.java - Use reflection!
-	 */
-	public int GetStringResourceId(String _resName) {
-		try {
-			Class<?> res = R.string.class;
-			Field field = res.getField(_resName);
-			int strId = field.getInt(null);
-			return strId;
-		} catch (Exception e) {
-			Log.e("jForm", "Failure to Get String  Resource", e);
-			return 0;
-		}
-	}
-
-	public String GetStringResourceById(int _resID) {
-		String r = "" + this.controls.activity.getResources().getText(_resID);		
-		return r;
-	}
-
 	public int GetDrawableResourceId(String _resName) {
 		try {
 			Class<?> res = R.drawable.class;
@@ -1237,6 +1216,98 @@ class jForm {
 	   
 	   return ret;
 	}
+	
+	//by  ADiV
+	public int GetStatusBarHeight() {
+
+		int resourceId = this.controls.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+		
+		if ( resourceId > 0 )
+			return this.controls.activity.getResources().getDimensionPixelSize(resourceId);
+		else
+			return 0;
+
+	}
+
+	//by  ADiV
+	public int GetNavigationHeight() {
+
+		int resourceId = this.controls.activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+		
+		if ( resourceId > 0 )
+			return this.controls.activity.getResources().getDimensionPixelSize(resourceId);
+		else
+			return 0;
+	}
+	
+	//by ADiV Software
+	public int GetContextTop(){
+	 ViewGroup view = ((ViewGroup) this.controls.activity.findViewById(android.R.id.content));
+	 
+	 if( view != null)
+	 	return view.getTop();
+	 else
+	 	return 0;
+		
+	}
+	
+	public int GetJavaLastId(){
+		return this.controls.GetJavaLastId();
+	}
+
+	// We assign the density for the correct scaling of assets images
+
+	public void SetDensityAssets( int _density ){
+		this.controls.SetDensityAssets(_density);
+	}
+	
+// -------------------------------------------------------------------------
+//  Android Device
+// -------------------------------------------------------------------------
+// Result: Phone Number - LORDMAN
+public  String GetDevPhoneNumber() {
+  String f = "";
+
+  TelephonyManager telephony = (TelephonyManager) this.controls.activity.getSystemService(Context.TELEPHONY_SERVICE);
+  if (telephony!=null) {
+	  try {
+		  f = telephony.getLine1Number();
+	  } catch (SecurityException ex) {
+		  Log.e("getDevPhoneNumber", ex.getMessage());
+	  }
+  }
+  
+  if(f == null) return "";
+  
+  return f;
+}
+
+//Result: Device ID - LORDMAN
+//Remarks : Nexus7 (no moblie device) -> Crash : fixed code - Simon
+//ANDROID_ID - Added by Tomash
+@SuppressLint("NewApi")
+public String GetDevDeviceID() {
+String devid = "";
+try {
+ TelephonyManager telephony = (TelephonyManager) this.controls.activity.getSystemService(Context.TELEPHONY_SERVICE);
+ 
+ if(telephony == null) return "";
+ 
+ devid = telephony.getDeviceId();
+ 	
+ if(devid == null) return "";
+ 
+ if(devid == "")	
+     devid = Secure.getString(this.controls.activity.getContentResolver(),Secure.ANDROID_ID);
+     	
+}
+catch (SecurityException e) //ExceptionExceptionException
+   { e.printStackTrace(); }
+
+if(devid == null) return "";
+
+return devid;
+}
 
 /*
  * To disableAction-bar Icon and Title, you must do two things:
@@ -2712,22 +2783,6 @@ public  void systemGC() {
    System.gc();
 }
 
-
-public void ShowAlert(String _title, String _message, String _btnText) {
-	
-	AlertDialog dialog = null;
-	AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
-	if(builder == null) return;
-	builder.setMessage       (_message)
-	       .setCancelable    (false)	       
-	       .setNeutralButton(_btnText, null);
-	       	      
-	dialog = builder.create();
-	dialog.setTitle(_title);
-	dialog.show();
-}
-
-
 public  void systemSetOrientation(int orientation) {
    this.activity.setRequestedOrientation(orientation);
 }
@@ -2754,53 +2809,6 @@ public Context GetContext() {
    return this.activity; 
 }
 
-//by ADiV Software
-public int getContextTop(){
- ViewGroup view = ((ViewGroup) this.activity.findViewById(android.R.id.content));
- 
- if( view != null)
- 	return view.getTop();
- else
- 	return 0;
-	
-}
-
-//by  ADiV
-public int getStatusBarHeight() {
-	int resourceId = this.activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
-	
-	if ( resourceId > 0 )
-		return this.activity.getResources().getDimensionPixelSize(resourceId);
-	else
-		return 0;
-}
-
-//by  ADiV
-public int GetNavigationHeight() {
-	int resourceId = this.activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-	
-	if ( resourceId > 0 )
-		return this.activity.getResources().getDimensionPixelSize(resourceId);
-	else
-		return 0;
-}
-
-//by  thierrydijoux
-public String getQuantityStringByName(String _resName, int _quantity) {
-	int id = this.activity.getResources().getIdentifier(_resName, "plurals", this.activity.getPackageName());
-	if(id == 0) return "";
-    String value = this.activity.getResources().getQuantityString(id, _quantity, _quantity);
-    if(value == null) return "";
-	return value;
-}
-
-//by thierrydijoux
-public String getStringResourceByName(String _resName) {
-	int id = this.activity.getResources().getIdentifier(_resName, "string", this.activity.getPackageName());
-	if(id == 0) return "";
-    String value = "" + this.activity.getResources().getText(id);    
-	return value;
-}   
 // -------------------------------------------------------------------------
 //  App Related
 // -------------------------------------------------------------------------
@@ -3099,53 +3107,7 @@ public String getLocale(int localeType) {
 
    	return value;
 }
-// -------------------------------------------------------------------------
-//  Android Device
-// -------------------------------------------------------------------------
-// Result: Phone Number - LORDMAN
-public  String getDevPhoneNumber() {
-  String f = "";
 
-  TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-  if (telephony!=null) {
-	  try {
-		  f = telephony.getLine1Number();
-	  } catch (SecurityException ex) {
-		  Log.e("getDevPhoneNumber", ex.getMessage());
-	  }
-  }
-  
-  if(f == null) return "";
-  
-  return f;
-}
-
-// Result: Device ID - LORDMAN
-// Remarks : Nexus7 (no moblie device) -> Crash : fixed code - Simon
-// ANDROID_ID - Added by Tomash
-@SuppressLint("NewApi")
-public String getDevDeviceID() {
-  String devid = "";
-  try {
-    TelephonyManager telephony = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-    
-    if(telephony == null) return "";
-    
-    devid = telephony.getDeviceId();
-    	
-    if(devid == null) return "";
-    
-    if(devid == "")	
-        devid = Secure.getString(activity.getContentResolver(),Secure.ANDROID_ID);
-        	
-  }
-  catch (SecurityException e) //ExceptionExceptionException
-      { e.printStackTrace(); }
-  
-  if(devid == null) return "";
-  
-  return devid;
-}
 // -------------------------------------------------------------------------
 //  Bitmap
 // -------------------------------------------------------------------------
