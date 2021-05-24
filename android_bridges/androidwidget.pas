@@ -890,26 +890,11 @@ type
     function GetNewId(): integer; // by ADiV
     function GetLastId(): integer; // by ADiV
 
-    function  GetJavaLastId(): integer; // by ADiV
-    procedure SetDensityAssets( _value : TDensityAssets ); // by ADiV
-
     procedure Finish();
     Procedure Recreate();
     function  GetContext(): jObject;
-    function  GetContextTop: integer;
-    function  GetStatusBarHeight : integer;  // by ADiV
-    function  GetActionBarHeight : integer;  // by ADiV
-    function  GetNavigationHeight : integer; // by ADiV
     function GetControlsVersionInfo: string;
     function GetControlsVersionFeatures: string; //sorry!
-
-    //thanks to  thierrydijoux
-    function GetStringResourceId(_resName: string): integer;
-    function GetStringResourceById(_resId: integer): string;
-
-    //by thierrydijoux - get a resource string by name
-    function GetStringResourceByName(_resName: string): string;
-    function GetQuantityStringByName(_resName: string; _Quantity: integer): string;
 
     function GetCurrentFormsIndex: integer;
     function GetNewFormsIndex: integer;
@@ -917,8 +902,6 @@ type
 
     procedure IncFormsIndex;
     procedure DecFormsIndex;
-
-    procedure ShowMessage(_title: string; _message: string; _btnText: string);
 
     function GetMainActivityName: string;
     function GetPackageName: string;
@@ -1157,7 +1140,6 @@ type
     FAnimationDurationOut: integer;
     FAnimationMode: TAnimationMode;
 
-    function GetActionBarHeight: integer;
     Procedure SetColor   (Value : TARGBColorBridge);
 
   protected
@@ -1204,6 +1186,10 @@ type
     function GetDateTime: string; overload;
     function GetDateTime( millisDateTime : int64 ) : string; overload; // By ADiV
     function GetBatteryPercent : integer; // BY ADiV
+    function GetStatusBarHeight: integer; // BY ADiV
+    function GetActionBarHeight: integer; // BY ADiV
+    function GetContextTop: integer;        // BY ADiV
+    function GetNavigationHeight : integer; // BY ADiV
 
     function GetStringExtra(intentData: jObject; extraName: string): string;
     function GetIntExtra(intentData: jObject; extraName: string; defaultValue: integer): integer;
@@ -1283,11 +1269,12 @@ type
     procedure SetScreenOrientationStyle(_orientation: TScreenStyle);
     function  GetScreenOrientationStyle(): TScreenStyle;
 
-    function GetScreenSize(): string;
-    function GetScreenDensity(): string; overload;
-    function GetScreenDpi(): integer;
-    function GetScreenDensity(strDensity: string): integer; overload;
-    procedure SetDensityAssets(strDensity: string);
+    function  GetJavaLastId(): integer; // by ADiV
+    function  GetScreenSize(): string;
+    function  GetScreenDensity(): string; overload;
+    function  GetScreenDpi(): integer;
+    function  GetScreenDensity(strDensity: string): integer; overload;
+    procedure SetDensityAssets( _value : TDensityAssets ); // by ADiV
 
     procedure LogDebug(_tag: string; _msg: string);
     procedure Vibrate(_milliseconds: integer);  overload;
@@ -1838,9 +1825,6 @@ Function jSysInfo_Language (env:PJNIEnv; this: jobject; localeType: TLocaleType)
 
 Function  jSysInfo_PathDataBase             (env:PJNIEnv;this:jobject;context : jObject) : String;
 // Device Info
-Function  jSysInfo_DevicePhoneNumber   (env:PJNIEnv;this:jobject) : String;
-Function  jSysInfo_DeviceID            (env:PJNIEnv;this:jobject) : String;
-
 
 Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
 function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
@@ -3325,6 +3309,52 @@ begin
   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBatteryPercent');
 end;
 
+function jForm.GetStatusBarHeight: integer;
+begin
+  Result := 0;
+  if not FInitialized then Exit;
+  Result:= jni_func_out_i(FjEnv, FjObject, 'GetStatusBarHeight');
+end;
+
+function jForm.GetActionBarHeight: integer;
+begin
+  Result := 0;
+  if not FInitialized then Exit;
+
+  if FActionBarTitle <> abtNone then
+   Result := GetContextTop - GetStatusBarHeight;
+end;
+
+function jForm.GetContextTop: integer;
+begin
+  Result := 0;
+  if not FInitialized then Exit;
+  Result:= jni_func_out_i(FjEnv, FjObject, 'GetContextTop');
+end;
+
+function jForm.GetNavigationHeight : integer;
+begin
+  Result := 0;
+  if not FInitialized then Exit;
+  Result:= jni_func_out_i(FjEnv, FjObject, 'GetNavigationHeight');
+end;
+
+//by ADiV
+function jForm.GetJavaLastId(): integer;
+begin
+  Result := 0;
+  if not FInitialized then Exit;
+  Result:= jni_func_out_i(FjEnv, FjObject, 'GetJavaLastId');
+end;
+
+//by ADiV
+procedure jForm.SetDensityAssets( _value : TDensityAssets );
+
+begin
+  if not FInitialized then Exit;
+  jni_proc_i(FjEnv, FjObject, 'SetDensityAssets', ord(_value));
+end;
+
 // BY ADiV
 function jForm.GetTimeInMilliseconds: int64;
 begin
@@ -3954,14 +3984,16 @@ end;
 
 function jForm.GetDevicePhoneNumber: String;
 begin
+   Result := '';
    if FInitialized then
-     Result:= jSysInfo_DevicePhoneNumber(FjEnv, gApp.Jni.jThis);
+    Result:= jni_func_out_t(FjEnv, FjObject, 'GetDevPhoneNumber');
 end;
 
 function jForm.GetDeviceID: String;
 begin
+   Result := '';
    if FInitialized then
-      Result:= jSysInfo_DeviceID(FjEnv, gApp.Jni.jThis);
+   Result:=jni_func_out_t(FjEnv, FjObject, 'GetDevDeviceID');
 end;
 
 function jForm.IsPackageInstalled(_packagename: string): boolean;
@@ -4022,14 +4054,6 @@ begin
    if (strDensity <> '') then
      Result:= StrToInt(strDensity)
    else Result:= 0;
-end;
-
-procedure jForm.SetDensityAssets(strDensity: string);
-var
-  intDensity: integer;
-begin
-   intDensity:= Self.GetScreenDensity(strDensity);
-   gApp.SetDensityAssets(TDensityAssets(intDensity));
 end;
 
 function jForm.GetScreenSize(): string;
@@ -4143,17 +4167,6 @@ begin
   Result := Result + 'Address: '+BackTraceStrFunc(ExceptAddr);
   for i:= 0 to ExceptFrameCount - 1 do
     Result := Result + LineEnding + BackTraceStrFunc(ExceptFrames[i]);
-end;
-
-function jForm.GetActionBarHeight: integer;
-begin
-  //in designing component state: result value here...
-  Result:= 0;
-  if FInitialized then
-  begin
-     if FActionBarTitle <> abtNone then
-        Result:= jni_func_out_i(FjEnv, FjObject, 'GetActionBarHeight');
-  end;
 end;
 
 function jForm.GetRealPathFromURI(_Uri: jObject): string;
@@ -5670,18 +5683,6 @@ begin
  result := FNewId;
 end;
 
-//by ADiV
-function jApp.GetJavaLastId(): integer;
-begin
-   Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'GetJavaLastId');
-end;
-
-//by ADiV
-procedure jApp.SetDensityAssets( _value : TDensityAssets );
-begin
-  jni_proc_i(Self.Jni.jEnv, Self.Jni.jThis, 'SetDensityAssets', ord(_value));
-end;
-
 procedure jApp.Init(env: PJNIEnv; this: jObject; activity: jObject;
   layout: jObject; intent: jobject);
 var
@@ -5801,11 +5802,6 @@ begin
       Forms.Index:= Forms.Index - 1;
 end;
 
-procedure jApp.ShowMessage(_title: string; _message: string; _btnText: string);
-begin
-  jSystem_ShowAlert(Jni.jEnv, Jni.jThis,  _title,  _message,  _btnText);
-end;
-
 procedure jApp.SetAppName(Value: String);
 begin
   FAppName:= Value;
@@ -5831,26 +5827,6 @@ begin
   Result:= jApp_GetContext(Self.Jni.jEnv, Self.Jni.jThis);
 end;
 
-function jApp.GetContextTop: integer;
-begin
-  Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'getContextTop');
-end;
-
-function jApp.GetStatusBarHeight: integer;
-begin
-  Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'getStatusBarHeight');
-end;
-
-function jApp.GetActionBarHeight: integer;
-begin
-  Result := GetContextTop - GetStatusBarHeight;
-end;
-
-function jApp.GetNavigationHeight : integer;
-begin
-  Result:= jni_func_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'GetNavigationHeight');
-end;
-
 function jApp.GetControlsVersionInfo: string;
 begin
   Result:= jni_func_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'GetControlsVersionInfo'); //"ver&rev|newFeature;ver$rev|newfeature2"
@@ -5859,29 +5835,6 @@ end;
 function jApp.GetControlsVersionFeatures: string;     //"ver&rev|newFeature;ver$rev|newfeature2"
 begin
   Result:= jni_func_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'GetControlsVersion');
-end;
-
-//thanks to  thierrydijoux
-function jApp.GetStringResourceId(_resName: string): integer;
-begin
-  Result:= jni_func_t_out_i(Self.Jni.jEnv, Self.Jni.jThis, 'GetStringResourceId', PChar(_resName));
-end;
-
-function  jApp.GetStringResourceById(_resId: integer): string;
-begin
-  Result:= jni_func_i_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'GetStringResourceById', _resId);
-end;
-
-//by thierrydijoux - get a resource string by name
-function jApp.GetStringResourceByName(_resName: string): string;
-begin
-  Result:= jni_func_t_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'getStringResourceByName', _resName);
-end;
-
-//by thierrydijoux - get a resource string by name
-function jApp.GetQuantityStringByName(_resName: string; _Quantity: integer): string;
-begin
-  Result:= jni_func_ti_out_t(Self.Jni.jEnv, Self.Jni.jThis, 'getQuantityStringByName', _resName, _Quantity);
 end;
 
 function jApp.GetMainActivityName: string;
@@ -7818,19 +7771,6 @@ end;
 Function jSysInfo_Language (env:PJNIEnv; this: jObject; localeType: TLocaleType): String;
 begin
  Result:= jni_func_i_out_t(env, this, 'getLocale', Ord(localeType));
-end;
-
-//------------------------------------------------------------------------------
-// Device Info
-//------------------------------------------------------------------------------
-Function  jSysInfo_DevicePhoneNumber(env:PJNIEnv;this:jobject) : String;
-begin
-   Result:= jni_func_out_t(env, this, 'getDevPhoneNumber');
-end;
-
-Function  jSysInfo_DeviceID(env:PJNIEnv;this:jobject) : String;
-begin
-   Result:= jni_func_out_t(env, this, 'getDevDeviceID');
 end;
 
 Procedure jSystem_SetOrientation(env:PJNIEnv; this:jobject; orientation : Integer);
