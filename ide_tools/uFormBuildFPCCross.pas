@@ -85,7 +85,7 @@ implementation
 {$R *.lfm}
 
 uses
-  IDEExternToolIntf, LazIDEIntf, IniFiles;
+  IDEExternToolIntf, LazIDEIntf, LCLVersion, IniFiles;
 
 { TFormBuildFPCCross }
 
@@ -367,8 +367,12 @@ begin
 
        Tool.Executable := AppendPathDelim(pathToFpcExecutables) + 'make'+strExt;
        Tool.CmdLineParams :=  Params.DelimitedText;
-       Tool.Scanners.Add(SubToolDefault);
 
+       {$IF LCL_FULLVERSION >= 2010000}
+       Tool.Parsers.Add(SubToolDefault);
+       {$ELSE}
+       Tool.Scanners.Add(SubToolDefault);
+       {$ENDIF}
        if not RunExternalTool(Tool) then
        begin
          sucess:= False;
@@ -473,7 +477,12 @@ begin
 
        Tool.Executable := pathToFpcExecutables + DirectorySeparator+ 'make'+strExt;
        Tool.CmdLineParams :=  Params.DelimitedText;
+
+       {$IF LCL_FULLVERSION >= 2010000}
+       Tool.Parsers.Add(SubToolDefault);
+       {$ELSE}
        Tool.Scanners.Add(SubToolDefault);
+       {$ENDIF}
 
        if not RunExternalTool(Tool) then
        begin
@@ -562,7 +571,13 @@ begin
 
        Tool.Executable := pathToFpcExecutables + DirectorySeparator+ 'make'+strExt;
        Tool.CmdLineParams :=  Params.DelimitedText;
+
+       {$IF LCL_FULLVERSION >= 2010000}
+       Tool.Parsers.Add(SubToolDefault);
+       {$ELSE}
        Tool.Scanners.Add(SubToolDefault);
+       {$ENDIF}
+
 
        if not RunExternalTool(Tool) then
        begin

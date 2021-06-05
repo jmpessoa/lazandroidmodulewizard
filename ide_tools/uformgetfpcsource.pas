@@ -47,7 +47,7 @@ implementation
 {$R *.lfm}
 
 uses
-  IDEExternToolIntf, LazIDEIntf{, IniFiles};
+  IDEExternToolIntf, LazIDEIntf, LCLVersion{, IniFiles};
 
 { TFormGetFPCSource }
 
@@ -98,7 +98,12 @@ begin
     Params.Add(fpcTrunkStorePath);       //https://github.com/graemeg/freepascal.git
 
     Tool.CmdLineParams := Params.DelimitedText;
-    Tool.Scanners.Add(SubToolDefault);  // deprecated use "Parsers"
+
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.Parsers.Add(SubToolDefault);
+    {$ELSE}
+    Tool.Scanners.Add(SubToolDefault);
+    {$ENDIF}
 
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot Run Extern [svn] Tool!');

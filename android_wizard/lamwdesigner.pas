@@ -61,7 +61,7 @@ type
     procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion=1070000}; {%H-}PropName: ShortString{$ENDIF});
     procedure OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
     //procedure OnPersistentDeleted;
-    procedure OnPersistentDeleted({$if lcl_fullversion>2010000}APersistent: TPersistent{$endif}); //thanks to @Coldzer0 !
+    procedure OnPersistentDeleted({$IF LCL_FULLVERSION >= 2010000}APersistent: TPersistent{$endif}); //thanks to @Coldzer0 !
     procedure OnPersistentDeleting(APersistent: TPersistent);
     procedure OnSetSelection(const ASelection: TPersistentSelectionList);
     // tk
@@ -1973,7 +1973,7 @@ begin
 end;
 
 // procedure TAndroidWidgetMediator.OnPersistentDeleted(APersistent: TPersistent);
-procedure TAndroidWidgetMediator.OnPersistentDeleted({$if lcl_fullversion>2010000}APersistent: TPersistent{$endif});
+procedure TAndroidWidgetMediator.OnPersistentDeleted({$IF LCL_FULLVERSION >= 2010000}APersistent: TPersistent{$endif});
 begin
   if FjControlDeleted then
     UpdateJControlsList;

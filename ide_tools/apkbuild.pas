@@ -767,7 +767,12 @@ begin
     Tool.ShowConsole := True;
 {$endif}
     // end tk
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.Parsers.Add(SubToolAnt);
+    {$ELSE}
     Tool.Scanners.Add(SubToolAnt);
+    {$ENDIF}
+
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot build APK!');
     Result := True;
@@ -929,7 +934,12 @@ begin
     Tool.ShowConsole := True;
 {$endif}
     // end tk
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.Parsers.Add(SubToolAnt);
+    {$ELSE}
     Tool.Scanners.Add(SubToolAnt);
+    {$ENDIF}
+
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot install APK!');
     Result := True;
@@ -975,7 +985,12 @@ begin
     Tool.ResolveMacros := True;
     Tool.Executable := IncludeTrailingPathDelimiter(FSdkPath) + 'platform-tools' + PathDelim + 'adb$(ExeExt)';
     Tool.CmdLineParams := 'shell am start -n ' + proj + '/.App';
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.Parsers.Add(SubToolDefault);
+    {$ELSE}
     Tool.Scanners.Add(SubToolDefault);
+    {$ENDIF}
+
     If Not RunExternalTool(Tool) then raise Exception.Create('Cannot run APK!');
     FApkRun := True;
   finally
@@ -1007,7 +1022,12 @@ begin
     Tool.ShowConsole := True;
 {$endif}
     // end tk
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.Parsers.Add(SubToolGradle);
+    {$ELSE}
     Tool.Scanners.Add(SubToolGradle);
+    {$ENDIF}
+
     if not RunExternalTool(Tool) then
       raise Exception.Create('Cannot build APK!');
     Result := True;
@@ -1039,7 +1059,12 @@ begin
     Tool.ShowConsole := True;
 {$endif}
     // end tk
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.Parsers.Add(SubToolGradle);
+    {$ELSE}
     Tool.Scanners.Add(SubToolGradle);
+    {$ENDIF}
+
     If Not RunExternalTool(Tool) then raise Exception.Create('Cannot run APK!');
     FApkRun := True;
   finally
@@ -1276,7 +1301,12 @@ begin
     Tool.ResolveMacros :=  True;
     Tool.Executable    :=  AdbExecutable;
     Tool.CmdLineParams :=  Command;
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.{%H-}Parsers.Add(Parser);
+    {$ELSE}
     Tool.{%H-}Scanners.Add(Parser);
+    {$ENDIF}
+
     Result             := RunExternalTool(Tool);
   finally
     Tool.Free;

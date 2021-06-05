@@ -33,7 +33,7 @@ uses
   baseunix,
   {$endif}
   LazIDEIntf, LazFileUtils, CompOptsIntf, IDEMsgIntf, IDEExternToolIntf,
-  ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles, LCLType, PackageIntf{, IDEImagesIntf};
+  ProjectIntf, MacroIntf, Controls, ApkBuild, IniFiles, LCLType, LCLVersion, PackageIntf{, IDEImagesIntf};
 
 procedure SaveShellScript(script: TStringList; const AFileName: string);
 begin
@@ -442,7 +442,13 @@ begin
       Tool.WorkingDirectory := pathToADB;
       Tool.Executable := pathToADB + DirectorySeparator+ 'adb'+strExt;
       Tool.CmdLineParams := paramText;
+
+      {$IF LCL_FULLVERSION >= 2010000}
+      Tool.Parsers.Add(SubToolDefault);
+      {$ELSE}
       Tool.Scanners.Add(SubToolDefault);
+      {$ENDIF}
+
       if not RunExternalTool(Tool) then
         raise Exception.Create('Cannot Run Extern [adb] Tool!');
     finally
