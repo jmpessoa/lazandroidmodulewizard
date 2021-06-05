@@ -210,7 +210,7 @@ uses LamwSettings;
 function TFormWorkspace.GetMaxNdkPlatform(var index: integer): integer;
 var
   lisDir: TStringList;
-  auxStr: string;
+  auxStr, aNDKDir: string;
   i, intAux,  count: integer;
 begin
   Result:= 0;
@@ -221,19 +221,26 @@ begin
 
   ListBoxNdkPlatform.Clear;
 
-  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms', False);
+  aNDKDir:=IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms';
+  // For NDK >= 22
+  // Best choice : arm platforms
+  if NOT DirectoryExists(aNDKDir) then
+    aNDKDir:=ConcatPaths([FPathToAndroidNdk,'toolchains','llvm','prebuilt',GetPrebuiltDirectory,'sysroot','usr','lib','arm-linux-androideabi']);
 
-  if lisDir.Count > 0 then
+  FindAllDirectories(lisDir, aNDKDir, False);
+
+  if (lisDir.Count > 0) then
   begin
     for i:=0 to lisDir.Count-1 do
     begin
        auxStr:= ExtractFileName(lisDir.Strings[i]);
        if auxStr <> '' then
        begin
+         if (Pos('-',auxStr)>0) then
          auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
          if IsAllCharNumber(PChar(auxStr))  then  //skip android-P
          begin
-           intAux:= StrToInt(auxStr);
+           intAux:= StrToIntDef(auxStr,0);
            if (intAux > 13) and (intAux < 27)  then
            begin
               ListBoxNdkPlatform.Items.Add(auxStr);
@@ -252,7 +259,8 @@ begin
     end;
     if ListBoxNdkPlatform.Items.Count > 0 then
        ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.Count-1;
-  end else ShowMessage('Fail! Folder ' + IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms is empty!');
+  end
+  else ShowMessage('Fail! Folder ' + aNDKDir + ' cannot be processed !');
   lisDir.free;
 
 end;
