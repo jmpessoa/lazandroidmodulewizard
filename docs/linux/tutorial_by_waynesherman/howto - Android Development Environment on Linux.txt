@@ -1,84 +1,151 @@
-# Setup Android Development Environment on Linux (FPCUPdeluxe / LAMW)
+Updated 2021-Jun-05 ver 1.5
 
-   by WayneSherman
-   ref. https://forum.lazarus.freepascal.org/index.php/topic,40750.0.html
- 
-# Tested on Xubuntu 16.04 64-bit and Xubuntu 18.04 64-bit
-# Target 32-bit ARM on Android
-# Target 64-bit aarch64 on Android
-# 2019-May-20 ver 1.3
+[HowTo] Android Development Environment on Linux (FPCUPdeluxe + LAMW)
+
+By WayneSherman 
+https://forum.lazarus.freepascal.org/index.php/topic,40750.html
+
+See also:  http://wiki.freepascal.org/LAMW_on_Linux
+
+Updated 2021-Jun-05 ver 1.5
+
+See also:  http://wiki.freepascal.org/LAMW_on_Linux
+
+Motivation:
+  Needed simple instructions to get an up-to-date Android build environment setup on Linux.
+   
+Thanks to other developers for sharing their hard work, utilities, and helpful information.
+Please provide feedback if you find any issues, or if there are ways to simplify even more.
+
+Everything is self-contained under the user's home "android" folder
+$HOME/android/sdk  (android sdk and build tools)
+$HOME/android/sdk/ndk-bundle  (android ndk)
+$HOME/android/fpcupdeluxe_app  (FPCUPdeluxe installer)
+$HOME/android/projects  (default LAMW projects folder)
+$HOME/android/fpc-lazarus  (FPC, Lazarus built w/ LAMW)
+$HOME/android/fpc-lazarus/ccr/lamw  (LAMW files and demos)
+$HOME/android/fpc-lazarus/ccr/lamw-gradle  (gradle build tool)
+
+Versions Tested
+Xubuntu 20.04 64-bit w/ latest updates installed
+
+Android Command-Line Tools build 7302050
+OpenJDK 11
+Android SDK/API Level 29 (Android 10)
+Android NDK ver 22
+Gradle 6.8.3 (installed automatically by FPCUPdeluxe)
+
+FPCUPdeluxe ver 1.8.2u
+FPC stable v3.2.2
+Lazarus stable v2.0.12
+
+32-bit CPU Target: ARMv7a + VFPv3 (hardware floating point)
+64-bit CPU Target: Aarch64
+
+I recommend running these commands one at a time so you can verify the results before moving on to the next step.
+-----------------------------------------------------------------------------------------------------------------
+# Setup Android Development Environment on Linux (FPCUPdeluxe / LAMW)
+# Tested on Xubuntu 20.04 64-bit
+# Targets: 32-bit ARM and 64-bit aarch64
+# 2021-Jun-05 ver 1.5
  
 # Install libraries and tools
-sudo apt-get install -y libx11-dev libgtk2.0-dev libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev libxtst-dev libatk1.0-dev libghc-x11-dev freeglut3 freeglut3-dev
-sudo apt-get install -y git subversion make build-essential gdb zip unzip unrar wget
-sudo apt-get install -y openjdk-8-jdk android-tools-adb ant
- 
-#Note:  Next line is not needed on Ubuntu 16.04
-sudo update-java-alternatives --set /usr/lib/jvm/java-1.8.0-openjdk-amd64
- 
-mkdir -p "$HOME/android/sdk"
+sudo apt install -y libx11-dev libgtk2.0-dev libgdk-pixbuf2.0-dev libcairo2-dev libpango1.0-dev libxtst-dev libatk1.0-dev libghc-x11-dev freeglut3 freeglut3-dev
+sudo apt install -y git subversion make build-essential gdb zip unzip unrar wget
+sudo apt install -y openjdk-11-jdk android-tools-adb
  
 # download and extract Android SDK Command Line Tools for Linux
 # from https://developer.android.com/studio/#downloads
-cd "$HOME/android/sdk"
-wget "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip"
-unzip "sdk-tools-linux-4333796.zip"
-rm "sdk-tools-linux-4333796.zip"
- 
-#Install SDK packages and NDK (as of 2019-May-20 this pulls in NDK r19c)
-cd "$HOME/android/sdk/tools/bin"
-./sdkmanager "platforms;android-26" "build-tools;26.0.3" "tools" "ndk-bundle" "extras;android;m2repository"
- 
-# make symbolic link to NDK toolchain
-ln -sf "$HOME/android/sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin" "$HOME/android/ndk-toolchain"
- 
-# work around bug, NDK 18 removed MIPS toolchains, but gradle plugin 3.0.1 won't run unless they are present
-ln -sf "$HOME/android/sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9" "$HOME/android/sdk/ndk-bundle/toolchains/mips64el-linux-android-4.9"
-ln -sf "$HOME/android/sdk/ndk-bundle/toolchains/arm-linux-androideabi-4.9" "$HOME/android/sdk/ndk-bundle/toolchains/mipsel-linux-android-4.9"
- 
-# download and extract Gradle 4.10.3
-# from https://gradle.org/releases/
-cd "$HOME/android"
-wget "https://services.gradle.org/distributions/gradle-4.10.3-bin.zip"
-unzip "gradle-4.10.3-bin.zip"
-rm "gradle-4.10.3-bin.zip"
- 
-# Use a text editor to open $HOME/.profile and add this text below:
-# example: mousepad $HOME/.profile
-export ANDROID_SDK_ROOT="${HOME}/android/sdk"
-export GRADLE_HOME="${HOME}/android/gradle-4.10.3"
-export PATH="${PATH}:${HOME}/android/ndk-toolchain"
-export PATH="${PATH}:${GRADLE_HOME}/bin"
- 
-# Reboot (or logout of session and login)
+mkdir -p "$HOME/android/sdk/cmdline-tools"
+cd "$HOME/android/sdk/cmdline-tools"
+wget "https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip"
+unzip "commandlinetools-linux-7302050_latest.zip"
+rm "commandlinetools-linux-7302050_latest.zip"
+mv cmdline-tools tools
+   
+# Install SDK packages and NDK (as of 2021-Jun-03 this pulls in NDK r22b)
+cd "$HOME/android/sdk/cmdline-tools/tools/bin"
+yes | ./sdkmanager --licenses
+./sdkmanager "platforms;android-29" "build-tools;29.0.3" "tools" "ndk-bundle" "extras;android;m2repository"
  
 # Download FPCUPdeluxe from https://github.com/newpascal/fpcupdeluxe/releases/latest
-# (tested with version 1.6.2v)
-mkdir "$HOME/fpcupdeluxe_app"
-cd "$HOME/fpcupdeluxe_app"
-wget "https://github.com/newpascal/fpcupdeluxe/releases/download/1.6.2v/fpcupdeluxe-x86_64-linux"
+# (tested with version 1.8.2u)
+mkdir "$HOME/android/fpcupdeluxe_app"
+cd "$HOME/android/fpcupdeluxe_app"
+wget "https://github.com/newpascal/fpcupdeluxe/releases/download/1.8.2u/fpcupdeluxe-x86_64-linux"
 chmod +x fpcupdeluxe-x86_64-linux
+echo "[General]" > fpcupdeluxe.ini
+echo "InstallDirectory=$HOME/android/fpc-lazarus" >> fpcupdeluxe.ini
 ./fpcupdeluxe-x86_64-linux
-# Using FPCUPdeluxe install FPC/Lazarus, crosscompiler, and packages/modules:
-# 1) On "Basic" tab, select FPC version "fixes3.2" & Lazarus version "fixes2.0" and click "Install/update FPC+Laz" button (if this fails, please see comments in next post)
-# 2) On "Cross" tab, select CPU arm & OS android, "Install compiler" (select "yes" to missing tools message box)
-# 3) On "Cross" tab, select CPU aarch64 & OS android, "Install compiler" (Ignore trunk warning, select "yes" to missing tools message box)
-# 4) On Modules tab, select LAMW, Install module
-# 5) (Optional but recommended) In module list: Select OPM, Install module (online package manager)
  
-# Run Lazarus using the shortcut created by FPCUPdeluxe
+# Using the FPCUPdeluxe GUI
+# (The install path is already set to: /home/[your_user]/android/fpc-lazarus)
+#
+# 1) At the bottom of the main Window, click "Android LAMW"
+#
+# As of 2021-Jun-04, this installs stable FPC (3.2.2), stable Lazarus (v2.0.12), cross
+# compilers for arm/android and aarch64/android, gradle v6.8.3, and latest LAMW from git.
+#
+# 2) (Optional) On module tab click the "OPM" button to install Online Package Manager.
+# 3) Close FPCUPdeluxe
  
-# NOTE: DO NOT forget to replace references to [user] with your user name in 3 paths below
-# Select Tools menu > [Lamw] Android Module Wizard > Paths Settings: [Jdk, Sdk, Ndk, ...]:
-# Path to Java JDK: /usr/lib/jvm/java-8-openjdk-amd64
-# Path to Ant bin: /usr/bin
-# Path to Gradle: /home/[user]/android/gradle-4.10.3
-# Path to Android NDK: /home/[user]/android/sdk/ndk-bundle
-# NDK Version: >11
-# Your Desktop System: linux-x86_64
-# Path to Android SDK: /home/[user]/android/sdk
+# Make a better name for the desktop shortcut
+mv $HOME/Desktop/fpcup-Lazarus_fpc-lazarus.desktop $HOME/Desktop/Lazarus-LAMW.desktop
+sed -i "/^Name=/c\Name=Lazarus-LAMW" $HOME/Desktop/Lazarus-LAMW.desktop
  
-# For new LAMW projects, use Gradle for APK Builder and
+# Create a directory for android projects
+mkdir -p "$HOME/android/projects"
+ 
+# Edit LAMW settings via the ini file
+LAMWini="$HOME/android/fpc-lazarus/config_lazarus/LAMW.ini"
+sed -i "/PathToWorkspace/c\PathToWorkspace=$HOME/android/projects" $LAMWini
+echo "PathToAndroidNDK=$HOME/android/sdk/ndk-bundle" >> $LAMWini
+echo "PathToAndroidSDK=$HOME/android/sdk" >> $LAMWini
+echo "NDK=5" >> $LAMWini
+echo "PrebuildOSYS=linux-x86_64" >> $LAMWini
+ 
+# After launching Lazarus-LAMW, you can confirm paths and settings in
+# the Tools | [LAMW] Android Module Wizard | Path Settings menu
+ 
+# For new LAMW projects
 #  for 32-bit:  ARMv7a + VFPv3 for Architecture/Instructions
 #  for 64-bit:  Aarch64 for Architecture/Instructions
  
+----------------------------------------------------------------------------- 
+
+***Optional for command line work***
+
+......................................................
+#Create shell script and desktop shortcut
+ 
+LAMWini="$HOME/android/fpc-lazarus/config_lazarus/LAMW.ini"
+cat <<EOF > $HOME/android/set_dev_environment
+#!/bin/sh
+# Setup environment for fpc / lazarus / android command line work
+ 
+FPC_PATH="$HOME/android/fpc-lazarus/fpc/bin/x86_64-linux"
+LAZ_PATH="$HOME/android/fpc-lazarus/lazarus"
+ 
+export PPC_CONFIG_PATH=\${FPC_PATH}
+export PATH=\${FPC_PATH}:\${LAZ_PATH}:\${PATH}
+ 
+export ANDROID_SDK_ROOT="${HOME}/android/sdk"
+export GRADLE_HOME="$(awk -F '=' '/PathToGradle/{print $NF}' $LAMWini)"
+export PATH=\${PATH}:\${GRADLE_HOME}/bin
+ 
+cd "$HOME/android/projects"
+exec /bin/bash
+EOF
+chmod +x $HOME/android/set_dev_environment
+ 
+cat <<EOF > $HOME/Desktop/Android-Command-Line.desktop
+[Desktop Entry]
+Type=Application
+Icon=utilities-terminal
+Exec=$HOME/android/set_dev_environment
+Name=Android-Command-Line
+Terminal=true
+StartupNotify=false
+EOF
+chmod +x $HOME/Desktop/Android-Command-Line.desktop
+...........................................................

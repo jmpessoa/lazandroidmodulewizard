@@ -52,8 +52,10 @@
     <supports-screens android:smallScreens="true" 
                   android:normalScreens="true" 
                   android:largeScreens="true" 
-                  android:anyDensity="true"/>                      
+                  android:anyDensity="true"/>   
+                   
     <application
+        android:requestLegacyExternalStorage="true"
 	android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
