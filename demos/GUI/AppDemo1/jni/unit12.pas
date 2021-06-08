@@ -19,9 +19,9 @@ type
       jImageList1: jImageList;
       jTextView1: jTextView;
       jTextView2: jTextView;
+      procedure AndroidModule12Show(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jCanvasES1_1GLChange(Sender: TObject; W, H: integer);
       procedure jCanvasES1_1GLCreate(Sender: TObject);
@@ -213,9 +213,9 @@ begin
   CanClose:= True;
 end;
 
-procedure TAndroidModule12.DataModuleJNIPrompt(Sender: TObject);
+procedure TAndroidModule12.AndroidModule12Show(Sender: TObject);
 begin
-  _glArcBall_Init(gArcBall);
+   _glArcBall_Init(gArcBall);
 end;
 
 procedure TAndroidModule12.jButton1Click(Sender: TObject);

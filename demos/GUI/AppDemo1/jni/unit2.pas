@@ -32,6 +32,8 @@ type
       jTextView1: jTextView;
       jTextView2: jTextView;
 
+      procedure AndroidModule2ActivityCreate(Sender: TObject;
+        intentData: jObject);
       procedure AndroidModule2BackButton(Sender: TObject);
       procedure AndroidModule2Close(Sender: TObject);
       procedure AndroidModule2CloseQuery(Sender: TObject; var CanClose: boolean);
@@ -71,6 +73,23 @@ begin
   ShowMessage('back pressed!');
 end;
 
+procedure TAndroidModule2.AndroidModule2ActivityCreate(Sender: TObject;
+  intentData: jObject);
+begin
+  AndroidModule3.Init(gApp);
+  AndroidModule4.Init(gApp);
+  AndroidModule5.Init(gApp);
+  AndroidModule6.Init(gApp);
+  AndroidModule7.Init(gApp);
+  AndroidModule8.Init(gApp);
+  AndroidModule9.Init(gApp);
+  AndroidModule10.Init(gApp);
+  AndroidModule11.Init(gApp);
+  AndroidModule12.Init(gApp);
+  AndroidModule13.Init(gApp);
+  AndroidModule14.Init(gApp);
+end;
+
 procedure TAndroidModule2.AndroidModule2Close(Sender: TObject);
 begin
    ShowMessage('Close....');
@@ -96,142 +115,61 @@ end;
 
 procedure TAndroidModule2.jButton1Click(Sender: TObject);  //DEMO: Base Controls
 begin
-  if AndroidModule3 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule3, AndroidModule3);
-   AndroidModule3.Init(gApp);
-  end;
-
   AndroidModule3.Show; //actRecyclable
 end;
 
 procedure TAndroidModule2.jButton2Click(Sender: TObject); //Demo: Memo and ScrollView
 begin
-  if AndroidModule4 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule4, AndroidModule4);
-   AndroidModule4.Init(gApp);
-  end;
-
   AndroidModule4.Show;   //actRecyclable
 end;
 
 procedure TAndroidModule2.jButton3Click(Sender: TObject); //Demo: jWebView1
 begin
-  if AndroidModule5 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule5, AndroidModule5);
-   AndroidModule5.Init(gApp);
-  end;
-
   AndroidModule5.Show; //actRecyclable
 end;
 
 procedure TAndroidModule2.jButton4Click(Sender: TObject);  //Demo: List View
 begin
-  if AndroidModule6 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule6, AndroidModule6);
-   AndroidModule6.Init(gApp);
-  end;
-
   AndroidModule6.Show;  //actRecyclable
 end;
 
 procedure TAndroidModule2.jButton5Click(Sender: TObject);
 begin
-  if AndroidModule7 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule7, AndroidModule7);
-   AndroidModule7.Init(gApp);
-  end;
-
   AndroidModule7.Show; //DEMO: jImageView , jScrollView , jImageBtn1
 end;
 
 procedure TAndroidModule2.jButton6Click(Sender: TObject);
 begin
-  if AndroidModule8 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule8, AndroidModule8);
-   AndroidModule8.Init(gApp);
-  end;
-
   AndroidModule8.Show; //DEMO: jView1, jCanvas, jBitmap1
 end;
 
 procedure TAndroidModule2.jButton7Click(Sender: TObject);
 begin
-  if AndroidModule9 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule9, AndroidModule9);
-   AndroidModule9.Init(gApp);
-  end;
-
   AndroidModule9.Show; //DEMO: jBitmap1  - pixels access...
 end;
 
 procedure TAndroidModule2.jButton8Click(Sender: TObject);  //gl_1 2D
 begin
-  if AndroidModule10 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule10, AndroidModule10);
-   AndroidModule10.Init(gApp);
-  end;
-
-  AndroidModule10.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
-  //or
-  //ReInitShowing(gApp);  //call OnJNIPrompt
+  AndroidModule10.Show;
 end;
 
 procedure TAndroidModule2.jButton9Click(Sender: TObject); //gl_2 2D
 begin
-
-  if AndroidModule11 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule11, AndroidModule11);
-   AndroidModule11.Init(gApp);
-  end;
-
-  AndroidModule11.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
-  //or
-  //ReInitShowing(gApp);  //call OnJNIPrompt  
+  AndroidModule11.Show;
 end;
 
 procedure TAndroidModule2.jButton10Click(Sender: TObject);  //gl_1 3D
 begin
-  if AndroidModule12 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule12, AndroidModule12);
-   AndroidModule12.Init(gApp);
-  end;
-
-  AndroidModule12.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
-  //or
-  //ReInitShowing(gApp);  //call OnJNIPrompt  
+  AndroidModule12.Show;
 end;
 
 procedure TAndroidModule2.jButton11Click(Sender: TObject); //gl_2 3D
 begin
-  if AndroidModule13 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule13, AndroidModule13);
-   AndroidModule13.Init(gApp);
-  end;
-
-  AndroidModule13.Show(gApp); //special Show need to re-init OpenGL engine  ... //combo: ReInit(gApp) + Show(False)
-  //or
-  //ReInitShowing(gApp);  //call OnJNIPrompt  
+  AndroidModule13.Show;
 end;
 
 procedure TAndroidModule2.jButton12Click(Sender: TObject);
 begin
-  if AndroidModule14 = nil then
-  begin
-   gApp.CreateForm(TAndroidModule14, AndroidModule14);
-   AndroidModule14.Init(gApp);
-  end;
-
   AndroidModule14.Show; //jAsyncTask1 / jHttpClient1
 end;
 

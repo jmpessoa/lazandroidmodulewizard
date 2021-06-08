@@ -22,8 +22,8 @@
       <Item0 Name="BuildSystem" Value="Ant"/>
       <Item1 Name="LAMW" Value="GUI"/>
       <Item2 Name="LamwVersion" Value="0.8.6.1"/>
-      <Item3 Name="NdkApi" Value="android-22"/>
-      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r20\"/>
+      <Item3 Name="NdkApi" Value="android-21"/>
+      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r22\"/>
       <Item5 Name="Package" Value="com.example.appdemo1"/>
       <Item6 Name="SdkPath" Value="c:\laztoapk\downloads\android-sdk-windows\"/>
       <Item7 Name="StartModule" Value="AndroidModule1"/>
@@ -59,7 +59,7 @@
         <HasResources Value="True"/>
         <CustomData Count="2">
           <Item0 Name="fclControls"/>
-          <Item1 Name="jControls" Value="jImageList;jImageView;jTextView;jTimer"/>
+          <Item1 Name="jControls" Value="jForm;jImageList;jImageView;jTextView;jTimer"/>
         </CustomData>
       </Unit1>
       <Unit2>
@@ -147,8 +147,9 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule10"/>
         <HasResources Value="True"/>
-        <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView;jTimer"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jForm"/>
         </CustomData>
       </Unit10>
       <Unit11>
@@ -204,7 +205,7 @@
       <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r20\platforms\android-22\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
+      <Libraries Value="C:\laztoapk\downloads\android-ndk-r22\platforms\android-21\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r22\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
@@ -228,7 +229,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r20\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
+      <CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r22\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>
