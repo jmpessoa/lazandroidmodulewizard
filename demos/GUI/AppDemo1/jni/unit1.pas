@@ -14,6 +14,7 @@ type
 
   TAndroidModule1 = class(jForm)
       jImageList1: jImageList;
+      jImageList2: jImageList;
       jImageView1: jImageView;
       jImageView2: jImageView;
       jTextView1: jTextView;
@@ -23,10 +24,10 @@ type
         );
       procedure AndroidModule1Create(Sender: TObject);
       procedure AndroidModule1Init(Sender: TObject);
-      procedure AndroidModule1JNIPrompt(Sender: TObject);
       procedure AndroidModule1RequestPermissionResult(Sender: TObject;
         requestCode: integer; manifestPermission: string;
         grantResult: TManifestPermissionResult);
+      procedure AndroidModule1Show(Sender: TObject);
       procedure jTimer1Timer(Sender: TObject);
     private
       {private declarations}
@@ -61,25 +62,12 @@ procedure TAndroidModule1.AndroidModule1Close(Sender: TObject);
 begin
   jTimer1.Enabled:= False;   //Stop Timer
 
-  gApp.CreateForm(TAndroidModule2, AndroidModule2);
   AndroidModule2.InitShowing(gapp);
 end;
 
 procedure TAndroidModule1.AndroidModule1Init(Sender: TObject);
 begin
  gapp.SetDensityAssets(daHIGH);
-end;
-
-procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
-begin
-  if IsRuntimePermissionNeed() then   // that is, target API >= 23  - Android 6
-  begin
-      ShowMessage('RequestRuntimePermission....');
-      //hint: if you  get "write" permission then you have "read", too!
-      Self.RequestRuntimePermission(['android.permission.WRITE_EXTERNAL_STORAGE'], 2003);  // some/any value...
-  end;
-
-  jTimer1.Enabled:= True;
 end;
 
 procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
@@ -94,6 +82,18 @@ begin
                 ShowMessage('Sorry... ['+manifestPermission+'] Permission not grant... ' );
           end;
    end;
+end;
+
+procedure TAndroidModule1.AndroidModule1Show(Sender: TObject);
+begin
+  if IsRuntimePermissionNeed() then   // that is, target API >= 23  - Android 6
+  begin
+      ShowMessage('RequestRuntimePermission....');
+      //hint: if you  get "write" permission then you have "read", too!
+      Self.RequestRuntimePermission(['android.permission.WRITE_EXTERNAL_STORAGE'], 2003);  // some/any value...
+  end;
+
+  jTimer1.Enabled:= True;
 end;
 
 procedure TAndroidModule1.jTimer1Timer(Sender: TObject);

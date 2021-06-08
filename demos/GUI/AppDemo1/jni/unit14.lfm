@@ -1,30 +1,32 @@
 object AndroidModule14: TAndroidModule14
-  Left = 366
-  Top = 68
-  Width = 300
-  Height = 668
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
+  Left = 366
+  Top = 50
+  Width = 300
+  Height = 668
   Text = 'AndroidModule14'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
-  OnJNIPrompt = DataModuleJNIPrompt
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  OnShow = AndroidModule14Show
   object jTextView1: jTextView
-    Left = 67
-    Top = 10
-    Width = 166
-    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Enabled = True
+    Left = 87
+    Top = 10
+    Width = 126
+    Height = 20
     Visible = True
-    Id = 41380
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -39,18 +41,17 @@ object AndroidModule14: TAndroidModule14
     GravityInParent = lgNone
   end
   object jButton1: jButton
-    Left = 5
-    Top = 93
-    Width = 290
-    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 5
+    Top = 87
+    Width = 290
+    Height = 50
     Visible = True
     Anchor = jCheckBox1
-    Id = 67114
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -64,18 +65,17 @@ object AndroidModule14: TAndroidModule14
     OnClick = jButton1Click
   end
   object jProgressBar1: jProgressBar
-    Left = 10
-    Top = 165
-    Width = 280
-    Height = 23
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Enabled = False
+    Left = 10
+    Top = 152
+    Width = 280
+    Height = 23
     Visible = False
     Anchor = jButton1
-    Id = 24359
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -87,18 +87,17 @@ object AndroidModule14: TAndroidModule14
     GravityInParent = lgNone
   end
   object jTextView2: jTextView
-    Left = 10
-    Top = 208
-    Width = 137
-    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Enabled = True
+    Left = 10
+    Top = 195
+    Width = 106
+    Height = 20
     Visible = True
     Anchor = jProgressBar1
-    Id = 69640
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -113,18 +112,17 @@ object AndroidModule14: TAndroidModule14
     GravityInParent = lgNone
   end
   object jEditText1: jEditText
-    Left = 10
-    Top = 254
-    Width = 280
-    Height = 153
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Enabled = True
+    Left = 10
+    Top = 235
+    Width = 280
+    Height = 167
     Visible = True
     Anchor = jTextView2
-    Id = 45472
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -146,21 +144,21 @@ object AndroidModule14: TAndroidModule14
     FontSizeUnit = unitDefault
     CloseSoftInputOnEnter = True
     CapSentence = False
+    CaptureBackPressed = False
     GravityInParent = lgNone
   end
   object jTextView3: jTextView
-    Left = 10
-    Top = 427
-    Width = 168
-    Height = 26
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Enabled = True
+    Left = 10
+    Top = 422
+    Width = 128
+    Height = 20
     Visible = True
     Anchor = jEditText1
-    Id = 47102
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -175,37 +173,36 @@ object AndroidModule14: TAndroidModule14
     GravityInParent = lgNone
   end
   object jScrollView1: jScrollView
-    Left = 5
-    Top = 468
-    Width = 290
-    Height = 153
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 5
+    Top = 457
+    Width = 290
+    Height = 167
     Visible = True
     Anchor = jTextView3
-    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpOneQuarterOfParent
+    InnerLayout = ilRelative
     FillViewportEnabled = False
     ScrollSize = 800
     BackgroundColor = colbrSkyBlue
     object jEditText2: jEditText
-      Left = 17
-      Top = 10
-      Width = 243
-      Height = 133
       MarginLeft = 5
       MarginTop = 10
       MarginRight = 30
       MarginBottom = 10
       Enabled = True
+      Left = 17
+      Top = 10
+      Width = 243
+      Height = 147
       Visible = True
-      Id = 0
       PosRelativeToAnchor = []
       PosRelativeToParent = [rpCenterInParent]
       LayoutParamWidth = lpMatchParent
@@ -227,22 +224,22 @@ object AndroidModule14: TAndroidModule14
       FontSizeUnit = unitDefault
       CloseSoftInputOnEnter = True
       CapSentence = False
+      CaptureBackPressed = False
       GravityInParent = lgNone
     end
   end
   object jCheckBox1: jCheckBox
-    Left = 5
-    Top = 51
-    Width = 131
-    Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 5
+    Top = 45
+    Width = 111
+    Height = 32
     Visible = True
     Anchor = jTextView1
-    Id = 2231034
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -267,14 +264,14 @@ object AndroidModule14: TAndroidModule14
     UploadFormName = 'lamwFormUpload'
     OnContentResult = jHttpClient1ContentResult
     OnCodeResult = jHttpClient1CodeResult
-    left = 160
-    top = 168
+    Left = 160
+    Top = 168
   end
   object jTimer1: jTimer
     Enabled = False
     Interval = 20
     OnTimer = jTimer1Timer
-    left = 233
-    top = 171
+    Left = 233
+    Top = 171
   end
 end

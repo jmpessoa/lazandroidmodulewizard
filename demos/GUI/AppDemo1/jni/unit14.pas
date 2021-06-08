@@ -24,7 +24,7 @@ type
       jTextView2: jTextView;
       jTextView3: jTextView;
       jTimer1: jTimer;
-      procedure DataModuleJNIPrompt(Sender: TObject);
+      procedure AndroidModule14Show(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jCheckBox1Click(Sender: TObject);
       procedure jHttpClient1CodeResult(Sender: TObject; code: integer);
@@ -48,10 +48,9 @@ implementation
 
 { TAndroidModule14 }
 
-
-procedure TAndroidModule14.DataModuleJNIPrompt(Sender: TObject);
+procedure TAndroidModule14.AndroidModule14Show(Sender: TObject);
 begin
-   if not Self.isConnected() then
+  if not Self.isConnected() then
   begin //try wifi
     if Self.SetWifiEnabled(True) then
       jCheckBox1.Checked:= True

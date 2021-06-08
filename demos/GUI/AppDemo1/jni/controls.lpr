@@ -5,7 +5,8 @@ library controls;  //by Lamw: Lazarus Android Module Wizard: 7/5/2015 17:22:33]
  
 uses
   Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,
-  Laz_And_Controls_Events, unit1;
+  Laz_And_Controls_Events, unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8,
+  unit9, unit10, unit11, unit12, unit13, unit14;
 
 {%region /fold 'LAMW generated code'}
 
@@ -1094,6 +1095,20 @@ begin
   gApp.AppName:=gjAppName;
   gApp.ClassName:=gjClassName;
   gApp.Initialize;
+
+  gApp.CreateForm(TAndroidModule2, AndroidModule2);
+  gApp.CreateForm(TAndroidModule3, AndroidModule3);
+  gApp.CreateForm(TAndroidModule4, AndroidModule4);
+  gApp.CreateForm(TAndroidModule5, AndroidModule5);
+  gApp.CreateForm(TAndroidModule6, AndroidModule6);
+  gApp.CreateForm(TAndroidModule7, AndroidModule7);
+  gApp.CreateForm(TAndroidModule8, AndroidModule8);
+  gApp.CreateForm(TAndroidModule9, AndroidModule9);
+  gApp.CreateForm(TAndroidModule10, AndroidModule10);
+  gApp.CreateForm(TAndroidModule11, AndroidModule11);
+  gApp.CreateForm(TAndroidModule12, AndroidModule12);
+  gApp.CreateForm(TAndroidModule13, AndroidModule13);
+  gApp.CreateForm(TAndroidModule14, AndroidModule14);
 
   gApp.CreateForm(TAndroidModule1, AndroidModule1);
 end.

@@ -19,9 +19,9 @@ type
       jImageList1: jImageList;
       jTextView1: jTextView;
       jView1: jView;
+      procedure AndroidModule9Show(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
       procedure DataModuleCreate(Sender: TObject);
-      procedure DataModuleJNIPrompt(Sender: TObject);
       procedure DataModuleRotate(Sender: TObject; rotate: integer; var rstRotate: integer);
       procedure jButton1Click(Sender: TObject);
       procedure jView1Draw(Sender: TObject);
@@ -58,16 +58,16 @@ begin
   CanClose:= True;
 end;
 
+procedure TAndroidModule9.AndroidModule9Show(Sender: TObject);
+begin
+  Ratio:= jBitmap1.GetRatio;
+end;
+
 procedure TAndroidModule9.DataModuleCreate(Sender: TObject);
 begin
   P.X:= 30;
   P.Y:= 30;
   SwapCanMode:= 0;
-end;
-
-procedure TAndroidModule9.DataModuleJNIPrompt(Sender: TObject);
-begin
-  Ratio:= jBitmap1.GetRatio;
 end;
 
 procedure TAndroidModule9.DataModuleRotate(Sender: TObject; rotate: integer;

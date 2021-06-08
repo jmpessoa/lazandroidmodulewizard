@@ -4,13 +4,13 @@
     <PathDelim Value="\"/>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="19">
+    <Units Count="48">
       <Unit0>
         <Filename Value="controls.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="33" Y="8"/>
-        <UsageCount Value="23"/>
+        <TopLine Value="2"/>
+        <CursorPos X="48" Y="9"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
@@ -21,12 +21,12 @@
         <HasResources Value="True"/>
         <CustomData Count="2">
           <Item0 Name="fclControls"/>
-          <Item1 Name="jControls" Value="jImageList;jImageView;jTextView;jTimer"/>
+          <Item1 Name="jControls" Value="jForm;jImageList;jImageView;jTextView;jTimer"/>
         </CustomData>
-        <EditorIndex Value="1"/>
-        <TopLine Value="50"/>
-        <CursorPos X="36" Y="65"/>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="32"/>
+        <TopLine Value="81"/>
+        <CursorPos X="71" Y="100"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -40,10 +40,12 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jImageList;jImageView;jTextView"/>
         </CustomData>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="173"/>
-        <CursorPos X="3" Y="176"/>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="75"/>
+        <CursorPos X="6" Y="117"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit2>
       <Unit3>
@@ -55,7 +57,12 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCheckBox;jDialogProgress;jDialogYN;jEditText;jImageList;jImageView;jProgressBar;jRadioButton;jTextView;jTimer"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="90"/>
+        <CursorPos X="57" Y="41"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit3>
       <Unit4>
@@ -67,10 +74,12 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jEditText;jScrollView;jTextView"/>
         </CustomData>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="12"/>
-        <CursorPos X="52" Y="55"/>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="57"/>
+        <CursorPos X="3" Y="75"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit4>
       <Unit5>
@@ -82,7 +91,12 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jEditText;jPanel;jTextView;jWebView"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="89"/>
+        <CursorPos X="3" Y="91"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit5>
       <Unit6>
@@ -94,7 +108,10 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jBitmap;jButton;jEditText;jImageList;jListView;jTextView"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="6"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit6>
       <Unit7>
@@ -106,7 +123,10 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jImageBtn;jImageList;jImageView;jScrollView;jTextView"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="7"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit7>
       <Unit8>
@@ -118,7 +138,12 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jBitmap;jButton;jCanvas;jImageList;jImageView;jTextView;jView"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="93"/>
+        <CursorPos X="3" Y="100"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit8>
       <Unit9>
@@ -130,7 +155,12 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jBitmap;jButton;jCanvas;jImageList;jTextView;jView"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="14"/>
+        <CursorPos X="7" Y="25"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit9>
       <Unit10>
@@ -138,10 +168,16 @@
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AndroidModule10"/>
         <HasResources Value="True"/>
-        <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView;jTimer"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jForm"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="31"/>
+        <TopLine Value="204"/>
+        <CursorPos X="3" Y="206"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit10>
       <Unit11>
@@ -153,10 +189,12 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCanvasES2;jImageList;jTextView;jTimer"/>
         </CustomData>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="205"/>
-        <CursorPos X="5" Y="216"/>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="203"/>
+        <CursorPos X="36" Y="98"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit11>
       <Unit12>
@@ -168,7 +206,12 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="12"/>
+        <TopLine Value="14"/>
+        <CursorPos X="7" Y="25"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit12>
       <Unit13>
@@ -180,7 +223,10 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCanvasES2;jTextView;jTimer"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="13"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit13>
       <Unit14>
@@ -192,51 +238,291 @@
           <Item0 Name="fclControls"/>
           <Item1 Name="jControls" Value="jButton;jCheckBox;jEditText;jHttpClient;jProgressBar;jScrollView;jTextView;jTimer"/>
         </CustomData>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="30"/>
+        <TopLine Value="65"/>
+        <CursorPos X="3" Y="68"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit14>
       <Unit15>
         <Filename Value="unitglobal.pas"/>
         <IsPartOfProject Value="True"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="46"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit15>
       <Unit16>
         <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\androidwidget.pas"/>
         <UnitName Value="AndroidWidget"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="7064"/>
-        <CursorPos X="57" Y="7076"/>
-        <UsageCount Value="11"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="3254"/>
+        <CursorPos X="17" Y="3273"/>
+        <UsageCount Value="14"/>
+        <Loaded Value="True"/>
       </Unit16>
       <Unit17>
         <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_Controls.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="11209"/>
-        <CursorPos X="40" Y="11280"/>
-        <UsageCount Value="10"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="13138"/>
+        <CursorPos X="79" Y="13157"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit17>
       <Unit18>
         <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_GLESv2_Canvas.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1376"/>
-        <CursorPos X="38" Y="1393"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="248"/>
+        <CursorPos X="52" Y="263"/>
+        <UsageCount Value="16"/>
       </Unit18>
+      <Unit19>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\gl2surfaceview.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="36"/>
+        <CursorPos X="34" Y="40"/>
+        <UsageCount Value="9"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\And_jni_Bridge.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="452"/>
+        <CursorPos X="56" Y="460"/>
+        <UsageCount Value="13"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\And_jni.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="199"/>
+        <CursorPos X="7" Y="210"/>
+        <UsageCount Value="10"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_GLESv2_Canvas_h.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="464"/>
+        <CursorPos X="11" Y="475"/>
+        <UsageCount Value="14"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\paintshader.pas"/>
+        <EditorIndex Value="20"/>
+        <TopLine Value="307"/>
+        <CursorPos X="32" Y="125"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\texttospeech.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="145"/>
+        <CursorPos X="21" Y="151"/>
+        <UsageCount Value="11"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\srecyclerview.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="757"/>
+        <CursorPos X="50" Y="774"/>
+        <UsageCount Value="11"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\gridview.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="925"/>
+        <CursorPos X="21" Y="934"/>
+        <UsageCount Value="11"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\speechtotext.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="152"/>
+        <CursorPos X="52" Y="170"/>
+        <UsageCount Value="11"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\zbarcodescannerview.pas"/>
+        <EditorIndex Value="29"/>
+        <TopLine Value="561"/>
+        <CursorPos X="16" Y="165"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\wifimanager.pas"/>
+        <EditorIndex Value="28"/>
+        <TopLine Value="253"/>
+        <CursorPos X="16" Y="71"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\telephonymanager.pas"/>
+        <EditorIndex Value="27"/>
+        <TopLine Value="306"/>
+        <CursorPos X="16" Y="90"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\spinner.pas"/>
+        <UnitName Value="Spinner"/>
+        <EditorIndex Value="26"/>
+        <TopLine Value="721"/>
+        <CursorPos X="3" Y="652"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\soundpool.pas"/>
+        <EditorIndex Value="25"/>
+        <TopLine Value="195"/>
+        <CursorPos X="16" Y="69"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\sensormanager.pas"/>
+        <EditorIndex Value="24"/>
+        <TopLine Value="328"/>
+        <CursorPos X="16" Y="146"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\seekbar.pas"/>
+        <EditorIndex Value="23"/>
+        <TopLine Value="376"/>
+        <CursorPos X="16" Y="116"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\sadmob.pas"/>
+        <EditorIndex Value="22"/>
+        <TopLine Value="594"/>
+        <CursorPos X="16" Y="174"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\preferences.pas"/>
+        <EditorIndex Value="21"/>
+        <TopLine Value="166"/>
+        <CursorPos X="60" Y="182"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\location.pas"/>
+        <EditorIndex Value="19"/>
+        <TopLine Value="677"/>
+        <CursorPos X="36" Y="185"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit37>
+      <Unit38>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\intentmanager.pas"/>
+        <EditorIndex Value="18"/>
+        <TopLine Value="1279"/>
+        <CursorPos X="15" Y="987"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\imagefilemanager.pas"/>
+        <EditorIndex Value="17"/>
+        <TopLine Value="12"/>
+        <CursorPos X="5" Y="28"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\flash.pas"/>
+        <EditorIndex Value="16"/>
+        <TopLine Value="182"/>
+        <CursorPos X="32" Y="64"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\customdialog.pas"/>
+        <EditorIndex Value="15"/>
+        <CursorPos X="33" Y="115"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\cbillingclient.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="14"/>
+        <TopLine Value="1034"/>
+        <CursorPos X="16" Y="1047"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\analogclock.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="271"/>
+        <CursorPos X="32" Y="80"/>
+        <UsageCount Value="11"/>
+      </Unit43>
+      <Unit44>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\brightness.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="86"/>
+        <CursorPos X="3" Y="66"/>
+        <UsageCount Value="10"/>
+      </Unit44>
+      <Unit45>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\broadcastreceiver.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="148"/>
+        <CursorPos X="52" Y="240"/>
+        <UsageCount Value="10"/>
+      </Unit45>
+      <Unit46>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\Laz_And_GLESv1_Canvas.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1099"/>
+        <CursorPos X="33" Y="1126"/>
+        <UsageCount Value="13"/>
+      </Unit46>
+      <Unit47>
+        <Filename Value="C:\Users\sotrafa\Documents\GitHub\lazandroidmodulewizard\android_bridges\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11749"/>
+        <CursorPos X="11" Y="11576"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit47>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="98" Column="3" TopLine="80"/>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\cbillingclient.pas"/>
+        <Caret Line="453" Column="34" TopLine="438"/>
       </Position1>
       <Position2>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="108" Column="23" TopLine="86"/>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\cbillingclient.pas"/>
+        <Caret Line="454" Column="18" TopLine="438"/>
       </Position2>
       <Position3>
-        <Filename Value="controls.lpr"/>
-        <Caret Line="8" Column="33"/>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\cbillingclient.pas"/>
+        <Caret Line="543" Column="52" TopLine="518"/>
       </Position3>
+      <Position4>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1001" Column="16" TopLine="974"/>
+      </Position4>
+      <Position5>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1018" Column="26" TopLine="997"/>
+      </Position5>
+      <Position6>
+        <Filename Value="C:\fpcupdeluxe\LAMW\android_bridges\cbillingclient.pas"/>
+        <Caret Line="1544" Column="17" TopLine="1530"/>
+      </Position6>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

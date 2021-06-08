@@ -17,8 +17,8 @@ object AndroidModule11: TAndroidModule11
   AnimationDurationOut = 1500
   AnimationMode = animNone
   OnCloseQuery = DataModuleCloseQuery
-  OnJNIPrompt = DataModuleJNIPrompt
   OnBackButton = AndroidModule11BackButton
+  OnShow = AndroidModule11Show
   object jTextView1: jTextView
     MarginLeft = 10
     MarginTop = 10

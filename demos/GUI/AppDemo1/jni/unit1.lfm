@@ -6,7 +6,7 @@ object AndroidModule1: TAndroidModule1
   MarginBottom = 0
   Enabled = True
   Left = 302
-  Top = 209
+  Top = 187
   Width = 300
   Height = 531
   Text = 'AndroidModule1'
@@ -18,8 +18,8 @@ object AndroidModule1: TAndroidModule1
   AnimationMode = animNone
   OnInit = AndroidModule1Init
   OnCloseQuery = AndroidModule1CloseQuery
-  OnJNIPrompt = AndroidModule1JNIPrompt
   OnClose = AndroidModule1Close
+  OnShow = AndroidModule1Show
   OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
     MarginLeft = 40
@@ -61,7 +61,6 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = [rpCenterInParent]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    ImageIndex = 0
     Images = jImageList1
     BackgroundColor = colbrDefault
     ImageScaleType = scaleCenter
@@ -76,10 +75,10 @@ object AndroidModule1: TAndroidModule1
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
-    Left = 114
+    Left = 126
     Top = 351
-    Width = 72
-    Height = 92
+    Width = 48
+    Height = 48
     Visible = True
     Anchor = jTextView1
     PosRelativeToAnchor = [raBelow]
@@ -89,6 +88,7 @@ object AndroidModule1: TAndroidModule1
     ImageIndex = 8
     Images = jImageList1
     BackgroundColor = colbrDefault
+    ImageIdentifier = 'ic_launcher'
     ImageScaleType = scaleFitCenter
     GravityInParent = lgNone
     RoundedShape = False
@@ -116,5 +116,9 @@ object AndroidModule1: TAndroidModule1
     )
     Left = 184
     Top = 128
+  end
+  object jImageList2: jImageList
+    Left = 88
+    Top = 64
   end
 end

@@ -25,8 +25,8 @@ type
       jTimer1: jTimer;
       procedure AndroidModule11BackButton(Sender: TObject);
       procedure AndroidModule11Create(Sender: TObject);
+      procedure AndroidModule11Show(Sender: TObject);
       procedure DataModuleCloseQuery(Sender: TObject; var CanClose: boolean);
-      procedure DataModuleJNIPrompt(Sender: TObject);
       procedure jButton1Click(Sender: TObject);
       procedure jButton2Click(Sender: TObject);
       procedure jButton3Click(Sender: TObject);
@@ -211,15 +211,6 @@ begin
 
 end;
 
-procedure TAndroidModule11.DataModuleJNIPrompt(Sender: TObject);
-begin
-    gAngle  := 0;
-    gSpeed  := 1.0;
-    gWork   := True;
-    gZoom   := 1.0;
-    ArcBall_Init(gArcBall);
-end;
-
 procedure TAndroidModule11.jButton1Click(Sender: TObject);
 begin
    jTimer1.Enabled:= not jTimer1.Enabled;
@@ -312,6 +303,15 @@ end;
 procedure TAndroidModule11.AndroidModule11Create(Sender: TObject);
 begin
  // IsCreate:= False;
+end;
+
+procedure TAndroidModule11.AndroidModule11Show(Sender: TObject);
+begin
+    gAngle  := 0;
+    gSpeed  := 1.0;
+    gWork   := True;
+    gZoom   := 1.0;
+    ArcBall_Init(gArcBall);
 end;
 
 procedure TAndroidModule11.AndroidModule11BackButton(Sender: TObject);

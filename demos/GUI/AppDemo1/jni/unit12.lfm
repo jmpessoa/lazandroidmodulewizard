@@ -1,55 +1,59 @@
 object AndroidModule12: TAndroidModule12
-  Left = 355
-  Top = 70
-  Width = 300
-  Height = 600
+  OnCreate = DataModuleCreate
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
-  OnCreate = DataModuleCreate
+  Enabled = True
+  Left = 355
+  Top = 70
+  Width = 300
+  Height = 600
   Text = 'AndroidModule12'
   ActivityMode = actRecyclable
   BackgroundColor = colbrBlack
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnCloseQuery = DataModuleCloseQuery
-  OnJNIPrompt = DataModuleJNIPrompt
+  OnShow = AndroidModule12Show
   object jTextView1: jTextView
-    Left = 86
-    Top = 10
-    Width = 127
-    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
+    Left = 86
+    Top = 10
+    Width = 127
+    Height = 20
     Visible = True
-    Id = 21393
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'OpenGLES1 3D Demo'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
-    Left = 5
-    Top = 45
-    Width = 285
-    Height = 40
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
+    Left = 5
+    Top = 45
+    Width = 290
+    Height = 50
     Visible = True
     Anchor = jTextView1
-    Id = 73178
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -59,21 +63,22 @@ object AndroidModule12: TAndroidModule12
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jCanvasES1_1: jCanvasES1
     Tag = 1
-    Left = 10
-    Top = 100
-    Width = 270
-    Height = 226
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
+    Left = 10
+    Top = 110
+    Width = 280
+    Height = 240
     Visible = True
     Anchor = jButton1
-    Id = 1670
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -88,36 +93,36 @@ object AndroidModule12: TAndroidModule12
     Images = jImageList1
   end
   object jTextView2: jTextView
-    Left = 86
-    Top = 346
-    Width = 127
-    Height = 20
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
+    Enabled = True
+    Left = 86
+    Top = 370
+    Width = 127
+    Height = 20
     Visible = True
     Anchor = jCanvasES1_1
-    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'Hint: touch  to move...'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrSilver
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jImageList1: jImageList
     Images.Strings = (
       'image03.png'
       'image04.jpg'
     )
-    left = 208
-    top = 173
+    Left = 208
+    Top = 173
   end
 end
