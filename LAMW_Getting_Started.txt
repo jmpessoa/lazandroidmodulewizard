@@ -66,7 +66,8 @@ I. Infrastructure
 	[Linux]		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 	[Mac]		https://dl.google.com/android/repository/sdk-tools-darwin-3859397.zip
 
-.Android NDK
+.Android NDK    [WARNING: Supported only Version < 22 !!!]
+
 	https://developer.android.com/ndk/downloads/index.html
 
 .Lazarus for Android
@@ -214,7 +215,7 @@ III. USING LAMW
 
 	2.6-[MinNkd] Select the  Min. NDK api:
 
-		example: 22         [warning: ndkApi > 22 will not run on old 4.x devices]
+		example: 22         [warning: ndkApi > 22 will not run on old Android 4.x devices]
 
 	2.7-[MinSdk] Select the  Min. Device Api need to run your App:
 
