@@ -110,7 +110,7 @@ object FormSettingsPaths: TFormSettingsPaths
     ModalResult = 1
     OnClick = BitBtnOKClick
     ParentFont = False
-    TabOrder = 5
+    TabOrder = 4
   end
   object BitBtnCancel: TBitBtn
     AnchorSideTop.Control = BitBtnOK
@@ -129,7 +129,7 @@ object FormSettingsPaths: TFormSettingsPaths
     ModalResult = 2
     OnClick = BitBtnCancelClick
     ParentFont = False
-    TabOrder = 6
+    TabOrder = 5
   end
   object EditPathToAndroidSDK: TEdit
     AnchorSideLeft.Control = Owner
@@ -147,7 +147,6 @@ object FormSettingsPaths: TFormSettingsPaths
   end
   object LabelPathToAndroidSDK: TLabel
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = RGNDKVersion
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 20
@@ -157,7 +156,6 @@ object FormSettingsPaths: TFormSettingsPaths
     Caption = 'Path to Android SDK:'
     ParentColor = False
     ParentFont = False
-    OnClick = LabelPathToAndroidSDKClick
   end
   object LabelPathToJavaJDK: TLabel
     AnchorSideLeft.Control = Owner
@@ -297,41 +295,6 @@ object FormSettingsPaths: TFormSettingsPaths
     Width = 526
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Around = 8
-  end
-  object RGNDKVersion: TRadioGroup
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = EditPathToAndroidNDK
-    AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 61
-    Top = 268
-    Width = 349
-    Anchors = [akTop, akLeft, akRight]
-    AutoFill = True
-    BorderSpacing.Around = 8
-    Caption = 'NDK Version'
-    ChildSizing.LeftRightSpacing = 6
-    ChildSizing.TopBottomSpacing = 6
-    ChildSizing.HorizontalSpacing = 4
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 6
-    ClientHeight = 36
-    ClientWidth = 345
-    Columns = 6
-    Items.Strings = (
-      '7x'
-      '9x'
-      '10a,b,c'
-      '10e...'
-      '11x'
-      '">11"'
-    )
-    ParentFont = False
-    TabOrder = 4
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -1561,7 +1524,7 @@ object FormSettingsPaths: TFormSettingsPaths
     BorderSpacing.Top = 16
     BorderSpacing.Around = 8
     ParentFont = False
-    TabOrder = 8
+    TabOrder = 7
   end
   object SpBPathToGradle: TSpeedButton
     AnchorSideTop.Control = EditPathToGradle
@@ -1631,7 +1594,7 @@ object FormSettingsPaths: TFormSettingsPaths
     ClientHeight = 36
     ClientWidth = 171
     ParentFont = False
-    TabOrder = 9
+    TabOrder = 8
     object ComboBoxPrebuild: TComboBox
       Left = 5
       Height = 28
@@ -1644,6 +1607,14 @@ object FormSettingsPaths: TFormSettingsPaths
       Style = csDropDownList
       TabOrder = 0
     end
+  end
+  object LabelNDKVersion: TLabel
+    Left = 8
+    Height = 20
+    Top = 296
+    Width = 98
+    Caption = 'NDK Version:....'
+    ParentColor = False
   end
   object SelDirDlgPathTo: TSelectDirectoryDialog
     left = 248

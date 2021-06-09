@@ -24,12 +24,12 @@ type
     EditPathToAntBinary: TEdit;
     GroupBox1: TGroupBox;
     Image1: TImage;
+    LabelNDKVersion: TLabel;
     LabelPathToGradle: TLabel;
     LabelPathToAndroidSDK: TLabel;
     LabelPathToJavaJDK: TLabel;
     LabelPathToAndroidNDK: TLabel;
     LabelPathToAntBinary: TLabel;
-    RGNDKVersion: TRadioGroup;
     SelDirDlgPathTo: TSelectDirectoryDialog;
     SpBPathToAndroidSDK: TSpeedButton;
     SpBPathToJavaJDK: TSpeedButton;
@@ -45,7 +45,6 @@ type
     procedure EditPathToAndroidNDKExit(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure LabelPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToGradleClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
@@ -67,7 +66,7 @@ type
     FPathToAntBin: string;
     FPrebuildOSYS: string;
     FPathToGradle: string;
-    //FGradleVersion: string;
+    FNDKVersionItemIndex: integer; {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
     procedure WriteIniString(Key, Value: string);
 
   public
@@ -77,7 +76,7 @@ type
     procedure LoadSettings(const fileName: string);
     procedure SaveSettings(const fileName: string);
     function GetPrebuiltDirectory: string;
-
+    function TryGetNDKVersion(pathNDK: string): string;
   end;
 
 var
@@ -90,6 +89,28 @@ uses LamwSettings;
 {$R *.lfm}
 
 { TFormSettingsPaths }
+
+function SplitStr(var theString: string; delimiter: string): string;
+var
+  i: integer;
+begin
+  Result:= '';
+  if theString <> '' then
+  begin
+    i:= Pos(delimiter, theString);
+    if i > 0 then
+    begin
+       Result:= Copy(theString, 1, i-1);
+       theString:= Copy(theString, i+Length(delimiter), maxLongInt);
+    end
+    else
+    begin
+       Result:= theString;
+       theString:= '';
+    end;
+  end;
+end;
+
 
 function TFormSettingsPaths.GetPrebuiltDirectory: string;
 var
@@ -129,6 +150,52 @@ begin
        {$endif}
    end;
 
+end;
+
+function TFormSettingsPaths.TryGetNDKVersion(pathNDK: string): string;
+var
+   list: TStringList;
+   aux, strNdkVersion: string;
+   intNdkVersion: integer;
+begin
+    list:= TStringList.Create;
+    if FileExists(pathNDK+DirectorySeparator+'source.properties') then
+    begin
+        list.LoadFromFile(pathNDK+DirectorySeparator+'source.properties');
+        {
+           Pkg.Desc = Android NDK
+           Pkg.Revision = 18.1.5063045
+        }
+        strNdkVersion:= list.Strings[1]; //Pkg.Revision = 18.1.5063045
+        aux:= SplitStr(strNdkVersion, '='); //aux:= 'Pkg.Revision '   ...strNdkVersion:=' 18.1.506304'
+
+        aux:=Trim(strNdkVersion); //18.1.506304
+        Result:= aux;
+        strNdkVersion:= SplitStr(aux, '.'); //strNdkVersion:='18'
+
+        if strNdkVersion <> '' then
+        begin
+          intNdkVersion:= StrToInt(Trim(strNdkVersion));
+
+          {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
+          if (intNdkVersion > 11) and (intNdkVersion < 22) then FNDKVersionItemIndex:=5
+          else if intNdkVersion = 11 then FNDKVersionItemIndex:= 4
+          else if   intNdkVersion >= 22 then FNDKVersionItemIndex:= 6;
+
+        end;
+    end
+    else
+    begin
+       if FileExists(pathNDK+DirectorySeparator+'RELEASE.TXT') then //r10e
+       begin
+         list.LoadFromFile(pathNDK+DirectorySeparator+'REALEASE.TXT');
+         if Trim(list.Strings[0]) = 'r10e' then
+         begin
+            FNDKVersionItemIndex:= 3;
+         end
+       end;
+    end;
+    list.Free;
 end;
 
 //C:\adt32\gradle-4.2.1
@@ -186,16 +253,15 @@ begin
   fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
   if FOk then
   begin
+    {index 3/r10e , index 4/11x, index 5/12...21, index 6/22...}
+    if (FNDKVersionItemIndex < 3) or (FNDKVersionItemIndex > 5) then
+    begin
+      ShowMessage('WARNING... unknown NDK... Please, Install NDK from "10e" to "21"');
+    end;
     SaveSettings(fName);
     LamwGlobalSettings.ReloadPaths;
   end;
 end;
-
-procedure TFormSettingsPaths.LabelPathToAndroidSDKClick(Sender: TObject);
-begin
-
-end;
-
 
 function TFormSettingsPaths.HasBuildTools(platform: integer): boolean;
 var
@@ -283,7 +349,6 @@ begin
        CopyFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini',
                 IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
        flag:= True;
-       //DeleteFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
     end;
   end;
 
@@ -331,6 +396,7 @@ end;
 
 procedure TFormSettingsPaths.BitBtnCancelClick(Sender: TObject);
 begin
+  FOK:=False;
   Close;
 end;
 
@@ -367,17 +433,14 @@ begin
   begin
      FPathToAndroidNDK:= EditPathToAndroidNDK.Text;
      ComboBoxPrebuild.Text:= Self.GetPrebuiltDirectory();
+     LabelNDKVersion.Caption:= 'NDK Version: '+ TryGetNDKVersion(FPathToAndroidNDK);
   end;
 end;
 
 procedure TFormSettingsPaths.BitBtnOKClick(Sender: TObject);
 begin
-   if RGNDKVersion.ItemIndex > -1 then
-   begin
-     FOk:= True;
-     Close;
-   end
-   else ShowMessage('Please, Select [Radio] "NDK Version" number!!!');
+   FOk:= True;
+   Close;
 end;
 
 procedure TFormSettingsPaths.SpBPathToAndroidSDKClick(Sender: TObject);
@@ -478,10 +541,10 @@ procedure TFormSettingsPaths.SpeedButtonHelpClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.5] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.6.1] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
-           sLineBreak+' 2. Gradle 4.4.1 [or up] [https://gradle.org/next-steps/?version=4.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 28 + "build-tools" 28.0.3 [or up]'+
+           sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]' +
+           sLineBreak+' 3. Android SDK "plataforms" 29 + "build-tools" 29.0.3'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -499,10 +562,10 @@ end;
 
 procedure TFormSettingsPaths.LoadSettings(const fileName: string);
 var
-   indexNdk: integer;
    pathToNdkToolchains49: string;
 begin
 
+  FNDKVersionItemIndex:= -1;
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
@@ -519,12 +582,17 @@ begin
       EditPathToAntBinary.Text := FPathToAntBin;
       EditpathToGradle.Text := FPathToGradle;
 
-      if ReadString('NewProject','NDK', '') <> '' then
-        indexNdk:= StrToInt(ReadString('NewProject','NDK', ''))
-      else
-        indexNdk:= 3;  //ndk 10e
+      {index 3/r10e , index 4/11x, index 5/12...21, index 6/22...}
 
-      RGNDKVersion.ItemIndex:= indexNdk;
+      if ReadString('NewProject','NDK', '') <> '' then
+      begin
+        FNDKVersionItemIndex:= StrToInt(ReadString('NewProject','NDK', ''));
+        if (FNDKVersionItemIndex < 3) or (FNDKVersionItemIndex > 5) then
+        begin
+          ShowMessage('WARNING... unknown NDK... Please, Install NDK from "10e" to "21"');
+        end;
+      end;
+
       FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
       if FPrebuildOSYS <> '' then
       begin
@@ -587,7 +655,8 @@ begin
     if (EditPathToGradle.Text <> '') then
       WriteString('NewProject', 'PathToGradle', EditPathToGradle.Text);
 
-    WriteString('NewProject', 'NDK', IntToStr(RGNDKVersion.ItemIndex));
+
+    WriteString('NewProject', 'NDK', IntToStr(FNDKVersionItemIndex));
 
     if ComboBoxPrebuild.Text = '' then
     begin
