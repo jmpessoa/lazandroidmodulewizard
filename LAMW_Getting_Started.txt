@@ -21,7 +21,7 @@
 	About MacOs Install:  [adapted from ".../docs/linux/tutorial_by_waynesherman]
 		.Install [I] Infrastructure
 		.Install FPCUpdeluxe
-                        https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/download/1.6.2y2/fpcupdeluxe-x86_64-darwin-cocoa.zip
+                        https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases       [for Mac...]
 		.Use FPCUpdeluxe to Install FPC+Laz   [trunk or  stable or ...]
 		.Use FPCUpdeluxe to Install arm/android cross-compile		
 					  
@@ -66,7 +66,7 @@ I. Infrastructure
 	[Linux]		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 	[Mac]		https://dl.google.com/android/repository/sdk-tools-darwin-3859397.zip
 
-.Android NDK    [WARNING: Supported only Version < 22 !!!]
+.Android NDK
 
 	https://developer.android.com/ndk/downloads/index.html
 

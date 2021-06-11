@@ -92,6 +92,7 @@ object FormSettingsPaths: TFormSettingsPaths
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
+  LCLVersion = '2.0.0.4'
   object BitBtnOK: TBitBtn
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Side = asrBottom
@@ -1608,12 +1609,12 @@ object FormSettingsPaths: TFormSettingsPaths
       TabOrder = 0
     end
   end
-  object LabelNDKVersion: TLabel
+  object LabelNDKRelease: TLabel
     Left = 8
     Height = 20
     Top = 296
-    Width = 98
-    Caption = 'NDK Version:....'
+    Width = 105
+    Caption = 'NDK Release: ....'
     ParentColor = False
   end
   object SelDirDlgPathTo: TSelectDirectoryDialog

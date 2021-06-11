@@ -50,8 +50,9 @@ type
      FPathToJavaJDK: string;
      FPathToAndroidSDK: string;  //Included TrailingPathDelimiter
      FPathToAndroidNDK: string;   //Included TrailingPathDelimiter
-     FNDK: string;
-     FNDKIndex: integer;
+     FNDK: string; //alias  '>11'etc..
+     FNDKIndex: integer; {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
+     FNDKVersion: integer; //18
 
      FPathToAntBin: string;
      FPathToGradle: string;
@@ -67,7 +68,8 @@ type
      FAntBuildMode: string;
      FMainActivity: string;
      FPathToJavaSrc: string;
-     FAndroidPlatform: string;
+     //FAndroidNDKPlatform: string;
+     FNdkApi: string;
 
      FPrebuildOSys: string;
 
@@ -740,8 +742,7 @@ var
   auxList, providerList: TStringList;
   outTag: integer;
   supportProvider, tempStr, insertRef: string;
-  c: char;
-  p1, p2: integer;
+  p1: integer;
 begin
   try
     FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
@@ -1459,7 +1460,6 @@ var
   strPack: string;
   sdkBuildTools, pluginVersion: string;
   compileSdkVersion: string;
-  androidPluginStr: string;
   androidPluginNumber: integer;
   gradleCompatible, outgradleCompatible: string;
   gradleCompatibleAsNumber: integer;
@@ -1572,9 +1572,12 @@ begin
 
       FPrebuildOSys:= frm.PrebuildOSys;
 
-      FNDK:= frm.NDK;
-      FNDKIndex:= frm.NDKIndex;
-      FAndroidPlatform:= frm.AndroidPlatform;   //android-15
+      FNDK:= frm.NDK; //alias '>11',  etc...
+      FNDKIndex:= frm.NDKIndex;  {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
+      FNDKVersion:=frm.NDKVersion; //ex 18
+
+      //FAndroidPlatform:= frm.AndroidPlatform; //"android-15" model was deprecated/droped after NDK 21
+      FNdkApi:= frm.NdkApi; //just 14 or 22 etc...
 
       FPathToAntBin:= frm.PathToAntBin;
       FPathToGradle:= frm.PathToGradle;
@@ -3220,6 +3223,7 @@ var
   customOptions_armV7a_VFPv3: string;
   customOptions_armV8: string;
 
+  androidPlatformApi: string;
   PathToNdkPlatformsArm: string;
   PathToNdkPlatformsX86: string;
   PathToNdkPlatformsX86_64: string;
@@ -3285,7 +3289,9 @@ begin
 
   AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
   AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
-  AProject.CustomData.Values['NdkApi']:= FAndroidPlatform;  // androd-13, android-14,  android-15 etc...
+
+  AProject.CustomData.Values['NdkApi']:= 'android-'+FNdkApi; //legacy
+
   AProject.CustomData.Values['BuildSystem'] := FBuildSystem;
 
   AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
@@ -3507,7 +3513,7 @@ begin
   if (Length(FPrebuildOSYS)=0) then
   begin
     {$ifdef Windows}
-    FPrebuildOSYS:='windows';
+    FPrebuildOSYS:='windows-x86_64';
     {$endif}
     {$ifdef Linux}
     FPrebuildOSYS:='linux';
@@ -3520,27 +3526,47 @@ begin
   osys:= FPrebuildOSys;
 
   {Set compiler options for Android requirements}
+  if FNDKIndex < 6 then
+  begin
+    androidPlatformApi:= 'android-'+FNdkApi;
+    PathToNdkPlatformsArm:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                                  androidPlatformApi +DirectorySeparator+'arch-arm'+DirectorySeparator+
+                                                  'usr'+DirectorySeparator+'lib';
 
-  PathToNdkPlatformsArm:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
-                                                FAndroidPlatform +DirectorySeparator+'arch-arm'+DirectorySeparator+
-                                                'usr'+DirectorySeparator+'lib';
+    PathToNdkPlatformsAarch64:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                                  androidPlatformApi +DirectorySeparator+'arch-arm64'+DirectorySeparator+
+                                                  'usr'+DirectorySeparator+'lib';
 
-  PathToNdkPlatformsAarch64:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
-                                                FAndroidPlatform +DirectorySeparator+'arch-arm64'+DirectorySeparator+
-                                                'usr'+DirectorySeparator+'lib';
+    PathToNdkPlatformsX86:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                               androidPlatformApi+DirectorySeparator+'arch-x86'+DirectorySeparator+
+                                               'usr'+DirectorySeparator+'lib';
 
-  PathToNdkPlatformsX86:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
-                                             FAndroidPlatform+DirectorySeparator+'arch-x86'+DirectorySeparator+
-                                             'usr'+DirectorySeparator+'lib';
+    PathToNdkPlatformsX86_64:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                               androidPlatformApi+DirectorySeparator+'arch-x86_64'+DirectorySeparator+
+                                               'usr'+DirectorySeparator+'lib';
 
-  PathToNdkPlatformsX86_64:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
-                                             FAndroidPlatform+DirectorySeparator+'arch-x86_64'+DirectorySeparator+
-                                             'usr'+DirectorySeparator+'lib';
+    PathToNdkPlatformsMips:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                               androidPlatformApi+DirectorySeparator+'arch-mips'+DirectorySeparator+
+                                               'usr'+DirectorySeparator+'lib';
+  end
+  else //NDK >= 22
+  begin
+   //C:\android\android-ndk-r22b\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\arm-linux-androideabi\22
+   PathToNdkPlatformsArm:=ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','arm-linux-androideabi', FNdkApi]);
 
-  PathToNdkPlatformsMips:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
-                                             FAndroidPlatform+DirectorySeparator+'arch-mips'+DirectorySeparator+
-                                             'usr'+DirectorySeparator+'lib';
+   //C:\android\android-ndk-r22b\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\aarch64-linux-android\22
+   PathToNdkPlatformsAarch64:= ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','aarch64-linux-android', FNdkApi]);
 
+   //C:\android\android-ndk-r22b\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\i686-linux-android\22
+   PathToNdkPlatformsX86:= ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','i686-linux-android', FNdkApi]);
+
+   //C:\android\android-ndk-r22b\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\x86_64-linux-android\22
+    PathToNdkPlatformsX86_64:= ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','x86_64-linux-android', FNdkApi]);
+
+    PathToNdkPlatformsMips:= ''; //note supported since NDK 18 ...
+  end;
+
+  {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
   if {FNDK = '7'} FNDKIndex = 0 then
   begin
       pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
@@ -3584,6 +3610,7 @@ begin
                                                  'x86-4.6'+DirectorySeparator+'prebuilt'+DirectorySeparator+
                                                  osys+DirectorySeparator+'bin';
 
+      {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
   end else if {FNDK = '10e'} {FNDK = '11c'} (FNDKIndex >=3) and (FNDKIndex < 5) then          //arm-linux-androideabi-4.9
   begin
       pathToNdkToolchainsArm:= FPathToAndroidNDK+'toolchains'+DirectorySeparator+
@@ -3688,13 +3715,25 @@ begin
                                                     osys+DirectorySeparator+'lib'+DirectorySeparator+'gcc'+DirectorySeparator+                                                   'mipsel-linux-android'+DirectorySeparator+'4.9.x';
   end;
 
-  libraries_arm:= PathToNdkPlatformsArm+';'+pathToNdkToolchainsArm;
-  libraries_aarch64:= PathToNdkPlatformsAarch64+';'+pathToNdkToolchainsAarch64;
+  if PathToNdkPlatformsArm <> '' then
+    libraries_arm:= PathToNdkPlatformsArm+';'+pathToNdkToolchainsArm
+  else  libraries_arm:= pathToNdkToolchainsArm;
 
-  libraries_x86:= PathToNdkPlatformsX86+';'+pathToNdkToolchainsX86;
-  libraries_x86_64:= PathToNdkPlatformsX86_64+';'+pathToNdkToolchainsX86_64;
+  if PathToNdkPlatformsAarch64 <>'' then
+      libraries_aarch64:= PathToNdkPlatformsAarch64+';'+pathToNdkToolchainsAarch64
+  else libraries_aarch64:= pathToNdkToolchainsAarch64;
 
-  libraries_mips:= PathToNdkPlatformsMips+';'+pathToNdkToolchainsMips;
+  if PathToNdkPlatformsX86 <>'' then
+     libraries_x86:= PathToNdkPlatformsX86+';'+pathToNdkToolchainsX86
+  else libraries_x86:= pathToNdkToolchainsX86;
+
+  if PathToNdkPlatformsX86_64 <>'' then
+    libraries_x86_64:= PathToNdkPlatformsX86_64+';'+pathToNdkToolchainsX86_64
+  else libraries_x86_64:= pathToNdkToolchainsX86_64;
+
+  if PathToNdkPlatformsMips <>'' then
+     libraries_mips:= PathToNdkPlatformsMips+';'+pathToNdkToolchainsMips
+  else libraries_mips:= pathToNdkToolchainsMips;
 
 
   //https://developer.android.com/ndk/guides/abis

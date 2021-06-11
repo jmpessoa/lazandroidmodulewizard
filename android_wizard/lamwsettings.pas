@@ -44,6 +44,7 @@ type
     FGradleVersion: string;
     FPrebuildOSYS: string;
     FNDK: string;
+    FNDKRelease: string;
 
     //function GetDefaultBuildSystem: string;
     procedure ReloadIni;
@@ -74,7 +75,7 @@ type
     destructor Destroy; override;
     procedure ReloadPaths; // loading paths from INI
     function GetNDK: string;
-
+    function GetNDKRelease: string;
     // if QueryPaths=True then retreiving paths through PathToXXX properties
     // will invoke a path prompt dialog when FPathToXXX is empty
     property QueryPaths: Boolean read FQueryPaths write FQueryPaths;
@@ -375,11 +376,17 @@ begin
   FNDK                 := ReadIniString('NDK');
   FPrebuildOSYS        := ReadIniString('PrebuildOSYS');
   FInstructionSet      := ReadIniString('InstructionSet');
+  FNDKRelease          := ReadIniString('NDKRelease');
 end;
 
 function TLamwGlobalSettings.GetNDK: string;
 begin
-  Result := ReadIniString('NDK'); //index
+  Result := ReadIniString('NDK'); {index 3/r10e , index  4/11x, index 5/12...18, index 6/19....}
+end;
+
+function TLamwGlobalSettings.GetNDKRelease: string;
+begin
+  Result := ReadIniString('NDKRelease'); //18.1.506304
 end;
 
 initialization

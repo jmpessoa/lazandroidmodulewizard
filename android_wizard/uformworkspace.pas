@@ -105,7 +105,8 @@ type
     FMainActivity: string;  //Simon "App"
     FNDK: string;
     FNDKIndex: integer;
-    FAndroidNdkPlatform: string;   //android-15
+    //FAndroidNdkPlatform: string;
+    FNdkApi: string;       //now just Api... 15  or 22 or ....
 
     FPrebuildOSYS: string;
     FFullJavaSrcPath: string;
@@ -122,6 +123,8 @@ type
     FIniFileSection: string;
     FIniFileName: string;
     FInstructionSetIndex: integer;
+    FNDKRelease: string;
+    FNDKVersion: integer;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
@@ -138,7 +141,6 @@ type
     function GetTextByListIndex(index:integer): string;
 
     function GetCodeNameByApi(api: string):string;
-    function GetNDKPlatformByApi(api: string): string;
 
     function GetFullJavaSrcPath(fullProjectName: string): string;
     function GetPrebuiltDirectory: string;
@@ -148,7 +150,9 @@ type
     function GetMaxSdkPlatform(): integer;
     function GetBuildTool(sdkApi: integer): string;
 
-    function GetMaxNdkPlatform(var index: integer): integer;
+    function GetMaxNdkPlatform(ndkVer: integer): integer; //new
+    function TryGetNDKRelease(pathNDK: string): string;
+    function GetNDKVersion(ndkRelease: string): integer;
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
     property InstructionSet: string read FInstructionSet write FInstructionSet;
@@ -170,9 +174,11 @@ type
     property TouchtestEnabled: string read FTouchtestEnabled write FTouchtestEnabled;
     property AntBuildMode: string read FAntBuildMode write FAntBuildMode;
     property MainActivity: string read FMainActivity write FMainActivity;
-    property NDK: string read FNDK write FNDK;
-    property NDKIndex: integer read FNDKIndex write FNDKIndex;
-    property AndroidPlatform: string read FAndroidNdkPlatform write FAndroidNdkPlatform;
+    property NDK: string read FNDK write FNDK; //alias name.. '>11'  etc...
+    property NDKIndex: integer read FNDKIndex write FNDKIndex; {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
+    property NDKVersion: integer read FNDKVersion write FNDKVersion; //18
+
+    property NdkApi: string read FNdkApi write FNdkApi;
 
     property PrebuildOSYS: string read FPrebuildOSYS write FPrebuildOSYS;
     property FullJavaSrcPath: string read FFullJavaSrcPath write FFullJavaSrcPath;
@@ -207,62 +213,26 @@ uses LamwSettings;
 { TFormWorkspace }
 
 //C:\adt32\ndk10e\platforms\
-function TFormWorkspace.GetMaxNdkPlatform(var index: integer): integer;
-var
-  lisDir: TStringList;
-  auxStr, aNDKDir: string;
-  i, intAux,  count: integer;
+
+function TFormWorkspace.GetMaxNdkPlatform(ndkVer: integer): integer;
 begin
-  Result:= 0;
-  index:= -1;
-  count:= 0;
-
-  lisDir:= TStringList.Create;
-
-  ListBoxNdkPlatform.Clear;
-
-  aNDKDir:=IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms';
-  // For NDK >= 22
-  // Best choice : arm platforms
-  if NOT DirectoryExists(aNDKDir) then
-    aNDKDir:=ConcatPaths([FPathToAndroidNdk,'toolchains','llvm','prebuilt',GetPrebuiltDirectory,'sysroot','usr','lib','arm-linux-androideabi']);
-
-  FindAllDirectories(lisDir, aNDKDir, False);
-
-  if (lisDir.Count > 0) then
-  begin
-    for i:=0 to lisDir.Count-1 do
-    begin
-       auxStr:= ExtractFileName(lisDir.Strings[i]);
-       if auxStr <> '' then
-       begin
-         if (Pos('-',auxStr)>0) then
-         auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
-         if IsAllCharNumber(PChar(auxStr))  then  //skip android-P
-         begin
-           intAux:= StrToIntDef(auxStr,0);
-           if (intAux > 13) and (intAux < 27)  then
-           begin
-              ListBoxNdkPlatform.Items.Add(auxStr);
-              count:= count + 1;
-           end;
-           if Result < intAux then
-           begin
-             if intAux < 23 then
-             begin
-                Result:= intAux;   //Max=22 for old 4.x, 5.x devices compatibility!!!!
-                index:= count - 1;
-             end;
-           end;
-         end;
-       end;
-    end;
-    if ListBoxNdkPlatform.Items.Count > 0 then
-       ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.Count-1;
-  end
-  else ShowMessage('Fail! Folder ' + aNDKDir + ' cannot be processed !');
-  lisDir.free;
-
+   Result:= 22;
+   case ndkVer of
+      10: Result:= 21;
+      11: Result:= 24;
+      12: Result:= 24;
+      13: Result:= 24;
+      14: Result:= 24;
+      15: Result:= 26;
+      16: Result:= 27;
+      17: Result:= 28;
+      18: Result:= 28;
+      19: Result:= 28;
+      20: Result:= 29;
+      21: Result:= 30;
+      22: Result:= 30; //The deprecated "platforms" directories have been removed....
+      23: Result:= 30;
+   end;
 end;
 
 function TFormWorkspace.GetMaxSdkPlatform(): integer;
@@ -323,7 +293,8 @@ begin
   else if api='26' then Result:= 'Oreo 8.0'
   else if api='27' then Result:= 'Oreo 8.1'
   else if api='28' then Result:= 'Pie 9.0'
-  else if api='29' then Result:= 'Android 10';
+  else if api='29' then Result:= 'Android 10'
+  else if api='30' then Result:= 'Android 11';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -352,24 +323,25 @@ begin
      14: Result:= 'Oreo 8.1'; // Api(27)
      15: Result:= 'Pie 9.0'; // Api(28)
      16: Result:= 'Android 10'; // Api(29)
+     17: Result:= 'Android 11'; // Api(30)
    end;
 end;
 
 
 procedure TFormWorkspace.ListBoxNdkPlatformChange(Sender: TObject);
 var
-  ndkApi: string;
+  api: string;
   intNdkApi: integer;
 begin
 
  if ListBoxNdkPlatform.ItemIndex >=  0 then
  begin
 
-   ndkApi:= ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
-   if ndkApi = '' then Exit;
+   api:= ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex];
+   if api = '' then Exit;
 
-   FAndroidNdkPlatform:= 'android-'+ ndkApi;
-   StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
+   FNdkApi:=  api; //'android-'+
+   StatusBarInfo.Panels.Items[0].Text:='[NDK-'+IntToStr(FNDKVersion)+' Api '+ FNdkApi+']';
 
    if IsAllCharNumber(PChar(ndkApi))  then  //skip android-P
         intNdkApi:=StrToInt(ndkApi)
@@ -378,7 +350,7 @@ begin
 
    if intNdkApi  > 22 then
       ShowMessage('Warning: for compatibility with old devices [4.x, 5.x]'+sLIneBreak+
-                  'is strongly recommended NDK API < 23!');
+                  'is strongly recommended NDK API <= 22!');
 
    if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 5) then
       ShowMessage('Warning: ARMv8 [aarch64] nedd  NDK Api >= 21');
@@ -386,7 +358,6 @@ begin
    if (intNdkApi  < 21) and (Self.RGInstruction.ItemIndex = 6) then
       ShowMessage('Warning: x86_64 nedd  NDK Api >= 21');
  end;
- //else ShowMessage('Fail! Folder ' + IncludeTrailingPathDelimiter(FPathToAndroidNdk)+'platforms is empty!');
 
 end;
 
@@ -505,11 +476,6 @@ begin
  {$endif}
 end;
 
-function TFormWorkspace.GetNDKPlatformByApi(api: string): string;
-begin
-  Result:= 'android-'+api;
-end;
-
 
 function TFormWorkspace.GetFullJavaSrcPath(fullProjectName: string): string;
 var
@@ -582,7 +548,7 @@ begin
 
   if ModalResult = mrCancel  then Exit;
 
-  FMainActivity:= 'App'; //TODO: flexibility here...
+  FMainActivity:= 'App'; //TODO: need flexibility here...
 
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
@@ -658,7 +624,7 @@ begin
        FJavaClassName:=  FSmallProjName //ex. "AppTest1"
   end;
 
-  FAndroidNdkPlatform:= GetNDKPlatformByApi(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]); //(ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex]);
+  FNdkApi:= ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex];
 
   if FProjectModel = 'Eclipse' then ////please, read as "project exists!"
   begin
@@ -816,11 +782,7 @@ begin
 end;
 
 procedure TFormWorkspace.FormCreate(Sender: TObject);
-var
-  flag: boolean;
-  fileName: string;
 begin
-  flag:= false;
   if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
   begin
     if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
@@ -831,7 +793,6 @@ begin
                 IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
        //DeleteFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini');
        Self.DoNewPathToJavaTemplate();
-       flag:= True;
     end;
   end;
 end;
@@ -920,14 +881,62 @@ begin
   listParam.Free;
 end;
 
+function TFormWorkspace.GetNDKVersion(ndkRelease: string): integer;
+var
+   strNdkVersion: string;
+begin
+
+    if Pos('.',ndkRelease) > 0 then //  //18.1.506304
+    begin
+      strNdkVersion:= SplitStr(ndkRelease, '.'); //strNdkVersion:='18'
+      if strNdkVersion <> '' then
+      begin
+        Result:= StrToInt(Trim(strNdkVersion));
+      end;
+    end
+    else Result:= 10; //r10e
+
+end;
+
+function TFormWorkspace.TryGetNDKRelease(pathNDK: string): string;
+var
+   list: TStringList;
+   aux, strNdkVersion: string;
+begin
+    list:= TStringList.Create;
+    if FileExists(pathNDK+DirectorySeparator+'source.properties') then
+    begin
+        list.LoadFromFile(pathNDK+DirectorySeparator+'source.properties');
+        {
+           Pkg.Desc = Android NDK
+           Pkg.Revision = 18.1.5063045
+        }
+        strNdkVersion:= list.Strings[1]; //Pkg.Revision = 18.1.5063045
+        aux:= SplitStr(strNdkVersion, '='); //aux:= 'Pkg.Revision '   ...strNdkVersion:=' 18.1.506304'
+        aux:=Trim(strNdkVersion); //18.1.506304
+        Result:= aux;
+    end
+    else
+    begin
+       if FileExists(pathNDK+DirectorySeparator+'RELEASE.TXT') then //r10e
+       begin
+         list.LoadFromFile(pathNDK+DirectorySeparator+'REALEASE.TXT');
+         if Trim(list.Strings[0]) = 'r10e' then
+            Result:= 'r10e'
+         else Result:= 'unknown';
+       end;
+    end;
+    list.Free;
+end;
+
 procedure TFormWorkspace.LoadPathsSettings(const fileName: string);
 var
-  indexNdk: integer;
   frm: TFormPathMissing;
   nativeMethodList, tempList, gdxList: TStringList;
   i, k: integer;
   strIndexNdk: string;
 begin
+
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
@@ -1001,27 +1010,25 @@ begin
       end;
 
       FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
-
       if FPrebuildOSYS = '' then
         if FPathToAndroidNDK <> '' then
            FPrebuildOSYS:= GetPrebuiltDirectory();
 
-      strIndexNdk:= ReadString('NewProject','NDK', ''); //ndk 10e   ... default
+      strIndexNdk:= ReadString('NewProject','NDK', '');
 
       if strIndexNdk = '' then strIndexNdk:= '5';
 
-      indexNdk:= StrToInt(strIndexNdk);
-
-      case indexNdk of
-         0: FNDK:= '7';
+     {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
+      FNDKIndex:= StrToInt(strIndexNdk);
+      case FNDKIndex of
+         0: FNDK:= '7';    //alias...
          1: FNDK:= '9';
          2: FNDK:= '10c';
          3: FNDK:= '10e';
          4: FNDK:= '11c';
-         5: FNDK:= '>11';
+         5: FNDK:= '>11<21';//rapid solution... better: '>11<19'
+         6: FNDK:= '>21';   //[rapid solution] deprecated "platforms" directories have been removed....
       end;
-
-      FNDKIndex:= indexNdk;
 
       FPathToJavaTemplates:= ReadString('NewProject','PathToJavaTemplates', '');
       if FPathToJavaTemplates = '' then
@@ -1100,7 +1107,6 @@ var
   lisDir: TStringList;
   numberAsString, auxStr: string;
   i, builderNumber: integer;
-  savedBuilder: integer;
 begin
   Result:= False;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
@@ -1166,7 +1172,7 @@ begin
 
   if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
 
-  if FPrebuildOSYS =  '' then
+  if FPrebuildOSYS =  '' then  //here again???
   begin
     if  FPathToAndroidNDK <> '' then
          FPrebuildOSYS:= GetPrebuiltDirectory();
@@ -1179,7 +1185,6 @@ begin
   SpeedButtonSDKPlusClick(Self);
 
   Self.RGInstruction.ItemIndex:= FInstructionSetIndex;
-
 
 end;
 
@@ -1363,6 +1368,7 @@ begin
     BitBtnOK.SetFocus;
   end;
 end;
+
 
 procedure TFormWorkspace.EditPathToWorkspaceExit(Sender: TObject);
 begin
@@ -1555,18 +1561,19 @@ begin
   end;
 end;
 
-procedure TFormWorkspace.LoadSettings(const pFilename: string);  //called by "AndroidWizard_inf.pas"
+//run before "OnFormActive called by "AndroidWizard_inf.pas""
+procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
   auxInstSet: string;
   tagVersion: integer;
-  ndk_index: integer;
+  i: integer;
 begin
-   //run before "OnFormActive"
 
-  //verify if some was not load!
+  //run before "OnFormActive"
+
   FFileName:= pFilename; //full filename
 
-  Self.LoadPathsSettings(FFileName);
+  Self.LoadPathsSettings(FFileName); // //verify if some was missing ...
 
   with TIniFile.Create(pFilename) do
   try
@@ -1610,6 +1617,18 @@ begin
        end;
     end;
 
+    FNDKRelease:= ReadString('NewProject','NDKRelease', '');
+    if FNDKRelease <> '' then
+    begin
+       FNDKVersion:= GetNDKVersion(FNDKRelease);
+    end
+    else
+    begin
+       FNDKRelease:= TryGetNDKRelease(FPathToAndroidNDK);
+       FNDKVersion:= GetNDKVersion(FNDKRelease); //18
+       WriteString('NewProject','NDKRelease', FNDKRelease);
+    end;
+
   finally
     Free;
   end;
@@ -1633,14 +1652,18 @@ begin
   if FMaxSdkPlatform = 0 then    //  try fix "android-0"
       FMaxSdkPlatform:= FCandidateSdkPlatform;
 
-  ndk_Index:= 22;
+  FMaxNdkPlatform:= Self.GetMaxNdkPlatform(FNDKVersion);
+  ListBoxNdkPlatform.Clear;
+  for i:= 16 to FMaxNdkPlatform  do  //16 is a good start point...
+  begin
+     ListBoxNdkPlatform.Items.Add(IntToStr(i));
+  end;
 
-  FMaxNdkPlatform:= Self.GetMaxNdkPlatform(ndk_Index);    //ndkIndex Max =  22 for old 4.x, 5.x devices compatibility!!!!
-
+  //default '22' is good for old 4.x, 5.x devices compatibility!!!!
   if ListBoxNdkPlatform.Items.Count > 0 then
   begin
-    ListBoxNdkPlatform.ItemIndex:= ndk_Index;
-    StatusBarInfo.Panels.Items[0].Text:='[Ndk] '+ GetCodeNameByApi(ListBoxNdkPlatform.Items[ListBoxNdkPlatform.ItemIndex]);
+    ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.IndexOf('22');
+    StatusBarInfo.Panels.Items[0].Text:='[NDK-'+IntToStr(FNDKVersion)+' Api 22]';
   end;
 
 end;
