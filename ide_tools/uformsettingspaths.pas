@@ -43,8 +43,8 @@ type
     procedure BitBtnCancelClick(Sender: TObject);
     procedure ComboBoxPrebuildChange(Sender: TObject);
     procedure EditPathToAndroidNDKExit(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormShow(Sender: TObject);
     procedure SpBPathToAndroidSDKClick(Sender: TObject);
     procedure SpBPathToGradleClick(Sender: TObject);
     procedure SpBPathToJavaJDKClick(Sender: TObject);
@@ -180,7 +180,10 @@ begin
          list.LoadFromFile(pathNDK+DirectorySeparator+'REALEASE.TXT');
          if Trim(list.Strings[0]) = 'r10e' then
             Result:= 'r10e'
-         else Result:= 'unknown';
+         else
+         begin
+            Result:= 'unknown';
+         end;
        end;
     end;
     list.Free;
@@ -275,6 +278,69 @@ begin
   end;
 end;
 
+procedure TFormSettingsPaths.FormShow(Sender: TObject);
+var
+ flag: boolean;
+begin
+  //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+  FPathToSmartDesigner:= GetPathToSmartDesigner();
+
+  //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java
+  FPathToJavaTemplates:= FPathToSmartDesigner  + PathDelim + 'java';
+
+  flag:= false;
+  if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
+  begin
+    if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
+    begin
+       CopyFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini',
+                IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+       flag:= True;
+    end;
+  end;
+
+  if flag then  //exists  'LAMW.ini'
+  begin
+    WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
+    WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
+  end;
+
+  LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
+
+  FOk:= False;
+
+  {$ifdef windows}
+  ComboBoxPrebuild.Items.Add('windows');
+  ComboBoxPrebuild.Items.Add('windows-x86_64');
+  if Self.FPrebuildOSYS <> '' then
+      ComboBoxPrebuild.Text:= FPrebuildOSYS
+  else
+     ComboBoxPrebuild.Text:= 'windows-x86_64';
+  {$endif}
+
+  {$ifdef linux}
+  ComboBoxPrebuild.Items.Add('linux-x86_32');
+  ComboBoxPrebuild.Items.Add('linux-x86_64');
+  if Self.FPrebuildOSYS <> '' then
+      ComboBoxPrebuild.Text:= FPrebuildOSYS
+  else
+     ComboBoxPrebuild.Text:= 'linux-x86_64';
+  {$endif}
+
+  {$ifdef darwin}
+  ComboBoxPrebuild.Items.Add('darwin-x86_64');
+  ComboBoxPrebuild.Text:= 'darwin-x86_64';
+  {$endif}
+
+  EditPathToJavaJDK.SetFocus;
+
+  {$ifdef darwin}
+    if EditPathToJavaJDK.Text = '' then
+       EditPathToJavaJDK.Text:= '${/usr/libexec/java_home}';
+  {$endif}
+
+end;
+
 function TFormSettingsPaths.HasBuildTools(platform: integer): boolean;
 var
   lisDir: TStringList;
@@ -340,70 +406,6 @@ begin
       Result:= Result + 'smartdesigner';
       //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
   end;
-end;
-
-procedure TFormSettingsPaths.FormActivate(Sender: TObject);
-var
- flag: boolean;
-begin
-
-  //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
-  FPathToSmartDesigner:= GetPathToSmartDesigner();
-
-  //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java
-  FPathToJavaTemplates:= FPathToSmartDesigner  + PathDelim + 'java';
-
-  flag:= false;
-  if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
-  begin
-    if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
-    begin
-       CopyFile(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini',
-                IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
-       flag:= True;
-    end;
-  end;
-
-  if flag then  //exists  'LAMW.ini'
-  begin
-    WriteIniString('PathToJavaTemplates', FPathToJavaTemplates);
-    WriteIniString('PathToSmartDesigner', FPathToSmartDesigner);
-  end;
-
-  LoadSettings(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini');
-
-  FOk:= False;
-
-  {$ifdef windows}
-  ComboBoxPrebuild.Items.Add('windows');
-  ComboBoxPrebuild.Items.Add('windows-x86_64');
-  if Self.FPrebuildOSYS <> '' then
-      ComboBoxPrebuild.Text:= FPrebuildOSYS
-  else
-     ComboBoxPrebuild.Text:= 'windows';
-  {$endif}
-
-  {$ifdef linux}
-  ComboBoxPrebuild.Items.Add('linux-x86_32');
-  ComboBoxPrebuild.Items.Add('linux-x86_64');
-  if Self.FPrebuildOSYS <> '' then
-      ComboBoxPrebuild.Text:= FPrebuildOSYS
-  else
-     ComboBoxPrebuild.Text:= 'linux-x86_64';
-  {$endif}
-
-  {$ifdef darwin}
-  ComboBoxPrebuild.Items.Add('darwin-x86_64');
-  ComboBoxPrebuild.Text:= 'darwin-x86_64';
-  {$endif}
-
-  EditPathToJavaJDK.SetFocus;
-
-  {$ifdef darwin}
-    if EditPathToJavaJDK.Text = '' then
-       EditPathToJavaJDK.Text:= '${/usr/libexec/java_home}';
-  {$endif}
-
 end;
 
 procedure TFormSettingsPaths.BitBtnCancelClick(Sender: TObject);

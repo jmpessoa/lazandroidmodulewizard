@@ -89,8 +89,8 @@ object FormSettingsPaths: TFormSettingsPaths
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
-  OnActivate = FormActivate
   OnClose = FormClose
+  OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '2.0.0.4'
   object BitBtnOK: TBitBtn
