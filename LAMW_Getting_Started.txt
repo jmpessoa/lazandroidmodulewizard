@@ -151,6 +151,8 @@ I. Infrastructure
 
 	Simply "extract here" the zip file to produce the folder "gradle-6.6.1" in a convenient location...
 
+	Warning: Gradle >= 7  don't supported by LAMW, yet!
+
 	warning: Gradle build process need internet connection!!!
 	Warning: Gradle 6.X  don't support Java > 13!
 
