@@ -846,6 +846,9 @@ type
     procedure SetDataBaseName(_dbName: string);
     function GetFullPathDataBaseName(): string;
 
+    function DBExport( _dbExportDir, _dbExportFileName : string ) : boolean;
+    function DBImport( _dbImportFileFull : string ) : boolean;
+
     function DatabaseExists(_databaseName: string): boolean;
     procedure SetAssetsSearchFolder(_folderName: string);
     procedure SetReturnHeaderOnSelect(_returnHeader: boolean);
@@ -13452,6 +13455,26 @@ begin
       SetReturnHeaderOnSelect(FReturnHeaderOnSelect);
 
   FFullPathDataBaseName:= GetFilePath(fpathDataBase) + '/' + FDataBaseName;
+
+end;
+
+function jSqliteDataAccess.DBExport( _dbExportDir, _dbExportFileName : string ) : boolean;
+begin
+
+  result := false;
+
+  if FInitialized then
+    result := jni_func_tt_out_z(FjEnv, FjObject, 'DBExport', _dbExportDir, _dbExportFileName);
+
+end;
+
+function jSqliteDataAccess.DBImport( _dbImportFileFull : string ) : boolean;
+begin
+
+  result := false;
+
+  if FInitialized then
+    result := jni_func_t_out_z(FjEnv, FjObject, 'DBImport', _dbImportFileFull);
 
 end;
 
