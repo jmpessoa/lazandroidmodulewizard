@@ -24,6 +24,7 @@ import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import java.nio.channels.FileChannel;
 
 /**[by renabor]
  * A helper class to manage database creation and version management using 
@@ -759,6 +762,63 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
    } 
  
    mydb = returnDatabase(DB_PATH, DATABASE_NAME);  
+ }
+ 
+ public boolean DBExport(String dbExportDir, String dbExportFileName) {
+     
+	 // RequestRuntimePermission 'android.permission.WRITE_EXTERNAL_STORAGE'
+     try {         
+             File currentDB = new File(controls.activity.getDatabasePath(DATABASE_NAME).getAbsolutePath());
+             
+             if(currentDB == null) return false;
+             
+             File fileDir = new File(dbExportDir);
+ 	         fileDir.mkdirs();
+ 	         File backupDB = new File(dbExportDir + File.separator + dbExportFileName);
+ 	         
+ 	         if(backupDB == null) return false;
+ 	                     
+             FileChannel src = new FileInputStream(currentDB).getChannel();
+             FileChannel dst = new FileOutputStream(backupDB).getChannel();
+             
+             dst.transferFrom(src, 0, src.size());
+             src.close();
+             dst.close();             
+             
+             return true;
+         
+     } catch (Exception e) {
+    	 
+    	 return false;         
+
+     }
+ }
+ 
+ public boolean DBImport(String dbImportFileFull) {
+     
+	 // RequestRuntimePermission 'android.permission.WRITE_EXTERNAL_STORAGE'
+     try {         
+    	     this.Free();
+    	     
+             File currentDB = new File(controls.activity.getDatabasePath(DATABASE_NAME).getAbsolutePath());                                      
+             File backupDB  = new File(dbImportFileFull);
+             
+             if( (backupDB == null) || (currentDB == null) ) return false;    	         	     
+
+             FileChannel src = new FileInputStream(backupDB).getChannel();
+             FileChannel dst = new FileOutputStream(currentDB).getChannel();
+             dst.transferFrom(src, 0, src.size());
+             src.close();
+             dst.close();
+             
+             OpenOrCreate(DATABASE_NAME);
+         
+             return true;
+         
+     } catch (Exception e) {
+
+         return false;
+     }
  }
 
  public void SetVersion(int version) {
