@@ -99,7 +99,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
 
         this.setBackgroundColor(mBackgroundColor);
 
-        this.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        //this.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         LAMWCommon = new jCommons(this, context, pascalObj);
         mTextPaint = new TextPaint();//new Paint();
         //mPaint.setStyle(Paint.Style.STROKE);
