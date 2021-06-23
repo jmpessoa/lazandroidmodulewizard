@@ -1388,6 +1388,7 @@ type
     function  GetTimeInMilliseconds : int64;
     function  GetTimeHHssSS( millisTime : int64 ) : string;
     function  GetDateTimeToMillis( _dateTime: string; _zone: boolean ) : int64;
+    function  GetDateTimeUTC( _dateTime: string ) : string;
 
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string); overload;
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer); overload; // by ADiV
@@ -3377,6 +3378,14 @@ begin
  Result := 0;
  if not FInitialized then Exit;
  Result:= jni_func_tz_out_j(FjEnv, FjObject, 'GetDateTimeToMillis', _dateTime, _zone);
+end;
+
+// BY ADiV
+function jForm.GetDateTimeUTC( _dateTime: string ) : string;
+begin
+ Result := '';
+ if not FInitialized then Exit;
+ Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetDateTimeUTC', _dateTime);
 end;
 
 procedure jForm.SetEnabled(Value: Boolean);
