@@ -559,6 +559,10 @@ type
                     itxTextPassword,
                     itxMultiLine, itxNull);
 
+  TInputModeAdjust = ( imaNothig,
+                       imaResize,
+                       imaPan );
+
   //http://www.semurjengkol.com/android-relative-layout-example/#sthash.JdHGbyti.dpuf
   TPositionRelativeToAnchorID = ( raAbove,
                                   raBelow,
@@ -1307,6 +1311,7 @@ type
 
     procedure HideSoftInput(); overload;
     procedure ShowSoftInput();
+    procedure SetSoftInputModeAdjust( _inputMode : TInputModeAdjust );
 
     function GetNetworkStatus(): TNetworkStatus;
     function GetDeviceWifiIPAddress(): string;
@@ -4302,6 +4307,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'ShowSoftInput');
+end;
+
+procedure jForm.SetSoftInputModeAdjust( _inputMode : TInputModeAdjust );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetSoftInputMode', Ord(_inputMode));
 end;
 
 function jForm.GetNetworkStatus(): TNetworkStatus;

@@ -1841,6 +1841,16 @@ return devid;
 		imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
 	}
 
+	public void SetSoftInputMode( int _inputMode ){
+		
+		switch (_inputMode) {	
+		 case 0: controls.activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING); break;
+		 case 1: controls.activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE); break;
+		 case 2: controls.activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN); break;
+		}
+		
+	}
+
 	//thanks to Mladen
 	public String GetDeviceModel() {
 		return android.os.Build.MODEL;
