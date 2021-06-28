@@ -95,7 +95,6 @@ object FormWorkspace: TFormWorkspace
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.0.4'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
@@ -1384,8 +1383,8 @@ object FormWorkspace: TFormWorkspace
       ItemIndex = 0
       Items.Strings = (
         'DeviceDefault'
-        'AppCompat.Light.NoActionBar'
         'AppCompat.Light.DarkActionBar'
+        'AppCompat.Light.NoActionBar'
         'Holo.Light.NoActionBar'
         'Holo.Light.DarkActionBar'
         'GDXGame'

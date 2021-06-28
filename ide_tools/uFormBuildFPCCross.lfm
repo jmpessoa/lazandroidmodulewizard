@@ -92,6 +92,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
+  LCLVersion = '2.0.0.4'
   object StatusBar1: TStatusBar
     Left = 0
     Height = 29

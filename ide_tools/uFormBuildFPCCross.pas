@@ -330,13 +330,18 @@ begin
        if FBuildMode <> bmAarch64 then
          Params.Add('OPT= "-vw-n-h-l-d-u-t-p-c- -dFPC_ARMHF"')  //Armel means that all floating point values are always passed in integer registers.
        else
-          Params.Add('OPT="-vw-n-h-l-d-u-t-p-c- "');
+         Params.Add('OPT="-vw-n-h-l-d-u-t-p-c- "');
 
        if FBuildMode = bmArmV6  then
           Params.Add('CROSSOPT="-CpARMv6 -CfSoft"');   //Soft means that all fp operations are performed by software, no FPU support.
 
        if FBuildMode = bmArmV7a then  //                      //[FPU] vfpv3 means that fp operations are performed by the hardware.
-          Params.Add('CROSSOPT="-CpARMv7a -Cf'+FFPUSet+'"');   //-OoFASTMATH to sacrifice precision for performance.
+       begin
+          if FFPUSet = 'Soft' then
+            Params.Add('CROSSOPT="-CpARMv7a -Cf'+FFPUSet+'"')   //-OoFASTMATH to sacrifice precision for performance.
+          else
+            Params.Add('CROSSOPT="-CaEABI -CpARMv7a -Cf'+FFPUSet+'"');   //-OoFASTMATH to sacrifice precision for performance.
+       end;
 
        if  FBuildMode <> bmAarch64 then
          crossBinDIR:= FPathToAndroidNDK+DirectorySeparator+

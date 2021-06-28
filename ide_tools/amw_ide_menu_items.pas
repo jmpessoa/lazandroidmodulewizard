@@ -9,7 +9,7 @@ uses
   uformsettingspaths{, lazandroidtoolsexpert}, ufrmEditor, ufrmCompCreate,
   uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked,
   uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff,
-  unitformimportpicture, uformapksigner;
+  unitformimportpicture, uformapksigner, unitFormExportProjectAsTemplate;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);     //By Thierrydijoux!
@@ -1827,6 +1827,250 @@ begin
   Result:= Copy(fullPathToProjectLFM, 1, p-1) + 'res';
 end;
 
+function GetPathToSmartDesigner(): string;
+var
+  Pkg: TIDEPackage;
+begin
+  Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
+  if Pkg<>nil then
+  begin
+      Result:= ExtractFilePath(Pkg.Filename) + 'smartdesigner' ;
+      //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+  end;
+end;
+
+procedure ExportAsAppTemplate(Sender: TObject);  //unitFormExportProjectAsTemplate
+var
+  Project: TLazProject;
+  package, pathToProject, pathToProjectJavaSrc, fileName, smallProjName: string;
+  pathToSmartDesigner, projectTheme, newTheme, pathToNewTemplate: string;
+  FormExportProjectAsTemplate: TFormExportProjectAsTemplate;
+  auxList: TStringList;
+  templateFiles,  codeList: TStringList;
+  i, count, p: integer;
+begin
+  Project:= LazarusIDE.ActiveProject;
+
+  if not Assigned(Project) then Exit;
+
+  if Project.CustomData.Values['LAMW'] = 'GUI' then
+  begin
+
+      projectTheme:= Project.CustomData['Theme'];
+      package:= Project.CustomData.Values['Package'];
+
+      p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
+      pathToProject:= Copy(Project.ProjectInfoFile, 1, p-1);
+      pathToProjectJavaSrc:= pathToProject+DirectorySeparator+'src'+DirectorySeparator+StringReplace(package,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
+
+      auxList:= TStringList.Create;
+      auxList.StrictDelimiter:= True;
+      auxList.Delimiter:= DirectorySeparator;
+      auxList.DelimitedText:= TrimChar(pathToProject, DirectorySeparator);
+      smallProjName:=  auxList.Strings[auxList.Count-1];; //AppLAMWProject10
+      auxList.Free;
+
+      pathToSmartDesigner:= GetPathToSmartDesigner();//C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+
+      FormExportProjectAsTemplate:=  TFormExportProjectAsTemplate.Create(Application);
+      FormExportProjectAsTemplate.StatusBar1.SimplePanel:= True;
+      //FormExportProjectAsTemplate.StatusBar1.SimpleText:=
+      FormExportProjectAsTemplate.EditTheme.Text:= projectTheme;
+      FormExportProjectAsTemplate.EditTheme.Enabled:= False;
+      FormExportProjectAsTemplate.EditThemeExt.Text:= smallProjName;
+      FormExportProjectAsTemplate.PathToTemplateFolder:= pathToSmartDesigner + PathDelim + 'AppTemplates';
+      if FormExportProjectAsTemplate.ShowModal = mrOk then
+      begin
+         if ForceDirectories(pathToSmartDesigner + PathDelim + 'AppTemplates') then
+         begin
+            newTheme:= projectTheme + '.' + FormExportProjectAsTemplate.EditThemeExt.Text;
+            pathToNewTemplate:= pathToSmartDesigner + PathDelim + 'AppTemplates' + PathDelim +  newTheme;
+            if ForceDirectories(pathToNewTemplate) then
+            begin
+               CopyFile(pathToProject+PathDelim+'AndroidManifest.xml', pathToNewTemplate+PathDelim+'AndroidManifest.xml');
+               CopyFile(pathToProject+PathDelim+'build.gradle', pathToNewTemplate+PathDelim+'build.gradle');
+
+               if ForceDirectories(pathToNewTemplate + PathDelim + 'jni') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 codeList:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'jni', '*.pas;*.lfm;*.lpi', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin   //{Hint: save all files to location
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      codeList.LoadFromFile(templateFiles.Strings[i]);
+
+                      if Pos('.pas', fileName) > 0 then
+                      begin
+                        if Pos('UNIT ', Uppercase(codeList.Strings[0])) <= 0 then //cleanup
+                          codeList.Delete(0);  //clean up ...
+                      end;
+                      codeList.SaveToFile(pathToNewTemplate + PathDelim + 'jni'+ PathDelim + fileName);
+                      //CopyFile(templateFiles.Strings[i], pathToNewTemplate + PathDelim + 'jni'+ PathDelim + fileName);
+                   end;
+                 finally
+                   codeList.Free;
+                   templateFiles.Free;
+                 end;
+               end;
+
+               if ForceDirectories(pathToNewTemplate+PathDelim + 'assets') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'assets', '*.*', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToProject + PathDelim + 'assets'+ PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;
+
+               if ForceDirectories(pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'res' +PathDelim+'drawable', '*.*', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable'+ PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;
+
+               if ForceDirectories(pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable-hdpi') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'res' +PathDelim+'drawable-hdpi', '*.*', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable-hdpi'+ PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;
+
+               if ForceDirectories(pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable-mdpi') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'res' +PathDelim+'drawable-mdpi', '*.*', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable-mdpi'+ PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;
+
+               if ForceDirectories(pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable-xhdpi') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'res' +PathDelim+'drawable-xhdpi', '*.*', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable-xhdpi'+ PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;
+
+               if ForceDirectories(pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable-xxhdpi') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'res' +PathDelim+'drawable-xxhdpi', '*.*', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToNewTemplate+PathDelim + 'res' + PathDelim + 'drawable-xxhdpi'+ PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;
+
+               if ForceDirectories(pathToNewTemplate+PathDelim + 'res' + PathDelim + 'raw') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'res' +PathDelim+'raw', '*.*', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToNewTemplate+PathDelim + 'res' + PathDelim + 'raw'+ PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;
+
+               if ForceDirectories(pathToNewTemplate+PathDelim + 'res' + PathDelim + 'xml') then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProject + PathDelim + 'res' +PathDelim+'xml', '*.*', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToNewTemplate+PathDelim + 'res' + PathDelim + 'xml'+ PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;
+
+               {
+               pathToNewTemplateJavaSrc:= pathToNewTemplate+PathDelim + 'src' + PathDelim + StringReplace(package,'.',PathDelim,[rfReplaceAll,rfIgnoreCase]);
+               if ForceDirectories(pathToNewTemplateJavaSrc) then
+               begin
+                 templateFiles:= TStringList.Create;
+                 try
+                   FindAllFiles(templateFiles, pathToProjectJavaSrc,'*.java', False);
+                   count:=  templateFiles.Count;
+                   for i:= 0 to count-1 do
+                   begin
+                      fileName:= ExtractFileName(templateFiles.Strings[i]);
+                      CopyFile(templateFiles.Strings[i], pathToNewTemplateJavaSrc + PathDelim + fileName);
+                   end;
+                 finally
+                   templateFiles.Free;
+                 end;
+               end;  }
+               ShowMessage('Success!! The ' +smallProjName+ sLineBreak + 'was exported as Template/Theme Project! ');
+
+            end;
+         end;
+      end;
+      FormExportProjectAsTemplate.Free;
+  end;
+
+end;
+
 procedure StartImportLAMWStuff(Sender: TObject);
 var
   Project: TLazProject;
@@ -2393,6 +2637,9 @@ begin
 
   //Adding 13a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToImportPictureForm', 'Use/Import Image/Picture...', nil, @StartImportPictureStuff);
+
+  //Adding 14a. entry
+  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToExportToTemplateForm', 'Export LAMW Project as Template/Theme...', nil, @ExportAsAppTemplate);
 
   //Register submenu AppCompat
   ideSubMnuAppCompat:= RegisterIDESubMenu(ideSubMnuAMW, 'ConvertToAppCompat', 'Convert the Project to AppCompat Theme');

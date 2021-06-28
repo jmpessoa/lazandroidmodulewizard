@@ -133,7 +133,7 @@ type
     procedure WriteIniString(Key, Value: string);
     function DoPathToSmartDesigner(): string;
     function DoNewPathToJavaTemplate(): string;
-
+    function GetPathToSmartDesigner(): string;
   public
     { public declarations }
     procedure LoadSettings(const pFilename: string);
@@ -1150,7 +1150,30 @@ begin          //C:\adt32\sdk\tools\ant
   end;
 end;
 
+function TFormWorkspace.GetPathToSmartDesigner(): string;
+var
+  Pkg: TIDEPackage;
+begin
+  Result:= '';
+  if FPathToSmartDesigner = '' then
+  begin
+    Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
+    if Pkg<>nil then
+    begin
+        FPathToSmartDesigner:= ExtractFilePath(Pkg.Filename);
+        FPathToSmartDesigner:= FPathToSmartDesigner + 'smartdesigner';
+        Result:=FPathToSmartDesigner;
+        //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+    end;
+  end
+  else Result:= FPathToSmartDesigner;
+end;
+
 procedure TFormWorkspace.FormActivate(Sender: TObject);
+var
+  listDirectories: TStringList;
+  i, count, p: integer;
+  lastDirName: string;
 begin
 
   EditPathToWorkspace.Left:= 8; // try fix hidpi bug
@@ -1185,6 +1208,21 @@ begin
   SpeedButtonSDKPlusClick(Self);
 
   Self.RGInstruction.ItemIndex:= FInstructionSetIndex;
+
+
+  //NEW! App Templates!
+  listDirectories:= TStringList.Create;
+  try
+     FindAllDirectories(listDirectories, GetPathToSmartDesigner() + PathDelim + 'AppTemplates', False);
+     count:=  listDirectories.Count;
+     for i:= 0 to count-1 do
+     begin
+        p:= LastDelimiter(PathDelim,listDirectories.Strings[i]);
+        ComboBoxTheme.Items.Add(Copy(listDirectories.Strings[i], p+1, Length(listDirectories.Strings[i])));
+     end;
+  finally
+     listDirectories.Free;
+  end;
 
 end;
 

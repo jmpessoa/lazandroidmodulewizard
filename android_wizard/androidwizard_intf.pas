@@ -79,6 +79,8 @@ type
      FGradleVersion: string;
 
      FAndroidTheme: string;
+     FAndroidTemplateTheme: string;  //new
+
      FBuildSystem: string;
      FMaxSdkPlatform: integer;
      FCandidateSdkBuild: string;
@@ -104,6 +106,7 @@ type
      function GetPathToSmartDesigner(): string;
      procedure WriteIniString(Key, Value: string);
      function TryUndoFakeVersion(grVer: string): string;
+     function IsTemplateProject(tryTheme: string; out outAndroidTheme: string): boolean;
 
    public
      constructor Create; override;
@@ -151,6 +154,8 @@ type
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
     ModuleType: integer;   //-1:gdx 0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
+
+    AndroidTheme: string;
 
     SmallProjName: string;
 
@@ -1030,24 +1035,21 @@ function TAndroidProjectDescriptor.GetPathToSmartDesigner(): string;
 var
   Pkg: TIDEPackage;
 begin
-  Result:= '';
   if FPathToSmartDesigner = '' then
   begin
     Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
-    if Pkg<>nil then
+    if Pkg <> nil then
     begin
-        FPathToSmartDesigner:= ExtractFilePath(Pkg.Filename);
-        FPathToSmartDesigner:= FPathToSmartDesigner + 'smartdesigner';
-        Result:=FPathToSmartDesigner;
+        FPathToSmartDesigner:= ExtractFilePath(Pkg.Filename) + 'smartdesigner';
         //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
     end;
-  end
-  else Result:= FPathToSmartDesigner;
+  end;
+  Result:=FPathToSmartDesigner;
 end;
 
 function TAndroidProjectDescriptor.DoNewPathToJavaTemplate(): string;
 begin
-   FPathToJavaTemplates:= GetPathToSmartDesigner() + pathDelim +'java';
+   FPathToJavaTemplates:= GetPathToSmartDesigner() + pathDelim + 'java';
    Result:=FPathToJavaTemplates;
     //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java
 end;
@@ -1137,6 +1139,10 @@ begin
     AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName;
     AndroidFileDescriptor.ModuleType:= FModuleType;
     AndroidFileDescriptor.SyntaxMode:= FSyntaxMode;
+
+    ShowMessage('try new jni FAndroidTheme = ' + FAndroidTheme);
+
+    AndroidFileDescriptor.AndroidTheme:= FAndroidTheme;
 
     FPascalJNIInterfaceCode:= frm.PascalJNIInterfaceCode;
 
@@ -1467,6 +1473,7 @@ var
   FVersionCode : integer;
   FVersionName : string;
   xmlAndroidManifest: TXMLDocument;
+  outTheme: string;
 begin
   Result:= False;
   FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
@@ -1490,7 +1497,7 @@ begin
     frm.CheckBoxPIE.Visible:= False;
     frm.CheckBoxLibrary.Visible:= False;
 
-    if projectType = -1 then //Gdx
+    if FModuleType = -1 then //Gdx
     begin
       frm.Color:= clWhite;
       frm.PanelButtons.Color:= clWhite;
@@ -1511,7 +1518,7 @@ begin
       frm.SpeedButtonHintTheme.Visible:= False;
     end;
 
-    if projectType = 1 then //No GUI
+    if FModuleType = 1 then //No GUI
     begin
       frm.Color:= clWhite;
       frm.PanelButtons.Color:= clWhite;
@@ -1523,7 +1530,7 @@ begin
       frm.SpeedButtonHintTheme.Visible:= False;
     end;
 
-    if projectType = 2 then //No GUI console executable or generic library [.so]
+    if FModuleType = 2 then //No GUI console executable or generic library [.so]
     begin
       frm.GroupBox1.Visible:= False;
       frm.GroupBox5.Visible:= False;
@@ -1552,7 +1559,16 @@ begin
       frm.SaveSettings(SettingsFilename);
 
       FBuildSystem:= frm.BuildSystem;
+
       FAndroidTheme:= frm.AndroidTheme;
+      FAndroidTemplateTheme:= '';
+
+      if IsTemplateProject(FAndroidTheme, outTheme) then
+      begin
+        FAndroidTemplateTheme:= FAndroidTheme;
+        FAndroidTheme:= outTheme;
+      end;
+
       FJavaClassName:= frm.JavaClassName;
       FSmallProjName:= frm.SmallProjName;
       FInstructionSet:= frm.InstructionSet;{ ex. ArmV6, ArmV7a, ArmV8}
@@ -1683,6 +1699,7 @@ begin
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors.xml',
                FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
 
+
             if Pos('AppCompat', FAndroidTheme) > 0 then
             begin
                 CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+FAndroidTheme+'.xml',
@@ -1767,7 +1784,7 @@ begin
 
           end;
 
-          if FModuleType <= 0 then  //Android Bridges Controls... [GUI] and Gdx
+          if FModuleType <= 0  then  //Android Bridges Controls... [GUI] and Gdx
           begin
             if not FileExists(FFullJavaSrcPath+DirectorySeparator+'App.java') then
             begin
@@ -1895,7 +1912,7 @@ begin
 
         end; // Ant
 
-        if FModuleType < 2 then
+        if FModuleType < 2 then    {-1: Gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
         begin
           strList.Clear;
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
@@ -3270,7 +3287,9 @@ begin
   else if FModuleType = 0 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
   begin
     AProject.CustomData.Values['LAMW'] := 'GUI';
+
     AProject.CustomData.Values['Theme']:= FAndroidTheme;
+
     AProject.CustomData['StartModule'] := 'AndroidModule1';
     if FSupport then
       AProject.CustomData.Values['Support'] := 'TRUE'
@@ -3979,12 +3998,244 @@ begin
 
 end;
 
+//C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner\AppTemplates
+function TAndroidProjectDescriptor.IsTemplateProject(tryTheme: string; out outAndroidTheme: string): boolean;
+var
+  p: integer;
+begin
+  if DirectoryExists(GetPathToSmartDesigner() + PathDelim + 'AppTemplates' +PathDelim + tryTheme) then
+  begin
+    p:= LastDelimiter('.', tryTheme);
+    outAndroidTheme:= Copy(tryTheme, 1, p-1);  //extract real android theme ....
+    Result:= True;
+  end
+  else
+  begin
+     Result:= False;
+     outAndroidTheme:= tryTheme;
+  end;
+end;
+
 function TAndroidProjectDescriptor.CreateStartFiles(AProject: TLazProject): TModalResult;
 var
   d: TIDesigner;
   c: TComponent;
   s: TLazProjectFile;
+  //xmlAndroidManifest: TXMLDocument;
+  templateFiles: TStringList;
+  i, count: integer;
+  fileName, pathToTemplate: string;
+  unitFile: TLazProjectFile;
 begin
+
+  if FAndroidTemplateTheme <> '' then //Template/Theme project
+  begin
+
+    pathToTemplate:= GetPathToSmartDesigner() + PathDelim + 'AppTemplates' +PathDelim + FAndroidTemplateTheme;
+
+    //assets
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'assets', '*.*', False);
+      count:=  templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'assets'+PathDelim+fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    // res/drawable
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate + PathDelim + 'res' + PathDelim + 'drawable', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         if Pos('ic_launcher',fileName) <= 0 then
+           CopyFile(templateFiles.Strings[i], FPathToJNIFolder + PathDelim + 'res' + PathDelim + 'drawable' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    // res/drawable-hdpi
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'res'+ PathDelim + 'drawable-hdpi', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         if Pos('ic_launcher',fileName) <= 0 then
+            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-hdpi' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    // res/drawable-mdpi
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'res'+ PathDelim + 'drawable-mdpi', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         if Pos('ic_launcher',fileName) <= 0 then
+            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-mdpi' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    // res/drawable-xhdpi
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'res'+ PathDelim + 'drawable-xhdpi', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         if Pos('ic_launcher',fileName) <= 0 then
+            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-xhdpi' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    // res/drawable-xxhdpi
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'res'+ PathDelim + 'drawable-xxhdpi', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         if Pos('ic_launcher',fileName) <= 0 then
+            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-xxhdpi' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    // res/drawable-ldpi
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'res'+ PathDelim + 'drawable-ldpi', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         if Pos('ic_launcher',fileName) <= 0 then
+            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-ldpi' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    // res/raw
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'res'+ PathDelim + 'raw', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'raw' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    // res/xml
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'res'+ PathDelim + 'xml', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'xml' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    //jni
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'jni', '*.pas;*.lfm', False);
+      count:=  templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         CopyFile(templateFiles.Strings[i], FPathToJNIFolder + PathDelim+'jni' + PathDelim + fileName);
+         if Pos('.pas', fileName) > 0 then
+         begin
+           unitFile := LazarusIDE.ActiveProject.CreateProjectFile(FPathToJNIFolder+PathDelim+'jni' + PathDelim + fileName);
+           unitFile.IsPartOfProject:= True;
+           LazarusIDE.ActiveProject.AddFile(unitFile, True);
+           LazarusIDE.ActiveProject.Modified:= True;
+         end;
+
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+    {
+     ReadXMLFile(xmlAndroidManifest, FPathToJNIFolder + DirectorySeparator+'AndroidManifest.xml');
+     if (xmlAndroidManifest <> nil) then
+     begin
+        with xmlAndroidManifest.DocumentElement do
+        begin
+          projectPackage := AttribStrings['package'];
+        end;
+     end;
+     }
+
+     {  not need ...
+     ReadXMLFile(xmlAndroidManifest, pathToTemplate + DirectorySeparator+'AndroidManifest.xml');
+     if (xmlAndroidManifest <> nil) then
+     begin
+       with xmlAndroidManifest.DocumentElement do
+       begin
+         templatePackage := AttribStrings['package'];
+         aux:=  StringReplace(templatePackage, '.' , PathDelim, [rfReplaceAll,rfIgnoreCase]);
+         pathToTemplateSrc:= pathToTemplate + PathDelim + 'src' + PathDelim + aux;
+         //C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner\templates\AppCompat.Light.NoActionBar.NavigationDrawer\src\org\lamw\appcompatnavigationdrawerdemo1
+       end;
+     end;
+     }
+
+     { not need ...
+     //java src
+     templateFiles:= TStringList.Create;
+     try
+       FindAllFiles(templateFiles, pathToTemplateSrc, '*.java', False);
+       count:=  templateFiles.Count;
+       for i:= 0 to count-1 do
+       begin
+          fileName:= ExtractFileName(templateFiles.Strings[i]);
+          auxList.Clear;
+          auxList.LoadFromFile(templateFiles.Strings[i]);
+          auxList.Strings[0]:= 'package '+ projectPackage+';';
+          auxList.SaveToFile(FFullJavaSrcPath + PathDelim + fileName);
+       end;
+     finally
+       templateFiles.Free;
+     end;
+     }
+
+     LazarusIDE.DoSaveProject([]); // TODO: change hardcoded "controls"
+
+     Exit;
+  end; //Template project
+
   case FModuleType of
   -1: // Gdx Controls
     AndroidFileDescriptor.ResourceClass:= TGdxModule;
@@ -4118,6 +4369,7 @@ var
    sourceList: TStringList;
    uName:  string;
 begin
+
    uName:= FileName;
    uName:= SplitStr(uName,'.');
    sourceList:= TStringList.Create;
@@ -4282,10 +4534,11 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
+
   if ModuleType = -1 then //GDX or GUI controls module
      Result := 'Classes, SysUtils, AndroidWidget, GdxForm;'
   else if ModuleType = 0 then //GDX or GUI controls module
-        Result := 'Classes, SysUtils, AndroidWidget;'
+     Result := 'Classes, SysUtils, AndroidWidget;'
   else if ModuleType = 1  then  //generic module: No GUI Controls
      Result := 'Classes, SysUtils, jni;'
   else // console app or generic library
@@ -4304,6 +4557,7 @@ function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filenam
 var
   strList: TStringList;
 begin
+
   strList:= TStringList.Create;
 
   strList.Add(' ');
@@ -4421,6 +4675,7 @@ function TAndroidFileDescPascalUnitWithResource.GetImplementationSource(
 var
   sttList: TStringList;
 begin
+
   sttList:= TStringList.Create;
   sttList.Add('{$R *.lfm}');
 
