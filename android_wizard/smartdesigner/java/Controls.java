@@ -179,6 +179,7 @@ import java.util.regex.PatternSyntaxException;
 import java.text.ParseException;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
@@ -719,11 +720,35 @@ class jForm {
 	      lnsTime = dateObject.getTime();
 	    
 	    }catch (java.text.ParseException e){        
-	            e.printStackTrace();            
+	            e.printStackTrace();
+	            return 0;
 	    }
 	    
 	    return (lnsTime - offset);
 	}
+	
+	public String GetDateTimeUTC(String _dateTime){
+		String     sPattern  = "yyyy-MM-dd HH:mm:ss";		 
+        
+        SimpleDateFormat formatter = new SimpleDateFormat(sPattern);
+        
+        if( formatter == null ) return "";
+        
+        Date dateObject;
+        
+        try{
+        	
+         dateObject = formatter.parse(_dateTime);
+         
+	    }catch (java.text.ParseException e){        
+         e.printStackTrace();
+         return "";
+        }
+        
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        
+        return formatter.format(dateObject);
+    }
 
 	//Free object except Self, Pascal Code Free the class.
 	public void Free() {
@@ -1814,6 +1839,16 @@ return devid;
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 		if(imm == null) return;
 		imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
+	}
+
+	public void SetSoftInputMode( int _inputMode ){
+		
+		switch (_inputMode) {	
+		 case 0: controls.activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING); break;
+		 case 1: controls.activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE); break;
+		 case 2: controls.activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN); break;
+		}
+		
 	}
 
 	//thanks to Mladen

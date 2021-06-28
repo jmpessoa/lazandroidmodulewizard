@@ -559,6 +559,10 @@ type
                     itxTextPassword,
                     itxMultiLine, itxNull);
 
+  TInputModeAdjust = ( imaNothig,
+                       imaResize,
+                       imaPan );
+
   //http://www.semurjengkol.com/android-relative-layout-example/#sthash.JdHGbyti.dpuf
   TPositionRelativeToAnchorID = ( raAbove,
                                   raBelow,
@@ -1307,6 +1311,7 @@ type
 
     procedure HideSoftInput(); overload;
     procedure ShowSoftInput();
+    procedure SetSoftInputModeAdjust( _inputMode : TInputModeAdjust );
 
     function GetNetworkStatus(): TNetworkStatus;
     function GetDeviceWifiIPAddress(): string;
@@ -1388,6 +1393,7 @@ type
     function  GetTimeInMilliseconds : int64;
     function  GetTimeHHssSS( millisTime : int64 ) : string;
     function  GetDateTimeToMillis( _dateTime: string; _zone: boolean ) : int64;
+    function  GetDateTimeUTC( _dateTime: string ) : string;
 
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string); overload;
     procedure SetBackgroundImageIdentifier(_imageIdentifier: string; _scaleType: integer); overload; // by ADiV
@@ -3379,6 +3385,14 @@ begin
  Result:= jni_func_tz_out_j(FjEnv, FjObject, 'GetDateTimeToMillis', _dateTime, _zone);
 end;
 
+// BY ADiV
+function jForm.GetDateTimeUTC( _dateTime: string ) : string;
+begin
+ Result := '';
+ if not FInitialized then Exit;
+ Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetDateTimeUTC', _dateTime);
+end;
+
 procedure jForm.SetEnabled(Value: Boolean);
 begin
   if FActivityMode = actEasel then Exit;
@@ -4293,6 +4307,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'ShowSoftInput');
+end;
+
+procedure jForm.SetSoftInputModeAdjust( _inputMode : TInputModeAdjust );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetSoftInputMode', Ord(_inputMode));
 end;
 
 function jForm.GetNetworkStatus(): TNetworkStatus;
