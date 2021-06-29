@@ -1839,11 +1839,22 @@ begin
   end;
 end;
 
+function TryCleanUpThemeExtension(input: string): string;
+var
+  aux, aux2: string;
+begin
+   aux:= StringReplace(input,'.','',[rfReplaceAll,rfIgnoreCase]);
+   aux2:= StringReplace(aux,' ','',[rfReplaceAll,rfIgnoreCase]);
+   aux:= StringReplace(aux2,'-','',[rfReplaceAll,rfIgnoreCase]);
+   aux2:= StringReplace(aux,'@','',[rfReplaceAll,rfIgnoreCase]);
+   Result:= StringReplace(aux2,'_','',[rfReplaceAll,rfIgnoreCase]);
+end;
+
 procedure ExportAsAppTemplate(Sender: TObject);  //unitFormExportProjectAsTemplate
 var
   Project: TLazProject;
-  package, pathToProject, pathToProjectJavaSrc, fileName, smallProjName: string;
-  pathToSmartDesigner, projectTheme, newTheme, pathToNewTemplate: string;
+  package, pathToProject, fileName, smallProjName: string;
+  aux, pathToSmartDesigner, projectTheme, newTheme, pathToNewTemplate: string;
   FormExportProjectAsTemplate: TFormExportProjectAsTemplate;
   auxList: TStringList;
   templateFiles,  codeList: TStringList;
@@ -1861,7 +1872,7 @@ begin
 
       p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
       pathToProject:= Copy(Project.ProjectInfoFile, 1, p-1);
-      pathToProjectJavaSrc:= pathToProject+DirectorySeparator+'src'+DirectorySeparator+StringReplace(package,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
+      //pathToProjectJavaSrc:= pathToProject+DirectorySeparator+'src'+DirectorySeparator+StringReplace(package,'.',DirectorySeparator,[rfReplaceAll,rfIgnoreCase]);
 
       auxList:= TStringList.Create;
       auxList.StrictDelimiter:= True;
@@ -1883,7 +1894,8 @@ begin
       begin
          if ForceDirectories(pathToSmartDesigner + PathDelim + 'AppTemplates') then
          begin
-            newTheme:= projectTheme + '.' + FormExportProjectAsTemplate.EditThemeExt.Text;
+            aux:= TryCleanUpThemeExtension(FormExportProjectAsTemplate.EditThemeExt.Text);
+            newTheme:= projectTheme + '.' +  aux;
             pathToNewTemplate:= pathToSmartDesigner + PathDelim + 'AppTemplates' + PathDelim +  newTheme;
             if ForceDirectories(pathToNewTemplate) then
             begin
@@ -2067,8 +2079,9 @@ begin
          end;
       end;
       FormExportProjectAsTemplate.Free;
-  end;
-
+  end
+  else
+    ShowMessage('Sorry, the active project is not a LAMW project!');
 end;
 
 procedure StartImportLAMWStuff(Sender: TObject);
