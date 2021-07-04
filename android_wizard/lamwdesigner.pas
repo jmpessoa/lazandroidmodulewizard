@@ -532,9 +532,15 @@ type
   { TDraftSToolbar }
 
   TDraftSToolbar = class(TDraftWidget)
+  private
+   FImageLogo: TPortableNetworkGraphic;
+   FImageNavigation: TPortableNetworkGraphic;
+   function GetImageLogo: TPortableNetworkGraphic;
+   function GetImageNavigation: TPortableNetworkGraphic;
   public
      constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
      procedure Draw; override;
+     procedure UpdateLayout; override;
   end;
 
   { TDraftSDrawerLayout }
@@ -1400,27 +1406,94 @@ end;
 
 { TDraftSToolbar }
 
+function TDraftSToolbar.GetImageLogo: TPortableNetworkGraphic;
+begin
+  if FImageLogo <> nil then
+    Result := FImageLogo
+  else
+    with jsToolbar(FAndroidWidget) do
+    begin
+      if LogoIconIdentifier <> '' then
+      begin
+        FImageLogo := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(LogoIconIdentifier));
+        Result := FImageLogo;
+      end else
+      Result := nil;
+    end;
+end;
+
+function TDraftSToolbar.GetImageNavigation: TPortableNetworkGraphic;
+begin
+  if FImageNavigation <> nil then
+    Result := FImageNavigation
+  else
+    with jsToolbar(FAndroidWidget) do
+    begin
+      if NavigationIconIdentifier <> '' then
+      begin
+        FImageNavigation := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(NavigationIconIdentifier));
+        Result := FImageNavigation;
+      end else
+      Result := nil;
+    end;
+end;
+
 constructor TDraftSToolbar.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
 begin
   BaseStyle := '';  //'autoTextViewStyle';
   inherited;
   Color := jsToolbar(AWidget).BackgroundColor;
   FontColor := jsToolbar(AWidget).FontColor;
+
+  {
+   if jsToolBar(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+  }
 end;
 
 procedure TDraftSToolbar.Draw;
+var
+  r: TRect;
 begin
+
   with Fcanvas do
   begin
+
     if jsToolbar(FAndroidWidget).BackgroundColor <> colbrDefault then
+    begin
       Brush.Color := ToTColor(jsToolbar(FAndroidWidget).BackgroundColor)
-    else begin
+    end
+    else
+    begin
       Brush.Color:= clNone;
       Brush.Style:= bsClear;
     end;
+
     Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
-    TextOut(12, 9, FAndroidWidget.Text);
+    TextOut(80, 9, FAndroidWidget.Text); //12, 9,
+
+    if GetImageNavigation <> nil then
+    begin
+      r := Rect(0, 0, 32, 32);
+      StretchDraw(r, GetImageNavigation);
+      //Draw(0, 0, GetImageNavigation);
+    end;
+
+
+    if GetImageLogo <> nil then
+    begin
+      r := Rect(48, 0, 80, 32);  //ALeft, ATop, ARight, ABottom
+      StretchDraw(r, GetImageLogo);
+      //Draw(0, 0, GetImageLogo);
+    end;
+
   end;
+
+end;
+
+procedure TDraftSToolbar.UpdateLayout;
+begin
+  inherited UpdateLayout;
 end;
 
 { TDraftSNavigationView }
@@ -4774,6 +4847,8 @@ initialization
   RegisterPropertyEditor(TypeInfo(string), jBitmap, 'ImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jsFloatingButton, 'ImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jsContinuousScrollableImageView, 'ImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jsToolbar, 'LogoIconIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jsToolbar, 'NavigationIconIdentifier', TImageIdentifierPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
