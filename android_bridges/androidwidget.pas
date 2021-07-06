@@ -3093,6 +3093,8 @@ begin
     if FColor <> colbrDefault then
        View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
 
+    FInitialized:= True;    //need here...
+
     if FBackgroundImageIdentifier <> '' then
       SetBackgroundImageIdentifier(FBackgroundImageIdentifier);
 
@@ -3105,7 +3107,6 @@ begin
     if FAnimationMode <> animNone then  //default
        SetAnimationMode(FAnimationMode);
 
-    FInitialized:= True;
 
     for i:= (Self.ComponentCount-1) downto 0 do
     begin
@@ -3201,6 +3202,8 @@ begin
     FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin
     FjPRLayout:= FjPRLayoutHome;  //base appLayout
 
+    FInitialized:= True;  //need here
+
     if FAnimationDurationIn <> 1500 then  //default
        SetAnimationDurationIn(FAnimationDurationIn);
 
@@ -3210,7 +3213,6 @@ begin
     if FAnimationMode <> animNone then  //default
        SetAnimationMode(FAnimationMode);
 
-    FInitialized:= True;
 
     for i:= (Self.ComponentCount-1) downto 0 do
     begin

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
-    package="dummyPackage" 
+    package="org.lamw.appcompatbasicdemo1" 
     android:versionCode="1"
     android:versionName="1.0">
-
-    <uses-sdk android:minSdkVersion="dummySdkApi" android:targetSdkVersion="dummyTargetApi"/>
 
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
@@ -61,7 +60,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity         
-            android:name="dummyAppName" 
+            android:name="org.lamw.appcompatbasicdemo1.App" 
             android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|fontScale"  
 	    android:launchMode="standard" android:enabled="true">
@@ -70,5 +69,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+<provider android:name="androidx.core.content.FileProvider" android:authorities="org.lamw.appcompatbasicdemo1.fileprovider" android:exported="false" android:grantUriPermissions="true"><meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/support_provider_paths"/></provider>
+
     </application>
 </manifest>

@@ -2360,13 +2360,14 @@ type
   Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
   Procedure Java_Event_pAppOnActivityResult      (env: PJNIEnv; this: jobject; requestCode, resultCode: Integer; intentData : jObject);
 
-  //by jmpessoa: support to Option Menu
   procedure Java_Event_pAppOnCreateOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject);
   Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
                                                  itemID: integer; itemCaption: JString; checked: jboolean); overload;
 
+
   Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
                                                  itemID: integer; itemCaption: JString; checked: boolean); overload; //deprecated..
+
 
   function Java_Event_pAppOnPrepareOptionsMenuItem(env: PJNIEnv; this: jobject; jObjMenu: jObject;  jObjMenuItem: jObject; itemIndex: integer): jBoolean;
   function Java_Event_pAppOnPrepareOptionsMenu(env: PJNIEnv; this: jobject; jObjMenu: jObject; menuSize: integer): jBoolean;
@@ -2926,7 +2927,6 @@ begin
                                                  itemID,itemCaption,JBoolean(checked));
 end;
 
-//by jmpessoa: support to Option Menu
 Procedure Java_Event_pAppOnClickOptionMenuItem(env: PJNIEnv; this: jobject; jObjMenuItem: jObject;
                                                 itemID: integer; itemCaption: JString; checked: jboolean);
 var
@@ -2934,11 +2934,16 @@ var
   pasStr: string;
   _jBoolean: JBoolean;
 begin
+
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
+
   if gApp.TopIndex < 0 then Exit;
+
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
+
   if not Assigned(Form) then Exit;
+
   Form.UpdateJNI(gApp);
 
   pasStr := '';
@@ -2949,6 +2954,7 @@ begin
   end;
 
   if Assigned(Form.OnClickOptionMenuItem) then Form.OnClickOptionMenuItem(Form,jObjMenuItem,itemID,pasStr,Boolean(checked));
+
 end;
 
 

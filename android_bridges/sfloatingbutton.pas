@@ -19,6 +19,8 @@ TFABSize = (fabNormal, fabMini, fabAuto); //SIZE_MINI SIZE_AUTO  SIZE_NORMAL
 jsFloatingButton = class(jVisualControl)
  private
     FImageIdentifier: string;
+    FElevation: single;
+    FABSize: TFABSize;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
     
@@ -63,6 +65,8 @@ jsFloatingButton = class(jVisualControl)
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property ImageIdentifier: string read FImageIdentifier write SetImageIdentifier;
+    property Elevation: single read FElevation write SetCompatElevation;
+    property Size: TFABSize read FABSize write SetSize;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     property OnClick: TOnNotify read FOnClick write FOnClick;
 end;
@@ -119,6 +123,8 @@ begin
   FLParamHeight := lpWrapContent; //lpMatchParent
   FAcceptChildrenAtDesignTime:= False;
 //your code here....
+  FElevation:= 20;
+  FABSize:= fabNormal;
 end;
 
 destructor jsFloatingButton.Destroy;
@@ -182,6 +188,9 @@ begin
   else Self.AnchorId:= -1; //dummy
 
   jsFloatingButton_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+
+  if FElevation <> 20 then
+     jsFloatingButton_SetCompatElevation(FjEnv, FjObject, FElevation);
 
   if not FInitialized then
   begin
@@ -367,6 +376,7 @@ end;
 procedure jsFloatingButton.SetCompatElevation(_value: single);
 begin
   //in designing component state: set value here...
+  FElevation:= _value;
   if FInitialized then
      jsFloatingButton_SetCompatElevation(FjEnv, FjObject, _value);
 end;
@@ -389,6 +399,7 @@ end;
 procedure jsFloatingButton.SetSize(_value: TFABSize);
 begin
   //in designing component state: set value here...
+  FABSize:= _value;
   if FInitialized then
      jsFloatingButton_SetSize(FjEnv, FjObject, Ord(_value));
 end;
