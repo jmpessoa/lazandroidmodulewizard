@@ -47,6 +47,7 @@ jsAppBarLayout = class(jVisualControl)
     procedure ClearLayout();
     procedure SetFitsSystemWindows(_value: boolean);
     procedure SetBackgroundToPrimaryColor();
+    procedure SetExpanded(expanded: boolean; animation: boolean);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -75,7 +76,7 @@ procedure jsAppBarLayout_ClearLayoutAll(env: PJNIEnv; _jsappbarlayout: JObject);
 procedure jsAppBarLayout_SetId(env: PJNIEnv; _jsappbarlayout: JObject; _id: integer);
 procedure jsAppBarLayout_SetFitsSystemWindows(env: PJNIEnv; _jsappbarlayout: JObject; _value: boolean);
 procedure jsAppBarLayout_SetBackgroundToPrimaryColor(env: PJNIEnv; _jsappbarlayout: JObject);
-
+procedure jsAppBarLayout_SetExpanded(env: PJNIEnv; _jsappbarlayout: JObject; expanded: boolean; animation: boolean);
 
 implementation
 
@@ -363,6 +364,12 @@ begin
      jsAppBarLayout_SetBackgroundToPrimaryColor(FjEnv, FjObject);
 end;
 
+procedure jsAppBarLayout.SetExpanded(expanded: boolean; animation: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsAppBarLayout_SetExpanded(FjEnv, FjObject, expanded ,animation);
+end;
 {-------- jsAppBarLayout_JNI_Bridge ----------}
 
 function jsAppBarLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -629,6 +636,30 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroudToPrimaryColor', '()V');
   env^.CallVoidMethod(env, _jsappbarlayout, jMethod);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jsAppBarLayout_SetExpanded(env: PJNIEnv; _jsappbarlayout: JObject; expanded: boolean; animation: boolean);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsappbarlayout);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetExpanded', '(ZZ)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(expanded);
+  jParams[1].z:= JBool(animation);
+
+  env^.CallVoidMethodA(env, _jsappbarlayout, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 end.

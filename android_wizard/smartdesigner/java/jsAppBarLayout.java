@@ -140,4 +140,12 @@ public class jsAppBarLayout extends AppBarLayout /*dummy*/ { //please, fix what 
 	   this.setBackgroundColor(LAMWCommon.getColorFromResources(context, R.color.primary)); 
   }
 
+
+   public void SetExpanded(boolean expanded, boolean animation){
+      this.setExpanded(expanded, animation);
+      // Change the size and update the layout
+     // controls.formNeedLayout = true;
+     // controls.appLayout.requestLayout();
+   }
+
 }
