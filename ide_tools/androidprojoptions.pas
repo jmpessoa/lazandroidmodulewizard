@@ -834,12 +834,14 @@ begin
    begin
      if pos('versionCode', strList.Strings[i]) > 1 then
       strList.Strings[i] := '            versionCode ' + intToStr(FVersionCode);
-
      if pos('versionName', strList.Strings[i]) > 1 then
      begin
       strList.Strings[i] := '            versionName "'+FVersionName+'"';
-      break;
      end;
+     if(pos('minSdkVersion',strList.Strings[i]) > 1 )then
+       strList.Strings[i] := '            minSdkVersion '+IntToStr(FMinSdkVersion);
+     if(pos('targetSdkVersion',strList.Strings[i]) > 1 )then
+       strList.Strings[i] := '            targetSdkVersion '+IntToStr(FTargetSdkVersion);
    end;
 
    strList.SaveToFile(fileGradle);
@@ -847,7 +849,9 @@ begin
    strList.Free;
   end;
 
-  if not Assigned(FUsesSDKNode) then
+{ 07.07.2021 lint error FIX.        sdk version must be placed in 'build.gradle' file but
+was in 'AndroidManifest.xml' file
+if not Assigned(FUsesSDKNode) then
   begin
     FUsesSDKNode := xml.CreateElement('uses-sdk');
     with xml.DocumentElement do
@@ -860,7 +864,7 @@ begin
   begin
     AttribStrings['android:minSdkVersion'] := IntToStr(FMinSdkVersion);
     AttribStrings['android:targetSdkVersion'] := IntToStr(FTargetSdkVersion);
-  end;
+  end;}
 
   // permissions
   r := FUsesSDKNode.NextSibling;

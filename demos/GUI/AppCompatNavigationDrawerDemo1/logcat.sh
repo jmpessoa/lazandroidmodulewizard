@@ -1,1 +1,1 @@
-/adt32/sdk/platform-tools/adb logcat &
+/Users/artem.bogomolov.a/develop/instruments/ObjectPascal/lamw_manager/LAMW/sdk/platform-tools/adb logcat &

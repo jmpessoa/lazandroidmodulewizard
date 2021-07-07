@@ -1,5 +1,5 @@
 public native void pAppOnCreate(Context context, RelativeLayout layout, Intent intent);
-public native int  pAppOnScreenStyle();
+public native int pAppOnScreenStyle();
 public native void pAppOnNewIntent(Intent intent);
 public native void pAppOnDestroy();
 public native void pAppOnPause();

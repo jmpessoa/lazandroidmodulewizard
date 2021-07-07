@@ -1,2 +1,2 @@
-/adt32/sdk/platform-tools/adb uninstall org.lamw.appcompatnavigationdrawerdemo1
-/adt32/sdk/platform-tools/adb install -r /eclipse/demos/GUI/AppCompatNavigationDrawerDemo1/bin/AppCompatNavigationDrawerDemo1-debug.apk
+/Users/artem.bogomolov.a/develop/instruments/ObjectPascal/lamw_manager/LAMW/sdk/platform-tools/adb uninstall org.lamw.appcompatnavigationdrawerdemo1
+/Users/artem.bogomolov.a/develop/instruments/ObjectPascal/lamw_manager/LAMW/sdk/platform-tools/adb install -r /Users/artem.bogomolov.a/develop/instruments/ObjectPascal/fpcdeluxe/ccr/lamw/demos/GUI/AppCompatNavigationDrawerDemo1/bin/AppCompatNavigationDrawerDemo1-debug.apk

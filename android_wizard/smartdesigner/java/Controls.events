@@ -1,4 +1,4 @@
-pAppOnCreate=Java_Event_pAppOnCreate(PEnv,this,context,layout,intent);AndroidModule1.ReInit(gApp);
+pAppOnCreate=Java_Event_pAppOnCreate(PEnv,this,context,layout,intent);AndroidModule1.Init(gApp);
 pAppOnScreenStyle=Java_Event_pAppOnScreenStyle(PEnv,this);
 pAppOnNewIntent=Java_Event_pAppOnNewIntent(PEnv,this,intent);
 pAppOnDestroy=Java_Event_pAppOnDestroy(PEnv,this);
