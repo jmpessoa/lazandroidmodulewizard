@@ -1,0 +1,1 @@
+public native void pOnClickBottomNavigationViewItem(long pasobj, int itemId, String itemCaption);

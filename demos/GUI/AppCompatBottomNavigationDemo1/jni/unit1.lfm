@@ -1,0 +1,120 @@
+object AndroidModule1: TAndroidModule1
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Left = 382
+  Top = 32
+  Width = 320
+  Height = 400
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  OnCreateOptionMenu = AndroidModule1CreateOptionMenu
+  OnClickOptionMenuItem = AndroidModule1ClickOptionMenuItem
+  OnActivityCreate = AndroidModule1ActivityCreate
+  object jPanel1: jPanel
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Left = 0
+    Top = 40
+    Width = 320
+    Height = 200
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpHalfOfParent
+    BackgroundColor = colbrDefault
+    MinPinchZoomFactor = 0.25
+    MaxPinchZoomFactor = 4
+    AnimationDurationIn = 1500
+    AnimationMode = animNone
+    object jPanel2: jPanel
+      MarginLeft = 0
+      MarginTop = 0
+      MarginRight = 0
+      MarginBottom = 0
+      Enabled = True
+      Left = 0
+      Top = 0
+      Width = 320
+      Height = 200
+      Visible = True
+      PosRelativeToAnchor = []
+      PosRelativeToParent = []
+      LayoutParamWidth = lpMatchParent
+      LayoutParamHeight = lpMatchParent
+      BackgroundColor = colbrGhostWhite
+      MinPinchZoomFactor = 0.25
+      MaxPinchZoomFactor = 4
+      AnimationDurationIn = 1500
+      AnimationMode = animFade
+      object jTextView1: jTextView
+        MarginLeft = 5
+        MarginTop = 5
+        MarginRight = 5
+        MarginBottom = 5
+        Enabled = True
+        Left = 104
+        Top = 87
+        Width = 112
+        Height = 26
+        Visible = True
+        PosRelativeToAnchor = []
+        PosRelativeToParent = [rpCenterInParent]
+        LayoutParamWidth = lpWrapContent
+        LayoutParamHeight = lpWrapContent
+        Text = 'Scene 1: home'
+        Alignment = taLeft
+        BackgroundColor = colbrDefault
+        FontColor = colbrDefault
+        FontSize = 0
+        TextTypeFace = tfNormal
+        FontSizeUnit = unitDefault
+        GravityInParent = lgNone
+      end
+    end
+  end
+  object jsBottomNavigationView1: jsBottomNavigationView
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Left = 0
+    Top = 360
+    Width = 320
+    Height = 40
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpBottom]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrAzure
+    GravityInParent = lgNone
+    FontColor = colbrDefault
+    OnClickItem = jsBottomNavigationView1ClickItem
+  end
+  object jMenu1: jMenu
+    Options.Strings = (
+      'Settings'
+      'About'
+    )
+    IconIdentifiers.Strings = (
+      'ic_settings'
+      'ic_about'
+    )
+    left = 49
+    top = 267
+  end
+end
