@@ -4,7 +4,8 @@
     package="dummyPackage" 
     android:versionCode="1"
     android:versionName="1.0">
-
+	<uses-sdk android:minSdkVersion="dummySdkApi" android:targetSdkVersion="dummyTargetApi"/>
+	
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>

@@ -5,7 +5,6 @@ unit AndroidProjOptions;
 interface
 
 uses
-
   Classes, SysUtils, Types, LazFileUtils, laz2_XMLRead, Laz2_DOM, LCLVersion,
   AvgLvlTree, LazIDEIntf, IDEOptionsIntf, ProjectIntf, SourceChanger, Forms, Controls,
   Dialogs, Grids, StdCtrls, LResources, ExtCtrls, Spin, ComCtrls, Buttons,
@@ -34,7 +33,7 @@ type
     FLabelAvailable: boolean;
     FLabel, FRealLabel: string;
     FIconFileName: string;
-    FSupport:boolean;
+    FSupport: boolean;
     //FTheme: string;
 
     function GetString(const XMLPath, Ref: string; out Res: string): boolean;
@@ -59,7 +58,7 @@ type
     property VersionName: string read FVersionName write FVersionName;
     property AppLabel: string read FRealLabel write FRealLabel;
     property IconFileName: string read FIconFileName;
-    property Support:boolean read FSupport write FSupport;
+    property Support: boolean read FSupport write FSupport;
     //property ThemeName: string read GetThemeName;
   end;
 
@@ -73,7 +72,7 @@ uses
   {$endif}
   laz2_XMLWrite, FileUtil, CodeToolManager, CodeTree, LinkScanner,
   CodeAtom, Graphics, ExtDlgs, AndroidWizard_intf, LamwDesigner, LamwSettings,
-  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils;
+  FPCanvas, FPimage, FPReadPNG, FPWritePNG, strutils, IDEMsgIntf, IDEExternToolIntf;
 
 {$R *.lfm}
 
@@ -81,116 +80,116 @@ type
 
   { TLamwProjectOptions }
 
-TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
- cbChipset: TComboBox;
- cbTheme: TComboBox;
- cbLaunchIconSize: TComboBox;
- cbBuildSystem: TComboBox;
- edLabel: TEdit;
- edVersionName: TEdit;
- ErrorPanel: TPanel;
- gbVersion: TGroupBox;
- GroupBox1: TGroupBox;
- ImageList1: TImageList;
- imLauncherIcon: TImage;
- Label1: TLabel;
- LabelSupport: TLabel;
- CheckBoxSupport: TCheckBox; 
- lblGradleHint: TLabel;
- Label2: TLabel;
- Label3: TLabel;
- Label4: TLabel;
- Label5: TLabel;
- Label6: TLabel;
- Label7: TLabel;
- Label8: TLabel;
- Label9: TLabel;
- lblErrorMessage: TLabel;
- PageControl1: TPageControl;
- PermissonGrid: TStringGrid;
- rbOrientation: TRadioGroup;
- seMinSdkVersion: TSpinEdit;
- seTargetSdkVersion: TComboBox;
- seVersionCode: TSpinEdit;
- SpeedButton1: TSpeedButton;
- SpeedButtonHintTheme: TSpeedButton;
- tsMiscellaneous: TTabSheet;
- tsAppl: TTabSheet;
- tsManifest: TTabSheet;
- procedure cbBuildSystemChange(Sender: TObject);
- procedure cbBuildSystemSelect(Sender: TObject);
- procedure cbChipsetChange(Sender: TObject);
- procedure cbLaunchIconSizeSelect(Sender: TObject);
- procedure cbThemeChange(Sender: TObject);
- procedure PermissonGridCheckboxToggled({%H-}Sender: TObject; {%H-}aCol,
- {%H-}aRow: integer; {%H-}aState: TCheckboxState);
- procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: integer;
-   aRect: TRect; {%H-}aState: TGridDrawState);
- procedure PermissonGridMouseDown(Sender: TObject; Button: TMouseButton;
-   Shift: TShiftState; X, Y: integer);
- procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState;
-   X, Y: integer);
- procedure seTargetSdkVersionEditingDone(Sender: TObject);
- procedure SpeedButton1Click(Sender: TObject);
- procedure SpeedButton2Click(Sender: TObject);
- procedure SpeedButtonHintThemeClick(Sender: TObject);
-private
- { private declarations }
-const
- Drawable: array [0..4] of record
-     Size: integer;
-     Suffix: string;
-   end
- = ((Size: 36; Suffix: 'ldpi'),
-   (Size: 48; Suffix: 'mdpi'),
-   (Size: 72; Suffix: 'hdpi'),
-   (Size: 96; Suffix: 'xhdpi'),
-   (Size: 144; Suffix: 'xxhdpi'));
-private
- IsLamwProject: boolean;
- FManifest: TLamwAndroidManifestOptions;
- FIconsPath: string; // ".../res/drawable-"
- FChkBoxDrawData: array [TCheckBoxState] of record
-   Details, DetailsHot: TThemedElementDetails;
-   CSize: TSize;
- end;
+  TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
+    cbChipset: TComboBox;
+    cbTheme: TComboBox;
+    cbLaunchIconSize: TComboBox;
+    cbBuildSystem: TComboBox;
+    edLabel: TEdit;
+    edVersionName: TEdit;
+    ErrorPanel: TPanel;
+    gbVersion: TGroupBox;
+    GroupBox1: TGroupBox;
+    ImageList1: TImageList;
+    imLauncherIcon: TImage;
+    Label1: TLabel;
+    LabelSupport: TLabel;
+    CheckBoxSupport: TCheckBox;
+    lblGradleHint: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    lblErrorMessage: TLabel;
+    PageControl1: TPageControl;
+    PermissonGrid: TStringGrid;
+    rbOrientation: TRadioGroup;
+    seMinSdkVersion: TSpinEdit;
+    seTargetSdkVersion: TComboBox;
+    seVersionCode: TSpinEdit;
+    SpeedButton1: TSpeedButton;
+    SpeedButtonHintTheme: TSpeedButton;
+    tsMiscellaneous: TTabSheet;
+    tsAppl: TTabSheet;
+    tsManifest: TTabSheet;
+    procedure cbBuildSystemChange(Sender: TObject);
+    procedure cbBuildSystemSelect(Sender: TObject);
+    procedure cbChipsetChange(Sender: TObject);
+    procedure cbLaunchIconSizeSelect(Sender: TObject);
+    procedure cbThemeChange(Sender: TObject);
+    procedure PermissonGridCheckboxToggled({%H-}Sender: TObject; {%H-}aCol,
+    {%H-}aRow: integer; {%H-}aState: TCheckboxState);
+    procedure PermissonGridDrawCell(Sender: TObject; aCol, aRow: integer;
+      aRect: TRect; {%H-}aState: TGridDrawState);
+    procedure PermissonGridMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: integer);
+    procedure PermissonGridMouseMove(Sender: TObject; {%H-}Shift: TShiftState;
+      X, Y: integer);
+    procedure seTargetSdkVersionEditingDone(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure SpeedButtonHintThemeClick(Sender: TObject);
+  private
+    { private declarations }
+  const
+    Drawable: array [0..4] of record
+        Size: integer;
+        Suffix: string;
+      end
+    = ((Size: 36; Suffix: 'ldpi'),
+      (Size: 48; Suffix: 'mdpi'),
+      (Size: 72; Suffix: 'hdpi'),
+      (Size: 96; Suffix: 'xhdpi'),
+      (Size: 144; Suffix: 'xxhdpi'));
+  private
+    IsLamwProject: boolean;
+    FManifest: TLamwAndroidManifestOptions;
+    FIconsPath: string; // ".../res/drawable-"
+    FChkBoxDrawData: array [TCheckBoxState] of record
+      Details, DetailsHot: TThemedElementDetails;
+      CSize: TSize;
+    end;
 
- FBuildSystem: string;
- FProjectPath: string;
- FDefaultTheme: string;
- FChipSetTarget: string;
+    FBuildSystem: string;
+    FProjectPath: string;
+    FDefaultTheme: string;
+    FChipSetTarget: string;
 
- FAllPermissionsState: TCheckBoxState;
- FAllPermissionsHot: boolean;
- function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
- procedure ErrorMessage(const msg: string);
- procedure FillPermissionGrid(Permissions: TStringList;
-   PermNames: TStringToStringTree);
- procedure SetControlsEnabled(ts: TTabSheet; en: boolean);
- procedure ShowLauncherIcon;
-private
- // gApp.Screen.Style := <orientation> statements
- function GetCurrentAppScreenStyle: string;
- function FindAppScreenStyleStatement(
-   out StartPos, ssConstStartPos, EndPos: integer): boolean;
- function GetAppScreenStyleStatement(ssConstStartPos: integer;
-   out ssConstVal: string): boolean;
- function SetAppScreenStyleStatement(const ssNewConstVal: string): boolean;
- function RemoveAppScreenStyleStatement: boolean;
- procedure TryUpdateStyleXML();
- function GetChipSetTarget(var cbIndex: integer): string;
- function GetBuildMode(filename: string; index: integer): string;
- procedure TryChangeChipset();
-public
- { public declarations }
- constructor Create(AOwner: TComponent); override;
- destructor Destroy; override;
- class function SupportedOptionsClass: TAbstractIDEOptionsClass; override;
- function GetTitle: string; override;
- procedure Setup({%H-}ADialog: TAbstractOptionsEditorDialog); override;
- procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
- procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
-end;
+    FAllPermissionsState: TCheckBoxState;
+    FAllPermissionsHot: boolean;
+    function GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
+    procedure ErrorMessage(const msg: string);
+    procedure FillPermissionGrid(Permissions: TStringList;
+      PermNames: TStringToStringTree);
+    procedure SetControlsEnabled(ts: TTabSheet; en: boolean);
+    procedure ShowLauncherIcon;
+  private
+    // gApp.Screen.Style := <orientation> statements
+    function GetCurrentAppScreenStyle: string;
+    function FindAppScreenStyleStatement(
+      out StartPos, ssConstStartPos, EndPos: integer): boolean;
+    function GetAppScreenStyleStatement(ssConstStartPos: integer;
+      out ssConstVal: string): boolean;
+    function SetAppScreenStyleStatement(const ssNewConstVal: string): boolean;
+    function RemoveAppScreenStyleStatement: boolean;
+    procedure TryUpdateStyleXML();
+    function GetChipSetTarget(var cbIndex: integer): string;
+    function GetBuildMode(filename: string; index: integer): string;
+    procedure TryChangeChipset();
+  public
+    { public declarations }
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    class function SupportedOptionsClass: TAbstractIDEOptionsClass; override;
+    function GetTitle: string; override;
+    procedure Setup({%H-}ADialog: TAbstractOptionsEditorDialog); override;
+    procedure ReadSettings({%H-}AOptions: TAbstractIDEOptions); override;
+    procedure WriteSettings({%H-}AOptions: TAbstractIDEOptions); override;
+  end;
 
 
   { TMyCanvas }
@@ -232,7 +231,8 @@ end;
 function IsAllCharNumber(pcString: PChar): boolean;
 begin
   Result := False;
-  if StrLen(pcString)=0 then exit;
+  if StrLen(pcString) = 0 then
+    exit;
   while pcString^ <> #0 do // 0 indicates the end of a PChar string
   begin
     if not (pcString^ in ['0'..'9']) then
@@ -349,7 +349,7 @@ begin
   FUsesSDKNode := nil;
   FMinSdkVersion := 14;
   FTargetSdkVersion := 21;
-  FSupport:=False;
+  FSupport := False;
   FPermissions.Clear;
 end;
 
@@ -358,7 +358,7 @@ var
   fn: string;
   build: TXMLDocument;
   n: TDOMNode;
-  aSupportLib:TSupportLib;
+  aSupportLib: TSupportLib;
   strList: TStringList;
   i: integer;
   smallProjName: string;
@@ -366,7 +366,7 @@ var
   locationSrc: string;
   tempStr, findString, oldTargetStr, oldCompileSdkVersion: string;
   p: integer;
-  cpuTarget:string;
+  cpuTarget: string;
   includeList: TStringList;
   universalApk: boolean;
   pathToAndroidProject: string;
@@ -489,54 +489,55 @@ begin
   strList.SaveToFile(ExtractFilePath(FFileName) + 'project.properties');
 
 
-  cpuTarget := ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+  cpuTarget := ExtractFileDir(
+    LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
   cpuTarget := ExtractFileName(cpuTarget);
 
-  includeList:= TStringList.Create;
-  includeList.Delimiter:= ',';
-  includeList.StrictDelimiter:= True;
-  includeList.Sorted:= True;
-  includeList.Duplicates:= dupIgnore;
+  includeList := TStringList.Create;
+  includeList.Delimiter := ',';
+  includeList.StrictDelimiter := True;
+  includeList.Sorted := True;
+  includeList.Duplicates := dupIgnore;
 
-  includeList.Add(''''+cpuTarget+''''); //initial  Instruction Set
+  includeList.Add('''' + cpuTarget + ''''); //initial  Instruction Set
 
-  PathToAndroidProject:= ExtractFilePath(FFileName);
+  PathToAndroidProject := ExtractFilePath(FFileName);
 
-  if FileExists(pathToAndroidProject + 'libs\armeabi\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\armeabi\libcontrols.so') then
   begin
     includeList.Add('''armeabi''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so') then
   begin
     includeList.Add('''armeabi-v7a''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\arm64-v8a\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\arm64-v8a\libcontrols.so') then
   begin
     includeList.Add('''arm64-v8a''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\x86_64\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\x86_64\libcontrols.so') then
   begin
     includeList.Add('''x86_64''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\x86\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\x86\libcontrols.so') then
   begin
     includeList.Add('''x86''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\mips\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\mips\libcontrols.so') then
   begin
     includeList.Add('''mips''');
   end;
 
-  cpuTarget:= includeList.DelimitedText; //NEW! includeList based...
+  cpuTarget := includeList.DelimitedText; //NEW! includeList based...
 
-  universalApk:= False;
+  universalApk := False;
   if includeList.Count > 1 then
-    universalApk:= True;
+    universalApk := True;
 
   includeList.Free;
 
@@ -544,46 +545,48 @@ begin
   if FileExists(ExtractFilePath(FFileName) + 'build.gradle') then
   begin
     strList.LoadFromFile(ExtractFilePath(FFileName) + 'build.gradle');
-    tempStr := StringReplace(strList.Text, 'targetSdkVersion ' + oldTargetStr,
-      'targetSdkVersion ' + IntToStr(FTargetSdkVersion), [rfIgnoreCase]);  //targetSdkVersion 23
+    tempStr := StringReplace(strList.Text, 'targetSdkVersion ' +
+      oldTargetStr, 'targetSdkVersion ' + IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+    //targetSdkVersion 23
     strList.Text := tempStr;
 
-    for i := 0 to (strList.Count-1) do
+    for i := 0 to (strList.Count - 1) do
     begin
       tempStr := strList.Strings[i];
-      if Pos(' include ',tempStr)>0 then
+      if Pos(' include ', tempStr) > 0 then
       begin
-        p:=Pos('include',tempStr);
-        Delete(tempStr,p,MaxInt);
-        tempStr:=tempStr+'include '+cpuTarget;  //NEW! includeList based...
-        strList.Strings[i]:=tempStr;
+        p := Pos('include', tempStr);
+        Delete(tempStr, p, MaxInt);
+        tempStr := tempStr + 'include ' + cpuTarget;  //NEW! includeList based...
+        strList.Strings[i] := tempStr;
         break;
       end;
     end;
 
-    for i := 0 to (strList.Count-1) do
+    for i := 0 to (strList.Count - 1) do
     begin
       tempStr := strList.Strings[i];
-      if Pos(' universalApk ',tempStr)>0 then
+      if Pos(' universalApk ', tempStr) > 0 then
       begin
-        p:=Pos('universalApk',tempStr);
+        p := Pos('universalApk', tempStr);
 
-        Delete(tempStr,p,MaxInt);
+        Delete(tempStr, p, MaxInt);
 
         if universalApk then
-          tempStr:=tempStr+'universalApk true'
+          tempStr := tempStr + 'universalApk true'
         else
-          tempStr:=tempStr+'universalApk false';
+          tempStr := tempStr + 'universalApk false';
 
-        strList.Strings[i]:=tempStr;
+        strList.Strings[i] := tempStr;
         break;
       end;
     end;
 
     if FOldMinSdkVersion <> FMinSdkVersion then
     begin
-      tempStr := StringReplace(strList.Text, 'minSdkVersion ' + IntToStr(FOldMinSdkVersion),
-        'minSdkVersion ' + IntToStr(FMinSdkVersion), [rfIgnoreCase]);  //minSdkVersion 14
+      tempStr := StringReplace(strList.Text, 'minSdkVersion ' +
+        IntToStr(FOldMinSdkVersion), 'minSdkVersion ' + IntToStr(FMinSdkVersion),
+        [rfIgnoreCase]);  //minSdkVersion 14
       strList.Text := tempStr;
     end;
 
@@ -599,14 +602,17 @@ begin
 
       tempStr := strList.Text;
 
-      findString:='compileSdkVersion ';
-      if (Pos(findString,tempStr)>0) then
-        tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+      findString := 'compileSdkVersion ';
+      if (Pos(findString, tempStr) > 0) then
+        tempStr := StringReplace(tempStr, findString + oldCompileSdkVersion,
+          findString + IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
 
       for aSupportLib in SupportLibs do
       begin
-        if (Pos(aSupportLib.Name,tempStr)>0) then
-          tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name(*+IntToStr(FTargetSdkVersion)*), [rfIgnoreCase]);
+        if (Pos(aSupportLib.Name, tempStr) > 0) then
+          tempStr := StringReplace(tempStr, aSupportLib.Name +
+            oldCompileSdkVersion, aSupportLib.Name(*+IntToStr(FTargetSdkVersion)*),
+            [rfIgnoreCase]);
       end;
 
       strList.Text := tempStr;
@@ -624,8 +630,8 @@ constructor TLamwAndroidManifestOptions.Create;
   procedure AddPerm(PermVisibleName: string; android_name: string = '');
   begin
     if android_name = '' then
-      android_name := 'android.permission.' +
-        StringReplace(UpperCase(PermVisibleName), ' ', '_', [rfReplaceAll]);
+      android_name := 'android.permission.' + StringReplace(
+        UpperCase(PermVisibleName), ' ', '_', [rfReplaceAll]);
     FPermNames[android_name] := PermVisibleName;
   end;
 
@@ -792,7 +798,8 @@ begin
       // @string/app_name
       // <string name="app_name">LamwGUIProject1</string>
       if not GetString(ExtractFilePath(FFileName) + PathDelim +
-        'res' + PathDelim + 'values' + PathDelim + 'strings.xml', FLabel, FRealLabel) then
+        'res' + PathDelim + 'values' + PathDelim + 'strings.xml',
+        FLabel, FRealLabel) then
       begin
         FRealLabel := '<null>';
         FLabelAvailable := False;
@@ -812,7 +819,7 @@ var
   n: TDOMElement;
   fn: string;
   strList: TStringList;
-  fileGradle : string;
+  buildGradleFileName: string;
 begin
   // writing manifest
   if not Assigned(xml) then
@@ -821,37 +828,36 @@ begin
   xml.DocumentElement.AttribStrings['android:versionCode'] := IntToStr(FVersionCode);
   xml.DocumentElement.AttribStrings['android:versionName'] := FVersionName;
 
-  strList    := nil;
-  fileGradle := ExtractFilePath(FFileName) + PathDelim + 'build.gradle';
+  strList := nil;
+  buildGradleFileName := ExtractFilePath(FFileName) + PathDelim + 'build.gradle';
 
-  if fileExists(fileGradle) then
+  if fileExists(buildGradleFileName) then
   begin
-   strList:= TStringList.Create;
+    strList := TStringList.Create;
 
-   strList.LoadFromFile(fileGradle);
+    strList.LoadFromFile(buildGradleFileName);
 
-   for i := 0 to strList.Count - 1 do
-   begin
-     if pos('versionCode', strList.Strings[i]) > 1 then
-      strList.Strings[i] := '            versionCode ' + intToStr(FVersionCode);
-     if pos('versionName', strList.Strings[i]) > 1 then
-     begin
-      strList.Strings[i] := '            versionName "'+FVersionName+'"';
-     end;
-     if(pos('minSdkVersion',strList.Strings[i]) > 1 )then
-       strList.Strings[i] := '            minSdkVersion '+IntToStr(FMinSdkVersion);
-     if(pos('targetSdkVersion',strList.Strings[i]) > 1 )then
-       strList.Strings[i] := '            targetSdkVersion '+IntToStr(FTargetSdkVersion);
-   end;
+    for i := 0 to strList.Count - 1 do
+    begin
+      if pos('versionCode', strList.Strings[i]) > 1 then
+        strList.Strings[i] := '            versionCode ' + IntToStr(FVersionCode);
+      if pos('versionName', strList.Strings[i]) > 1 then
+      begin
+        strList.Strings[i] := '            versionName "' + FVersionName + '"';
+      end;
+      if (pos('minSdkVersion', strList.Strings[i]) > 1) then
+        strList.Strings[i] := '            minSdkVersion ' + IntToStr(FMinSdkVersion);
+      if (pos('targetSdkVersion', strList.Strings[i]) > 1) then
+        strList.Strings[i] := '            targetSdkVersion ' +
+          IntToStr(FTargetSdkVersion);
+    end;
 
-   strList.SaveToFile(fileGradle);
+    strList.SaveToFile(buildGradleFileName);
 
-   strList.Free;
+    strList.Free;
   end;
 
-{ 07.07.2021 lint error FIX.        sdk version must be placed in 'build.gradle' file but
-was in 'AndroidManifest.xml' file
-if not Assigned(FUsesSDKNode) then
+  if not Assigned(FUsesSDKNode) then
   begin
     FUsesSDKNode := xml.CreateElement('uses-sdk');
     with xml.DocumentElement do
@@ -860,11 +866,14 @@ if not Assigned(FUsesSDKNode) then
       else
         InsertBefore(FUsesSDKNode, ChildNodes[0]);
   end;
+  AddIDEMessage(TMessageLineUrgency.mluVerbose, 'minSdkVersion' + IntToStr(FMinSdkVersion));
+  AddIDEMessage(TMessageLineUrgency.mluVerbose, 'targetSdkVersion' +
+    IntToStr(FTargetSdkVersion));
   with FUsesSDKNode do
   begin
     AttribStrings['android:minSdkVersion'] := IntToStr(FMinSdkVersion);
     AttribStrings['android:targetSdkVersion'] := IntToStr(FTargetSdkVersion);
-  end;}
+  end;
 
   // permissions
   r := FUsesSDKNode.NextSibling;
@@ -1182,27 +1191,29 @@ var
   pathToFile, newTheme, strTemp: string;
   list: TStringList;
 begin
-  newTheme:= cbTheme.Text;
+  newTheme := cbTheme.Text;
   if newTheme <> FDefaultTheme then;
   begin
-     list:= TStringList.Create;
+    list := TStringList.Create;
 
-     if Pos('AppCompat', newTheme) > 0 then   //AppCompat.Light.DarkActionBar   or  AppCompat.Light.NoActionBar
-       strTemp:= 'values'
-     else  //DeviceDefault   or  Holo.Light.DarkActionBar or Holo.Light.NoActionBar
-       strTemp:='values-v21';
+    if Pos('AppCompat', newTheme) > 0 then
+      //AppCompat.Light.DarkActionBar   or  AppCompat.Light.NoActionBar
+      strTemp := 'values'
+    else  //DeviceDefault   or  Holo.Light.DarkActionBar or Holo.Light.NoActionBar
+      strTemp := 'values-v21';
 
-     pathToFile:= ConcatPaths([FProjectPath,'res',strTemp])+ PathDelim + 'styles.xml';
+    pathToFile := ConcatPaths([FProjectPath, 'res', strTemp]) + PathDelim + 'styles.xml';
 
-     if FileExists(pathToFile) then
-     begin
-       list.LoadFromFile(pathToFile);
-       strTemp:= StringReplace(list.Text, FDefaultTheme,newTheme,[]); //rfReplaceAll, rfIgnoreCase
-       list.Text:= strTemp;
-       list.SaveToFile(pathToFile);
-       LazarusIDE.ActiveProject.CustomData['Theme']:= newTheme;
-     end;
-     list.Free;
+    if FileExists(pathToFile) then
+    begin
+      list.LoadFromFile(pathToFile);
+      strTemp := StringReplace(list.Text, FDefaultTheme, newTheme, []);
+      //rfReplaceAll, rfIgnoreCase
+      list.Text := strTemp;
+      list.SaveToFile(pathToFile);
+      LazarusIDE.ActiveProject.CustomData['Theme'] := newTheme;
+    end;
+    list.Free;
   end;
 end;
 
@@ -1277,7 +1288,8 @@ end;
 
 procedure TLamwProjectOptions.cbThemeChange(Sender: TObject);
 begin
-  if cbTheme.Text = '' then cbTheme.Text:= FDefaultTheme;
+  if cbTheme.Text = '' then
+    cbTheme.Text := FDefaultTheme;
 end;
 
 procedure TLamwProjectOptions.cbBuildSystemSelect(Sender: TObject);
@@ -1297,12 +1309,13 @@ var
   p1, p2: integer;
   temp: string;
 begin
-  list:= TStringList.Create;
-  list.LoadFromFile(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ filename);
-  temp:= list.Strings[index];
-  p1:= Pos('"', temp) +1; //0 = Libraries ; 2 =CustomOptions
-  p2:= LastDelimiter('"',temp);
-  Result:= Copy(temp, p1, p2 - p1);
+  list := TStringList.Create;
+  list.LoadFromFile(FProjectPath + 'jni' + PathDelim + 'build-modes' +
+    PathDelim + filename);
+  temp := list.Strings[index];
+  p1 := Pos('"', temp) + 1; //0 = Libraries ; 2 =CustomOptions
+  p2 := LastDelimiter('"', temp);
+  Result := Copy(temp, p1, p2 - p1);
   list.Free;
 end;
 
@@ -1310,86 +1323,129 @@ end;
 procedure TLamwProjectOptions.TryChangeChipset();
 var
   index: integer;
-  cfname:TStringArray;
+  cfname: TStringArray;
 begin
   if cbChipset.Text <> '' then
   begin
     if cbChipset.Text <> FChipSetTarget then
     begin
-       index:= cbChipset.ItemIndex;
-       cfname:=LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename.Split(PathDelim);
-       case index of
-         0: begin  //ARMv6
-           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_armV6.txt') then
-           begin
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'armeabi'+PathDelim+cfname[high(cfname)];
-             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_armV6.txt', 2);
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
-             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_armV6.txt', 0);
-           end;
-         end;
-         1: begin  //ARMv7a+Soft
-           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_armV7a.txt') then
-           begin
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'armeabi-v7a'+PathDelim+cfname[high(cfname)];
-             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_armV7a.txt', 2);
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
-             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_armV7a.txt', 0);
-           end;
-         end;
-         2: begin //ARMv7a+VFPv3
-           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_armV7a_VFPv3.txt') then
-           begin
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'armeabi-v7a'+PathDelim+cfname[high(cfname)];
-             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_armV7a_VFPv3.txt', 2);
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
-             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_armV7a_VFPv3.txt', 0);
-           end;
-         end;
-         3: begin //x86
-           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_x86.txt') then
-           begin
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'x86'+PathDelim+cfname[high(cfname)];
-             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_x86.txt', 2);
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'i386';
-             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_x86.txt', 0);
-           end;
-         end;
-         4: begin //Mipsel
-           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_mipsel.txt') then
-           begin
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'mips'+PathDelim+cfname[high(cfname)];
-             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_mipsel.txt', 2);
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'mipsel';
-             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_mipsel.txt', 0);
-           end
-         end;
-         5: begin //Aarch64    //build_arm64.txt
-           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_arm64.txt') then
-           begin
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'arm64-v8a'+PathDelim+cfname[high(cfname)];
-             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_arm64.txt', 2);
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'aarch64';
-             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_arm64.txt', 0);
-           end;
-         end;
-         6: begin  //x86_64
-           if FileExists(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ 'build_x86_64.txt') then
-           begin
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:=  '..'+PathDelim+'libs'+PathDelim+'x86_64'+PathDelim+cfname[high(cfname)];
-             LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= GetBuildMode('build_x86_64.txt', 2);
-             LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'x86_64';
-             LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= GetBuildMode('build_x86_64.txt', 0);
-           end;
-         end;
-       end;
+      index := cbChipset.ItemIndex;
+      cfname := LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename.Split(
+        PathDelim);
+      case index of
+        0:
+        begin  //ARMv6
+          if FileExists(FProjectPath + 'jni' + PathDelim +
+            'build-modes' + PathDelim + 'build_armV6.txt') then
+          begin
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename :=
+              '..' + PathDelim + 'libs' + PathDelim + 'armeabi' +
+              PathDelim + cfname[high(cfname)];
+            LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions :=
+              GetBuildMode('build_armV6.txt', 2);
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU := 'arm';
+            LazarusIDE.ActiveProject.LazCompilerOptions.Libraries :=
+              GetBuildMode('build_armV6.txt', 0);
+          end;
+        end;
+        1:
+        begin  //ARMv7a+Soft
+          if FileExists(FProjectPath + 'jni' + PathDelim +
+            'build-modes' + PathDelim + 'build_armV7a.txt') then
+          begin
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename :=
+              '..' + PathDelim + 'libs' + PathDelim + 'armeabi-v7a' +
+              PathDelim + cfname[high(cfname)];
+            LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions :=
+              GetBuildMode('build_armV7a.txt', 2);
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU := 'arm';
+            LazarusIDE.ActiveProject.LazCompilerOptions.Libraries :=
+              GetBuildMode('build_armV7a.txt', 0);
+          end;
+        end;
+        2:
+        begin //ARMv7a+VFPv3
+          if FileExists(FProjectPath + 'jni' + PathDelim +
+            'build-modes' + PathDelim + 'build_armV7a_VFPv3.txt') then
+          begin
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename :=
+              '..' + PathDelim + 'libs' + PathDelim + 'armeabi-v7a' +
+              PathDelim + cfname[high(cfname)];
+            LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions :=
+              GetBuildMode('build_armV7a_VFPv3.txt', 2);
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU := 'arm';
+            LazarusIDE.ActiveProject.LazCompilerOptions.Libraries :=
+              GetBuildMode('build_armV7a_VFPv3.txt', 0);
+          end;
+        end;
+        3:
+        begin //x86
+          if FileExists(FProjectPath + 'jni' + PathDelim +
+            'build-modes' + PathDelim + 'build_x86.txt') then
+          begin
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename :=
+              '..' + PathDelim + 'libs' + PathDelim + 'x86' + PathDelim +
+              cfname[high(cfname)];
+            LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions :=
+              GetBuildMode('build_x86.txt', 2);
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU := 'i386';
+            LazarusIDE.ActiveProject.LazCompilerOptions.Libraries :=
+              GetBuildMode('build_x86.txt', 0);
+          end;
+        end;
+        4:
+        begin //Mipsel
+          if FileExists(FProjectPath + 'jni' + PathDelim +
+            'build-modes' + PathDelim + 'build_mipsel.txt') then
+          begin
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename :=
+              '..' + PathDelim + 'libs' + PathDelim + 'mips' +
+              PathDelim + cfname[high(cfname)];
+            LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions :=
+              GetBuildMode('build_mipsel.txt', 2);
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU := 'mipsel';
+            LazarusIDE.ActiveProject.LazCompilerOptions.Libraries :=
+              GetBuildMode('build_mipsel.txt', 0);
+          end;
+        end;
+        5:
+        begin //Aarch64    //build_arm64.txt
+          if FileExists(FProjectPath + 'jni' + PathDelim +
+            'build-modes' + PathDelim + 'build_arm64.txt') then
+          begin
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename :=
+              '..' + PathDelim + 'libs' + PathDelim + 'arm64-v8a' +
+              PathDelim + cfname[high(cfname)];
+            LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions :=
+              GetBuildMode('build_arm64.txt', 2);
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU := 'aarch64';
+            LazarusIDE.ActiveProject.LazCompilerOptions.Libraries :=
+              GetBuildMode('build_arm64.txt', 0);
+          end;
+        end;
+        6:
+        begin  //x86_64
+          if FileExists(FProjectPath + 'jni' + PathDelim +
+            'build-modes' + PathDelim + 'build_x86_64.txt') then
+          begin
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename :=
+              '..' + PathDelim + 'libs' + PathDelim + 'x86_64' +
+              PathDelim + cfname[high(cfname)];
+            LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions :=
+              GetBuildMode('build_x86_64.txt', 2);
+            LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU := 'x86_64';
+            LazarusIDE.ActiveProject.LazCompilerOptions.Libraries :=
+              GetBuildMode('build_x86_64.txt', 0);
+          end;
+        end;
+      end;
     end;
   end;
 end;
 
 procedure TLamwProjectOptions.cbChipsetChange(Sender: TObject);
 begin
-//
+
 end;
 
 procedure TLamwProjectOptions.cbBuildSystemChange(Sender: TObject);
@@ -1398,8 +1454,8 @@ begin
   begin
     if Pos('Ant', cbBuildSystem.Text) > 0 then
     begin
-       ShowMessage('Sorry... AppCompat theme need "Gradle" build system');
-       cbBuildSystem.Text:= 'Gradle';
+      ShowMessage('Sorry... AppCompat theme need "Gradle" build system');
+      cbBuildSystem.Text := 'Gradle';
     end;
   end;
 end;
@@ -1454,7 +1510,8 @@ begin
       r := Y;
     end;
     if (c = 1) and (r = 0) and
-      PtInRect(GetAllPermissonsCheckBoxBounds(PermissonGrid.CellRect(c, r)), Point(X, Y)) then
+      PtInRect(GetAllPermissonsCheckBoxBounds(PermissonGrid.CellRect(c, r)),
+      Point(X, Y)) then
     begin
       if FAllPermissionsState = cbChecked then
       begin
@@ -1583,39 +1640,39 @@ procedure TLamwProjectOptions.SpeedButton2Click(Sender: TObject);
 var
   listInfo: TStringList;
 begin
-   listInfo:= TStringList.Create;
-   listInfo.Add('How to get more ".so" chipset builds:');
-   listInfo.Add(' ');
-   listInfo.Add('Hint1: Lazarus needs to be prepared [cross-compile] for selected chipset!');
-   listInfo.Add(' ');
-   listInfo.Add('Hint2: Laz4Android supports only 32bits: "armV6", "armV7a+Soft", "x86"!');
-   listInfo.Add(' ');
-   listInfo.Add('1.  > Chipset [select!] -> [OK]');
-   listInfo.Add(' ');
-   listInfo.Add('2. From LazarusIDE  menu:');
-   listInfo.Add(' ');
-   listInfo.Add('   > Run -> Clean up and Build...');
-   listInfo.Add(' ');
-   listInfo.Add('3. From LazarusIDE menu:');
-   listInfo.Add(' ');
-   listInfo.Add('   > [LAMW] Build Android Apk and Run');
-   listInfo.Add(' ');
-   ShowMessage(listInfo.Text);
-   listInfo.Free;
+  listInfo := TStringList.Create;
+  listInfo.Add('How to get more ".so" chipset builds:');
+  listInfo.Add(' ');
+  listInfo.Add('Hint1: Lazarus needs to be prepared [cross-compile] for selected chipset!');
+  listInfo.Add(' ');
+  listInfo.Add('Hint2: Laz4Android supports only 32bits: "armV6", "armV7a+Soft", "x86"!');
+  listInfo.Add(' ');
+  listInfo.Add('1.  > Chipset [select!] -> [OK]');
+  listInfo.Add(' ');
+  listInfo.Add('2. From LazarusIDE  menu:');
+  listInfo.Add(' ');
+  listInfo.Add('   > Run -> Clean up and Build...');
+  listInfo.Add(' ');
+  listInfo.Add('3. From LazarusIDE menu:');
+  listInfo.Add(' ');
+  listInfo.Add('   > [LAMW] Build Android Apk and Run');
+  listInfo.Add(' ');
+  ShowMessage(listInfo.Text);
+  listInfo.Free;
 end;
 
 procedure TLamwProjectOptions.SpeedButtonHintThemeClick(Sender: TObject);
 begin
-  ShowMessage('Hint 1:'+ sLineBreak +
-               'You can "change" only to compatibles themes:' + sLineBreak +
-               'DeviceDefault <--> Holo.Light.NoActionBar' + sLineBreak +
-               'DeviceDefault <--> Holo.Light.DarkActionBar' + sLineBreak +
-               'Holo.Light.DarkActionBar <--> Holo.Light.NoActionBar' + sLineBreak + sLineBreak +
-               'AppCompat.Light.NoActionBar <--> AppCompat.Light.DarkActionBar'+ sLineBreak + sLineBreak+
-               'Hint 2:'+ sLineBreak +
-               'You can "convert" a project to  "AppCompat" [material] theme:'  + sLineBreak +
-               'Menu "Tools" --> "[LAMW]..." --> "Convert the project to AppCompat..."'
-               );
+  ShowMessage('Hint 1:' + sLineBreak +
+    'You can "change" only to compatibles themes:' + sLineBreak +
+    'DeviceDefault <--> Holo.Light.NoActionBar' + sLineBreak +
+    'DeviceDefault <--> Holo.Light.DarkActionBar' + sLineBreak +
+    'Holo.Light.DarkActionBar <--> Holo.Light.NoActionBar' + sLineBreak +
+    sLineBreak + 'AppCompat.Light.NoActionBar <--> AppCompat.Light.DarkActionBar' +
+    sLineBreak + sLineBreak + 'Hint 2:' + sLineBreak +
+    'You can "convert" a project to  "AppCompat" [material] theme:' +
+    sLineBreak + 'Menu "Tools" --> "[LAMW]..." --> "Convert the project to AppCompat..."'
+    );
 end;
 
 function TLamwProjectOptions.GetAllPermissonsCheckBoxBounds(InRect: TRect): TRect;
@@ -1708,43 +1765,44 @@ var
   projectCustom: string;
 begin
 
-  projectTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;  //..\libs\armeabi-v7a\libcontrols
-  projectCustom:= UpperCase(LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions);
+  projectTarget := LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
+  //..\libs\armeabi-v7a\libcontrols
+  projectCustom := UpperCase(LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions);
 
   if Pos('arm64-v8a', projectTarget) > 0 then     //arm64-v8a
   begin
-     Result:= 'Aarch64';
-     cbIndex:= 5;
+    Result := 'Aarch64';
+    cbIndex := 5;
   end
   else if Pos('armeabi-v7a', projectTarget) > 0 then
   begin
-     Result:= 'ARMv7a+Soft';
-     cbIndex:= 1;
-     if Pos('VFPV3', projectCustom) > 0 then
-     begin
-       Result:= 'ARMv7a+VFPv3';
-       cbIndex:= 2;
-     end;
+    Result := 'ARMv7a+Soft';
+    cbIndex := 1;
+    if Pos('VFPV3', projectCustom) > 0 then
+    begin
+      Result := 'ARMv7a+VFPv3';
+      cbIndex := 2;
+    end;
   end
   else if Pos('armeabi', projectTarget) > 0 then
   begin
-     Result:= 'ARMv6';
-     cbIndex:= 0;
+    Result := 'ARMv6';
+    cbIndex := 0;
   end
   else if Pos('x86_64', projectTarget) > 0 then
   begin
-     Result:= 'x86_64';
-     cbIndex:= 6;
+    Result := 'x86_64';
+    cbIndex := 6;
   end
   else if Pos('x86', projectTarget) > 0 then
   begin
-     Result:= 'x86';
-     cbIndex:= 3;
+    Result := 'x86';
+    cbIndex := 3;
   end
   else if Pos('mips', projectTarget) > 0 then    //droped for >= NDK r17
   begin
-     Result:= 'Mipsel';
-     cbIndex:= 4;
+    Result := 'Mipsel';
+    cbIndex := 4;
   end;
 
 end;
@@ -1759,17 +1817,17 @@ begin
   // reading manifest
   SetControlsEnabled(tsManifest, False);
 
-  proj:= LazarusIDE.ActiveProject;
+  proj := LazarusIDE.ActiveProject;
   if (proj = nil) or (proj.IsVirtual) then
     Exit;
 
-  cbIndex:= -1;
-  FChipSetTarget:= GetChipSetTarget(cbIndex);
+  cbIndex := -1;
+  FChipSetTarget := GetChipSetTarget(cbIndex);
 
   if cbIndex >= 0 then
     cbChipset.ItemIndex := cbIndex;
 
-  CheckBoxSupport.Checked:=(LazarusIDE.ActiveProject.CustomData['Support']='TRUE');
+  CheckBoxSupport.Checked := (LazarusIDE.ActiveProject.CustomData['Support'] = 'TRUE');
 
   FBuildSystem := proj.CustomData['BuildSystem'];
   i := cbBuildSystem.Items.IndexOf(FBuildSystem);
@@ -1777,7 +1835,7 @@ begin
     cbBuildSystem.ItemIndex := i;
   fn := proj.MainFile.Filename;
   fn := Copy(fn, 1, Pos(PathDelim + 'jni' + PathDelim, fn));
-  FProjectPath:= fn;
+  FProjectPath := fn;
   fn := fn + 'AndroidManifest.xml';
   IsLamwProject := False;
   if not FileExists(fn) then
@@ -1813,8 +1871,8 @@ begin
   FDefaultTheme := LazarusIDE.ActiveProject.CustomData['Theme'];  //FManifest.ThemeName;
   if Pos('AppCompat', FDefaultTheme) > 0 then
   begin
-     cbTheme.Items.Add('AppCompat.Light.NoActionBar');
-     cbTheme.Items.Add('AppCompat.Light.DarkActionBar');
+    cbTheme.Items.Add('AppCompat.Light.NoActionBar');
+    cbTheme.Items.Add('AppCompat.Light.DarkActionBar');
   end
   else
   begin
@@ -1822,7 +1880,7 @@ begin
     cbTheme.Items.Add('Holo.Light.NoActionBar');
     cbTheme.Items.Add('Holo.Light.DarkActionBar');
   end;
-  cbTheme.Text:= FDefaultTheme;
+  cbTheme.Text := FDefaultTheme;
 
   s := GetCurrentAppScreenStyle;
   if SameText(s, 'ssPortrait') then
@@ -1850,9 +1908,9 @@ begin
   TryChangeChipset();
 
   if CheckBoxSupport.Checked then
-    LazarusIDE.ActiveProject.CustomData['Support']:='TRUE'
+    LazarusIDE.ActiveProject.CustomData['Support'] := 'TRUE'
   else
-    LazarusIDE.ActiveProject.CustomData['Support']:='FALSE';
+    LazarusIDE.ActiveProject.CustomData['Support'] := 'FALSE';
 
 
   with FManifest do
@@ -1889,10 +1947,10 @@ begin
   if cbBuildSystem.Text <> '' then
     LazarusIDE.ActiveProject.CustomData['BuildSystem'] := cbBuildSystem.Text;
 
-  if LazarusIDE.ActiveProject.CustomData['Support'] ='TRUE' then
+  if LazarusIDE.ActiveProject.CustomData['Support'] = 'TRUE' then
   begin
-     if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
-       ShowMessage('Warning: Support Library need "Gradle" builder ...');
+    if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
+      ShowMessage('Warning: Support Library need "Gradle" builder ...');
   end;
 
   TryUpdateStyleXML();

@@ -872,15 +872,17 @@ begin
     with strList do
     begin
       LoadFromFile(sourcepath);
-      auxStr := FPackageName + '.' + LowerCase(FSmallProjName);
+      auxStr := FPackageName;
+    {  if pos(FPackageName,'.' + LowerCase(FSmallProjName))=0 then
+            auxStr:= auxStr+ '.' + LowerCase(FSmallProjName);}
       tempStr := StringReplace(Text, 'dummyPackage', auxStr,
         [rfReplaceAll, rfIgnoreCase]);
       tempStr := StringReplace(tempStr, 'dummyAppName', '.App',
         [rfReplaceAll, rfIgnoreCase]);
-     { tempStr := StringReplace(tempStr, 'dummySdkApi', '0',
+      tempStr := StringReplace(tempStr, 'dummySdkApi', '0',
         [rfReplaceAll, rfIgnoreCase]);
       tempStr := StringReplace(tempStr, 'dummyTargetApi', '0',
-        [rfReplaceAll, rfIgnoreCase]);}
+        [rfReplaceAll, rfIgnoreCase]);
       Clear;
       Text := tempStr;
       SaveToFile(targetpath);
@@ -941,8 +943,8 @@ begin
     end
     else //re-introduce it!
     begin
-//      manifestApis := '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="' +
-//        IntToStr(targetApi) + '"/>';
+      manifestApis := '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="' +
+        IntToStr(targetApi) + '"/>';
       insertRef := 'android:versionName='; //insert reference point
       p1 := Pos(insertRef, tempStr);
       p2 := p1 + Length(insertRef);
@@ -2666,7 +2668,7 @@ begin
       jclassname + '.feature');
     if auxList.Count > 0 then
     begin
-     // insertRef := '<uses-sdk android:minSdkVersion'; //insert reference point
+      insertRef := '<uses-sdk android:minSdkVersion'; //insert reference point
       manifestList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
       aux := manifestList.Text;
 

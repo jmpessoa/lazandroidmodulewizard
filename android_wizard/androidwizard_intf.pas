@@ -542,10 +542,10 @@ begin
           strAfterReplace := StringReplace(strAfterReplace,
             'dummyAppName', strPackName, [rfReplaceAll, rfIgnoreCase]);
 
-         { strAfterReplace := StringReplace(strAfterReplace, 'dummySdkApi',
+          strAfterReplace := StringReplace(strAfterReplace, 'dummySdkApi',
             FMinApi, [rfReplaceAll, rfIgnoreCase]);
           strAfterReplace := StringReplace(strAfterReplace, 'dummyTargetApi',
-            FTargetApi, [rfReplaceAll, rfIgnoreCase]);}
+            FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
           Clear;
           Text := strAfterReplace;
@@ -1103,10 +1103,10 @@ begin
       strAfterReplace := StringReplace(strAfterReplace, 'dummyAppName',
         strMainActivity, [rfReplaceAll, rfIgnoreCase]);
 
-      {strAfterReplace := StringReplace(strAfterReplace, 'dummySdkApi',
+      strAfterReplace := StringReplace(strAfterReplace, 'dummySdkApi',
         FMinApi, [rfReplaceAll, rfIgnoreCase]);
       strAfterReplace := StringReplace(strAfterReplace, 'dummyTargetApi',
-        FTargetApi, [rfReplaceAll, rfIgnoreCase]);}
+        FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
       auxList.Clear;
       auxList.Text := strAfterReplace;
@@ -2101,6 +2101,7 @@ begin
                 '.' + LowerCase(FSmallProjName) + '"');
               strList.Add('    android:versionCode="1"');
               strList.Add('    android:versionName="1.0" >');
+              strList.Add('    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="29"/>');
               strList.Add('    <application');
               strList.Add('        android:allowBackup="true"');
               strList.Add('        android:icon="@drawable/ic_launcher"');
