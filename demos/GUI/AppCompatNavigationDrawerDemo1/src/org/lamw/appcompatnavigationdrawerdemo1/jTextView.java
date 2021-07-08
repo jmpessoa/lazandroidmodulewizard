@@ -49,7 +49,10 @@ public class jTextView extends TextView {
 
     private ClipboardManager mClipBoard = null;
     private ClipData mClipData = null;
-    private int mRadius = 20;    
+    private int mRadius = 20;
+    
+    private int mFontFace     = 0; // Normal
+    private int mFontTypeFace = 0; // Normal
     
     int mTextAlignment;
         	    
@@ -77,7 +80,7 @@ public class jTextView extends TextView {
 			public boolean onLongClick(View arg0) {
 				// TODO Auto-generated method stub				
 				   if (mEnabled) {
-	                    controls.pOnLongClick(LAMWCommon.getPasObj(), Const.Click_Default);
+	                    controls.pOnLongClick(LAMWCommon.getPasObj());
 	               }								
 				   return false;  //true if the callback consumed the long click, false otherwise. 
  			}
@@ -96,6 +99,12 @@ public class jTextView extends TextView {
 
 	public long GetPasObj() {
 		return LAMWCommon.getPasObj();
+	}
+	
+	public void BringToFront() {
+		 this.bringToFront();
+
+		 LAMWCommon.BringToFront();		
 	}
 
 	public  void SetViewParent(ViewGroup _viewgroup ) {
@@ -200,12 +209,15 @@ public class jTextView extends TextView {
     }
     public void CopyToClipboard() {
         mClipData = ClipData.newPlainText("text", this.getText().toString());
+        if( mClipData == null) return;
         mClipBoard.setPrimaryClip(mClipData);
     }
 
     public void PasteFromClipboard() {
         ClipData cdata = mClipBoard.getPrimaryClip();
+        if(cdata == null) return;
         ClipData.Item item = cdata.getItemAt(0);
+        if(item == null) return;
         this.setText(item.getText().toString());
     }
 
@@ -213,10 +225,13 @@ public class jTextView extends TextView {
     	mEnabled = value;
         this.setEnabled(value);
     }
-
-    public void SetTextTypeFace(int _typeface) {
-        this.setTypeface(null, _typeface);
-    }
+    
+    public void SetUnderline(boolean _on){
+        if( _on )
+      	  this.setPaintFlags(this.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
+        else
+      	  this.setPaintFlags(Paint.ANTI_ALIAS_FLAG);
+      }
 
     public void Append(String _txt) {
         this.append( _txt);
@@ -229,16 +244,30 @@ public class jTextView extends TextView {
     public void AppendTab() {
         this.append("\t");
     }
-
-    public void SetFontAndTextTypeFace(int fontFace, int fontStyle) {
-        Typeface t = null;
-        switch (fontFace) {
+    
+    private void SetFontAndTypeFace(){
+    	Typeface t = null;
+        switch (mFontFace) {
             case 0: t = Typeface.DEFAULT; break;
             case 1: t = Typeface.SANS_SERIF; break;
             case 2: t = Typeface.SERIF; break;
             case 3: t = Typeface.MONOSPACE; break;
         }
-        this.setTypeface(t, fontStyle);
+        this.setTypeface(t, mFontTypeFace);
+    }
+    
+    public void SetFontFace( int _fontFace ){
+    	
+    	mFontFace = _fontFace;
+    	
+    	SetFontAndTypeFace();        
+    }
+    
+    public void SetTextTypeFace(int _typeface) {
+    	
+    	mFontTypeFace = _typeface;
+    	
+    	SetFontAndTypeFace();    
     }
 
     public void SetTextSize(float size) {
@@ -274,26 +303,15 @@ public class jTextView extends TextView {
 	    if (!mEnabled) this.setEnabled(false); 
 	}
 	
-	private Drawable GetDrawableResourceById(int _resID) {
-		if( _resID == 0 ) return null; // by tr3e
-		
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by ADiV
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+				
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -307,13 +325,14 @@ public class jTextView extends TextView {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
 		
-		if( id == 0 ) return; // by tr3e
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
-		Drawable d = GetDrawableResourceById(id);
-		
-		if( d == null ) return;
+		// by ADiV
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
 		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
@@ -330,9 +349,11 @@ public class jTextView extends TextView {
 	public void SetRoundCorner() {
 		   if (this != null) {  		
 			        PaintDrawable  shape =  new PaintDrawable();
+			        if(shape == null) return;
 			        shape.setCornerRadius(mRadius);                
 			        int color = Color.TRANSPARENT;
-			        Drawable background = this.getBackground();        
+			        Drawable background = this.getBackground();
+			        if(background == null) return;
 			        if (background instanceof ColorDrawable) {
 			          color = ((ColorDrawable)this.getBackground()).getColor();
 				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
@@ -456,15 +477,15 @@ public class jTextView extends TextView {
 	public void SetTextAsLink(String _linkText) {
 
                //[ifdef_api24up]
-	       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
-	           this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));
-               }else //[endif_api24up]
-		   this.setText(Html.fromHtml(_linkText));
+	       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+	        this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));
+           else //[endif_api24up]
+		    this.setText(Html.fromHtml(_linkText));
 
                this.setMovementMethod(LinkMovementMethod.getInstance());
 	}
 
-	public void SetTextAsLink(String _linkText, int _color) {  //by TR3E
+	public void SetTextAsLink(String _linkText, int _color) {  //by ADiV
 		//[ifdef_api24up]
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
 			this.setText(Html.fromHtml(_linkText, Html.FROM_HTML_MODE_LEGACY));

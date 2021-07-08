@@ -13,7 +13,7 @@ uses
   ufrmEditor, uimportcstuff, uimportjavastuff, uimportjavastuffchecked, 
   uregistercompform, uformimportlamwstuff, unitformimportpicture, 
   uFormComplements, uformimportjarstuff, lamwtoolsoptions, 
-  GDBMIServerDebuggerLAMW, LazarusPackageIntf;
+  GDBMIServerDebuggerLAMW, uFormApksigner, LazarusPackageIntf;
 
 implementation
 

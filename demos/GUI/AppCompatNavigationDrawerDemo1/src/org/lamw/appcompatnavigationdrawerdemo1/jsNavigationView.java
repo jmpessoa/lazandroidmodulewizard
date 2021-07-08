@@ -14,6 +14,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.support.design.widget.NavigationView;
+import com.google.android.material.navigation.NavigationView;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
@@ -60,10 +62,19 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    
    int itemId;
    String itemCaption;
-    
+
    int textColor = Color.WHITE;
    int subTextColor = Color.WHITE;
-   
+
+   int headerTextSize = 0; //default
+   int textSizeDecorated = 0; //1 = Decreasing  //2 Increasing  //0 none
+
+   float textSizeDecoratedGap = 3;
+
+   int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP;
+
+   int imagePosRelativeToParente = RelativeLayout.CENTER_IN_PARENT;
+
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jsNavigationView(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
 
@@ -120,7 +131,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
   	 //setOnClickListener(null);
 	 LAMWCommon.free();
    }
- 
+
    public void SetViewParent(ViewGroup _viewgroup) {
 	 LAMWCommon.setParent(_viewgroup);
    }
@@ -182,9 +193,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    }
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   public void SetId(int _id) { //wrapper method pattern ...
-      this.setId(_id);
-   }
       
    public Menu GetMenu() {
       return this.getMenu();
@@ -194,7 +202,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    public Menu AddMenu(String _headerTitle) {	    
 	    Menu menu = this.getMenu();	    
 	    Menu submenu = menu.addSubMenu(_headerTitle);	    
-	    //submenu.setHeaderIcon(GetDrawableResourceId(_headerIconIdentifier));
+	    //submenu.setHeaderIcon(controls.GetDrawableResourceId(_headerIconIdentifier));
 	    this.invalidate();
 	    return submenu;
    }	   
@@ -316,26 +324,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    public Bitmap GetRoundedShape(Bitmap _bitmapImage) {
    	return GetRoundedShape(_bitmapImage, 0);
    }
-
-   
-   public int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     Log.e("jForm", "Failure to get drawable id.", e);
-		     return 0;
-		  }
-	}
-
-   /*
-   public Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));	
-	}
-    */
       
    private Bitmap GetBitmapFromById(int _resID) {
 	    if( _resID == 0 ) return null; // by tr3e
@@ -362,8 +350,86 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
  		  return  null;
  	}
 
-   
-   public void AddHeaderView(int _color, String _drawableLogoIdentifier, String _text, int _height) {
+
+	public void AddHeaderView(int _color, Bitmap _bitmapLogo, String _text, int _height) {
+		String delimiter = "|";
+		String[] words = _text.split(Pattern.quote(delimiter));
+		int countText = words.length;
+
+		if (countText >= 2) {
+			headerText = words[0];
+			headerSubText = words[1];
+		}
+		else {
+			headerText = _text;
+		}
+
+		headerColor = _color;
+
+		Bitmap bmp =  _bitmapLogo;
+		if (bmp != null) bmp = GetRoundedShape(bmp);
+
+		headerLayout = new RelativeLayout(context);
+
+		int h =  (int) (_height * getResources().getDisplayMetrics().density);  //_height = 192
+		RelativeLayout.LayoutParams paramLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h);
+
+		headerLayout.setLayoutParams(paramLayout);
+		headerLayout.setBackgroundColor(headerColor);
+		headerImageView = new ImageView(context);
+
+		if (bmp != null) {
+			headerImageView.setImageBitmap(bmp);
+			headerImageView.setPadding(10, 10, 10, 10);
+			headerImageView.setId(controls.getJavaNewId());
+		}
+
+		headerTextView = new TextView(context);
+		headerTextView.setId(controls.getJavaNewId());
+		headerTextView.setText(headerText);
+		headerTextView.setPadding(10, 30, 10, 5);
+		headerTextView.setTextColor(textColor);
+
+		int i = 0;
+		float auxf = setTextSizeAndGetAuxf(headerTextSize, headerTextView);
+		if ( textSizeDecorated == 1)
+			headerTextView.setTextSize(mTextSizeTypedValue, auxf - textSizeDecoratedGap*i);  // sdDeCecreasing
+		else if (textSizeDecorated == 2)
+			headerTextView.setTextSize(mTextSizeTypedValue, auxf + textSizeDecoratedGap*i);  // sdInCecreasing
+
+		if (bmp != null) {
+			RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			paramImg.addRule(imagePosRelativeToParente); //RelativeLayout.CENTER_IN_PARENT
+			headerLayout.addView(headerImageView, paramImg);
+		}
+
+		RelativeLayout.LayoutParams paramText = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		paramText.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		paramText.addRule(RelativeLayout.BELOW, headerImageView.getId());
+		headerLayout.addView(headerTextView, paramText);
+
+		if (countText >= 2) {
+			headerSubTextView = new TextView(context);
+			headerSubTextView.setText(headerSubText);
+			headerSubTextView.setPadding(10, 5, 10, 20);
+			headerSubTextView.setTextColor(subTextColor);
+
+			int factor = 1;
+			float aux = setTextSizeAndGetAuxf(headerTextSize, headerSubTextView);
+			if ( textSizeDecorated == 1)
+				headerSubTextView.setTextSize(mTextSizeTypedValue, aux - textSizeDecoratedGap*factor);  // sdDeCecreasing
+			else if (textSizeDecorated == 2)
+				headerSubTextView.setTextSize(mTextSizeTypedValue, aux + textSizeDecoratedGap*factor);  // sdInCecreasing
+
+			RelativeLayout.LayoutParams paramText2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			paramText2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			paramText2.addRule(RelativeLayout.BELOW, headerTextView.getId());
+			headerLayout.addView(headerSubTextView, paramText2);
+		}
+		this.addHeaderView(headerLayout);
+	}
+
+	public void AddHeaderView(int _color, String _drawableLogoIdentifier, String _text, int _height) {
 	   	   
 	      String delimiter = "|";
 	      String[] words = _text.split(Pattern.quote(delimiter));
@@ -393,44 +459,56 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	      headerLayout.setBackgroundColor(headerColor);
 	      headerImageView = new ImageView(context);
 
-	      int id1 = 111111111;
 	      if (bmp != null) { 	    	  
 	    	  headerImageView.setImageBitmap(bmp);	      
 	          headerImageView.setPadding(10, 10, 10, 10);
-	          headerImageView.setId(id1);
+	          headerImageView.setId(controls.getJavaNewId());
           }
-
-	      int id2 = 111111110;
+	      
 		  headerTextView = new TextView(context);
-		  headerTextView.setId(id2);
+		  headerTextView.setId(controls.getJavaNewId());
 		  headerTextView.setText(headerText);      
-		  headerTextView.setPadding(10, 30, 10, 10);	      		  
+		  headerTextView.setPadding(10, 30, 10, 5);
 		  headerTextView.setTextColor(textColor);
-		  
-		  if (bmp != null) {
+
+		int i = 0;
+		float auxf = setTextSizeAndGetAuxf(headerTextSize, headerTextView);
+		if ( textSizeDecorated == 1)
+			headerTextView.setTextSize(mTextSizeTypedValue, auxf - textSizeDecoratedGap*i);  // sdDeCecreasing
+		else if (textSizeDecorated == 2)
+			headerTextView.setTextSize(mTextSizeTypedValue, auxf + textSizeDecoratedGap*i);  // sdInCecreasing
+
+		if (bmp != null) {
 	          RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-	          paramImg.addRule(RelativeLayout.CENTER_IN_PARENT);            			  
+	          paramImg.addRule(imagePosRelativeToParente);//RelativeLayout.CENTER_IN_PARENT
 			  headerLayout.addView(headerImageView, paramImg);
 		  }	      
 
 		  RelativeLayout.LayoutParams paramText = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		  paramText.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		  paramText.addRule(RelativeLayout.BELOW, id1);
-		  headerLayout.addView(headerTextView, paramText);	    	  
+		  paramText.addRule(RelativeLayout.BELOW, headerImageView.getId());
+		  headerLayout.addView(headerTextView, paramText);
 
 		  if (countText >= 2) {
   	          headerSubTextView = new TextView(context);
   	          headerSubTextView.setText(headerSubText);      
-  	          headerSubTextView.setPadding(10, 10, 10, 20);	      
-     	      headerSubTextView.setTextColor(subTextColor);        	  
+  	          headerSubTextView.setPadding(10, 5, 10, 20);
+     	      headerSubTextView.setTextColor(subTextColor);
+
+			  int factor = 1;
+			  float aux = setTextSizeAndGetAuxf(headerTextSize, headerSubTextView);
+			  if ( textSizeDecorated == 1)
+				  headerSubTextView.setTextSize(mTextSizeTypedValue, aux - textSizeDecoratedGap*factor);  // sdDeCecreasing
+			  else if (textSizeDecorated == 2)
+				  headerSubTextView.setTextSize(mTextSizeTypedValue, aux + textSizeDecoratedGap*factor);  // sdInCecreasing
+
     		  RelativeLayout.LayoutParams paramText2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     		  paramText2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-    		  paramText2.addRule(RelativeLayout.BELOW, id2);
+    		  paramText2.addRule(RelativeLayout.BELOW, headerTextView.getId());
     	      headerLayout.addView(headerSubTextView, paramText2);	    	  
 	      }
 
 	      this.addHeaderView(headerLayout);
-	      
    }
 
 	public void AddHeaderView(String _drawableBackgroundIdentifier, String _drawableLogoIdentifier, String _text, int _height) {
@@ -456,39 +534,52 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 		headerLayout.setLayoutParams(paramLayout);
 		headerImageView = new ImageView(context);
 
-		int id1 = 111111111;
 		if (bmp != null) {
 			headerImageView.setImageBitmap(bmp);
 			headerImageView.setPadding(10, 10, 10, 10);
-			headerImageView.setId(id1);
+			headerImageView.setId(controls.getJavaNewId());
 		}
-
-		int id2 = 111111110;
+		
 		headerTextView = new TextView(context);
-		headerTextView.setId(id2);
+		headerTextView.setId(controls.getJavaNewId());
 		headerTextView.setText(headerText);
-		headerTextView.setPadding(10, 30, 10, 10);
+		headerTextView.setPadding(10, 30, 10, 5);
 		headerTextView.setTextColor(textColor);
+
+		int factor1 = 0;
+		float aux1 = setTextSizeAndGetAuxf(headerTextSize, headerTextView);
+		if ( textSizeDecorated == 1)
+			headerTextView.setTextSize(mTextSizeTypedValue, aux1 - textSizeDecoratedGap*factor1);  // sdDeCecreasing
+		else if (textSizeDecorated == 2)
+			headerTextView.setTextSize(mTextSizeTypedValue, aux1 + textSizeDecoratedGap*factor1);  // sdInCecreasing
 
 		if (bmp != null) {
 			RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			paramImg.addRule(RelativeLayout.CENTER_IN_PARENT);
+			paramImg.addRule(imagePosRelativeToParente); //RelativeLayout.CENTER_IN_PARENT
 			headerLayout.addView(headerImageView, paramImg);
 		}
 
 		RelativeLayout.LayoutParams paramText = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		paramText.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		paramText.addRule(RelativeLayout.BELOW, id1);
+		paramText.addRule(RelativeLayout.BELOW, headerImageView.getId());
 		headerLayout.addView(headerTextView, paramText);
 
 		if (countText >= 2) {
 			headerSubTextView = new TextView(context);
 			headerSubTextView.setText(headerSubText);
-			headerSubTextView.setPadding(10, 10, 10, 20);
+			headerSubTextView.setPadding(10, 5, 10, 20);
 			headerSubTextView.setTextColor(subTextColor);
+
+			int factor2 = 1;
+			float aux2 = setTextSizeAndGetAuxf(headerTextSize, headerSubTextView);
+			if ( textSizeDecorated == 1)
+				headerSubTextView.setTextSize(mTextSizeTypedValue, aux2 - textSizeDecoratedGap*factor2);  // sdDeCecreasing
+			else if (textSizeDecorated == 2)
+				headerSubTextView.setTextSize(mTextSizeTypedValue, aux2 + textSizeDecoratedGap*factor2);  // sdInCecreasing
+
 			RelativeLayout.LayoutParams paramText2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 			paramText2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-			paramText2.addRule(RelativeLayout.BELOW, id2);
+			paramText2.addRule(RelativeLayout.BELOW, headerTextView.getId());
 			headerLayout.addView(headerSubTextView, paramText2);
 		}
 
@@ -496,13 +587,143 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 		this.addHeaderView(headerLayout);
 
 	}
-      
+
+	public void AddHeaderView(String _drawableBackgroundIdentifier, Bitmap _bitmapLogo, String _text, int _height) {
+
+		String delimiter = "|";
+		String[] words = _text.split(Pattern.quote(delimiter));
+		int countText = words.length;
+
+		if (countText >= 2) {
+			headerText = words[0];
+			headerSubText = words[1];
+		}
+		else {
+			headerText = _text;
+		}
+
+		Bitmap bmp =  _bitmapLogo;
+		if (bmp != null) bmp = GetRoundedShape(bmp);
+
+		headerLayout = new RelativeLayout(context);
+		int h =  (int) (_height * getResources().getDisplayMetrics().density);  //_height = 192
+		RelativeLayout.LayoutParams paramLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h);
+		headerLayout.setLayoutParams(paramLayout);
+		headerImageView = new ImageView(context);
+
+		if (bmp != null) {
+			headerImageView.setImageBitmap(bmp);
+			headerImageView.setPadding(10, 10, 10, 10);
+			headerImageView.setId(controls.getJavaNewId());
+		}
+
+		headerTextView = new TextView(context);
+		headerTextView.setId(controls.getJavaNewId());
+		headerTextView.setText(headerText);
+		headerTextView.setPadding(10, 30, 10, 5);
+		headerTextView.setTextColor(textColor);
+
+		int factor1 = 0;
+		float aux1 = setTextSizeAndGetAuxf(headerTextSize, headerTextView);
+		if ( textSizeDecorated == 1)
+			headerTextView.setTextSize(mTextSizeTypedValue, aux1 - textSizeDecoratedGap*factor1);  // sdDeCecreasing
+		else if (textSizeDecorated == 2)
+			headerTextView.setTextSize(mTextSizeTypedValue, aux1 + textSizeDecoratedGap*factor1);  // sdInCecreasing
+
+		if (bmp != null) {
+			RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			paramImg.addRule(imagePosRelativeToParente); //RelativeLayout.CENTER_IN_PARENT
+			headerLayout.addView(headerImageView, paramImg);
+		}
+
+		RelativeLayout.LayoutParams paramText = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		paramText.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		paramText.addRule(RelativeLayout.BELOW, headerImageView.getId());
+		headerLayout.addView(headerTextView, paramText);
+
+		if (countText >= 2) {
+			headerSubTextView = new TextView(context);
+			headerSubTextView.setText(headerSubText);
+			headerSubTextView.setPadding(10, 5, 10, 20);
+			headerSubTextView.setTextColor(subTextColor);
+
+			int factor2 = 1;
+			float aux2 = setTextSizeAndGetAuxf(headerTextSize, headerSubTextView);
+			if ( textSizeDecorated == 1)
+				headerSubTextView.setTextSize(mTextSizeTypedValue, aux2 - textSizeDecoratedGap*factor2);  // sdDeCecreasing
+			else if (textSizeDecorated == 2)
+				headerSubTextView.setTextSize(mTextSizeTypedValue, aux2 + textSizeDecoratedGap*factor2);  // sdInCecreasing
+
+			RelativeLayout.LayoutParams paramText2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			paramText2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			paramText2.addRule(RelativeLayout.BELOW, headerTextView.getId());
+			headerLayout.addView(headerSubTextView, paramText2);
+		}
+
+		headerLayout.setBackgroundResource(context.getResources().getIdentifier(_drawableBackgroundIdentifier, "drawable", context.getPackageName() ));
+		this.addHeaderView(headerLayout);
+
+	}
+
     public void SetSubtitleTextColor(int _color) {
 	   subTextColor =  _color;
    }
+
     public void SetTitleTextColor(int _color) {
 	   textColor = _color; 
    }
+
+	public void SetTitleTextSize(int _textSize) {
+		headerTextSize = _textSize;
+	}
+
+	public void SetTitleSizeDecorated(int _sizeDecorated) {
+		//int textSizeDecorated = 1; //1 = Decreasing  //2 Increasing  //0 none
+		textSizeDecorated = _sizeDecorated;
+	}
+
+	public void SetTitleSizeDecoratedGap(float _textSizeGap) {
+		//int textSizeDecorated = 1; //1 = Decreasing  //2 Increasing  //0 none
+		textSizeDecoratedGap = _textSizeGap;
+	}
+
+	public void SetLogoPosition(int _logoPosition) {
+		imagePosRelativeToParente = _logoPosition; //RelativeLayout.CENTER_IN_PARENT;
+	}
+
+   /* TODO
+	public void SetFontSizeUnit(int _unit) {
+		switch (_unit) {
+			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break;  //raw pixel :: good experience!
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //device
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break;
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break;  //points
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break;  //scaled pixel -- default
+		}
+	}
+   */
+
+	private float pixelsToSP(Float px) {  //Scaled Pixels
+		float scaledDensity = controls.activity.getResources().getDisplayMetrics().scaledDensity;
+		return px/scaledDensity;
+	}
+
+	private float setTextSizeAndGetAuxf(int _textSize, TextView _textView){
+		float auxCustomPixel;
+		float defaultInPixel = _textView.getTextSize();  //default in pixel!!!
+		float result =  pixelsToSP(defaultInPixel);  //just initialize ... pixel to TypedValue.COMPLEX_UNIT_SP
+		if (mTextSizeTypedValue == TypedValue.COMPLEX_UNIT_SP) {
+			result =  pixelsToSP(defaultInPixel);   //default in TypedValue.COMPLEX_UNIT_SP!
+			if (_textSize != 0) {
+				_textView.setTextSize(_textSize);
+				auxCustomPixel = _textView.getTextSize();
+				result = pixelsToSP(auxCustomPixel);  //custom in default in TypedValue.COMPLEX_UNIT_SP!
+			}
+		}
+		return result;
+	}
+
 
 }
 

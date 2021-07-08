@@ -18,15 +18,16 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <CustomData Count="8">
+    <CustomData Count="9">
       <Item0 Name="BuildSystem" Value="Gradle"/>
       <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.4"/>
+      <Item2 Name="LamwVersion" Value="0.8.6.1"/>
       <Item3 Name="NdkApi" Value="android-22"/>
-      <Item4 Name="NdkPath" Value="C:\android\ndkr18b\"/>
+      <Item4 Name="NdkPath" Value="C:\Users\artem.bogomolov.a\develop\instruments\ObjectPascal\lamw_manager\LAMW\sdk\ndk-bundle\"/>
       <Item5 Name="Package" Value="org.lamw.appcompatnavigationdrawerdemo1"/>
-      <Item6 Name="SdkPath" Value="C:\adt32\sdk\"/>
-      <Item7 Name="Theme" Value="AppCompat.Light.NoActionBar"/>
+      <Item6 Name="SdkPath" Value="C:\Users\artem.bogomolov.a\develop\instruments\ObjectPascal\lamw_manager\LAMW\sdk\"/>
+      <Item7 Name="Support" Value="TRUE"/>
+      <Item8 Name="Theme" Value="AppCompat.Light.NoActionBar"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -57,7 +58,7 @@
         <HasResources Value="True"/>
         <CustomData Count="2">
           <Item0 Name="fclControls"/>
-          <Item1 Name="jControls" Value="jEditText;jForm;jImageView;jPanel;jsDrawerLayout;jsNavigationView;jsToolbar;jTextView"/>
+          <Item1 Name="jControls" Value="jEditText;jImageView;jPanel;jsDrawerLayout;jsNavigationView;jsToolbar;jTextView"/>
         </CustomData>
       </Unit1>
       <Unit2>
@@ -67,7 +68,7 @@
         <HasResources Value="True"/>
         <CustomData Count="2">
           <Item0 Name="fclControls"/>
-          <Item1 Name="jControls" Value="jEditText;jForm;jImageView;jPanel;jTextView"/>
+          <Item1 Name="jControls" Value="jEditText;jImageView;jPanel;jTextView"/>
         </CustomData>
       </Unit2>
       <Unit3>
@@ -99,12 +100,12 @@
       <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\android\ndkr18b\platforms\android-22\arch-arm\usr\lib\;C:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
+      <Libraries Value="C:\Users\artem.bogomolov.a\develop\instruments\ObjectPascal\lamw_manager\LAMW\sdk\ndk-bundle\platforms\android-22\arch-arm\usr\lib\;C:\Users\artem.bogomolov.a\develop\instruments\ObjectPascal\lamw_manager\LAMW\sdk\ndk-bundle\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <SyntaxMode Value="delphi"/>
+        <SyntaxMode Value="Delphi"/>
         <CStyleMacros Value="True"/>
       </SyntaxOptions>
     </Parsing>
@@ -128,7 +129,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
+      <CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\Users\artem.bogomolov.a\develop\instruments\ObjectPascal\lamw_manager\LAMW\sdk\ndk-bundle\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>
