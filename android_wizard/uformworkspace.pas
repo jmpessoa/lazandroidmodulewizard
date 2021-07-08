@@ -5,8 +5,9 @@ unit uformworkspace;
 interface
 
 uses
-  inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, LazIDEIntf,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, FormPathMissing, PackageIntf;
+  inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
+  LazIDEIntf, StdCtrls, Buttons, ExtCtrls, ComCtrls, ComboEx,
+  FormPathMissing, PackageIntf;
 
 type
 
@@ -19,6 +20,8 @@ type
     CheckBoxSupport: TCheckBox;
     CheckBoxPIE: TCheckBox;
     cbBuildSystem: TComboBox;
+    ComboBoxThemeColor: TComboBoxEx;
+    ImageList1: TImageList;
     Label1: TLabel;
     ListBoxNdkPlatform: TComboBox;
     ListBoxMinSDK: TComboBox;
@@ -56,6 +59,7 @@ type
     procedure CheckBoxSupportChange(Sender: TObject);
     procedure CheckBoxSupportClick(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
+    procedure ComboBoxThemeColorChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
     procedure EditPathToWorkspaceExit(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -112,6 +116,7 @@ type
     FFullJavaSrcPath: string;
     FJavaClassName: string;
     FAndroidTheme: string;
+    FAndroidThemeColor: string;
     FPieChecked: boolean;
     FLibraryChecked: boolean;  //raw .so
     FGradleVersion: string;
@@ -186,6 +191,7 @@ type
     property ModuleType: integer read FModuleType write FModuleType;  //-1: gdx 0: GUI project   1: NoGui project
     property SmallProjName: string read FSmallProjName write FSmallProjName;
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
+    property AndroidThemeColor: string read FAndroidThemeColor write FAndroidThemeColor;
     property PieChecked: boolean read FPieChecked write FPieChecked;
     property LibraryChecked: boolean read FLibraryChecked write FLibraryChecked; //raw .so
     property BuildSystem: string read GetBuildSystem;
@@ -375,7 +381,7 @@ begin
 
     intTarqetApi:= StrToInt(FTargetApi);
     if intTarqetApi  < 29 then
-       ShowMessage('Warning: remember that "google play" store NOW equires Target Api >= 29 !');
+       ShowMessage('Warning: remember that "google play" store NOW requires Target Api >= 29 !');
 
   end;
 end;
@@ -1173,7 +1179,6 @@ procedure TFormWorkspace.FormActivate(Sender: TObject);
 var
   listDirectories: TStringList;
   i, count, p: integer;
-  lastDirName: string;
 begin
 
   EditPathToWorkspace.Left:= 8; // try fix hidpi bug
@@ -1224,6 +1229,8 @@ begin
      listDirectories.Free;
   end;
 
+  FAndroidThemeColor:= 'blue';
+  ComboBoxThemeColor.Enabled:= False;
 end;
 
 procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
@@ -1231,21 +1238,21 @@ var
   index, intTargetApi: integer;
 begin
 
-  if Pos('GDXGame', ComboBoxTheme.Text) > 0 then
+  if Pos('AppCompat',  ComboBoxTheme.Text) > 0 then
   begin
-    if Pos('Gradle',cbBuildSystem.Items.Text) > 0 then
-    begin
-      index:= cbBuildSystem.Items.IndexOf('Gradle');
-      cbBuildSystem.ItemIndex:= index;
-      cbBuildSystem.Text:= 'Gradle';
-      cbBuildSystemCloseUp(Self);
-    end;
+     ComboBoxThemeColor.Enabled:= True;
+     if ComboBoxThemeColor.ItemIndex = 0 then ComboBoxThemeColor.ItemIndex:= 1; //blue
+  end
+  else
+  begin
+     ComboBoxThemeColor.ItemIndex:= 0;
+     ComboBoxThemeColor.Enabled:= False;
   end;
 
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then
   begin
-
     CheckBoxSupport.Checked:= True; //inner Supported!!!
+    //sCheckBoxSupport.Enabled:= False;
 
     if (FMaxSdkPlatform < 29) or (FPathToGradle = '')   then
     begin
@@ -1302,6 +1309,33 @@ begin
 
   end;
 
+  if Pos('GDXGame', ComboBoxTheme.Text) > 0 then
+  begin
+    if Pos('Gradle',cbBuildSystem.Items.Text) > 0 then
+    begin
+      index:= cbBuildSystem.Items.IndexOf('Gradle');
+      cbBuildSystem.ItemIndex:= index;
+      cbBuildSystem.Text:= 'Gradle';
+      cbBuildSystemCloseUp(Self);
+    end;
+  end;
+
+end;
+
+procedure TFormWorkspace.ComboBoxThemeColorChange(Sender: TObject);
+begin
+  case ComboBoxThemeColor.ItemIndex of
+     1: FAndroidThemeColor:= 'blue';
+     2: FAndroidThemeColor:= 'orange';
+     3: FAndroidThemeColor:= 'green';
+     4: FAndroidThemeColor:= 'red';
+     5: FAndroidThemeColor:= 'lightblue';
+     6: FAndroidThemeColor:= 'white';
+     7: FAndroidThemeColor:= 'violet';
+     8: FAndroidThemeColor:= 'gray';
+     9: FAndroidThemeColor:= 'yellow';
+     10:FAndroidThemeColor:= 'black';
+  end;
 end;
 
 procedure TFormWorkspace.CheckBoxPIEClick(Sender: TObject);
@@ -1330,6 +1364,9 @@ var
   intApi, index: integer;
   flag: boolean;
 begin
+
+  if Pos('AppCompat', FAndroidTheme) > 0 then CheckBoxSupport.Checked:= True;
+
   FSupport:=TCheckBox(Sender).Checked;
   if FSupport then
   begin

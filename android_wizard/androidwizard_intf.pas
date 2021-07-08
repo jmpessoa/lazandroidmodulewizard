@@ -79,6 +79,7 @@ type
      FGradleVersion: string;
 
      FAndroidTheme: string;
+     FAndroidThemeColor: string;       //new
      FAndroidTemplateTheme: string;  //new
 
      FBuildSystem: string;
@@ -1561,6 +1562,7 @@ begin
       FBuildSystem:= frm.BuildSystem;
 
       FAndroidTheme:= frm.AndroidTheme;
+      FAndroidThemeColor:= frm.AndroidThemeColor;
       FAndroidTemplateTheme:= '';
 
       if IsTemplateProject(FAndroidTheme, outTheme) then
@@ -1696,8 +1698,13 @@ begin
 
             CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
 
-            CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors.xml',
-               FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
+
+            if DirectoryExists(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors'+DirectorySeparator+FAndroidThemeColor) then
+               CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors'+DirectorySeparator+FAndroidThemeColor+DirectorySeparator+'colors.xml',
+                  FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml')
+            else
+              CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors.xml',
+                  FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
 
 
             if Pos('AppCompat', FAndroidTheme) > 0 then
@@ -1724,8 +1731,10 @@ begin
             strList.Add('</resources>');
             strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
 
+            {
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors.xml',
                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
+            }
 
             CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
 
