@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Controls, ProjectIntf, Forms, AndroidWidget,
-  process, Math, SourceChanger, propedits;
+  process, math, SourceChanger, propedits;
 
 //tk min and max API versions for build.xml
 const
@@ -50,10 +50,8 @@ type
     procedure AddSupportToFCLControls(chipArch: string);
     function GetEventSignature(const nativeMethod: string): string;
     function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
-    function GetCorrectTemplateFileName(const Path, FileName: string): string;
-    //by kordal
-    function TryAddJControl(ControlsJava: TStringList; jclassname: string;
-      out nativeAdded: boolean): boolean;
+    function GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
+    function TryAddJControl(ControlsJava: TStringList; jclassname: string; out nativeAdded: boolean): boolean;
     procedure UpdateProjectLpr(oldModuleName: string; newModuleName: string);
     procedure InitSmartDesignerHelpers;
     procedure UpdateStartModuleVarName;
@@ -76,8 +74,7 @@ type
 
     function GetBuildTool(sdkApi: integer): string;
     function GetPluginVersion(buildTool: string): string;
-    function TryGradleCompatibility(plugin: string; gradleVers: string;
-      out outGradleVer: string): boolean;
+    function TryGradleCompatibility(plugin: string; gradleVers: string; out outGradleVer: string):boolean;
     function TryPluginCompatibility(gradleVers: string): string;
 
     function GetVerAsNumber(gradleVers: string): integer;
@@ -104,9 +101,11 @@ type
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
 
-    function AddClicked(ADesigner: TIDesigner; MouseDownComponent: TComponent;
-      Button: TMouseButton; Shift: TShiftState; X, Y: integer;
-      var AComponentClass: TComponentClass; var NewParent: TComponent): boolean;
+    function AddClicked(ADesigner: TIDesigner;
+                 MouseDownComponent: TComponent; Button: TMouseButton;
+                 Shift: TShiftState; X, Y: Integer;
+                 var AComponentClass: TComponentClass;
+                 var NewParent: TComponent): boolean;
 
   public
     destructor Destroy; override;
@@ -115,18 +114,16 @@ type
     function IsLaz4Android(): boolean;
 
     // calleds from Designer/TAndroidWidgetMediator
-    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
-    //TAndroidWidgetMediator.UpdateJControlsList;
-    procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
-    //TAndroidWidgetMediator.UpdateJControlsList;
+    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
+    procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateProjectStartModule(const NewName: string; moduleType: integer);
 
   end;
 
-// tk ReplaceChar made public
-function ReplaceChar(const query: string; oldchar, newchar: char): string;
-// end tk
-function IsAllCharNumber(pcString: PChar): boolean;
+  // tk ReplaceChar made public
+  function ReplaceChar(const query: string; oldchar, newchar: char): string;
+  // end tk
+  function IsAllCharNumber(pcString: PChar): Boolean;
 
 var
   LamwSmartDesigner: TLamwSmartDesigner;
@@ -135,8 +132,7 @@ implementation
 
 uses
   {$ifdef unix}BaseUnix,{$endif}
-  {Controls,} Dialogs, {SrcEditorIntf,} LazIDEIntf, IDEMsgIntf,
-  IDEExternToolIntf, CodeToolManager, CodeTree,
+  {Controls,} Dialogs, {SrcEditorIntf,} LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
   CodeCache, {SourceChanger,} LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
   LazFileUtils, LamwSettings, uJavaParser, strutils, PackageIntf;
 
@@ -174,23 +170,20 @@ end;
 
 function ReplaceChar(const query: string; oldchar, newchar: char): string;
 var
-  i: integer;
+  i: Integer;
 begin
   Result := query;
   for i := 1 to Length(Result) do
-    if Result[i] = oldchar then
-      Result[i] := newchar;
+    if Result[i] = oldchar then Result[i] := newchar;
 end;
 
-function IsAllCharNumber(pcString: PChar): boolean;
+function IsAllCharNumber(pcString: PChar): Boolean;
 begin
   Result := False;
-  if StrLen(pcString) = 0 then
-    exit;
+  if StrLen(pcString)=0 then exit;
   while pcString^ <> #0 do // 0 indicates the end of a PChar string
   begin
-    if not (pcString^ in ['0'..'9']) then
-      Exit;
+    if not (pcString^ in ['0'..'9']) then Exit;
     Inc(pcString);
   end;
   Result := True;
@@ -202,15 +195,15 @@ var
   strAux: string;
   packList: TStringList;
 begin
-  Result := '';
+  Result:= '';
   if FileExists(fullPathToBuildXML) then
   begin
-    packList := TStringList.Create;
+    packList:= TStringList.Create;
     packList.LoadFromFile(fullPathToBuildXML);
-    pk := Pos('location="', packList.Text);  //ex. location="C:\adt32\sdk"
-    strAux := Copy(packList.Text, pk + Length('location="'), MaxInt);
+    pk:= Pos('location="',packList.Text);  //ex. location="C:\adt32\sdk"
+    strAux:= Copy(packList.Text, pk+Length('location="'), MaxInt);
     i := PosEx('"', strAux, 2);
-    Result := Trim(Copy(strAux, 1, i - 1));
+    Result:= Trim(Copy(strAux, 1, i-1));
     packList.Free;
   end;
 end;
@@ -220,102 +213,93 @@ end;
 
 //http://wiki.freepascal.org/Extending_the_IDE#Event_handlers
 function TLamwSmartDesigner.AddClicked(ADesigner: TIDesigner;
-  MouseDownComponent: TComponent; Button: TMouseButton; Shift: TShiftState;
-  X, Y: integer; var AComponentClass: TComponentClass;
-  var NewParent: TComponent): boolean;
+             MouseDownComponent: TComponent; Button: TMouseButton;
+             Shift: TShiftState; X, Y: Integer;
+             var AComponentClass: TComponentClass;
+             var NewParent: TComponent): boolean;
 var
   temp: string;
 begin
-  Result := True;
+  Result:= True;
   if LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
   begin
 
-    if AComponentClass.ClassName[1] = 'T' then
-    begin
-      case QuestionDlg('Warning: LCL Component', '"' + AComponentClass.ClassName +
-          '"' + sLineBreak + 'does not seem to be a LAMW component...',
-          mtCustom, [mrYes, 'Continue', mrNo, 'Exit'], '') of
-        mrNo:
-        begin
-          Result := False;
-          Exit;
+      if AComponentClass.ClassName[1] = 'T' then
+      begin
+        case QuestionDlg ('Warning: LCL Component','"'+AComponentClass.ClassName+'"'+sLineBreak+
+                                    'does not seem to be a LAMW component...',
+                                    mtCustom,[mrYes,'Continue', mrNo, 'Exit'],'') of
+             mrNo: begin Result:= False; Exit; end;
         end;
       end;
-    end;
 
 
-    temp := Lowercase(Copy(AComponentClass.ClassName, 1, 4));
+      temp:= Lowercase(Copy(AComponentClass.ClassName, 1,4));
 
-    if Pos('GDXGame', LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
-    begin
-      if temp <> 'jgdx' then
+      if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
       begin
-        Result := False;
-        ShowMessage('Sorry.. [' + AComponentClass.ClassName +
-          '] not for a libGDX project...');
-        Exit;
-      end;
-    end
-    else
-    begin
-      if temp = 'jgdx' then
+         if temp <> 'jgdx' then
+         begin
+          Result:= False;
+          ShowMessage('Sorry.. ['+AComponentClass.ClassName+'] not for a libGDX project...');
+          Exit;
+         end;
+      end
+      else
       begin
-        Result := False;
-        ShowMessage('Sorry..[' + AComponentClass.ClassName +
-          '] only for a libGDX project...');
-        Exit;
+         if temp = 'jgdx' then
+         begin
+           Result:= False;
+           ShowMessage('Sorry..['+AComponentClass.ClassName+'] only for a libGDX project...');
+           Exit;
+         end;
       end;
-    end;
 
-    if Pos('AppCompat.', LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
-      Exit;
+      if Pos('AppCompat.',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then Exit;
 
-    if AComponentClass.ClassNameIs('jsFloatingButton') or
-      AComponentClass.ClassNameIs('jsTextInput') or
-      AComponentClass.ClassNameIs('jsRecyclerView') or
-      AComponentClass.ClassNameIs('jsCardView') or
-      AComponentClass.ClassNameIs('jsViewPager') or
-      AComponentClass.ClassNameIs('jsDrawerLayout') or
-      AComponentClass.ClassNameIs('jsNavigationView') or
-      AComponentClass.ClassNameIs('jsAppBarLayout') or
-      AComponentClass.ClassNameIs('jsTabLayout') or
-      AComponentClass.ClassNameIs('jsToolBar') or
-      AComponentClass.ClassNameIs('jsCoordenatorLayout') or
-      AComponentClass.ClassNameIs('jsCollapsingToolbarLayout') or
-      AComponentClass.ClassNameIs('jsNestedScrollView') or
-      AComponentClass.ClassNameIs('jsBottomNavigationView') or
-      AComponentClass.ClassNameIs('jsAdMod') or
-      AComponentClass.ClassNameIs('jsContinuousScrollableImageView') then
-    begin
-      ShowMessage('[Undoing..] "' + AComponentClass.ClassName +
-        '" need AppCompat theme...' + sLIneBreak +
-        'Hint:  You can convert the project to AppCompat theme:' +
-        sLIneBreak + '       menu "Tools" --> "[LAMW]..." --> "Convert..."');
-      Result := False;
-    end;
+      if AComponentClass.ClassNameIs('jsFloatingButton') or
+         AComponentClass.ClassNameIs('jsTextInput') or
+         AComponentClass.ClassNameIs('jsRecyclerView') or
+         AComponentClass.ClassNameIs('jsCardView') or
+         AComponentClass.ClassNameIs('jsViewPager') or
+         AComponentClass.ClassNameIs('jsDrawerLayout') or
+         AComponentClass.ClassNameIs('jsNavigationView') or
+         AComponentClass.ClassNameIs('jsAppBarLayout') or
+         AComponentClass.ClassNameIs('jsTabLayout') or
+         AComponentClass.ClassNameIs('jsToolBar') or
+         AComponentClass.ClassNameIs('jsCoordenatorLayout') or
+         AComponentClass.ClassNameIs('jsCollapsingToolbarLayout') or
+         AComponentClass.ClassNameIs('jsNestedScrollView') or
+         AComponentClass.ClassNameIs('jsBottomNavigationView') or
+         AComponentClass.ClassNameIs('jsAdMod') or
+         AComponentClass.ClassNameIs('jsContinuousScrollableImageView') then
+      begin
+        ShowMessage('[Undoing..] "'+AComponentClass.ClassName+'" need AppCompat theme...' +sLIneBreak+
+                     'Hint:  You can convert the project to AppCompat theme:'  +sLIneBreak+
+                     '       menu "Tools" --> "[LAMW]..." --> "Convert..."');
+        Result:= False;
+      end;
 
   end;
 end;
 
 function TLamwSmartDesigner.OnProjectOpened(Sender: TObject;
-  AProject: TLazProject): TModalResult;
+ AProject: TLazProject): TModalResult;
 begin
   if AProject.CustomData.Contains('LAMW') then
   begin
-    Init4Project(AProject);
+     Init4Project(AProject);
   end;
-  Result := mrOk;
+  Result := mrOK;
 end;
 
-function TLamwSmartDesigner.GetPackageNameFromAndroidManifest(
-  pathToAndroidManifest: string): string;
+function TLamwSmartDesigner.GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
 var
   str: string;
   xml: TXMLDocument;
 begin
   str := pathToAndroidManifest + 'AndroidManifest.xml';
-  if not FileExists(str) then
-    Exit('');
+  if not FileExists(str) then Exit('');
   ReadXMLFile(xml, str);
   try
     Result := xml.DocumentElement.AttribStrings['package'];
@@ -330,14 +314,12 @@ var
   n: TDOMNode;
 begin
   Result := '';
-  if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then
-    Exit;
+  if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
   try
     ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
     try
       n := ManifestXML.DocumentElement.FindNode('uses-sdk');
-      if not (n is TDOMElement) then
-        Exit;
+      if not (n is TDOMElement) then Exit;
       Result := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
     finally
       ManifestXML.Free
@@ -353,14 +335,12 @@ var
   n: TDOMNode;
 begin
   Result := '';
-  if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then
-    Exit;
+  if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
   try
     ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
     try
       n := ManifestXML.DocumentElement.FindNode('uses-sdk');
-      if not (n is TDOMElement) then
-        Exit;
+      if not (n is TDOMElement) then Exit;
       Result := TDOMElement(n).AttribStrings['android:minSdkVersion'];
     finally
       ManifestXML.Free
@@ -372,75 +352,72 @@ end;
 
 function TLamwSmartDesigner.GetNDKVersion(ndkRelease: string): integer;
 var
-  strNdkVersion: string;
+   strNdkVersion: string;
 begin
 
-  if Pos('.', ndkRelease) > 0 then //  //18.1.506304
-  begin
-    strNdkVersion := SplitStr(ndkRelease, '.'); //strNdkVersion:='18'
-    if strNdkVersion <> '' then
+    if Pos('.',ndkRelease) > 0 then //  //18.1.506304
     begin
-      Result := StrToInt(Trim(strNdkVersion));
-    end;
-  end
-  else
-    Result := 10; //r10e
+      strNdkVersion:= SplitStr(ndkRelease, '.'); //strNdkVersion:='18'
+      if strNdkVersion <> '' then
+      begin
+        Result:= StrToInt(Trim(strNdkVersion));
+      end;
+    end
+    else Result:= 10; //r10e
 
 end;
 
 function TLamwSmartDesigner.TryGetNDKRelease(pathNDK: string): string;
 var
-  list: TStringList;
-  aux, strNdkVersion: string;
+   list: TStringList;
+   aux, strNdkVersion: string;
 begin
-  list := TStringList.Create;
-  if FileExists(pathNDK + 'source.properties') then
-  begin
-    list.LoadFromFile(pathNDK + 'source.properties');
+    list:= TStringList.Create;
+    if FileExists(pathNDK+'source.properties') then
+    begin
+        list.LoadFromFile(pathNDK+'source.properties');
         {
            Pkg.Desc = Android NDK
            Pkg.Revision = 18.1.5063045
         }
-    strNdkVersion := list.Strings[1]; //Pkg.Revision = 18.1.5063045
-    aux := SplitStr(strNdkVersion, '=');
-    //aux:= 'Pkg.Revision '   ...strNdkVersion:=' 18.1.506304'
-    aux := Trim(strNdkVersion); //18.1.506304
-    Result := aux;
-  end
-  else
-  begin
-    if FileExists(pathNDK + 'RELEASE.TXT') then //r10e
+        strNdkVersion:= list.Strings[1]; //Pkg.Revision = 18.1.5063045
+        aux:= SplitStr(strNdkVersion, '='); //aux:= 'Pkg.Revision '   ...strNdkVersion:=' 18.1.506304'
+        aux:=Trim(strNdkVersion); //18.1.506304
+        Result:= aux;
+    end
+    else
     begin
-      list.LoadFromFile(pathNDK + 'REALEASE.TXT');
-      if Trim(list.Strings[0]) = 'r10e' then
-        Result := 'r10e'
-      else
-        Result := 'unknown';
+       if FileExists(pathNDK+'RELEASE.TXT') then //r10e
+       begin
+         list.LoadFromFile(pathNDK+'REALEASE.TXT');
+         if Trim(list.Strings[0]) = 'r10e' then
+            Result:= 'r10e'
+         else Result:= 'unknown';
+       end;
     end;
-  end;
-  list.Free;
+    list.Free;
 end;
 
 
 function TLamwSmartDesigner.GetMaxNdkPlatform(ndkVer: integer): integer;
 begin
-  Result := 22;
-  case ndkVer of
-    10: Result := 21;
-    11: Result := 24;
-    12: Result := 24;
-    13: Result := 24;
-    14: Result := 24;
-    15: Result := 26;
-    16: Result := 27;
-    17: Result := 28;
-    18: Result := 28;
-    19: Result := 28;
-    20: Result := 29;
-    21: Result := 30;
-    22: Result := 30; //The deprecated "platforms" directories have been removed....
-    23: Result := 30;
-  end;
+   Result:= 22;
+   case ndkVer of
+      10: Result:= 21;
+      11: Result:= 24;
+      12: Result:= 24;
+      13: Result:= 24;
+      14: Result:= 24;
+      15: Result:= 26;
+      16: Result:= 27;
+      17: Result:= 28;
+      18: Result:= 28;
+      19: Result:= 28;
+      20: Result:= 29;
+      21: Result:= 30;
+      22: Result:= 30; //The deprecated "platforms" directories have been removed....
+      23: Result:= 30;
+   end;
 end;
 
 function TLamwSmartDesigner.GetMaxSdkPlatform(out outBuildTool: string): integer;
@@ -451,99 +428,93 @@ var
   tempOutBuildTool: string;
 begin
 
-  Result := 0;
-  FCandidateSdkPlatform := 0;
+  Result:= 0;
+  FCandidateSdkPlatform:= 0;
 
-  lisDir := TStringList.Create;
-  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK) +
-    'platforms', False);
+  lisDir:= TStringList.Create;
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms', False);
 
   if lisDir.Count > 0 then
   begin
-    for i := 0 to lisDir.Count - 1 do
+    for i:=0 to lisDir.Count-1 do
     begin
-      strApi := ExtractFileName(lisDir.Strings[i]);   //android-21
-      if strApi <> '' then
-      begin
-        strApi := Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
-        if IsAllCharNumber(PChar(strApi)) then  //skip android-P
-        begin
-          intApi := StrToInt(strApi);
-          if FCandidateSdkPlatform < intApi then
-            FCandidateSdkPlatform := intApi;
-          if Result < intApi then
-          begin
-            if HasBuildTools(intApi, tempOutBuildTool) then
-            begin
-              Result := intApi;
-              outBuildTool := tempOutBuildTool;  //26.0.2
-            end;
-          end;
+       strApi:= ExtractFileName(lisDir.Strings[i]);   //android-21
+       if strApi <> '' then
+       begin
+         strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+         if IsAllCharNumber(PChar(strApi))  then  //skip android-P
+         begin
+              intApi:= StrToInt(strApi);
+              if FCandidateSdkPlatform < intApi then FCandidateSdkPlatform:= intApi;
+              if Result < intApi then
+              begin
+                if HasBuildTools(intApi, tempOutBuildTool) then
+                begin
+                   Result:= intApi;
+                   outBuildTool:= tempOutBuildTool;  //26.0.2
+                end;
+              end;
 
-        end;
-      end;
+         end;
+       end;
     end;
   end;
-  lisDir.Free;
+  lisDir.free;
 end;
 
-function TLamwSmartDesigner.HasBuildTools(platform: integer;
-  out outBuildTool: string): boolean;
+function TLamwSmartDesigner.HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
 var
   lisDir: TStringList;
   numberAsString, auxStr: string;
-  i, builderNumber, savedBuilder: integer;
+  i, builderNumber,  savedBuilder: integer;
 begin
-  Result := False;
-  savedBuilder := 0;
-  lisDir := TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
+  Result:= False;
+  savedBuilder:= 0;
+  lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
 
-  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK) +
-    'build-tools', False);
+  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
 
   if lisDir.Count > 0 then
   begin
-    for i := 0 to lisDir.Count - 1 do
+    for i:=0 to lisDir.Count-1 do
     begin
-      auxStr := ExtractFileName(lisDir.Strings[i]);
-      lisDir.Strings[i] := auxStr;
+       auxStr:= ExtractFileName(lisDir.Strings[i]);
+       lisDir.Strings[i]:=auxStr;
     end;
-    lisDir.Sorted := True;
-    for i := 0 to lisDir.Count - 1 do
+    lisDir.Sorted:=True;
+    for i:=0 to lisDir.Count-1 do
     begin
-      auxStr := lisDir.Strings[i];
-      if auxStr <> '' then
-      begin
-        if Pos('rc2', auxStr) = 0 then   //escape some alien...
-        begin
-          numberAsString := Copy(auxStr, 1, 2);  //19
-          if IsAllCharNumber(PChar(numberAsString)) then
-          begin
-            builderNumber := StrToInt(numberAsString);
+       auxStr:= lisDir.Strings[i];
+       if  auxStr <> '' then
+       begin
+         if Pos('rc2', auxStr) = 0 then   //escape some alien...
+         begin
+           numberAsString:= Copy(auxStr, 1 , 2);  //19
+           if IsAllCharNumber(PChar(numberAsString))  then
+           begin
+               builderNumber:=  StrToInt(numberAsString);
 
-            if savedBuilder < builderNumber then
-            begin
-              savedBuilder := builderNumber;
-              if builderNumber > platform then
-                FCandidateSdkBuild := auxStr;
-            end;
+               if savedBuilder < builderNumber then
+               begin
+                 savedBuilder:= builderNumber;
+                 if builderNumber > platform then FCandidateSdkBuild:= auxStr;
+               end;
 
-            if platform <= builderNumber then
-            begin
-              FCandidateSdkBuild := auxStr;
-              Result := True;
-            end;
+               if platform <= builderNumber then
+               begin
+                 FCandidateSdkBuild:= auxStr;
+                 Result:= True;
+               end;
 
-            outBuildTool := FCandidateSdkBuild; //19.1.0
+               outBuildTool:= FCandidateSdkBuild; //19.1.0
 
-            if Result then
-              break;
-          end;
-        end;
-      end;
+               if Result then break;
+           end;
+         end;
+       end;
     end;
   end;
-  lisDir.Free;
+  lisDir.free;
 end;
 
 
@@ -551,13 +522,12 @@ function TLamwSmartDesigner.GetBuildTool(sdkApi: integer): string;
 var
   tempOutBuildTool: string;
 begin
-  Result := '';
+  Result:= '';
   if not HasBuildTools(sdkApi, tempOutBuildTool) then
   begin
-    ShowMessage('Warning: Android "sdk\build-tools" not installed for Api ' +
-      IntToStr(sdkApi));
+     ShowMessage('Warning: Android "sdk\build-tools" not installed for Api ' + IntToStr(sdkApi));
   end;
-  Result := tempOutBuildTool;  //26.0.2
+  Result:= tempOutBuildTool;  //26.0.2
 end;
 
 function TLamwSmartDesigner.GetPluginVersion(buildTool: string): string;
@@ -565,65 +535,63 @@ var
   maxBuilderNumber: integer;
   numberAsString: string;
 begin
-  Result := '';
+  Result:= '';
 
-  if (buildTool = '') then
-    Exit;
+  if (buildTool = '') then Exit;
 
-  numberAsString := StringReplace(buildTool, '.', '', [rfReplaceAll]); //26.0.2
-  numberAsString := Trim(numberAsString);
+  numberAsString:= StringReplace(buildTool,'.', '', [rfReplaceAll]); //26.0.2
+  numberAsString:= Trim(numberAsString);
 
-  if IsAllCharNumber(PChar(numberAsString)) then
+  if IsAllCharNumber(PChar(numberAsString))  then
   begin
-    maxBuilderNumber := StrToInt(numberAsString);  //2602
+    maxBuilderNumber:= StrToInt(numberAsString);  //2602
 
     if (maxBuilderNumber >= 2111) and (maxBuilderNumber < 2112) then
     begin
-      Result := '2.0.0';
+      Result:= '2.0.0';
     end
     else if (maxBuilderNumber >= 2112) and (maxBuilderNumber < 2302) then
     begin
-      Result := '2.0.0';
+      Result:= '2.0.0';
     end
     else if (maxBuilderNumber >= 2302) and (maxBuilderNumber < 2500) then
     begin
-      Result := '2.2.0';
+        Result:= '2.2.0';
     end
-    else if (maxBuilderNumber >= 2500) and (maxBuilderNumber < 2602) then
-      //<<---- good performance !!!
+    else if (maxBuilderNumber >= 2500) and (maxBuilderNumber < 2602) then   //<<---- good performance !!!
     begin
-      Result := '2.3.3';
-      //gradleVer:= '3.3';
+        Result:= '2.3.3';
+        //gradleVer:= '3.3';
     end
-    else if (maxBuilderNumber >= 2602) and (maxBuilderNumber < 2700) then
+    else if (maxBuilderNumber >= 2602) and (maxBuilderNumber < 2700)  then
     begin
-      Result := '3.0.1';
-      //gradleVer:= '4.1';
+        Result:= '3.0.1';
+        //gradleVer:= '4.1';
     end
-    else if (maxBuilderNumber >= 2700) and (maxBuilderNumber < 2703) then
+    else if (maxBuilderNumber >= 2700) and (maxBuilderNumber < 2703)   then
     begin
-      Result := '3.1.0';
-      //gradleVer:= '4.4';
+        Result:= '3.1.0';
+        //gradleVer:= '4.4';
     end
-    else if (maxBuilderNumber >= 2703) and (maxBuilderNumber < 2803) then
+    else if (maxBuilderNumber >= 2703) and (maxBuilderNumber < 2803)   then
     begin
-      //Result:= '3.2.0'; //need build-tools 28.0.2 and need drop minSdk/targetSdk from AndroidManifest!!
-      //gradleVer:= '4.6';
+        //Result:= '3.2.0'; //need build-tools 28.0.2 and need drop minSdk/targetSdk from AndroidManifest!!
+        //gradleVer:= '4.6';
 
-      Result := '3.1.0'; //just to support minSdk/targetSdk in AndroidManifest!!
+         Result:= '3.1.0'; //just to support minSdk/targetSdk in AndroidManifest!!
     end
-    else if maxBuilderNumber >= 2803 then
+    else if maxBuilderNumber >= 2803   then
     begin
-      //Result:= '3.3.0';  //need droped minSdk/targetSdk in AndroidManifest!!
-      //gradleVer:= 'Gradle 4.10.1';
+        //Result:= '3.3.0';  //need droped minSdk/targetSdk in AndroidManifest!!
+        //gradleVer:= 'Gradle 4.10.1';
 
-      //Result:= '3.4.0';
-      //gradleVer:= 'Gradle Gradle 5.1.1'
+        //Result:= '3.4.0';
+        //gradleVer:= 'Gradle Gradle 5.1.1'
 
-      //Result:= '3.4.3';
-      //gradleVer:= 'Gradle Gradle 6.6.1'
+         //Result:= '3.4.3';
+        //gradleVer:= 'Gradle Gradle 6.6.1'
 
-      Result := '3.1.0'; // just to support minSdk/targetSdk from AndroidManifest!!
+         Result:= '3.1.0'; // just to support minSdk/targetSdk from AndroidManifest!!
     end;
 
   end;
@@ -632,15 +600,11 @@ end;
 
 function TLamwSmartDesigner.TryUndoFakeVersion(grVer: string): string;
 begin
-  Result := grVer;
-  if grVer = '4.9.1' then
-    Result := '4.10'
-  else if grVer = '4.9.2' then
-    Result := '4.10.1'
-  else if grVer = '4.9.3' then
-    Result := '4.10.2'
-  else if grVer = '4.9.4' then
-    Result := '4.10.3';
+  Result:=  grVer;
+  if grVer = '4.9.1' then Result := '4.10'
+  else if grVer = '4.9.2' then Result := '4.10.1'
+  else if grVer = '4.9.3' then Result := '4.10.2'
+  else if grVer = '4.9.4' then Result := '4.10.3';
 end;
 
 function TLamwSmartDesigner.GetVerAsNumber(gradleVers: string): integer;
@@ -648,43 +612,32 @@ var
   numberAsString: string;
   len: integer;
 begin
-  if (Length(gradleVers) > 0) then
+  if (Length(gradleVers)>0) then
   begin
-    numberAsString := StringReplace(gradleVers, '.', '', [rfReplaceAll]);
-    len := Length(numberAsString);
-    if len = 2 then
-      numberAsString := numberAsString + '00';
-    if len = 3 then
-      numberAsString := numberAsString + '0';
-    Result := StrToInt(numberAsString);
-  end
-  else
-    Result := 0;
+    numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]);
+    len:= Length(numberAsString);
+    if len = 2 then numberAsString:= numberAsString + '00';
+    if len = 3 then numberAsString:= numberAsString + '0';
+    Result:= StrToInt(numberAsString);
+  end else Result:=0;
 end;
 
 function TLamwSmartDesigner.TryPluginCompatibility(gradleVers: string): string;
 var
   gradleVersNumber: integer;
 begin
-  Result := '3.0.1';
-  gradleVersNumber := GetVerAsNumber(gradleVers);
-  if gradleVersNumber < 4100 then
-    Result := '2.3.3'
-  else if (gradleVersNumber >= 4100) and (gradleVersNumber < 4400) then
-    Result := '3.0.1'
-  else if (gradleVersNumber >= 4400) and (gradleVersNumber < 4600) then
-    Result := '3.1.0'
-  else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then
-    Result := '3.2.1'
-  else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then
-    Result := '3.3.2'
-  else
-    Result := '4.1.0'; //gradleVersNumber >= 5110
+  Result:= '3.0.1';
+  gradleVersNumber:= GetVerAsNumber(gradleVers);
+  if gradleVersNumber <  4100 then Result:= '2.3.3'
+  else if (gradleVersNumber >= 4100) and (gradleVersNumber < 4400) then Result:= '3.0.1'
+  else if (gradleVersNumber >= 4400) and (gradleVersNumber < 4600) then Result:= '3.1.0'
+  else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then Result:= '3.2.1'
+  else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then Result:= '3.3.2'
+  else Result:= '3.4.3'; //gradleVersNumber >= 5110
 end;
 
 //https://developer.android.com/studio/releases/gradle-plugin.html#updating-plugin
-function TLamwSmartDesigner.TryGradleCompatibility(plugin: string;
-  gradleVers: string; out outGradleVer: string): boolean;
+function TLamwSmartDesigner.TryGradleCompatibility(plugin: string; gradleVers: string; out outGradleVer: string):boolean;
 var
   pluginNumber: integer;
   numberAsString: string;
@@ -693,15 +646,15 @@ var
   gradleNumber: integer;
 begin
 
-  Result := False;
+  Result:= False;
   {200  < 220 ---  2.1
   220  < 233 ---  2.14.1
   233  < 301 ---  3.3
   301  >     ---  4.0}
   if gradleVers = '' then
   begin
-    ShowMessage('Error. Gradle version is empty');
-    Exit;
+   ShowMessage('Error. Gradle version is empty');
+   Exit;
   end;
 
   if plugin = '' then
@@ -710,64 +663,54 @@ begin
     Exit;
   end;
 
-  numberAsString := StringReplace(plugin, '.', '', [rfReplaceAll]); //3.0.1
-  pluginNumber := StrToInt(numberAsString);  //301
+  numberAsString:= StringReplace(plugin,'.', '', [rfReplaceAll]); //3.0.1
+  pluginNumber:= StrToInt(numberAsString);  //301
 
-  if (pluginNumber >= 200) and (pluginNumber < 220) then
+  if (pluginNumber >=  200) and (pluginNumber <  220) then
   begin
-    tryGradleVer := '2.10';   //210  -> 2100
-  end
-  else if (pluginNumber >= 220) and (pluginNumber < 233) then
+     tryGradleVer:= '2.10';   //210  -> 2100
+  end else if (pluginNumber >= 220) and (pluginNumber <  233) then
   begin
-    tryGradleVer := '2.14.1';  //        2141
-  end
-  else if (pluginNumber >= 233) and (pluginNumber < 310) then
-  begin
-    tryGradleVer := '4.1';
-  end
-  else if (pluginNumber >= 310) and (pluginNumber < 320) then
-  begin
-    tryGradleVer := '4.4';         //27.0.3
-  end
-  else if (pluginNumber >= 320) and (pluginNumber < 330) then
-  begin
-    tryGradleVer := '4.6';         //28.0.3
-  end
-  else if (pluginNumber >= 330) and (pluginNumber < 340) then
-  begin
-    tryGradleVer := '4.9.2';   //fake -> '4.10.1'  //4.10.1 --> 4920     //28.0.3
-  end
-  else //(pluginNumber >= 340)
-  begin
-    tryGradleVer := '6.6.1';         //28.0.3
-  end;
+    tryGradleVer:= '2.14.1';  //        2141
+  end else if (pluginNumber >= 233) and (pluginNumber <  310) then
+   begin
+      tryGradleVer:= '4.1';
+   end else if (pluginNumber >= 310) and  (pluginNumber <  320) then
+   begin
+      tryGradleVer:= '4.4';         //27.0.3
+   end else if (pluginNumber >= 320) and  (pluginNumber <  330) then
+   begin
+      tryGradleVer:= '4.6';         //28.0.3
+   end else if (pluginNumber >= 330) and  (pluginNumber <  340) then
+   begin
+      tryGradleVer:= '4.9.2';   //fake -> '4.10.1'  //4.10.1 --> 4920     //28.0.3
+   end else //(pluginNumber >= 340)
+   begin
+       tryGradleVer:= '6.6.1';         //28.0.3
+   end;
 
-  numberAsString := StringReplace(tryGradleVer, '.', '', [rfReplaceAll]); //3.3
-  len := Length(numberAsString);
-  if len = 2 then
-    numberAsString := numberAsString + '00';
-  if len = 3 then
-    numberAsString := numberAsString + '0';
-  tryGradleNumber := StrToInt(numberAsString);
+  numberAsString:= StringReplace(tryGradleVer,'.', '', [rfReplaceAll]); //3.3
+  len:= Length(numberAsString);
+  if len = 2 then numberAsString:= numberAsString + '00';
+  if len = 3 then numberAsString:= numberAsString + '0';
+  tryGradleNumber:= StrToInt(numberAsString);
 
-  numberAsString := StringReplace(gradleVers, '.', '', [rfReplaceAll]); //41
-  len := Length(numberAsString);
-  if len = 2 then
-    numberAsString := numberAsString + '00'; //4100
-  if len = 3 then
-    numberAsString := numberAsString + '0';
+  numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]); //41
+  len:= Length(numberAsString);
+  if len = 2 then numberAsString:= numberAsString + '00'; //4100
+  if len = 3 then numberAsString:= numberAsString + '0';
 
-  gradleNumber := StrToInt(numberAsString);
+  gradleNumber:= StrToInt(numberAsString);
 
   if gradleNumber >= tryGradleNumber then
   begin
-    outGradleVer := gradleVers;
-    Result := True;
+    outGradleVer:= gradleVers;
+    Result:= True;
   end
   else
   begin
-    outGradleVer := TryUndoFakeVersion(tryGradleVer);
-    Result := False;
+    outGradleVer:= TryUndoFakeVersion(tryGradleVer);
+    Result:= False;
   end;
 
 end;
@@ -778,7 +721,7 @@ var
   strList, providerList: TStringList;
   i, minsdkApi, sdkManifMinApiNumber: integer;
   strTargetApi, auxStr, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
-  aSupportLib: TSupportLib;
+  aSupportLib:TSupportLib;
   AndroidTheme: string;
   androidPluginNumber: integer;
   pluginVersion: string;
@@ -789,209 +732,182 @@ var
   linuxDirSeparator: string; //don't delete it!
   buildToolApi: string;
   directive: string;
-  FSupport: boolean;
-  sourcepath, targetpath: string;
+  FSupport:boolean;
+  sourcepath,targetpath:string;
   includeList: TStringList;
   universalApk: boolean;
   insertRef, manifestApis, supportProvider: string;
   p1, p2: integer;
   c: char;
-  FVersionCode: integer;
-  FVersionName: string;
+  FVersionCode : integer;
+  FVersionName : string;
   xmlAndroidManifest: TXMLDocument;
-  foundSignature: boolean;
-  buildToolVersion: string;
+  foundSignature : boolean;
 begin
 
-  strList := TStringList.Create;
+  strList:= TStringList.Create;
 
-  targetpath := ConcatPaths([FPathToAndroidProject, 'res', 'values']);
+  targetpath:=ConcatPaths([FPathToAndroidProject,'res','values']);
   ForceDirectories(targetpath);
 
-  sourcepath := ConcatPaths([LamwGlobalSettings.PathToJavaTemplates, 'values']) +
-    DirectorySeparator + 'colors.xml';
+  sourcepath:=ConcatPaths([LamwGlobalSettings.PathToJavaTemplates,'values'])+DirectorySeparator +'colors.xml';
   if FileExists(sourcepath) then
   begin
-    if not FileExists(targetpath + DirectorySeparator + 'colors.xml') then
-    begin
-      strList.LoadFromFile(sourcepath);
-      ForceDirectories(targetpath);
-      strList.SaveToFile(targetpath + DirectorySeparator + 'colors.xml');
-    end;
+     if not FileExists(targetpath+DirectorySeparator+'colors.xml') then
+     begin
+       strList.LoadFromFile(sourcepath);
+       ForceDirectories(targetpath);
+       strList.SaveToFile(targetpath+DirectorySeparator+'colors.xml');
+     end;
   end;
 
-  AndroidTheme := LazarusIDE.ActiveProject.CustomData.Values['Theme'];
-  FSupport := (LazarusIDE.ActiveProject.CustomData.Values['Support'] = 'TRUE');
+  AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
+  FSupport:= (LazarusIDE.ActiveProject.CustomData.Values['Support']='TRUE');
 
   if Pos('AppCompat', AndroidTheme) > 0 then
   begin
-    LazarusIDE.ActiveProject.CustomData.Values['Support'] := 'TRUE';
-    FSupport := True;
+     LazarusIDE.ActiveProject.CustomData.Values['Support']:='TRUE';
+     FSupport:= True;
   end;
 
 
-  if not FileExists(targetpath + DirectorySeparator + 'styles.xml') then
+  if not FileExists(targetpath+DirectorySeparator+'styles.xml') then
   begin
     if (Pos('AppCompat', AndroidTheme) > 0) or (Pos('GDXGame', AndroidTheme) > 0) then
     begin
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'values' +
-        DirectorySeparator + AndroidTheme + '.xml') then
-      begin
-        CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'values' +
-          DirectorySeparator + AndroidTheme + '.xml',
-          targetpath + DirectorySeparator + 'styles.xml');
-      end;
+       if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+AndroidTheme+'.xml') then
+       begin
+          CopyFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+AndroidTheme+'.xml',
+                     targetpath+DirectorySeparator+'styles.xml');
+       end;
     end
     else
     begin
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'values' +
-        DirectorySeparator + 'styles.xml') then
-      begin
-        strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-          'values' + DirectorySeparator + 'styles.xml');
-        strList.SaveToFile(targetpath + DirectorySeparator + 'styles.xml');
-      end;
+       if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'styles.xml') then
+       begin
+          strList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator +'styles.xml');
+          strList.SaveToFile(targetpath+DirectorySeparator+'styles.xml');
+       end;
     end;
 
   end;
 
-  minsdkApi := 14;
-  if minsdkApi < FMinSdkControl then
-    minsdkApi := FMinSdkControl;
+  minsdkApi:= 14;
+  if  minsdkApi < FMinSdkControl then minsdkApi:= FMinSdkControl;
 
-  sdkManifMinApi := GetMinSDKFromManifest();
+  sdkManifMinApi:= GetMinSDKFromManifest();
   if sdkManifMinApi <> '' then
-    sdkManifMInApiNumber := StrToInt(sdkManifMinApi)
+    sdkManifMInApiNumber:= StrToInt(sdkManifMinApi)
   else
-    sdkManifMInApiNumber := 0; //dummy
+    sdkManifMInApiNumber:= 0; //dummy
 
-  sourcepath := LamwGlobalSettings.PathToJavaTemplates + 'androidmanifest.txt';
-  targetpath := FPathToAndroidProject + 'AndroidManifest.xml';
+  sourcepath:=LamwGlobalSettings.PathToJavaTemplates+'androidmanifest.txt';
+  targetpath:=FPathToAndroidProject+'AndroidManifest.xml';
 
-  if FileExists(sourcepath) and (not FileExists(targetpath)) then
-    with strList do
-    begin
-      LoadFromFile(sourcepath);
-      auxStr := FPackageName;
-    {  if pos(FPackageName,'.' + LowerCase(FSmallProjName))=0 then
-            auxStr:= auxStr+ '.' + LowerCase(FSmallProjName);}
-      tempStr := StringReplace(Text, 'dummyPackage', auxStr,
-        [rfReplaceAll, rfIgnoreCase]);
-      tempStr := StringReplace(tempStr, 'dummyAppName', '.App',
-        [rfReplaceAll, rfIgnoreCase]);
-      tempStr := StringReplace(tempStr, 'dummySdkApi', '0',
-        [rfReplaceAll, rfIgnoreCase]);
-      tempStr := StringReplace(tempStr, 'dummyTargetApi', '0',
-        [rfReplaceAll, rfIgnoreCase]);
-      Clear;
-      Text := tempStr;
-      SaveToFile(targetpath);
-    end;
+  if FileExists(sourcepath) AND (NOT FileExists(targetpath)) then with strList do
+  begin
+    LoadFromFile(sourcepath);
+    auxStr:=FPackageName + '.' + LowerCase(FSmallProjName);
+    tempStr  := StringReplace(Text, 'dummyPackage',auxStr, [rfReplaceAll, rfIgnoreCase]);
+    tempStr  := StringReplace(tempStr, 'dummyAppName','.App', [rfReplaceAll, rfIgnoreCase]);
+    tempStr  := StringReplace(tempStr, 'dummySdkApi', '0', [rfReplaceAll, rfIgnoreCase]);
+    tempStr  := StringReplace(tempStr, 'dummyTargetApi', '0', [rfReplaceAll, rfIgnoreCase]);
+    Clear;
+    Text:= tempStr;
+    SaveToFile(targetpath);
+  end;
 
   if (FSupport) or (Pos('AppCompat', AndroidTheme) > 0) then
   begin
     strList.Clear;
-    strList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
 
-    if Pos('android.support.v4.content.FileProvider', strList.Text) > 0 then
-      //update to androidX
+    if Pos('android.support.v4.content.FileProvider', strList.Text) > 0 then //update to androidX
     begin
-      tempStr := StringReplace(strList.Text,
-        'android.support.v4.content.FileProvider', 'androidx.core.content.FileProvider',
-        [rfReplaceAll, rfIgnoreCase]);
-      strList.Clear;
-      strList.Text := tempStr;
-      strList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
+       tempStr:= StringReplace(strList.Text, 'android.support.v4.content.FileProvider','androidx.core.content.FileProvider', [rfReplaceAll, rfIgnoreCase]);
+       strList.Clear;
+       strList.Text:= tempStr;
+       strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
     end
     else
     begin
 
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'support' +
-        DirectorySeparator + 'manifest_support_provider.txt') then
-      begin
-        providerList := TStringList.Create;
-        providerList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-          'support' + DirectorySeparator + 'manifest_support_provider.txt');
-        supportProvider := StringReplace(providerList.Text,
-          'dummyPackage', FPackageName, [rfReplaceAll, rfIgnoreCase]);
-        providerList.Free;
-        if Pos('androidx.core.content.FileProvider', strList.Text) <= 0 then
-        begin
-          tempStr := strList.Text;  //manifest
-          insertRef := '</activity>'; //insert reference point
-          p1 := Pos(insertRef, tempStr);
-          Insert(sLineBreak + supportProvider, tempStr, p1 + Length(insertRef));
-          strList.Clear;
-          strList.Text := tempStr;
-          strList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-        end;
-      end;
+       if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt') then
+       begin
+         providerList:= TStringList.Create;
+         providerList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt');
+         supportProvider  := StringReplace(providerList.Text, 'dummyPackage',FPackageName, [rfReplaceAll, rfIgnoreCase]);
+         providerList.Free;
+         if Pos('androidx.core.content.FileProvider', strList.Text) <= 0 then
+         begin
+           tempStr:= strList.Text;  //manifest
+           insertRef:= '</activity>'; //insert reference point
+           p1:= Pos(insertRef, tempStr);
+           Insert(sLineBreak + supportProvider, tempStr, p1+Length(insertRef) );
+           strList.Clear;
+           strList.Text:= tempStr;
+           strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+         end;
+       end;
 
     end;
   end;
 
-  if sdkManifMinApiNumber < minsdkApi then
+  if sdkManifMinApiNumber < minsdkApi  then
   begin
     strList.Clear;
-    strList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-    tempStr := strList.Text;  //manifest
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+    tempStr:= strList.Text;  //manifest
     if Pos('android:minSdkVersion=', tempStr) > 0 then
     begin
-      tempStr := StringReplace(tempStr, 'android:minSdkVersion="' +
-        sdkManifMinApi + '"', 'android:minSdkVersion="' + IntToStr(minsdkApi) +
-        '"', [rfReplaceAll, rfIgnoreCase]);
+      tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+sdkManifMinApi+'"' , 'android:minSdkVersion="'+IntToStr(minsdkApi)+'"', [rfReplaceAll,rfIgnoreCase]);
     end
     else //re-introduce it!
     begin
-      manifestApis := '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="' +
-        IntToStr(targetApi) + '"/>';
-      insertRef := 'android:versionName='; //insert reference point
-      p1 := Pos(insertRef, tempStr);
-      p2 := p1 + Length(insertRef);
-      c := tempStr[p2];
-      while c <> '>' do
-      begin
-        Inc(p2);
-        c := tempStr[p2];
-      end;
-      Inc(p2);
-      insertRef := Trim(Copy(tempStr, p1, p2 - p1));
-      p1 := Pos(insertRef, tempStr);
-      Insert(sLineBreak + manifestApis, tempStr, p1 + Length(insertRef));
+       manifestApis:= '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="'+IntToStr(targetApi)+'"/>';
+       insertRef:= 'android:versionName='; //insert reference point
+       p1:= Pos(insertRef, tempStr);
+       p2:= p1 + Length(insertRef);
+       c:= tempStr[p2];
+       while c <> '>' do
+       begin
+          Inc(p2);
+          c:= tempStr[p2];
+       end;
+       Inc(p2);
+       insertRef:= Trim(Copy(tempStr, p1, p2-p1));
+       p1:= Pos(insertRef, tempStr);
+       Insert(sLineBreak + manifestApis, tempStr, p1+Length(insertRef) );
     end;
-    strList.Text := tempStr;
-    strList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
+    strList.Text:= tempStr;
+    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
   end;
 
-  sdkManifestTarqet := GetTargetFromManifest();
+  sdkManifestTarqet:= GetTargetFromManifest();
 
   if sdkManifestTarqet <> '' then
   begin
-    strList.Clear;
-    strList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-    tempStr := strList.Text;
-    tempStr := StringReplace(tempStr, 'android:targetSdkVersion="' +
-      sdkManifestTarqet + '"', 'android:targetSdkVersion="' +
-      IntToStr(targetApi) + '"', [rfReplaceAll, rfIgnoreCase]);
-    strList.Text := tempStr;
-    strList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
+       strList.Clear;
+       strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       tempStr:= strList.Text;
+       tempStr:= StringReplace(tempStr, 'android:targetSdkVersion="'+sdkManifestTarqet+'"' , 'android:targetSdkVersion="'+IntToStr(targetApi)+'"', [rfReplaceAll,rfIgnoreCase]);
+       strList.Text:= tempStr;
+       strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
   end;
 
-  strTargetApi := IntToStr(targetApi);
+  strTargetApi:= IntTostr(targetApi);
 
   strList.Clear;
   strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
-  strList.Add('<project name="' + FSmallProjName + '" default="help">');
-  strList.Add('<property name="sdk.dir" location="' + FPathToAndroidSDK + '"/>');
-  strList.Add('<property name="target" value="android-' + strTargetApi + '"/>');
+  strList.Add('<project name="'+FSmallProjName+'" default="help">');
+  strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');
+  strList.Add('<property name="target" value="android-'+ strTargetApi+'"/>');
   strList.Add('<property file="ant.properties"/>');
   strList.Add('<fail message="sdk.dir is missing." unless="sdk.dir"/>');
   // tk Generate code to allow conditional compilation in our java sources
   strList.Add('');
   strList.Add('<!-- Tags required to enable conditional compilation in java sources -->');
-  strList.Add('<property name="src.dir" location=".' + PathDelim +
-    'src' + PathDelim + AppendPathDelim(ReplaceChar(FPackageName, '.',
-    PathDelim)) + '"/>');
+  strList.Add('<property name="src.dir" location=".'+PathDelim+'src'+PathDelim+AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim))+'"/>');
   strList.Add('<property name="source.dir" value="${src.dir}/${target}" />');
   strList.Add('<import file="${sdk.dir}/tools/ant/build.xml"/>');
 
@@ -1000,23 +916,23 @@ begin
   for i := cMinAPI to cMaxAPI do
   begin
     if i <= targetApi then
-      strList.Add('<property name="api' + IntToStr(i) + '" value="true"/>')
+      strList.Add('<property name="api'+IntToStr(i)+'" value="true"/>')
     else
-      strList.Add('<property name="api' + IntToStr(i) + '" value="false"/>');
+      strList.Add('<property name="api'+IntToStr(i)+'" value="false"/>');
   end;
 
   strList.Add('');
   strList.Add('<!-- API conditions, do not modify -->');
   for i := cMinAPI to cMaxAPI do
   begin
-    strList.Add('<condition property="ifdef_api' + IntToStr(i) + 'up" value="/*">');
-    strList.Add('  <equals arg1="${api' + IntToStr(i) + '}" arg2="false"/>');
+    strList.Add('<condition property="ifdef_api'+IntToStr(i)+'up" value="/*">');
+    strList.Add('  <equals arg1="${api'+IntToStr(i)+'}" arg2="false"/>');
     strList.Add('</condition>');
-    strList.Add('<condition property="endif_api' + IntToStr(i) + 'up" value="*/">');
-    strList.Add('  <equals arg1="${api' + IntToStr(i) + '}" arg2="false"/>');
+    strList.Add('<condition property="endif_api'+IntToStr(i)+'up" value="*/">');
+    strList.Add('  <equals arg1="${api'+IntToStr(i)+'}" arg2="false"/>');
     strList.Add('</condition>');
-    strList.Add('<property name="ifdef_api' + IntToStr(i) + 'up" value=""/>');
-    strList.Add('<property name="endif_api' + IntToStr(i) + 'up" value=""/>');
+    strList.Add('<property name="ifdef_api'+IntToStr(i)+'up" value=""/>');
+    strList.Add('<property name="endif_api'+IntToStr(i)+'up" value=""/>');
   end;
 
   strList.Add('');
@@ -1028,16 +944,14 @@ begin
   strList.Add('  <filterset begintoken="//[" endtoken="]">');
   for i := cMinAPI to cMaxAPI do
   begin
-    strList.Add('    <filter token="ifdef_api' + IntToStr(i) +
-      'up" value="${ifdef_api' + IntToStr(i) + 'up}"/>');
-    strList.Add('    <filter token="endif_api' + IntToStr(i) +
-      'up" value="${endif_api' + IntToStr(i) + 'up}"/>');
+    strList.Add('    <filter token="ifdef_api'+IntToStr(i)+'up" value="${ifdef_api'+IntToStr(i)+'up}"/>');
+    strList.Add('    <filter token="endif_api'+IntToStr(i)+'up" value="${endif_api'+IntToStr(i)+'up}"/>');
   end;
   strList.Add('  </filterset>');
   strList.Add('</copy>');
   // end tk
   strList.Add('</project>');
-  strList.SaveToFile(FPathToAndroidProject + 'build.xml');
+  strList.SaveToFile(FPathToAndroidProject+'build.xml');
 
   strList.Clear;
   strList.Add('# This file is automatically generated by Android Tools.');
@@ -1049,14 +963,12 @@ begin
   strList.Add('# "ant.properties", and override values to adapt the script to your');
   strList.Add('# project structure.');
   strList.Add('#');
-  strList.Add(
-    '# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):');
-  strList.Add(
-    '#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
+  strList.Add('# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):');
+  strList.Add('#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
   strList.Add(' ');
   strList.Add('# Project target.');
-  strList.Add('target=android-' + strTargetApi);
-  strList.SaveToFile(FPathToAndroidProject + 'project.properties');
+  strList.Add('target=android-'+strTargetApi);
+  strList.SaveToFile(FPathToAndroidProject+'project.properties');
 
   strList.Clear;
   strList.Add('sdk.dir=' + FPathToAndroidSDK);
@@ -1068,7 +980,7 @@ begin
   tempStr:= StringReplace(tempStr, ':', '\:', [rfReplaceAll]);
   strList.Text:=tempStr;
   {$ENDIF}
-  strList.SaveToFile(FPathToAndroidProject + 'local.properties');
+  strList.SaveToFile(FPathToAndroidProject+'local.properties');
 
   //gradle.build
 
@@ -1076,257 +988,225 @@ begin
   begin
     if buildTool <> '' then
     begin
-      buildToolApi := Copy(buildTool, 1, 2);   //26.0.2  --> 26
-      if IsAllCharNumber(PChar(buildToolApi)) then
-      begin
-        if StrToInt(buildToolApi) >= 25 then
-          pluginVersion := GetPluginVersion(buildTool)
-        else
-          pluginVersion := '2.3.3';
-      end
-      else
-      begin
-        buildToolApi := '29';
-        pluginVersion := '3.1.0';  //gradle 4.4.1
-      end;
+       buildToolApi:= Copy(buildTool,1,2);   //26.0.2  --> 26
+       if IsAllCharNumber(PChar(buildToolApi))  then
+       begin
+         if StrToInt(buildToolApi) >= 25 then
+           pluginVersion:= GetPluginVersion(buildTool)
+         else
+           pluginVersion:= '2.3.3';
+       end
+       else
+       begin
+         buildToolApi:= '29';
+         pluginVersion:= '3.1.0';  //gradle 4.4.1
+       end;
 
-      if pluginVersion <> '' then
-      begin
-        //gradleCompatible:= TryGradleCompatibility(pluginVersion, FGradleVersion);
-        outgradleCompatible := '';
-        gradleCompatible := FGradleVersion;
-        if not TryGradleCompatibility(pluginVersion, FGradleVersion,
-          outgradleCompatible) then
-        begin
-          if MessageDlg('Warning ', 'plugin "' + pluginVersion +
-            '" [build-tools "' + buildTool + '"] require Gradle "' +
-            outgradleCompatible + '"' + sLineBreak + '[current Gradle: "' +
-            FGradleVersion + '"]' + sLineBreak +
-            'Select [Ignore] to try compatibility...', mtConfirmation,
-            [mbOK, mbIgnore], 0) = mrOk then
-          begin
-            gradleCompatible := outgradleCompatible;
-            ShowMessage('[Ok] Please, update to Gradle "' +
-              outgradleCompatible + '" ' + sLineBreak + 'https://gradle.org/releases/');
-          end
-          else
-          begin
-            pluginVersion := TryPluginCompatibility(FGradleVersion);
-          end;
-        end;
+       if pluginVersion <> '' then
+       begin
+         //gradleCompatible:= TryGradleCompatibility(pluginVersion, FGradleVersion);
+         outgradleCompatible:= '';
+         gradleCompatible:= FGradleVersion;
+         if not TryGradleCompatibility(pluginVersion, FGradleVersion, outgradleCompatible) then
+         begin
+             if MessageDlg('Warning ','plugin "'+pluginVersion+'" [build-tools "'+buildTool+ '"] require Gradle "'+outgradleCompatible+'"' +sLineBreak + '[current Gradle: "'+FGradleVersion+'"]' + sLineBreak + 'Select [Ignore] to try compatibility...',
+                mtConfirmation, [mbOk, mbIgnore], 0) = mrOk then
+                begin
+                   gradleCompatible:= outgradleCompatible;
+                   ShowMessage('[Ok] Please, update to Gradle "'+outgradleCompatible+'" ' + sLineBreak + 'https://gradle.org/releases/');
+                end
+                else
+                begin
+                   pluginVersion:= TryPluginCompatibility(FGradleVersion);
+                end;
+         end;
 
-        androidPluginNumber := GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
-        gradleCompatibleAsNumber :=
-          GetVerAsNumber(TryPluginCompatibility(FGradleVersion));
-        if gradleCompatibleAsNumber > androidPluginNumber then
-        begin
-          pluginVersion := TryPluginCompatibility(FGradleVersion);
-          androidPluginNumber := GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
-        end;
+         androidPluginNumber:= GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
+         gradleCompatibleAsNumber:= GetVerAsNumber(TryPluginCompatibility(FGradleVersion));
+         if gradleCompatibleAsNumber>androidPluginNumber then
+         begin
+           pluginVersion:= TryPluginCompatibility(FGradleVersion);
+           androidPluginNumber:= GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
+         end;
 
-        strList.Clear;
-        foundSignature := False;
+         strList.Clear;
+         foundSignature := false;
 
-        if fileExists(FPathToAndroidProject + 'gradle.properties') then
-        begin
-          strList.LoadFromFile(FPathToAndroidProject + 'gradle.properties');
+         if fileExists(FPathToAndroidProject+'gradle.properties') then
+         begin
+          strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
 
           foundSignature := (strList.Count = 4);
-        end;
+         end;
 
-        strList.Clear;
-        strList.Add('buildscript {');
-        strList.Add('    repositories {');
-        strList.Add('        mavenCentral()');
-        strList.Add(
-          '        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method');
-        if androidPluginNumber >= 3000 then
-          strList.Add('        google()')
-        else
-          strList.Add('        //google()');
-        strList.Add('    }');
-        strList.Add('    dependencies {');
-        strList.Add('        classpath ''com.android.tools.build:gradle:' +
-          pluginVersion + '''');
-        strList.Add('    }');
-        strList.Add('}');
+         strList.Clear;
+         strList.Add('buildscript {');
+         strList.Add('    repositories {');
+         strList.Add('        jcenter()');
+         strList.Add('        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method');
+         if androidPluginNumber >= 3000 then
+            strList.Add('        google()')
+         else
+            strList.Add('        //google()');
+         strList.Add('    }');
+         strList.Add('    dependencies {');
+         strList.Add('        classpath ''com.android.tools.build:gradle:'+ pluginVersion+'''');
+         strList.Add('    }');
+         strList.Add('}');
 
-        strList.Add('allprojects {');
-        strList.Add('    repositories {');
-        if androidPluginNumber >= 3000 then
-          strList.Add('       google()')
-        else
-          strList.Add('     //google()');
-        strList.Add('       mavenCentral()');
-        strList.Add('       maven { url ''https://jitpack.io'' }');
-        strList.Add('    }');
-        strList.Add('}');
+         strList.Add('allprojects {');
+         strList.Add('    repositories {');
+         if androidPluginNumber >= 3000 then
+         strList.Add('       google()')
+         else
+         strList.Add('     //google()');
+         strList.Add('       jcenter()');
+         strList.Add('       maven { url ''https://jitpack.io'' }');
+         strList.Add('    }');
+         strList.Add('}');
 
-        strList.Add('apply plugin: ''com.android.application''');
-        strList.Add('android {');
-        strList.Add('    lintOptions {');
-        //bad code, unused resources, unwanted classes link in xml files don't go in target apk.
-        strList.Add('       abortOnError true');
-        strList.Add('       showAll true');
-        strList.Add('       checkDependencies true');
-        strList.Add('       warningsAsErrors true');
-        strList.Add('       ignoreWarnings false');
-        strList.Add('       checkTestSources true');
-        strList.Add('       checkReleaseBuilds true');
-        strList.Add('    }');
-        strList.Add('    compileOptions {');
-        strList.Add('       sourceCompatibility 1.8');
-        strList.Add('       targetCompatibility 1.8');
-        strList.Add('    }');
-        HasBuildTools(targetApi, buildToolVersion);
-        if (buildToolVersion <> '') then
-          strList.Add('    buildToolsVersion "' + buildToolVersion + '"');
-        tempStr := LowerCase(FInstructionSet);
-        if Length(tempStr) > 0 then
-        begin
-          if tempStr = 'armv6' then
-            auxStr := 'armeabi';
-          if tempStr = 'armv7a' then
-            auxStr := 'armeabi-v7a';
-          if tempStr = 'x86' then
-            auxStr := 'x86';
-          if tempStr = 'x86_64' then
-            auxStr := 'x86_64';
-          if tempStr = 'mipsel' then
-            auxStr := 'mips';
-          if tempStr = 'armv8' then
-            auxStr := 'arm64-v8a';
-        end
-        else
-        begin
-          auxStr := ExtractFileDir(
-            LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
-          auxStr := ExtractFileName(auxStr);
-        end;
+         strList.Add('apply plugin: ''com.android.application''');
+         strList.Add('android {');
+         strList.Add('    lintOptions {');
+         strList.Add('       abortOnError false');
+         strList.Add('    }');
 
-        includeList := TStringList.Create;
-        includeList.Delimiter := ',';
-        includeList.StrictDelimiter := True;
-        includeList.Sorted := True;
-        includeList.Duplicates := dupIgnore;
+         tempStr:= LowerCase(FInstructionSet);
+         if Length(tempStr)>0 then
+         begin
+         if tempStr = 'armv6'  then auxStr:='armeabi';
+         if tempStr = 'armv7a' then auxStr:='armeabi-v7a';
+         if tempStr = 'x86'    then auxStr:='x86';
+         if tempStr = 'x86_64' then auxStr:='x86_64';
+         if tempStr = 'mipsel' then auxStr:='mips';
+         if tempStr = 'armv8'  then auxStr:='arm64-v8a';
+         end
+         else
+         begin
+           auxStr := ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+           auxStr := ExtractFileName(auxStr);
+         end;
 
-        includeList.Add('''' + auxStr + ''''); //initial  Instruction Set
+         includeList:= TStringList.Create;
+         includeList.Delimiter:= ',';
+         includeList.StrictDelimiter:= True;
+         includeList.Sorted:= True;
+         includeList.Duplicates:= dupIgnore;
 
-        if FileExists(FPathToAndroidProject + 'libs\armeabi\libcontrols.so') then
-        begin
-          includeList.Add('''armeabi''');
-        end;
+         includeList.Add(''''+auxStr+''''); //initial  Instruction Set
 
-        if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so') then
-        begin
-          includeList.Add('''armeabi-v7a''');
-        end;
+         if FileExists(FPathToAndroidProject + 'libs\armeabi\libcontrols.so' ) then
+         begin
+           includeList.Add('''armeabi''');
+         end;
 
-        if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\libcontrols.so') then
-        begin
-          includeList.Add('''arm64-v8a''');
-        end;
+         if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so' ) then
+         begin
+           includeList.Add('''armeabi-v7a''');
+         end;
 
-        if FileExists(FPathToAndroidProject + 'libs\x86_64\libcontrols.so') then
-        begin
-          includeList.Add('''x86_64''');
-        end;
+         if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\libcontrols.so' ) then
+         begin
+           includeList.Add('''arm64-v8a''');
+         end;
 
-        if FileExists(FPathToAndroidProject + 'libs\x86\libcontrols.so') then
-        begin
-          includeList.Add('''x86''');
-        end;
+         if FileExists(FPathToAndroidProject + 'libs\x86_64\libcontrols.so' ) then
+         begin
+           includeList.Add('''x86_64''');
+         end;
 
-        if FileExists(FPathToAndroidProject + 'libs\mips\libcontrols.so') then
-        begin
-          includeList.Add('''mips''');
-        end;
+         if FileExists(FPathToAndroidProject + 'libs\x86\libcontrols.so' ) then
+         begin
+           includeList.Add('''x86''');
+         end;
 
-        auxStr := includeList.DelimitedText; //NEW! includeList based...
+         if FileExists(FPathToAndroidProject + 'libs\mips\libcontrols.so' ) then
+         begin
+           includeList.Add('''mips''');
+         end;
 
-        universalApk := False;
-        if includeList.Count > 1 then
-          universalApk := True;
+         auxStr:= includeList.DelimitedText; //NEW! includeList based...
 
-        includeList.Free;
+         universalApk:= False;
+         if includeList.Count > 1 then
+           universalApk:= True;
 
-        if Length(auxStr) > 0 then
-        begin
-          strList.Add('    splits {');
-          strList.Add('        abi {');
-          strList.Add('            enable true');
-          strList.Add('            reset()');
+         includeList.Free;
 
-          strList.Add('            include ' + auxStr); //NEW! includeList based...
-          //strList.Add('            include '''+auxStr+'''');
-          //strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
+         if Length(auxStr) > 0 then //
+         begin
+         strList.Add('    splits {');
+         strList.Add('        abi {');
+         strList.Add('            enable true');
+         strList.Add('            reset()');
 
-          if universalApk then
-            strList.Add('            universalApk true')
-          else
-            strList.Add('            universalApk false');
+         strList.Add('            include '+auxStr); //NEW! includeList based...
+         //strList.Add('            include '''+auxStr+'''');
+         //strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
 
-          strList.Add('        }');
-          strList.Add('    }');
-        end;
+         if universalApk then
+           strList.Add('            universalApk true')
+         else
+           strList.Add('            universalApk false');
+
+         strList.Add('        }');
+         strList.Add('    }');
+         end;
 
 
-        if Pos('AppCompat', AndroidTheme) > 0 then
-        begin
+         if Pos('AppCompat', AndroidTheme) > 0 then
+         begin
 
-          strList.Add('    compileSdkVersion ' + buildToolApi);
+           strList.Add('    compileSdkVersion '+ buildToolApi);
 
-          if androidPluginNumber < 3000 then
-            strList.Add('    buildToolsVersion "26.0.2"'); //buildTool
-          //else: each version of the Android Gradle Plugin now has a default version of the build tools
+           if androidPluginNumber < 3000 then
+              strList.Add('    buildToolsVersion "26.0.2"'); //buildTool
+           //else: each version of the Android Gradle Plugin now has a default version of the build tools
 
-        end
-        else
-        begin
-          strList.Add('    compileSdkVersion ' + buildToolApi);
-          if androidPluginNumber < 3000 then
-            strList.Add('    buildToolsVersion "' + buildTool + '"');
-          //else: each version of the Android Gradle Plugin now has a default version of the build tools
-        end;
+         end
+         else
+         begin
+           strList.Add('    compileSdkVersion '+ buildToolApi);
+           if androidPluginNumber < 3000 then
+              strList.Add('    buildToolsVersion "'+buildTool+'"');
+           //else: each version of the Android Gradle Plugin now has a default version of the build tools
+         end;
 
-        strList.Add('    defaultConfig {');
+         strList.Add('    defaultConfig {');
 
-        if sdkManifMInApiNumber >= minsdkApi then
-          strList.Add('            minSdkVersion ' + sdkManifMInApi)
-        else
-          strList.Add('            minSdkVersion ' + IntToStr(minsdkApi));
+         if sdkManifMInApiNumber >= minsdkApi then
+            strList.Add('            minSdkVersion ' + sdkManifMInApi)
+         else
+            strList.Add('            minSdkVersion '+IntToStr(minsdkApi));
 
-        if targetApi <= StrToInt(buildToolApi) then
-          strList.Add('            targetSdkVersion ' + IntToStr(targetApi))
-        else
-          strList.Add('            targetSdkVersion ' + buildToolApi);
+         if targetApi <= StrToInt(buildToolApi) then
+            strList.Add('            targetSdkVersion '+IntToStr(targetApi))
+         else
+            strList.Add('            targetSdkVersion '+buildToolApi);
 
-        if fileExists(FPathToAndroidProject + 'AndroidManifest.xml') then
-        begin
-          ReadXMLFile(xmlAndroidManifest, FPathToAndroidProject + 'AndroidManifest.xml');
+         if fileExists(FPathToAndroidProject+'AndroidManifest.xml') then
+         begin
+          ReadXMLFile(xmlAndroidManifest, FPathToAndroidProject+'AndroidManifest.xml');
 
-          if (xmlAndroidManifest = nil) or
-            (xmlAndroidManifest.DocumentElement = nil) then
-            Exit;
+          if (xmlAndroidManifest = nil) or (xmlAndroidManifest.DocumentElement = nil) then
+             Exit;
           with xmlAndroidManifest.DocumentElement do
           begin
-            FVersionCode :=
-              StrToIntDef(AttribStrings['android:versionCode'], 1);
-            FVersionName := AttribStrings['android:versionName'];
+                      FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
+                      FVersionName := AttribStrings['android:versionName'];
           end;
-        end
-        else
-        begin
+         end else
+         begin
           FVersionCode := 1;
           FVersionName := '1.0';
-        end;
+         end;
 
-        strList.Add('            versionCode ' + IntToStr(FVersionCode));
-        strList.Add('            versionName "' + FVersionName + '"');
-        strList.Add('    }');
+         strList.Add('            versionCode ' + intToStr(FVersionCode));
+         strList.Add('            versionName "'+FVersionName+'"');
+         strList.Add('    }');
 
-        if foundSignature then
-        begin
+         if foundSignature then
+         begin
           strList.Add('    signingConfigs {');
           strList.Add('        release {');
           strList.Add('            storeFile file(RELEASE_STORE_FILE)');
@@ -1340,78 +1220,53 @@ begin
           strList.Add('            signingConfig signingConfigs.release');
           strList.Add('        }');
           strList.Add('    }');
-        end;
+         end;
 
-        strList.Add('    sourceSets {');
-        strList.Add('        main {');
-        strList.Add('            manifest.srcFile ''AndroidManifest.xml''');
-        strList.Add('            java.srcDirs = [''src'']');
-        strList.Add('            resources.srcDirs = [''src'']');
-        strList.Add('            aidl.srcDirs = [''src'']');
-        strList.Add('            renderscript.srcDirs = [''src'']');
-        strList.Add('            res.srcDirs = [''res'']');
-        strList.Add('            assets.srcDirs = [''assets'']');
-        strList.Add('            jni.srcDirs = []');
-        strList.Add('            jniLibs.srcDirs = [''libs'']');
-        strList.Add('        }');
-        strList.Add('        debug.setRoot(''build-types/debug'')');
-        strList.Add('        release.setRoot(''build-types/release'')');
-        strList.Add('    }');
-        strList.Add('    buildTypes {');
-        strList.Add('        debug {');
-        strList.Add('            debuggable true');
-        strList.Add('            jniDebuggable true');
-        strList.Add('            shrinkResources false');
-        strList.Add('        }');
-        strList.Add('        release {');
-        strList.Add('            debuggable false');
-        strList.Add('            jniDebuggable false');
-        strList.Add('            shrinkResources true');
-        strList.Add('            minifyEnabled true');
-        strList.Add(
-          '            proguardFiles getDefaultProguardFile(''proguard-android-optimize.txt''),''proguard-project.txt''');
-        strList.Add('        }');
-        strList.Add('    }');
-        strList.Add('    flavorDimensions "version"');
-        strList.Add('    productFlavors {');
-        strList.Add('             demo {');
-        strList.Add('   	          dimension "version"');
-        strList.Add('   	          versionNameSuffix "-demo"');
-        strList.Add('   	          applicationIdSuffix ".demo"');
-        strList.Add('             }');
-        strList.Add('             free {');
-        strList.Add('   	          dimension "version"');
-        strList.Add('   	          versionNameSuffix "-free"');
-        strList.Add('   	          applicationIdSuffix ".free"');
-        strList.Add('             }');
-        strList.Add('             full {');
-        strList.Add('   	          dimension "version"');
-        strList.Add('   	          versionNameSuffix "-full"');
-        strList.Add('   	          applicationIdSuffix ".full"');
-        strList.Add('             }');
-        strList.Add('      }');
-        strList.Add('}');
+         strList.Add('    sourceSets {');
+         strList.Add('        main {');
+         strList.Add('            manifest.srcFile ''AndroidManifest.xml''');
+         strList.Add('            java.srcDirs = [''src'']');
+         strList.Add('            resources.srcDirs = [''src'']');
+         strList.Add('            aidl.srcDirs = [''src'']');
+         strList.Add('            renderscript.srcDirs = [''src'']');
+         strList.Add('            res.srcDirs = [''res'']');
+         strList.Add('            assets.srcDirs = [''assets'']');
+         strList.Add('            jni.srcDirs = []');
+         strList.Add('            jniLibs.srcDirs = [''libs'']');
+         strList.Add('        }');
+         strList.Add('        debug.setRoot(''build-types/debug'')');
+         strList.Add('        release.setRoot(''build-types/release'')');
+         strList.Add('    }');
+         strList.Add('    buildTypes {');
+         strList.Add('        debug {');
+         strList.Add('            debuggable true');
+         strList.Add('            jniDebuggable true');
+         strList.Add('        }');
+         strList.Add('        release {');
+         strList.Add('            debuggable false');
+         strList.Add('            jniDebuggable false');
+         strList.Add('        }');
+         strList.Add('    }');
+         strList.Add('}');
 
-        strList.Add('dependencies {');
+         strList.Add('dependencies {');
 
-        if androidPluginNumber < 3000 then
-          directive := 'compile'
-        else
-          directive := 'implementation';
+         if androidPluginNumber < 3000 then
+           directive:='compile'
+         else
+           directive:='implementation';
 
-        strList.Add('    ' + directive +
-          ' fileTree(include: [''*.jar''], dir: ''libs'')');
+         strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-        if ((Pos('AppCompat', AndroidTheme) <= 0) and (FSupport)) then
-        begin
-          for aSupportLib in SupportLibs do
-          begin
-            if aSupportLib.MinAPI <= StrToInt(buildToolApi) then
-              strList.Add('    ' + directive + ' ''' + aSupportLib.Name + '''');
-            //buildToolApi+'.+''');
-          end;
+         if ((Pos('AppCompat', AndroidTheme) <= 0) and (FSupport)) then
+         begin
+           for aSupportLib in SupportLibs do
+           begin
+             if aSupportLib.MinAPI<=StrToInt(buildToolApi) then
+               strList.Add('    '+directive+' '''+aSupportLib.Name+'''');//buildToolApi+'.+''');
+           end;
 
-          //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
+           //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
 
             {
             requiredList:= TStringList.Create;
@@ -1433,91 +1288,82 @@ begin
             requiredList.Free;
             }
 
-        end;
+         end;
 
-        if Pos('GDXGame', AndroidTheme) > 0 then
-        begin
-          directive := 'api';
-          strList.Add('    ' + directive + ' ''com.badlogicgames.gdx:gdx:1.9.10''');
-          strList.Add('    ' + directive +
-            ' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
-          strList.Add('    ' + directive +
-            ' ''com.badlogicgames.gdx:gdx-backend-android:1.9.10''');
-          strList.Add('    ' + directive +
-            ' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
-        end;
+         if Pos('GDXGame', AndroidTheme) > 0 then
+         begin
+           directive:= 'api';
+           strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx:1.9.10''');
+           strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
+           strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-backend-android:1.9.10''');
+           strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
+         end;
 
-        strList.Add('}');
+         strList.Add('}');
 
-        strList.Add(' ');
-        strList.Add('task run(type: Exec, dependsOn: '':installDebug'') {');
-        strList.Add(
-          '	if (System.properties[''os.name''].toLowerCase().contains(''windows'')) {');
-        strList.Add(
-          '	    commandLine ''cmd'', ''/c'', ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'
-          + FPackageName + '/.App"');
-        strList.Add('	} else {');
-        strList.Add('	    commandLine ''adb'', ''shell'', ''am'', ''start'', ''-n'', "' +
-          FPackageName + '/.App"');
-        strList.Add('	}');
-        strList.Add('}');
-        strList.Add(' ');
-        gradleCompatibleAsNumber := GetVerAsNumber(gradleCompatible);
-        if gradleCompatibleAsNumber < 5000 then
-        begin
-          strList.Add('task wrapper(type: Wrapper) {');
-          strList.Add('    gradleVersion = ''' + TryUndoFakeVersion(
-            gradleCompatible) + '''');
-          strList.Add('}');
-        end
-        else
-        begin
-          strList.Add('wrapper {');
-          strList.Add('    gradleVersion = ''' + TryUndoFakeVersion(
-            gradleCompatible) + '''');
-          strList.Add('}');
-        end;
-        strList.Add('//how to use: look for "gradle_readme.txt"');
-        strList.SaveToFile(FPathToAndroidProject + 'build.gradle');
-      end;
+         strList.Add(' ');
+         strList.Add('task run(type: Exec, dependsOn: '':installDebug'') {');
+         strList.Add('	if (System.properties[''os.name''].toLowerCase().contains(''windows'')) {');
+         strList.Add('	    commandLine ''cmd'', ''/c'', ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+FPackageName+'/.App"');
+         strList.Add('	} else {');
+         strList.Add('	    commandLine ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+FPackageName+'/.App"');
+         strList.Add('	}');
+         strList.Add('}');
+         strList.Add(' ');
+         gradleCompatibleAsNumber:= GetVerAsNumber(gradleCompatible);
+         if  gradleCompatibleAsNumber < 5000 then
+         begin
+           strList.Add('task wrapper(type: Wrapper) {');
+           strList.Add('    gradleVersion = '''+TryUndoFakeVersion(gradleCompatible)+'''');
+           strList.Add('}');
+         end
+         else
+         begin
+           strList.Add('wrapper {');
+           strList.Add('    gradleVersion = '''+TryUndoFakeVersion(gradleCompatible)+'''');
+           strList.Add('}');
+         end;
+         strList.Add('//how to use: look for "gradle_readme.txt"');
+         strList.SaveToFile(FPathToAndroidProject+'build.gradle');
+       end;
     end;
 
     //gradle build scripts;
 
     strList.Clear;
-    strList.Add('set Path=%PATH%;' + FPathToAndroidSDK + 'platform-tools');
+    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
     if FPathToGradle = '' then
       strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
     else
-      strList.Add('set GRADLE_HOME=' + FPathToGradle);
+      strList.Add('set GRADLE_HOME='+ FPathToGradle);
     strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
     strList.Add('gradle clean build --info');
-    strList.SaveToFile(FPathToAndroidProject + 'gradle-local-build.bat');
+    strList.SaveToFile(FPathToAndroidProject+'gradle-local-build.bat');
 
     strList.Clear;
-    strList.Add('set Path=%PATH%;' + FPathToAndroidSDK + 'platform-tools');
+    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
     if FPathToGradle = '' then
       strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
     else
-      strList.Add('set GRADLE_HOME=' + FPathToGradle);
+      strList.Add('set GRADLE_HOME='+ FPathToGradle);
     strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
     strList.Add('gradle clean bundle --info');
-    strList.SaveToFile(FPathToAndroidProject + 'gradle-local-build-bundle.bat');
+    strList.SaveToFile(FPathToAndroidProject+'gradle-local-build-bundle.bat');
 
 
     strList.Clear;
-    strList.Add('set Path=%PATH%;' + FPathToAndroidSDK + 'platform-tools');
+    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
     if FPathToGradle = '' then
       strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
     else
-      strList.Add('set GRADLE_HOME=' + FPathToGradle);
+      strList.Add('set GRADLE_HOME='+ FPathToGradle);
     strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
     strList.Add('gradle run');
-    strList.SaveToFile(FPathToAndroidProject + 'gradle-local-run.bat');
+    strList.SaveToFile(FPathToAndroidProject+'gradle-local-run.bat');
 
-    linuxDirSeparator := DirectorySeparator;
-    linuxPathToAndroidSdk := FPathToAndroidSDK;
-    linuxPathToGradle := FPathToGradle;
+    linuxDirSeparator:= DirectorySeparator;
+    linuxPathToAndroidSdk:= FPathToAndroidSDK;
+    linuxPathToGradle:= FPathToGradle;
 
     {$IFDEF WINDOWS}
        linuxDirSeparator:= '/';
@@ -1531,54 +1377,48 @@ begin
     {$ENDIF}
 
     strList.Clear;
-    strList.Add('export PATH=' + linuxPathToAndroidSDK + 'platform-tools' + ':$PATH');
+    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
 
     if FPathToGradle = '' then
       strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
     else
-      strList.Add('export GRADLE_HOME=' + linuxPathToGradle);
+      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
 
     strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
     strList.Add('source ~/.bashrc');
     //strList.Add('.\gradle clean build --info');
     strList.Add('gradle clean build --info');
-    SaveShellScript(strList, FPathToAndroidProject + 'gradle-local-build.sh');
+    SaveShellScript(strList, FPathToAndroidProject+'gradle-local-build.sh');
 
     strList.Clear;
-    strList.Add('export PATH=' + linuxPathToAndroidSDK + 'platform-tools' + ':$PATH');
+    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
     if FPathToGradle = '' then
       strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
     else
-      strList.Add('export GRADLE_HOME=' + linuxPathToGradle);
+      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
     strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
     strList.Add('source ~/.bashrc');
     strList.Add('gradle clean bundle --info');
     SaveShellScript(strList, FPathToAndroidProject + 'gradle-local-build-bundle.sh');
 
     strList.Clear;
-    strList.Add('export PATH=' + linuxPathToAndroidSDK + 'platform-tools' + ':$PATH');
+    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
 
     if FPathToGradle = '' then
       strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
     else
-      strList.Add('export GRADLE_HOME=' + linuxPathToGradle);
+      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
 
     strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
     strList.Add('source ~/.bashrc');
     //strList.Add('.\gradle run');
     strList.Add('gradle run');
-    SaveShellScript(strList, FPathToAndroidProject + 'gradle-local-run.sh');
+    SaveShellScript(strList, FPathToAndroidProject+'gradle-local-run.sh');
 
     if not FileExists(FPathToAndroidProject + 'gradle.properties') then
     begin
       strList.Clear;
-      if Pos('AppCompat', AndroidTheme) > 0 then
-      begin
-        strList.add('android.useAndroidX=true');
-        strList.add('android.enableJetifier=true');
-      end;
-      strList.add('android.enableR8.fullMode=true');
-      strList.SaveToFile(FPathToAndroidProject + 'gradle.properties');
+      strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
     end;
 
   end;
@@ -1673,71 +1513,64 @@ a call to gradle have to give a good result in the terminal/commandline first.
 }
 function TLamwSmartDesigner.GetGradleVersionFromGradle(path: string): string;
 var
-  Proc: TProcess;
-  FN: string;
-  CharBuffer: array [0..511] of char;
-  p, ReadCount: integer;
-  strExt, strTemp: string;
+   Proc: TProcess;
+   FN: string;
+   CharBuffer: array [0..511] of char;
+   p, ReadCount: integer;
+   strExt, strTemp: string;
 begin
-  Result := '';
-  if path = '' then
-    Exit;
-  strExt := '';
+    Result:='';
+    if path = '' then Exit;
+    strExt:= '';
     {$IFDEF WINDOWS}
     strExt:= '.bat';
     {$ENDIF}
 
-  try
-    Proc := TProcess.Create(nil);
-    Proc.Options := [poUsePipes];
-    //Proc.Options:= Proc.Options + [poWaitOnExit];
-    Proc.Parameters.Add('-v');
-    FN := AppendPathDelim(path) + 'gradle' + strExt;
-    if not FileExistsUTF8(FN) then
-    begin
-      FN := AppendPathDelim(path) + 'bin' + pathDelim + 'gradle' + strExt;
-      if not FileExistsUTF8(FN) then
-      begin
-        FN := path + 'bin' + pathDelim + 'gradle' + strExt;
-      end;
-    end;
-    Proc.Executable := FN;
-    IDEMessagesWindow.AddCustomMessage(mluVerbose,
-      'Info...Used expanded Gradle Path: ' + Proc.Executable);
-    Proc.Execute();
-    while (Proc.Running) or (Proc.Output.NumBytesAvailable > 0) or
-      (Proc.Stderr.NumBytesAvailable > 0) do
-    begin
-      // read stdout and write to our stdout
-      while Proc.Output.NumBytesAvailable > 0 do
-      begin
-        ReadCount := Min(512, Proc.Output.NumBytesAvailable);
-        //Read up to buffer, not more
-        Proc.Output.Read(CharBuffer, ReadCount);
-        strTemp := Copy(CharBuffer, 0, ReadCount);
-        if Pos('Gradle', strTemp) > 0 then
-        begin
-          Result := Trim(strTemp);
-          break;
+    try
+      Proc := TProcess.Create(nil);
+      Proc.Options := [poUsePipes];
+      //Proc.Options:= Proc.Options + [poWaitOnExit];
+      Proc.Parameters.Add('-v');
+      FN:= AppendPathDelim(path) + 'gradle' + strExt;
+      if not FileExistsUTF8(FN) then begin
+        FN:= AppendPathDelim(path) + 'bin' + pathDelim + 'gradle' + strExt;
+        if not FileExistsUTF8(FN) then begin
+          FN:= path + 'bin' + pathDelim + 'gradle' + strExt;
         end;
       end;
-      application.ProcessMessages;
-    end;
-    ExitCode := Proc.ExitStatus;
-  finally
-    Proc.Free;
-    if Result <> '' then
-    begin
-      p := Pos(' ', Result);  //Gradle 3.3
-      Result := Copy(Result, p + 1, MaxInt); //3.3
-      IDEMessagesWindow.AddCustomMessage(mluVerbose,
-        'Success!! Found Gradle version: ' + Result);
-    end
-    else
-      IDEMessagesWindow.AddCustomMessage(mluVerbose,
-        'Sorry... Fail to find Gradle version from Gradle path ... Reason:' + strTemp);
+      Proc.Executable:= FN;
+      IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Info...Used expanded Gradle Path: ' + Proc.Executable);
+      Proc.Execute();
+      while (Proc.Running) or (Proc.Output.NumBytesAvailable > 0) or
+        (Proc.Stderr.NumBytesAvailable > 0) do
+      begin
+        // read stdout and write to our stdout
+        while Proc.Output.NumBytesAvailable > 0 do
+        begin
+          ReadCount := Min(512, Proc.Output.NumBytesAvailable); //Read up to buffer, not more
+          Proc.Output.Read(CharBuffer, ReadCount);
+          strTemp:= Copy(CharBuffer, 0, ReadCount);
+          if Pos('Gradle', strTemp) > 0 then
+          begin
+             Result:= Trim(strTemp);
+             break;
+          end;
+        end;
+        application.ProcessMessages;
+      end;
+      ExitCode := Proc.ExitStatus;
+    finally
+      Proc.Free;
+      if Result <> '' then
+      begin
+        p:= Pos(' ', Result);  //Gradle 3.3
+        Result:= Copy(Result, p+1, MaxInt); //3.3
+        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Success!! Found Gradle version: ' + Result);
+      end
+      else
+        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Sorry... Fail to find Gradle version from Gradle path ... Reason:'+ strTemp);
 
-  end;
+    end;
 end;
 
 function TLamwSmartDesigner.GetGradleVersion(path: string): string;
@@ -1746,37 +1579,31 @@ var
   strAux: string;
   posLastDelim: integer;
 begin
-  Result := '';
+  Result:='';
   if path <> '' then
   begin
-    strAux := ExcludeTrailingPathDelimiter(path);
-    posLastDelim := LastDelimiter(PathDelim, strAux);
-    strAux := Copy(strAux, posLastDelim + 1, MaxInt);  //gradle-3.3
+     strAux:=ExcludeTrailingPathDelimiter(path);
+     posLastDelim:= LastDelimiter(PathDelim, strAux);
+     strAux:= Copy(strAux, posLastDelim+1, MaxInt);  //gradle-3.3
 
-    p := 1;
-    //skip characters that do not represent a version number
-    while (p <= Length(strAux)) and (not (strAux[p] in ['0'..'9', '.'])) do
-      Inc(p);
-    if (p <= Length(strAux)) then
-    begin
-      Result := Copy(strAux, p, MaxInt);  // 3.3
-    end;
+     p:=1;
+     //skip characters that do not represent a version number
+     while (p<=Length(strAux)) AND (NOT (strAux[p] in ['0'..'9','.'])) do Inc(p);
+     if (p<=Length(strAux)) then
+     begin
+       Result:= Copy(strAux, p, MaxInt);  // 3.3
+     end;
 
-    if Result = '' then
-    begin
-      IDEMessagesWindow.AddCustomMessage(mluVerbose,
-        'Please, wait... trying find Gradle version from Gradle [' + path + ']');
-      Result := GetGradleVersionFromGradle(path);
-    end;
+     if Result = '' then
+     begin
+       IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Please, wait... trying find Gradle version from Gradle ['+path+']');
+       Result:= GetGradleVersionFromGradle(path);
+     end;
 
-    if Result = '4.10' then
-      Result := '4.9.1'  //fake
-    else if Result = '4.10.1' then
-      Result := '4.9.2'  //fake
-    else if Result = '4.10.2' then
-      Result := '4.9.3'  //fake
-    else if Result = '4.10.3' then
-      Result := '4.9.4';  //fake
+     if Result = '4.10'   then Result:= '4.9.1'  //fake
+     else if Result = '4.10.1' then Result:= '4.9.2'  //fake
+     else if Result = '4.10.2' then Result:= '4.9.3'  //fake
+     else if Result = '4.10.3' then Result:= '4.9.4';  //fake
 
   end;
 end;
@@ -1786,7 +1613,7 @@ var
   pathToConfig, pathToLaz: string;
   p: integer;
 begin
-  Result := False;
+ Result:= False;
  {$ifdef windows}
  pathToConfig:= LazarusIDE.GetPrimaryConfigPath();
  p:= Pos('config',pathToConfig);
@@ -1808,7 +1635,7 @@ var
   isProjectImported: boolean;
   sdkManifestTargetApi, buildTool: string;
   manifestTargetApi: integer;
-  queryValue: string;
+  queryValue : String;
   isBrandNew: boolean;
   projectTarget, projectCustom, alertMsg: string;
   ndkRelease, aux: string;
@@ -1817,43 +1644,37 @@ begin
   begin
     FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
     FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
-    FPrebuildOSYS := LamwGlobalSettings.PrebuildOSYS;
-    FPathToSmartDesigner := LamwGlobalSettings.PathToSmartDesigner;
+    FPrebuildOSYS:= LamwGlobalSettings.PrebuildOSYS;
+    FPathToSmartDesigner:= LamwGlobalSettings.PathToSmartDesigner;
 
-    ndkRelease := LamwGlobalSettings.GetNDKRelease;
+    ndkRelease:= LamwGlobalSettings.GetNDKRelease;
     if ndkRelease <> '' then
     begin
-      FNDKVersion := GetNDKVersion(ndkRelease);
+      FNDKVersion:= GetNDKVersion(ndkRelease);
     end
     else
     begin
-      ndkRelease := TryGetNDKRelease(FPathToAndroidNDK);
-      FNDKVersion := GetNDKVersion(ndkRelease); //18
+      ndkRelease:= TryGetNDKRelease(FPathToAndroidNDK);
+      FNDKVersion:= GetNDKVersion(ndkRelease); //18
     end;
 
-    FChipArchitecture := 'x86';
+    FChipArchitecture:= 'x86';
     aux := LowerCase(LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions);
-    if Pos('-cparmv6', aux) > 0 then
-      FChipArchitecture := 'armeabi'
-    else if Pos('-cparmv7a', aux) > 0 then
-      FChipArchitecture := 'armeabi-v7a'
-    else if Pos('-xpaarch64', aux) > 0 then
-      FChipArchitecture := 'arm64-v8a'
-    else if Pos('-xpx86_64', aux) > 0 then
-      FChipArchitecture := 'x86_64'
-    else if Pos('-xpmipsel', aux) > 0 then
-      FChipArchitecture := 'mips';
+    if Pos('-cparmv6', aux) > 0 then FChipArchitecture:= 'armeabi'
+    else if Pos('-cparmv7a', aux) > 0 then FChipArchitecture:= 'armeabi-v7a'
+    else if Pos('-xpaarch64', aux) > 0 then FChipArchitecture:= 'arm64-v8a'
+    else if Pos('-xpx86_64', aux) > 0 then FChipArchitecture:= 'x86_64'
+    else if Pos('-xpmipsel', aux) > 0 then FChipArchitecture:= 'mips';
 
     FProjFile := AProject.MainFile;
 
-    FNdkApi := AProject.CustomData['NdkApi']; //android-22
-    tempStr := SplitStr(FNdkApi, '-');   //now  FNdkApi = 22 !
+    FNdkApi:= AProject.CustomData['NdkApi']; //android-22
+    tempStr:= SplitStr(FNdkApi, '-');   //now  FNdkApi = 22 !
 
-    isBrandNew := False;
+    isBrandNew:= False;
 
-    if (AProject.CustomData['LamwVersion'] = '') and
-      (AProject.CustomData['Theme'] <> '') then
-      isBrandNew := True;
+    if (AProject.CustomData['LamwVersion'] = '') and (AProject.CustomData['Theme'] <> '') then
+      isBrandNew:= True;
 
     if AProject.CustomData['LamwVersion'] <> LamwGlobalSettings.Version then
     begin
@@ -1863,42 +1684,38 @@ begin
     end;
 
     FPathToAndroidProject := ExtractFilePath(AProject.MainFile.Filename);
-    FPathToAndroidProject := Copy(FPathToAndroidProject, 1,
-      RPosEX(PathDelim, FPathToAndroidProject, Length(FPathToAndroidProject) - 1));
+    FPathToAndroidProject := Copy(FPathToAndroidProject, 1, RPosEX(PathDelim, FPathToAndroidProject, Length(FPathToAndroidProject) - 1));
 
-    tempStr := Copy(FPathToAndroidProject, 1, Length(FPathToAndroidProject) - 1);
-    p := LastDelimiter(PathDelim, tempStr) + 1;
-    FSmallProjName := Copy(tempStr, p, Length(tempStr));
+    tempStr:= Copy(FPathToAndroidProject, 1, Length(FPathToAndroidProject)-1);
+    p:= LastDelimiter(PathDelim, tempStr) + 1;
+    FSmallProjName:= Copy(tempStr,  p, Length(tempStr));
     FPackageName := AProject.CustomData['Package'];
     if FPackageName = '' then
     begin
       FPackageName := GetPackageNameFromAndroidManifest(FPathToAndroidProject);
       AProject.CustomData['Package'] := FPackageName;
     end;
-    FPathToJavaSource := FPathToAndroidProject + 'src' + PathDelim +
-      AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim));
-    androidTheme := AProject.CustomData['Theme'];
+    FPathToJavaSource:= FPathToAndroidProject + 'src' + PathDelim + AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim));
+    androidTheme:= AProject.CustomData['Theme'];
 
-    if (androidTheme = '') or (Pos('AppCompat', androidTheme) <= 0) then
-      LamwGlobalSettings.QueryPaths := False;  //dont query Path to Gradle
+    if  (androidTheme = '') or (Pos('AppCompat', androidTheme) <= 0) then
+      LamwGlobalSettings.QueryPaths:= False;  //dont query Path to Gradle
 
-    FPathToGradle := LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
-    LamwGlobalSettings.QueryPaths := True; // reset to default...
+    FPathToGradle:= LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
+    LamwGlobalSettings.QueryPaths:= True; // reset to default...
 
     if FPathToGradle <> '' then
-      FGradleVersion := GetGradleVersion(FPathToGradle);
+       FGradleVersion:= GetGradleVersion(FPathToGradle);
 
     if not isBrandNew then
     begin
-      isProjectImported := IsDemoProject();   //demo or imported project,  etc...
-      if not DirectoryExists(FPathToAndroidProject + 'lamwdesigner') then
-        //very very old project
+      isProjectImported:= IsDemoProject();   //demo or imported project,  etc...
+      if not DirectoryExists(FPathToAndroidProject + 'lamwdesigner') then //very very old project
       begin
-        InitSmartDesignerHelpers;
+         InitSmartDesignerHelpers;
       end;
     end
-    else
-      isProjectImported := False;
+    else isProjectImported:= False;
 
     //try fix/repair project paths [demos, etc..] in "Run" --> "build"  time ...
     if isProjectImported then
@@ -1910,118 +1727,113 @@ begin
     if AProject.CustomData['BuildSystem'] = 'Ant' then
     begin
       if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
-        AProject.CustomData['BuildSystem'] := 'Gradle';
+         AProject.CustomData['BuildSystem']:= 'Gradle';
     end;
 
     if not isBrandNew then
     begin
-      LazarusIDE.ActiveProject.CustomData.Values['NdkPath'] := FPathToAndroidNDK;
-      LazarusIDE.ActiveProject.CustomData.Values['SdkPath'] := FPathToAndroidSDK;
+      LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
+      LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
 
       if AProject.CustomData['BuildSystem'] = '' then
       begin
         if IsSdkToolsAntEnable(FPathToAndroidSDK) then
-          AProject.CustomData['BuildSystem'] := 'Ant'
+          AProject.CustomData['BuildSystem']:= 'Ant'
         else
-          AProject.CustomData['BuildSystem'] := 'Gradle';
+          AProject.CustomData['BuildSystem']:= 'Gradle';
       end
       else
       begin
         if AProject.CustomData['BuildSystem'] = 'Ant' then
-          if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
-            AProject.CustomData['BuildSystem'] := 'Gradle';
+           if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
+               AProject.CustomData['BuildSystem']:= 'Gradle'
       end;
 
       if AProject.CustomData['Theme'] = '' then
-        AProject.CustomData['Theme'] := 'DeviceDefault';
+         AProject.CustomData['Theme']:= 'DeviceDefault';
 
-      sdkManifestTargetApi := GetTargetFromManifest();
+      sdkManifestTargetApi:= GetTargetFromManifest();
 
-      if IsAllCharNumber(PChar(sdkManifestTargetApi)) then
-        manifestTargetApi := StrToInt(sdkManifestTargetApi)
-      else
-        manifestTargetApi := 29;
+      if IsAllCharNumber(PChar(sdkManifestTargetApi))  then
+          manifestTargetApi:= StrToInt(sdkManifestTargetApi)
+      else manifestTargetApi:= 29;
 
-      buildTool := GetBuildTool(manifestTargetApi);
+      buildTool:=  GetBuildTool(manifestTargetApi);
 
       if manifestTargetApi < 29 then
       begin
-        queryValue := '29';
+         queryValue:= '29';
 
-        if InputQuery('Warning. Manifest Target Api [' + sdkManifestTargetApi +
-          '] < 29', '[Suggestion] Change Target API to 29' +
-          sLineBreak + '[minimum required by "Google Play Store"]:', queryValue) then
-        begin
-          if (IsAllCharNumber(PChar(queryValue)) and (queryValue <> '29')) then
-          begin
-            manifestTargetApi := StrToInt(queryValue);
-            buildTool := GetBuildTool(manifestTargetApi);
-          end
-          else
-          begin
-            manifestTargetApi := 29;
-            buildTool := GetBuildTool(29);
-          end;
-          ;
-        end; //if input...
+         if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 29',
+                       '[Suggestion] Change Target API to 29'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
+         begin
+           if ( IsAllCharNumber(PChar(queryValue)) AND (queryValue <> '29') ) then
+              begin
+                 manifestTargetApi:= StrToInt(queryValue);
+                 buildTool:= GetBuildTool(manifestTargetApi);
+           end
+           else
+           begin
+             manifestTargetApi:= 29;
+             buildTool:= GetBuildTool(29);
+           end;  ;
+         end; //if input...
 
       end
       else //target >= 29
       begin
-        outMaxBuildTool := FCandidateSdkBuild;
-        if not LamwGlobalSettings.KeepManifestTargetApi then
+        outMaxBuildTool:= FCandidateSdkBuild;
+        if not LamwGlobalSettings.KeepManifestTargetApi  then
         begin
-          buildTool := outMaxBuildTool;
+           buildTool:= outMaxBuildTool
         end
         else
         begin
-          buildTool := GetBuildTool(manifestTargetApi);
-        end;
+           buildTool:= GetBuildTool(manifestTargetApi);
+        end
       end;
 
       KeepBuildUpdated(manifestTargetApi, buildTool);
 
       if Self.IsLaz4Android() then
       begin
-        projectCustom := UpperCase(AProject.LazCompilerOptions.CustomOptions);
-        projectTarget := AProject.LazCompilerOptions.TargetCPU;
-        //aarch64 or arm or i386 or mipsel
-        //(-Fl) C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\;
-        //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\
+         projectCustom:= UpperCase(AProject.LazCompilerOptions.CustomOptions);
+         projectTarget:= AProject.LazCompilerOptions.TargetCPU;  //aarch64 or arm or i386 or mipsel
+         //(-Fl) C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\;
+         //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\
 
-        //(-o)  ..\libs\armeabi-v7a\libcontrols
+         //(-o)  ..\libs\armeabi-v7a\libcontrols
 
-        //-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi-
-        //-FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin
-        alertMsg := '';
-        if Pos('aarch64', projectTarget) > 0 then
-          alertMsg := 'WARNING: Target CPU "aarch64" not supported ' +
-            sLineBreak + '[out-of-box] by Laz4Android' + sLineBreak +
-            sLineBreak +
-            'Hint1: Fora all: after "prebuild" change to your NDK installed system...' +
-            sLineBreak + sLineBreak + 'Hint2: "Project" --> "Project Option" -->' +
-            sLineBreak + '["Path"]' + sLineBreak + '-Fl' +
-            sLineBreak + 'change arch-arm64 [to] arch-arm' + sLineBreak +
-            'change aarch64-linux-android [to] arm-linux-androideabi' +
-            sLineBreak + sLineBreak + '-o' + sLineBreak +
-            'change arm64-v8a [to] armeabi-v7a' + sLineBreak + sLineBreak +
-            '["Config and Target"]' + sLineBreak +
-            'change Target CPU (-P) [to] arm' + sLineBreak + sLineBreak +
-            '["Custom Options"]' + sLineBreak +
-            'expand -Xd [to] -Xd -CfSoft -CpARMV7A' + sLineBreak +
-            'change aarch64-linux-android [to] arm-linux-androideabi' +
-            sLineBreak + sLineBreak + '[Ctrl+c to Copy to Clipboard]';
+         //-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi-
+         //-FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin
+         alertMsg:= '';
+         if Pos('aarch64', projectTarget) > 0  then
+            alertMsg:= 'WARNING: Target CPU "aarch64" not supported '+sLineBreak+
+                       '[out-of-box] by Laz4Android' +sLineBreak+ sLineBreak+
+                       'Hint1: Fora all: after "prebuild" change to your NDK installed system...'+sLineBreak+ sLineBreak+
+                       'Hint2: "Project" --> "Project Option" -->'+sLineBreak+
+                        '["Path"]'+sLineBreak+
+                        '-Fl' +sLineBreak+
+                        'change arch-arm64 [to] arch-arm'+sLineBreak+
+                        'change aarch64-linux-android [to] arm-linux-androideabi'+sLineBreak+ sLineBreak+
+                        '-o' +sLineBreak+
+                       'change arm64-v8a [to] armeabi-v7a'+sLineBreak+sLineBreak+
+                       '["Config and Target"]'+sLineBreak+
+                       'change Target CPU (-P) [to] arm'+sLineBreak+sLineBreak+
+                       '["Custom Options"]'+sLineBreak+
+                       'expand -Xd [to] -Xd -CfSoft -CpARMV7A'+sLineBreak+
+                       'change aarch64-linux-android [to] arm-linux-androideabi'+sLineBreak+
+                       sLineBreak+ '[Ctrl+c to Copy to Clipboard]';
 
-        if Pos('VFPV3', projectCustom) > 0 then
-          alertMsg := 'WARNING: Custom Option "-CfVFPV3" not supported ' +
-            sLineBreak + '[out-of-box] by Laz4Android' + sLineBreak +
-            sLineBreak + 'Hint: "Project" --> "Project Option" -->' +
-            sLineBreak + '"[LAMW] Android Project Options" --> "Build"' +
-            sLineBreak + 'change -CfVFPV3 to -CfSoft' + sLineBreak +
-            sLineBreak + '[Ctrl+c to Copy to Clipboard]';
+         if Pos('VFPV3', projectCustom) > 0  then
+            alertMsg:= 'WARNING: Custom Option "-CfVFPV3" not supported '+sLineBreak+
+                       '[out-of-box] by Laz4Android'+sLineBreak+ sLineBreak+
+                       'Hint: "Project" --> "Project Option" -->'+sLineBreak+'"[LAMW] Android Project Options" --> "Build"'+sLineBreak+
+                       'change -CfVFPV3 to -CfSoft'+sLineBreak+
+                       sLineBreak+'[Ctrl+c to Copy to Clipboard]';
 
-        if alertMsg <> '' then
-          ShowMessage(alertMsg);
+         if alertMsg <> '' then
+            ShowMessage(alertMsg);
 
       end;
       UpdateBuildModes();
@@ -2031,10 +1843,10 @@ end;
 
 function TLamwSmartDesigner.IsSdkToolsAntEnable(path: string): boolean;
 begin          //C:\adt32\sdk\tools\ant
-  Result := False;
+  Result:= False;
   if DirectoryExists(path + 'tools' + PathDelim + 'ant') then
   begin
-    Result := True;
+     Result:= True;
   end;
 end;
 
@@ -2172,17 +1984,16 @@ procedure TLamwSmartDesigner.UpdateJControls(ProjFile: TLazProjectFile;
   AndroidForm: TAndroidForm);
 var
   jControls: TStringList;
-  i: integer;
+  i: Integer;
   c: TComponent;
   temp: string;
 begin
-  if (ProjFile = nil) or (AndroidForm = nil) then
-    Exit;
+  if (ProjFile = nil) or (AndroidForm = nil) then Exit;
   jControls := TStringList.Create;
   jControls.Sorted := True;
   jControls.Duplicates := dupIgnore;
 
-  if Pos('GDXGame', LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
+  if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0  then
     jControls.Add('jGdxForm')
   else
     jControls.Add('jForm');
@@ -2192,10 +2003,9 @@ begin
     c := AndroidForm.Components[i];
     if c is jControl then
     begin
-      temp := c.ClassName;  //Fixed JPaintShader.pas -->  jPaintShader.java
-      if temp[1] = 'J' then
-        temp[1] := LowerCase(temp[1]);
-      jControls.Add(temp);
+       temp:= c.ClassName;  //Fixed JPaintShader.pas -->  jPaintShader.java
+       if temp[1] = 'J' then temp[1]:= LowerCase(temp[1]);
+       jControls.Add(temp);
     end;
     //else if Pos(c.ClassName, fclList.Text) > 0 then jControls.Add(c.ClassName); //else if c.ClassName = 'TFPNoGUIGraphicsBridge' then
   end;
@@ -2210,45 +2020,41 @@ procedure TLamwSmartDesigner.UpdateFCLControls(ProjFile: TLazProjectFile;
 var
   fclControls: TStringList;
   fclList: TStringList;
-  i: integer;
+  i: Integer;
   c: TComponent;
   pathToFclBridges: string;
 begin
-  if (ProjFile = nil) or (AndroidForm = nil) then
-    Exit;
+  if (ProjFile = nil) or (AndroidForm = nil) then Exit;
 
-  FPathToSmartDesigner := GetPathToSmartDesigner();
-  pathToFclBridges := FPathToSmartDesigner + PathDelim + 'fcl' + pathDelim;
+  FPathToSmartDesigner:=  GetPathToSmartDesigner();
+  pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
 
-  fclList := TStringList.Create;
+  fclList:=  TStringList.Create;
 
-  if FileExists(pathToFclBridges + 'fcl_bridges.txt') then
-    fclList.LoadFromFile(pathToFclBridges + 'fcl_bridges.txt');
+  if FileExists(pathToFclBridges+'fcl_bridges.txt') then
+     fclList.LoadFromFile(pathToFclBridges+'fcl_bridges.txt');
 
   fclControls := TStringList.Create;
   fclControls.Sorted := True;
   fclControls.Duplicates := dupIgnore;
   fclControls.Delimiter := ';';
-  for i := 0 to AndroidForm.ComponentCount - 1 do
+  for i:= 0 to AndroidForm.ComponentCount - 1 do
   begin
-    c := AndroidForm.Components[i];
-    if Pos(c.ClassName, fclList.Text) > 0 then
-      fclControls.Add(c.ClassName);
+    c:= AndroidForm.Components[i];
+    if Pos(c.ClassName, fclList.Text) > 0 then fclControls.Add(c.ClassName);
   end;
-  ProjFile.CustomData['fclControls'] := fclControls.DelimitedText;
+  ProjFile.CustomData['fclControls']:= fclControls.DelimitedText;
   fclControls.Free;
   fclList.Free;
 end;
 
-procedure TLamwSmartDesigner.UpdateProjectStartModule(const NewName: string;
-  moduleType: integer);
+procedure TLamwSmartDesigner.UpdateProjectStartModule(const NewName: string; moduleType: integer);
 var
   cb: TCodeBuffer;
   IdentList: TStringList;
   OldName: string;
 begin
-  if not FProjFile.IsPartOfProject then
-    Exit;
+  if not FProjFile.IsPartOfProject then Exit;
 
   OldName := LazarusIDE.ActiveProject.CustomData['StartModule'];
 
@@ -2256,12 +2062,10 @@ begin
   begin
     if moduleType <> -1 then    //??
       OldName := 'AndroidModule1'
-    else
-      OldName := 'GdxModule1';
+    else OldName:= 'GdxModule1';
   end;
 
-  if (NewName = '') or (OldName = NewName) then
-    Exit;
+  if (NewName = '') or (OldName = NewName) then Exit;
   IdentList := TStringList.Create;
   try
     IdentList.Add(OldName);
@@ -2278,7 +2082,7 @@ begin
   finally
     IdentList.Free;
   end;
-  FStartModuleVarName := NewName; //LAMW 0.8
+  FStartModuleVarName:= NewName; //LAMW 0.8
   LazarusIDE.ActiveProject.CustomData['StartModule'] := NewName;
 end;
 
@@ -2290,32 +2094,31 @@ var
   i: integer;
   fileName: string;
 begin
-  //By TR3E, disable backup of .java for not incrementase .apk file
+   //By TR3E, disable backup of .java for not incrementase .apk file
   //of gradle and not showing source code of program
 
   //ForceDirectory(FPathToJavaSource+'bak');
-  contentList := FindAllFiles(FPathToJavaSource, '*.java', False);
-  for i := 0 to contentList.Count - 1 do
+  contentList:= FindAllFiles(FPathToJavaSource, '*.java', False);
+  for i:= 0 to contentList.Count-1 do
   begin
 
     //dont backup anymore...
     //CopyFile(contentList.Strings[i],
-    //FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
+          //FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
 
-    fileName := ExtractFileName(contentList.Strings[i]);
-    //not delete custom java code [support to jActivityLauncher and gdx]
+    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher and gdx]
 
     if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
     begin
-      DeleteFile(contentList.Strings[i]);
+       DeleteFile(contentList.Strings[i]);
     end;
 
   end;
   contentList.Free;
 
   //ForceDirectory(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'bak');
-  contentList := FindAllFiles(FPathToAndroidProject + 'lamwdesigner', '*.native', False);
-  for i := 0 to contentList.Count - 1 do
+  contentList := FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.native', False);
+  for i:= 0 to contentList.Count-1 do
   begin
     { //dont backup anymore...
     CopyFile(contentList.Strings[i],
@@ -2330,7 +2133,7 @@ procedure TLamwSmartDesigner.GetAllJControlsFromForms(jControlsList: TStrings);
 var
   list: TStringList;
   i: integer;
-  Data: string;
+  data: string;
 begin
   list := TStringList.Create;
   list.Delimiter := ';';
@@ -2339,10 +2142,10 @@ begin
     begin
       if Files[i].IsPartOfProject then
       begin
-        Data := Files[i].CustomData['jControls'];
-        if Data <> '' then
+        data:=  Files[i].CustomData['jControls'];
+        if data <> '' then
         begin
-          list.DelimitedText := Data;
+          list.DelimitedText := data;
           jControlsList.AddStrings(list);
         end;
       end;
@@ -2357,14 +2160,14 @@ var
   pathToNdkApiPlatforms, pathToFclBridges, androidNdkApi, arch, aux: string;
 begin
 
-  FPathToSmartDesigner := GetPathToSmartDesigner();
-  pathToFclBridges := FPathToSmartDesigner + PathDelim + 'fcl' + pathDelim;
+  FPathToSmartDesigner:=  GetPathToSmartDesigner();
+  pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
 
-  fclList := TStringList.Create;
+  fclList:= TStringList.Create;
   if FileExists(pathToFclBridges + 'fcl_bridges.txt') then
     fclList.LoadFromFile(pathToFclBridges + 'fcl_bridges.txt');
 
-  fileList := TStringList.Create;
+  fileList:= TStringList.Create;
   fileList.Delimiter := ';';
 
   controlsList := TStringList.Create;
@@ -2378,70 +2181,55 @@ begin
       controlsList.AddStrings(fileList);
     end;
 
-  auxList := TStringList.Create;
-  for j := 0 to fclList.Count - 1 do
+  auxList:= TStringList.Create;
+  for j:= 0 to fclList.Count - 1 do
   begin
-    if controlsList.IndexOf(fclList.Strings[j]) >= 0 then  //TFPNoGUIGraphicsBridge
-    begin
-      if FileExists(pathToFclBridges + fclList.Strings[j] + '.libso') then
-        //TFPNoGUIGraphicsBridge.libso
-      begin
-        auxList.LoadFromFile(pathToFclBridges + fclList.Strings[j] + '.libso');
+     if controlsList.IndexOf(fclList.Strings[j]) >= 0 then  //TFPNoGUIGraphicsBridge
+     begin
+         if FileExists(pathToFclBridges + fclList.Strings[j] + '.libso') then //TFPNoGUIGraphicsBridge.libso
+         begin
+            auxList.LoadFromFile(pathToFclBridges + fclList.Strings[j]+'.libso');
 
-        CopyFile(pathToFclBridges + 'libso' + PathDelim + chipArch +
-          PathDelim + auxList.Strings[0],   //'libfreetype.so',
-          FPathToAndroidProject + 'libs' + PathDelim + chipArch +
-          PathDelim + auxList.Strings[0]); //'libfreetype.so'
+            CopyFile(pathToFclBridges+'libso'+PathDelim+chipArch+PathDelim+auxList.Strings[0],   //'libfreetype.so',
+                     FPathToAndroidProject+'libs'+PathDelim+
+                     chipArch+PathDelim+auxList.Strings[0]); //'libfreetype.so'
 
-        //Added support to TFPNoGUIGraphicsBridge ... TMySQL57Bridge ... etc
-        androidNdkApi := LazarusIDE.ActiveProject.CustomData.Values['NdkApi'];
-        //android-13 or android-14 or ...NDK- for NDK > 21
+            //Added support to TFPNoGUIGraphicsBridge ... TMySQL57Bridge ... etc
+            androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-13 or android-14 or ...NDK- for NDK > 21
 
-        if androidNdkApi <> '' then
-        begin
-          if FNDKVersion < 22 then
-          begin
-            arch := 'arch-x86';
-            if Pos('armeabi', chipArch) > 0 then
-              arch := 'arch-arm'
-            else if Pos('arm64', chipArch) > 0 then
-              arch := 'arch-arm64'
-            else if Pos('mips', chipArch) > 0 then
-              arch := 'arch-mips'
-            else if Pos('86_64', chipArch) > 0 then
-              arch := 'arch-x86_64';
+            if androidNdkApi <> '' then
+            begin
+              if FNDKVersion < 22 then
+              begin
+                    arch:= 'arch-x86';
+                    if Pos('armeabi', chipArch) > 0 then arch:= 'arch-arm'
+                    else if Pos('arm64', chipArch) > 0 then arch:= 'arch-arm64'
+                    else if Pos('mips', chipArch) > 0 then arch:= 'arch-mips'
+                    else if Pos('86_64', chipArch) > 0 then arch:= 'arch-x86_64';
 
-            pathToNdkApiPlatforms :=
-              FPathToAndroidNDK + 'platforms' + DirectorySeparator +
-              androidNdkApi + DirectorySeparator + arch +
-              DirectorySeparator + 'usr' + DirectorySeparator + 'lib';
+                    pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                                      androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
+                                                      'usr'+DirectorySeparator+'lib';
 
-            //need by linker!  //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
-            CopyFile(pathToFclBridges + 'libso' + PathDelim +
-              chipArch + PathDelim + auxList.Strings[0],
-              pathToNdkApiPlatforms + PathDelim + auxList.Strings[0]);
+                    //need by linker!  //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
+                    CopyFile(pathToFclBridges+'libso'+PathDelim+chipArch+PathDelim+auxList.Strings[0],
+                              pathToNdkApiPlatforms+PathDelim+auxList.Strings[0]);
 
-          end
-          else //NDK >= 22
-          begin
-            arch := 'i686-linux-android';
-            if Pos('armeabi', chipArch) > 0 then
-              arch := 'arm-linux-androideabi'
-            else if Pos('arm64', chipArch) > 0 then
-              arch := 'aarch64-linux-android'
-            else if Pos('86_64', chipArch) > 0 then
-              arch := 'x86_64-linux-android';
+              end
+              else //NDK >= 22
+              begin
+                arch:= 'i686-linux-android';
+                if Pos('armeabi', chipArch) > 0 then arch:= 'arm-linux-androideabi'
+                else if Pos('arm64', chipArch) > 0 then arch:= 'aarch64-linux-android'
+                else if Pos('86_64', chipArch) > 0 then arch:= 'x86_64-linux-android';
 
-            aux := SplitStr(androidNdkApi, '-');
-            pathToNdkApiPlatforms :=
-              ConcatPaths([FPathToAndroidNDK, 'toolchains', 'llvm',
-              'prebuilt', FPrebuildOSys, 'sysroot', 'usr', 'lib', arch, androidNdkApi]);
-            //need by linker!  //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
-            CopyFile(pathToFclBridges + 'libso' + PathDelim + chipArch +
-              PathDelim + auxList.Strings[0],
-              pathToNdkApiPlatforms + PathDelim + auxList.Strings[0]);
+                aux:= SplitStr(androidNdkApi, '-');
+                pathToNdkApiPlatforms:= ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib',arch, androidNdkApi]);
+                //need by linker!  //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
+                CopyFile(pathToFclBridges+'libso'+PathDelim+chipArch+PathDelim+auxList.Strings[0],
+                          pathToNdkApiPlatforms+PathDelim+auxList.Strings[0]);
 
-          end;
+              end;
               (*
               //need by compiler
               CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetype.pp',
@@ -2451,21 +2239,19 @@ begin
               CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'ftfont.pp',
                        FPathToAndroidProject+'jni'+PathDelim+ 'ftfont.pp');
               *)
-        end
-        else
-        begin
-          pathToNdkApiPlatforms := '';
-          aux := LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
-          //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
-          p := Pos(';', aux);
-          pathToNdkApiPlatforms := Trim(Copy(aux, 1, p - 1));
-          //need by linker!
-          CopyFile(pathToFclBridges + 'libso' + PathDelim + chipArch +
-            PathDelim + auxList.Strings[0],
-            pathToNdkApiPlatforms + auxList.Strings[0]);
-        end;
-      end;
-    end;
+            end
+            else
+            begin
+              pathToNdkApiPlatforms:='';
+              aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+              p:= Pos(';', aux);
+              pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p-1));
+              //need by linker!
+              CopyFile(pathToFclBridges+'libso'+PathDelim+chipArch+PathDelim+auxList.Strings[0],
+                          pathToNdkApiPlatforms+auxList.Strings[0]);
+            end;
+         end;
+     end;
   end;
   controlsList.Free;
   auxList.Free;
@@ -2476,8 +2262,7 @@ end;
 // returns the original file name from the JAVA template directory
 // ex: JClasSs = class(JControl) -> jClass.java
 //warning: On Linux, this should also work because TSearchRec is cross-platform, but I have not tested it.
-function TLamwSmartDesigner.GetCorrectTemplateFileName(
-  const Path, FileName: string): string; //by kordal
+function TLamwSmartDesigner.GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
 var
   SR: TSearchRec;
 begin
@@ -2487,551 +2272,488 @@ begin
   FindClose(SR);
 end;
 
-function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList;
-  jclassname: string; out nativeAdded: boolean): boolean;
+function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname: string;
+  out nativeAdded: boolean): boolean;
 var
   list, auxList, manifestList, gradleList: TStringList;
   p, p1, p2, i, minSdkManifest: integer;
   aux, tempStr, auxStr: string;
   insertRef, minSdkManifestStr: string;
   c: char;
-  androidNdkApi, pathToNdkApiPlatforms, arch: string;
+  androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;
 begin
-  nativeAdded := False;
-  Result := False;
+   nativeAdded:= False;
+   Result:= False;
 
-  if FPackageName = '' then
-    Exit;
+   if FPackageName = '' then Exit;
 
-  if FileExists(FPathToJavaSource + jclassname + '.java') then
-    Exit; //do not duplicated!
+   if FileExists(FPathToJavaSource+jclassname+'.java') then Exit; //do not duplicated!
 
-  list := TStringList.Create;
-  manifestList := TStringList.Create;
-  auxList := TStringList.Create;
+   list:= TStringList.Create;
+   manifestList:= TStringList.Create;
+   auxList:= TStringList.Create;
 
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.java') then
-  begin
-    list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.java');
-    list.Strings[0] := 'package ' + FPackageName + ';';
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java') then
+   begin
+     list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.java');
+     list.Strings[0]:= 'package '+FPackageName+';';
 
-    //Pascal classes can now be written case-insensitively :)
-    list.SaveToFile(FPathToJavaSource + GetCorrectTemplateFileName(
-      LamwGlobalSettings.PathToJavaTemplates, jclassname + '.java')); // by kordal
+     //Pascal classes can now be written case-insensitively :)
+     list.SaveToFile(FPathToJavaSource + GetCorrectTemplateFileName(LamwGlobalSettings.PathToJavaTemplates, jclassname + '.java')); // by kordal
 
-    //add relational class
-    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname +
-      '.relational') then
-    begin
-      list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-        jclassname + '.relational');
-      for i := 0 to list.Count - 1 do
-      begin
-        if FileExists(LamwGlobalSettings.PathToJavaTemplates + list.Strings[i]) then
+     //add relational class
+     if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational') then
+     begin
+       list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational');
+       for i:= 0 to list.Count-1 do
+       begin
+          if FileExists(LamwGlobalSettings.PathToJavaTemplates + list.Strings[i]) then
+          begin
+            auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + list.Strings[i]);
+            auxList.Strings[0]:= 'package '+FPackageName+';';
+            auxList.SaveToFile(FPathToJavaSource + list.Strings[i]);
+          end;
+       end;
+     end;
+
+     Result:= True;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.native') then
+   begin
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.native',
+                FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+jclassname+'.native');
+        nativeAdded:= True;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.create') then
+   begin
+     list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.create');
+     if FileExists(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+jclassname+'.native') then
+     begin
+       auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.native');
+       for i:= 0 to auxList.Count-1 do
+       begin
+         list.Add(auxList.Strings[i]);
+       end;
+     end;
+
+     aux:= list.Text;
+     ControlsJava.Insert(ControlsJava.Count-1, aux);
+
+   end;
+
+   //updated manifest minAdkApi
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk') then
+   begin
+     minSdkManifestStr:= GetMinSDKFromManifest();
+
+     if  minSdkManifestStr <> '' then
+       minSdkManifest:= StrToInt(minSdkManifestStr)
+     else
+       minSdkManifest:= 14;
+
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk');
+
+     tempMinSdk:= StrToInt(auxList.Strings[0]);
+     if FMinSdkControl < tempMinSdk then FMinSdkControl:= tempMinSdk;
+
+     if FMinSdkControl > minSdkManifest then
+     begin
+        auxList.Clear;
+        auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+        tempStr:= auxList.Text;
+        tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+IntTostr(minSdkManifest)+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
+        auxList.Text:= tempStr;
+        auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+
+        if FileExists(FPathToAndroidProject+'build.gradle') then
         begin
-          auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-            list.Strings[i]);
-          auxList.Strings[0] := 'package ' + FPackageName + ';';
-          auxList.SaveToFile(FPathToJavaSource + list.Strings[i]);
+          auxList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+          tempStr:= auxList.Text;
+          tempStr:= StringReplace(tempStr, 'minSdkVersion '+IntTostr(minSdkManifest), 'minSdkVersion '+IntToStr(FMinSdkControl), [rfReplaceAll,rfIgnoreCase]);
+          auxList.Text:= tempStr;
+          auxList.SaveToFile(FPathToAndroidProject+'build.gradle');
         end;
-      end;
-    end;
+     end;
+   end;
 
-    Result := True;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.native') then
-  begin
-    CopyFile(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.native',
-      FPathToAndroidProject + 'lamwdesigner' + DirectorySeparator +
-      jclassname + '.native');
-    nativeAdded := True;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.create') then
-  begin
-    list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.create');
-    if FileExists(FPathToAndroidProject + 'lamwdesigner' + DirectorySeparator +
-      jclassname + '.native') then
-    begin
-      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-        jclassname + '.native');
-      for i := 0 to auxList.Count - 1 do
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then   //JCenter component palette
+   begin
+      if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
       begin
-        list.Add(auxList.Strings[i]);
+         ShowMessage(jclassname+'.java require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
+         LazarusIDE.ActiveProject.Modified:= True;
+         LazarusIDE.ActiveProject.CustomData['BuildSystem']:= 'Gradle';
       end;
-    end;
+   end;
 
-    aux := list.Text;
-    ControlsJava.Insert(ControlsJava.Count - 1, aux);
+   //try insert reference required by the jControl in AndroidManifest ..
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission');
+     if auxList.Count > 0 then
+     begin
+       insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
 
-  end;
+       list.Clear;
+       for i:= 0 to auxList.Count-1 do
+       begin
+         if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
+       end;
 
-  //updated manifest minAdkApi
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.minsdk') then
-  begin
-    minSdkManifestStr := GetMinSDKFromManifest();
+       if list.Count > 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         p2:= p1 + Length(insertRef);
+         c:= aux[p2];
+         while c <> '>' do
+         begin
+            Inc(p2);
+            c:= aux[p2];
+         end;
+         Inc(p2);
+         insertRef:= Trim(Copy(aux, p1, p2-p1));
+         p1:= Pos(insertRef, aux);
+         if Length(list.Text) >  10 then  //dummy
+         begin
+           Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
+           manifestList.Text:= aux;
+           manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+         end;
+       end;
+     end;
+   end;
 
-    if minSdkManifestStr <> '' then
-      minSdkManifest := StrToInt(minSdkManifestStr)
-    else
-      minSdkManifest := 14;
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature');
+     if auxList.Count > 0 then
+     begin
+       insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
 
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.minsdk');
+       //listRequirements.Add(Trim(auxList.Text));  //Add feature
+       list.Clear;
+       for i:= 0 to auxList.Count-1 do
+       begin
+         if Pos(Trim(auxList.Strings[i]), aux) <= 0 then
+           list.Add(Trim(auxList.Strings[i])); //do not insert duplicate..
+       end;
 
-    tempMinSdk := StrToInt(auxList.Strings[0]);
-    if FMinSdkControl < tempMinSdk then
-      FMinSdkControl := tempMinSdk;
+       if list.Count > 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         p2:= p1 + Length(insertRef);
+         c:= aux[p2];
+         while c <> '>' do
+         begin
+            Inc(p2);
+            c:= aux[p2];
+         end;
+         Inc(p2);
+         insertRef:= Trim(Copy(aux, p1, p2-p1));
+         p1:= Pos(insertRef, aux);
+         if Length(list.Text) > 10 then  //dummy
+         begin
+           Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
+           manifestList.Text:= aux;
+           manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+         end;
+       end;
+     end;
+   end;
 
-    if FMinSdkControl > minSdkManifest then
-    begin
-      auxList.Clear;
-      auxList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      tempStr := auxList.Text;
-      {tempStr := StringReplace(tempStr, 'android:minSdkVersion="' +
-        IntToStr(minSdkManifest) + '"', 'android:minSdkVersion="' +
-        IntToStr(FMinSdkControl) + '"', [rfReplaceAll, rfIgnoreCase]);}
-      auxList.Text := tempStr;
-      auxList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.intentfilter') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.intentfilter');
+     if auxList.Count > 0 then
+     begin
+       insertRef:= '<intent-filter>'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
 
-      if FileExists(FPathToAndroidProject + 'build.gradle') then
+       list.Clear;
+       for i:= 0 to auxList.Count-1 do
+       begin
+         if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
+       end;
+
+       if list.Count > 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         if Length(list.Text) > 10 then  //dummy
+         begin
+           Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
+           manifestList.Text:= aux;
+           manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+         end;
+       end;
+     end;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.service') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.service');
+     if auxList.Text <> '' then
+     begin
+       tempStr:= Trim(auxList.Text);
+       insertRef:= '</activity>'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
+       //listRequirements.Add(tempStr);  //Add service
+       if Pos(tempStr , aux) <= 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
+         manifestList.Text:= aux;
+         manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+       end;
+     end;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.activity') then  //jModalDialog
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.activity');
+     if auxList.Text <> '' then
+     begin
+       tempStr:= Trim(auxList.Text);
+       insertRef:= '</activity>'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
+       //listRequirements.Add(tempStr);  //Add service
+       if Pos(tempStr , aux) <= 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
+         manifestList.Text:= aux;
+         manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+       end;
+     end;
+   end;
+
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.provider') then
+   begin
+     manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+
+     if Pos('org.lamw.fileprovider', manifestList.Text) > 0 then  //fix old projects [thanks to Manlio!]
+     begin
+       tempStr:= Trim(StringReplace(manifestList.Text, 'org.lamw.fileprovider', FPackageName, [rfReplaceAll,rfIgnoreCase]) );
+       manifestList.Text:= tempStr;
+       manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+     end;
+
+     aux:= manifestList.Text;
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.provider');
+     if auxList.Text <> '' then
+     begin
+       tempStr:= Trim(StringReplace(auxList.Text, 'org.lamw.fileprovider', FPackageName, [rfReplaceAll,rfIgnoreCase]) );
+       insertRef:= '</activity>'; //insert reference point
+       //listRequirements.Add(tempStr);  //Add providers
+       if Pos(tempStr , aux) <= 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
+         manifestList.Text:= aux;
+         manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+       end;
+     end;
+
+   end;
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.receiver') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.receiver');
+     if auxList.Text <> '' then
+     begin
+       aux:= Trim(auxList.Text);
+       tempStr:= StringReplace(aux,'WPACKAGENAME', FPackageName, [rfIgnoreCase]);
+       insertRef:= '</activity>'; //insert reference point
+       manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+       aux:= manifestList.Text;
+       if Pos(tempStr , aux) <= 0 then
+       begin
+         p1:= Pos(insertRef, aux);
+         Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
+         manifestList.Text:= aux;
+         manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+       end;
+     end;
+   end;
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.layout') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.layout');
+     list.Clear;
+     list.Delimiter:= DirectorySeparator;
+     list.StrictDelimiter:= True;
+     list.DelimitedText:= FPathToAndroidProject + 'dummy';
+     aux:= StringReplace(auxList.Text,'WAPPNAME',  list.Strings[list.Count-2], [rfIgnoreCase]);
+     auxList.Text:= aux;
+     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+LowerCase(jclassname)+'_layout.xml');
+   end;
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.info') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.info');
+     ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
+     auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+LowerCase(jclassname)+'_info.xml');
+   end;
+
+   //<string name="lamw_ussd_service">LAMW USSD Service</string>
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.strings') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.strings');
+     list.LoadFromFile(FPathToAndroidProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
+     for i:= 0 to auxList.Count-1 do
+     begin
+       if auxList.Strings[i] <> '' then
+       begin
+         if Pos(auxList.Strings[i], list.Text) <= 0 then
+         begin
+            list.Strings[list.Count-1]:= auxList.Strings[i];  //replace </resources>  tag
+            list.Add('</resources>'); //re-introduce tag
+         end;
+       end;
+     end;
+     list.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'values'+DirectorySeparator+'strings.xml');
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.jpg') then
+   begin
+     CopyFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.jpg',
+          FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+LowerCase(jclassname)+'_image.jpg');
+   end;
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.anim') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.anim');
+     ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'anim');
+     for i:= 0 to  auxList.Count-1 do
+     begin
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'anim' + DirectorySeparator + auxList.Strings[i],
+            FPathToAndroidProject+'res'+DirectorySeparator+'anim'+DirectorySeparator+auxList.Strings[i]);
+     end;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libjar') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libjar');
+     //ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'anim');
+     for i:= 0 to  auxList.Count-1 do
+     begin
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libjar' + DirectorySeparator + auxList.Strings[i],
+            FPathToAndroidProject+'libs'+DirectorySeparator+auxList.Strings[i]);
+     end;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.libso') then //jBarcodeScannerView.libso
+   begin
+     //libiconv.so
+     //libzbarjni.so
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libso');
+
+     for i:= 0 to  auxList.Count-1 do
+     begin
+        CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' + PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i],
+                FPathToAndroidProject+'libs'+PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i]);
+     end;
+
+     androidNdkApi:= LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-21
+     if androidNdkApi <> '' then
+     begin
+       if FNDKVersion < 22 then
+       begin
+           arch:= 'arch-x86';
+           if Pos('armeabi', FChipArchitecture) > 0 then arch:= 'arch-arm'
+           else if Pos('arm64', FChipArchitecture) > 0 then arch:= 'arch-arm64'
+           else if Pos('86_64', FChipArchitecture) > 0 then arch:= 'arch-x86_64'
+           else if Pos('mips', FChipArchitecture) > 0 then arch:= 'arch-mips';
+
+           //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
+           pathToNdkApiPlatforms:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
+                                                   androidNdkApi +DirectorySeparator+arch+DirectorySeparator+
+                                                   'usr'+DirectorySeparator+'lib';
+
+
+           //need by linker!                       //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
+          for i:= 0 to  auxList.Count-1 do
+          begin
+             CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' + PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i],
+                      pathToNdkApiPlatforms+PathDelim+auxList.Strings[i]);
+          end;
+       end
+       else
+       begin   //NDK > 21
+
+          arch:= 'i686-linux-android';
+          if Pos('armeabi', FChipArchitecture) > 0 then arch:= 'arm-linux-androideabi'
+          else if Pos('arm64', FChipArchitecture) > 0 then arch:= 'aarch64-linux-android'
+          else if Pos('86_64', FChipArchitecture) > 0 then arch:= 'x86_64-linux-android';
+
+          aux:= SplitStr(androidNdkApi, '-');
+          pathToNdkApiPlatforms:= ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib',arch, androidNdkApi]);
+
+          //need by linker!                       //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
+          for i:= 0 to  auxList.Count-1 do
+          begin
+             CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' + PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i],
+                      pathToNdkApiPlatforms+PathDelim+auxList.Strings[i]);
+          end;
+
+       end;
+     end
+     else
+     begin
+       pathToNdkApiPlatforms:='';
+       aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries; //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+       p:= Pos(';', aux);
+       pathToNdkApiPlatforms:= Trim(Copy(aux, 1, p-1));
+       //need by linker!
+       for i:= 0 to  auxList.Count-1 do
+       begin
+          CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' + PathDelim+FChipArchitecture+PathDelim+auxList.Strings[i],
+                   pathToNdkApiPlatforms+auxList.Strings[i]);
+       end;
+     end;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dependencies') then
+   begin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dependencies');
+      if auxList.Text <> '' then
       begin
-        auxList.LoadFromFile(FPathToAndroidProject + 'build.gradle');
-        tempStr := auxList.Text;
-{        tempStr := StringReplace(tempStr, 'minSdkVersion ' +
-          IntToStr(minSdkManifest), 'minSdkVersion ' + IntToStr(FMinSdkControl),
-          [rfReplaceAll, rfIgnoreCase]);}
-        auxList.Text := tempStr;
-        auxList.SaveToFile(FPathToAndroidProject + 'build.gradle');
-      end;
-    end;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.buildsys') then
-    //JCenter component palette
-  begin
-    if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
-    begin
-      ShowMessage(jclassname + '.java require Gradle' + sLineBreak +
-        'Build system...' + sLineBreak + 'Changed to Gradle!');
-      LazarusIDE.ActiveProject.Modified := True;
-      LazarusIDE.ActiveProject.CustomData['BuildSystem'] := 'Gradle';
-    end;
-  end;
-
-  //try insert reference required by the jControl in AndroidManifest ..
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.permission') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.permission');
-    if auxList.Count > 0 then
-    begin
-      insertRef := '<uses-sdk android:minSdkVersion'; //insert reference point
-      manifestList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      aux := manifestList.Text;
-
-      list.Clear;
-      for i := 0 to auxList.Count - 1 do
-      begin
-        if Pos(Trim(auxList.Strings[i]), aux) <= 0 then
-          list.Add(Trim(auxList.Strings[i])); //not duplicate..
-      end;
-
-      if list.Count > 0 then
-      begin
-        p1 := Pos(insertRef, aux);
-        p2 := p1 + Length(insertRef);
-        c := aux[p2];
-        while c <> '>' do
+        gradleList:=TStringList.Create;
+        gradleList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+        aux:= gradleList.Text;
+        insertRef:= 'fileTree(include: [''*.jar''], dir: ''libs'')';
+        for i:= 0 to auxList.Count-1 do
         begin
-          Inc(p2);
-          c := aux[p2];
+           auxStr:=auxList.Strings[i];
+           SplitStr(auxStr, ' ');
+           p:= LastDelimiter(':',auxStr);
+           tempStr:= Copy(auxStr, 2, p - 2);
+           if Pos(tempStr, aux) <= 0 then
+           begin
+             p1:= Pos(insertRef, aux);
+             Insert(sLineBreak + '    '+auxList.Strings[i] , aux, p1+Length(insertRef) );
+           end;
         end;
-        Inc(p2);
-        insertRef := Trim(Copy(aux, p1, p2 - p1));
-        p1 := Pos(insertRef, aux);
-        if Length(list.Text) > 10 then  //dummy
-        begin
-          Insert(sLineBreak + Trim(list.Text), aux, p1 + Length(insertRef));
-          manifestList.Text := aux;
-          manifestList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-        end;
+        gradleList.Text:= aux;
+        gradleList.SaveToFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
+        gradleList.Free;
       end;
-    end;
-  end;
+   end;
+   //-----
 
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.feature') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.feature');
-    if auxList.Count > 0 then
-    begin
-      insertRef := '<uses-sdk android:minSdkVersion'; //insert reference point
-      manifestList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      aux := manifestList.Text;
-
-      //listRequirements.Add(Trim(auxList.Text));  //Add feature
-      list.Clear;
-      for i := 0 to auxList.Count - 1 do
-      begin
-        if Pos(Trim(auxList.Strings[i]), aux) <= 0 then
-          list.Add(Trim(auxList.Strings[i])); //do not insert duplicate..
-      end;
-
-      if list.Count > 0 then
-      begin
-        p1 := Pos(insertRef, aux);
-        p2 := p1 + Length(insertRef);
-        c := aux[p2];
-        while c <> '>' do
-        begin
-          Inc(p2);
-          c := aux[p2];
-        end;
-        Inc(p2);
-        insertRef := Trim(Copy(aux, p1, p2 - p1));
-        p1 := Pos(insertRef, aux);
-        if Length(list.Text) > 10 then  //dummy
-        begin
-          Insert(sLineBreak + Trim(list.Text), aux, p1 + Length(insertRef));
-          manifestList.Text := aux;
-          manifestList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-        end;
-      end;
-    end;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname +
-    '.intentfilter') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.intentfilter');
-    if auxList.Count > 0 then
-    begin
-      insertRef := '<intent-filter>'; //insert reference point
-      manifestList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      aux := manifestList.Text;
-
-      list.Clear;
-      for i := 0 to auxList.Count - 1 do
-      begin
-        if Pos(Trim(auxList.Strings[i]), aux) <= 0 then
-          list.Add(Trim(auxList.Strings[i])); //not duplicate..
-      end;
-
-      if list.Count > 0 then
-      begin
-        p1 := Pos(insertRef, aux);
-        if Length(list.Text) > 10 then  //dummy
-        begin
-          Insert(sLineBreak + Trim(list.Text), aux, p1 + Length(insertRef));
-          manifestList.Text := aux;
-          manifestList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-        end;
-      end;
-    end;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.service') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.service');
-    if auxList.Text <> '' then
-    begin
-      tempStr := Trim(auxList.Text);
-      insertRef := '</activity>'; //insert reference point
-      manifestList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      aux := manifestList.Text;
-      //listRequirements.Add(tempStr);  //Add service
-      if Pos(tempStr, aux) <= 0 then
-      begin
-        p1 := Pos(insertRef, aux);
-        Insert(sLineBreak + tempStr, aux, p1 + Length(insertRef));
-        manifestList.Text := aux;
-        manifestList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      end;
-    end;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.activity') then
-    //jModalDialog
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.activity');
-    if auxList.Text <> '' then
-    begin
-      tempStr := Trim(auxList.Text);
-      insertRef := '</activity>'; //insert reference point
-      manifestList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      aux := manifestList.Text;
-      //listRequirements.Add(tempStr);  //Add service
-      if Pos(tempStr, aux) <= 0 then
-      begin
-        p1 := Pos(insertRef, aux);
-        Insert(sLineBreak + tempStr, aux, p1 + Length(insertRef));
-        manifestList.Text := aux;
-        manifestList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      end;
-    end;
-  end;
-
-  //-----
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.provider') then
-  begin
-    manifestList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-
-    if Pos('org.lamw.fileprovider', manifestList.Text) > 0 then
-      //fix old projects [thanks to Manlio!]
-    begin
-      tempStr := Trim(StringReplace(manifestList.Text, 'org.lamw.fileprovider',
-        FPackageName, [rfReplaceAll, rfIgnoreCase]));
-      manifestList.Text := tempStr;
-      manifestList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-    end;
-
-    aux := manifestList.Text;
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.provider');
-    if auxList.Text <> '' then
-    begin
-      tempStr := Trim(StringReplace(auxList.Text, 'org.lamw.fileprovider',
-        FPackageName, [rfReplaceAll, rfIgnoreCase]));
-      insertRef := '</activity>'; //insert reference point
-      //listRequirements.Add(tempStr);  //Add providers
-      if Pos(tempStr, aux) <= 0 then
-      begin
-        p1 := Pos(insertRef, aux);
-        Insert(sLineBreak + tempStr, aux, p1 + Length(insertRef));
-        manifestList.Text := aux;
-        manifestList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      end;
-    end;
-
-  end;
-  //-----
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.receiver') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.receiver');
-    if auxList.Text <> '' then
-    begin
-      aux := Trim(auxList.Text);
-      tempStr := StringReplace(aux, 'WPACKAGENAME', FPackageName, [rfIgnoreCase]);
-      insertRef := '</activity>'; //insert reference point
-      manifestList.LoadFromFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      aux := manifestList.Text;
-      if Pos(tempStr, aux) <= 0 then
-      begin
-        p1 := Pos(insertRef, aux);
-        Insert(sLineBreak + tempStr, aux, p1 + Length(insertRef));
-        manifestList.Text := aux;
-        manifestList.SaveToFile(FPathToAndroidProject + 'AndroidManifest.xml');
-      end;
-    end;
-  end;
-  //-----
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.layout') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.layout');
-    list.Clear;
-    list.Delimiter := DirectorySeparator;
-    list.StrictDelimiter := True;
-    list.DelimitedText := FPathToAndroidProject + 'dummy';
-    aux := StringReplace(auxList.Text, 'WAPPNAME', list.Strings[list.Count - 2],
-      [rfIgnoreCase]);
-    auxList.Text := aux;
-    auxList.SaveToFile(FPathToAndroidProject + 'res' + DirectorySeparator +
-      'layout' + DirectorySeparator + LowerCase(jclassname) + '_layout.xml');
-  end;
-  //-----
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.info') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.info');
-    ForceDirectories(FPathToAndroidProject + 'res' + DirectorySeparator + 'xml');
-    auxList.SaveToFile(FPathToAndroidProject + 'res' + DirectorySeparator +
-      'xml' + DirectorySeparator + LowerCase(jclassname) + '_info.xml');
-  end;
-
-  //<string name="lamw_ussd_service">LAMW USSD Service</string>
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.strings') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.strings');
-    list.LoadFromFile(FPathToAndroidProject + 'res' + DirectorySeparator +
-      'values' + DirectorySeparator + 'strings.xml');
-    for i := 0 to auxList.Count - 1 do
-    begin
-      if auxList.Strings[i] <> '' then
-      begin
-        if Pos(auxList.Strings[i], list.Text) <= 0 then
-        begin
-          list.Strings[list.Count - 1] := auxList.Strings[i];
-          //replace </resources>  tag
-          list.Add('</resources>'); //re-introduce tag
-        end;
-      end;
-    end;
-    list.SaveToFile(FPathToAndroidProject + 'res' + DirectorySeparator +
-      'values' + DirectorySeparator + 'strings.xml');
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.jpg') then
-  begin
-    CopyFile(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.jpg',
-      FPathToAndroidProject + 'res' + DirectorySeparator + 'drawable-hdpi' +
-      DirectorySeparator + LowerCase(jclassname) + '_image.jpg');
-  end;
-  //-----
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.anim') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.anim');
-    ForceDirectories(FPathToAndroidProject + 'res' + DirectorySeparator + 'anim');
-    for i := 0 to auxList.Count - 1 do
-    begin
-      CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'anim' +
-        DirectorySeparator + auxList.Strings[i],
-        FPathToAndroidProject + 'res' + DirectorySeparator + 'anim' +
-        DirectorySeparator + auxList.Strings[i]);
-    end;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.libjar') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.libjar');
-    //ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'anim');
-    for i := 0 to auxList.Count - 1 do
-    begin
-      CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libjar' +
-        DirectorySeparator + auxList.Strings[i],
-        FPathToAndroidProject + 'libs' + DirectorySeparator + auxList.Strings[i]);
-    end;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.libso') then
-    //jBarcodeScannerView.libso
-  begin
-    //libiconv.so
-    //libzbarjni.so
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.libso');
-
-    for i := 0 to auxList.Count - 1 do
-    begin
-      CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' +
-        PathDelim + FChipArchitecture + PathDelim + auxList.Strings[i],
-        FPathToAndroidProject + 'libs' + PathDelim + FChipArchitecture +
-        PathDelim + auxList.Strings[i]);
-    end;
-
-    androidNdkApi := LazarusIDE.ActiveProject.CustomData.Values['NdkApi']; //android-21
-    if androidNdkApi <> '' then
-    begin
-      if FNDKVersion < 22 then
-      begin
-        arch := 'arch-x86';
-        if Pos('armeabi', FChipArchitecture) > 0 then
-          arch := 'arch-arm'
-        else if Pos('arm64', FChipArchitecture) > 0 then
-          arch := 'arch-arm64'
-        else if Pos('86_64', FChipArchitecture) > 0 then
-          arch := 'arch-x86_64'
-        else if Pos('mips', FChipArchitecture) > 0 then
-          arch := 'arch-mips';
-
-        //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib
-        pathToNdkApiPlatforms :=
-          FPathToAndroidNDK + 'platforms' + DirectorySeparator +
-          androidNdkApi + DirectorySeparator + arch +
-          DirectorySeparator + 'usr' + DirectorySeparator + 'lib';
-
-
-        //need by linker!                       //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
-        for i := 0 to auxList.Count - 1 do
-        begin
-          CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' +
-            PathDelim + FChipArchitecture + PathDelim + auxList.Strings[i],
-            pathToNdkApiPlatforms + PathDelim + auxList.Strings[i]);
-        end;
-      end
-      else
-      begin   //NDK > 21
-
-        arch := 'i686-linux-android';
-        if Pos('armeabi', FChipArchitecture) > 0 then
-          arch := 'arm-linux-androideabi'
-        else if Pos('arm64', FChipArchitecture) > 0 then
-          arch := 'aarch64-linux-android'
-        else if Pos('86_64', FChipArchitecture) > 0 then
-          arch := 'x86_64-linux-android';
-
-        aux := SplitStr(androidNdkApi, '-');
-        pathToNdkApiPlatforms :=
-          ConcatPaths([FPathToAndroidNDK, 'toolchains', 'llvm', 'prebuilt',
-          FPrebuildOSys, 'sysroot', 'usr', 'lib', arch, androidNdkApi]);
-
-        //need by linker!                       //C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\libmysqlclient.so
-        for i := 0 to auxList.Count - 1 do
-        begin
-          CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' +
-            PathDelim + FChipArchitecture + PathDelim + auxList.Strings[i],
-            pathToNdkApiPlatforms + PathDelim + auxList.Strings[i]);
-        end;
-
-      end;
-    end
-    else
-    begin
-      pathToNdkApiPlatforms := '';
-      aux := LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
-      //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
-      p := Pos(';', aux);
-      pathToNdkApiPlatforms := Trim(Copy(aux, 1, p - 1));
-      //need by linker!
-      for i := 0 to auxList.Count - 1 do
-      begin
-        CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libso' +
-          PathDelim + FChipArchitecture + PathDelim + auxList.Strings[i],
-          pathToNdkApiPlatforms + auxList.Strings[i]);
-      end;
-    end;
-  end;
-
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname +
-    '.dependencies') then
-  begin
-    auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-      jclassname + '.dependencies');
-    if auxList.Text <> '' then
-    begin
-      gradleList := TStringList.Create;
-      gradleList.LoadFromFile(FPathToAndroidProject + 'build.gradle');
-      aux := gradleList.Text;
-      insertRef := 'fileTree(include: [''*.jar''], dir: ''libs'')';
-      for i := 0 to auxList.Count - 1 do
-      begin
-        auxStr := auxList.Strings[i];
-        SplitStr(auxStr, ' ');
-        p := LastDelimiter(':', auxStr);
-        tempStr := Copy(auxStr, 2, p - 2);
-        if Pos(tempStr, aux) <= 0 then
-        begin
-          p1 := Pos(insertRef, aux);
-          Insert(sLineBreak + '    ' + auxList.Strings[i], aux, p1 + Length(insertRef));
-        end;
-      end;
-      gradleList.Text := aux;
-      gradleList.SaveToFile(FPathToAndroidProject + 'build.gradle'); //buildgradletList
-      gradleList.Free;
-    end;
-  end;
-  //-----
-
-  manifestList.Free;
-  list.Free;
-  auxList.Free;
+   manifestList.Free;
+   list.Free;
+   auxList.Free;
 
 end;
 
@@ -3043,81 +2765,77 @@ var
   i, d, p, p1, p2: integer;
   listParam: TStringList;
 begin
-  listParam := TStringList.Create;
-  method := nativeMethod;
+  listParam:= TStringList.Create;
+  method:= nativeMethod;
 
-  p := Pos('native', method);
-  method := Copy(method, p + Length('native'), MaxInt);
-  p1 := Pos('(', method);
-  p2 := PosEx(')', method, p1 + 1);
-  d := (p2 - p1);
+  p:= Pos('native', method);
+  method:= Copy(method, p+Length('native'), MaxInt);
+  p1:= Pos('(', method);
+  p2:= PosEx(')', method, p1 + 1);
+  d:=(p2-p1);
 
-  params := Copy(method, p1 + 1, d - 1); //long pasobj, long elapsedTimeMillis
-  method := Copy(method, 1, p1 - 1);
-  method := Trim(method); //void pOnChronometerTick
+  params:= Copy(method, p1+1, d-1); //long pasobj, long elapsedTimeMillis
+  method:= Copy(method, 1, p1-1);
+  method:= Trim(method); //void pOnChronometerTick
   Delete(method, 1, Pos(' ', method));
-  method := Trim(method); //pOnChronometerTick
+  method:= Trim(method); //pOnChronometerTick
 
-  signature := '(PEnv,this';  //no param...
+  signature:= '(PEnv,this';  //no param...
 
-  if Length(params) > 3 then
+  if  Length(params) > 3 then
   begin
-    listParam.Delimiter := ',';
-    listParam.StrictDelimiter := True;
-    listParam.DelimitedText := params;
+    listParam.Delimiter:= ',';
+    listParam.StrictDelimiter:= True;
+    listParam.DelimitedText:= params;
 
-    for i := 0 to listParam.Count - 1 do
+    for i:= 0 to listParam.Count-1 do
     begin
-      paramName := Trim(listParam.Strings[i]); //long pasobj
-      Delete(paramName, 1, Pos(' ', paramName));
-      listParam.Strings[i] := Trim(paramName);
+       paramName:= Trim(listParam.Strings[i]); //long pasobj
+       Delete(paramName, 1, Pos(' ', paramName));
+       listParam.Strings[i]:= Trim(paramName);
     end;
 
-    for i := 0 to listParam.Count - 1 do
+    for i:= 0 to listParam.Count-1 do
     begin
       if Pos('pasobj', listParam.Strings[i]) > 0 then
-        signature := signature + ',TObject(' + listParam.Strings[i] + ')'
+        signature:= signature + ',TObject(' + listParam.Strings[i]+')'
       else
-        signature := signature + ',' + listParam.Strings[i];
+        signature:= signature + ',' + listParam.Strings[i];
     end;
 
   end;
 
-  Result := method + '=Java_Event_' + method + signature + ');';
+  Result:= method+'=Java_Event_'+method+signature+');';
   if method = 'pAppOnCreate' then
   begin
     //Result := Result + FStartModuleVarName + '.Init(gApp);';
-    Result := Result + FStartModuleVarName + '.ReInit(gApp);'; //by tr3e
+    Result := Result + FStartModuleVarName + '.ReInit(gApp);' //by tr3e
   end;
 
   listParam.Free;
 end;
 
 
-procedure TLamwSmartDesigner.UpdateProjectLpr(oldModuleName: string;
-  newModuleName: string);
+procedure TLamwSmartDesigner.UpdateProjectLpr(oldModuleName: string; newModuleName: string);
 var
   tempList, importList, javaClassList, nativeMethodList: TStringList;
-  i, k, FromPos, ToPos: integer;
+  i, k, FromPos, ToPos: Integer;
   n: TCodeTreeNode;
   cb: TCodeBuffer;
-  PosFound: boolean;
+  PosFound: Boolean;
   str: string;
   Beauty: TBeautifyCodeOptions;
-  IdentList: TStringList;
+  IdentList : TStringList;
 begin
-  if not FProjFile.IsPartOfProject then
-    Exit;
-  if FPackageName = '' then
-    Exit;
+  if not FProjFile.IsPartOfProject then Exit;
+  if FPackageName = '' then Exit;
 
-  nativeMethodList := TStringList.Create;
-  tempList := TStringList.Create;
-  importList := TStringList.Create;
+  nativeMethodList:= TStringList.Create;
+  tempList:= TStringList.Create;
+  importList:= TStringList.Create;
   importList.Sorted := True;
   importList.Duplicates := dupIgnore;
-  javaClassList := FindAllFiles(FPathToAndroidProject + 'lamwdesigner',
-    '*.native', False);
+  javaClassList := FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.native', False);
   for k := 0 to javaClassList.Count - 1 do
   begin
     tempList.LoadFromFile(javaClassList.Strings[k]);
@@ -3138,7 +2856,7 @@ begin
   end;
 
   tempList.Clear;
-  for i := 0 to nativeMethodList.Count - 1 do
+  for i:= 0 to nativeMethodList.Count-1 do
   begin
     tempList.Add(GetEventSignature(nativeMethodList.Strings[i]));
   end;
@@ -3155,11 +2873,11 @@ begin
   if nativeMethodList.Count > 0 then
   begin
     with TJavaParser.Create(javaClassList) do
-      try
-        str := GetPascalJNIInterfaceCode(tempList);
-      finally
-        Free
-      end;
+    try
+      str := GetPascalJNIInterfaceCode(tempList);
+    finally
+      Free
+    end;
 
     with CodeToolBoss do
     begin
@@ -3198,8 +2916,8 @@ begin
 
       if not PosFound then // fallback
       begin
-        str := '{%region /fold ''LAMW generated code''}' + sLineBreak +
-          sLineBreak + str + sLineBreak + '{%endregion}' + sLineBreak;
+        str := '{%region /fold ''LAMW generated code''}' + sLineBreak + sLineBreak
+          + str + sLineBreak + '{%endregion}' + sLineBreak;
         n := CurCodeTool.Tree.Root;
         FromPos := n.FirstChild.EndPos; // should be the end of uses-clause
         ToPos := n.LastChild.StartPos;  // should be the start of begin..end section
@@ -3219,19 +2937,19 @@ begin
       begin
         if oldModuleName <> newModuleName then
         begin
-          IdentList := TStringList.Create;
-          try
-            IdentList.Add(oldModuleName);
-            IdentList.Add(newModuleName);
-            IdentList.Add('T' + oldModuleName);
-            IdentList.Add('T' + newModuleName);
-            cb := FindFile(FProjFile.GetFullFilename);
-            InitCurCodeTool(cb);
-            SourceChangeCache.MainScanner := CurCodeTool.Scanner;
-            CurCodeTool.ReplaceWords(IdentList, True, SourceChangeCache);
-          finally
-            IdentList.Free;
-          end;
+            IdentList := TStringList.Create;
+            try
+              IdentList.Add(oldModuleName);
+              IdentList.Add(newModuleName);
+              IdentList.Add('T' + oldModuleName);
+              IdentList.Add('T' + newModuleName);
+              cb := FindFile(FProjFile.GetFullFilename);
+              InitCurCodeTool(cb);
+              SourceChangeCache.MainScanner := CurCodeTool.Scanner;
+              CurCodeTool.ReplaceWords(IdentList, True, SourceChangeCache);
+            finally
+              IdentList.Free;
+            end;
         end;
       end;
       //LAMW 0.8
@@ -3250,34 +2968,30 @@ var
   dlgMessage: string;
 begin
   // FProjFile = nil if it is a just created project
-  if (FProjFile = nil) or not FProjFile.IsPartOfProject then
-    Exit;
+  if (FProjFile = nil) or not FProjFile.IsPartOfProject then Exit;
 
-  if not DirectoryExists(FPathToAndroidProject + 'lamwdesigner') then
+  if not DirectoryExists(FPathToAndroidProject+'lamwdesigner') then
   begin
     ForceDirectory(FPathToJavaSource + 'bak');
 
-    dlgMessage := 'Hello!' + sLineBreak + sLineBreak +
-      'We need to do an important change/update in your project.' +
-      sLineBreak + sLineBreak + 'Don''t worry.' + sLineBreak + sLineBreak +
-      'The project''s backup files will be saved as *.bak.OLD' +
-      sLineBreak + sLineBreak +
-      'Please, whenever a dialog prompt select "Reload from disk" ';
+    dlgMessage:= 'Hello!'+sLineBreak+sLineBreak+'We need to do an important change/update in your project.'+sLineBreak+sLineBreak+
+                 'Don''t worry.'+sLineBreak+sLineBreak+'The project''s backup files will be saved as *.bak.OLD'+sLineBreak+sLineBreak+
+                 'Please, whenever a dialog prompt select "Reload from disk" ';
 
-    if QuestionDlg('\o/ \o/ \o/    ' + 'Welcome to LAMW version ' +
-      LamwGlobalSettings.Version + '!', dlgMessage, mtCustom, [mrYes, 'OK'], '') =
-      mrYes then
-    begin
-      CopyFile(FPathToJavaSource + 'Controls.java',
-        FPathToJavaSource + 'bak' + DirectorySeparator + 'Controls.java.bak.OLD');
+    if QuestionDlg ('\o/ \o/ \o/    ' +
+         'Welcome to LAMW version ' + LamwGlobalSettings.Version + '!',
+         dlgMessage,mtCustom,[mrYes,'OK'],'') = mrYes
+    then  begin
+      CopyFile(FPathToJavaSource+'Controls.java',
+               FPathToJavaSource+'bak'+DirectorySeparator+'Controls.java.bak.OLD');
 
-      CopyFile(FPathToJavaSource + 'App.java',
-        FPathToJavaSource + 'bak' + DirectorySeparator + 'App.java.bak.OLD');
+      CopyFile(FPathToJavaSource+'App.java',
+               FPathToJavaSource+'bak'+DirectorySeparator+'App.java.bak.OLD');
 
-      CopyFile(FPathToAndroidProject + 'jni' + DirectorySeparator + 'controls.lpr',
-        FPathToAndroidProject + 'jni' + DirectorySeparator + 'controls.lpr.bak.OLD');
+      CopyFile(FPathToAndroidProject+'jni'+DirectorySeparator+'controls.lpr',
+               FPathToAndroidProject+'jni'+DirectorySeparator+'controls.lpr.bak.OLD');
     end;
-    ForceDirectory(FPathToAndroidProject + 'lamwdesigner');
+    ForceDirectory(FPathToAndroidProject+'lamwdesigner');
     // old [fat] *.lpr will be cleanup on project saving
   end;
 
@@ -3286,7 +3000,7 @@ end;
 
 procedure TLamwSmartDesigner.UpdateStartModuleVarName;
 var
-  j: integer;
+  j: Integer;
 begin
   with CodeToolBoss do
   begin
@@ -3318,7 +3032,7 @@ end;
 
 function TLamwSmartDesigner.GetLprStartModuleVarName: string;
 var
-  j: integer;
+  j: Integer;
 begin
   with CodeToolBoss do
   begin
@@ -3350,37 +3064,36 @@ function TLamwSmartDesigner.GetPathToSmartDesigner(): string;
 var
   Pkg: TIDEPackage;
 begin
-  Result := '';
+  Result:= '';
   if FPathToSmartDesigner = '' then
   begin
-    Pkg := PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
-    if Pkg <> nil then
+    Pkg:=PackageEditingInterface.FindPackageWithName('lazandroidwizardpack');
+    if Pkg<>nil then
     begin
-      FPathToSmartDesigner := ExtractFilePath(Pkg.Filename);
-      FPathToSmartDesigner := FPathToSmartDesigner + 'smartdesigner';
-      Result := FPathToSmartDesigner;
-      //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
+        FPathToSmartDesigner:= ExtractFilePath(Pkg.Filename);
+        FPathToSmartDesigner:= FPathToSmartDesigner + 'smartdesigner';
+        Result:=FPathToSmartDesigner;
+        //C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner
     end;
   end
-  else
-    Result := FPathToSmartDesigner;
+  else Result:= FPathToSmartDesigner;
 end;
 
 procedure TLamwSmartDesigner.UpdateAllJControls(AProject: TLazProject);
 var
   jControls, LFM, fclList: TStringList;
   lfmFileName, str: string;
-  i, j, k: integer;
+  i, j, k: Integer;
   pathToFclBridges: string;
 begin
 
-  fclList := TStringList.Create;
-  FPathToSmartDesigner := GetPathToSmartDesigner();
+  fclList:=  TStringList.Create;
+  FPathToSmartDesigner:=  GetPathToSmartDesigner();
 
-  pathToFclBridges := FPathToSmartDesigner + PathDelim + 'fcl' + pathDelim;
+  pathToFclBridges:= FPathToSmartDesigner + PathDelim +  'fcl' + pathDelim;
 
-  if FileExists(pathToFclBridges + 'fcl_bridges.txt') then
-    fclList.LoadFromFile(pathToFclBridges + 'fcl_bridges.txt');
+  if FileExists(pathToFclBridges+'fcl_bridges.txt') then
+     fclList.LoadFromFile(pathToFclBridges+'fcl_bridges.txt');
 
   jControls := TStringList.Create;
   jControls.Sorted := True;
@@ -3404,10 +3117,9 @@ begin
             if k > 0 then
             begin
               str := Trim(Copy(str, k + 1, MaxInt)); //(str = 'TFPNoGUIGraphicsBridge')
-              if (Pos(str, fclList.Text) > 0) or
-                FileExists(LamwGlobalSettings.PathToJavaTemplates + str + '.java') then
+              if  (Pos(str, fclList.Text) > 0) or FileExists(LamwGlobalSettings.PathToJavaTemplates + str + '.java') then
               begin
-                jControls.Add(str);
+                  jControls.Add(str);
               end;
             end;
           end;
@@ -3424,46 +3136,40 @@ end;
 function TLamwSmartDesigner.OnProjectSavingAll(Sender: TObject): TModalResult;
 var
   ControlsJava, auxList, controlsList, libList, nativeGdxFormList, gdxList: TStringList;
-  i, j, p, k: integer;
-  nativeExists: boolean;
+  i, j, p, k: Integer;
+  nativeExists: Boolean;
   aux, compileSdkVersion, PathToJavaTemplates, LibPath, linkLibrariesPath: string;
   AndroidTheme: string;
   compoundList: TStringList;
   lprModuleName: string;
   hasControls: boolean;
   nativeMethodList, tempList: TStringList;
-  FSupport: boolean;
-  aSupportLib: TSupportLib;
-  aAppCompatLib: TAppCompatLib;
+  FSupport:boolean;
+  aSupportLib:TSupportLib;
+  aAppCompatLib:TAppCompatLib;
   innerSupported: boolean;
 begin
   Result := mrOk;
-  if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
-    Exit;
+  if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
 
-  hasControls := False;
+  hasControls:= False;
 
-  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GUI' then
-    hasControls := True;
-  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GDX' then
-    hasControls := True;
+  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GUI' then hasControls:= True;
+  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GDX' then hasControls:= True;
 
-  if not hasControls then
-    Exit;  //no form basead
+  if not hasControls then Exit;  //no form basead
 
-  FSupport := (LazarusIDE.ActiveProject.CustomData.Values['Support'] = 'TRUE');
+  FSupport:=(LazarusIDE.ActiveProject.CustomData.Values['Support']='TRUE');
 
-  AndroidTheme := LazarusIDE.ActiveProject.CustomData.Values['Theme'];
+  AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
 
-  PathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates;
-  //included path delimiter
+  PathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates; //included path delimiter
   // C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java\
 
   //LAMW 0.8
-  lprModuleName := GetLprStartModuleVarName();
-  FStartModuleVarName := LazarusIDE.ActiveProject.CustomData.Values['StartModule'];
-  if FStartModuleVarName = '' then
-    UpdateStartModuleVarName;
+  lprModuleName:= GetLprStartModuleVarName();
+  FStartModuleVarName:= LazarusIDE.ActiveProject.CustomData.Values['StartModule'];
+  if FStartModuleVarName = '' then UpdateStartModuleVarName;
   //LAMW 0.8
 
   AddSupportToFCLControls(FChipArchitecture);
@@ -3472,68 +3178,58 @@ begin
   begin
     CleanupAllJControlsSource;
 
-    ControlsJava := TStringList.Create;
-    auxList := TStringList.Create;
+    ControlsJava:= TStringList.Create;
+    auxList:= TStringList.Create;
     controlsList := TStringList.Create;
     controlsList.Sorted := True;
     controlsList.Duplicates := dupIgnore;
-    compoundList := TStringList.Create;
+    compoundList:= TStringList.Create;
 
     GetAllJControlsFromForms(controlsList);
 
-    for i := 0 to controlsList.Count - 1 do       //Add component compound support
+    for i:= 0 to controlsList.Count - 1 do       //Add component compound support
     begin
-      if FileExists(PathToJavaTemplates + controlsList.Strings[i] + '.compound') then
+      if FileExists(PathToJavaTemplates+controlsList.Strings[i]+'.compound') then
       begin
-        compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-          controlsList.Strings[i] + '.compound');
-        for j := 0 to compoundList.Count - 1 do
+        compoundList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+controlsList.Strings[i]+'.compound');
+        for j:= 0 to compoundList.Count - 1 do
         begin
           if compoundList.Strings[j] <> '' then
-            controlsList.Add(compoundList.Strings[j]);
+             controlsList.Add(compoundList.Strings[j]);
         end;
       end;
     end;
 
     //re-add all [updated] java code ...
 
-    if (FSupport) or (Pos('AppCompat', AndroidTheme) > 0) then
-      // refactored by jmpessoa: UNIQUE "Controls.java" !!!
+    if (FSupport) or (Pos('AppCompat', AndroidTheme)>0) then  // refactored by jmpessoa: UNIQUE "Controls.java" !!!
     begin
 
-      if FileExists(PathToJavaTemplates + DirectorySeparator +
-        'support' + DirectorySeparator + 'jSupported.java') then
-      begin
-        auxList.LoadFromFile(PathToJavaTemplates + DirectorySeparator +
-          'support' + DirectorySeparator + 'jSupported.java');
-        auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
-        auxList.SaveToFile(FPathToJavaSource + 'jSupported.java');
-      end;
+       if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java') then
+       begin
+         auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java');
+         auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
+         auxList.SaveToFile(FPathToJavaSource + 'jSupported.java');
+       end;
 
-      if FileExists(PathToJavaTemplates + DirectorySeparator +
-        'support' + DirectorySeparator + 'support_provider_paths.xml') and
-        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator +
-        'xml' + DirectorySeparator + 'support_provider_paths.xml')) then
-      begin
-        ForceDirectories(FPathToAndroidProject + 'res' + DirectorySeparator +
-          'drawable');
-        auxList.LoadFromFile(PathToJavaTemplates + DirectorySeparator +
-          'support' + DirectorySeparator + 'support_provider_paths.xml');
-        ForceDirectories(FPathToAndroidProject + 'res' + DirectorySeparator + 'xml');
-        auxList.SaveToFile(FPathToAndroidProject + 'res' + DirectorySeparator +
-          'xml' + DirectorySeparator + 'support_provider_paths.xml');
-      end;
+       if FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') and
+          (not FileExists(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml'))then
+       begin
+         ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'drawable');
+         auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml');
+         ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
+         auxList.SaveToFile(FPathToAndroidProject +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
+       end;
 
     end
     else
     begin
-      if FileExists(PathToJavaTemplates + DirectorySeparator + 'jSupported.java') then
-      begin
-        auxList.LoadFromFile(PathToJavaTemplates + DirectorySeparator +
-          'jSupported.java');
-        auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
-        auxList.SaveToFile(FPathToJavaSource + 'jSupported.java');
-      end;
+       if FileExists(PathToJavaTemplates+DirectorySeparator+ 'jSupported.java') then
+       begin
+         auxList.LoadFromFile(PathToJavaTemplates+DirectorySeparator+ 'jSupported.java');
+         auxList.Strings[0] := 'package ' + FPackageName + ';';  //replace dummy
+         auxList.SaveToFile(FPathToJavaSource  + 'jSupported.java');
+       end;
     end;
 
     auxList.Clear;
@@ -3547,33 +3243,30 @@ begin
     //UNIQUE "Controls.java" !!!
     ControlsJava.LoadFromFile(PathToJavaTemplates + 'Controls.java');
 
-    ControlsJava.Strings[0] := 'package ' + FPackageName + ';';
+    ControlsJava.Strings[0]:= 'package '+FPackageName+';';
 
-    for j := 0 to controlsList.Count - 1 do
+    for j:= 0 to controlsList.Count - 1 do
     begin
-      if FileExists(PathToJavaTemplates + controlsList.Strings[j] + '.java') then
-        TryAddJControl(ControlsJava, controlsList.Strings[j], nativeExists);
+      if FileExists(PathToJavaTemplates+controlsList.Strings[j]+'.java') then
+           TryAddJControl(ControlsJava, controlsList.Strings[j], nativeExists);
     end;
 
     // tk Output some useful messages about libraries
-    LibPath := FPathToAndroidProject + 'libs' + DirectorySeparator + FChipArchitecture;
-    IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Selected chip architecture: ' +
-      FChipArchitecture);
-    IDEMessagesWindow.AddCustomMessage(mluVerbose,
-      'Taking libraries from folder: ' + LibPath);
+    LibPath := FPathToAndroidProject + 'libs'+DirectorySeparator+FChipArchitecture;
+    IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Selected chip architecture: ' + FChipArchitecture);
+    IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Taking libraries from folder: ' + LibPath);
     // end tk
 
-    linkLibrariesPath := '';
-    aux := LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
-    //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
-    p := Pos(';', aux);
+    linkLibrariesPath:='';
+    aux:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;  //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
+    p:= Pos(';', aux);
     if p > 0 then
     begin
-      linkLibrariesPath := Trim(Copy(aux, 1, p - 1));
-      libList := FindAllFiles(LibPath, '*.so', False);
-      for j := 0 to libList.Count - 1 do
+      linkLibrariesPath:= Trim(Copy(aux, 1, p-1));
+      libList:= FindAllFiles(LibPath, '*.so', False);
+      for j:= 0 to libList.Count-1 do
       begin
-        aux := ExtractFileName(libList.Strings[j]);
+        aux:= ExtractFileName(libList.Strings[j]);
 
         // tk Show what library has been added
         IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Found library: ' + aux);
@@ -3583,85 +3276,74 @@ begin
         begin
           if linkLibrariesPath <> '' then
           begin
-            if not FileExists(linkLibrariesPath + aux) then
-              //prepare "exotic" library to Linker
-              CopyFile(LibPath + PathDelim + aux, linkLibrariesPath + aux);
+          if not FileExists(linkLibrariesPath + aux) then  //prepare "exotic" library to Linker
+             CopyFile(LibPath +PathDelim+ aux, linkLibrariesPath + aux);
           end;
         end;
 
-        p := Pos('.', aux);
-        aux := Trim(copy(aux, 4, p - 4));
+        p:= Pos('.', aux);
+        aux:= Trim(copy(aux,4, p-4));
         auxList.Add(aux);
       end;
     end;
 
     //update all java code ...
     libList.Clear;
-    for j := 0 to auxList.Count - 1 do
+    for j:= 0 to auxList.Count-1 do
     begin
-      libList.Add('try{System.loadLibrary("' + auxList.Strings[j] +
-        '");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_lib' +
-        auxList.Strings[j] + '", "exception", e);}');
+      libList.Add('try{System.loadLibrary("'+auxList.Strings[j]+'");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_lib'+auxList.Strings[j]+'", "exception", e);}');
     end;
 
     if libList.Count > 0 then
-      aux := StringReplace(ControlsJava.Text, '/*libsmartload*/',
-        Trim(libList.Text), [rfReplaceAll, rfIgnoreCase])
+       aux:=  StringReplace(ControlsJava.Text, '/*libsmartload*/' ,Trim(libList.Text), [rfReplaceAll,rfIgnoreCase])
     else
-      aux := StringReplace(ControlsJava.Text, '/*libsmartload*/',
-        'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
-        [rfReplaceAll, rfIgnoreCase]);
+       aux:=  StringReplace(ControlsJava.Text, '/*libsmartload*/' ,
+               'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
+               [rfReplaceAll,rfIgnoreCase]);
 
-    ControlsJava.Text := aux;
-    ControlsJava.SaveToFile(FPathToJavaSource + 'Controls.java');
+    ControlsJava.Text:= aux;
+    ControlsJava.SaveToFile(FPathToJavaSource+'Controls.java');
 
     auxList.Clear;
     if (Pos('AppCompat', AndroidTheme) > 0) then
     begin
-      if FileExists(PathToJavaTemplates + 'support' + DirectorySeparator +
-        'App.java') then
-        auxList.LoadFromFile(PathToJavaTemplates + 'support' +
-          DirectorySeparator + 'App.java');
-      auxList.Strings[0] := 'package ' + FPackageName + ';';
-      auxList.SaveToFile(FPathToJavaSource + 'App.java');
+      if FileExists(PathToJavaTemplates +'support'+DirectorySeparator+'App.java') then
+        auxList.LoadFromFile(PathToJavaTemplates + 'support'+DirectorySeparator+'App.java');
+        auxList.Strings[0]:= 'package '+FPackageName+';';
+        auxList.SaveToFile(FPathToJavaSource+'App.java');
     end
     else if Pos('GDXGame', AndroidTheme) > 0 then
     begin
-      if FileExists(PathToJavaTemplates + 'gdx' + DirectorySeparator + 'App.java') then
+      if FileExists(PathToJavaTemplates +'gdx'+DirectorySeparator+'App.java') then
       begin
 
-        auxList.LoadFromFile(PathToJavaTemplates + 'gdx' + DirectorySeparator +
-          'App.java');
-        auxList.Strings[0] := 'package ' + FPackageName + ';';
-        auxList.SaveToFile(FPathToJavaSource + 'App.java');
+        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'App.java');
+        auxList.Strings[0]:= 'package '+FPackageName+';';
+        auxList.SaveToFile(FPathToJavaSource+'App.java');
 
         auxList.Clear;
-        auxList.LoadFromFile(PathToJavaTemplates + 'gdx' +
-          DirectorySeparator + 'jGdxForm.java');
-        auxList.Strings[0] := 'package ' + FPackageName + ';';
-        auxList.SaveToFile(FPathToJavaSource + 'jGdxForm.java');
+        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.java');
+        auxList.Strings[0]:= 'package '+FPackageName+';';
+        auxList.SaveToFile(FPathToJavaSource+'jGdxForm.java');
 
         auxList.Clear;
-        auxList.LoadFromFile(PathToJavaTemplates + 'gdx' +
-          DirectorySeparator + 'MyGdxGame.java');
-        auxList.Strings[0] := 'package ' + FPackageName + ';';
-        auxList.SaveToFile(FPathToJavaSource + 'MyGdxGame.java');
+        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'MyGdxGame.java');
+        auxList.Strings[0]:= 'package '+FPackageName+';';
+        auxList.SaveToFile(FPathToJavaSource+'MyGdxGame.java');
 
-        ControlsJava.LoadFromFile(FPathToJavaSource + 'Controls.java');
+        ControlsJava.LoadFromFile(FPathToJavaSource+'Controls.java');
 
-        nativeGdxFormList := TStringList.Create;
-        nativeGdxFormList.LoadFromFile(PathToJavaTemplates + 'gdx' +
-          DirectorySeparator + 'jGdxForm.create');
+        nativeGdxFormList:= TStringList.Create;
+        nativeGdxFormList.LoadFromFile(PathToJavaTemplates + 'gdx'+ DirectorySeparator+'jGdxForm.create');
 
-        gdxList := TStringList.Create;
-        gdxList.LoadFromFile(PathToJavaTemplates + 'gdx' +
-          DirectorySeparator + 'jGdxForm.native');
-        for i := 0 to gdxList.Count - 1 do
+        gdxList:= TStringList.Create;
+        gdxList.LoadFromFile(PathToJavaTemplates  + 'gdx'+DirectorySeparator+'jGdxForm.native');
+        for i:= 0 to gdxList.Count-1 do
         begin
           nativeGdxFormList.Add(gdxList.Strings[i]);
         end;
-        ControlsJava.Insert(ControlsJava.Count - 1, nativeGdxFormList.Text);
-        ControlsJava.SaveToFile(FPathToJavaSource + 'Controls.java');
+        ControlsJava.Insert(ControlsJava.Count-1, nativeGdxFormList.Text);
+        ControlsJava.SaveToFile(FPathToJavaSource+'Controls.java');
         gdxList.Free;
         nativeGdxFormList.Free;
       end;
@@ -3670,28 +3352,26 @@ begin
     begin
       if FileExists(PathToJavaTemplates + 'App.java') then
       begin
-        auxList.LoadFromFile(PathToJavaTemplates + 'App.java');
-        auxList.Strings[0] := 'package ' + FPackageName + ';';
-        auxList.SaveToFile(FPathToJavaSource + 'App.java');
-      end;
+         auxList.LoadFromFile(PathToJavaTemplates + 'App.java');
+         auxList.Strings[0]:= 'package '+FPackageName+';';
+         auxList.SaveToFile(FPathToJavaSource+'App.java');
+      end
     end;
 
     auxList.Clear;
 
-    if Pos('AppCompat', AndroidTheme) > 0 then
+    if Pos('AppCompat', AndroidTheme) > 0  then
     begin
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'support' +
-        DirectorySeparator + 'jCommons.java') then
-        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-          'support' + DirectorySeparator + 'jCommons.java');
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'jCommons.java') then
+        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'support'+DirectorySeparator+'jCommons.java');
     end
     else
     begin
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'jCommons.java') then
-        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + 'jCommons.java');
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates+'jCommons.java') then
+        auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'jCommons.java');
     end;
-    auxList.Strings[0] := 'package ' + FPackageName + ';';
-    auxList.SaveToFile(FPathToJavaSource + 'jCommons.java');
+    auxList.Strings[0]:= 'package '+FPackageName+';';
+    auxList.SaveToFile(FPathToJavaSource+'jCommons.java');
 
     compoundList.Free;
     controlsList.Free;
@@ -3702,30 +3382,28 @@ begin
 
   end;  //CanUpdateJavaTemplate
 
-  if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'Controls.java') then
+  if FileExists(LamwGlobalSettings.PathToJavaTemplates+'Controls.java') then
   begin
-    nativeMethodList := TStringList.Create;
-    tempList := TStringList.Create;
-    tempList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + 'Controls.java');
-    for i := 0 to tempList.Count - 1 do
+    nativeMethodList:= TStringList.Create;
+    tempList:= TStringList.Create;
+    tempList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.java');
+    for i:= 0 to tempList.Count - 1 do
     begin
-      if Pos(' native ', tempList.Strings[i]) > 0 then
-        nativeMethodList.Add(Trim(tempList.Strings[i]));
+       if Pos(' native ', tempList.Strings[i]) > 0 then
+          nativeMethodList.Add(Trim(tempList.Strings[i]));
     end;
     tempList.Clear;
-    for i := 0 to nativeMethodList.Count - 1 do
+    for i:= 0 to nativeMethodList.Count-1 do
     begin
       tempList.Add(GetEventSignature(nativeMethodList.Strings[i]));
     end;
     if Pos('GDXGame', AndroidTheme) > 0 then
     begin
-      gdxList := TStringList.Create;
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'gdx' +
-        DirectorySeparator + 'jGdxForm.native') then
+      gdxList:= TStringList.Create;
+      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.native') then
       begin
-        gdxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +
-          'gdx' + DirectorySeparator + 'jGdxForm.native');
-        for k := 0 to gdxList.Count - 1 do
+        gdxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.native');
+        for k:= 0 to gdxList.Count-1 do
         begin
           tempList.Add(GetEventSignature(gdxList.Strings[k]));
           nativeMethodList.Add(gdxList.Strings[k]);
@@ -3733,10 +3411,8 @@ begin
       end;
       gdxList.Free;
     end;
-    tempList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates + 'Controls.events');
-    //old "ControlsEvents.txt"
-    nativeMethodList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates +
-      'Controls.native');
+    tempList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.events');  //old "ControlsEvents.txt"
+    nativeMethodList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.native');
     nativeMethodList.Free;
     tempList.Free;
   end;
@@ -3744,47 +3420,44 @@ begin
   if FileExists(PathToJavaTemplates + 'Controls.native') then
   begin
     CopyFile(PathToJavaTemplates + 'Controls.native',
-      FPathToAndroidProject + 'lamwdesigner' + DirectorySeparator + 'Controls.native');
+       FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'Controls.native');
   end;
 
-  if FileExists(FPathToAndroidProject + 'build.gradle') then
+  if FileExists(FPathToAndroidProject+'build.gradle') then
   begin
-    tempList := TStringList.Create;
+    tempList:= TStringList.Create;
     try
-      tempList.LoadFromFile(FPathToAndroidProject + 'build.gradle');
+      tempList.LoadFromFile(FPathToAndroidProject+'build.gradle');
 
-      aux := '';
+      aux:='';
 
-      k := -1;
+      k:=-1;
 
-      for i := (tempList.Count - 1) downto 0 do
+      for i:=(tempList.Count-1) downto 0 do
       begin
         //get the dependencies denominator
-        if (Pos('fileTree(include', tempList.Strings[i]) > 0) then
+        if (Pos('fileTree(include', tempList.Strings[i])>0) then
         begin
-          aux := Trim(tempList.Strings[i]);
-          p := Pos(' ', aux);
-          if (p > 0) then
-            Delete(aux, p, MaxInt);
-          k := i; //store index
+          aux:=Trim(tempList.Strings[i]);
+          p:=Pos(' ',aux);
+          if (p>0) then Delete(aux,p,MaxInt);
+          k:=i; //store index
           break;
         end;
       end;
 
-      if (k <> -1) then
+      if (k<>-1) then
       begin
 
         //remove our own appCompat libs if any
-        for i := (tempList.Count - 1) downto (k - 1) do
+        for i:=(tempList.Count-1) downto (k-1) do
         begin
-          if ((Pos(aux, tempList.Strings[i]) > 0) and
-            (Pos('androidx.appcompat:appcompat:', tempList.Strings[i]) > 0)) or
-            ((Pos(aux, tempList.Strings[i]) > 0) and
-            (Pos('com.google.android.material:material:', tempList.Strings[i]) > 0)) then
+          if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('androidx.appcompat:appcompat:', tempList.Strings[i])>0)) or
+             ((Pos(aux, tempList.Strings[i])>0) AND (Pos('com.google.android.material:material:', tempList.Strings[i])>0)) then
           begin
             for aAppCompatLib in AppCompatLibs do
             begin
-              if Pos(aAppCompatLib.Name, tempList.Strings[i]) > 0 then
+              if Pos(aAppCompatLib.Name,tempList.Strings[i])>0 then
               begin
                 tempList.Delete(i);
                 break;
@@ -3794,14 +3467,13 @@ begin
         end;
 
         //remove our own Support libs if any
-        for i := (tempList.Count - 1) downto (k - 1) do
+        for i:=(tempList.Count-1) downto (k-1) do
         begin
-          if ((Pos(aux, tempList.Strings[i]) > 0) and
-            (Pos('androidx.core:core:', tempList.Strings[i]) > 0)) then
+          if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('androidx.core:core:', tempList.Strings[i])>0)) then
           begin
             for aSupportLib in SupportLibs do
             begin
-              if Pos(aSupportLib.Name, tempList.Strings[i]) > 0 then
+              if Pos(aSupportLib.Name,tempList.Strings[i])>0 then
               begin
                 tempList.Delete(i);
                 break;
@@ -3810,75 +3482,72 @@ begin
           end;
         end;
 
-        innerSupported := False;
+        innerSupported:= False;
 
         if Pos('AppCompat', AndroidTheme) > 0 then
         begin
-          innerSupported := True; //that is, AppCompat has inner "Support" Libraries
+          innerSupported:= True; //that is, AppCompat has inner "Support" Libraries
 
           //get the compileSdkVersion
-          compileSdkVersion := '';
-          for i := (tempList.Count - 1) downto 0 do
+          compileSdkVersion:='';
+          for i:=(tempList.Count-1) downto 0 do
           begin
-            if (Pos('compileSdkVersion ', tempList.Strings[i]) > 0) then
+            if (Pos('compileSdkVersion ', tempList.Strings[i])>0) then
             begin
-              compileSdkVersion := Trim(tempList.Strings[i]);
-              p := Pos(' ', compileSdkVersion);
-              if (p > 0) then
-                Delete(compileSdkVersion, 1, p);
-              compileSdkVersion := Trim(compileSdkVersion);
+              compileSdkVersion:=Trim(tempList.Strings[i]);
+              p:=Pos(' ',compileSdkVersion);
+              if (p>0) then Delete(compileSdkVersion,1,p);
+              compileSdkVersion:=Trim(compileSdkVersion);
               break;
             end;
           end;
 
-          if (Length(compileSdkVersion) > 0) then
+          if (Length(compileSdkVersion)>0) then
           begin
-            for aAppCompatLib in AppCompatLibs do
-            begin
-              if aAppCompatLib.MinAPI <= StrToInt(compileSdkVersion) then
+              for aAppCompatLib in AppCompatLibs do
               begin
-                tempList.Insert((k + 1), '    ' + aux + ' ''' +
-                  aAppCompatLib.Name + '''');
-                Inc(k);
+                if aAppCompatLib.MinAPI<=StrToInt(compileSdkVersion) then
+                begin
+                  tempList.Insert((k+1),'    '+aux+' '''+aAppCompatLib.Name+'''');
+                  Inc(k);
+                end;
               end;
-            end;
           end;
 
         end //AppCompat
         else if FSupport and (not innerSupported) then
         begin
           //get the compileSdkVersion
-          compileSdkVersion := '';
-          for i := (tempList.Count - 1) downto 0 do
+          compileSdkVersion:='';
+          for i:=(tempList.Count-1) downto 0 do
           begin
-            if (Pos('compileSdkVersion ', tempList.Strings[i]) > 0) then
+            if (Pos('compileSdkVersion ', tempList.Strings[i])>0) then
             begin
-              compileSdkVersion := Trim(tempList.Strings[i]);
-              p := Pos(' ', compileSdkVersion);
-              if (p > 0) then
-                Delete(compileSdkVersion, 1, p);
-              compileSdkVersion := Trim(compileSdkVersion);
+              compileSdkVersion:=Trim(tempList.Strings[i]);
+              p:=Pos(' ',compileSdkVersion);
+              if (p>0) then Delete(compileSdkVersion,1,p);
+              compileSdkVersion:=Trim(compileSdkVersion);
               break;
             end;
           end;
 
-          if (Length(compileSdkVersion) > 0) then
+          if (Length(compileSdkVersion)>0) then
           begin
-            for aSupportLib in SupportLibs do
-            begin
-              if aSupportLib.MinAPI <= StrToInt(compileSdkVersion) then
+              for aSupportLib in SupportLibs do
               begin
-                tempList.Insert((k + 1), '    ' + aux + ' ''' + aSupportLib.Name + '''');
-                Inc(k);
+                if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
+                begin
+                  tempList.Insert((k+1),'    '+aux+' '''+aSupportLib.Name + '''');
+                  Inc(k);
+                end;
               end;
-            end;
           end;
 
         end; //Supported
 
       end;
 
-      tempList.SaveToFile(FPathToAndroidProject + 'build.gradle');
+      tempList.SaveToFile(FPathToAndroidProject+'build.gradle');
     finally
       tempList.Free;
     end;
@@ -3897,8 +3566,8 @@ begin
     LazarusIDE.RemoveHandlerOnProjectOpened(@OnProjectOpened);
     LazarusIDE.RemoveHandlerOnSavingAll(@OnProjectSavingAll);
   end;
-  if GlobalDesignHook <> nil then
-    GlobalDesignHook.RemoveHandlerAddClicked(@AddClicked);
+  if  GlobalDesignHook <> nil then
+     GlobalDesignHook.RemoveHandlerAddClicked(@AddClicked);
   inherited Destroy;
 end;
 
@@ -3916,43 +3585,33 @@ end;
 //custom
 //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin
 
-function TLamwSmartDesigner.TryChangeNdkPlatformsApi(path: string;
-  newNdkApi: integer): string;
+function TLamwSmartDesigner.TryChangeNdkPlatformsApi(path: string; newNdkApi: integer): string;
 var
   tail, head: string;
   arch: string;
 begin
   if FNDKVersion < 22 then
   begin
-    tail := path;
-    head := SplitStr(tail, ';');
-    arch := 'arch-x86';
-    if Pos('armeabi', FChipArchitecture) > 0 then
-      arch := 'arch-arm'
-    else if Pos('arm64', FChipArchitecture) > 0 then
-      arch := 'arch-arm64'
-    else if Pos('mips', FChipArchitecture) > 0 then
-      arch := 'arch-mips'
-    else if Pos('86_64', FChipArchitecture) > 0 then
-      arch := 'arch-x86_64';
-    head := ConcatPaths([FPathToAndroidNDK, 'platforms', 'android-' +
-      IntToStr(newNdkApi), arch, 'usr', 'lib']);
-    Result := head + PathDelim + ';' + tail;
+      tail:= path;
+      head:= SplitStr(tail,';');
+      arch:= 'arch-x86';
+      if Pos('armeabi', FChipArchitecture) > 0 then arch:= 'arch-arm'
+      else if Pos('arm64', FChipArchitecture) > 0 then arch:= 'arch-arm64'
+      else if Pos('mips', FChipArchitecture) > 0 then arch:= 'arch-mips'
+      else if Pos('86_64', FChipArchitecture) > 0 then arch:= 'arch-x86_64';
+      head:= ConcatPaths([FPathToAndroidNDK,'platforms','android-'+IntToStr(newNdkApi), arch,'usr','lib']);
+      Result:= head + PathDelim + ';' + tail;
   end
   else // NDK >= 22
   begin
-    tail := path;
-    head := SplitStr(tail, ';');
-    arch := 'i686-linux-android';
-    if Pos('armeabi', FChipArchitecture) > 0 then
-      arch := 'arm-linux-androideabi'
-    else if Pos('arm64', FChipArchitecture) > 0 then
-      arch := 'aarch64-linux-android'
-    else if Pos('86_64', FChipArchitecture) > 0 then
-      arch := 'x86_64-linux-android';
-    head := ConcatPaths([FPathToAndroidNDK, 'toolchains', 'llvm',
-      'prebuilt', FPrebuildOSYS, 'sysroot', 'usr', 'lib', arch]);
-    Result := head + PathDelim + IntToStr(newNdkApi) + PathDelim + ';' + tail;
+      tail:= path;
+      head:= SplitStr(tail,';');
+      arch:= 'i686-linux-android';
+      if Pos('armeabi', FChipArchitecture) > 0 then arch:= 'arm-linux-androideabi'
+      else if Pos('arm64', FChipArchitecture) > 0 then arch:= 'aarch64-linux-android'
+      else if Pos('86_64', FChipArchitecture) > 0 then arch:= 'x86_64-linux-android';
+      head:= ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSYS, 'sysroot', 'usr', 'lib', arch]);
+      Result:= head + PathDelim + IntToStr(newNdkApi) + PathDelim + ';' + tail;
   end;
 end;
 
@@ -3963,20 +3622,19 @@ var
   p: integer;
   tail: string;
 begin
-  Result := path;
-  extPrebuildOSYS := PathDelim + FPrebuildOSYS + PathDelim;
-  p := Pos('prebuilt', path);
-  tail := Copy(path, p + 9, MaxInt);
-  p := Pos(PathDelim, tail);
+  Result:= path;
+  extPrebuildOSYS:= PathDelim + FPrebuildOSYS + PathDelim;
+  p:= Pos('prebuilt', path);
+  tail:= Copy(path, p+9, MaxInt);
+  p:= Pos(PathDelim, tail);
 
   if p > 0 then
   begin
-    projPrebuildOSYS := Copy(tail, 1, p - 1);
-    projPrebuildOSYS := PathDelim + projPrebuildOSYS + PathDelim;
-    if projPrebuildOSYS <> extPrebuildOSYS then
+    projPrebuildOSYS:=  Copy(tail, 1, p-1);
+    projPrebuildOSYS:=  PathDelim + projPrebuildOSYS + PathDelim;
+    if  projPrebuildOSYS <>  extPrebuildOSYS then
     begin
-      Result := StringReplace(path, projPrebuildOSYS, extPrebuildOSYS,
-        [rfReplaceAll, rfIgnoreCase]);
+      Result:= StringReplace(path, projPrebuildOSYS ,extPrebuildOSYS,[rfReplaceAll,rfIgnoreCase]);
     end;
   end;
 
@@ -3984,27 +3642,26 @@ end;
 
 procedure TLamwSmartDesigner.UpdateBuildModes();
 var
-  listBuildMode: TStringList;
-  x, ndkApi: string;
+ listBuildMode: TStringList;
+ x,  ndkApi: string;
 begin
 
-  FMaxNdk := 22;  //android 4.x and 5.x compatibility....
+   FMaxNdk := 22;  //android 4.x and 5.x compatibility....
 
-  ndkApi := IntToStr(FMaxNdk);
+   ndkApi:= IntToStr(FMaxNdk);
 
-  if FNDKIndex = '' then
-    FNDKIndex := LamwGlobalSettings.GetNDK;
+   if FNDKIndex = '' then
+      FNDKIndex := LamwGlobalSettings.GetNDK;
 
 
-  if FNDKIndex = '' then
-    FNDKIndex := '5';
+   if FNDKIndex = '' then FNDKIndex:= '5';
 
-  x := '';
-  if StrToInt(FNDKIndex) > 4 then
-    x := '.x';
+   x:='';
+   if StrToInt(FNDKIndex) > 4 then
+     x:='.x';
 
-  if (Length(FPrebuildOSYS) = 0) then
-  begin
+   if (Length(FPrebuildOSYS)=0) then
+   begin
      {$ifdef Windows}
      FPrebuildOSYS:='windows';
      {$endif}
@@ -4014,199 +3671,94 @@ begin
      {$ifdef Darwin}
      FPrebuildOSYS:='darwin';
      {$endif}
-  end;
+   end;
 
-  listBuildMode := TStringList.Create;
+   listBuildMode:= TStringList.Create;
 
-  listBuildMode.Clear;
-  if FNDKVersion < 22 then //arch-arm64
-    listBuildMode.Add('<Libraries Value="' + FPathToAndroidNDK +
-      'platforms' + PathDelim + 'android-' + ndkApi + PathDelim +
-      'arch-arm64' + PathDelim + 'usr' + PathDelim + 'lib;' +
-      FPathToAndroidNDK + 'toolchains' + PathDelim + 'aarch64-linux-android-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim +
-      'lib' + PathDelim + 'gcc' + PathDelim + 'aarch64-linux-android' +
-      PathDelim + '4.9' + x + '"/>')
-  else
-    listBuildMode.Add('<Libraries Value="' + ConcatPaths(
-      [FPathToAndroidNDK, 'toolchains', 'llvm', 'prebuilt', FPrebuildOSys,
-      'sysroot', 'usr', 'lib', 'aarch64-linux-android', ndkApi]) +
-      ';' + FPathToAndroidNDK + 'toolchains' + PathDelim +
-      'aarch64-linux-android-4.9' + PathDelim + 'prebuilt' + PathDelim +
-      FPrebuildOSYS + PathDelim + 'lib' + PathDelim + 'gcc' + PathDelim +
-      'aarch64-linux-android' + PathDelim + '4.9' + x + '"/>');
-  listBuildMode.Add('<TargetCPU Value="aarch64"/>');
-  listBuildMode.Add('<CustomOptions Value="-Xd -XPaarch64-linux-android- -FD' +
-    FPathToAndroidNDK + 'toolchains' + PathDelim + 'aarch64-linux-android-4.9' +
-    PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim + 'bin"/>');
-  listBuildMode.SavetoFile(FPathToAndroidProject + 'jni' + PathDelim +
-    'build-modes' + PathDelim + 'build_arm64.txt');
+   listBuildMode.Clear;
+   if FNDKVersion < 22 then //arch-arm64
+     listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-arm64'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'aarch64-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'aarch64-linux-android'+PathDelim+'4.9'+x+'"/>')
+   else
+     listBuildMode.Add('<Libraries Value="'+ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','aarch64-linux-android', ndkApi])+';'+FPathToAndroidNDK+'toolchains'+PathDelim+'aarch64-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'aarch64-linux-android'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="aarch64"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -XPaarch64-linux-android- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'aarch64-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_arm64.txt');
 
-  listBuildMode.Clear;
-  if FNDKVersion < 22 then  //arch-armV6
-    listBuildMode.Add('<Libraries Value="' + FPathToAndroidNDK +
-      'platforms' + PathDelim + 'android-' + ndkApi + PathDelim +
-      'arch-arm' + PathDelim + 'usr' + PathDelim + 'lib;' + FPathToAndroidNDK +
-      'toolchains' + PathDelim + 'arm-linux-androideabi-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim +
-      'lib' + PathDelim + 'gcc' + PathDelim + 'arm-linux-androideabi' +
-      PathDelim + '4.9' + x + '"/>')
-  else
-    listBuildMode.Add('<Libraries Value="' + ConcatPaths(
-      [FPathToAndroidNDK, 'toolchains', 'llvm', 'prebuilt', FPrebuildOSys,
-      'sysroot', 'usr', 'lib', 'arm-linux-androideabi', ndkApi]) +
-      ';' + FPathToAndroidNDK + 'toolchains' + PathDelim +
-      'arm-linux-androideabi-4.9' + PathDelim + 'prebuilt' + PathDelim +
-      FPrebuildOSYS + PathDelim + 'lib' + PathDelim + 'gcc' + PathDelim +
-      'arm-linux-androideabi' + PathDelim + '4.9' + x + '"/>');
-  listBuildMode.Add('<TargetCPU Value="arm"/>');
-  listBuildMode.Add(
-    '<CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FD' +
-    FPathToAndroidNDK + 'toolchains' + PathDelim + 'arm-linux-androideabi-4.9' +
-    PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim + 'bin"/>');
-  listBuildMode.SavetoFile(FPathToAndroidProject + 'jni' + PathDelim +
-    'build-modes' + PathDelim + 'build_armV6.txt');
+   listBuildMode.Clear;
+   if FNDKVersion < 22 then  //arch-armV6
+       listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-arm'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>')
+   else
+       listBuildMode.Add('<Libraries Value="'+ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','arm-linux-androideabi', ndkApi])+';'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="arm"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_armV6.txt');
 
-  listBuildMode.Clear;
-  if FNDKVersion < 22 then //arch-armV7
-    listBuildMode.Add('<Libraries Value="' + FPathToAndroidNDK +
-      'platforms' + PathDelim + 'android-' + ndkApi + PathDelim +
-      'arch-arm' + PathDelim + 'usr' + PathDelim + 'lib;' + FPathToAndroidNDK +
-      'toolchains' + PathDelim + 'arm-linux-androideabi-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim +
-      'lib' + PathDelim + 'gcc' + PathDelim + 'arm-linux-androideabi' +
-      PathDelim + '4.9' + x + '"/>')
-  else
-    listBuildMode.Add('<Libraries Value="' + ConcatPaths(
-      [FPathToAndroidNDK, 'toolchains', 'llvm', 'prebuilt', FPrebuildOSys,
-      'sysroot', 'usr', 'lib', 'arm-linux-androideabi', ndkApi]) +
-      ';' + FPathToAndroidNDK + 'toolchains' + PathDelim +
-      'arm-linux-androideabi-4.9' + PathDelim + 'prebuilt' + PathDelim +
-      FPrebuildOSYS + PathDelim + 'lib' + PathDelim + 'gcc' + PathDelim +
-      'arm-linux-androideabi' + PathDelim + '4.9' + x + '"/>');
-  listBuildMode.Add('<TargetCPU Value="arm"/>');
-  listBuildMode.Add(
-    '<CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FD' +
-    FPathToAndroidNDK + 'toolchains' + PathDelim + 'arm-linux-androideabi-4.9' +
-    PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim + 'bin"/>');
-  listBuildMode.SavetoFile(FPathToAndroidProject + 'jni' + PathDelim +
-    'build-modes' + PathDelim + 'build_armV7a.txt');
+   listBuildMode.Clear;
+   if FNDKVersion < 22 then //arch-armV7
+       listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-arm'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>')
+   else
+     listBuildMode.Add('<Libraries Value="'+ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','arm-linux-androideabi', ndkApi])+';'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="arm"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_armV7a.txt');
 
-  listBuildMode.Clear;
-  if FNDKVersion < 22 then //rmV7a_VFPv3
-    listBuildMode.Add('<Libraries Value="' + FPathToAndroidNDK +
-      'platforms' + PathDelim + 'android-' + ndkApi + PathDelim +
-      'arch-arm' + PathDelim + 'usr' + PathDelim + 'lib;' + FPathToAndroidNDK +
-      'toolchains' + PathDelim + 'arm-linux-androideabi-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim +
-      'lib' + PathDelim + 'gcc' + PathDelim + 'arm-linux-androideabi' +
-      PathDelim + '4.9' + x + '"/>')
-  else
-    listBuildMode.Add('<Libraries Value="' + ConcatPaths(
-      [FPathToAndroidNDK, 'toolchains', 'llvm', 'prebuilt', FPrebuildOSys,
-      'sysroot', 'usr', 'lib', 'arm-linux-androideabi', ndkApi]) +
-      ';' + FPathToAndroidNDK + 'toolchains' + PathDelim +
-      'arm-linux-androideabi-4.9' + PathDelim + 'prebuilt' + PathDelim +
-      FPrebuildOSYS + PathDelim + 'lib' + PathDelim + 'gcc' + PathDelim +
-      'arm-linux-androideabi' + PathDelim + '4.9' + x + '"/>');
-  listBuildMode.Add('<TargetCPU Value="arm"/>');
-  listBuildMode.Add(
-    '<CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FD' +
-    FPathToAndroidNDK + 'toolchains' + PathDelim + 'arm-linux-androideabi-4.9' +
-    PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim + 'bin"/>');
-  listBuildMode.SavetoFile(FPathToAndroidProject + 'jni' + PathDelim +
-    'build-modes' + PathDelim + 'build_armV7a_VFPv3.txt');
+   listBuildMode.Clear;
+   if FNDKVersion < 22 then //rmV7a_VFPv3
+     listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-arm'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>')
+   else
+     listBuildMode.Add('<Libraries Value="'+ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','arm-linux-androideabi', ndkApi])+';'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'arm-linux-androideabi'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="arm"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'arm-linux-androideabi-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_armV7a_VFPv3.txt');
 
-  listBuildMode.Clear;
-  if FNDKVersion < 22 then  //x86
-    listBuildMode.Add('<Libraries Value="' + FPathToAndroidNDK +
-      'platforms' + PathDelim + 'android-' + ndkApi + PathDelim +
-      'arch-x86' + PathDelim + 'usr' + PathDelim + 'lib;' + FPathToAndroidNDK +
-      'toolchains' + PathDelim + 'x86-4.9' + PathDelim + 'prebuilt' +
-      PathDelim + FPrebuildOSYS + PathDelim + 'lib' + PathDelim + 'gcc' +
-      PathDelim + 'x86-linux-android' + PathDelim + '4.9' + x + '"/>')
-  else
-    listBuildMode.Add('<Libraries Value="' + ConcatPaths(
-      [FPathToAndroidNDK, 'toolchains', 'llvm', 'prebuilt', FPrebuildOSys,
-      'sysroot', 'usr', 'lib', 'i686-linux-android', ndkApi]) + ';' +
-      FPathToAndroidNDK + 'toolchains' + PathDelim + 'x86-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim +
-      'lib' + PathDelim + 'gcc' + PathDelim + 'x86-linux-android' +
-      PathDelim + '4.9' + x + '"/>');
-  listBuildMode.Add('<TargetCPU Value="i386"/>');
-  listBuildMode.Add('<CustomOptions Value="-Xd -XPi686-linux-android- -FD' +
-    FPathToAndroidNDK + 'toolchains' + PathDelim + 'x86-4.9' +
-    PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim + 'bin"/>');
-  listBuildMode.SavetoFile(FPathToAndroidProject + 'jni' + PathDelim +
-    'build-modes' + PathDelim + 'build_x86.txt');
+   listBuildMode.Clear;
+   if FNDKVersion < 22 then  //x86
+      listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-x86'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'x86-linux-android'+PathDelim+'4.9'+x+'"/>')
+   else
+      listBuildMode.Add('<Libraries Value="'+ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','i686-linux-android', ndkApi])+';'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'x86-linux-android'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="i386"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -XPi686-linux-android- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_x86.txt');
 
-  listBuildMode.Clear;
-  if FNDKVersion < 22 then  //x86_64
-    listBuildMode.Add('<Libraries Value="' + FPathToAndroidNDK +
-      'platforms' + PathDelim + 'android-' + ndkApi + PathDelim +
-      'arch-x86_64' + PathDelim + 'usr' + PathDelim + 'lib;' +
-      FPathToAndroidNDK + 'toolchains' + PathDelim + 'x86_64-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim +
-      'lib' + PathDelim + 'gcc' + PathDelim + 'x86_64-linux-android' +
-      PathDelim + '4.9' + x + '"/>')
-  else
-    listBuildMode.Add('<Libraries Value="' + ConcatPaths(
-      [FPathToAndroidNDK, 'toolchains', 'llvm', 'prebuilt', FPrebuildOSys,
-      'sysroot', 'usr', 'lib', 'x86_64-linux-android', ndkApi]) +
-      ';' + FPathToAndroidNDK + 'toolchains' + PathDelim + 'x86_64-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim +
-      'lib' + PathDelim + 'gcc' + PathDelim + 'x86_64-linux-android' +
-      PathDelim + '4.9' + x + '"/>');
-  listBuildMode.Add('<TargetCPU Value="x86_64"/>');
-  listBuildMode.Add('<CustomOptions Value="-Xd -XPx86_64-linux-android- -FD' +
-    FPathToAndroidNDK + 'toolchains' + PathDelim + 'x86_64-4.9' +
-    PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim + 'bin"/>');
-  listBuildMode.SavetoFile(FPathToAndroidProject + 'jni' + PathDelim +
-    'build-modes' + PathDelim + 'build_x86_64.txt');
+   listBuildMode.Clear;
+   if FNDKVersion < 22 then  //x86_64
+      listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-x86_64'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86_64-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'x86_64-linux-android'+PathDelim+'4.9'+x+'"/>')
+   else
+      listBuildMode.Add('<Libraries Value="'+ConcatPaths([FPathToAndroidNDK,'toolchains','llvm','prebuilt',FPrebuildOSys,'sysroot','usr','lib','x86_64-linux-android', ndkApi])+';'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86_64-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'x86_64-linux-android'+PathDelim+'4.9'+x+'"/>');
+   listBuildMode.Add('<TargetCPU Value="x86_64"/>');
+   listBuildMode.Add('<CustomOptions Value="-Xd -XPx86_64-linux-android- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'x86_64-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_x86_64.txt');
 
-  listBuildMode.Clear;
-  if FNDKVersion < 22 then
-  begin
-    listBuildMode.Add('<Libraries Value="' + FPathToAndroidNDK +
-      'platforms' + PathDelim + 'android-' + ndkApi + PathDelim +
-      'arch-mips' + PathDelim + 'usr' + PathDelim + 'lib;' +
-      FPathToAndroidNDK + 'toolchains' + PathDelim + 'mipsel-linux-android-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim +
-      'lib' + PathDelim + 'gcc' + PathDelim + 'mipsel-linux-android' +
-      PathDelim + '4.9' + x + '"/>');
-    listBuildMode.Add('<TargetCPU Value="mipsel"/>');
-    listBuildMode.Add('<CustomOptions Value="-Xd -XPmipsel-linux-android- -FD' +
-      FPathToAndroidNDK + 'toolchains' + PathDelim + 'mipsel-linux-android-4.9' +
-      PathDelim + 'prebuilt' + PathDelim + FPrebuildOSYS + PathDelim + 'bin"/>');
-    listBuildMode.SavetoFile(FPathToAndroidProject + 'jni' + PathDelim +
-      'build-modes' + PathDelim + 'build_mipsel.txt');
-  end;
+   listBuildMode.Clear;
+   if FNDKVersion < 22 then
+   begin
+     listBuildMode.Add('<Libraries Value="'+FPathToAndroidNDK+'platforms'+PathDelim+'android-'+ndkApi+PathDelim+'arch-mips'+PathDelim+'usr'+PathDelim+'lib;'+FPathToAndroidNDK+'toolchains'+PathDelim+'mipsel-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'lib'+PathDelim+'gcc'+PathDelim+'mipsel-linux-android'+PathDelim+'4.9'+x+'"/>');
+     listBuildMode.Add('<TargetCPU Value="mipsel"/>');
+     listBuildMode.Add('<CustomOptions Value="-Xd -XPmipsel-linux-android- -FD'+FPathToAndroidNDK+'toolchains'+PathDelim+'mipsel-linux-android-4.9'+PathDelim+'prebuilt'+PathDelim+FPrebuildOSYS+PathDelim+'bin"/>');
+     listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'build_mipsel.txt');
+   end;
 
-  listBuildMode.Clear;
-  listBuildMode.Add('How to get more ".so" chipset builds:');
-  listBuildMode.Add(' ');
-  listBuildMode.Add(
-    '   :: Warning 1: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds!');
-  listBuildMode.Add(
-    '   :: Warning 2: Laz4Android [out-of-box] support only 32 Bits chipset: "armV6", "armV7a+Soft", "x86"!');
-  listBuildMode.Add(' ');
-  listBuildMode.Add('1. From LazarusIDE menu:');
-  listBuildMode.Add(' ');
-  listBuildMode.Add(
-    '   > Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]');
-  listBuildMode.Add(' ');
-  listBuildMode.Add('2. From LazarusIDE  menu:');
-  listBuildMode.Add(' ');
-  listBuildMode.Add('   > Run -> Clean up and Build...');
-  listBuildMode.Add(' ');
-  listBuildMode.Add('3. From LazarusIDE menu:');
-  listBuildMode.Add(' ');
-  listBuildMode.Add('   > [LAMW] Build Android Apk and Run');
-  listBuildMode.Add(' ');
-  listBuildMode.SavetoFile(FPathToAndroidProject + 'jni' + PathDelim +
-    'build-modes' + PathDelim + 'readme.txt');
+   listBuildMode.Clear;
+   listBuildMode.Add('How to get more ".so" chipset builds:');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('   :: Warning 1: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds!');
+   listBuildMode.Add('   :: Warning 2: Laz4Android [out-of-box] support only 32 Bits chipset: "armV6", "armV7a+Soft", "x86"!');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('1. From LazarusIDE menu:');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('   > Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('2. From LazarusIDE  menu:');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('   > Run -> Clean up and Build...');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('3. From LazarusIDE menu:');
+   listBuildMode.Add(' ');
+   listBuildMode.Add('   > [LAMW] Build Android Apk and Run');
+   listBuildMode.Add(' ');
+   listBuildMode.SavetoFile(FPathToAndroidProject+'jni'+PathDelim+'build-modes'+PathDelim+'readme.txt');
 
-  listBuildMode.Free;
+   listBuildMode.Free;
 
 end;
 
@@ -4217,16 +3769,16 @@ var
   p: integer;
   new49x: string;
 begin
-  Result := path;
-  new49x := PathDelim + '4.9.x' + PathDelim;  //  /4.9.x/
+  Result:= path;
+  new49x:= PathDelim + '4.9.x' + PathDelim;  //  /4.9.x/
 
-  p := Pos(PathDelim + '4.9', path);
+  p:= Pos(PathDelim+'4.9', path);
   if p > 0 then
   begin
-    proj49 := Copy(path, p, MaxInt); //  /4.9/
-    if proj49 <> new49x then
+    proj49:= Copy(path, p, MaxInt); //  /4.9/
+    if  proj49 <>  new49x then
     begin
-      Result := StringReplace(path, proj49, new49x, [rfReplaceAll, rfIgnoreCase]);
+      Result:= StringReplace(path, proj49, new49x,[rfReplaceAll,rfIgnoreCase]);
     end;
   end;
 
@@ -4238,16 +3790,16 @@ var
   p: integer;
   new49: string;
 begin
-  Result := path;
-  new49 := PathDelim + '4.9' + PathDelim;  //  /4.9/
+  Result:= path;
+  new49:= PathDelim + '4.9' + PathDelim;  //  /4.9/
 
-  p := Pos(PathDelim + '4.9.x', path);
+  p:= Pos(PathDelim+'4.9.x', path);
   if p > 0 then
   begin
-    proj49x := Copy(path, p, MaxInt); //  /4.9.x/
-    if proj49x <> new49 then
+    proj49x:= Copy(path, p, MaxInt); //  /4.9.x/
+    if  proj49x <>  new49 then
     begin
-      Result := StringReplace(path, proj49x, new49, [rfReplaceAll, rfIgnoreCase]);
+      Result:= StringReplace(path, proj49x, new49,[rfReplaceAll,rfIgnoreCase]);
     end;
   end;
 
@@ -4259,58 +3811,53 @@ var
   pathToAntBin, pathToJavaJDK, androidProjectName, antBuildMode: string;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
-  linuxAndroidProjectName: string;
+  linuxAndroidProjectName:  string;
   linuxPathToAntBin: string;
   linuxPathToAndroidSdk: string;
   tempStr, linuxPathToAdbBin, packageName: string;
 
 begin
 
-  pathToAntBin := Copy(LamwGlobalSettings.PathToAntBin, 1,
-    Length(LamwGlobalSettings.PathToAntBin) - 1); //paths have trailing path
-  if pathToAntBin = '' then
-    Exit;
+  pathToAntBin:= Copy(LamwGlobalSettings.PathToAntBin, 1, Length(LamwGlobalSettings.PathToAntBin)-1); //paths have trailing path
+  if pathToAntBin = '' then Exit;
 
-  antBuildMode := 'debug';
-  packageName := LazarusIDE.ActiveProject.CustomData.Values['Package'];
+  antBuildMode:= 'debug';
+  packageName:= LazarusIDE.ActiveProject.CustomData.Values['Package'];
 
-  pathToJavaJDK := Copy(LamwGlobalSettings.PathToJavaJDK, 1,
-    Length(LamwGlobalSettings.PathToJavaJDK) - 1); //paths have trailing path
+  pathToJavaJDK:= Copy(LamwGlobalSettings.PathToJavaJDK, 1, Length(LamwGlobalSettings.PathToJavaJDK)-1); //paths have trailing path
 
-  androidProjectName := FPathToAndroidProject; //paths have trailing path
+  androidProjectName:= FPathToAndroidProject; //paths have trailing path
 
-  strList := TStringList.Create;
+  strList:= TStringList.Create;
 
-  strList.Add('set Path=%PATH%;' + pathToAntBin);
-  //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
-  strList.Add('set JAVA_HOME=' + pathToJavaJDK);
-  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-  strList.Add('cd ' + androidProjectName);
+  strList.Add('set Path=%PATH%;'+pathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
+  strList.Add('set JAVA_HOME='+pathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
+  strList.Add('cd '+androidProjectName);
   strList.Add('call ant clean -Dtouchtest.enabled=true debug');
   strList.Add('if errorlevel 1 pause');
-  strList.SaveToFile(androidProjectName + 'ant-build-debug.bat');
+  strList.SaveToFile(androidProjectName+'ant-build-debug.bat');
 
   strList.Clear;
-  strList.Add('set Path=%PATH%;' + pathToAntBin);
-  strList.Add('set JAVA_HOME=' + pathToJavaJDK);
-  strList.Add('cd ' + androidProjectName);
+  strList.Add('set Path=%PATH%;'+pathToAntBin);
+  strList.Add('set JAVA_HOME='+pathToJavaJDK);
+  strList.Add('cd '+androidProjectName);
   strList.Add('call ant clean release');
   strList.Add('if errorlevel 1 pause');
-  strList.SaveToFile(androidProjectName + 'ant-build-release.bat');
+  strList.SaveToFile(androidProjectName+'ant-build-release.bat');
 
   strList.Clear;
-  strList.Add('cd ' + androidProjectName + 'bin');
-  strList.Add(FPathToAndroidSDK + 'platform-tools' + DirectorySeparator +
-    'adb install -r ' + FSmallProjName + '-' + antBuildMode + '.apk');
+  strList.Add('cd '+androidProjectName+'bin');
+  strList.Add(FPathToAndroidSDK+'platform-tools'+
+             DirectorySeparator+'adb install -r '+FSmallProjName+'-'+antBuildMode+'.apk');
   strList.Add('cd ..');
   strList.Add('pause');
-  strList.SaveToFile(androidProjectName + 'adb-install.bat');
+  strList.SaveToFile(androidProjectName+'adb-install.bat');
 
-  linuxDirSeparator := DirectorySeparator;
-  linuxPathToJavaJDK := pathToJavaJDK;
-  linuxAndroidProjectName := androidProjectName;
-  linuxPathToAntBin := pathToAntBin;
-  linuxPathToAndroidSdk := FPathToAndroidSDK;
+  linuxDirSeparator:= DirectorySeparator;
+  linuxPathToJavaJDK:= pathToJavaJDK;
+  linuxAndroidProjectName:= androidProjectName;
+  linuxPathToAntBin:= pathToAntBin;
+  linuxPathToAndroidSdk:= FPathToAndroidSDK;
 
   {$IFDEF WINDOWS}
      linuxDirSeparator:= '/';
@@ -4337,66 +3884,61 @@ begin
 
   strList.Clear;
   if pathToAntBin <> '' then
-    strList.Add('export PATH=' + linuxPathToAntBin + ':$PATH');
+    strList.Add('export PATH='+linuxPathToAntBin+':$PATH');
 
-  strList.Add('export JAVA_HOME=' + linuxPathToJavaJDK);
-  strList.Add('cd ' + linuxAndroidProjectName);
+  strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);
+  strList.Add('cd '+linuxAndroidProjectName);
   strList.Add('ant -Dtouchtest.enabled=true debug');
-  SaveShellScript(strList, androidProjectName + 'ant-build-debug.sh');
+  SaveShellScript(strList, androidProjectName+'ant-build-debug.sh');
 
 
   //MacOs
   strList.Clear;
   if pathToAntBin <> '' then
   begin
-    strList.Add('export PATH=' + linuxPathToAntBin + ':$PATH');
-    //export PATH=/usr/bin/ant:PATH
-    strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');
-    //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-    strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
-    strList.Add('cd ' + linuxAndroidProjectName);
-    strList.Add('ant -Dtouchtest.enabled=true debug');
-    SaveShellScript(strList, androidProjectName + 'ant-build-debug-macos.sh');
+     strList.Add('export PATH='+linuxPathToAntBin+':$PATH');        //export PATH=/usr/bin/ant:PATH
+     strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+     strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
+     strList.Add('cd '+linuxAndroidProjectName);
+     strList.Add('ant -Dtouchtest.enabled=true debug');
+     SaveShellScript(strList, androidProjectName+'ant-build-debug-macos.sh');
   end;
 
   strList.Clear;
   if pathToAntBin <> '' then
-    strList.Add('export PATH=' + linuxPathToAntBin + ':$PATH');
-  //export PATH=/usr/bin/ant:PATH
+     strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
 
-  strList.Add('export JAVA_HOME=' + linuxPathToJavaJDK);
-  //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-  strList.Add('cd ' + linuxAndroidProjectName);
+  strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+  strList.Add('cd '+linuxAndroidProjectName);
   strList.Add('ant clean release');
-  SaveShellScript(strList, androidProjectName + 'ant-build-release.sh');
+  SaveShellScript(strList, androidProjectName+'ant-build-release.sh');
 
-  linuxPathToAdbBin := linuxPathToAndroidSdk + 'platform-tools';
+  linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
 
   //linux install - thanks to Stephano!
   strList.Clear;
-  strList.Add(linuxPathToAdbBin + linuxDirSeparator + 'adb uninstall ' + packageName);
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
   (*
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r bin'+linuxDirSeparator+FSmallProjName+'-'+antBuildMode+'.apk');
   *)
 
-  tempStr := androidProjectName;
+  tempStr:= androidProjectName;
   {$ifdef windows}
   tempStr:= StringReplace(androidProjectName,PathDelim,linuxDirSeparator, [rfReplaceAll]);
   tempStr:= Copy(tempStr, 3, MaxInt); //drop C:
   {$endif}
 
-  strList.Add(linuxPathToAdbBin + linuxDirSeparator + 'adb install -r ' +
-    tempStr + 'bin' + linuxDirSeparator + FSmallProjName + '-' + antBuildMode + '.apk');
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr + 'bin' + linuxDirSeparator+FSmallProjName+'-'+antBuildMode+'.apk');
   //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
-  SaveShellScript(strList, androidProjectName + 'adb-install.sh');
+  SaveShellScript(strList, androidProjectName+'adb-install.sh');
 
   strList.Clear;
-  strList.Add(linuxPathToAdbBin + linuxDirSeparator + 'adb uninstall ' + packageName);
-  SaveShellScript(strList, androidProjectName + 'adb-uninstall.sh');
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
+  SaveShellScript(strList, androidProjectName+'adb-uninstall.sh');
 
   strList.Clear;
-  strList.Add(linuxPathToAdbBin + linuxDirSeparator + 'adb logcat &');
-  SaveShellScript(strList, androidProjectName + 'logcat.sh');
+  strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
+  SaveShellScript(strList, androidProjectName+'logcat.sh');
 
   strList.Free;
 end;
@@ -4407,120 +3949,114 @@ var
   strResult: string;
   lpiFileName: string;
   strTemp: string;
-  strCustom, strLibrary: string;
-  pathToDemoNDK, pathToDemoNDKConverted: string;
+  strCustom,  strLibrary: string;
+  pathToDemoNDK,  pathToDemoNDKConverted: string;
   pathToDemoSDK: string;
   localSys: string;
   strMaxNdk: string;
 begin
 
-  strList := TStringList.Create;
-  pathToDemoSDK := LazarusIDE.ActiveProject.CustomData.Values['SdkPath'];
-  //included pathDelimiter
+  strList:= TStringList.Create;
+  pathToDemoSDK:= LazarusIDE.ActiveProject.CustomData.Values['SdkPath']; //included pathDelimiter
 
   if pathToDemoSDK = '' then
-    pathToDemoSDK := GetPathToSDKFromBuildXML(FPathToAndroidProject + 'build.xml');
-  //included pathDelimiter
+    pathToDemoSDK:= GetPathToSDKFromBuildXML(FPathToAndroidProject+'build.xml'); //included pathDelimiter
 
-  pathToDemoNDK := LazarusIDE.ActiveProject.CustomData.Values['NdkPath'];
-  //included pathDelimiter
+  pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath']; //included pathDelimiter
 
   if (FPathToAndroidNDK <> '') and (pathToDemoNDK <> '') then
   begin
     if Pos(':', FPathToAndroidNDK) > 0 then
     begin
-      localSys := 'win';
-      pathToDemoNDKConverted :=
-        StringReplace(pathToDemoNDK, '/', '\', [rfReplaceAll, rfIgnoreCase]);
+      localSys:= 'win';
+      pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '/', '\', [rfReplaceAll,rfIgnoreCase]);
     end
     else
     begin
-      localSys := 'unix';
-      pathToDemoNDKConverted :=
-        StringReplace(pathToDemoNDK, '\', '/', [rfReplaceAll, rfIgnoreCase]);
+      localSys:= 'unix';
+      pathToDemoNDKConverted:= StringReplace(pathToDemoNDK, '\', '/', [rfReplaceAll,rfIgnoreCase]);
     end;
   end;
 
   if (FPathToAndroidSDK <> '') and (pathToDemoSDK <> '') then
   begin
-    if FileExists(FPathToAndroidProject + 'build.xml') then
+    if FileExists(FPathToAndroidProject+'build.xml') then
     begin
-      strList.LoadFromFile(FPathToAndroidProject + 'build.xml');
-      strList.SaveToFile(FPathToAndroidProject + 'build.xml.bak2');
+      strList.LoadFromFile(FPathToAndroidProject+'build.xml');
+      strList.SaveToFile(FPathToAndroidProject+'build.xml.bak2');
       strResult := StringReplace(strList.Text, pathToDemoSDK,
-        FPathToAndroidSDK, [rfReplaceAll, rfIgnoreCase]);
+                                               FPathToAndroidSDK,
+                                               [rfReplaceAll,rfIgnoreCase]);
       strList.Text := strResult;
-      strList.SaveToFile(FPathToAndroidProject + 'build.xml');
+      strList.SaveToFile(FPathToAndroidProject+'build.xml');
     end;
   end
   else
     ShowMessage('Sorry.. Project "build.xml" Path  to SDK not fixed... [Please, change it by hand!]');
 
   lpiFileName := LazarusIDE.ActiveProject.ProjectInfoFile; //full path to 'controls.lpi';
-  CopyFile(lpiFileName, lpiFileName + '.bak2');
+  CopyFile(lpiFileName, lpiFileName+'.bak2');
 
   if FNDKIndex = '' then
     FNDKIndex := LamwGlobalSettings.GetNDK;
 
-  if FNDKIndex = '' then
-    FNDKIndex := '5';
+  if  FNDKIndex = '' then FNDKIndex:= '5';
 
   if (pathToDemoNDK <> '') and (FPathToAndroidNDK <> '') then
   begin
 
-    LazarusIDE.ActiveProject.Modified := True;
+      LazarusIDE.ActiveProject.Modified:= True;
 
-    //Libraries
-    strTemp := LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;
-    //path already converted!!!
+      //Libraries
+      strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.Libraries;   //path already converted!!!
 
-    strLibrary := StringReplace(strTemp, pathToDemoNDKConverted,
-      FPathToAndroidNDK, [rfReplaceAll, rfIgnoreCase]);
+      strLibrary:= StringReplace(strTemp, pathToDemoNDKConverted,
+                                         FPathToAndroidNDK,
+                                         [rfReplaceAll,rfIgnoreCase]);
 
-    //try
-    strResult := StringReplace(strLibrary, '4.6', '4.9', [rfReplaceAll, rfIgnoreCase]);
+      //try
+      strResult:= StringReplace(strLibrary, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
 
-    FMaxNdk := 22;  //android 4.x and 5.x compatibulty....
+      FMaxNdk:= 22;  //android 4.x and 5.x compatibulty....
 
-    strMaxNdk := IntToStr(FMaxNdk);
+      strMaxNdk:= IntToStr(FMaxNdk);
 
-    strResult := TryChangePrebuildOSY(strResult); //LAMW 0.8
-    if StrToInt(FNDKIndex) > 4 then  //LAMW 0.8
-    begin
-      strResult := TryChangeTo49x(strResult);
-    end
-    else
-      strResult := TryChangeTo49(strResult);
+      strResult:= TryChangePrebuildOSY(strResult); //LAMW 0.8
+      if StrToInt(FNDKIndex) > 4 then  //LAMW 0.8
+      begin
+         strResult:= TryChangeTo49x(strResult)
+      end
+      else
+         strResult:= TryChangeTo49(strResult);
 
-    strResult := TryChangeNdkPlatformsApi(strResult, FMaxNdk);
+      strResult:= TryChangeNdkPlatformsApi(strResult, FMaxNdk);
 
-    LazarusIDE.ActiveProject.LazCompilerOptions.Libraries := strResult;
-    LazarusIDE.ActiveProject.CustomData.Values['NdkApi'] := 'android-' + strMaxNdk;
-    //android-13 or android-14 or ... etc
+      LazarusIDE.ActiveProject.LazCompilerOptions.Libraries:= strResult;
+      LazarusIDE.ActiveProject.CustomData.Values['NdkApi']:='android-'+strMaxNdk; //android-13 or android-14 or ... etc
 
-    //CustomOptions
-    strTemp := LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
-    //path not already converted!!
+      //CustomOptions
+      strTemp:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;  //path not already converted!!
 
-    if localSys = 'win' then
-      strCustom := StringReplace(strTemp, '/', '\', [rfReplaceAll, rfIgnoreCase])
-    else   //unix
-      strCustom := StringReplace(strTemp, '\', '/', [rfReplaceAll, rfIgnoreCase]);
+      if localSys = 'win' then
+        strCustom:= StringReplace(strTemp, '/', '\', [rfReplaceAll,rfIgnoreCase])
+      else   //unix
+        strCustom:= StringReplace(strTemp, '\', '/', [rfReplaceAll,rfIgnoreCase]);
 
-    strResult := StringReplace(strCustom, pathToDemoNDKConverted,
-      FPathToAndroidNDK, [rfReplaceAll, rfIgnoreCase]);
+      strResult:= StringReplace(strCustom, pathToDemoNDKConverted,
+                                         FPathToAndroidNDK,
+                                         [rfReplaceAll,rfIgnoreCase]);
 
-    //try
-    strResult := StringReplace(strResult, '4.6', '4.9', [rfReplaceAll, rfIgnoreCase]);
+      //try
+      strResult:= StringReplace(strResult, '4.6', '4.9', [rfReplaceAll,rfIgnoreCase]);
 
-    strResult := TryChangePrebuildOSY(strResult); //LAMW 0.8
+      strResult:= TryChangePrebuildOSY(strResult); //LAMW 0.8
 
-    LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions := strResult;
+      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= strResult;
 
-    //update custom ...
-    LazarusIDE.ActiveProject.CustomData.Values['NdkPath'] := FPathToAndroidNDK;
-    LazarusIDE.ActiveProject.CustomData.Values['SdkPath'] := FPathToAndroidSDK;
+      //update custom ...
+      LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
+      LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
 
   end
   else
@@ -4539,21 +4075,21 @@ var
   p2: integer;
 begin
 
-  strList := TStringList.Create;
+  strList:= TStringList.Create;
   if FileExists(FPathToAndroidProject + 'readme.txt') then
   begin
     strList.LoadFromFile(FPathToAndroidProject + 'readme.txt');
 
     p := Pos('System Path to Android SDK=', strList.Text);
-    p := p + length('System Path to Android SDK=');
+    p := p+length('System Path to Android SDK=');
 
     p2 := Pos('System Path to Android NDK=', strList.Text);
-    pathToDemoSDK := Trim(copy(strList.Text, p, p2 - p));
+    pathToDemoSDK := Trim(copy(strList.Text,p,p2-p));
 
     p := Pos('System Path to Android NDK=', strList.Text);
-    p := p + length('System Path to Android NDK=');
+    p := p+length('System Path to Android NDK=');
 
-    pathToDemoNDK := Trim(copy(strList.Text, p, strList.Count));
+    pathToDemoNDK := Trim(copy(strList.Text,p,strList.Count));
   end;
 
   strList.Free;
@@ -4566,30 +4102,26 @@ var
 begin
   Result := False;
 
-  pathToDemoNDK := LazarusIDE.ActiveProject.CustomData.Values['NdkPath'];
-  //included delimiter
-  pathToDemoSDK := LazarusIDE.ActiveProject.CustomData.Values['SdkPath'];
-  //included delimiter
+  pathToDemoNDK:= LazarusIDE.ActiveProject.CustomData.Values['NdkPath']; //included delimiter
+  pathToDemoSDK:= LazarusIDE.ActiveProject.CustomData.Values['SdkPath']; //included delimiter
 
   if (pathToDemoNDK = '') and (pathToDemoSDK = '') then
   begin
     TryFindDemoPathsFromReadme(pathToDemoNDK, pathToDemoSDK);  // try "readme.txt"
-    if (pathToDemoNDK = '') and (pathToDemoSDK = '') then
-      Exit;
+    if (pathToDemoNDK = '') and (pathToDemoSDK = '') then Exit;
     //create custom data
-    pathToDemoNDK := IncludeTrailingPathDelimiter(pathToDemoNDK);
-    pathToDemoSDK := IncludeTrailingPathDelimiter(pathToDemoSDK);
-    LazarusIDE.ActiveProject.CustomData.Values['NdkPath'] := pathToDemoNDK;
-    LazarusIDE.ActiveProject.CustomData.Values['SdkPath'] := pathToDemoSDK;
+    pathToDemoNDK:= IncludeTrailingPathDelimiter(pathToDemoNDK);
+    pathToDemoSDK:= IncludeTrailingPathDelimiter(pathToDemoSDK);
+    LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= pathToDemoNDK;
+    LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= pathToDemoSDK;
   end;
 
-  if (pathToDemoNDK = FPathToAndroidNDK) and (pathToDemoSDK = FPathToAndroidSDK) then
-    Exit;
+  if (pathToDemoNDK = FPathToAndroidNDK) and (pathToDemoSDK = FPathToAndroidSDK) then Exit;
 
   if Pos(':', pathToDemoNDK) > 0 then //project imported from windows ...
     TryRunProcessChmod(FPathToAndroidProject); //need to convert win to Linux ...
 
-  Result := True;
+  Result:= True;
 end;
 
 

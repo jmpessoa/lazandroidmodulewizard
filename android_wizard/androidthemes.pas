@@ -388,11 +388,14 @@ var
   xml: TXMLDocument;
   n: TDOMNode;
   s, pp: string;
-
 begin
   Result := nil;
   if not FileExists(AndroidManifestFileName) then Exit;
   xml := LoadXML(AndroidManifestFileName, True);
+  n := xml.DocumentElement.FindNode('uses-sdk');
+  if n = nil then Exit;
+  s := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
+  if not TryStrToInt(s, TargetAPI) then Exit;
   n := xml.DocumentElement.FindNode('application');
   if n = nil then Exit;
   s := TDOMElement(n).AttribStrings['android:theme'];
