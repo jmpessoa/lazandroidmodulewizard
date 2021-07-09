@@ -44,6 +44,7 @@ type
     FNDKVersion: integer;
     FMinSdkControl: integer;
     FNdkApi: string;
+    FAndroidTheme: string;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
@@ -113,9 +114,11 @@ type
     procedure Init4Project(AProject: TLazProject);
     function IsLaz4Android(): boolean;
 
-    // calleds from Designer/TAndroidWidgetMediator
-    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
-    procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm); //TAndroidWidgetMediator.UpdateJControlsList;
+    // calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
+    procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
+
+     //calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
+    procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
     procedure UpdateProjectStartModule(const NewName: string; moduleType: integer);
 
   end;
@@ -722,7 +725,6 @@ var
   i, minsdkApi, sdkManifMinApiNumber: integer;
   strTargetApi, auxStr, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
   aSupportLib:TSupportLib;
-  AndroidTheme: string;
   androidPluginNumber: integer;
   pluginVersion: string;
   gradleCompatible, outgradleCompatible: string;
@@ -761,10 +763,9 @@ begin
      end;
   end;
 
-  AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
   FSupport:= (LazarusIDE.ActiveProject.CustomData.Values['Support']='TRUE');
 
-  if Pos('AppCompat', AndroidTheme) > 0 then
+  if Pos('AppCompat', FAndroidTheme) > 0 then
   begin
      LazarusIDE.ActiveProject.CustomData.Values['Support']:='TRUE';
      FSupport:= True;
@@ -773,11 +774,11 @@ begin
 
   if not FileExists(targetpath+DirectorySeparator+'styles.xml') then
   begin
-    if (Pos('AppCompat', AndroidTheme) > 0) or (Pos('GDXGame', AndroidTheme) > 0) then
+    if (Pos('AppCompat', FAndroidTheme) > 0) or (Pos('GDXGame', FAndroidTheme) > 0) then
     begin
-       if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+AndroidTheme+'.xml') then
+       if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+FAndroidTheme+'.xml') then
        begin
-          CopyFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+AndroidTheme+'.xml',
+          CopyFile(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+FAndroidTheme+'.xml',
                      targetpath+DirectorySeparator+'styles.xml');
        end;
     end
@@ -792,14 +793,33 @@ begin
 
   end;
 
-  minsdkApi:= 14;
-  if  minsdkApi < FMinSdkControl then minsdkApi:= FMinSdkControl;
+  if Pos('AppCompat',  FAndroidTheme) > 0 then
+     minsdkApi:= 18
+  else
+     minsdkApi:= 14;
+
+  auxStr:= LazarusIDE.ActiveProject.CustomData['MinSdk']; //new
+
+  if auxStr <> '' then
+  begin
+     FMinSdkControl:= StrToInt(auxStr);
+  end
+  else
+  begin
+    FMinSdkControl:= minsdkApi;
+    LazarusIDE.ActiveProject.CustomData['MinSdk']:= IntToStr(FMinSdkControl);
+    LazarusIDE.ActiveProject.Modified:= True;
+  end;
+
+  if  minsdkApi < FMinSdkControl then
+      minsdkApi:= FMinSdkControl;
 
   sdkManifMinApi:= GetMinSDKFromManifest();
+
   if sdkManifMinApi <> '' then
     sdkManifMInApiNumber:= StrToInt(sdkManifMinApi)
   else
-    sdkManifMInApiNumber:= 0; //dummy
+    sdkManifMInApiNumber:= 0; //minSdk was removed from manisfest ... so we need re-introduce it!
 
   sourcepath:=LamwGlobalSettings.PathToJavaTemplates+'androidmanifest.txt';
   targetpath:=FPathToAndroidProject+'AndroidManifest.xml';
@@ -817,7 +837,7 @@ begin
     SaveToFile(targetpath);
   end;
 
-  if (FSupport) or (Pos('AppCompat', AndroidTheme) > 0) then
+  if (FSupport) or (Pos('AppCompat', FAndroidTheme) > 0) then
   begin
     strList.Clear;
     strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
@@ -864,7 +884,11 @@ begin
     end
     else //re-introduce it!
     begin
-       manifestApis:= '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="'+IntToStr(targetApi)+'"/>';
+       if Pos('AppCompat', FAndroidTheme) > 0 then
+          manifestApis:= '<uses-sdk android:minSdkVersion="18" android:targetSdkVersion="'+IntToStr(targetApi)+'"/>'
+       else
+          manifestApis:= '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="'+IntToStr(targetApi)+'"/>';
+
        insertRef:= 'android:versionName='; //insert reference point
        p1:= Pos(insertRef, tempStr);
        p2:= p1 + Length(insertRef);
@@ -1154,7 +1178,7 @@ begin
          end;
 
 
-         if Pos('AppCompat', AndroidTheme) > 0 then
+         if Pos('AppCompat', FAndroidTheme) > 0 then
          begin
 
            strList.Add('    compileSdkVersion '+ buildToolApi);
@@ -1258,7 +1282,7 @@ begin
 
          strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-         if ((Pos('AppCompat', AndroidTheme) <= 0) and (FSupport)) then
+         if ((Pos('AppCompat', FAndroidTheme) <= 0) and (FSupport)) then
          begin
            for aSupportLib in SupportLibs do
            begin
@@ -1290,7 +1314,7 @@ begin
 
          end;
 
-         if Pos('GDXGame', AndroidTheme) > 0 then
+         if Pos('GDXGame', FAndroidTheme) > 0 then
          begin
            directive:= 'api';
            strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx:1.9.10''');
@@ -1631,7 +1655,6 @@ var
   tempStr: string;
   p: integer;
   outMaxBuildTool: string;
-  androidTheme: string;
   isProjectImported: boolean;
   sdkManifestTargetApi, buildTool: string;
   manifestTargetApi: integer;
@@ -1646,6 +1669,8 @@ begin
     FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
     FPrebuildOSYS:= LamwGlobalSettings.PrebuildOSYS;
     FPathToSmartDesigner:= LamwGlobalSettings.PathToSmartDesigner;
+
+    FAndroidTheme:= AProject.CustomData['Theme'];
 
     ndkRelease:= LamwGlobalSettings.GetNDKRelease;
     if ndkRelease <> '' then
@@ -1673,7 +1698,7 @@ begin
 
     isBrandNew:= False;
 
-    if (AProject.CustomData['LamwVersion'] = '') and (AProject.CustomData['Theme'] <> '') then
+    if (AProject.CustomData['LamwVersion'] = '') and (FAndroidTheme <> '') then
       isBrandNew:= True;
 
     if AProject.CustomData['LamwVersion'] <> LamwGlobalSettings.Version then
@@ -1696,9 +1721,8 @@ begin
       AProject.CustomData['Package'] := FPackageName;
     end;
     FPathToJavaSource:= FPathToAndroidProject + 'src' + PathDelim + AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim));
-    androidTheme:= AProject.CustomData['Theme'];
 
-    if  (androidTheme = '') or (Pos('AppCompat', androidTheme) <= 0) then
+    if  (FAndroidTheme = '') or (Pos('AppCompat', FAndroidTheme) <= 0) then
       LamwGlobalSettings.QueryPaths:= False;  //dont query Path to Gradle
 
     FPathToGradle:= LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
@@ -1748,6 +1772,7 @@ begin
            if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
                AProject.CustomData['BuildSystem']:= 'Gradle'
       end;
+
 
       if AProject.CustomData['Theme'] = '' then
          AProject.CustomData['Theme']:= 'DeviceDefault';
@@ -1980,6 +2005,7 @@ begin
 end;
 *)
 
+// calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
 procedure TLamwSmartDesigner.UpdateJControls(ProjFile: TLazProjectFile;
   AndroidForm: TAndroidForm);
 var
@@ -1993,7 +2019,9 @@ begin
   jControls.Sorted := True;
   jControls.Duplicates := dupIgnore;
 
-  if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0  then
+  FAndroidTheme:= LazarusIDE.ActiveProject.CustomData['Theme'];
+
+  if Pos('GDXGame', FAndroidTheme) > 0  then
     jControls.Add('jGdxForm')
   else
     jControls.Add('jForm');
@@ -2276,12 +2304,13 @@ function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname
   out nativeAdded: boolean): boolean;
 var
   list, auxList, manifestList, gradleList: TStringList;
-  p, p1, p2, i, minSdkManifest: integer;
+  p, p1, p2, i, num,  minSdkManifest: integer;
   aux, tempStr, auxStr: string;
   insertRef, minSdkManifestStr: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;
+  customMinSdkApi: string;
 begin
    nativeAdded:= False;
    Result:= False;
@@ -2347,24 +2376,35 @@ begin
    //updated manifest minAdkApi
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk') then
    begin
+
      minSdkManifestStr:= GetMinSDKFromManifest();
 
-     if  minSdkManifestStr <> '' then
-       minSdkManifest:= StrToInt(minSdkManifestStr)
-     else
-       minSdkManifest:= 14;
+     if minSdkManifestStr <> '' then
+         minSdkManifest:= StrToInt(minSdkManifestStr)
+      else minSdkManifest:= 0;
 
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk');
 
-     tempMinSdk:= StrToInt(auxList.Strings[0]);
-     if FMinSdkControl < tempMinSdk then FMinSdkControl:= tempMinSdk;
+     aux:= auxList.Strings[0];
+
+     if aux <> '' then
+        tempMinSdk:= StrToInt(aux)
+     else
+        tempMinSdk:= 14;
+
+     if FMinSdkControl < tempMinSdk then
+     begin
+        FMinSdkControl:= tempMinSdk;
+        LazarusIDE.ActiveProject.CustomData['MinSdk']:= aux;
+        LazarusIDE.ActiveProject.Modified:= True;
+     end;
 
      if FMinSdkControl > minSdkManifest then
      begin
         auxList.Clear;
         auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
         tempStr:= auxList.Text;
-        tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+IntTostr(minSdkManifest)+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
+        tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+minSdkManifestStr+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
         auxList.Text:= tempStr;
         auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
 
@@ -2372,7 +2412,7 @@ begin
         begin
           auxList.LoadFromFile(FPathToAndroidProject+'build.gradle');
           tempStr:= auxList.Text;
-          tempStr:= StringReplace(tempStr, 'minSdkVersion '+IntTostr(minSdkManifest), 'minSdkVersion '+IntToStr(FMinSdkControl), [rfReplaceAll,rfIgnoreCase]);
+          tempStr:= StringReplace(tempStr, 'minSdkVersion '+minSdkManifestStr, 'minSdkVersion '+IntToStr(FMinSdkControl), [rfReplaceAll,rfIgnoreCase]);
           auxList.Text:= tempStr;
           auxList.SaveToFile(FPathToAndroidProject+'build.gradle');
         end;

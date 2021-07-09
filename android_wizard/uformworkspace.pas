@@ -569,7 +569,7 @@ begin
 
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then
   begin
-     if StrToInt(FMinApi) < 14 then FMinApi:= '14'
+     if StrToInt(FMinApi) < 18 then FMinApi:= '18' //14
   end;
 
   //SaveWorkSpaceSettings(FFileName);
