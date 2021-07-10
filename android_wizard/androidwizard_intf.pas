@@ -2161,10 +2161,15 @@ begin
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant.properties');
 
           strList.Clear;  //if need, hiden info in "build.grade" source
+
           //strList.Add('RELEASE_STORE_FILE='+LowerCase(FSmallProjName)+'-release.keystore');
           //strList.Add('RELEASE_KEY_ALIAS='+apk_aliaskey);
           //strList.Add('RELEASE_STORE_PASSWORD=123456');
           //strList.Add('RELEASE_KEY_PASSWORD=123456');
+
+          if Pos('AppCompat', FAndroidTheme) > 0 then
+             strList.Add('android.useAndroidX=true');
+
           strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle.properties');  //if need configure proxy here, too
 
           //keytool input [dammy] data!
@@ -2646,8 +2651,10 @@ begin
                    innerSupported:= True;
                    for aAppCompatLib in AppCompatLibs do
                    begin
-                     if aAppCompatLib.MinAPI<=StrToInt(compileSdkVersion) then
-                       strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');//compileSdkVersion+'.+''');
+                     strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
+                     if aAppCompatLib.MinAPI > StrToInt(compileSdkVersion) then
+                         ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
+                                      IntToStr(aAppCompatLib.MinAPI));
                    end;
                    //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
                 end else
@@ -2655,8 +2662,10 @@ begin
                  begin
                    for aSupportLib in SupportLibs do
                    begin
-                     if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
-                       strList.Add('    '+directive+' '''+aSupportLib.Name+'''');//compileSdkVersion+'.+''');
+                     strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
+                     if aSupportLib.MinAPI > StrToInt(compileSdkVersion) then
+                       ShowMessage('Warning: Support library need Android SDK >= ' +
+                                    IntToStr(aSupportLib.MinAPI));
                    end;
                    //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
                  end;

@@ -725,6 +725,7 @@ var
   i, minsdkApi, sdkManifMinApiNumber: integer;
   strTargetApi, auxStr, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
   aSupportLib:TSupportLib;
+  aAppCompatLib:TAppCompatLib;
   androidPluginNumber: integer;
   pluginVersion: string;
   gradleCompatible, outgradleCompatible: string;
@@ -741,10 +742,11 @@ var
   insertRef, manifestApis, supportProvider: string;
   p1, p2: integer;
   c: char;
-  FVersionCode : integer;
-  FVersionName : string;
+  versionCode : string;
+  versionName : string;
   xmlAndroidManifest: TXMLDocument;
   foundSignature : boolean;
+  innerSupported: boolean;
 begin
 
   strList:= TStringList.Create;
@@ -798,7 +800,7 @@ begin
   else
      minsdkApi:= 14;
 
-  auxStr:= LazarusIDE.ActiveProject.CustomData['MinSdk']; //new
+  auxStr:= LazarusIDE.ActiveProject.CustomData['MinSdk'];             //new
 
   if auxStr <> '' then
   begin
@@ -1059,8 +1061,8 @@ begin
          if fileExists(FPathToAndroidProject+'gradle.properties') then
          begin
           strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
-
-          foundSignature := (strList.Count = 4);
+          if Pos('RELEASE_STORE_FILE', strList.Text) > 0 then
+             foundSignature := True;
          end;
 
          strList.Clear;
@@ -1180,13 +1182,10 @@ begin
 
          if Pos('AppCompat', FAndroidTheme) > 0 then
          begin
-
            strList.Add('    compileSdkVersion '+ buildToolApi);
-
            if androidPluginNumber < 3000 then
               strList.Add('    buildToolsVersion "26.0.2"'); //buildTool
            //else: each version of the Android Gradle Plugin now has a default version of the build tools
-
          end
          else
          begin
@@ -1216,17 +1215,17 @@ begin
              Exit;
           with xmlAndroidManifest.DocumentElement do
           begin
-                      FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
-                      FVersionName := AttribStrings['android:versionName'];
+              versionCode := AttribStrings['android:versionCode'];
+              versionName := AttribStrings['android:versionName'];
           end;
          end else
          begin
-          FVersionCode := 1;
-          FVersionName := '1.0';
+          versionCode := '1';
+          versionName := '1.0';
          end;
 
-         strList.Add('            versionCode ' + intToStr(FVersionCode));
-         strList.Add('            versionName "'+FVersionName+'"');
+         strList.Add('            versionCode ' + versionCode);
+         strList.Add('            versionName "'+ versionName+'"');
          strList.Add('    }');
 
          if foundSignature then
@@ -1281,37 +1280,28 @@ begin
            directive:='implementation';
 
          strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
+         innerSupported:= False;
+         if Pos('AppCompat', FAndroidTheme) > 0 then
+         begin
+           innerSupported:= True; //that is, AppCompat has inner "Support" Libraries
+           for aAppCompatLib in AppCompatLibs do
+           begin
+             strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
+             if aAppCompatLib.MinAPI > StrToInt(buildToolApi) then
+                ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
+                             IntToStr(aAppCompatLib.MinAPI));
+           end;
 
-         if ((Pos('AppCompat', FAndroidTheme) <= 0) and (FSupport)) then
+         end
+         else if FSupport and (not innerSupported) then  //only Supported
          begin
            for aSupportLib in SupportLibs do
            begin
-             if aSupportLib.MinAPI<=StrToInt(buildToolApi) then
-               strList.Add('    '+directive+' '''+aSupportLib.Name+'''');//buildToolApi+'.+''');
+              strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
+              if aSupportLib.MinAPI > StrToInt(buildToolApi) then
+                ShowMessage('Warning: Support library need Android SDK >= ' +
+                             IntToStr(aSupportLib.MinAPI));
            end;
-
-           //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
-
-            {
-            requiredList:= TStringList.Create;
-            requiredList:= FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.required', False);
-            for i:= 0 to requiredList.Count-1 do
-            begin
-                listRequirements.LoadFromFile(requiredList.Strings[i]);
-                for k:= 0 to listRequirements.Count-1 do
-                begin                           //implementation 'com.github.nisrulz:lantern:2.0.0'
-                   p:= Pos('implementation ', listRequirements.Strings[k]);
-                   if p > 0 then
-                   begin
-                     p:= Pos(' ', listRequirements.Strings[k]);
-                     tempStr:= Copy(listRequirements.Strings[k], p, MaxInt);
-                     strList.Add('    '+directive+tempStr);
-                   end;
-                end;
-            end;
-            requiredList.Free;
-            }
-
          end;
 
          if Pos('GDXGame', FAndroidTheme) > 0 then
@@ -1349,6 +1339,18 @@ begin
          end;
          strList.Add('//how to use: look for "gradle_readme.txt"');
          strList.SaveToFile(FPathToAndroidProject+'build.gradle');
+
+         strList.Clear;
+         if Pos('AppCompat', FAndroidTheme) > 0 then
+         begin
+           strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
+           if Pos(Uppercase('android.useAndroidX'), Uppercase(strList.Text) ) <= 0 then
+           begin
+              strList.Add('android.useAndroidX=true');
+              strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
+           end;
+         end;
+
        end;
     end;
 
@@ -2304,13 +2306,12 @@ function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname
   out nativeAdded: boolean): boolean;
 var
   list, auxList, manifestList, gradleList: TStringList;
-  p, p1, p2, i, num,  minSdkManifest: integer;
+  p, p1, p2, i,  minSdkManifest: integer;
   aux, tempStr, auxStr: string;
   insertRef, minSdkManifestStr: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;
-  customMinSdkApi: string;
 begin
    nativeAdded:= False;
    Result:= False;
@@ -3178,16 +3179,13 @@ var
   ControlsJava, auxList, controlsList, libList, nativeGdxFormList, gdxList: TStringList;
   i, j, p, k: Integer;
   nativeExists: Boolean;
-  aux, compileSdkVersion, PathToJavaTemplates, LibPath, linkLibrariesPath: string;
+  aux, PathToJavaTemplates, LibPath, linkLibrariesPath: string;
   AndroidTheme: string;
   compoundList: TStringList;
   lprModuleName: string;
   hasControls: boolean;
   nativeMethodList, tempList: TStringList;
   FSupport:boolean;
-  aSupportLib:TSupportLib;
-  aAppCompatLib:TAppCompatLib;
-  innerSupported: boolean;
 begin
   Result := mrOk;
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
@@ -3463,137 +3461,7 @@ begin
        FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'Controls.native');
   end;
 
-  if FileExists(FPathToAndroidProject+'build.gradle') then
-  begin
-    tempList:= TStringList.Create;
-    try
-      tempList.LoadFromFile(FPathToAndroidProject+'build.gradle');
-
-      aux:='';
-
-      k:=-1;
-
-      for i:=(tempList.Count-1) downto 0 do
-      begin
-        //get the dependencies denominator
-        if (Pos('fileTree(include', tempList.Strings[i])>0) then
-        begin
-          aux:=Trim(tempList.Strings[i]);
-          p:=Pos(' ',aux);
-          if (p>0) then Delete(aux,p,MaxInt);
-          k:=i; //store index
-          break;
-        end;
-      end;
-
-      if (k<>-1) then
-      begin
-
-        //remove our own appCompat libs if any
-        for i:=(tempList.Count-1) downto (k-1) do
-        begin
-          if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('androidx.appcompat:appcompat:', tempList.Strings[i])>0)) or
-             ((Pos(aux, tempList.Strings[i])>0) AND (Pos('com.google.android.material:material:', tempList.Strings[i])>0)) then
-          begin
-            for aAppCompatLib in AppCompatLibs do
-            begin
-              if Pos(aAppCompatLib.Name,tempList.Strings[i])>0 then
-              begin
-                tempList.Delete(i);
-                break;
-              end;
-            end;
-          end;
-        end;
-
-        //remove our own Support libs if any
-        for i:=(tempList.Count-1) downto (k-1) do
-        begin
-          if ((Pos(aux, tempList.Strings[i])>0) AND (Pos('androidx.core:core:', tempList.Strings[i])>0)) then
-          begin
-            for aSupportLib in SupportLibs do
-            begin
-              if Pos(aSupportLib.Name,tempList.Strings[i])>0 then
-              begin
-                tempList.Delete(i);
-                break;
-              end;
-            end;
-          end;
-        end;
-
-        innerSupported:= False;
-
-        if Pos('AppCompat', AndroidTheme) > 0 then
-        begin
-          innerSupported:= True; //that is, AppCompat has inner "Support" Libraries
-
-          //get the compileSdkVersion
-          compileSdkVersion:='';
-          for i:=(tempList.Count-1) downto 0 do
-          begin
-            if (Pos('compileSdkVersion ', tempList.Strings[i])>0) then
-            begin
-              compileSdkVersion:=Trim(tempList.Strings[i]);
-              p:=Pos(' ',compileSdkVersion);
-              if (p>0) then Delete(compileSdkVersion,1,p);
-              compileSdkVersion:=Trim(compileSdkVersion);
-              break;
-            end;
-          end;
-
-          if (Length(compileSdkVersion)>0) then
-          begin
-              for aAppCompatLib in AppCompatLibs do
-              begin
-                if aAppCompatLib.MinAPI<=StrToInt(compileSdkVersion) then
-                begin
-                  tempList.Insert((k+1),'    '+aux+' '''+aAppCompatLib.Name+'''');
-                  Inc(k);
-                end;
-              end;
-          end;
-
-        end //AppCompat
-        else if FSupport and (not innerSupported) then
-        begin
-          //get the compileSdkVersion
-          compileSdkVersion:='';
-          for i:=(tempList.Count-1) downto 0 do
-          begin
-            if (Pos('compileSdkVersion ', tempList.Strings[i])>0) then
-            begin
-              compileSdkVersion:=Trim(tempList.Strings[i]);
-              p:=Pos(' ',compileSdkVersion);
-              if (p>0) then Delete(compileSdkVersion,1,p);
-              compileSdkVersion:=Trim(compileSdkVersion);
-              break;
-            end;
-          end;
-
-          if (Length(compileSdkVersion)>0) then
-          begin
-              for aSupportLib in SupportLibs do
-              begin
-                if aSupportLib.MinAPI<=StrToInt(compileSdkVersion) then
-                begin
-                  tempList.Insert((k+1),'    '+aux+' '''+aSupportLib.Name + '''');
-                  Inc(k);
-                end;
-              end;
-          end;
-
-        end; //Supported
-
-      end;
-
-      tempList.SaveToFile(FPathToAndroidProject+'build.gradle');
-    finally
-      tempList.Free;
-    end;
-  end;
-
-  //*cleanup! old commented code was here.... [by jmpessoa]
+  (*  old code here .... solved in "keepProjectUpdated" !! *)
 
   UpdateProjectLpr(lprModuleName, FStartModuleVarName);
 end;
