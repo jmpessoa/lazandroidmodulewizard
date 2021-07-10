@@ -1,4 +1,4 @@
-package org.lamw.appcompatnavigationdrawerdemo1;
+package org.lamw.appcompatnavigationdrawerdemo3;
 
 
 import java.lang.reflect.Field;
@@ -45,7 +45,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    private Boolean enabled  = true;           // click-touch enabled!
    private MenuItem mLastMenuItem = null;
    
-   private int menuItemColor = R.color.primary_text;
+   private int menuItemColor = R.color.accent;
    private int selectedMenuItemColor = R.color.primary;
       
    RelativeLayout  headerLayout;     
@@ -98,7 +98,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
     		    
     		    if (mLastMenuItem !=  null) {    	
     		       // mLastMenuItem.setChecked(false);    		    	
-        		   if (menuItemColor == R.color.primary_text)
+        		   if (menuItemColor == menuItemColor)
     		           mLastMenuItem.setChecked(false);  //highlighted item
         		   else
         		      SetItemTextColor(mLastMenuItem, menuItemColor);    		    	    		    	
