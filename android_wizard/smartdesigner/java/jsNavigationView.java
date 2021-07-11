@@ -45,7 +45,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    private Boolean enabled  = true;           // click-touch enabled!
    private MenuItem mLastMenuItem = null;
    
-   private int menuItemColor = R.color.accent;
+   private int menuItemColor = android.R.color.black;
    private int selectedMenuItemColor = R.color.primary;
       
    RelativeLayout  headerLayout;     
@@ -98,7 +98,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
     		    
     		    if (mLastMenuItem !=  null) {    	
     		       // mLastMenuItem.setChecked(false);    		    	
-        		   if (menuItemColor == menuItemColor)
+        		   if (menuItemColor == android.R.color.black)
     		           mLastMenuItem.setChecked(false);  //highlighted item
         		   else
         		      SetItemTextColor(mLastMenuItem, menuItemColor);    		    	    		    	
