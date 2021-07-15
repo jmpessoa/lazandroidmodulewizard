@@ -1758,8 +1758,9 @@ begin
 
     if not isBrandNew then
     begin
-      LazarusIDE.ActiveProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
-      LazarusIDE.ActiveProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
+      AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
+      AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
+      AProject.Modified:= True;
 
       if AProject.CustomData['BuildSystem'] = '' then
       begin
@@ -1767,17 +1768,25 @@ begin
           AProject.CustomData['BuildSystem']:= 'Ant'
         else
           AProject.CustomData['BuildSystem']:= 'Gradle';
+
+        AProject.Modified:= True;
       end
       else
       begin
         if AProject.CustomData['BuildSystem'] = 'Ant' then
            if not IsSdkToolsAntEnable(FPathToAndroidSDK) then
-               AProject.CustomData['BuildSystem']:= 'Gradle'
+           begin
+             AProject.CustomData['BuildSystem']:= 'Gradle';
+             AProject.Modified:= True;
+           end;
       end;
 
 
       if AProject.CustomData['Theme'] = '' then
-         AProject.CustomData['Theme']:= 'DeviceDefault';
+      begin
+        AProject.CustomData['Theme']:= 'DeviceDefault';
+        AProject.Modified:= True;
+      end;
 
       sdkManifestTargetApi:= GetTargetFromManifest();
 
@@ -2670,6 +2679,7 @@ begin
      CopyFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.jpg',
           FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+LowerCase(jclassname)+'_image.jpg');
    end;
+
    //-----
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.anim') then
    begin
@@ -2679,6 +2689,17 @@ begin
      begin
        CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'anim' + DirectorySeparator + auxList.Strings[i],
             FPathToAndroidProject+'res'+DirectorySeparator+'anim'+DirectorySeparator+auxList.Strings[i]);
+     end;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.drawable') then
+   begin
+     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.drawable');
+     ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'drawable');
+     for i:= 0 to  auxList.Count-1 do
+     begin
+       CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'drawable' + DirectorySeparator + auxList.Strings[i],
+            FPathToAndroidProject+'res'+DirectorySeparator+'drawable'+DirectorySeparator+auxList.Strings[i]);
      end;
    end;
 
@@ -3272,12 +3293,6 @@ begin
 
     auxList.Clear;
 
-    (* commented/refactored by jmpessoa
-    if ((Pos('AppCompat', AndroidTheme) > 0) OR (FSupport)) AND FileExists(PathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'Controls.java') then
-      ControlsJava.LoadFromFile(PathToJavaTemplates +'support'+DirectorySeparator+'Controls.java')
-    else
-    *)
-
     //UNIQUE "Controls.java" !!!
     ControlsJava.LoadFromFile(PathToJavaTemplates + 'Controls.java');
 
@@ -3341,6 +3356,17 @@ begin
 
     ControlsJava.Text:= aux;
     ControlsJava.SaveToFile(FPathToJavaSource+'Controls.java');
+
+    auxList.Clear;
+    if LazarusIDE.ActiveProject.CustomData['LAMW'] = 'GUI' then
+    begin
+      if FileExists(PathToJavaTemplates+'jForm.java') then
+      begin
+          auxList.LoadFromFile(PathToJavaTemplates+'jForm.java');
+          auxList.Strings[0]:= 'package '+FPackageName+';';
+          auxList.SaveToFile(FPathToJavaSource+'jForm.java');
+      end;
+    end;
 
     auxList.Clear;
     if (Pos('AppCompat', AndroidTheme) > 0) then

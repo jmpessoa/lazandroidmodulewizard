@@ -786,7 +786,7 @@ begin
             end;
           end;
 
-          //UNIQUE "Controls.java" !!!
+          //UNIQUE and now Refactored "Controls.java" !!!
           LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
           Strings[0] := 'package ' + strPackName + ';';  //replace dummy - Controls.java
           aux:=  StringReplace(Text, '/*libsmartload*/' ,
@@ -794,6 +794,15 @@ begin
                  [rfReplaceAll,rfIgnoreCase]);
           Text:= aux;
           SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
+
+          //NEW GUI jForm Refactored from "Controls.java"
+          Clear;
+          if fileExists(FPathToJavaTemplates + DirectorySeparator + 'jForm.java') then
+          begin
+            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'jForm.java');
+            Strings[0] := 'package ' + strPackName + ';';  //replace dummy
+            SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jForm.java');
+          end;
 
           Clear;
           if (Pos('AppCompat', FAndroidTheme) > 0) then
@@ -4592,7 +4601,7 @@ begin
     if ResourceName <> '' then
        strList.Add('  T' + ResourceName + ' = class(jForm)')
     else
-       strList.Add('  TAndroidModuleXX = class(jForm)');
+       strList.Add('  TAndroidModuleXX = class(jForm)'); //dummy
   end
   else if ModuleType = 1 then//generic module
   begin
