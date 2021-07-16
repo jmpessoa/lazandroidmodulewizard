@@ -144,6 +144,13 @@ jIntentManager = class(jControl)
     function  GetShareItemLabel(_pos: integer) : String;
     function  GetShareItemPackageName(_pos: integer) : String;
     function  GetShareItemBitmap( _pos : integer ) : jObject;
+
+    //https://forum.lazarus.freepascal.org/index.php/topic,55344.0.html
+    //thanks to schumi !
+    function GetExtraByteArray(_intent: jObject; _dataName: string): TDynArrayOfJByte;
+    procedure PutExtraByteArray(_dataName: string; var _values: TDynArrayOfJByte);
+    function JByteArrayToString(var _byteArray: TDynArrayOfJByte): string;
+
  published
     property IntentAction: TIntentAction read FIntentAction write SetAction;
 
@@ -190,6 +197,10 @@ function jIntentManager_IsActionEqual(env: PJNIEnv; _jintentmanager: JObject; _i
 
 procedure jIntentManager_SetDataAndType(env: PJNIEnv; _jintentmanager: JObject; _uriData: jObject; _mimeType: string); overload;
 function jIntentManager_GetExtraSMS(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _addressBodyDelimiter: string): string;
+
+function jIntentManager_GetExtraByteArray(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _dataName: string): TDynArrayOfJByte;
+procedure jIntentManager_PutExtraByteArray(env: PJNIEnv; _jintentmanager: JObject; _dataName: string; var _values: TDynArrayOfJByte);
+function jIntentManager_ByteArrayToString(env: PJNIEnv; _jintentmanager: JObject; var _byteArray: TDynArrayOfJByte): string;
 
 implementation
 
@@ -988,6 +999,28 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionDeleteAsString');
+end;
+
+function jIntentManager.GetExtraByteArray(_intent: jObject; _dataName: string): TDynArrayOfJByte;
+begin
+  Result := nil;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetExtraByteArray(FjEnv, FjObject, _intent ,_dataName);
+end;
+
+procedure jIntentManager.PutExtraByteArray(_dataName: string; var _values: TDynArrayOfJByte);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_PutExtraByteArray(FjEnv, FjObject, _dataName ,_values);
+end;
+
+function jIntentManager.JByteArrayToString(var _byteArray: TDynArrayOfJByte): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_ByteArrayToString(FjEnv, FjObject, _byteArray);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2107,5 +2140,92 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+function jIntentManager_GetExtraByteArray(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _dataName: string): TDynArrayOfJByte;
+var
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  Result := nil;
+
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetExtraByteArray', '(Landroid/content/Intent;Ljava/lang/String;)[B');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _intent;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_dataName));
+
+  jResultArray:= env^.CallObjectMethodA(env, _jintentmanager, jMethod,  @jParams);
+
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    env^.GetByteArrayRegion(env, jResultArray, 0, resultSize, @Result[0] {target});
+  end;
+
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jIntentManager_PutExtraByteArray(env: PJNIEnv; _jintentmanager: JObject; _dataName: string; var _values: TDynArrayOfJByte);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'PutExtraByteArray', '(Ljava/lang/String;[I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_dataName));
+  newSize0:= Length(_values);
+  jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
+  env^.SetByteArrayRegion(env, jNewArray0, 0 , newSize0, @_values[0] {source});
+  jParams[1].l:= jNewArray0;
+
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jIntentManager_ByteArrayToString(env: PJNIEnv; _jintentmanager: JObject; var _byteArray: TDynArrayOfJByte): string;
+var
+  jStr: JString;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+begin
+  newSize0:= Length(_byteArray);
+  jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
+  env^.SetByteArrayRegion(env, jNewArray0, 0 , newSize0, @_byteArray[0] {source});
+  jParams[0].l:= jNewArray0;
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  jMethod:= env^.GetMethodID(env, jCls, 'ByteArrayToString', '([B)Ljava/lang/String;');
+  jStr:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+end;
 
 end.

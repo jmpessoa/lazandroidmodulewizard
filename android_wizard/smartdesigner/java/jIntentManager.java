@@ -1,4 +1,4 @@
-package org.lamw.appintentdemolaunchapp;
+package org.lamw.appjcenterdatalogicdemo1;
 
 import java.util.Iterator;
 import java.util.List;
@@ -918,6 +918,20 @@ Sending Data: Extras vs. URI Parameters
             }
         }
         return str;
+    }
+
+    //https://forum.lazarus.freepascal.org/index.php/topic,55344.0.html
+    //thanks to schumi !
+    public byte[] GetExtraByteArray(Intent _intent, String _dataName) {
+        return _intent.getByteArrayExtra(_dataName);
+    }
+
+    public void PutExtraByteArray(String _dataName, byte[] _values) {
+        mIntent.putExtra(_dataName, _values);
+    }
+
+    public String ByteArrayToString(byte[] _byteArray) {
+        return (new String(_byteArray));
     }
 }
 
