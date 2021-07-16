@@ -857,13 +857,15 @@ begin
   Proc('');
 
   o := GetComponent(0);
+
   if not (o is TComponent) then
-    Exit;
+     Exit;
 
   if not (o is TAndroidForm)  then  //so we can use for "jForm" BackgrounImageIdentifier property
   begin
     o := TComponent(o).Owner;
-    if not (o is TAndroidForm) then Exit;
+    if not (o is TAndroidForm) then
+      Exit;
   end;
 
   d := TAndroidForm(o).Designer as TAndroidWidgetMediator;
@@ -4849,6 +4851,9 @@ initialization
   RegisterPropertyEditor(TypeInfo(string), jsContinuousScrollableImageView, 'ImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jsToolbar, 'LogoIconIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jsToolbar, 'NavigationIconIdentifier', TImageIdentifierPropertyEditor);
+
+  RegisterPropertyEditor(TypeInfo(string), jsNavigationView, 'HeaderBackgroundImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jsNavigationView, 'HeaderLogoImageIdentifier', TImageIdentifierPropertyEditor);
 
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget

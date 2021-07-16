@@ -14,12 +14,23 @@ type
 
 {jVisualControl template}
 
+{ jsNavigationView }
+
 jsNavigationView = class(jVisualControl)
  private
     FOnClickItem: TOnClickNavigationViewItem;
+    FFitsSystemWindows: boolean;
+
+    FHeaderBackgroundImageIdentifier: string;
+    FHeaderLogoImageIdentifier: string;
+    FHeaderTitle: string;
+    FHeaderHeight: integer;
+    FHeaderLogoPosition: TPositionRelativeToParent;
+    FHeaderColor: TARGBColorBridge;
+
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    
+
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -50,9 +61,6 @@ jsNavigationView = class(jVisualControl)
     procedure ClearMenu();
     procedure SetLGravity(_value: TLayoutGravity);
 
-    procedure AddHeaderView(_headerView: jObject);  overload;
-    procedure AddHeaderView(_drawableBackgroundIdentifier: string; _drawableLogoIdentifier: string; _text: string; _height: integer); overload;
-
     function AddMenu(_headerTitle: string): jObject; overload;
     procedure AddItemIcon(_menuItem: jObject; _drawableIdentifier: string);
 
@@ -61,24 +69,48 @@ jsNavigationView = class(jVisualControl)
     procedure ResetAllItemsTextColor();
     procedure SetFontColor(_color: TARGBColorBridge);
     procedure SetSelectedItemTextColor(_color: TARGBColorBridge);
-    procedure AddHeaderView(_color: TARGBColorBridge; _drawableLogoIdentifier: string; _text: string; _height: integer);overload;
     function AddItem(_menu: jObject; _itemId: integer; _itemCaption: string): jObject;  overload;
     procedure AddItem(_menu: jObject; _itemId: integer; _itemCaption: string; _drawableIdentifier: string); overload;
     procedure SetSubtitleTextColor(_color: integer);
     procedure SetTitleTextColor(_color: integer);
 
+    procedure AddHeaderView(_color: integer; _bitmapLogo: jObject; _text: string; _height: integer);overload;
+    procedure AddHeaderView(_color: TARGBColorBridge; _drawableLogoIdentifier: string; _text: string; _height: integer);overload;
+    procedure AddHeaderView(_drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);overload;
+    procedure AddHeaderView(_headerView: jObject);  overload;
+    procedure AddHeaderView(_drawableBackgroundIdentifier: string; _drawableLogoIdentifier: string; _text: string; _height: integer); overload;
+
     procedure SetTitleTextSize(_textSize: integer);
     procedure SetTitleSizeDecorated(_sizeDecorated: TTextSizeDecorated);
     procedure SetTitleSizeDecoratedGap(_textSizeGap: single);  //default = 3
-    procedure AddHeaderView(_color: integer; _bitmapLogo: jObject; _text: string; _height: integer);overload;
-    procedure AddHeaderView(_drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);overload;
-    procedure SetLogoPosition(_logoPosition: TPositionRelativeToParent); //default = rpCenterInParent
+    procedure SetFitsSystemWindows(_value: boolean);
 
+    procedure SetHeaderBackgroundImageIdentifier(_backgroundIdentifier: string);
+    procedure SetHeaderLogoImageIdentifier(_logoIdentifier: string);
+    procedure SetHeaderLogoPosition(_logoPosition: TPositionRelativeToParent); //default = rpCenterInParent
+    procedure SetHeaderColor(_color: TARGBColorBridge);
+    procedure SetHeaderTitle(_headerTitle: string);
+    procedure SetHeaderHeight(_value: integer);
+
+    procedure SetHeader(_backgroundIdentifier: string; _logoIdentifier: string; _logoPosition: integer;
+                        _color: integer; _headerTitle: string; _height: integer);
+    procedure UpdateHeader();
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
     property FontColor : TARGBColorBridge  read FFontColor write SetFontColor;
+    property FitsSystemWindows: boolean read FFitsSystemWindows write SetFitsSystemWindows;
+
+    property HeaderBackgroundImageIdentifier: string read FHeaderBackgroundImageIdentifier write SetHeaderBackgroundImageIdentifier;
+    property HeaderLogoImageIdentifier: string read FHeaderLogoImageIdentifier write SetHeaderLogoImageIdentifier;
+    property HeaderLogoPosition: TPositionRelativeToParent read FHeaderLogoPosition write SetHeaderLogoPosition;
+    property HeaderColor: TARGBColorBridge read FHeaderColor write SetHeaderColor;
+
+    property HeaderTitle: string  read FHeaderTitle write SetHeaderTitle;
+    property HeaderHeight: integer  read FHeaderHeight write SetHeaderHeight;
+
+
     property OnClickItem: TOnClickNavigationViewItem read FOnClickItem write FOnClickItem;
 
 end;
@@ -125,7 +157,20 @@ procedure jsNavigationView_SetTitleSizeDecorated(env: PJNIEnv; _jsnavigationview
 procedure jsNavigationView_SetTitleSizeDecoratedGap(env: PJNIEnv; _jsnavigationview: JObject; _textSizeGap: single);
 procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _color: integer; _bitmapLogo: jObject; _text: string; _height: integer);overload;
 procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);overload;
-procedure jsNavigationView_SetLogoPosition(env: PJNIEnv; _jsnavigationview: JObject; _logoPosition: integer);
+
+
+procedure jsNavigationView_SetHeaderHeight(env: PJNIEnv; _jsnavigationview: JObject; _value: integer);
+procedure jsNavigationView_SetHeaderTitle(env: PJNIEnv; _jsnavigationview: JObject; _headerTitle: string);
+procedure jsNavigationView_SetHeaderColor(env: PJNIEnv; _jsnavigationview: JObject; _color: integer);
+procedure jsNavigationView_SetHeaderLogoPosition(env: PJNIEnv; _jsnavigationview: JObject; _logoPosition: integer);
+procedure jsNavigationView_SetHeaderLogoImageIdentifier(env: PJNIEnv; _jsnavigationview: JObject; _logoIdentifier: string);
+procedure jsNavigationView_SetHeaderBackgroundImageIdentifier(env: PJNIEnv; _jsnavigationview: JObject; _backgroundIdentifier: string);
+
+procedure jsNavigationView_SetHeader(env: PJNIEnv; _jsnavigationview: JObject; _backgroundIdentifier: string; _logoIdentifier: string; _logoPosition: integer;
+                                     _color: integer; _headerTitle: string; _height: integer);
+procedure jsNavigationView_UpdateHeader(env: PJNIEnv; _jsnavigationview: JObject);
+
+procedure jsNavigationView_SetFitsSystemWindows(env: PJNIEnv; _jsnavigationview: JObject; _value: boolean);
 
 implementation
 
@@ -148,6 +193,12 @@ begin
   FAcceptChildrenAtDesignTime:= False;
   FGravityInParent:= lgLeft;
 //your code here....
+  FHeaderLogoPosition:= rpCenterInParent;
+  FHeaderHeight:= 240;
+  FHeaderTitle:= 'Navigation Drawer|LAMW';
+  FHeaderBackgroundImageIdentifier:= 'bg_blue';
+  FHeaderLogoImageIdentifier:= 'ic_logo_lemur';
+  FHeaderColor:= colbrForestGreen;
 end;
 
 destructor jsNavigationView.Destroy;
@@ -223,6 +274,13 @@ begin
    if  FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
+   SetHeader(FHeaderBackgroundImageIdentifier, FHeaderLogoImageIdentifier,
+                          GetPositionRelativeToParent(FHeaderLogoPosition),
+                          GetARGB(FCustomColor, FHeaderColor), FHeaderTitle, FHeaderHeight);
+
+   SetFitsSystemWindows(FFitsSystemWindows);
+
+
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
 end;
@@ -233,6 +291,7 @@ begin
   if (FInitialized = True) and (FColor <> colbrDefault)  then
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
+
 procedure jsNavigationView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
@@ -565,11 +624,80 @@ begin
      jsNavigationView_AddHeaderView(FjEnv, FjObject, _drawableBackgroundIdentifier ,_bitmapLogo ,_text ,_height);
 end;
 
+{
 procedure jsNavigationView.SetLogoPosition(_logoPosition: TPositionRelativeToParent);
 begin
   //in designing component state: set value here...
+  FLogoPosition:= _logoPosition;
   if FInitialized then
      jsNavigationView_SetLogoPosition(FjEnv, FjObject, GetPositionRelativeToParent(_logoPosition) );
+end;
+}
+
+procedure jsNavigationView.SetFitsSystemWindows(_value: boolean);
+begin
+  FFitsSystemWindows:= _value;
+  if FInitialized then
+     jsNavigationView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+end;
+
+procedure jsNavigationView.SetHeaderBackgroundImageIdentifier(_backgroundIdentifier: string);
+begin
+  //in designing component state: set value here...
+   FHeaderBackgroundImageIdentifier:= _backgroundIdentifier;
+  if FInitialized then
+     jsNavigationView_SetHeaderBackgroundImageIdentifier(FjEnv, FjObject, _backgroundIdentifier);
+end;
+
+procedure jsNavigationView.SetHeaderLogoImageIdentifier(_logoIdentifier: string);
+begin
+  //in designing component state: set value here...
+  FHeaderLogoImageIdentifier:= _logoIdentifier;
+  if FInitialized then
+     jsNavigationView_SetHeaderLogoImageIdentifier(FjEnv, FjObject, _logoIdentifier);
+end;
+
+procedure jsNavigationView.SetHeaderLogoPosition(_logoPosition: TPositionRelativeToParent);
+begin
+  //in designing component state: set value here...
+  FHeaderLogoPosition:= _logoPosition;
+  if FInitialized then
+     jsNavigationView_SetHeaderLogoPosition(FjEnv, FjObject, GetPositionRelativeToParent(_logoPosition) );
+end;
+
+procedure jsNavigationView.SetHeaderColor(_color: TARGBColorBridge);
+begin
+   FHeaderColor:=_color;
+  if FInitialized then
+     jsNavigationView_SetHeaderColor(FjEnv, FjObject, Ord(_color));
+end;
+
+procedure jsNavigationView.SetHeaderTitle(_headerTitle: string);
+begin
+  FHeaderTitle:= _headerTitle;
+  if FInitialized then
+     jsNavigationView_SetHeaderTitle(FjEnv, FjObject, _headerTitle);
+end;
+
+procedure jsNavigationView.SetHeaderHeight(_value: integer);
+begin
+  FHeaderHeight:= _value;
+  if FInitialized then
+     jsNavigationView_SetHeaderHeight(FjEnv, FjObject, _value);
+end;
+
+procedure jsNavigationView.UpdateHeader();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_UpdateHeader(FjEnv, FjObject);
+end;
+
+procedure jsNavigationView.SetHeader(_backgroundIdentifier: string; _logoIdentifier: string; _logoPosition: integer; _color: integer; _headerTitle: string; _height: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsNavigationView_SetHeader(FjEnv, FjObject, _backgroundIdentifier ,_logoIdentifier ,_logoPosition ,_color ,_headerTitle ,_height);
 end;
 
 {-------- jsNavigationView_JNI_Bridge ----------}
@@ -1153,10 +1281,9 @@ begin
   jCls:= env^.GetObjectClass(env, _jsnavigationview);
   jMethod:= env^.GetMethodID(env, jCls, 'AddHeaderView', '(ILandroid/graphics/Bitmap;Ljava/lang/String;I)V');
   env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
 end;
-
 
 procedure jsNavigationView_AddHeaderView(env: PJNIEnv; _jsnavigationview: JObject; _drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);
 var
@@ -1176,18 +1303,220 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
-procedure jsNavigationView_SetLogoPosition(env: PJNIEnv; _jsnavigationview: JObject; _logoPosition: integer);
+procedure jsNavigationView_SetHeaderBackgroundImageIdentifier(env: PJNIEnv; _jsnavigationview: JObject; _backgroundIdentifier: string);
 var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
-  jParams[0].i:= _logoPosition;
+
   jCls:= env^.GetObjectClass(env, _jsnavigationview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLogoPosition', '(I)V');
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHeaderBackgroundImageIdentifier', '(Ljava/lang/String;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_backgroundIdentifier));
+
   env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+procedure jsNavigationView_SetHeaderLogoImageIdentifier(env: PJNIEnv; _jsnavigationview: JObject; _logoIdentifier: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHeaderLogoImageIdentifier', '(Ljava/lang/String;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_logoIdentifier));
+
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jsNavigationView_SetHeaderLogoPosition(env: PJNIEnv; _jsnavigationview: JObject; _logoPosition: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHeaderLogoPosition', '(I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _logoPosition;
+
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jsNavigationView_SetHeaderColor(env: PJNIEnv; _jsnavigationview: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHeaderColor', '(I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _color;
+
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jsNavigationView_SetHeaderTitle(env: PJNIEnv; _jsnavigationview: JObject; _headerTitle: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHeaderTitle', '(Ljava/lang/String;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_headerTitle));
+
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jsNavigationView_SetHeaderHeight(env: PJNIEnv; _jsnavigationview: JObject; _value: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHeaderHeight', '(I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _value;
+
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jsNavigationView_UpdateHeader(env: PJNIEnv; _jsnavigationview: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'UpdateHeader', '()V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  env^.CallVoidMethod(env, _jsnavigationview, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jsNavigationView_SetFitsSystemWindows(env: PJNIEnv; _jsnavigationview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_value);
+
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jsNavigationView_SetHeader(env: PJNIEnv; _jsnavigationview: JObject; _backgroundIdentifier: string; _logoIdentifier: string; _logoPosition: integer; _color: integer; _headerTitle: string; _height: integer);
+var
+  jParams: array[0..5] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jsnavigationview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHeader', '(Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_backgroundIdentifier));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_logoIdentifier));
+  jParams[2].i:= _logoPosition;
+  jParams[3].i:= _color;
+  jParams[4].l:= env^.NewStringUTF(env, PChar(_headerTitle));
+  jParams[5].i:= _height;
+
+  env^.CallVoidMethodA(env, _jsnavigationview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[4].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 end.

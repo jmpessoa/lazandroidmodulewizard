@@ -115,8 +115,8 @@ begin
   
   FMarginLeft   := 10;
   FMarginTop    := 10;
-  FMarginBottom := 10;
-  FMarginRight  := 10;
+  FMarginBottom := 50;
+  FMarginRight  := 50;
   FHeight       := 56;
   FWidth        := 56;
   FLParamWidth  := lpWrapContent;

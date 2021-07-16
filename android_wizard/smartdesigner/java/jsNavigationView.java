@@ -1,9 +1,7 @@
-package org.lamw.appcompatnavigationdrawerdemo3;
-
+package org.lamw.appcompatnavigationdrawerdemo1;
 
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -27,7 +25,6 @@ import com.google.android.material.navigation.NavigationView;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-
 
 /*Draft java code by "Lazarus Android Module Wizard" [12/16/2017 0:54:36]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -54,12 +51,22 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    TextView headerSubTextView;
    
    int headerImageIdentifier = R.drawable.ic_launcher;
-   
-   String headerText = "Hello World!";
-   String headerSubText =  "LAMW 0.8";
-   
-   int headerColor = 0xC5CAE9; // R.color.primary_light;
-   
+
+   String mHeaderBackgroundImageIdentifier = "";
+   String mHeaderLogoImageIdentifier = "";
+   String mHeaderTitle ="Hello World!|LAMW 0.8";
+   int mHeaderHeight = 240;
+
+   int mHeaderLogoPosition = RelativeLayout.CENTER_IN_PARENT;
+
+   //int imagePosRelativeToParente = RelativeLayout.CENTER_IN_PARENT;
+   //int headerColor = 0xC5CAE9; // R.color.primary_light; ;
+
+	String headerText;
+    String headerSubText;
+
+   int mHeaderColor = 0xC5CAE9; // R.color.primary_light; ;
+
    int itemId;
    String itemCaption;
 
@@ -72,8 +79,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    float textSizeDecoratedGap = 3;
 
    int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP;
-
-   int imagePosRelativeToParente = RelativeLayout.CENTER_IN_PARENT;
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jsNavigationView(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -108,8 +113,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
     		        menuItem.setChecked(true);  //highlighted item
     		    else
     		    	SetItemTextColor(menuItem, selectedMenuItemColor);
-    		     
-    		    
+
     		    mLastMenuItem = menuItem;
     		    
     		    Handler handler = new Handler();
@@ -350,7 +354,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
  		  return  null;
  	}
 
-
 	public void AddHeaderView(int _color, Bitmap _bitmapLogo, String _text, int _height) {
 		String delimiter = "|";
 		String[] words = _text.split(Pattern.quote(delimiter));
@@ -364,8 +367,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 			headerText = _text;
 		}
 
-		headerColor = _color;
-
 		Bitmap bmp =  _bitmapLogo;
 		if (bmp != null) bmp = GetRoundedShape(bmp);
 
@@ -375,7 +376,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 		RelativeLayout.LayoutParams paramLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h);
 
 		headerLayout.setLayoutParams(paramLayout);
-		headerLayout.setBackgroundColor(headerColor);
+		headerLayout.setBackgroundColor(_color);
 		headerImageView = new ImageView(context);
 
 		if (bmp != null) {
@@ -399,7 +400,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 
 		if (bmp != null) {
 			RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			paramImg.addRule(imagePosRelativeToParente); //RelativeLayout.CENTER_IN_PARENT
+			paramImg.addRule(mHeaderLogoPosition); //RelativeLayout.CENTER_IN_PARENT
 			headerLayout.addView(headerImageView, paramImg);
 		}
 
@@ -442,8 +443,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	      else {	    	  
 	    	  headerText = _text;
 	      }
-	      	     	   
-	      headerColor = _color;
 
 	      headerImageIdentifier = context.getResources().getIdentifier(_drawableLogoIdentifier, "drawable", context.getPackageName() );
 
@@ -456,7 +455,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	      RelativeLayout.LayoutParams paramLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h);
 
 	      headerLayout.setLayoutParams(paramLayout);
-	      headerLayout.setBackgroundColor(headerColor);
+	      headerLayout.setBackgroundColor(_color);
 	      headerImageView = new ImageView(context);
 
 	      if (bmp != null) { 	    	  
@@ -480,7 +479,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 
 		if (bmp != null) {
 	          RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-	          paramImg.addRule(imagePosRelativeToParente);//RelativeLayout.CENTER_IN_PARENT
+	          paramImg.addRule(mHeaderLogoPosition);//RelativeLayout.CENTER_IN_PARENT
 			  headerLayout.addView(headerImageView, paramImg);
 		  }	      
 
@@ -511,9 +510,9 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	      this.addHeaderView(headerLayout);
    }
 
-	public void AddHeaderView(String _drawableBackgroundIdentifier, String _drawableLogoIdentifier, String _text, int _height) {
-
-		String delimiter = "|";
+	private void AddHeaderView(int _headerColor,  String _drawableBackgroundIdentifier, String _drawableLogoIdentifier, String _text, int _height) {
+		Bitmap bmp = null;
+   	    String delimiter = "|";
 		String[] words = _text.split(Pattern.quote(delimiter));
 		int countText = words.length;
 
@@ -524,22 +523,25 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 		else {
 			headerText = _text;
 		}
+		if (! _drawableLogoIdentifier.equals("")) {
+			headerImageIdentifier = context.getResources().getIdentifier(_drawableLogoIdentifier, "drawable", context.getPackageName());
+			bmp = GetBitmapFromById(headerImageIdentifier);
+			if (bmp != null) bmp = GetRoundedShape(bmp);
+		}
 
-		headerImageIdentifier = context.getResources().getIdentifier(_drawableLogoIdentifier, "drawable", context.getPackageName() );
-		Bitmap bmp =  GetBitmapFromById(headerImageIdentifier);
-		if (bmp != null) bmp = GetRoundedShape(bmp);
 		headerLayout = new RelativeLayout(context);
 		int h =  (int) (_height * getResources().getDisplayMetrics().density);  //_height = 192
 		RelativeLayout.LayoutParams paramLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h);
 		headerLayout.setLayoutParams(paramLayout);
-		headerImageView = new ImageView(context);
+		headerLayout.setBackgroundColor(_headerColor);
 
 		if (bmp != null) {
+			headerImageView = new ImageView(context);
 			headerImageView.setImageBitmap(bmp);
 			headerImageView.setPadding(10, 10, 10, 10);
 			headerImageView.setId(controls.getJavaNewId());
 		}
-		
+
 		headerTextView = new TextView(context);
 		headerTextView.setId(controls.getJavaNewId());
 		headerTextView.setText(headerText);
@@ -555,7 +557,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 
 		if (bmp != null) {
 			RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			paramImg.addRule(imagePosRelativeToParente); //RelativeLayout.CENTER_IN_PARENT
+			paramImg.addRule(mHeaderLogoPosition); //RelativeLayout.CENTER_IN_PARENT
 			headerLayout.addView(headerImageView, paramImg);
 		}
 
@@ -583,9 +585,58 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 			headerLayout.addView(headerSubTextView, paramText2);
 		}
 
-		headerLayout.setBackgroundResource(context.getResources().getIdentifier(_drawableBackgroundIdentifier, "drawable", context.getPackageName() ));
+		if (! _drawableBackgroundIdentifier.equals("")) {
+			headerLayout.setBackgroundResource(context.getResources().getIdentifier(_drawableBackgroundIdentifier, "drawable", context.getPackageName()));
+		}
+
 		this.addHeaderView(headerLayout);
 
+	}
+
+	public void AddHeaderView(String _drawableBackgroundIdentifier, String _drawableLogoIdentifier, String _text, int _height) {
+		AddHeaderView(android.R.color.transparent,  _drawableBackgroundIdentifier, _drawableLogoIdentifier, _text, _height);
+	}
+
+	public void SetHeaderBackgroundImageIdentifier(String _backgroundIdentifier) {
+		mHeaderBackgroundImageIdentifier = _backgroundIdentifier;
+	}
+
+	public void SetHeaderLogoImageIdentifier(String _logoIdentifier) {
+		mHeaderLogoImageIdentifier = _logoIdentifier;
+	}
+
+	public void SetHeaderLogoPosition(int _logoPosition) {//RelativeLayout.CENTER_IN_PARENT;
+		mHeaderLogoPosition = _logoPosition;
+	}
+
+	public void SetHeaderColor(int _color) {
+		mHeaderColor = _color;
+	}
+
+	public void SetHeaderTitle(String _headerTitle) {
+		mHeaderTitle = _headerTitle;
+	}
+
+	public void SetHeaderHeight(int _value) {
+		mHeaderHeight = _value;
+	}
+
+	public void SetHeader(String _backgroundIdentifier,String _logoIdentifier,
+			               int _logoPosition, int _color, String _headerTitle, int _height) {
+		mHeaderBackgroundImageIdentifier = _backgroundIdentifier;
+		mHeaderLogoImageIdentifier = _logoIdentifier;
+		mHeaderLogoPosition = _logoPosition;
+		mHeaderColor = _color;
+		mHeaderTitle = _headerTitle;
+		mHeaderHeight = _height;
+		UpdateHeader();
+	}
+
+	public void UpdateHeader() {
+		AddHeaderView(mHeaderColor, mHeaderBackgroundImageIdentifier,
+				                    mHeaderLogoImageIdentifier,
+				                    mHeaderTitle,
+				                    mHeaderHeight);
 	}
 
 	public void AddHeaderView(String _drawableBackgroundIdentifier, Bitmap _bitmapLogo, String _text, int _height) {
@@ -632,7 +683,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 
 		if (bmp != null) {
 			RelativeLayout.LayoutParams paramImg = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			paramImg.addRule(imagePosRelativeToParente); //RelativeLayout.CENTER_IN_PARENT
+			paramImg.addRule(mHeaderLogoPosition); //RelativeLayout.CENTER_IN_PARENT
 			headerLayout.addView(headerImageView, paramImg);
 		}
 
@@ -662,7 +713,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 
 		headerLayout.setBackgroundResource(context.getResources().getIdentifier(_drawableBackgroundIdentifier, "drawable", context.getPackageName() ));
 		this.addHeaderView(headerLayout);
-
 	}
 
     public void SetSubtitleTextColor(int _color) {
@@ -685,10 +735,6 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 	public void SetTitleSizeDecoratedGap(float _textSizeGap) {
 		//int textSizeDecorated = 1; //1 = Decreasing  //2 Increasing  //0 none
 		textSizeDecoratedGap = _textSizeGap;
-	}
-
-	public void SetLogoPosition(int _logoPosition) {
-		imagePosRelativeToParente = _logoPosition; //RelativeLayout.CENTER_IN_PARENT;
 	}
 
    /* TODO
@@ -724,6 +770,10 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
 		return result;
 	}
 
+
+	public void SetFitsSystemWindows(boolean _value) {
+	   LAMWCommon.setFitsSystemWindows(_value);
+	}
 
 }
 
