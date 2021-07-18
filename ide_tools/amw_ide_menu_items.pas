@@ -1853,7 +1853,7 @@ end;
 procedure ExportAsAppTemplate(Sender: TObject);  //unitFormExportProjectAsTemplate
 var
   Project: TLazProject;
-  package, pathToProject, fileName, smallProjName: string;
+  {package,} pathToProject, fileName, smallProjName: string;
   aux, pathToSmartDesigner, projectTheme, newTheme, pathToNewTemplate: string;
   FormExportProjectAsTemplate: TFormExportProjectAsTemplate;
   auxList: TStringList;
@@ -1868,7 +1868,7 @@ begin
   begin
 
       projectTheme:= Project.CustomData['Theme'];
-      package:= Project.CustomData.Values['Package'];
+      //package:= Project.CustomData.Values['Package'];
 
       p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
       pathToProject:= Copy(Project.ProjectInfoFile, 1, p-1);

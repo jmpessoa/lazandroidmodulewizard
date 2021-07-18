@@ -38,8 +38,9 @@ type
     PageControl1: TPageControl;
     Panel1: TPanel;
     Panel2: TPanel;
-    PopupMenu1: TPopupMenu;
-    PopupMenu2: TPopupMenu;
+    PopupMenuDraftCode: TPopupMenu;
+    PopupMenuRegister: TPopupMenu;
+    SpeedButton1: TSpeedButton;
     StatusBar1: TStatusBar;
     SynJavaSyn1: TSynJavaSyn;
     SynMemo1: TSynMemo;
@@ -54,6 +55,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure PopupMenu1Close(Sender: TObject);
     procedure PopupMenu2Close(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
     FProjectModel: string;
@@ -1261,6 +1263,16 @@ begin
   frm:= TFormAddComplements.Create(nil);
   if frm.ShowModal = mrOK then
   begin  //FPathToJavaTemplates: "C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner\java"
+
+     if frm.ListBoxGradleDep.Count > 0 then
+     begin
+      if StrToInt(frm.ComboBoxMinSdkApi.Text) < 18 then
+      begin
+         frm.ComboBoxMinSdkApi.Text:= '18';
+         ShowMessage('warning: [online] library dependencies need MinsSdkApi=18 and Grandle....');
+      end;
+     end;
+
      count:= frm.ListBoxPath.Count;
      list:= TStringList.Create;
 
@@ -1372,17 +1384,18 @@ begin
   begin
     if Pos('unit ', SynMemo2.Lines.Strings[0] ) = 0  then  // In case Substr isn't found, 0 is returned. The search is case-sensitive.
     begin
-       ShowMessage('You do not have the code to create a component!');
+       ShowMessage('Sorry... You don''t have the code to create a new component!');
        Exit;
     end;
 
     frm:= TFormRegisterComp.Create(nil);
-    frm.OpenDialog2.InitialDir:= FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator;
-    frm.Edit2.Text:= FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+'register_extras.pas';
+    frm.PathToLAMW:= FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator;
+    frm.EditRegisterPath.Text:= FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+'register_extras.pas';
+    frm.EditRegisterPath.ReadOnly:= True;
     if frm.ShowModal = mrOK then
     begin
-      iconPath:= frm.Edit1.Text;
-      regFile:=  frm.Edit2.Text;
+      iconPath:= frm.EditIconPath.Text;
+      regFile:=  frm.EditRegisterPath.Text;
 
       if iconPath <> '' then
       begin
@@ -1475,9 +1488,31 @@ begin
            end;
          end; //finally
       end;     //if iconPath
-    end;      //showModal
+    end      //showModal
+    else
+    begin //cancel -> clean up
+      if not FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java') then
+      begin
+          if FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+'.create') then
+          begin
+            DeleteFile(FPathToJavaTemplates+PathDelim+FJavaClassName+'.create');
+          end;
+      end;
+    end;
     frm.Free;
   end;
+end;
+
+procedure TFrmCompCreate.SpeedButton1Click(Sender: TObject);
+begin
+  ShowMessage('About Android Bridges components palettes' + sLineBreak +
+            'and Android system builder (Ant/Gradle):' + sLineBreak + sLineBreak +
+            '"Android Bridges" [visual controls] support "Ant" and "Gradle" prefix class "j"' + sLineBreak +
+            '"Android Bridges Extra" [not visual] support "Ant" and "Gradle" prefix class "j"'+ sLineBreak + sLineBreak+
+            '"Android Bridges jCenter" support only "Gradle" prefix class "jc"' + sLineBreak +
+            '(here we put bridges for generics "online" libraries)' + sLineBreak + sLineBreak +
+            '"Android Bridges AppCompat" support only "Gradle" prefix class "js"' + sLineBreak +
+            '(here we put bridges for Android AppCompat/Material libraries)');
 end;
 
 procedure TFrmCompCreate.FormCreate(Sender: TObject);

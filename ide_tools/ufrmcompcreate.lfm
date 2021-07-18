@@ -1,11 +1,12 @@
 object FrmCompCreate: TFrmCompCreate
   Left = 231
-  Height = 518
+  Height = 648
   Top = 300
-  Width = 815
+  Width = 1019
   Caption = '[LAMW]  Create New jComponent'
-  ClientHeight = 518
-  ClientWidth = 815
+  ClientHeight = 648
+  ClientWidth = 1019
+  DesignTimePPI = 120
   Icon.Data = {
     9E09000000000100010018180000010020008809000016000000280000001800
     0000300000000100200000000000000900006400000064000000000000000000
@@ -90,23 +91,22 @@ object FrmCompCreate: TFrmCompCreate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '2.0.3.0'
   object Panel1: TPanel
     Left = 0
-    Height = 40
+    Height = 50
     Top = 0
-    Width = 815
+    Width = 1019
     Align = alTop
     BevelOuter = bvNone
-    ClientHeight = 40
-    ClientWidth = 815
+    ClientHeight = 50
+    ClientWidth = 1019
     ParentFont = False
     TabOrder = 0
     object BitBtnJAR: TBitBtn
-      Left = 737
-      Height = 30
+      Left = 921
+      Height = 38
       Top = 0
-      Width = 75
+      Width = 94
       Anchors = [akTop, akRight]
       Caption = 'Explore'
       Glyph.Data = {
@@ -246,20 +246,63 @@ object FrmCompCreate: TFrmCompCreate
       ParentFont = False
       TabOrder = 0
     end
+    object SpeedButton1: TSpeedButton
+      Left = 7
+      Height = 28
+      Top = 8
+      Width = 29
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF0086351B1C86351B8086351BD086351BF286351BF28635
+        1BD386351B8686351B22FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF0089381D838E3D1FF3A75323F9B96227FDC06929FFC06929FFB963
+        28FDA85424F9903E1FF489381D86FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF008C3C208EA04E25F7C06B2CFEC26D2DFFC26D2DFFC26D2DFFC26D2DFFC26D
+        2DFFC26D2DFFC06B2DFFA25025F78C3C208EFFFFFF00FFFFFF00FFFFFF009040
+        2483A3532BF7C47132FFC47132FFC47132FFC47132FFC47132FFC47132FFC471
+        32FFC47132FFC47132FFC47132FFA5542AF790402489FFFFFF009445271A9B4E
+        2EF3C57437FEC77638FFC77638FFC77638FFC77638FFFCF9F6FFFCF9F6FFC776
+        38FFC77638FFC77638FFC77638FFC67538FF9B4E2DF394452728984A2B7DB56A
+        3FF9CA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFFCFAF7FFFCFAF7FFCA7B
+        3EFFCA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFB86C3FF9984A2B8C9C502FC4C57B
+        43FDCD8144FFCD8144FFCD8144FFCD8144FFCD8144FFFCFAF7FFFCFAF7FFCD81
+        44FFCD8144FFCD8144FFCD8144FFCD8144FFC77B43FD9C502FD0A05533E7CF86
+        4CFED0874BFFD0874BFFD0874BFFD0874BFFD0874BFFFCFAF7FFFCFAF7FFD087
+        4BFFD0874BFFD0874BFFD0874BFFD0874BFFD0874CFFA05533ECA55A37ECD797
+        61FFD48D52FFD48D52FFD48D52FFD48D52FFD48D52FFFCFAF7FFFCFAF7FFD48D
+        52FFD48D52FFD48D52FFD48D52FFD48D52FFD7955FFFA55A37ECA9603BC4D79F
+        74FDD79358FFD79358FFD79358FFD79358FFD79358FFC18239FFC18239FFD793
+        58FFD79358FFD79358FFD79358FFD79358FFD8A176FDA9603BCAAD653F7DCE99
+        77F9DB9C64FFDA985EFFDA985EFFDA985EFFDA985EFFFFFFFFFFFFFFFFFFDA98
+        5EFFDA985EFFDA985EFFDA985EFFDB9A62FFCE9876F9AD653F7DB16A421AB671
+        4AF3E5B994FEDD9E65FFDD9D64FFDD9D64FFDD9D64FFFFFFFFFFFFFFFFFFDD9D
+        64FFDD9D64FFDD9D64FFDD9D64FFE6B993FEB8754EF3B16A421AFFFFFF00B56E
+        467DC78D69F6EAC29EFFE0A46EFFDFA169FFDFA169FFC4883FFFC4883FFFDFA1
+        69FFDFA169FFE0A36DFFEAC19CFFC9916DF6B56E4683FFFFFF00FFFFFF00FFFF
+        FF00B872498CC88E69F6ECCAABFEE9BD94FFE6B384FFE3AA76FFE3AA75FFE6B3
+        83FFE9BC92FFEDCAACFECB936EF6B872498EFFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00BB754B80BF7C53F3D5A380F8E0B797FBEBCAACFDEBCAADFEE1B8
+        98FBD7A583F8C07D54F3BB754B83FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00BD784D11BD784D72BD784DA5BD784DD6BD784DD8BD78
+        4DA8BD784D78BD784D14FFFFFF00FFFFFF00FFFFFF00FFFFFF00
+      }
+      OnClick = SpeedButton1Click
+    end
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 23
-    Top = 495
-    Width = 815
+    Height = 29
+    Top = 619
+    Width = 1019
     Panels = <>
     ParentFont = False
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 425
-    Top = 40
-    Width = 815
+    Height = 531
+    Top = 50
+    Width = 1019
     ActivePage = TabSheet3
     Align = alClient
     ParentFont = False
@@ -278,15 +321,15 @@ object FrmCompCreate: TFrmCompCreate
         Top = 0
         Width = 1011
         Align = alClient
-        Font.Height = -10
+        Font.Height = -13
         Font.Name = 'Courier New'
         Font.Pitch = fpFixed
         Font.Quality = fqNonAntialiased
         ParentColor = False
         ParentFont = False
-        PopupMenu = PopupMenu1
+        PopupMenu = PopupMenuDraftCode
         TabOrder = 0
-        Gutter.Width = 53
+        Gutter.Width = 68
         Gutter.MouseActions = <>
         Highlighter = SynJavaSyn1
         Keystrokes = <        
@@ -726,11 +769,11 @@ object FrmCompCreate: TFrmCompCreate
         SelectedColor.StrikeOutPriority = 50
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
-            Width = 24
+            Width = 30
             MouseActions = <>
           end
           object SynGutterLineNumber1: TSynGutterLineNumber
-            Width = 13
+            Width = 17
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
@@ -740,18 +783,19 @@ object FrmCompCreate: TFrmCompCreate
             LeadingZeros = False
           end
           object SynGutterChanges1: TSynGutterChanges
-            Width = 4
+            Width = 5
             MouseActions = <>
             ModifiedColor = 59900
             SavedColor = clGreen
           end
           object SynGutterSeparator1: TSynGutterSeparator
-            Width = 2
+            Width = 3
             MouseActions = <>
             MarkupInfo.Background = clWhite
             MarkupInfo.Foreground = clGray
           end
           object SynGutterCodeFolding1: TSynGutterCodeFolding
+            Width = 13
             MouseActions = <>
             MarkupInfo.Background = clNone
             MarkupInfo.Foreground = clGray
@@ -774,15 +818,15 @@ object FrmCompCreate: TFrmCompCreate
         Top = 0
         Width = 1011
         Align = alClient
-        Font.Height = -10
+        Font.Height = -13
         Font.Name = 'Courier New'
         Font.Pitch = fpFixed
         Font.Quality = fqNonAntialiased
         ParentColor = False
         ParentFont = False
-        PopupMenu = PopupMenu2
+        PopupMenu = PopupMenuRegister
         TabOrder = 0
-        Gutter.Width = 53
+        Gutter.Width = 68
         Gutter.MouseActions = <>
         Highlighter = SynPasSyn1
         Keystrokes = <        
@@ -1219,11 +1263,11 @@ object FrmCompCreate: TFrmCompCreate
         SelectedColor.StrikeOutPriority = 50
         inline SynLeftGutterPartList1: TSynGutterPartList
           object SynGutterMarks1: TSynGutterMarks
-            Width = 24
+            Width = 30
             MouseActions = <>
           end
           object SynGutterLineNumber1: TSynGutterLineNumber
-            Width = 13
+            Width = 17
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
@@ -1233,18 +1277,19 @@ object FrmCompCreate: TFrmCompCreate
             LeadingZeros = False
           end
           object SynGutterChanges1: TSynGutterChanges
-            Width = 4
+            Width = 5
             MouseActions = <>
             ModifiedColor = 59900
             SavedColor = clGreen
           end
           object SynGutterSeparator1: TSynGutterSeparator
-            Width = 2
+            Width = 3
             MouseActions = <>
             MarkupInfo.Background = clWhite
             MarkupInfo.Foreground = clGray
           end
           object SynGutterCodeFolding1: TSynGutterCodeFolding
+            Width = 13
             MouseActions = <>
             MarkupInfo.Background = clNone
             MarkupInfo.Foreground = clGray
@@ -1256,14 +1301,14 @@ object FrmCompCreate: TFrmCompCreate
     end
     object TabSheet3: TTabSheet
       Caption = 'Help'
-      ClientHeight = 397
-      ClientWidth = 807
+      ClientHeight = 498
+      ClientWidth = 1011
       ParentFont = False
       object Memo1: TMemo
         Left = 0
-        Height = 397
+        Height = 498
         Top = 0
-        Width = 807
+        Width = 1011
         Align = alClient
         Lines.Strings = (
           '"LAMW: Lazarus Android Module Wizard"'
@@ -1473,20 +1518,20 @@ object FrmCompCreate: TFrmCompCreate
   end
   object Panel2: TPanel
     Left = 0
-    Height = 30
-    Top = 465
-    Width = 815
+    Height = 38
+    Top = 581
+    Width = 1019
     Align = alBottom
     BevelOuter = bvNone
-    ClientHeight = 30
-    ClientWidth = 815
+    ClientHeight = 38
+    ClientWidth = 1019
     ParentFont = False
     TabOrder = 3
     object BitBtn1: TBitBtn
-      Left = 740
-      Height = 30
+      Left = 925
+      Height = 38
       Top = 0
-      Width = 75
+      Width = 94
       Align = alRight
       DefaultCaption = True
       GlyphShowMode = gsmAlways
@@ -1501,8 +1546,8 @@ object FrmCompCreate: TFrmCompCreate
     Enabled = False
     CommentAttri.Foreground = clOlive
     KeyAttri.Foreground = clGreen
-    Left = 122
-    Top = 128
+    left = 153
+    top = 160
   end
   object SynPasSyn1: TSynPasSyn
     Enabled = False
@@ -1510,12 +1555,12 @@ object FrmCompCreate: TFrmCompCreate
     KeyAttri.Foreground = clNavy
     CompilerMode = pcmDelphi
     NestedComments = False
-    Left = 397
-    Top = 237
+    left = 496
+    top = 296
   end
-  object PopupMenu1: TPopupMenu
-    Left = 294
-    Top = 173
+  object PopupMenuDraftCode: TPopupMenu
+    left = 368
+    top = 216
     object MenuItem1: TMenuItem
       Caption = 'Insert Java jControl template'
       OnClick = PopupMenu1Close
@@ -1564,9 +1609,9 @@ object FrmCompCreate: TFrmCompCreate
       OnClick = PopupMenu1Close
     end
   end
-  object PopupMenu2: TPopupMenu
-    Left = 435
-    Top = 96
+  object PopupMenuRegister: TPopupMenu
+    left = 544
+    top = 120
     object MenuItem2: TMenuItem
       Caption = 'Register Component...'
       OnClick = PopupMenu2Close
@@ -1582,7 +1627,7 @@ object FrmCompCreate: TFrmCompCreate
   object OpenDialog1: TOpenDialog
     DefaultExt = '.jar'
     Filter = 'JAR|*.jar'
-    Left = 320
-    Top = 6
+    left = 400
+    top = 8
   end
 end
