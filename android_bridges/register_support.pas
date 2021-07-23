@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  sfirebasepushnotificationlistener,
   scontinuousscrollableimageview,
   sadmob,
   sdrawerlayout,
@@ -35,8 +36,9 @@ implementation
   
 Procedure Register;
 begin
-  {$I jscontinuousscrollableimageview_icon.lrs}
+  {$I jsfirebasepushnotificationlistener_icon.lrs}
   {$I jsadmob_icon.lrs}
+  {$I jscontinuousscrollableimageview_icon.lrs}
   {$I jsdrawerlayout_icon.lrs}
   {$I jsnavigationview_icon.lrs}
   {$I jscoordinatorlayout_icon.lrs}
@@ -53,8 +55,9 @@ begin
   {$I jstextinput_icon.lrs}
   RegisterComponents('Android Bridges AppCompat',
     [
-      jsContinuousScrollableImageView,
+      jsFirebasePushNotificationListener,
       jsAdMob,
+      jsContinuousScrollableImageView,
       jsDrawerLayout,
       jsNavigationView,
       jsCoordinatorLayout,

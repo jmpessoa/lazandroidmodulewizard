@@ -1135,7 +1135,7 @@ type
     FOnActivityStop: TOnActivityStop;
     FOnRequestPermissionResult: TOnRequestPermissionResult;
     FOnRunOnUiThread: TOnRunOnUiThread;
-
+    FOnNewIntent: TOnNewIntent;
 
     FLayoutVisibility: boolean;
     FBackgroundImageIdentifier: string;
@@ -1511,7 +1511,7 @@ type
     property OnActivityPause: TOnActivityPause read FOnActivityPause write FOnActivityPause;
     property OnActivityResume: TOnActivityResume read FOnActivityResume write FOnActivityResume;
     property OnRequestPermissionResult: TOnRequestPermissionResult read FOnRequestPermissionResult write FOnRequestPermissionResult;
-    //property OnNewIntent: TOnNewIntent read FOnNewIntent write FOnNewIntent;
+    property OnNewIntent: TOnNewIntent read FOnNewIntent write FOnNewIntent;
 
     property OnActivityStart: TOnActivityStart read FOnActivityStart write FOnActivityStart;
     property OnActivityStop: TOnActivityStop read FOnActivityStop write FOnActivityStop;

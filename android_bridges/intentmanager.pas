@@ -107,7 +107,7 @@ jIntentManager = class(jControl)
     function GetActionCallAsString(): string;
     function GetContactNumber(_contactUri: jObject): string;
     function GetContactEmail(_contactUri: jObject): string;
-    function GetBundleContent(_intent: jObject): TDynArrayOfString;
+    function GetBundleContent(_intent: jObject): TDynArrayOfString; overload;
     function IsCallable(_intent: jObject): boolean; overload;
     function IsCallable(_intentAction: string): boolean; overload;
 
@@ -151,6 +151,8 @@ jIntentManager = class(jControl)
     procedure PutExtraByteArray(_dataName: string; var _values: TDynArrayOfJByte);
     function JByteArrayToString(var _byteArray: TDynArrayOfJByte): string;
 
+    function GetBundleContent(_intent: jObject; keyValueDelimiter: string): TDynArrayOfString; overload;
+
  published
     property IntentAction: TIntentAction read FIntentAction write SetAction;
 
@@ -190,7 +192,7 @@ function jIntentManager_GetTelUri(env: PJNIEnv; _jintentmanager: JObject; _telNu
 procedure jIntentManager_PutExtraFile(env: PJNIEnv; _jintentmanager: JObject; _uri: jObject); overload;
 function jIntentManager_GetContactNumber(env: PJNIEnv; _jintentmanager: JObject; _contactUri: jObject): string;
 function jIntentManager_GetContactEmail(env: PJNIEnv; _jintentmanager: JObject; _contactUri: jObject): string;
-function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): TDynArrayOfString;
+function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): TDynArrayOfString; overload;
 
 function jIntentManager_IsCallable(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject): boolean;  overload;
 function jIntentManager_IsActionEqual(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; _intentAction: string): boolean;
@@ -202,6 +204,7 @@ function jIntentManager_GetExtraByteArray(env: PJNIEnv; _jintentmanager: JObject
 procedure jIntentManager_PutExtraByteArray(env: PJNIEnv; _jintentmanager: JObject; _dataName: string; var _values: TDynArrayOfJByte);
 function jIntentManager_ByteArrayToString(env: PJNIEnv; _jintentmanager: JObject; var _byteArray: TDynArrayOfJByte): string;
 
+function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; keyValueDelimiter: string): TDynArrayOfString; overload;
 implementation
 
 
@@ -1021,6 +1024,14 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_ByteArrayToString(FjEnv, FjObject, _byteArray);
+end;
+
+
+function jIntentManager.GetBundleContent(_intent: jObject; keyValueDelimiter: string): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetBundleContent(FjEnv, FjObject, _intent ,keyValueDelimiter);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2226,6 +2237,46 @@ begin
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; keyValueDelimiter: string): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBundleContent', '(Landroid/content/Intent;Ljava/lang/String;)[Ljava/lang/String;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _intent;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(keyValueDelimiter));
+
+  jResultArray:= env^.CallObjectMethodA(env, _jintentmanager, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);
+    end;
+  end;
+  env^.DeleteLocalRef(env,jParams[1].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 end.

@@ -2558,7 +2558,10 @@ begin
                 strList.Add('        }');
                 strList.Add('    }');
                 end;
-
+                strList.Add('    compileOptions {');
+                strList.Add('        sourceCompatibility 1.8');
+                strList.Add('        targetCompatibility 1.8');
+                strList.Add('    }');
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin
 

@@ -16,7 +16,7 @@ type
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
     ComboBoxMinSdkApi: TComboBox;
-    ComboBoxPermission: TComboBox;
+    EditManifestPermission: TEdit;
     EditGradleDep: TEdit;
     EditPath: TEdit;
     Label1: TLabel;
@@ -28,6 +28,8 @@ type
     ListBoxPath: TListBox;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
+    SpeedButton1: TSpeedButton;
+    SpeedButton5: TSpeedButton;
     SpeedButtonPermission: TSpeedButton;
     SpeedButton2: TSpeedButton;
     SpeedButtonAddPath: TSpeedButton;
@@ -36,6 +38,8 @@ type
     SpeedButton4: TSpeedButton;
     SpeedButtonOpen: TSpeedButton;
     StatusBar1: TStatusBar;
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton5Click(Sender: TObject);
     procedure SpeedButtonPermissionClick(Sender: TObject);
     procedure SpeedButtonAddPathClick(Sender: TObject);
     procedure SpeedButtonAddGradleDepClick(Sender: TObject);
@@ -72,11 +76,35 @@ end;
 
 procedure TFormAddComplements.SpeedButtonPermissionClick(Sender: TObject);
 begin
-  if ComboBoxPermission.Text <> '' then
+  if EditManifestPermission.Text <> '' then
   begin
-    ListBoxPermission.Items.Add(ComboBoxPermission.Text);
-    ComboBoxPermission.Text:= '';
+    ListBoxPermission.Items.Add(EditManifestPermission.Text);
+    EditManifestPermission.Text:= '';
   end;
+end;
+
+procedure TFormAddComplements.SpeedButton1Click(Sender: TObject);
+var
+  s1, s2, s3: string;
+begin
+  s1:= 'implementation ''com.sun.mail:android-mail:1.6.2''';
+  s2:= 'classpath ''com.google.gms:google-services:4.3.8''';
+  s3:= 'apply plugin: ''com.google.gms.google-services''';
+  ShowMessage('Gradle Add Examples:' + sLineBreak +
+               sLineBreak + s1 + sLineBreak + sLineBreak + s2 +
+               sLineBreak + sLineBreak + s3);
+end;
+
+procedure TFormAddComplements.SpeedButton5Click(Sender: TObject);
+var
+  s1, s2, s3: string;
+begin
+  s1:= 'android.permission.INTERNET';
+  s2:= 'android.permission.BLUETOOTH';
+  s3:= 'android.permission.VIBRATE';
+  ShowMessage('Android Manifest Permission Examples:' + sLineBreak +
+               sLineBreak + s1 + sLineBreak + s2 + sLineBreak + s3 + sLineBreak + sLineBreak +
+               'warning: dangerous permission need be handled by code, too');
 end;
 
 procedure TFormAddComplements.SpeedButtonAddGradleDepClick(Sender: TObject);

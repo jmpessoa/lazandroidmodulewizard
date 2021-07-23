@@ -1312,13 +1312,34 @@ begin
 
      for i:= 0 to count-1 do
      begin
-        aux:= frm.ListBoxGradleDep.Items.Strings[i];
+        aux:= Trim(frm.ListBoxGradleDep.Items.Strings[i]);
         list.Clear;
-        data:= GetCleanDepData(Trim(aux));
-        if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies') then
-            list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
-        list.Add('implementation '''+data+'''');
-        list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
+
+        if Pos('implementation', aux) > 0 then
+        begin
+          if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies') then
+               list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
+          list.Add(aux);
+          list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.dependencies');
+        end;
+
+        if Pos('classpath', aux) > 0 then
+        begin
+          if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.classpath') then
+               list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.classpath');
+
+          list.Add(aux);
+          list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.classpath');
+        end;
+
+        if Pos('apply', aux) > 0 then
+        begin
+          if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.plugin') then
+               list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.plugin');
+          list.Add(aux);
+          list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.plugin');
+        end;
+
      end;
 
      count:= frm.ListBoxPermission.Count; //<uses-permission android:name="android.permission.INTERNET"/>
@@ -1330,7 +1351,11 @@ begin
         if FileExists(FPathToJavaTemplates + PathDelim + javaclassName + '.permission') then
             list.LoadFromFile(FPathToJavaTemplates + PathDelim + javaclassName + '.permission');
 
-        list.Add('<uses-permission android:name="'+data+'"/>');
+        if Pos('<uses-permission', data) > 0 then
+           list.Add(data)
+        else
+           list.Add('<uses-permission android:name="'+data+'"/>');
+
         list.SaveToFile(FPathToJavaTemplates + PathDelim + javaclassName + '.permission');
      end;
 

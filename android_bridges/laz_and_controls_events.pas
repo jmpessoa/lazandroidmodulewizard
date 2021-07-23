@@ -279,6 +279,9 @@ uses
    procedure Java_Event_pOnBluetoothLECharacteristicChanged(env:PJNIEnv;this:JObject;Sender:TObject;strValue:jString;strCharacteristic:jString);
    procedure Java_Event_pOnBluetoothLECharacteristicRead(env:PJNIEnv;this:JObject;Sender:TObject;strValue:jString;strCharacteristic:jString);
 
+   //jsFirebasePushNotificationListener
+   procedure Java_Event_pOnGetTokenComplete(env:PJNIEnv;this:JObject;Sender:TObject;token:jString;isSuccessful:jBoolean;statusMessage:jString);
+
 implementation
 
 uses
@@ -293,7 +296,7 @@ uses
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
-   cbillingclient, ctoytimerservice, bluetoothlowenergy;
+   cbillingclient, ctoytimerservice, bluetoothlowenergy, sfirebasepushnotificationlistener;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3445,6 +3448,20 @@ begin
   begin
     jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
     jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLECharacteristicRead(Sender,GetString(env,strValue),GetString(env,strCharacteristic));
+  end;
+end;
+
+//jsFirebasePushNotificationListener
+procedure Java_Event_pOnGetTokenComplete(env:PJNIEnv;this:JObject;Sender:TObject;token:jString;isSuccessful:jBoolean;statusMessage:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis:= this;
+
+  if Sender is jsFirebasePushNotificationListener then
+  begin
+    jForm(jsFirebasePushNotificationListener(Sender).Owner).UpdateJNI(gApp);
+    jsFirebasePushNotificationListener(Sender).GenEvent_OnGetTokenComplete(Sender,GetString(env,token),boolean(isSuccessful),GetString(env,statusMessage));
   end;
 end;
 

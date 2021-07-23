@@ -1,0 +1,1 @@
+public native void pOnGetTokenComplete(long pasobj, String token, boolean isSuccessful, String statusMessage);

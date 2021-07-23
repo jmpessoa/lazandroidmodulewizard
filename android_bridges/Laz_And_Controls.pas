@@ -2576,17 +2576,17 @@ begin
 end;
 
 Procedure Java_Event_pAppOnNewIntent(env: PJNIEnv; this: jObject; intent: jobject);
-{var
-  Form: jForm;}
+var
+  Form: jForm;
 begin
   gApp.Jni.jEnv := env;
   gApp.Jni.jThis:= this;
-  { //TODO
-  Form := gApp.Forms.Stack[gApp.TopIndex].Form;
+
+  if gApp.TopIndex < 0 then Exit;
+  Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
   Form.UpdateJNI(gApp);
   if Assigned(Form.OnNewIntent) then Form.OnNewIntent(Form, intent);
-  }
 end;
 
 // The activity is about to be destroyed.

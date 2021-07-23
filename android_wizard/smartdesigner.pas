@@ -274,8 +274,9 @@ begin
          AComponentClass.ClassNameIs('jsCollapsingToolbarLayout') or
          AComponentClass.ClassNameIs('jsNestedScrollView') or
          AComponentClass.ClassNameIs('jsBottomNavigationView') or
+         AComponentClass.ClassNameIs('jsContinuousScrollableImageView') or
          AComponentClass.ClassNameIs('jsAdMod') or
-         AComponentClass.ClassNameIs('jsContinuousScrollableImageView') then
+         AComponentClass.ClassNameIs('jsFirebasePushNotificationListener') then
       begin
         ShowMessage('[Undoing..] "'+AComponentClass.ClassName+'" need AppCompat theme...' +sLIneBreak+
                      'Hint:  You can convert the project to AppCompat theme:'  +sLIneBreak+
@@ -1179,6 +1180,10 @@ begin
          strList.Add('    }');
          end;
 
+         strList.Add('    compileOptions {');
+         strList.Add('        sourceCompatibility 1.8');
+         strList.Add('        targetCompatibility 1.8');
+         strList.Add('    }');
 
          if Pos('AppCompat', FAndroidTheme) > 0 then
          begin
@@ -2315,9 +2320,9 @@ function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname
   out nativeAdded: boolean): boolean;
 var
   list, auxList, manifestList, gradleList: TStringList;
-  p, p1, p2, i,  minSdkManifest: integer;
+  p, p1, p2, i,  minSdkManifest, count: integer;
   aux, tempStr, auxStr: string;
-  insertRef, minSdkManifestStr: string;
+  insertRef, insertRefShort , minSdkManifestStr: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;
@@ -2798,7 +2803,13 @@ begin
         begin
            auxStr:=auxList.Strings[i];
            SplitStr(auxStr, ' ');
-           p:= LastDelimiter(':',auxStr);
+
+           count:= WordCount(auxStr, [':']);
+           if count > 2 then //has version
+              p:= LastDelimiter(':',auxStr)
+           else
+              p:= Length(auxStr);
+
            tempStr:= Copy(auxStr, 2, p - 2);
            if Pos(tempStr, aux) <= 0 then
            begin
@@ -2812,7 +2823,67 @@ begin
       end;
    end;
    //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.classpath') then
+   begin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.classpath');
+      if auxList.Text <> '' then
+      begin
+        gradleList:=TStringList.Create;
+        gradleList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+        aux:= gradleList.Text;
+        insertRef:= 'classpath ''com.android.tools.build:gradle:3.4.3''';
+        for i:= 0 to auxList.Count-1 do
+        begin
+           auxStr:=auxList.Strings[i];
+           SplitStr(auxStr, ' ');
 
+           count:= WordCount(auxStr, [':']);
+           if count > 2 then //has version
+              p:= LastDelimiter(':',auxStr)
+           else
+              p:= Length(auxStr);
+
+           tempStr:= Copy(auxStr, 2, p - 2);
+           if Pos(tempStr, aux) <= 0 then
+           begin
+             p1:= Pos(insertRef, aux);
+             Insert(sLineBreak + '        ' + auxList.Strings[i] , aux, p1 + Length(insertRef));
+           end;
+
+        end;
+        gradleList.Text:= aux;
+        gradleList.SaveToFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
+        gradleList.Free;
+      end;
+   end;
+   //-----
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.plugin') then
+   begin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.plugin');
+      if auxList.Text <> '' then
+      begin
+        gradleList:=TStringList.Create;
+        gradleList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+        aux:= gradleList.Text;
+
+        insertRef:= 'apply plugin: ''com.android.application''';
+
+        for i:= 0 to auxList.Count-1 do
+        begin
+           auxStr:=auxList.Strings[i];
+           SplitStr(auxStr, ' ');
+           if Pos(auxStr, aux) <= 0 then
+           begin
+             p1:= Pos(insertRef, aux);
+             Insert(sLineBreak+auxList.Strings[i] , aux, p1+Length(insertRef) );
+           end;
+        end;
+        gradleList.Text:= aux;
+        gradleList.SaveToFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
+        gradleList.Free;
+      end;
+   end;
+//--------
    manifestList.Free;
    list.Free;
    auxList.Free;

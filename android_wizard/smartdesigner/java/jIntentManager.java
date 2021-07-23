@@ -1,4 +1,4 @@
-package org.lamw.appjcenterdatalogicdemo1;
+package org.lamw.appcompatfirebasepushnotificationlistenerdemo1;
 
 import java.util.Iterator;
 import java.util.List;
@@ -691,7 +691,28 @@ Sending Data: Extras vs. URI Parameters
      } else return null;   
      
    }
-   
+
+    public String[] GetBundleContent(Intent _intent, String keyValueDelimiter) {
+
+        Bundle extras = _intent.getExtras();
+
+        if (extras != null) {
+            int i;
+            Set keys = extras.keySet();
+            String[] strKeys = new String[keys.size()];
+            Iterator iterate = keys.iterator();
+            i = 0;
+            while (iterate.hasNext()) {
+                String key = (String) iterate.next();
+                strKeys[i] = key + keyValueDelimiter +  extras.get(key) ;
+                i++;
+            }
+            return strKeys;
+
+        } else return null;
+
+    }
+
    public String GetActionImageCaptureAsString() {
 	     return "android.media.action.IMAGE_CAPTURE";
    }
