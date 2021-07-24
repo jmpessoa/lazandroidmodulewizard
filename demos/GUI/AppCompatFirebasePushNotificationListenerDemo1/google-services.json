@@ -1,0 +1,70 @@
+{
+  "project_info": {
+    "project_number": "141157875589",
+    "firebase_url": "https://lamw-b914a.firebaseio.com",
+    "project_id": "lamw-b914a",
+    "storage_bucket": "lamw-b914a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141157875589:android:e6a9f18f4f96ed16",
+        "android_client_info": {
+          "package_name": "org.lamw"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141157875589-s23uume9gsi22n4oo5gn7uq9k06b0hfq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEksEc8o5sYWtk5U6-xuX-_CmEwGWSjVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "141157875589-s23uume9gsi22n4oo5gn7uq9k06b0hfq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-5850963032090364~4641793731"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141157875589:android:f6ca265b5ec675a153ceec",
+        "android_client_info": {
+          "package_name": "org.lamw.appcompatfirebasepushnotificationlistenerdemo1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141157875589-s23uume9gsi22n4oo5gn7uq9k06b0hfq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEksEc8o5sYWtk5U6-xuX-_CmEwGWSjVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "141157875589-s23uume9gsi22n4oo5gn7uq9k06b0hfq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
