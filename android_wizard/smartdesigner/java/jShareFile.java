@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.util.TypedValue;
 import android.view.View;
@@ -135,24 +136,33 @@ public class jShareFile /*extends ...*/ {
 		   intent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));    		       		 	     
 		   controls.activity.startActivity(Intent.createChooser(intent, "Share ["+filename+"] by:")); 		   
 	}	
-		
+	
+   private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return controls.activity.getExternalFilesDir(environmentDir);
+       }
+   }
+	
 	private String GetEnvironmentDirectoryPath(int _directory) {
 		
 		File filePath= null;
 		String absPath="";   //fail!
 		  
-		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //API 19!
+		//getMyEnvDir(Environment.DIRECTORY_DOCUMENTS);break; //API 19!
 		if (_directory != 8) {		  	   	 
 		  switch(_directory) {	                       
 		    
-		    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break; //hack		    
-		    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
-		    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
-		    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
-		    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
-		    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
-		    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
-		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+		    case 0:  filePath = getMyEnvDir(Environment.DIRECTORY_DOWNLOADS); break; //hack		    
+		    case 1:  filePath = getMyEnvDir(Environment.DIRECTORY_DCIM); break;
+		    case 2:  filePath = getMyEnvDir(Environment.DIRECTORY_MUSIC); break;
+		    case 3:  filePath = getMyEnvDir(Environment.DIRECTORY_PICTURES); break;
+		    case 4:  filePath = getMyEnvDir(Environment.DIRECTORY_NOTIFICATIONS); break;
+		    case 5:  filePath = getMyEnvDir(Environment.DIRECTORY_MOVIES); break;
+		    case 6:  filePath = getMyEnvDir(Environment.DIRECTORY_PODCASTS); break;
+		    case 7:  filePath = getMyEnvDir(Environment.DIRECTORY_RINGTONES); break;
 		    
 		    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
 		    case 10: absPath = this.controls.activity.getFilesDir().getPath();

@@ -1,4 +1,4 @@
-package org.lamw.appnavigationdrawerdemo3;
+package com.example.appopenfiledialogdemo1;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.2 - 15 July - 2021 [splited jForm]
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -765,9 +765,18 @@ public  String getStrDateTime() {
     return (FileExt.getPath());
   }
 
+  private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return this.activity.getExternalFilesDir(environmentDir);
+       }
+   }
+
   // Result : /storage/emulated/0/DCIM
   public String getPathDCIM() {
-    File FileDCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+    File FileDCIM = getMyEnvDir(Environment.DIRECTORY_DCIM);
 
     if (FileDCIM == null) {
       return "";

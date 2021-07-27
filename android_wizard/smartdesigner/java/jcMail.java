@@ -2,9 +2,9 @@ package org.lamw.appjcenteremailreceiverdemo1;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 //import android.util.Log;
-
 import java.io.IOException;
 import java.util.Properties;
 import javax.mail.Address;
@@ -36,7 +36,7 @@ public class jcMail /*extends ...*/ {
     String mPort;
     String mUserName;
     String mPassword;
-    String mAttachSaveDirectory = "";//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
+    String mAttachSaveDirectory = "";
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 

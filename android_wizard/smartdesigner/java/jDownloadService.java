@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Environment;
 //import android.util.Log;
 
@@ -50,7 +51,7 @@ public class jDownloadService extends IntentService {
       pascalObj = _Self;
       controls  = _ctrls;
 
-      filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);   
+      filePath = getMyEnvDir(Environment.DIRECTORY_DOWNLOADS);   
       mFILEPATH = filePath.getPath();      
       
    }
@@ -61,7 +62,17 @@ public class jDownloadService extends IntentService {
  
    //write others [public] methods code here......
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   
+
+      private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return controls.activity.getExternalFilesDir(environmentDir);
+       }
+   }
+
+
    @Override
    protected void onHandleIntent(Intent intent) {   // will be called asynchronously by Android
    	    //TODO Auto-generated method stub	   

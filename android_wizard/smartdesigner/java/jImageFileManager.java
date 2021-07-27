@@ -1,4 +1,4 @@
-package org.lamw.appsharefiledemo2;
+package com.example.appopenfiledialogdemo1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,6 +23,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -365,6 +366,15 @@ public class jImageFileManager /*extends ...*/ {
 	    return true;
 }
  
+   private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return controls.activity.getExternalFilesDir(environmentDir);
+       }
+   }
+
  public boolean SaveToGallery(Bitmap bitmap, String folderName, String fileName)
  {
      OutputStream fos;
@@ -394,7 +404,7 @@ public class jImageFileManager /*extends ...*/ {
 		 }
 		 //[endif_api29up]
      } else {
-         String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() 
+         String imagesDir = getMyEnvDir(Environment.DIRECTORY_PICTURES).toString() 
         		            + File.separator + folderName;
          
          imageFile = new File(imagesDir);

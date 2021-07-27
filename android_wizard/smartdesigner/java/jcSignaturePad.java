@@ -1,10 +1,12 @@
 package org.lamw.appjcentersignaturepaddemo1;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
@@ -147,9 +149,18 @@ public class jcSignaturePad extends SignaturePad /*dummy*/ { //please, fix what 
  
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     
+   private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return controls.activity.getExternalFilesDir(environmentDir);
+       }
+   }
+
     public File getAlbumStorageDir(String albumName) {
         // Get the directory for the user's public pictures directory.
-        File file = new File(Environment.getExternalStoragePublicDirectory(
+        File file = new File(getMyEnvDir(
                 Environment.DIRECTORY_PICTURES), albumName);
         if (!file.mkdirs()) {
             Log.e("SignaturePad", "Directory not created");

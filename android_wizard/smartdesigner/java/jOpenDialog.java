@@ -3,6 +3,7 @@ package com.example.appopenfiledialogdemo1;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
@@ -81,21 +82,30 @@ public class jOpenDialog /*extends ...*/ {
  
  //write others [public] methods code here......
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   
+
+   private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return controls.activity.getExternalFilesDir(environmentDir);
+       }
+   }
+
    private File GetEnvironmentDirectoryPath(int _directory) {		
 		File filePath= null;
 		String absPath;
 		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
 		if (_directory != 8) {		  	   	 
 		  switch(_directory) {	                       
-		    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break;	   
-		    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
-		    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
-		    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
-		    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
-		    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
-		    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
-		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+		    case 0:  filePath = getMyEnvDir(Environment.DIRECTORY_DOWNLOADS); break;
+		    case 1:  filePath = getMyEnvDir(Environment.DIRECTORY_DCIM); break;
+		    case 2:  filePath = getMyEnvDir(Environment.DIRECTORY_MUSIC); break;
+		    case 3:  filePath = getMyEnvDir(Environment.DIRECTORY_PICTURES); break;
+		    case 4:  filePath = getMyEnvDir(Environment.DIRECTORY_NOTIFICATIONS); break;
+		    case 5:  filePath = getMyEnvDir(Environment.DIRECTORY_MOVIES); break;
+		    case 6:  filePath = getMyEnvDir(Environment.DIRECTORY_PODCASTS); break;
+		    case 7:  filePath = getMyEnvDir(Environment.DIRECTORY_RINGTONES); break;
 		    
 		    case 9: filePath  = this.controls.activity.getFilesDir(); break;      //Result : /data/data/com/MyApp/files	    	    
 		    //case 10: filePath  = this.controls.activity.getFilesDir(); break;      //TODO		//databases
@@ -115,9 +125,10 @@ public class jOpenDialog /*extends ...*/ {
 		}    			    		 
 		return filePath;
 	}
-   
+
+
    public void SetInitialDirectory (int _initialEnvDirectory) {
-	   initDir = GetEnvironmentDirectoryPath(_initialEnvDirectory);
+	      initDir = GetEnvironmentDirectoryPath(_initialEnvDirectory);
    }
    
    public void SetFileExtension(String _fileExtension) {
@@ -161,7 +172,7 @@ public class jOpenDialog /*extends ...*/ {
     */
    private void refresh(File path) {
        this.currentPath = path;
-       Log.i("currentPath", currentPath.getPath());
+       //Log.i("currentPath", currentPath.getPath());
        if (path.exists()) {
            File[] dirs = path.listFiles(new FileFilter() {
                @Override public boolean accept(File file) {

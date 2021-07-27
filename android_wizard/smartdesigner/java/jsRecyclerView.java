@@ -583,8 +583,17 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     	}       	
     }
 
+    private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return controls.activity.getExternalFilesDir(environmentDir);
+       }
+   }
+
     public Bitmap LoadFromFile(String _filename) { //EnvironmentDirectoryPath  !!	
-       File filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);	 	 	      	      
+       File filePath = getMyEnvDir(Environment.DIRECTORY_DOWNLOADS);	 	 	      	      
  	   return BitmapFactory.decodeFile(filePath.getPath() +"/"+_filename);
     }
     
