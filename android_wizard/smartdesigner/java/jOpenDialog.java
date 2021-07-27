@@ -1,4 +1,4 @@
-package com.example.appfileproviderdemo1;
+package com.example.appopenfiledialogdemo1;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -185,18 +185,30 @@ public class jOpenDialog /*extends ...*/ {
            });
 
            //convert to an array
+           int dirslength = 0;
+           int fileslength = 0;
+
+           if (dirs != null) dirslength = dirs.length;
+           if (files != null) fileslength = files.length;
+
            int i = 0;
            String[] fileList;
            if (path.getParentFile() == null) {
-               fileList = new String[dirs.length + files.length];
+               fileList = new String[dirslength + fileslength];
            } else {
-               fileList = new String[dirs.length + files.length + 1];
+               fileList = new String[dirslength + fileslength + 1];
                fileList[i++] = PARENT_DIR;
            }
-           Arrays.sort(dirs);
-           Arrays.sort(files);
-           for (File dir : dirs) { fileList[i++] = dir.getName(); }
-           for (File file : files ) { fileList[i++] = file.getName(); }
+
+           if (dirs != null) {
+               Arrays.sort(dirs);
+               for (File dir : dirs) { fileList[i++] = dir.getName(); }
+           }
+
+           if (files != null) {
+               Arrays.sort(files);
+               for (File file : files ) { fileList[i++] = file.getName(); }
+           }
 
            // refresh the user interface
            dialog.setTitle(currentPath.getPath());
