@@ -2614,7 +2614,7 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 	}
 
    private File getMyEnvDir(String environmentDir) {
-       if (Build.VERSION.SDK_INT <  29) {
+       if (Build.VERSION.SDK_INT <=  29) {
            return Environment.getExternalStoragePublicDirectory(environmentDir);
        }
        else {

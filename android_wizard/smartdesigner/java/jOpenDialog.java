@@ -83,14 +83,14 @@ public class jOpenDialog /*extends ...*/ {
  //write others [public] methods code here......
  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
-   private File getMyEnvDir(String environmentDir) {
-       if (Build.VERSION.SDK_INT <  29) {
-           return Environment.getExternalStoragePublicDirectory(environmentDir);
-       }
-       else {
-           return controls.activity.getExternalFilesDir(environmentDir);
-       }
-   }
+    private File getMyEnvDir(String environmentDir) {
+        if (Build.VERSION.SDK_INT <=  29) {  //legacy
+            return Environment.getExternalStoragePublicDirectory(environmentDir);
+        }
+        else {
+            return controls.activity.getExternalFilesDir(environmentDir);
+        }
+    }
 
    private File GetEnvironmentDirectoryPath(int _directory) {		
 		File filePath= null;
@@ -172,13 +172,14 @@ public class jOpenDialog /*extends ...*/ {
     */
    private void refresh(File path) {
        this.currentPath = path;
-       //Log.i("currentPath", currentPath.getPath());
        if (path.exists()) {
+
            File[] dirs = path.listFiles(new FileFilter() {
                @Override public boolean accept(File file) {
-                   return (file.isDirectory() && file.canRead());
+                   return (file.isDirectory() && file.canRead() );
                }
            });
+
            File[] files = path.listFiles(new FileFilter() {
                @Override public boolean accept(File file) {
                    if (!file.isDirectory()) {
@@ -199,8 +200,13 @@ public class jOpenDialog /*extends ...*/ {
            int dirslength = 0;
            int fileslength = 0;
 
-           if (dirs != null) dirslength = dirs.length;
-           if (files != null) fileslength = files.length;
+           if (dirs != null) {
+               dirslength = dirs.length;
+           }
+
+           if (files != null) {
+               fileslength = files.length;
+           }
 
            int i = 0;
            String[] fileList;
@@ -231,8 +237,7 @@ public class jOpenDialog /*extends ...*/ {
                           return view;
                       }
                   });
-       }   
-       
+       }
    }
       
    /**
