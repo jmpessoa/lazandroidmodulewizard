@@ -1,15 +1,15 @@
-package com.example.appfileproviderdemo1;
+package com.example.appopenfiledialogdemo1;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -101,8 +101,7 @@ public class jTextFileManager /*extends ...*/ {
      String retStr = "";
 
      try {
-         InputStream inputStream = context.openFileInput(_filename);
-
+         FileInputStream inputStream = new FileInputStream(new File(_filename));
          if ( inputStream != null ) {
              InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
              BufferedReader bufferedReader = new BufferedReader(inputStreamReader);

@@ -1,16 +1,15 @@
-package org.lamw.applistviewdemo7;
+package com.example.appopenfiledialogdemo1;
 
 import java.io.BufferedReader;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -683,12 +682,9 @@ public class jEditText extends EditText {
 	
 	
 	public void LoadFromFile(String _filename) {
-
 		     String retStr = "";
-
 		     try {
-		         InputStream inputStream = controls.activity.openFileInput(_filename);
-
+		         FileInputStream inputStream = new FileInputStream(new File(_filename));
 		         if ( inputStream != null ) {
 		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -697,13 +693,12 @@ public class jEditText extends EditText {
 		             while ( (receiveString = bufferedReader.readLine()) != null ) {
 		                 stringBuilder.append(receiveString);
 		             }
-
 		             inputStream.close();
 		             retStr = stringBuilder.toString();
 		         }
 		     }
 		     catch (IOException e) {
-		        // Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
+		        Log.i("LAMW", "LoadFromFile error: " + e.toString());
 		     }
 		     this.setText(retStr);
     }
