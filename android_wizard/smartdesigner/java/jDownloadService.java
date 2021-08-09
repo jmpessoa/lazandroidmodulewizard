@@ -63,7 +63,7 @@ public class jDownloadService extends IntentService {
    //write others [public] methods code here......
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
-      private File getMyEnvDir(String environmentDir) {
+   private File getMyEnvDir(String environmentDir) {
        if (Build.VERSION.SDK_INT <=  29) {
            return Environment.getExternalStoragePublicDirectory(environmentDir);
        }

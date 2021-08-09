@@ -1,0 +1,8 @@
+public native void pOnRecyclerViewItemClick(long pasobj, int itemIndex);
+public native void pOnRecyclerViewItemLongClick(long pasobj, int itemIndex);
+public native void pOnRecyclerViewItemTouchUp(long pasobj, int itemIndex);
+public native void pOnRecyclerViewItemTouchDown(long pasobj, int itemIndex);
+public native void pOnRecyclerViewItemWidgetClick(long pasobj, int itemIndex, int widgetClass, int widgetId, int status);
+public native void pOnRecyclerViewItemWidgetLongClick(long pasobj, int itemIndex, int widgetClass, int widgetId);
+public native void pOnRecyclerViewItemWidgetTouchUp(long pasobj, int itemIndex, int widgetClass, int widgetId);
+public native void pOnRecyclerViewItemWidgetTouchDown(long pasobj, int itemIndex, int widgetClass, int widgetId);									

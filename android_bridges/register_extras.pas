@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  batterymanager,
   bluetoothlowenergy,
   netapi,
   barcodegen,
@@ -75,6 +76,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jbatterymanager_icon.lrs}
   {$I jnetapi_icon.lrs}
   {$I jbarcodegen_icon.lrs}
   {$I jussdservice_icon.lrs}
@@ -143,6 +145,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jBatteryManager,
       jNetApi,
       jBarcodeGen,
       jUSSDService,

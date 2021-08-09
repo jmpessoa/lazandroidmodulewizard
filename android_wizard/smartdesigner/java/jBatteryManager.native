@@ -1,0 +1,5 @@
+public native void pOnBatteryCharging(long pasobj, int batteryAtPercentLevel, int pluggedBy);
+public native void pOnBatteryDisCharging(long pasobj, int batteryAtPercentLevel);
+public native void pOnBatteryFull(long pasobj, int batteryAtPercentLevel);
+public native void pOnBatteryUnknown(long pasobj, int batteryAtPercentLevel);
+public native void pOnBatteryNotCharging(long pasobj, int batteryAtPercentLevel);

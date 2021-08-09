@@ -1,0 +1,3 @@
+public java.lang.Object jBatteryManager_jCreate(long _Self) {
+  return (java.lang.Object)(new jBatteryManager(this,_Self));
+}

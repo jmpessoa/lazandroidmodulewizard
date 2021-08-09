@@ -282,6 +282,14 @@ uses
    //jsFirebasePushNotificationListener
    procedure Java_Event_pOnGetTokenComplete(env:PJNIEnv;this:JObject;Sender:TObject;token:jString;isSuccessful:jBoolean;statusMessage:jString);
 
+   //jBatteryManager
+   procedure Java_Event_pOnBatteryCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer;pluggedBy:integer);
+   procedure Java_Event_pOnBatteryDisCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
+   procedure Java_Event_pOnBatteryFull(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
+   procedure Java_Event_pOnBatteryUnknown(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
+   procedure Java_Event_pOnBatteryNotCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
+
+
 implementation
 
 uses
@@ -296,7 +304,8 @@ uses
    sadmob, zbarcodescannerview, cmikrotikrouteros, scontinuousscrollableimageview,
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
-   cbillingclient, ctoytimerservice, bluetoothlowenergy, sfirebasepushnotificationlistener;
+   cbillingclient, ctoytimerservice, bluetoothlowenergy,
+   sfirebasepushnotificationlistener, batterymanager;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3462,6 +3471,68 @@ begin
   begin
     jForm(jsFirebasePushNotificationListener(Sender).Owner).UpdateJNI(gApp);
     jsFirebasePushNotificationListener(Sender).GenEvent_OnGetTokenComplete(Sender,GetString(env,token),boolean(isSuccessful),GetString(env,statusMessage));
+  end;
+end;
+
+//jBatteryManager
+procedure Java_Event_pOnBatteryCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer;pluggedBy:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis:= this;
+
+  if Sender is jBatteryManager then
+  begin
+    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
+    jBatteryManager(Sender).GenEvent_OnBatteryCharging(Sender,batteryAtPercentLevel,pluggedBy);
+  end;
+end;
+procedure Java_Event_pOnBatteryDisCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis:= this;
+
+  if Sender is jBatteryManager then
+  begin
+    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
+    jBatteryManager(Sender).GenEvent_OnBatteryDisCharging(Sender,batteryAtPercentLevel);
+  end;
+end;
+procedure Java_Event_pOnBatteryFull(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis:= this;
+
+  if Sender is jBatteryManager then
+  begin
+    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
+    jBatteryManager(Sender).GenEvent_OnBatteryFull(Sender,batteryAtPercentLevel);
+  end;
+end;
+procedure Java_Event_pOnBatteryUnknown(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis:= this;
+
+  if Sender is jBatteryManager then
+  begin
+    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
+    jBatteryManager(Sender).GenEvent_OnBatteryUnknown(Sender,batteryAtPercentLevel);
+  end;
+end;
+procedure Java_Event_pOnBatteryNotCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis:= this;
+
+  if Sender is jBatteryManager then
+  begin
+    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
+    jBatteryManager(Sender).GenEvent_OnBatteryNotCharging(Sender,batteryAtPercentLevel);
   end;
 end;
 
