@@ -1,1 +1,2 @@
 public native void pOnClickToggleButton(long pasobj, boolean state);
+public native void pOnLongClickToggleButton(long pasobj, boolean state);

@@ -1,4 +1,4 @@
-package com.example.appgooglemapsdemo1;
+package org.lamw.appbatterymanagerdemo1;
 
 import java.lang.reflect.Field;
 
@@ -23,6 +23,9 @@ public class jToggleButton extends ToggleButton /*dummy*/ { //please, fix what G
    private Context context = null;
    private OnClickListener onClickListener;   // click event
 
+   private OnLongClickListener onLongClickListener;  //by a6p
+   private Boolean  mEnabledLongClick  = false;
+
    private Boolean enabled  = false;           // click-touch enabled!
    boolean mState = false;
 
@@ -46,6 +49,21 @@ public class jToggleButton extends ToggleButton /*dummy*/ { //please, fix what G
          };
       };
       setOnClickListener(onClickListener);
+
+      onLongClickListener = new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View arg0) {
+               mState = !mState;
+               if (enabled) {
+                  if (mEnabledLongClick) {
+                     controls.pOnLongClickToggleButton(pascalObj, mState);
+                  }
+               }
+               return false;  //true if the callback consumed the long click, false otherwise.
+            }
+      };
+      setOnLongClickListener(onLongClickListener);
+
    } //end constructor
 
    public void jFree() {
@@ -133,6 +151,10 @@ public class jToggleButton extends ToggleButton /*dummy*/ { //please, fix what G
 
    public void DispatchOnToggleEvent(boolean _value) {
       enabled = _value;
+   }
+
+   public void SetEnabledLongClick(boolean _enableLongClick) {
+      mEnabledLongClick = _enableLongClick;
    }
 
 } //end class

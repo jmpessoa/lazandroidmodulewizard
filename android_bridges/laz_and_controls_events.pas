@@ -50,6 +50,7 @@ uses
 
    Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: jboolean); overload;
    Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);  overload; //deprecated
+   procedure Java_Event_pOnLongClickToggleButton(env:PJNIEnv;this:JObject;Sender:TObject;state:jBoolean);
 
    Procedure Java_Event_pOnChangeSwitchButton(env: PJNIEnv; this: jobject; Obj: TObject; state: jboolean); overload;
    Procedure Java_Event_pOnChangeSwitchButton(env: PJNIEnv; this: jobject; Obj: TObject; state: boolean);  overload; //deprecated
@@ -1094,6 +1095,19 @@ begin
   begin
     jForm(jToggleButton(Obj).Owner).UpdateJNI(gApp);
     jToggleButton(Obj).GenEvent_OnClickToggleButton(Obj, Boolean(state));
+  end;
+end;
+
+procedure Java_Event_pOnLongClickToggleButton(env:PJNIEnv;this:JObject;Sender:TObject;state:jBoolean);
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis:= this;
+
+  if Sender is jToggleButton then
+  begin
+    jForm(jToggleButton(Sender).Owner).UpdateJNI(gApp);
+    jToggleButton(Sender).GenEvent_OnLongClickToggleButton(Sender,boolean(state));
   end;
 end;
 

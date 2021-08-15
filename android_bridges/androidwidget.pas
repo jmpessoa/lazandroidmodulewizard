@@ -384,7 +384,7 @@ type
 
  TToggleState = (tsOff, tsOn);
 
- TOnClickToggleButton = procedure (Sender: TObject; state: boolean) of Object;
+ TOnClickToggleButton = procedure (Sender: TObject; isStateOn: boolean) of Object;
 
  TWidgetItem = (wgNone,wgCheckBox,wgRadioButton,wgButton,wgTextView, wgEditText, wgSwitch);
 

@@ -9,6 +9,8 @@ uses
 
 type
 
+TOnLongClickToggleButton=procedure(Sender:TObject; isStateOn:boolean) of object;
+
 {Draft Component code by "Lazarus Android Module Wizard" [1/7/2015 1:26:30]}
 {https://github.com/jmpessoa/lazandroidmodulewizard}
 
@@ -20,6 +22,10 @@ type
     FTextOn: string;
     FToggleState: TToggleState;
     FOnToggle: TOnClickToggleButton;
+
+    FEnabledLongClick: boolean;
+    FOnLongClick: TOnLongClickToggleButton;
+
     procedure SetColor(Value: TARGBColorBridge); //background
     
   public
@@ -50,6 +56,8 @@ type
     function IsChecked(): boolean;
     procedure SetBackgroundDrawable(_imageIdentifier: string);
     procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetEnabledLongClick(_enableLongClick: boolean);
+    procedure GenEvent_OnLongClickToggleButton(Sender:TObject;state:boolean);
 
   published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -57,7 +65,9 @@ type
     property TextOn: string read FTextOn write SetTextOn;
     property State: TToggleState read FToggleState write SetToggleState;
     property GravityInParent: TLayoutGravity read FGravityInParent write SetLGravity;
+    property EnabledLongClick: boolean read FEnabledLongClick write SetEnabledLongClick;
     property OnToggle: TOnClickToggleButton read FOnToggle write FOnToggle;
+    property OnLongClick: TOnLongClickToggleButton read FOnLongClick write FOnLongClick;
   end;
 
 function jToggleButton_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -81,6 +91,7 @@ procedure jToggleButton_Toggle(env: PJNIEnv; _jtogglebutton: JObject);
 function jToggleButton_IsChecked(env: PJNIEnv; _jtogglebutton: JObject): boolean;
 procedure jToggleButton_SetBackgroundDrawable(env: PJNIEnv; _jtogglebutton: JObject; _imageIdentifier: string);
 procedure jToggleButton_SetFrameGravity(env: PJNIEnv; _jtogglebutton: JObject; _value: integer);
+procedure jToggleButton_SetEnabledLongClick(env: PJNIEnv; _jtogglebutton: JObject; _enableLongClick: boolean);
 
 
 implementation
@@ -106,6 +117,7 @@ begin
   FTextOff:= 'OFF';
   FTextOn:= 'ON';
   FToggleState:= tsOff;
+  FEnabledLongClick:= False;
 end;
 
 destructor jToggleButton.Destroy;
@@ -186,6 +198,9 @@ begin
      jToggleButton_SetChecked(FjEnv, FjObject, True);
 
    jToggleButton_DispatchOnToggleEvent(FjEnv, FjObject, True);
+
+   if FEnabledLongClick then
+      jToggleButton_SetEnabledLongClick(FjEnv, FjObject, True);
 
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
@@ -397,6 +412,24 @@ begin
      jToggleButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
 end;
 
+procedure jToggleButton.SetEnabledLongClick(_enableLongClick: boolean);
+begin
+  //in designing component state: set value here...
+  FEnabledLongClick:= _enableLongClick;
+  if FInitialized then
+     jToggleButton_SetEnabledLongClick(FjEnv, FjObject, _enableLongClick);
+end;
+
+procedure jToggleButton.GenEvent_OnLongClickToggleButton(Sender:TObject;state:boolean);
+begin
+
+  if state then
+    FToggleState:= tsOn
+  else
+    FToggleState:= tsOff;
+
+  if Assigned(FOnLongClick) then FOnLongClick(Sender,state);
+end;
 
 {-------- jToggleButton_JNI_Bridge ----------}
 
@@ -696,6 +729,29 @@ begin
   jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
   env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jToggleButton_SetEnabledLongClick(env: PJNIEnv; _jtogglebutton: JObject; _enableLongClick: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jtogglebutton);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetEnabledLongClick', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_enableLongClick);
+
+  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 end.
