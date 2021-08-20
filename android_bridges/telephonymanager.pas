@@ -56,6 +56,10 @@ jTelephonyManager = class(jControl)
     function IsWifiEnabled(): boolean;
     procedure GetUidTotalMobileBytesAsync(_startTime, _endTime:int64; _uid: integer);
     procedure GetUidTotalWifiBytesAsync(_startTime, _endTime:int64; _uid: integer);
+    function GetLocationAreaCode(): integer;
+    function GetBaseStationId(): integer;
+    function GetMobileNetworkCode(): integer;
+    function GetMobileCountryCode(): integer;
 
     procedure GenEvent_OnTelephonyCallStateChanged(Sender: TObject; state: TTelephonyCallState; phoneNumber: string);
     procedure GenEvent_OnGetUidTotalMobileBytesFinished(Sender: TObject; totalbytes: int64 ; uid: integer);
@@ -69,6 +73,11 @@ end;
 function jTelephonyManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jTelephonyManager_GetUidTotalMobileBytesAsync(env: PJNIEnv; _jtelephonymanager: JObject; _startTime, _endTime:int64; _uid: integer);
 procedure jTelephonyManager_GetUidTotalWifiBytesAsync(env: PJNIEnv; _jtelephonymanager: JObject; _startTime, _endTime:int64; _uid: integer);
+
+function jTelephonyManager_GetLocationAreaCode(env: PJNIEnv; _jtelephonymanager: JObject): integer;
+function jTelephonyManager_GetBaseStationId(env: PJNIEnv; _jtelephonymanager: JObject): integer;
+function jTelephonyManager_GetMobileNetworkCode(env: PJNIEnv; _jtelephonymanager: JObject): integer;
+function jTelephonyManager_GetMobileCountryCode(env: PJNIEnv; _jtelephonymanager: JObject): integer;
 
 implementation
 
@@ -304,6 +313,34 @@ begin
   if Assigned(FOnGetUidTotalWifiBytesFinished) then  FOnGetUidTotalWifiBytesFinished(Sender, totalbytes, uid);
 end;
 
+function jTelephonyManager.GetLocationAreaCode(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTelephonyManager_GetLocationAreaCode(FjEnv, FjObject);
+end;
+
+function jTelephonyManager.GetBaseStationId(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTelephonyManager_GetBaseStationId(FjEnv, FjObject);
+end;
+
+function jTelephonyManager.GetMobileNetworkCode(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTelephonyManager_GetMobileNetworkCode(FjEnv, FjObject);
+end;
+
+function jTelephonyManager.GetMobileCountryCode(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jTelephonyManager_GetMobileCountryCode(FjEnv, FjObject);
+end;
+
 {-------- jTelephonyManager_JNI_Bridge ----------}
 
 function jTelephonyManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -357,6 +394,89 @@ begin
   jParams[2].i:= _uid;
   env^.CallVoidMethodA(env, _jtelephonymanager, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+function jTelephonyManager_GetLocationAreaCode(env: PJNIEnv; _jtelephonymanager: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jtelephonymanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetLocationAreaCode', '()I');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  Result:= env^.CallIntMethod(env, _jtelephonymanager, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jTelephonyManager_GetBaseStationId(env: PJNIEnv; _jtelephonymanager: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jtelephonymanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBaseStationId', '()I');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  Result:= env^.CallIntMethod(env, _jtelephonymanager, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jTelephonyManager_GetMobileNetworkCode(env: PJNIEnv; _jtelephonymanager: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jtelephonymanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetMobileNetworkCode', '()I');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  Result:= env^.CallIntMethod(env, _jtelephonymanager, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jTelephonyManager_GetMobileCountryCode(env: PJNIEnv; _jtelephonymanager: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jtelephonymanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetMobileCountryCode', '()I');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  Result:= env^.CallIntMethod(env, _jtelephonymanager, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 end.
