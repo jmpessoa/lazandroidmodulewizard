@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
-    package="dummyPackage" 
+    package="org.lamw.appwebviewdemo1" 
     android:versionCode="1"
     android:versionName="1.0">
 
-    <uses-sdk android:minSdkVersion="dummySdkApi" android:targetSdkVersion="dummyTargetApi"/>
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="29"/>
 
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
@@ -34,7 +34,7 @@
     <uses-permission android:name="android.permission.REORDER_TASKS"/>
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-
+ 
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.flash" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
@@ -57,7 +57,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity         
-            android:name="dummyAppName" 
+            android:name="org.lamw.appwebviewdemo1.App" 
             android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|fontScale"  
 	    android:launchMode="standard" android:enabled="true">

@@ -1988,18 +1988,16 @@ type
   jWebView = class(jVisualControl)
   private
     FJavaScript : Boolean;
-    //
     FOnStatus   : TOnWebViewStatus;
-
     // Fatih - ZoomControl
     FZoomControl : Boolean;
-
     //LMB
-    fOnFindResult: TOnWebViewFindResult;
-
+    FOnFindResult: TOnWebViewFindResult;
     //segator
     FOnEvaluateJavascriptResult: TOnWebViewEvaluateJavascriptResult;
 
+    FDomStorage: boolean;
+    FOnReceivedSslError: TOnWebViewReceivedSslError;
 
     Procedure SetColor     (Value : TARGBColorBridge);
     Procedure SetZoomControl(Value : Boolean);
@@ -2047,8 +2045,27 @@ type
     function GetWidth: integer;  override;//LMB
     function GetHeight: integer; override;//LMB
 
+    procedure SetDomStorage(_domStorage: boolean);
+    procedure SetLoadWithOverviewMode(_overviewMode: boolean);
+    procedure SetUseWideViewPort(_wideViewport: boolean);
+    procedure SetAllowContentAccess(_allowContentAccess: boolean);
+    procedure SetAllowFileAccess(_allowFileAccess: boolean);
+    procedure SetAppCacheEnabled(_cacheEnabled: boolean);
+    procedure SetDisplayZoomControls(_displayZoomControls: boolean);
+    procedure SetGeolocationEnabled(_geolocationEnabled: boolean);
+    procedure SetJavaScriptCanOpenWindowsAutomatically(_javaScriptCanOpenWindows: boolean);
+    procedure SetLoadsImagesAutomatically(_loadsImagesAutomatically: boolean);
+    procedure SetSupportMultipleWindows(_supportMultipleWindows: boolean);
+    procedure SetAllowUniversalAccessFromFileURLs(_allowUniversalAccessFromFileURLs: boolean);
+    procedure SetMediaPlaybackRequiresUserGesture(_mediaPlaybackRequiresUserGesture: boolean);
+    procedure SetSafeBrowsingEnabled(_safeBrowsingEnabled: boolean);
+    procedure SetSupportZoom(_supportZoom: boolean);
+    procedure SetUserAgent(_userAgent: string);
+
     procedure CallEvaluateJavascript(_jsInnerCode: string); //segator
     procedure GenEvent_OnEvaluateJavascriptResult(Sender:TObject;data:string); //segator
+
+    procedure GenEvent_OnWebViewReceivedSslError(Sender:TObject;error:string;primaryError:integer;var outReturn:boolean);
 
   published
     property JavaScript: Boolean          read FJavaScript write SetJavaScript;
@@ -2059,7 +2076,10 @@ type
     property OnStatus  : TOnWebViewStatus read FOnStatus   write FOnStatus;
     property OnLongClick: TOnNotify read FOnLongClick write FOnLongClick;
     property OnFindResult: TOnWebViewFindResult read FOnFindResult write FOnFindResult;
+    property DomStorage: boolean read FDomStorage write SetDomStorage;
     property OnEvaluateJavascriptResult: TOnWebViewEvaluateJavascriptResult read FOnEvaluateJavascriptResult write FOnEvaluateJavascriptResult;
+    property OnReceivedSslError: TOnWebViewReceivedSslError read FOnReceivedSslError write FOnReceivedSslError;
+
 
   end;
 
@@ -2440,6 +2460,8 @@ type
 
   //by segator
   procedure Java_Event_pOnWebViewEvaluateJavascriptResult(env:PJNIEnv;this:JObject;Sender:TObject;data:jString);
+
+  function Java_Event_pOnWebViewReceivedSslError(env:PJNIEnv;this:JObject;Sender:TObject;error:jString;primaryError:integer):jBoolean;
 
   // AsyncTask Event & Task
  // procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject; Obj : TObject; EventType,Progress: integer);
@@ -3928,6 +3950,23 @@ begin
     jForm(jWebView(Sender).Owner).UpdateJNI(gApp);
     jWebView(Sender).GenEvent_OnEvaluateJavascriptResult(Sender,GetPascalString(env,data));
   end;
+end;
+
+function Java_Event_pOnWebViewReceivedSslError(env:PJNIEnv;this:JObject;Sender:TObject;error:jString;primaryError:integer):jBoolean;
+var
+  outReturn: boolean;
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
+
+  outReturn:=False;
+  if Sender is jWebView then
+  begin
+    jForm(jWebView(Sender).Owner).UpdateJNI(gApp);
+    jWebView(Sender).GenEvent_OnWebViewReceivedSslError(Sender,GetPascalString(env,error),primaryError,outReturn);
+  end;
+  Result:=JBool(outReturn);
 end;
 
 
@@ -10464,6 +10503,8 @@ begin
 
   FJavaScript:= True;
   FZoomControl:= True;
+  FDomStorage:= True;
+
   FOnStatus:= nil;
   FLParamWidth:= lpMatchParent;
   FLParamHeight:= lpWrapContent;
@@ -10509,8 +10550,6 @@ begin
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
-                  
-  SetZoomControl(FZoomControl);
 
   for rToA := raAbove to raAlignRight do
   begin
@@ -10535,7 +10574,15 @@ begin
   if not FInitialized then
   begin
    FInitialized:= True;
-   SetJavaScript(FJavaScript);
+
+   if FJavaScript <> True then
+     SetJavaScript(FJavaScript);
+
+   if FDomStorage <> True then
+     jWebView_SetDomStorage(FjEnv, FjObject, FDomStorage);
+
+   if FZoomControl <> True then
+     SetZoomControl(FZoomControl);
 
    if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
@@ -10807,10 +10854,129 @@ begin
      jni_proc_t(FjEnv, FjObject, 'CallEvaluateJavascript', _jsInnerCode);
 end;
 
+procedure jWebView.SetDomStorage(_domStorage: boolean);
+begin
+  //in designing component state: set value here...
+  FDomStorage:= _domStorage;
+  if FInitialized then
+     jWebView_SetDomStorage(FjEnv, FjObject, _domStorage);
+end;
+
+procedure jWebView.SetLoadWithOverviewMode(_overviewMode: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetLoadWithOverviewMode(FjEnv, FjObject, _overviewMode);
+end;
+
+procedure jWebView.SetUseWideViewPort(_wideViewport: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetUseWideViewPort(FjEnv, FjObject, _wideViewport);
+end;
+
+procedure jWebView.SetAllowContentAccess(_allowContentAccess: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetAllowContentAccess(FjEnv, FjObject, _allowContentAccess);
+end;
+
+procedure jWebView.SetAllowFileAccess(_allowFileAccess: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetAllowFileAccess(FjEnv, FjObject, _allowFileAccess);
+end;
+
+procedure jWebView.SetAppCacheEnabled(_cacheEnabled: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetAppCacheEnabled(FjEnv, FjObject, _cacheEnabled);
+end;
+
+procedure jWebView.SetDisplayZoomControls(_displayZoomControls: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetDisplayZoomControls(FjEnv, FjObject, _displayZoomControls);
+end;
+
+procedure jWebView.SetGeolocationEnabled(_geolocationEnabled: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetGeolocationEnabled(FjEnv, FjObject, _geolocationEnabled);
+end;
+
+procedure jWebView.SetJavaScriptCanOpenWindowsAutomatically(_javaScriptCanOpenWindows: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetJavaScriptCanOpenWindowsAutomatically(FjEnv, FjObject, _javaScriptCanOpenWindows);
+end;
+
+procedure jWebView.SetLoadsImagesAutomatically(_loadsImagesAutomatically: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetLoadsImagesAutomatically(FjEnv, FjObject, _loadsImagesAutomatically);
+end;
+
+procedure jWebView.SetSupportMultipleWindows(_supportMultipleWindows: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetSupportMultipleWindows(FjEnv, FjObject, _supportMultipleWindows);
+end;
+
+procedure jWebView.SetAllowUniversalAccessFromFileURLs(_allowUniversalAccessFromFileURLs: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetAllowUniversalAccessFromFileURLs(FjEnv, FjObject, _allowUniversalAccessFromFileURLs);
+end;
+
+procedure jWebView.SetMediaPlaybackRequiresUserGesture(_mediaPlaybackRequiresUserGesture: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetMediaPlaybackRequiresUserGesture(FjEnv, FjObject, _mediaPlaybackRequiresUserGesture);
+end;
+
+procedure jWebView.SetSafeBrowsingEnabled(_safeBrowsingEnabled: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetSafeBrowsingEnabled(FjEnv, FjObject, _safeBrowsingEnabled);
+end;
+
+procedure jWebView.SetSupportZoom(_supportZoom: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetSupportZoom(FjEnv, FjObject, _supportZoom);
+end;
+
+procedure jWebView.SetUserAgent(_userAgent: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetUserAgent(FjEnv, FjObject, _userAgent);
+end;
+
+
 //by segator
 procedure jWebView.GenEvent_OnEvaluateJavascriptResult(Sender:TObject;data:string);
 begin
   if Assigned(FOnEvaluateJavascriptResult) then FOnEvaluateJavascriptResult(Sender,data);
+end;
+
+procedure jWebView.GenEvent_OnWebViewReceivedSslError(Sender:TObject;error:string;primaryError:integer;var outReturn:boolean);
+begin
+  if Assigned(FOnReceivedSslError) then FOnReceivedSslError(Sender,error,TWebViewSslError(primaryError),outReturn);
 end;
 
 //------------------------------------------------------------------------------

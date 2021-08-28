@@ -212,6 +212,24 @@ procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject;
 
 procedure jWebView_LoadDataWithBaseURL(env: PJNIEnv; _jwebview: JObject; _s1,_s2,_s3,_s4,_s5: string);//LMB
 
+procedure jWebView_SetDomStorage(env: PJNIEnv; _jwebview: JObject; _domStorage: boolean);
+procedure jWebView_SetLoadWithOverviewMode(env: PJNIEnv; _jwebview: JObject; _overviewMode: boolean);
+procedure jWebView_SetUseWideViewPort(env: PJNIEnv; _jwebview: JObject; _wideViewport: boolean);
+procedure jWebView_SetAllowContentAccess(env: PJNIEnv; _jwebview: JObject; _allowContentAccess: boolean);
+procedure jWebView_SetAllowFileAccess(env: PJNIEnv; _jwebview: JObject; _allowFileAccess: boolean);
+procedure jWebView_SetAppCacheEnabled(env: PJNIEnv; _jwebview: JObject; _cacheEnabled: boolean);
+procedure jWebView_SetDisplayZoomControls(env: PJNIEnv; _jwebview: JObject; _displayZoomControls: boolean);
+procedure jWebView_SetGeolocationEnabled(env: PJNIEnv; _jwebview: JObject; _geolocationEnabled: boolean);
+procedure jWebView_SetJavaScriptCanOpenWindowsAutomatically(env: PJNIEnv; _jwebview: JObject; _javaScriptCanOpenWindows: boolean);
+procedure jWebView_SetLoadsImagesAutomatically(env: PJNIEnv; _jwebview: JObject; _loadsImagesAutomatically: boolean);
+procedure jWebView_SetSupportMultipleWindows(env: PJNIEnv; _jwebview: JObject; _supportMultipleWindows: boolean);
+procedure jWebView_SetAllowUniversalAccessFromFileURLs(env: PJNIEnv; _jwebview: JObject; _allowUniversalAccessFromFileURLs: boolean);
+procedure jWebView_SetMediaPlaybackRequiresUserGesture(env: PJNIEnv; _jwebview: JObject; _mediaPlaybackRequiresUserGesture: boolean);
+procedure jWebView_SetSafeBrowsingEnabled(env: PJNIEnv; _jwebview: JObject; _safeBrowsingEnabled: boolean);
+procedure jWebView_SetSupportZoom(env: PJNIEnv; _jwebview: JObject; _supportZoom: boolean);
+procedure jWebView_SetUserAgent(env: PJNIEnv; _jwebview: JObject; _userAgent: string);
+
+
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
                                         this:jobject; SelfObj : TObject) : jObject;
@@ -1840,6 +1858,390 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+procedure jWebView_SetDomStorage(env: PJNIEnv; _jwebview: JObject; _domStorage: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDomStorage', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_domStorage);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetLoadWithOverviewMode(env: PJNIEnv; _jwebview: JObject; _overviewMode: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLoadWithOverviewMode', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_overviewMode);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetUseWideViewPort(env: PJNIEnv; _jwebview: JObject; _wideViewport: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetUseWideViewPort', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_wideViewport);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jWebView_SetAllowContentAccess(env: PJNIEnv; _jwebview: JObject; _allowContentAccess: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAllowContentAccess', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_allowContentAccess);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetAllowFileAccess(env: PJNIEnv; _jwebview: JObject; _allowFileAccess: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAllowFileAccess', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_allowFileAccess);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetAppCacheEnabled(env: PJNIEnv; _jwebview: JObject; _cacheEnabled: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAppCacheEnabled', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_cacheEnabled);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetDisplayZoomControls(env: PJNIEnv; _jwebview: JObject; _displayZoomControls: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetDisplayZoomControls', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_displayZoomControls);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetGeolocationEnabled(env: PJNIEnv; _jwebview: JObject; _geolocationEnabled: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetGeolocationEnabled', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_geolocationEnabled);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetJavaScriptCanOpenWindowsAutomatically(env: PJNIEnv; _jwebview: JObject; _javaScriptCanOpenWindows: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetJavaScriptCanOpenWindowsAutomatically', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_javaScriptCanOpenWindows);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetLoadsImagesAutomatically(env: PJNIEnv; _jwebview: JObject; _loadsImagesAutomatically: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetLoadsImagesAutomatically', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_loadsImagesAutomatically);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetSupportMultipleWindows(env: PJNIEnv; _jwebview: JObject; _supportMultipleWindows: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSupportMultipleWindows', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_supportMultipleWindows);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetAllowUniversalAccessFromFileURLs(env: PJNIEnv; _jwebview: JObject; _allowUniversalAccessFromFileURLs: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetAllowUniversalAccessFromFileURLs', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_allowUniversalAccessFromFileURLs);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetMediaPlaybackRequiresUserGesture(env: PJNIEnv; _jwebview: JObject; _mediaPlaybackRequiresUserGesture: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMediaPlaybackRequiresUserGesture', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_mediaPlaybackRequiresUserGesture);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetSafeBrowsingEnabled(env: PJNIEnv; _jwebview: JObject; _safeBrowsingEnabled: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSafeBrowsingEnabled', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_safeBrowsingEnabled);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetSupportZoom(env: PJNIEnv; _jwebview: JObject; _supportZoom: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSupportZoom', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_supportZoom);
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jWebView_SetUserAgent(env: PJNIEnv; _jwebview: JObject; _userAgent: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetUserAgent', '(Ljava/lang/String;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_userAgent));
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 //------------------------------------------------------------------------------
 // Canvas

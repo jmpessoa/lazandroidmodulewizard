@@ -760,6 +760,12 @@ type
   //by segator
   TOnWebViewEvaluateJavascriptResult=procedure(Sender:TObject;data:string) of object;
 
+  TWebViewSslError = (sslNotYetValid, sslExpired, sslIdMisMatch, sslUntrusted);
+
+  TOnWebViewReceivedSslError=procedure(Sender:TObject;error:string;primaryError:TWebViewSslError;var outProceed:boolean) of object;
+
+  //SSL_UNTRUSTED:  //SSL_NOT YET VALID   SSL_IDMISMATCH  SSL_EXPIRED
+
   TAsyncTaskState = (atsBefore, atsProgress, atsPost, atsInBackground);
   TOnAsyncEvent = Procedure(Sender: TObject; eventType, progress: integer) of object;
   TOnAsyncEventDoInBackground = Procedure(Sender: TObject; progress: integer; out keepInBackground: boolean) of object;
