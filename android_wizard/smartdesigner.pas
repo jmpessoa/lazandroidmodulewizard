@@ -393,7 +393,7 @@ begin
     begin
        if FileExists(pathNDK+'RELEASE.TXT') then //r10e
        begin
-         list.LoadFromFile(pathNDK+'REALEASE.TXT');
+         list.LoadFromFile(pathNDK+'RELEASE.TXT');
          if Trim(list.Strings[0]) = 'r10e' then
             Result:= 'r10e'
          else Result:= 'unknown';
