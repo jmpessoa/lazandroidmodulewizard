@@ -1,4 +1,4 @@
-package org.lamw.applistviewdemo5;
+package org.lamw.applistviewdemo7;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1831,7 +1831,8 @@ public class jListView extends ListView {
 	//
 	public  void clear() {
 		lastSelectedItem = -1;
-		alist.clear();			
+		alist.clear();
+		orig_alist.clear();  //thanks to JKannes!
 		aadapter.notifyDataSetChanged();
 	}
 	
@@ -1886,6 +1887,7 @@ public class jListView extends ListView {
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		alist.clear();
+		orig_alist.clear(); //thanks to JKannes!
 		genericBmp = null;
 		alist    = null;
 		setAdapter(null);
