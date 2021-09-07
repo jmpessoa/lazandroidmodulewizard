@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "C:\\android\\workspace\\AppLinearLayoutDemo1\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v21\\values-v21.xml",
+            "map": [
+                {
+                    "source": "C:\\android\\workspace\\AppLinearLayoutDemo1\\res\\values-v21\\styles.xml",
+                    "from": {
+                        "startLines": "6",
+                        "startColumns": "4",
+                        "startOffsets": "255",
+                        "endLines": "17",
+                        "endColumns": "12",
+                        "endOffsets": "829"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "13",
+                        "endColumns": "12",
+                        "endOffsets": "618"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+#Internal package file, do not edit.
+#Sun Sep 05 18:14:47 BRT 2021
+0.base=C\:\\android\\workspace\\AppLinearLayoutDemo1\\build\\intermediates\\transforms\\dexMerger\\debug\\0
+0.path=classes.dex
+1.baseType=DIRECTORY
+count=2
+1.path=lib/armeabi-v7a/libcontrols.so
+0.baseType=DIRECTORY
+1.set=NATIVE_RESOURCE
+1.base=C\:\\android\\workspace\\AppLinearLayoutDemo1\\build\\intermediates\\transforms\\stripDebugSymbol\\debug\\0
+0.set=DEX

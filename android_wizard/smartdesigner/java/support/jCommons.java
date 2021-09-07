@@ -1,4 +1,4 @@
-package org.lamw.appsupportdemo5;
+package org.lamw.appcompatnavigationdrawerdemo3;
 
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -127,9 +127,16 @@ public class jCommons {
 		if ( (parent != null) && (aOwnerView != null) ) { parent.removeView(aOwnerView); }
 		parent = _viewgroup;
 		if ( (parent != null) && (aOwnerView != null) ) {
-			parent.addView(aOwnerView, newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
+			
+			if (parent instanceof LinearLayout) { 
+				parent.addView(aOwnerView, 0, newLayoutParams(parent, (ViewGroup.MarginLayoutParams) lparams));
+			}
+			else {
+				parent.addView(aOwnerView, newLayoutParams(parent, (ViewGroup.MarginLayoutParams) lparams));
+			}
+
 			lparams = (ViewGroup.MarginLayoutParams)aOwnerView.getLayoutParams();
-            aOwnerView.setVisibility(android.view.View.VISIBLE);
+                        aOwnerView.setVisibility(android.view.View.VISIBLE);
 		}
 		mRemovedFromParent = false;
 	}

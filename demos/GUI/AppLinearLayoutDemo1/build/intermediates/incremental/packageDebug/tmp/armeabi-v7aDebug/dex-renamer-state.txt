@@ -1,0 +1,4 @@
+#Tue Sep 07 16:53:34 BRT 2021
+base.0=C\:\\android\\workspace\\AppLinearLayoutDemo1\\build\\intermediates\\transforms\\dexMerger\\debug\\0
+renamed.0=classes.dex
+path.0=classes.dex
