@@ -1,4 +1,4 @@
-package org.lamw.apptestsupportproviderdemo4;
+package org.lamw.apptfphttpclientdemo1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -140,6 +140,10 @@ public class jHttpClient /*extends ...*/ {
     public void jFree() {
         //free local objects...
         if (client3 != null) client3.disconnect();
+    }
+
+    public void Free() {
+        jFree();
     }
 
     //write others [public] methods code here......

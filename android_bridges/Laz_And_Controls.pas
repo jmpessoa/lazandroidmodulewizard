@@ -1261,7 +1261,10 @@ type
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetFontFromAssets(_fontName: string);
     procedure ClearLayout();
+
     procedure SetLGravity(_value: TLayoutGravity);
+    procedure SetLWeight(_weight: single);
+
     procedure SetViewParent(Value: jObject);  override;
     procedure RemoveFromViewParent;  override;
     procedure ResetViewParent();  override;
@@ -5717,6 +5720,7 @@ begin
    if FGravityInParent <> lgNone then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
+
    View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject, Self.Id);
   end;
@@ -6013,6 +6017,14 @@ begin
   if FInitialized then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 end;
+
+procedure jButton.SetLWeight(_weight: single);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     View_SetLWeight(FjEnv, FjObject, _weight);
+end;
+
 
 procedure jButton.SetFocus();
 begin
@@ -7786,7 +7798,7 @@ begin
   if not FInitialized then Exit;
 
   jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
-  Result := jni_func_t_out_t(FjEnv, FjObject, 'GetStateful', _stringUrl);
+  Result := jni_func_t_out_t(FjEnv, FjObject, 'Post', _stringUrl); //fixed! thanks to JKennes
 end;
 
 procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string);
