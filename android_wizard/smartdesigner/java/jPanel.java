@@ -324,15 +324,15 @@ public class jPanel extends RelativeLayout {
 		if ( (animationDurationIn > 0)  && (animationMode != 0) ) {
 			switch (animationMode) {
 				case 1: {
-					fadeInAnimation(this, animationDurationIn);
+					controls.fadeInAnimation(this, animationDurationIn);
 					break;
 				}
 				case 2: {  //RightToLeft
-					slidefromRightToLeft(this, animationDurationIn);
+					controls.slidefromRightToLeftIn(this, animationDurationIn);
 					break;
 				}
 				case 3: {  //RightToLeft
-					slidefromLeftToRight3(this, animationDurationIn);
+					controls.slidefromLeftToRightIn(this, animationDurationIn);
 					break;
 				}
 			}
@@ -358,116 +358,6 @@ public class jPanel extends RelativeLayout {
 	public void SetAnimationMode(int _animationMode) {
 		animationMode = _animationMode;
 	}
-
-	/// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
-	private void fadeInAnimation(final View view, int duration) {
-		Animation fadeIn = new AlphaAnimation(0, 1);
-		fadeIn.setInterpolator(new DecelerateInterpolator());
-		fadeIn.setDuration(duration);
-		fadeIn.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-			}
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				view.setVisibility(View.VISIBLE);
-			}
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-			}
-		});
-
-		view.startAnimation(fadeIn);
-	}
-
-	private void fadeOutAnimation(final View view, int duration) {
-		Animation fadeOut = new AlphaAnimation(1, 0);
-		fadeOut.setInterpolator(new AccelerateInterpolator());
-		fadeOut.setStartOffset(duration);
-		fadeOut.setDuration(duration);
-		fadeOut.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-			}
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				view.setVisibility(View.INVISIBLE);
-			}
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-			}
-		});
-		view.startAnimation(fadeOut);
-	}
-
-	//https://stackoverflow.com/questions/20696801/how-to-make-a-right-to-left-animation-in-a-layout/20696822
-	private void slidefromRightToLeft(View view, long duration) {
-		TranslateAnimation animate;
-		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(controls.appLayout.getWidth(),
-					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
-		} else {
-			animate = new TranslateAnimation(view.getWidth(),0, 0, 0); // View for animation
-		}
-		animate.setDuration(duration);
-		animate.setFillAfter(true);
-		view.startAnimation(animate);
-		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-	}
-
-	private void slidefromLeftToRight(View view, long duration) {  //try
-
-		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(0,
-					controls.appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
-		} else {
-			animate = new TranslateAnimation(0,view.getWidth(), 0, 0); // View for animation
-		}
-
-		animate.setDuration(duration);
-		animate.setFillAfter(true);
-		view.startAnimation(animate);
-		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-	}
-
-
-	private void slidefromRightToLeft3(View view, long duration) {
-		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(0, -controls.appLayout.getWidth(),
-					0, 0); //(xFrom,xTo, yFrom,yTo)
-		} else {
-			animate = new TranslateAnimation(0,-controls.appLayout.getWidth(),
-					0, 0); // View for animation
-		}
-
-		animate.setDuration(duration);
-		animate.setFillAfter(true);
-		view.startAnimation(animate);
-		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-	}
-
-	private void slidefromLeftToRight3(View view, long duration) {  //try
-
-		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(-controls.appLayout.getWidth(),
-					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
-		} else {
-			animate = new TranslateAnimation(-controls.appLayout.getWidth(),0, 0, 0); // View for animation
-		}
-
-		animate.setDuration(duration);
-		animate.setFillAfter(true);
-		view.startAnimation(animate);
-		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-	}
-
 }
 
 
