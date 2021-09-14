@@ -7785,17 +7785,17 @@ begin
   if not FInitialized then Exit;
 
   if  FUrl <> '' then
-    Result := jni_func_t_out_t(FjEnv, FjObject, 'Post', FUrl)
+    Result := jni_func_t_out_t(FjEnv, FjObject, 'Get', FUrl)
 end;
 
-procedure jHttpClient.ClearNameValueData; //ClearPost2Values;
+procedure jHttpClient.ClearNameValueData;
 begin
-  if(FInitialized) then jni_proc(FjEnv, FjObject, 'ClearPost2Values');
+  if(FInitialized) then jni_proc(FjEnv, FjObject, 'ClearNameValueData');
 end;
 
-procedure jHttpClient.AddNameValueData(_name, _value: string); //AddValueForPost2
+procedure jHttpClient.AddNameValueData(_name, _value: string);
 begin
-  if(FInitialized) then jni_proc_tt(FjEnv, FjObject, 'AddValueForPost2', _name, _value);
+  if(FInitialized) then jni_proc_tt(FjEnv, FjObject, 'AddNameValueData', _name, _value);
 end;
 
 function jHttpClient.Post(_stringUrl: string): string;

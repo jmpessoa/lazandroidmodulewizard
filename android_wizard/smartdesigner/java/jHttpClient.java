@@ -210,12 +210,12 @@ public class jHttpClient /*extends ...*/ {
     }
 
     //by renabor
-    public void AddValueForPost2(String Name, String Value) {  //Pascal: AddPostNameValueData
+    public void AddNameValueData(String Name, String Value) {  //Pascal: AddValueForPost2
         ValuesForPost.put(Name, Value);
     }
 
     //by renabor
-    public void ClearPost2Values() { // Pascal: ClearPostNameValueData
+    public void ClearNameValueData() {
         ValuesForPost.clear();
     }
 
@@ -1479,7 +1479,7 @@ public class jHttpClient /*extends ...*/ {
         boolean saveEncodeState = encodeValue;
         unvaluedName = disregard;
         encodeValue =false;                               //not encode ValueData
-        AddValueForPost2(disregard,_SOAPData);
+        AddNameValueData(disregard,_SOAPData);
         PostNameValueDataAsync(_stringUrl); //http://192.168.1.3/soap/IOSW
         encodeValue = saveEncodeState;                 //not encode ValueData
         unvaluedName = "SOAPBODY";
