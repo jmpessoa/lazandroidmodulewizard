@@ -1324,6 +1324,78 @@ public  int Image_getWH (String filename ) {
 		view.startAnimation(animate);
 		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
 	}
+	
+	public void slidefromTopToBottomOut(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, 0, 0, appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromTopToBottomIn(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0,	0, -appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromBottomToTopOut(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromBottomToTopIn(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0,	0, appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromMoveCustomIn(View view, long duration, int _xFrom, int _yFrom) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(_xFrom, 0, _yFrom, 0); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromMoveCustomOut(View view, long duration, int _xTo, int _yTo) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, _xTo, 0, _yTo); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
 
   // -------------------------------------------------------------------------
   //  jForm Create - Please, Don't remove it!

@@ -349,22 +349,8 @@ public class jForm {
         //fadeOutAnimation(layout, 2000);
         //fadeInAnimation(layout, 2000);
 
-        if (animationDurationIn > 0) {
-            switch (animationMode) {
-                case 1: {
-                    controls.fadeInAnimation(layout, animationDurationIn);
-                    break;
-                }
-                case 2: {  //RightToLeft
-                	controls.slidefromRightToLeftIn(layout, animationDurationIn);
-                    break;
-                }
-                case 3: {  //RightToLeft
-                	controls.slidefromLeftToRightIn(layout, animationDurationIn);
-                    break;
-                }
-            }
-        }
+        if (animationDurationIn > 0)
+        	Animate( true, 0, 0 );
 
         //controls.appLayout.addView(layout);
         //parent = controls.appLayout;
@@ -383,24 +369,36 @@ public class jForm {
     public void Close2() {
         //fadeOutAnimation(layout, 2000);
         // slidefromLeftToRight(layout, 2000);
-        if (animationDurationOut > 0) {
-            switch (animationMode) {
-                case 1: {
-                    controls.fadeOutAnimation(layout, animationDurationOut);
-                    break;
-                }
-                case 2: {
-                	controls.slidefromLeftToRightOut(layout, animationDurationOut);
-                    break;
-                }
-                case 3: {
-                	controls.slidefromRightToLeftOut(layout, animationDurationOut);
-                    break;
-                }
-            }
-        }
+        if (animationDurationOut > 0)
+        	Animate( false, 0, 0 );
+        
         parent.removeView(layout);
         controls.pOnClose(PasObj);
+    }
+    
+    // by ADiV
+    public void Animate( boolean animateIn, int _xFromTo, int _yFromTo ){
+	    if ( animationMode == 0 ) return;
+	    
+	    if( animateIn && (animationDurationIn > 0) )
+	    	switch (animationMode) {
+	    	 case 1: controls.fadeInAnimation(layout, animationDurationIn); break; // Fade
+	    	 case 2: controls.slidefromRightToLeftIn(layout, animationDurationIn); break; //RightToLeft
+	    	 case 3: controls.slidefromLeftToRightIn(layout, animationDurationIn); break; //LeftToRight
+	    	 case 4: controls.slidefromTopToBottomIn(layout, animationDurationIn); break; //TopToBottom
+	    	 case 5: controls.slidefromBottomToTopIn(layout, animationDurationIn); break; //BottomToTop
+	    	 case 6: controls.slidefromMoveCustomIn(layout, animationDurationIn, _xFromTo, _yFromTo); break; //MoveCustom
+	    	}
+	    
+	    if( !animateIn && (animationDurationOut > 0) )
+	    	switch (animationMode) {
+	    	 case 1: controls.fadeOutAnimation(layout, animationDurationOut); break; // Fade
+	    	 case 2: controls.slidefromRightToLeftOut(layout, animationDurationOut); break; //RightToLeft
+	    	 case 3: controls.slidefromLeftToRightOut(layout, animationDurationOut); break; //LeftToRight
+	    	 case 4: controls.slidefromTopToBottomOut(layout, animationDurationOut); break; //TopToBottom
+	    	 case 5: controls.slidefromBottomToTopOut(layout, animationDurationOut); break; //BottomToTop
+	    	 case 6: controls.slidefromMoveCustomOut(layout, animationDurationOut, _xFromTo, _yFromTo); break; //MoveCustom
+	    	}			
     }
 
     //by ADiV
