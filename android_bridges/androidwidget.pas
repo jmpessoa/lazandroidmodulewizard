@@ -1088,7 +1088,7 @@ type
 
   { jForm }
 
-  TAnimationMode = (animNone, animFade, animRightToLeft, animLeftToRight);
+  TAnimationMode = (animNone, animFade, animRightToLeft, animLeftToRight, animTopToBottom, animBottomToTop, animMoveCustom);
   TOnRunOnUiThread=procedure(Sender:TObject;tag:integer) of object;
 
   jForm = class(TAndroidForm)
@@ -1950,6 +1950,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure jni_proc_vig(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _viewgroup: jObject);
   procedure jni_proc_viw(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _view: jObject);
   procedure jni_proc_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bool: boolean);
+  procedure jni_proc_zii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bool: boolean; _int0, _int1: integer);
 
   function jni_func_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string): single;
   function jni_func_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string): integer;
@@ -8126,6 +8127,32 @@ begin
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
   env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jni_proc_zii(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                       _bool: boolean; _int0, _int1: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(ZII)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_bool);
+  jParams[1].i:= _int0;
+  jParams[2].i:= _int1;
+
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;

@@ -179,6 +179,12 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
 //**class entrypoint**//please, do not remove/change this line!
@@ -1230,6 +1236,166 @@ public  int Image_getWH (String filename ) {
     intent.putExtra("return-data", true);
     activity.startActivityForResult(intent, 12345);
   }
+  
+  /// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
+	public void fadeInAnimation(final View view, int duration) {
+		Animation fadeIn = new AlphaAnimation(0, 1);
+		fadeIn.setInterpolator(new DecelerateInterpolator());
+		fadeIn.setDuration(duration);
+		fadeIn.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				view.setVisibility(View.VISIBLE);
+			}
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+
+		view.startAnimation(fadeIn);
+	}
+
+	public void fadeOutAnimation(final View view, int duration) {
+		Animation fadeOut = new AlphaAnimation(1, 0);
+		fadeOut.setInterpolator(new AccelerateInterpolator());
+		fadeOut.setStartOffset(duration);
+		fadeOut.setDuration(duration);
+		fadeOut.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				view.setVisibility(View.INVISIBLE);
+			}
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+		view.startAnimation(fadeOut);
+	}
+
+	//https://stackoverflow.com/questions/20696801/how-to-make-a-right-to-left-animation-in-a-layout/20696822
+	public void slidefromRightToLeftIn(View view, long duration) {
+		TranslateAnimation animate;
+		
+		animate = new TranslateAnimation(appLayout.getWidth(), 0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromRightToLeftOut(View view, long duration) {
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0,-appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromLeftToRightOut(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromLeftToRightIn(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(-appLayout.getWidth(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromTopToBottomOut(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, 0, 0, appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromTopToBottomIn(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0,	0, -appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromBottomToTopOut(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromBottomToTopIn(View view, long duration) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0,	0, appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromMoveCustomIn(View view, long duration, int _xFrom, int _yFrom) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(_xFrom, 0, _yFrom, 0); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromMoveCustomOut(View view, long duration, int _xTo, int _yTo) {  //try
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, _xTo, 0, _yTo); //(xFrom,xTo, yFrom,yTo)		
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
 
   // -------------------------------------------------------------------------
   //  jForm Create - Please, Don't remove it!

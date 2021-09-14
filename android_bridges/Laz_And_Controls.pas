@@ -1523,6 +1523,7 @@ type
     procedure ShowPopupMenu(_items: array of string);   overload;
     procedure SetAnimationDurationIn(_animationDurationIn: integer);
     procedure SetAnimationMode(_animationMode: TAnimationMode);
+    procedure Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
 
     procedure SetImageDrawable(_imageAnimation: jObject);
     procedure Clear();
@@ -5720,7 +5721,6 @@ begin
    if FGravityInParent <> lgNone then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-
    View_SetViewParent(FjEnv, FjObject, FjPRLayout);
    View_SetId(FjEnv, FjObject, Self.Id);
   end;
@@ -6024,7 +6024,6 @@ begin
   if FInitialized then
      View_SetLWeight(FjEnv, FjObject, _weight);
 end;
-
 
 procedure jButton.SetFocus();
 begin
@@ -7472,6 +7471,13 @@ begin
   if FjObject = nil then exit;
 
   jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode) );
+end;
+
+procedure jImageView.Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
+begin
+  if FjObject = nil then exit;
+
+  jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
 end;
 
 procedure jImageView.SetImageFromAssets(_filename: string);
