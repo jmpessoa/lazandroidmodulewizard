@@ -168,6 +168,7 @@ type
      FMaxZoomFactor: single;
 
      FAnimationDurationIn: integer;
+     FAnimationDurationOut: integer;
      FAnimationMode: TAnimationMode;
 
      Procedure SetColor(Value: TARGBColorBridge); //background
@@ -223,14 +224,19 @@ type
      procedure BringChildToFront(_view: jObject);
      procedure BringToFront;
      procedure SetVisibilityGone();
+
      procedure SetAnimationDurationIn(_animationDurationIn: integer);
+     procedure SetAnimationDurationOut(_animationDurationOut: integer);
      procedure SetAnimationMode(_animationMode: TAnimationMode);
+     procedure Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
 
    published
      property BackgroundColor: TARGBColorBridge read FColor write SetColor;
      property MinPinchZoomFactor: single read FMinZoomFactor write FMinZoomFactor;
      property MaxPinchZoomFactor: single read FMaxZoomFactor write FMaxZoomFactor;
-     property AnimationDurationIn: integer read FAnimationDurationIn write SetAnimationDurationIn;
+
+     property AnimationDurationIn : integer read FAnimationDurationIn write SetAnimationDurationIn;
+     property AnimationDurationOut: integer read FAnimationDurationOut write SetAnimationDurationOut;
      property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
 
      property OnDown : TOnNotify read FOnDown write FOnDown;
@@ -1433,7 +1439,8 @@ type
     FRoundedShape: boolean;
     FOnPopupItemSelected: TOnImageViewPopupItemSelected;
 
-    FAnimationDurationIn: integer;
+    FAnimationDurationIn : integer;
+    FAnimationDurationOut: integer;
     FAnimationMode: TAnimationMode;
 
     Procedure SetColor    (Value : TARGBColorBridge);
@@ -1521,7 +1528,9 @@ type
     function GetView(): jObject; override;
     procedure ShowPopupMenu(var _items: TDynArrayOfString); overload;
     procedure ShowPopupMenu(_items: array of string);   overload;
+
     procedure SetAnimationDurationIn(_animationDurationIn: integer);
+    procedure SetAnimationDurationOut(_animationDurationOut: integer);
     procedure SetAnimationMode(_animationMode: TAnimationMode);
     procedure Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
 
@@ -1542,12 +1551,13 @@ type
     property RoundedShape: boolean read FRoundedShape write SetRoundedShape;
 
     property AnimationDurationIn: integer read FAnimationDurationIn write SetAnimationDurationIn;
+    property AnimationDurationOut: integer read FAnimationDurationOut write SetAnimationDurationOut;
     property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
 
     // Events
     property OnPopupItemSelected: TOnImageViewPopupItemSelected read FOnPopupItemSelected write FOnPopupItemSelected;
      property OnClick: TOnNotify read FOnClick write FOnClick;
-    //by tre3
+    //by ADiV
     property OnTouchDown : TOnTouchEvent read FOnTouchDown write FOnTouchDown;
     property OnTouchMove : TOnTouchEvent read FOnTouchMove write FOnTouchMove;
     property OnTouchUp   : TOnTouchEvent read FOnTouchUp   write FOnTouchUp;
@@ -2259,6 +2269,10 @@ type
     FSleepDown: integer;
     FAlpha : integer;
 
+    FAnimationDurationIn : integer;
+    FAnimationDurationOut: integer;
+    FAnimationMode: TAnimationMode;
+
     procedure SetImages(Value: jImageList);
     Procedure SetColor    (Value : TARGBColorBridge);
 
@@ -2302,9 +2316,18 @@ type
     procedure SetColorScale(_red, _green, _blue, _alpha : single); // by ADiV
     procedure SetImageState(_imageState: TImageBtnState);
 
+    procedure SetAnimationDurationIn(_animationDurationIn: integer);
+    procedure SetAnimationDurationOut(_animationDurationOut: integer);
+    procedure SetAnimationMode(_animationMode: TAnimationMode);
+    procedure Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
+
   published
     property OnDown : TOnNotify read FOnDown write FOnDown; // by ADiV
     property OnUp : TOnNotify read FOnUp write FOnUp;
+
+    property AnimationDurationIn: integer read FAnimationDurationIn write SetAnimationDurationIn;
+    property AnimationDurationOut: integer read FAnimationDurationOut write SetAnimationDurationOut;
+    property AnimationMode: TAnimationMode read FAnimationMode write SetAnimationMode;
 
     property BackgroundColor   : TARGBColorBridge read FColor     write SetColor;
     property Enabled : Boolean   read FEnabled   write SetEnabled;
@@ -6839,6 +6862,7 @@ begin
   FRoundedShape:= False;
   FAnimationMode:= animNone;
   FAnimationDurationIn:= 1500;
+  FAnimationDurationOut:= 1500;
 
   FAlpha := 255;
 end;
@@ -6916,6 +6940,9 @@ begin
 
   if FAnimationDurationIn <> 1500 then
      SetAnimationDurationIn(FAnimationDurationIn);
+
+  if FAnimationDurationOut <> 1500 then
+     SetAnimationDurationOut(FAnimationDurationOut);
 
   if FAnimationMode <> animNone then
     SetAnimationMode(FAnimationMode);
@@ -7462,6 +7489,15 @@ begin
   if FjObject = nil then exit;
 
   jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
+end;
+
+procedure jImageView.SetAnimationDurationOut(_animationDurationOut: integer);
+begin
+  //in designing component state: set value here...
+  FAnimationDurationOut:= _animationDurationOut;
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
 end;
 
 procedure jImageView.SetAnimationMode(_animationMode: TAnimationMode);
@@ -12777,6 +12813,10 @@ begin
   FHeight       := 72;
   FSleepDown    := 150;
   FAlpha        := 255;
+
+  FAnimationMode:= animNone;
+  FAnimationDurationIn:= 1500;
+  FAnimationDurationOut:= 1500;
 end;
 
 Destructor jImageBtn.Destroy;
@@ -12875,6 +12915,15 @@ begin
    View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
   end;
 
+  if FAnimationDurationIn <> 1500 then
+     SetAnimationDurationIn(FAnimationDurationIn);
+
+  if FAnimationDurationOut <> 1500 then
+     SetAnimationDurationOut(FAnimationDurationOut);
+
+  if FAnimationMode <> animNone then
+    SetAnimationMode(FAnimationMode);
+
   if FAlpha <> 255 then
      SetAlpha(FAlpha);
 end;
@@ -12940,6 +12989,37 @@ procedure jImageBtn.Refresh;
 begin
   if FInitialized then
      View_Invalidate(FjEnv, FjObject );
+end;
+
+procedure jImageBtn.SetAnimationDurationIn(_animationDurationIn: integer);
+begin
+  //in designing component state: set value here...
+  FAnimationDurationIn:= _animationDurationIn;
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
+end;
+
+procedure jImageBtn.SetAnimationDurationOut(_animationDurationOut: integer);
+begin
+  //in designing component state: set value here...
+  FAnimationDurationOut:= _animationDurationOut;
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
+end;
+
+procedure jImageBtn.SetAnimationMode(_animationMode: TAnimationMode);
+begin
+  //in designing component state: set value here...
+  FAnimationMode:= _animationMode;
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
+end;
+
+procedure jImageBtn.Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
+begin
+  if FjObject = nil then exit;
+
+  jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
 end;
 
 // by ADiV
@@ -14085,8 +14165,10 @@ begin
   FMaxZoomFactor:= 8/2;
   FHeight:= 48;
   FWidth:= 300;
-  FAnimationDurationIn:= 1500;
+
   FAnimationMode:= animNone;
+  FAnimationDurationIn:= 1500;
+  FAnimationDurationOut:= 1500;
 end;
 
 destructor jPanel.Destroy;
@@ -14168,6 +14250,8 @@ begin
    if FAnimationDurationIn <> 1500 then //default
      SetAnimationDurationIn(FAnimationDurationIn);
 
+   if FAnimationDurationOut <> 1500 then
+     SetAnimationDurationOut(FAnimationDurationOut);
 
    if FColor <> colbrDefault then
     View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{!}, GetARGB(FCustomColor, FColor));
@@ -14366,12 +14450,27 @@ begin
      jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
 end;
 
+procedure jPanel.SetAnimationDurationOut(_animationDurationOut: integer);
+begin
+  //in designing component state: set value here...
+  FAnimationDurationOut:= _animationDurationOut;
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
+end;
+
 procedure jPanel.SetAnimationMode(_animationMode: TAnimationMode);
 begin
   //in designing component state: set value here...
   FAnimationMode:= _animationMode;
   if FInitialized then
      jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
+end;
+
+procedure jPanel.Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
+begin
+  if FjObject = nil then exit;
+
+  jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
 end;
 
 // Event : Java -> Pascal
