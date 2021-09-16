@@ -35,11 +35,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -51,7 +46,7 @@ import java.io.File;
 
 //-------------------------------------------------------------------------
 // jImageView
-// Reviewed by ADiV on 2021-03-09
+// Reviewed by ADiV on 2021-09-16
 //-------------------------------------------------------------------------
 
 public class jImageView extends ImageView {
@@ -71,7 +66,7 @@ public class jImageView extends ImageView {
 
 	private int animationDurationIn = 1500;
 	private int animationDurationOut = 1500;
-	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
+	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft, TopToBottom, BottomToTop, MoveCustom
 
 
 	//Constructor
@@ -676,6 +671,7 @@ public class jImageView extends ImageView {
 			this.setVisibility(android.view.View.VISIBLE);
 	}
 	
+	// by ADiV
 	public void Animate( boolean animateIn, int _xFromTo, int _yFromTo ){
 		    if ( animationMode == 0 ) return;
 		    

@@ -13,11 +13,6 @@ import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
 
 public class jPanel extends RelativeLayout {
@@ -38,7 +33,7 @@ public class jPanel extends RelativeLayout {
 
 	private int animationDurationIn = 1500;
 	private int animationDurationOut = 1500;
-	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
+	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft, TopToBottom, BottomToTop, MoveCustom
 
 	//Constructor
 	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
@@ -321,25 +316,36 @@ public class jPanel extends RelativeLayout {
 		//fadeOutAnimation(layout, 2000);
 		//fadeInAnimation(layout, 2000);
 
-		if ( (animationDurationIn > 0)  && (animationMode != 0) ) {
-			switch (animationMode) {
-				case 1: {
-					controls.fadeInAnimation(this, animationDurationIn);
-					break;
-				}
-				case 2: {  //RightToLeft
-					controls.slidefromRightToLeftIn(this, animationDurationIn);
-					break;
-				}
-				case 3: {  //RightToLeft
-					controls.slidefromLeftToRightIn(this, animationDurationIn);
-					break;
-				}
-			}
-		}
+		if ( (animationDurationIn > 0)  && (animationMode != 0) )
+			Animate( true, 0, 0);		
 
 		if (animationMode == 0)
 		   this.setVisibility(android.view.View.VISIBLE);
+	}
+	
+	// by ADiV
+	public void Animate( boolean animateIn, int _xFromTo, int _yFromTo ){
+			    if ( animationMode == 0 ) return;
+			    
+			    if( animateIn && (animationDurationIn > 0) )
+			    	switch (animationMode) {
+			    	 case 1: controls.fadeInAnimation(this, animationDurationIn); break; // Fade
+			    	 case 2: controls.slidefromRightToLeftIn(this, animationDurationIn); break; //RightToLeft
+			    	 case 3: controls.slidefromLeftToRightIn(this, animationDurationIn); break; //LeftToRight
+			    	 case 4: controls.slidefromTopToBottomIn(this, animationDurationIn); break; //TopToBottom
+			    	 case 5: controls.slidefromBottomToTopIn(this, animationDurationIn); break; //BottomToTop
+			    	 case 6: controls.slidefromMoveCustomIn(this, animationDurationIn, _xFromTo, _yFromTo); break; //MoveCustom
+			    	}
+			    
+			    if( !animateIn && (animationDurationOut > 0) )
+			    	switch (animationMode) {
+			    	 case 1: controls.fadeOutAnimation(this, animationDurationOut); break; // Fade
+			    	 case 2: controls.slidefromRightToLeftOut(this, animationDurationOut); break; //RightToLeft
+			    	 case 3: controls.slidefromLeftToRightOut(this, animationDurationOut); break; //LeftToRight
+			    	 case 4: controls.slidefromTopToBottomOut(this, animationDurationOut); break; //TopToBottom
+			    	 case 5: controls.slidefromBottomToTopOut(this, animationDurationOut); break; //BottomToTop
+			    	 case 6: controls.slidefromMoveCustomOut(this, animationDurationOut, _xFromTo, _yFromTo); break; //MoveCustom
+			    	}			
 	}
 	
 	public void SetVisibilityGone() {
