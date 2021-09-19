@@ -1,0 +1,8 @@
+public native void pOnTCPSocketClientMessageReceived(long pasobj, String messageReceived);
+public native void pOnTCPSocketClientBytesReceived(long pasobj, byte[] bytesReceived);
+public native void pOnTCPSocketClientConnected(long pasobj);
+public native void pOnTCPSocketClientFileSendProgress(long pasobj, String filename, int sendFileSize, int filesize);
+public native void pOnTCPSocketClientFileSendFinished(long pasobj, String filename, int filesize);
+public native void pOnTCPSocketClientFileGetProgress(long pasobj, String filename, int remainingFileSize, int filesize);
+public native void pOnTCPSocketClientFileGetFinished(long pasobj, String filename, int filesize);
+public native void pOnTCPSocketClientDisConnected(long pasobj);

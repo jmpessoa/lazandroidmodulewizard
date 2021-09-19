@@ -1,0 +1,3 @@
+<Libraries Value="D:\Install\android-ndk-r10e-windows-x86\android-ndk-r10e\platforms\android-22\arch-mips\usr\lib;D:\Install\android-ndk-r10e-windows-x86\android-ndk-r10e\toolchains\mipsel-linux-android-4.9\prebuilt\windows\lib\gcc\mipsel-linux-android\4.9"/>
+<TargetCPU Value="mipsel"/>
+<CustomOptions Value="-Xd -XPmipsel-linux-android- -FDD:\Install\android-ndk-r10e-windows-x86\android-ndk-r10e\toolchains\mipsel-linux-android-4.9\prebuilt\windows\bin"/>
