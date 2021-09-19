@@ -58,8 +58,8 @@ begin
   jCanvas1.PaintColor:=colbrYellow;
   jCanvas1.PaintTextSize:=20;
 
-  densidad := jCanvas1.Density.ToString.ToInteger;
-  i:= trunc(x/3/densidad) * densidad;
+  densidad := Trunc(jCanvas1.Density);   //fixed! thanks to guaracy ...
+  i:= trunc(x/3/densidad) * densidad;     
 
   jCanvas1.drawText('First1 Text Size 20', 50, 0-tag+i);
   jCanvas1.drawText('First2 Text Size 20', 50, x*1-tag+i);

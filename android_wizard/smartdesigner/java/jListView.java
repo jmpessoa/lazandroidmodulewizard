@@ -1,4 +1,4 @@
-package org.lamw.applistviewdemo7;
+package org.lamw.applamwproject1;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -509,7 +509,7 @@ class jArrayAdapter extends ArrayAdapter {
 			
 			int leftSize  = items.get(position).leftDelimiter.length();
 			int pos1 = -1;
-			pos1     = line.indexOf(items.get(position).leftDelimiter);  //"("			
+			pos1     = line.indexOf(items.get(position).leftDelimiter);
 			
 			if (pos1 >= 0) {							   											    
 				   if ( pos1  !=  0) { 
@@ -773,7 +773,7 @@ class jArrayAdapter extends ArrayAdapter {
 				case 1:  itemWidget = new CheckBox(ctx);
 					((CheckBox)itemWidget).setId(controls.getJavaNewId());
 
-					((CheckBox)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					((CheckBox)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light)); //fixed! thanks to guaracy!
 					
 					((CheckBox)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 
@@ -812,7 +812,7 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 2:  itemWidget = new RadioButton(ctx);
 					((RadioButton)itemWidget).setId(controls.getJavaNewId());
-					((RadioButton)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					((RadioButton)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 					
 					((RadioButton)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 
@@ -851,7 +851,7 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 3:  itemWidget = new Button(ctx);
 					((Button)itemWidget).setId(controls.getJavaNewId());
-					((Button)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					((Button)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 					
 					((Button)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 
@@ -888,7 +888,7 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 4:  itemWidget = new TextView(ctx);
 					((TextView)itemWidget).setId(controls.getJavaNewId());
-					((TextView)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					((TextView)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 					
 					((TextView)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 					
@@ -925,7 +925,7 @@ class jArrayAdapter extends ArrayAdapter {
 
 				case 5:  itemWidget = new EditText(ctx);
 				 ((EditText)itemWidget).setId(controls.getJavaNewId());
-				 ((EditText)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+				 ((EditText)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 
 				 if (items.get(position).widgetTextColor != 0) {
 					((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
@@ -1014,7 +1014,7 @@ class jArrayAdapter extends ArrayAdapter {
 				case 6:  itemWidget = new Switch(ctx);
 				 ((Switch)itemWidget).setId(controls.getJavaNewId());
 
-				 ((Switch)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+				 ((Switch)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 				
 				 ((Switch)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 
@@ -1619,7 +1619,7 @@ public class jListView extends ListView {
     int mCurrentFirstVisibleItem;
     int mCurrentVisibleItemCount;
     int mTotalItem;
-    
+
     boolean mDisableScroll = false;
     
     final ListView mListView = this;
