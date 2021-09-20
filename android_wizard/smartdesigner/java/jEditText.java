@@ -748,6 +748,7 @@ public class jEditText extends EditText {
 			if (background instanceof ColorDrawable) {
 				color = ((ColorDrawable)this.getBackground()).getColor();
 				shape.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+				shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 			}
 
 			if(Build.VERSION.SDK_INT >= 16) {
