@@ -10065,7 +10065,7 @@ begin
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].f:= _float;
 
-  Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
+  Result:= env^.CallFloatMethodA(env, _jobject, jMethod, @jParams);
 
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);     
