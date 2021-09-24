@@ -1159,7 +1159,7 @@ public  int Image_getWH (String filename ) {
               Log.e("Camera", "File " + path + " was scanned successfully: " + uri);
             }
           });
-    }
+    }       
   }
 
   public String jCamera_takePhoto(String path, String filename, int requestCode, boolean addToGallery) {
@@ -1282,7 +1282,8 @@ public  int Image_getWH (String filename ) {
 	public void slidefromRightToLeftIn(View view, long duration) {
 		TranslateAnimation animate;
 		
-		animate = new TranslateAnimation(appLayout.getWidth(), 0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		//animate = new TranslateAnimation(appLayout.getWidth(), 0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(appLayout.getWidth()-view.getX(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 		
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1293,7 +1294,8 @@ public  int Image_getWH (String filename ) {
 	public void slidefromRightToLeftOut(View view, long duration) {
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0,-appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		//animate = new TranslateAnimation(0,-appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0,-view.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
 		
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1305,7 +1307,8 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0, appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)		
+		//animate = new TranslateAnimation(0, appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0, appLayout.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1317,7 +1320,8 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(-appLayout.getWidth(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)		
+		//animate = new TranslateAnimation(-appLayout.getWidth(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(-view.getWidth()-view.getX(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1329,7 +1333,7 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0, 0, 0, appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)		
+		animate = new TranslateAnimation(0, 0, 0, appLayout.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)		
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1341,7 +1345,8 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0,	0, -appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)		
+		//animate = new TranslateAnimation(0,	0, -appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0,	0, -view.getHeight()-view.getY(), 0); //(xFrom,xTo, yFrom,yTo)
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1353,7 +1358,8 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)		
+		//animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0,	0, 0, -view.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1365,7 +1371,8 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0,	0, appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)		
+		//animate = new TranslateAnimation(0,	0, appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0, 0, appLayout.getHeight()-view.getY(), 0); //(xFrom,xTo, yFrom,yTo)
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);

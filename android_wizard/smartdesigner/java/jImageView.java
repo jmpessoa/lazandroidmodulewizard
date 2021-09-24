@@ -572,7 +572,8 @@ public class jImageView extends ImageView {
 			        
 			        if (background instanceof ColorDrawable) {
 			            color = ((ColorDrawable)this.getBackground()).getColor();
-				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
+				        shape.setColorFilter(color, Mode.SRC_ATOP);
+				        shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 				        //[ifdef_api16up]
 				  	    if(Build.VERSION.SDK_INT >= 16) 
 				             this.setBackground((Drawable)shape);
