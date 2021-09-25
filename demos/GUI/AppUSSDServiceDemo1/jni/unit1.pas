@@ -65,7 +65,7 @@ begin
    if action = 'org.lamw.action.USSDService' then
    begin
       USSDResponse:= jIntentManager1.GetExtraString(intent, 'message');
-      ShowMessage(USSDResponse);
+      if Pos('USSD:', USSDResponse) > 0 then ShowMessage(USSDResponse);
    end;
 end;
 
