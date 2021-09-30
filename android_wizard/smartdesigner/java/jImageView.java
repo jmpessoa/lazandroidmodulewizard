@@ -696,6 +696,10 @@ public class jImageView extends ImageView {
 		    	 case 6: controls.slidefromMoveCustomOut(this, animationDurationOut, _xFromTo, _yFromTo); break; //MoveCustom
 		    	}			
 	}
+	
+	public void AnimateRotate( int _angleFrom, int _angleTo ){
+		controls.animateRotate( this, animationDurationIn, _angleFrom, _angleTo );		
+	}
 
 	public void SetVisibilityGone() {
 		LAMWCommon.setVisibilityGone();

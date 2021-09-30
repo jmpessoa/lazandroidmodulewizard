@@ -24,6 +24,8 @@ import android.widget.ImageView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Toast;
+
 //-------------------------------------------------------------------------
 //jImageBtn
 //Reviewed by ADiV on 2021-09-16
@@ -40,6 +42,8 @@ public class jImageBtn extends ImageView {
 	private int             btnState = 0;      // Normal/Up = 0 , Pressed = 1
 	private Boolean         enabled  = true;   //
 	private int             mSleep   = 150;
+	
+	private int 			mAngle = 0;
 	
 	private ImageView       mImage = null;
 	
@@ -109,7 +113,9 @@ public class jImageBtn extends ImageView {
 		setButtonDown(filedn);
 	}
 
-	public void setButtonUp( String fileup) {
+	public void setButtonUp( String fileup ) {
+		
+		if( fileup == "" ) return;
 		
 		this.setImageResource(android.R.color.transparent);
 		
@@ -131,6 +137,8 @@ public class jImageBtn extends ImageView {
 
 	public void setButtonDown( String filedn ) {  
 		
+		if( filedn == "" ) return;
+		
 		if (filedn.equals("null")) return;
 		
         BitmapFactory.Options bo = new BitmapFactory.Options();		
@@ -146,7 +154,7 @@ public class jImageBtn extends ImageView {
 
 	public  void setButtonUpByRes(String resup) {   // ..res/drawable
 		
-		if( resup == null ) return;
+		if( resup == "" ) return;
 			
         Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(resup));
 		
@@ -167,7 +175,7 @@ public class jImageBtn extends ImageView {
 
 	public  void setButtonDownByRes(String resdn) {   // ..res/drawable
 		
-		if( resdn == null ) return;
+		if( resdn == "" ) return;
 		
         Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(resdn));
 		
@@ -221,6 +229,11 @@ public class jImageBtn extends ImageView {
 			canvas.drawBitmap(bmpScale, posLeft, posTop, null);
 		}
 		
+	}
+	
+	public void SetRotation( int angle ){
+		mAngle = angle;
+		this.setRotation(mAngle);		
 	}
 	
 	public void SetImageState(int _state) {
@@ -308,6 +321,10 @@ public class jImageBtn extends ImageView {
 			    	 case 5: controls.slidefromBottomToTopOut(this, animationDurationOut); break; //BottomToTop
 			    	 case 6: controls.slidefromMoveCustomOut(this, animationDurationOut, _xFromTo, _yFromTo); break; //MoveCustom
 			    	}			
+	}
+	
+	public void AnimateRotate( int _angleFrom, int _angleTo ){
+		controls.animateRotate( this, animationDurationIn, _angleFrom, _angleTo );		
 	}
 	
 	public void SetAnimationDurationIn(int _animationDurationIn) {

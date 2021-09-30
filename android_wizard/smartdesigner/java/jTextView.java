@@ -51,6 +51,8 @@ public class jTextView extends TextView {
     private ClipData mClipData = null;
     private int mRadius = 20;
     
+    private int mAngle = 0;
+    
     private int mFontFace     = 0; // Normal
     private int mFontTypeFace = 0; // Normal
     
@@ -368,6 +370,11 @@ public class jTextView extends TextView {
 	
 	public void SetRadiusRoundCorner(int _radius) {
 		mRadius =  _radius;
+	}
+	
+	public void SetRotation( int angle ){
+		mAngle = angle;
+		this.setRotation(mAngle);		
 	}
 		
 	// https://blog.stylingandroid.com/gradient-text/

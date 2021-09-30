@@ -229,6 +229,7 @@ type
      procedure SetAnimationDurationOut(_animationDurationOut: integer);
      procedure SetAnimationMode(_animationMode: TAnimationMode);
      procedure Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
+     procedure AnimateRotate( _angleFrom, _angleTo : integer );
 
    published
      property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -1021,6 +1022,8 @@ type
     procedure SetAllCaps(_value: boolean);
     procedure SetTextAsHtml(_htmlText: string);
 
+    procedure SetRotation(angle: integer);
+
     procedure BringToFront;
     procedure SetUnderline( _on : boolean ); // by ADiV
 
@@ -1533,6 +1536,7 @@ type
     procedure SetAnimationDurationOut(_animationDurationOut: integer);
     procedure SetAnimationMode(_animationMode: TAnimationMode);
     procedure Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
+    procedure AnimateRotate( _angleFrom, _angleTo : integer );
 
     procedure SetImageDrawable(_imageAnimation: jObject);
     procedure Clear();
@@ -2315,11 +2319,13 @@ type
     procedure SetSaturation(Value: single); // by ADiV
     procedure SetColorScale(_red, _green, _blue, _alpha : single); // by ADiV
     procedure SetImageState(_imageState: TImageBtnState);
+    procedure SetRotation( _angle : integer );
 
     procedure SetAnimationDurationIn(_animationDurationIn: integer);
     procedure SetAnimationDurationOut(_animationDurationOut: integer);
     procedure SetAnimationMode(_animationMode: TAnimationMode);
     procedure Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
+    procedure AnimateRotate( _angleFrom, _angleTo : integer );
 
   published
     property OnDown : TOnNotify read FOnDown write FOnDown; // by ADiV
@@ -4709,6 +4715,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
+end;
+
+procedure jTextView.SetRotation(angle: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_i(FjEnv, FjObject, 'SetRotation', angle);
 end;
 
 procedure jTextView.SetShadowLayer(_radius: single; _dx: single; _dy: single; _color: TARGBColorBridge);
@@ -7514,6 +7527,13 @@ begin
   if FjObject = nil then exit;
 
   jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
+end;
+
+procedure jImageView.AnimateRotate( _angleFrom, _angleTo : integer );
+begin
+  if FjObject = nil then exit;
+
+  jni_proc_ii(FjEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
 end;
 
 procedure jImageView.SetImageFromAssets(_filename: string);
@@ -13022,6 +13042,20 @@ begin
   jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
 end;
 
+procedure jImageBtn.AnimateRotate( _angleFrom, _angleTo : integer );
+begin
+  if FjObject = nil then exit;
+
+  jni_proc_ii(FjEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
+end;
+
+procedure jImageBtn.SetRotation(  _angle : integer );
+begin
+  if FjObject = nil then exit;
+
+  jni_proc_i(FjEnv, FjObject, 'SetRotation',  _angle );
+end;
+
 // by ADiV
 procedure jImageBtn.SetImageUp( _bmp : jObject );
 begin
@@ -14471,6 +14505,13 @@ begin
   if FjObject = nil then exit;
 
   jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
+end;
+
+procedure jPanel.AnimateRotate( _angleFrom, _angleTo : integer );
+begin
+  if FjObject = nil then exit;
+
+  jni_proc_ii(FjEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
 end;
 
 // Event : Java -> Pascal
