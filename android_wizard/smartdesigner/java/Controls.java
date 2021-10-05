@@ -185,6 +185,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
+import android.view.animation.RotateAnimation;
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
 //**class entrypoint**//please, do not remove/change this line!
@@ -1242,6 +1243,7 @@ public  int Image_getWH (String filename ) {
 		Animation fadeIn = new AlphaAnimation(0, 1);
 		fadeIn.setInterpolator(new DecelerateInterpolator());
 		fadeIn.setDuration(duration);
+		fadeIn.setFillAfter(true);
 		fadeIn.setAnimationListener(new Animation.AnimationListener() {
 			@Override
 			public void onAnimationStart(Animation animation) {
@@ -1263,6 +1265,7 @@ public  int Image_getWH (String filename ) {
 		fadeOut.setInterpolator(new AccelerateInterpolator());
 		fadeOut.setStartOffset(duration);
 		fadeOut.setDuration(duration);
+		fadeOut.setFillAfter(true);
 		fadeOut.setAnimationListener(new Animation.AnimationListener() {
 			@Override
 			public void onAnimationStart(Animation animation) {
@@ -1402,6 +1405,17 @@ public  int Image_getWH (String filename ) {
 		animate.setFillAfter(true);
 		view.startAnimation(animate);
 		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void animateRotate( View view, long duration, int _angleFrom, int _angleTo ){
+		RotateAnimation animate; 
+		
+		animate = new RotateAnimation(_angleFrom, _angleTo, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+		
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		
+		view.startAnimation(animate);		
 	}
 
   // -------------------------------------------------------------------------

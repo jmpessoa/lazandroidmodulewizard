@@ -349,6 +349,10 @@ public class jPanel extends RelativeLayout {
 			    	}			
 	}
 	
+	public void AnimateRotate( int _angleFrom, int _angleTo ){
+		controls.animateRotate( this, animationDurationIn, _angleFrom, _angleTo );		
+	}
+	
 	public void SetVisibilityGone() {
 		LAMWCommon.setVisibilityGone();
 	}
