@@ -2,22 +2,27 @@ package org.lamw.appexpressiondemo1;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -34,6 +39,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
 import android.view.Gravity;
+import android.widget.TextView;
+
+//Reviewed by TR3E on 08/20/2019
 
 public class jEditText extends EditText {
 	//Pascal Interface
@@ -45,12 +53,15 @@ public class jEditText extends EditText {
 	private TextWatcher   textwatcher;       // OnChange
 
 	private OnClickListener onClickListener;   // event
+	
+	private EditText mEdit = null;
 
 	String bufStr;
 	private boolean canDispatchChangeEvent = false;
 	private boolean canDispatchChangedEvent = false;
 	private boolean mFlagSuggestion = false;
 	private boolean mFlagCapSentence = false;
+	private boolean mFlagCaptureBackPressed = false; // by tr3e
 
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
@@ -59,7 +70,18 @@ public class jEditText extends EditText {
 	private int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
 
 	private boolean mCloseSoftInputOnEnter = true;
+
+	boolean mIsRounded = false;
+	int mBackgroundColor = Color.TRANSPARENT;
+
+	int mRoundRadius = 8;
+	int mRoundBorderColor = Color.CYAN;
+	int mRoundBorderWidth = 3;
+	int mRoundBackgroundColor= Color.TRANSPARENT;
 	
+	boolean mAllUpperCase = false;
+	boolean mAllLowerCase = false;
+
 	//Constructor
 	public  jEditText(android.content.Context context,
 					  Controls ctrls,long pasobj ) {
@@ -69,6 +91,8 @@ public class jEditText extends EditText {
 
 		controls = ctrls;
 		LAMWCommon = new jCommons(this,context,pasobj);
+		
+		mEdit = this;
 
 		mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
 
@@ -76,10 +100,12 @@ public class jEditText extends EditText {
 			public void onFocusChange(View v, boolean hasFocus) {
 				final int p = v.getId();
 				final EditText Caption = (EditText)v;
-				if (!hasFocus){
-					if (p >= 0) {
-						controls.pOnLostFocus(LAMWCommon.getPasObj(), Caption.getText().toString());
-					}
+				
+				if (p >= 0){
+				 if (!hasFocus)
+					controls.pOnLostFocus(LAMWCommon.getPasObj(), Caption.getText().toString());
+				 else
+					controls.pOnFocus(LAMWCommon.getPasObj(), Caption.getText().toString());					
 				}
 			}
 		});
@@ -93,28 +119,62 @@ public class jEditText extends EditText {
 			};
 		};
 		setOnClickListener(onClickListener);
-
+		
+		// Fixed "Go / Next / Done / Ok" command capture [by TR3E]
+		setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			        @Override
+			        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+			            if (actionId != 0) {
+			            	final EditText caption = (EditText)v;
+						    
+			            	if (mCloseSoftInputOnEnter) {
+								InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+								imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							}
+						    
+							if (!caption.getText().toString().equals("")){  //try fix program logic...
+								controls.pOnEnter(LAMWCommon.getPasObj());							
+							}
+											    
+			                return true;
+			            } else {
+			                return false;
+			            }
+			        }
+	     });
+		
 		onKeyListener = new OnKeyListener() {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
-				//if (event.getAction() == KeyEvent.ACTION_UP) {
+				
 				    final EditText caption = (EditText)v;
-					//if (keyCode == KeyEvent.KEYCODE_ENTER) {     //just as Go/Enter/Done/Next/Ok
-				    if((event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+				    
+				    // by tr3e fix back_key close app
+				    if( mFlagCaptureBackPressed && (event.getAction() == KeyEvent.ACTION_DOWN) &&
+					   	(KeyEvent.KEYCODE_BACK == keyCode) )
+				    {			            
+				    	InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						controls.pOnBackPressed(LAMWCommon.getPasObj());
+						return true;
+			        }
+				    					
+				    if( (event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
 						if (mCloseSoftInputOnEnter) {
 							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 						}
 						if (! caption.getText().toString().equals("")){  //try fix program logic...
-							controls.pOnEnter(LAMWCommon.getPasObj());
+						 controls.pOnEnter(LAMWCommon.getPasObj());
 						}
 						return mCloseSoftInputOnEnter;
 					}
-				//}
+				
 				return false;
 			}
 		};
 
 		setOnKeyListener(onKeyListener);
+		
 		//Event
 		textwatcher = new TextWatcher() {
 			@Override
@@ -130,12 +190,29 @@ public class jEditText extends EditText {
 				}
 			}
 			@Override
-			public  void afterTextChanged(Editable s) {
-				//
+			public  void afterTextChanged(Editable et) {
+				  String s=et.toString();
+				  
+				  if(mAllUpperCase)
+			       if(!s.equals(s.toUpperCase()))
+			       {
+			         s=s.toUpperCase();
+			         mEdit.setText(s);
+			         mEdit.setSelection(mEdit.length()); //fix reverse texting
+			       }
+				  
+				  if(mAllLowerCase)
+				       if(!s.equals(s.toLowerCase()))
+				       {
+				         s=s.toLowerCase();
+				         mEdit.setText(s);
+				         mEdit.setSelection(mEdit.length()); //fix reverse texting
+				       }
 			}
 		};
 
 		addTextChangedListener(textwatcher);
+
 	}
 
 	//Free object except Self, Pascal Code Free the class.
@@ -209,6 +286,15 @@ public class jEditText extends EditText {
 	public View GetView() {
 	   return this;
     }
+	
+	public void SetAllLowerCase( boolean _lowercase ){
+		mAllLowerCase = _lowercase;
+	}
+	
+	public void SetAllUpperCase( boolean _uppercase ){
+		mAllUpperCase = _uppercase;
+	}
+	
 	//CURRENCY   
 	public  void SetInputTypeEx(String str) {  
 		bufStr = new String(str.toString());
@@ -233,7 +319,9 @@ public class jEditText extends EditText {
 		else if (str.equals("TEXTMULTILINE")){
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		}
-
+		else if (str.equals("NULL")){
+			this.setInputType(InputType.TYPE_NULL);
+		}
 		else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
 
 		if (!mFlagSuggestion) {
@@ -282,7 +370,9 @@ public class jEditText extends EditText {
 
 	public  void InputMethodShow() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+		//Repaired forever show the "softInput" by TR3E
+		this.requestFocus();
+		imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
 	}
 
 
@@ -406,6 +496,11 @@ public class jEditText extends EditText {
 	public void SetCapSentence(boolean _value) {
 		mFlagCapSentence = _value;
 	}
+	
+	// by tr3e
+	public void SetCaptureBackPressed(boolean _value) {
+		mFlagCaptureBackPressed = _value;
+	}
 
 	public void CopyToClipboard() {
 		mClipData = ClipData.newPlainText("text", this.getText().toString());
@@ -443,6 +538,11 @@ public class jEditText extends EditText {
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
 	}
+	
+	//by TR3E
+	public void SetSelection(int _value){
+		this.setSelection(_value);
+	}
 
 	public void SetSelectAllOnFocus(boolean _value){
 		this.setSelectAllOnFocus(_value);
@@ -450,30 +550,18 @@ public class jEditText extends EditText {
 
 	public void SelectAll() {
 		this.selectAll();
-	}
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
 	}	
 	
-	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));
+	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource(controls.GetDrawableResourceId(_imgResIdentifier));
 	}		
 
-	public void SetBackgroundByImage(Bitmap _image) {	
+	public void SetBackgroundByImage(Bitmap _image) {
+		if( _image == null ) return;
+		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		if( d == null ) return;
 //[ifdef_api16up]
 	if(Build.VERSION.SDK_INT >= 16) 
              this.setBackground(d);
@@ -491,6 +579,13 @@ public class jEditText extends EditText {
 	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+				
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -504,8 +599,15 @@ public class jEditText extends EditText {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -580,12 +682,9 @@ public class jEditText extends EditText {
 	
 	
 	public void LoadFromFile(String _filename) {
-
 		     String retStr = "";
-
 		     try {
-		         InputStream inputStream = controls.activity.openFileInput(_filename);
-
+		         FileInputStream inputStream = new FileInputStream(new File(_filename));
 		         if ( inputStream != null ) {
 		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -594,13 +693,12 @@ public class jEditText extends EditText {
 		             while ( (receiveString = bufferedReader.readLine()) != null ) {
 		                 stringBuilder.append(receiveString);
 		             }
-
 		             inputStream.close();
 		             retStr = stringBuilder.toString();
 		         }
 		     }
 		     catch (IOException e) {
-		        // Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
+		        Log.i("LAMW", "LoadFromFile error: " + e.toString());
 		     }
 		     this.setText(retStr);
     }
@@ -629,6 +727,56 @@ public class jEditText extends EditText {
 		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
 		     }
     }
+
+    public void SetSoftInputShownOnFocus(boolean _show) {
+		//[ifdef_api21up]
+		if (Build.VERSION.SDK_INT >= 21) {
+			this.setShowSoftInputOnFocus(_show);
+		} //[endif_api21up]
+	}
+
+	//https://stackoverflow.com/questions/44071755/android-how-to-set-corner-radius-programmatically
+	public void SetRoundCorner() {
+		if (this != null) {
+			GradientDrawable shape =  new GradientDrawable();
+			shape.setCornerRadius(mRoundRadius);
+			shape.setStroke(mRoundBorderWidth, mRoundBorderColor);
+			shape.setColor(mRoundBackgroundColor); //
+
+			int color;
+			Drawable background = this.getBackground();
+			if (background instanceof ColorDrawable) {
+				color = ((ColorDrawable)this.getBackground()).getColor();
+				shape.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+				shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
+			}
+
+			if(Build.VERSION.SDK_INT >= 16) {
+				//[ifdef_api16up]
+				this.setBackground(shape); //(Drawable)
+				//[endif_api16up]
+			}
+			else {
+				this.setBackgroundDrawable(shape);
+			}
+		}
+	}
+
+	public void SetRoundRadiusCorner(int _radius) {
+		mRoundRadius =  _radius;  //8
+	}
+
+	public void SetRoundBorderColor(int _color) {
+		mRoundBorderColor =  _color; //Color.CYAN
+	}
+
+	public void SetRoundBorderWidth(int _strokeWidth) {
+		mRoundBorderWidth =  _strokeWidth;  //3
+	}
+
+	public void SetRoundBackgroundColor(int _color) {
+		mRoundBackgroundColor =  _color;
+	}
 
 }
 

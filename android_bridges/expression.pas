@@ -27,6 +27,10 @@ jExpression = class(jControl)
     procedure SetFormula(_expression: string; _variables: array of string); overload;
     procedure SetValue(_variable: string; _value: double);
     function Evaluate(): double;
+    function IsExpressionValid(_checkVariablesSet: boolean): boolean;
+
+    function CanEvaluate(_checkVariableSet: boolean): boolean;
+    function GetValue(): double;
 
  published
 
@@ -38,6 +42,10 @@ procedure jExpression_SetFormula(env: PJNIEnv; _jexpression: JObject; _expressio
 procedure jExpression_SetFormula(env: PJNIEnv; _jexpression: JObject; _expression: string;  _variables: array of string);  overload;
 procedure jExpression_SetValue(env: PJNIEnv; _jexpression: JObject; _variable: string; _value: double);
 function jExpression_Evaluate(env: PJNIEnv; _jexpression: JObject): double;
+function jExpression_IsExpressionValid(env: PJNIEnv; _jexpression: JObject; _checkVariablesSet: boolean): boolean;
+
+function jExpression_CanEvaluate(env: PJNIEnv; _jexpression: JObject; _checkVariableSet: boolean): boolean;
+function jExpression_GetValue(env: PJNIEnv; _jexpression: JObject): double;
 
 implementation
 
@@ -111,6 +119,27 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jExpression_Evaluate(FjEnv, FjObject);
+end;
+
+function jExpression.IsExpressionValid(_checkVariablesSet: boolean): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jExpression_IsExpressionValid(FjEnv, FjObject, _checkVariablesSet);
+end;
+
+function jExpression.CanEvaluate(_checkVariableSet: boolean): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jExpression_CanEvaluate(FjEnv, FjObject, _checkVariableSet);
+end;
+
+function jExpression.GetValue(): double;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jExpression_GetValue(FjEnv, FjObject);
 end;
 
 {-------- jExpression_JNI_Bridge ----------}
@@ -201,7 +230,7 @@ begin
   jCls:= env^.GetObjectClass(env, _jexpression);
   jMethod:= env^.GetMethodID(env, jCls, 'SetValue', '(Ljava/lang/String;D)V');
   env^.CallVoidMethodA(env, _jexpression, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
 end;
 
@@ -217,6 +246,79 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+function jExpression_IsExpressionValid(env: PJNIEnv; _jexpression: JObject; _checkVariablesSet: boolean): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jexpression);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'IsExpressionValid', '(Z)Z');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_checkVariablesSet);
+
+  jBoo:= env^.CallBooleanMethodA(env, _jexpression, jMethod, @jParams);
+
+  Result:= boolean(jBoo);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jExpression_CanEvaluate(env: PJNIEnv; _jexpression: JObject; _checkVariableSet: boolean): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jexpression);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'CanEvaluate', '(Z)Z');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_checkVariableSet);
+
+  jBoo:= env^.CallBooleanMethodA(env, _jexpression, jMethod, @jParams);
+
+  Result:= boolean(jBoo);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jExpression_GetValue(env: PJNIEnv; _jexpression: JObject): double;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jexpression);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetValue', '()D');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  Result:= env^.CallDoubleMethod(env, _jexpression, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 
 end.

@@ -5,38 +5,103 @@ import java.lang.reflect.Field;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.os.Handler;
+import android.os.Build;
 import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
+import android.widget.ImageView;
 import android.view.View;
 import android.view.ViewGroup;
 
 //-------------------------------------------------------------------------
 //jImageBtn
+//Reviewed by ADiV on 2021-09-16
 //-------------------------------------------------------------------------
 
-public class jImageBtn extends View {
+public class jImageBtn extends ImageView {
 	private Controls        controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
+	private long           PasObj   = 0;      // Pascal Obj
 	
-	private Paint           mPaint   = null;
 	private Bitmap          bmpUp    = null;
 	private Bitmap          bmpDn    = null;
-	private Rect            rect;
+	
 	private int             btnState = 0;      // Normal/Up = 0 , Pressed = 1
 	private Boolean         enabled  = true;   //
+	private int             mSleep   = 150;
+	
+	private ImageView       mImage = null;
+	
+	private int animationDurationIn = 1500;
+	private int animationDurationOut = 1500;
+	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft, TopToBottom, BottomToTop, MoveCustom
 
 	//Constructor
-	public jImageBtn(android.content.Context context,
-					  Controls ctrls,long pasobj ) {
+	public jImageBtn(android.content.Context context, Controls ctrls,long pasobj ) {
+		
 		super(context);
+
+		//Connect Pascal I/F
+		PasObj   = pasobj;
 		controls = ctrls;
 		LAMWCommon = new jCommons(this,context,pasobj);
-		mPaint = new Paint();
-		rect   = new Rect(0,0,200,200);
+		
+		setScaleType(ImageView.ScaleType.CENTER);
+		
+		mImage = this;
+	}
+	
+	public  boolean onTouchEvent( MotionEvent event) {
+	        //by ADiV
+			if (enabled == false) return false;
+			
+			int actType = event.getAction()&MotionEvent.ACTION_MASK;
+			
+			switch(actType) {
+			    case MotionEvent.ACTION_UP: {				
+				 controls.pOnUp(PasObj);
+				 break;
+			    }
+				case MotionEvent.ACTION_DOWN: {  
+					
+					if( btnState == 1 ) return false;
+										
+					btnState = 1;
+					
+					controls.pOnDown(PasObj);
+					
+				    this.setImageBitmap(bmpDn);
+				    
+					//invalidate();
+					final Handler handler = new Handler();
+					handler.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							// Do something after: 1s = 1000ms
+							if(btnState != 0) {
+							 btnState = 0;
+							 mImage.setImageBitmap(bmpUp);
+							 controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
+							}
+						}
+					}, mSleep);  //1s = 1000ms
+
+					break;
+				}				
+			}
+			
+			return true;
 	}
 
 	public void setButton(String fileup, String filedn) {
@@ -45,176 +110,237 @@ public class jImageBtn extends View {
 	}
 
 	public void setButtonUp( String fileup) {
-		// /data/data/com.example.appimagebtndemo1/files/btn_red.jpg
-	    BitmapFactory.Options bo = new BitmapFactory.Options();
+		
+		this.setImageResource(android.R.color.transparent);
+		
+		if (fileup.equals("null")) { this.setImageBitmap(null); bmpUp = null; bmpDn = null; return; }
+		
+		BitmapFactory.Options bo = new BitmapFactory.Options();		
+		
+	    if( bo == null ) { this.setImageBitmap(null); bmpUp = null; bmpDn = null; return; }
 	    
-	    if( bo != null ){
-	     bo.inScaled = false;
-	     
-		 bmpUp = BitmapFactory.decodeFile(fileup,bo);
+	    if( controls.GetDensityAssets() > 0 )
+	     bo.inDensity = controls.GetDensityAssets();
+			
+		bmpUp = BitmapFactory.decodeFile(fileup, bo);
 		 
-		 if( bmpUp != null ){
-		  rect = new Rect(0, 0, bmpUp.getWidth(), bmpUp.getHeight());
-		  LAMWCommon.setLParamWidth(bmpUp.getWidth());
-		  LAMWCommon.setLParamHeight(bmpUp.getHeight());
-		  invalidate();
-		 }
-	    }
+		this.setImageResource(android.R.color.transparent);
+				
+		this.setImageBitmap(bmpUp);		  			   
 	}
 
 	public void setButtonDown( String filedn ) {  
-		// /data/data/com.example.appimagebtndemo1/files/btn_blue.jpg
-	    BitmapFactory.Options bo = new BitmapFactory.Options();
-	    
-	    if( bo != null ){
-	     bo.inScaled = false;
-	     
-	     bmpDn = BitmapFactory.decodeFile(filedn, bo);
-	     
-	     if( bmpDn != null ){		 
-		  rect = new Rect(0, 0, bmpDn.getWidth(), bmpDn.getHeight());
-		  invalidate();
-	     }
-	    }
+		
+		if (filedn.equals("null")) return;
+		
+        BitmapFactory.Options bo = new BitmapFactory.Options();		
+		
+	    if( bo == null ) return;
+	    	
+	    if( controls.GetDensityAssets() > 0 )
+	  	     bo.inDensity = controls.GetDensityAssets();
+			
+	    bmpDn = BitmapFactory.decodeFile(filedn, bo);		 
+	    		
 	}
-
-    private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName"
-		     
-		     if( field != null ){
-		    	int drawableId = field.getInt(null);
-		      	return drawableId;
-		     } else
-		    	 return 0;
-		  }
-		  catch (Exception e) {
-		     //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
-		     return 0;
-		  }
-     }
-    
-     public Drawable GetDrawableResourceById(int _resID) {
-				
-		if( _resID == 0 ) return null;
-		
-		Drawable res = null;
-		
-		if (android.os.Build.VERSION.SDK_INT < 21 ) {
-			res = this.controls.activity.getResources().getDrawable(_resID);
-		}
-		
-		//[ifdef_api21up]
-		if(android.os.Build.VERSION.SDK_INT >= 21)
-			res = this.controls.activity.getResources().getDrawable(_resID, null);
-        //[endif_api21up]
-						
-		return res;
-	}
-    
-    /*
-     *** It does not load the images correctly according to the resolution ***
-     * 
-     * public Bitmap GetBitmapResource(String _resourceDrawableIdentifier, boolean _inScaled) {
-       int id =	GetDrawableResourceId(_resourceDrawableIdentifier);	
-       BitmapFactory.Options bo = new BitmapFactory.Options();
-       bo.inScaled = _inScaled; //false; 
-       return  BitmapFactory.decodeResource(this.controls.activity.getResources(), id, bo);
-    }*/    
 
 	public  void setButtonUpByRes(String resup) {   // ..res/drawable
-		//bmpUp = GetBitmapResource(resup, false);
-		Drawable d = GetDrawableResourceById(GetDrawableResourceId(resup));
 		
-		if( d != null ){
-		 bmpUp  = ((BitmapDrawable)d).getBitmap();
-		 
-		 if( bmpUp != null ){
-		  rect   = new Rect(0,0,bmpUp.getWidth(),bmpUp.getHeight());
-		  LAMWCommon.setLParamWidth(bmpUp.getWidth());
-		  LAMWCommon.setLParamHeight(bmpUp.getHeight());
-		  invalidate();
-		 }
-		}				
+		if( resup == null ) return;
+			
+        Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(resup));
+		
+		if( d == null ) { this.setImageBitmap(null); bmpUp = null; bmpDn = null; return; }
+		
+		Bitmap b = ((BitmapDrawable)d).getBitmap();
+		
+		if( b == null ) { this.setImageBitmap(null); bmpUp = null; bmpDn = null; return; }
+		
+		bmpUp = Bitmap.createScaledBitmap(b, b.getWidth(), b.getHeight(), true);
+				
+		this.setImageResource(android.R.color.transparent);
+		
+		this.setImageBitmap(bmpUp);
+		
+		this.invalidate();
 	}
 
 	public  void setButtonDownByRes(String resdn) {   // ..res/drawable
-		//bmpDn = bmpUp = GetBitmapResource(resdn, false);
-		Drawable d = GetDrawableResourceById(GetDrawableResourceId(resdn));
 		
-		if( d != null ){
-		 bmpDn  = ((BitmapDrawable)d).getBitmap();
-		 
-		 if(bmpDn != null){
-		  rect   = new Rect(0,0,bmpDn.getWidth(),bmpDn.getHeight());		  
-		  invalidate();
-		 }
-		}
-				
+		if( resdn == null ) return;
+		
+        Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(resdn));
+		
+		if( d == null ) return;
+		
+		Bitmap b = ((BitmapDrawable)d).getBitmap();
+		
+		if( b == null ) return;
+		
+		bmpDn = Bitmap.createScaledBitmap(b, b.getWidth(), b.getHeight(), true);
+		
 	}
-
-	//
-	@Override
-	public  boolean onTouchEvent( MotionEvent event) {
-      //LORDMAN 2013-08-16
-		if (enabled == false) { return false; }
-		int actType = event.getAction()&MotionEvent.ACTION_MASK;
-		switch(actType) {
-			case MotionEvent.ACTION_DOWN: {  btnState = 1;
-				invalidate();
-				break;
-			}
-			case MotionEvent.ACTION_MOVE: // { break; } Fixed the bug: The button stays down after clicking and moving
-			case MotionEvent.ACTION_UP  : {
-				if ( btnState == 1 ){   //try fix twice event!
-					btnState = 0;
-					invalidate();
-					controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
-				}
-				break;
-			}
-		}
-		return true;
+	
+	public  void SetImageUp(Bitmap _bmp) {
+		bmpUp = _bmp;
+		
+        this.setImageResource(android.R.color.transparent);
+		
+		this.setImageBitmap(bmpUp);
+		
+		this.invalidate();
 	}
-
-	@Override
-	public  void onDraw( Canvas canvas) {
-		if (btnState == 0) {
+	
+	public  void SetImageDown(Bitmap _bmp) {   		
+		bmpDn = _bmp;		
+	}
+	
+	public void SetImageDownScale( float _scale ) {
+		
+		if(bmpUp == null) return;
+		
+		int newWidth = (int)(bmpUp.getWidth()*_scale);
+		int newHeight = (int)(bmpUp.getHeight()*_scale);
+		
+		Bitmap bmpScale = Bitmap.createScaledBitmap( bmpUp, newWidth, newHeight, true );
+		
+		if( bmpScale == null ) return;
+		
+		bmpScale.setDensity( bmpUp.getDensity() );				
+		
+		int posLeft = (bmpUp.getWidth() - bmpScale.getWidth()) / 2;
+		int posTop  = (bmpUp.getHeight() - bmpScale.getHeight()) / 2;				
+					
+		bmpDn = Bitmap.createBitmap(bmpUp.getWidth(), bmpUp.getHeight(), Bitmap.Config.ARGB_8888);
+							
+		if( bmpDn != null ){
+			
+			bmpDn.setDensity( bmpUp.getDensity() );
+						
+			Canvas canvas = new Canvas(bmpDn);
+			canvas.drawBitmap(bmpScale, posLeft, posTop, null);
+		}
+		
+	}
+	
+	public void SetImageState(int _state) {
+		if (_state == 0 ) {
 			if (bmpUp != null) {
-				LAMWCommon.setLParamWidth(bmpUp.getWidth());
-				LAMWCommon.setLParamHeight(bmpUp.getHeight());				
-				canvas.drawBitmap(bmpUp,null,rect,null);				
+				this.setImageBitmap(bmpUp);
 			}
 		}
-		else  {
-			if (bmpDn != null) {
-				LAMWCommon.setLParamWidth(bmpDn.getWidth());
-				LAMWCommon.setLParamHeight(bmpDn.getHeight());
-				canvas.drawBitmap(bmpDn,null,rect,null); 
-			}
+		else  { //_state ==
+		  if (bmpDn != null) {
+			  this.setImageBitmap(bmpDn);
+		  }
 		}
+	}
+    
+    public void SetAlpha( int value ){
+    	
+        if( bmpUp == null ) return;
+		
+		if( value < 0 ) value = 0;
+		if( value > 255) value = 255;
+		
+		//[ifdef_api16up]
+		if(Build.VERSION.SDK_INT >= 16) setImageAlpha(value);
+		//[endif_api16up]
+    }
+    
+    public void SetSaturation( float value ){
+     ColorMatrix matrix = new ColorMatrix();
+     
+     matrix.setSaturation(value); 
+     
+     setColorFilter(new ColorMatrixColorFilter(matrix));
+    }
+    
+    public void SetColorScale(float _red, float _green, float _blue, float _alpha){
+    	
+    	ColorMatrix matrix = new ColorMatrix();
+        
+        matrix.setScale(_red, _green, _blue, _alpha); 
+        
+        setColorFilter(new ColorMatrixColorFilter(matrix));
+    }
+
+	public void SetSleepDown(int _sleepMiliSeconds) {
+        mSleep = _sleepMiliSeconds;
 	}
 
 	public  void setEnabled(boolean value) {
 		enabled = value;
 	}
+	
+	public void BringToFront() {
+		 this.bringToFront();
+
+		 LAMWCommon.BringToFront();
+		 
+		 if ( (animationDurationIn > 0)  && (animationMode != 0) )
+				Animate( true, 0, 0 );				
+
+		if (animationMode == 0)
+				this.setVisibility(android.view.View.VISIBLE);
+	}
+	
+	// by ADiV
+	public void Animate( boolean animateIn, int _xFromTo, int _yFromTo ){
+			    if ( animationMode == 0 ) return;
+			    
+			    if( animateIn && (animationDurationIn > 0) )
+			    	switch (animationMode) {
+			    	 case 1: controls.fadeInAnimation(this, animationDurationIn); break; // Fade
+			    	 case 2: controls.slidefromRightToLeftIn(this, animationDurationIn); break; //RightToLeft
+			    	 case 3: controls.slidefromLeftToRightIn(this, animationDurationIn); break; //LeftToRight
+			    	 case 4: controls.slidefromTopToBottomIn(this, animationDurationIn); break; //TopToBottom
+			    	 case 5: controls.slidefromBottomToTopIn(this, animationDurationIn); break; //BottomToTop
+			    	 case 6: controls.slidefromMoveCustomIn(this, animationDurationIn, _xFromTo, _yFromTo); break; //MoveCustom
+			    	}
+			    
+			    if( !animateIn && (animationDurationOut > 0) )
+			    	switch (animationMode) {
+			    	 case 1: controls.fadeOutAnimation(this, animationDurationOut); break; // Fade
+			    	 case 2: controls.slidefromRightToLeftOut(this, animationDurationOut); break; //RightToLeft
+			    	 case 3: controls.slidefromLeftToRightOut(this, animationDurationOut); break; //LeftToRight
+			    	 case 4: controls.slidefromTopToBottomOut(this, animationDurationOut); break; //TopToBottom
+			    	 case 5: controls.slidefromBottomToTopOut(this, animationDurationOut); break; //BottomToTop
+			    	 case 6: controls.slidefromMoveCustomOut(this, animationDurationOut, _xFromTo, _yFromTo); break; //MoveCustom
+			    	}			
+	}
+	
+	public void SetAnimationDurationIn(int _animationDurationIn) {
+		animationDurationIn = _animationDurationIn;
+	}
+
+	public void SetAnimationDurationOut(int _animationDurationOut) {
+		animationDurationOut = _animationDurationOut;
+	}
+
+	public void SetAnimationMode(int _animationMode) {
+		animationMode = _animationMode;
+	}
 
 	public  void Free() {
-		if (bmpUp  != null) { bmpUp.recycle();         }
-		if (bmpDn  != null) { bmpDn.recycle();         }
+		if (bmpUp  != null) bmpUp.recycle();     
+		if (bmpDn  != null) bmpDn.recycle();
+		
+		bmpUp = null;
+		bmpDn = null;
+		
+		setImageBitmap(null);
+		setImageResource(0); //android.R.color.transparent;
+		setOnClickListener(null);
+		
 		LAMWCommon.free();
-		bmpUp   = null;
-		bmpDn   = null;
-		mPaint  = null;
-		rect    = null;
 	}
 
 	public long GetPasObj() {
 		return LAMWCommon.getPasObj();
 	}
 
-	public  void setParent(ViewGroup _viewgroup ) {
+	public  void SetViewParent(ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
 	
@@ -226,15 +352,15 @@ public class jImageBtn extends View {
 		LAMWCommon.removeFromViewParent();
 	}
 
-	public void setLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
+	public void SetLeftTopRightBottomWidthHeight(int left, int top, int right, int bottom, int w, int h) {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(left,top,right,bottom,w,h);
 	}
 		
-	public void setLParamWidth(int w) {
+	public void SetLParamWidth(int w) {
 		LAMWCommon.setLParamWidth(w);
 	}
 
-	public void setLParamHeight(int h) {
+	public void SetLParamHeight(int h) {
 		LAMWCommon.setLParamHeight(h);
 	}
     
@@ -246,23 +372,23 @@ public class jImageBtn extends View {
 		return LAMWCommon.getLParamWidth();					
 	}  
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 	
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int idAnchor) {
+	public void SetLayoutAll(int idAnchor) {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 	

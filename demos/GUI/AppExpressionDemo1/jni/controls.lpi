@@ -15,16 +15,17 @@
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
-    <CustomData Count="9">
+    <CustomData Count="10">
       <Item0 Name="BuildSystem" Value="Ant"/>
       <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.4"/>
-      <Item3 Name="NdkApi" Value="android-22"/>
-      <Item4 Name="NdkPath" Value="C:\android\ndkr18b\"/>
-      <Item5 Name="Package" Value="org.lamw.appexpressiondemo1"/>
-      <Item6 Name="SdkPath" Value="C:\adt32\sdk\"/>
-      <Item7 Name="StartModule" Value="AndroidModule1"/>
-      <Item8 Name="Theme" Value="DeviceDefault"/>
+      <Item2 Name="LamwVersion" Value="0.8.6.1"/>
+      <Item3 Name="MinSdk" Value="14"/>
+      <Item4 Name="NdkApi" Value="android-22"/>
+      <Item5 Name="NdkPath" Value="C:\android\ndkr18b\"/>
+      <Item6 Name="Package" Value="org.lamw.appexpressiondemo1"/>
+      <Item7 Name="SdkPath" Value="C:\android\sdkr25\"/>
+      <Item8 Name="StartModule" Value="AndroidModule1"/>
+      <Item9 Name="Theme" Value="DeviceDefault"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>

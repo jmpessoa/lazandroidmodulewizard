@@ -1,6 +1,5 @@
 C:\android\workspace\AppExpressionDemo1\gen\org\lamw\appexpressiondemo1\R.java \
  : C:\android\workspace\AppExpressionDemo1\res\drawable\bullet_go.png \
-C:\android\workspace\AppExpressionDemo1\res\drawable\pencil__arrow.png \
 C:\android\workspace\AppExpressionDemo1\res\drawable\plus_circle.png \
 C:\android\workspace\AppExpressionDemo1\res\drawable\plus_white.png \
 C:\android\workspace\AppExpressionDemo1\res\drawable-hdpi\ic_launcher.png \

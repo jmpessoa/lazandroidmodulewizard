@@ -1,30 +1,32 @@
 object AndroidModule1: TAndroidModule1
-  Left = 316
-  Top = 152
-  Width = 356
-  Height = 550
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
+  Left = 316
+  Top = 152
+  Width = 356
+  Height = 550
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnJNIPrompt = AndroidModule1JNIPrompt
   object jTextView1: jTextView
-    Left = 90
-    Top = 5
-    Width = 176
-    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 90
+    Top = 5
+    Width = 176
+    Height = 26
     Visible = True
-    Id = 1
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -39,18 +41,17 @@ object AndroidModule1: TAndroidModule1
     GravityInParent = lgNone
   end
   object jTextView2: jTextView
-    Left = 23
-    Top = 41
-    Width = 84
-    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 23
+    Top = 41
+    Width = 84
+    Height = 26
     Visible = True
     Anchor = jTextView1
-    Id = 2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
@@ -65,18 +66,17 @@ object AndroidModule1: TAndroidModule1
     GravityInParent = lgNone
   end
   object jEditText1: jEditText
-    Left = 5
-    Top = 77
-    Width = 346
-    Height = 39
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 5
+    Top = 77
+    Width = 346
+    Height = 39
     Visible = True
     Anchor = jTextView2
-    Id = 3
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -98,21 +98,21 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     CloseSoftInputOnEnter = True
     CapSentence = False
+    CaptureBackPressed = False
     GravityInParent = lgNone
   end
   object jTextView3: jTextView
-    Left = 5
-    Top = 141
-    Width = 102
-    Height = 26
     MarginLeft = 5
     MarginTop = 20
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 5
+    Top = 141
+    Width = 102
+    Height = 26
     Visible = True
     Anchor = jEditText1
-    Id = 4
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
@@ -127,18 +127,17 @@ object AndroidModule1: TAndroidModule1
     GravityInParent = lgNone
   end
   object jButton1: jButton
-    Left = 59
-    Top = 303
-    Width = 237
-    Height = 57
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 59
+    Top = 303
+    Width = 237
+    Height = 57
     Visible = True
     Anchor = jListView1
-    Id = 10
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpTwoThirdOfParent
@@ -152,18 +151,17 @@ object AndroidModule1: TAndroidModule1
     OnClick = jButton1Click
   end
   object jListView1: jListView
-    Left = 59
-    Top = 202
-    Width = 237
-    Height = 96
     MarginLeft = 0
     MarginTop = 30
     MarginRight = 0
     MarginBottom = 0
     Enabled = True
+    Left = 59
+    Top = 202
+    Width = 237
+    Height = 96
     Visible = True
     Anchor = jTextView3
-    Id = 11
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpTwoThirdOfParent
@@ -178,31 +176,41 @@ object AndroidModule1: TAndroidModule1
     WidgetItem = wgEditText
     WidgetText = '?     '
     Delimiter = '|'
+    TextColorInfo = colbrDefault
     TextDecorated = txtNormal
     ItemLayout = layImageTextWidget
     TextSizeDecorated = sdNone
     TextAlign = alLeft
+    TextPosition = posCenter
+    TextWordWrap = False
+    EnableOnClickTextLeft = False
+    EnableOnClickTextCenter = False
+    EnableOnClickTextRight = False
     HighLightSelectedItemColor = colbrDefault
     FontSizeUnit = unitDefault
     ImageItemIdentifier = 'bullet_go'
     ItemPaddingTop = 40
     ItemPaddingBottom = 40
+    ItemPaddingLeft = 10
+    ItemPaddingRight = 10
+    TextMarginLeft = 10
+    TextMarginRight = 10
+    TextMarginInner = 2
     WidgetTextColor = colbrWhite
     OnDrawItemWidgetText = jListView1DrawItemWidgetText
   end
   object jEditText2: jEditText
-    Left = 119
-    Top = 151
-    Width = 118
-    Height = 39
     MarginLeft = 5
     MarginTop = 30
     MarginRight = 5
     MarginBottom = 10
     Enabled = True
+    Left = 119
+    Top = 151
+    Width = 118
+    Height = 39
     Visible = True
     Anchor = jEditText1
-    Id = 12
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpOneThirdOfParent
@@ -224,33 +232,63 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     CloseSoftInputOnEnter = True
     CapSentence = False
+    CaptureBackPressed = False
     GravityInParent = lgNone
   end
   object jImageBtn1: jImageBtn
-    Left = 279
-    Top = 141
-    Width = 72
-    Height = 72
     MarginLeft = 5
     MarginTop = 20
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 279
+    Top = 141
+    Width = 72
+    Height = 72
     Visible = True
     Anchor = jEditText1
-    Id = 13
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpRight]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
+    AnimationDurationIn = 1500
+    AnimationDurationOut = 1500
+    AnimationMode = animNone
     BackgroundColor = colbrDefault
+    IndexImageUp = -1
+    IndexImageDown = -1
     ImageUpIdentifier = 'plus_circle'
     ImageDownIdentifier = 'plus_white'
+    SleepDown = 150
     GravityInParent = lgNone
     OnClick = jImageBtn1Click
   end
+  object jButton2: jButton
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 58
+    Top = 371
+    Width = 237
+    Height = 57
+    Visible = True
+    Anchor = jButton1
+    PosRelativeToAnchor = []
+    PosRelativeToParent = []
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'CanEvaluate(!?)'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton2Click
+  end
   object jExpression1: jExpression
-    left = 200
-    top = 432
+    left = 272
+    top = 41
   end
 end

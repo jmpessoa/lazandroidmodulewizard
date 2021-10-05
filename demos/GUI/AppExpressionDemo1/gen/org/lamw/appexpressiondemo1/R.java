@@ -23,9 +23,8 @@ public final class R {
     public static final class drawable {
         public static final int bullet_go=0x7f020000;
         public static final int ic_launcher=0x7f020001;
-        public static final int pencil__arrow=0x7f020002;
-        public static final int plus_circle=0x7f020003;
-        public static final int plus_white=0x7f020004;
+        public static final int plus_circle=0x7f020002;
+        public static final int plus_white=0x7f020003;
     }
     public static final class layout {
         public static final int activity_app=0x7f030000;

@@ -14,6 +14,7 @@ type
 
   TAndroidModule1 = class(jForm)
     jButton1: jButton;
+    jButton2: jButton;
     jEditText1: jEditText;
     jEditText2: jEditText;
     jExpression1: jExpression;
@@ -24,6 +25,7 @@ type
     jTextView3: jTextView;
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
+    procedure jButton2Click(Sender: TObject);
     procedure jImageBtn1Click(Sender: TObject);
     procedure jListView1DrawItemWidgetText(Sender: TObject; itemIndex: integer;
       widgetText: string; out newWidgetText: string);
@@ -68,6 +70,9 @@ sqrt: square root
 tan: tangent
 tanh: hyperbolic tangent
 signum: signum function
+
+ref. https://www.objecthunter.net/exp4j/
+
 *)
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
@@ -88,25 +93,76 @@ begin
    end;
 
    jExpression1.SetFormula(Trim(jEditText1.Text), variables);
+    //or ...
    //jExpression1.SetFormula('3 * sin(y) - 2 / (x - 2)', ['x', 'y']);
 
+   if jExpression1.IsExpressionValid(False) then //False --> Validate an expression before variables have been set, i.e. skip checking if all variables have been set.
+   begin
+
+     for i:= 0 to count-1 do
+     begin
+         strNumber:= Trim(jListView1.GetWidgetText(i));
+         if strNumber <> '' then
+           jExpression1.SetValue(variables[i], StrToFloat(strNumber))
+         else
+           jExpression1.SetValue(variables[i], 0);
+     end;
+     //or ...
+     //jExpression1.SetValue('x', 2.3);
+     //jExpression1.SetValue('y', 3.14);
+
+     exprValue:= jExpression1.Evaluate();
+
+     ShowMessage(FloatToStr(exprValue));
+
+     SetLength(variables, 0);
+   end
+   else ShowMessage('Error! Expression Invalid!');
+
+end;
+
+//Or .....
+procedure TAndroidModule1.jButton2Click(Sender: TObject);
+var
+  variables: array of string;
+  count, i: integer;
+  exprValue: double;
+  strNumber: string;
+begin
+
+   count:= jListView1.Count;
+
+   SetLength(variables, count);
 
    for i:= 0 to count-1 do
    begin
-       strNumber:= Trim(jListView1.GetWidgetText(i));
-       if strNumber <> '' then
-         jExpression1.SetValue(variables[i], StrToFloat(strNumber))
-       else
-         jExpression1.SetValue(variables[i], 0);
+     variables[i]:= jListView1.GetItemText(i);
    end;
-   //jExpression1.SetValue('x', 2.3);
-   //jExpression1.SetValue('y', 3.14);
 
-   exprValue:= jExpression1.Evaluate();
+   jExpression1.SetFormula(Trim(jEditText1.Text), variables);
+   //or ...
+   //jExpression1.SetFormula('3 * sin(y) - 2 / (x - 2)', ['x', 'y']);
 
-   ShowMessage(FloatToStr(exprValue));
+   if jExpression1.CanEvaluate(False) then //False --> Validate an expression before variables have been set, i.e. skip checking if all variables have been set.
+   begin
 
-   SetLength(variables, 0);
+     for i:= 0 to count-1 do
+     begin
+         strNumber:= Trim(jListView1.GetWidgetText(i));
+         if strNumber <> '' then
+           jExpression1.SetValue(variables[i], StrToFloat(strNumber))
+         else
+           jExpression1.SetValue(variables[i], 0);
+     end;
+     //or ...
+     //jExpression1.SetValue('x', 2.3);
+     //jExpression1.SetValue('y', 3.14);
+
+     ShowMessage(FloatToStr(jExpression1.GetValue()));
+
+     SetLength(variables, 0);
+   end
+   else ShowMessage('Error! Expression Invalid!');
 
 end;
 
