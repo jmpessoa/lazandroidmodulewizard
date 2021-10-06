@@ -316,13 +316,17 @@ public class jImageFileManager /*extends ...*/ {
 	   return BitmapFactory.decodeFile(_path + "/" + _filename, bo); 
  }
  
+ //Android SDK >=29 need <application android:requestLegacyExternalStorage="true" ... >
  public boolean SaveToFile(Bitmap _image, String _filename) {
 	    if( _image == null ) return false;
 	    
-	    String root = this.controls.activity.getFilesDir().getAbsolutePath();	      	    	    
+	    String root = this.controls.activity.getFilesDir().getAbsolutePath();
+	    
 	    File file = new File (root +"/"+ _filename);
 	    
-	    if (file.exists ()) file.delete ();
+	    if( file == null) return false;
+	    
+	    if (file.exists()) file.delete ();
 	    
 	    try {
 	        FileOutputStream out = new FileOutputStream(file);	  
@@ -339,28 +343,37 @@ public class jImageFileManager /*extends ...*/ {
 	    
 	    return true;
  }
-    
- public boolean SaveToFile(Bitmap _image,String _path, String _filename) {	   	    
-	    if( _image == null ) return false;
+ 
+ // Android SDK >=29 need <application android:requestLegacyExternalStorage="true" ... >
+ public boolean SaveToFile(Bitmap _bitmap, String _path, String _filename) {	   	    
+	    if( _bitmap == null ) return false;
 	 
-	    File filePath = new File (_path);
+	    File filePath = new File(_path);
+	    
+	    if(filePath == null) return false;
+	    
 	    filePath.mkdirs(); // don't forget to make the directory
 	    
-	    File file = new File (_path +"/"+ _filename);
+	    File file = new File(_path +"/"+ _filename);
 	    
-	    if (file.exists ()) file.delete ();
+	    if( file == null) return false;
+	    
+	    if (file.exists()) file.delete();
+	    
+	    OutputStream outStream = null;
 	    
 	    try {
-	        FileOutputStream out = new FileOutputStream(file);	  
+	    	outStream = new FileOutputStream(file);	  
 	        
-	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
-	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);
+	        if ( _filename.toLowerCase().contains(".jpg") ) _bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
+	        if ( _filename.toLowerCase().contains(".png") ) _bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
 	        
-	         out.flush();
-	         out.close();
+	        outStream.flush();
+	        outStream.close();	      
+	        
 	    } catch (Exception e) {
-	         e.printStackTrace();
-	         return false;
+	        e.printStackTrace();
+	        return false;
 	    }
 	    
 	    return true;
@@ -390,8 +403,10 @@ public class jImageFileManager /*extends ...*/ {
          ContentResolver resolver = context.getContentResolver();
          ContentValues contentValues = new ContentValues();
          contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+         
          if(isPng) contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
          else      contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+         
          contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, 
         		 Environment.DIRECTORY_PICTURES + File.separator + folderName);
          imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);

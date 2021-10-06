@@ -963,37 +963,42 @@ public class jForm {
         }
     }
 
+    // Android SDK >=29 need <application android:requestLegacyExternalStorage="true" ... >
     public String CreateDir(String _dirName) {
         this.controls.activity.getDir(_dirName, 0); //if not exist -->> CREATE!
         String absPath = this.controls.activity.getFilesDir().getPath();
-        if (absPath == null) {
+        if (absPath == null) 
             return "";
-        }
+        
         absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/" + _dirName;
         return absPath;
     }
 
+    // Android SDK >=29 need <application android:requestLegacyExternalStorage="true" ... >
     public String CreateDir(int _environmentDir, String _dirName) {
+    	
         String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
+        
         if (!baseDir.equalsIgnoreCase("")) {
             File file = new File(baseDir, _dirName);
-            if (file == null) {
-                return "";
-            }
-            file.mkdirs();
-            return file.getPath();
-        } else {
-            return "";
-        }
+            
+            if (file != null)                            
+             if( file.mkdirs() ) 
+              return file.getPath();
+        } 
+        
+        return "";        
     }
 
+    // Android SDK >=29 need <application android:requestLegacyExternalStorage="true" ... >
     public String CreateDir(String _fullPath, String _dirName) {
         File file = new File(_fullPath, _dirName);
-        if (file == null) {
-            return "";
-        }
-        file.mkdirs();
-        return file.getPath();
+        
+        if (file != null)                     
+         if( file.mkdirs() )
+          return file.getPath();
+        
+        return "";
     }
 
     /*
