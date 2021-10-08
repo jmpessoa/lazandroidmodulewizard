@@ -116,6 +116,14 @@ Procedure jEditText_GetCursorPos       (env:PJNIEnv; EditText : jObject; Var x,y
 
 procedure jEditText_setFontAndTextTypeFace(env: PJNIEnv; EditText: jObject; FontFace, TextTypeFace: DWord); 
 
+procedure jEditText_SetActionIconIdentifier(env: PJNIEnv; _jedittext: JObject; _actionIconIdentifier: string);
+procedure jEditText_ShowActionIcon(env: PJNIEnv; _jedittext: JObject);
+procedure jEditText_HideActionIcon(env: PJNIEnv; _jedittext: JObject);
+function jEditText_IsActionIconShowing(env: PJNIEnv; _jedittext: JObject): boolean;
+
+function jEditText_GetTextLength(env: PJNIEnv; _jedittext: JObject): int64;
+function jEditText_IsEmpty(env: PJNIEnv; _jedittext: JObject): boolean;
+
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 
@@ -656,6 +664,142 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+
+procedure jEditText_SetActionIconIdentifier(env: PJNIEnv; _jedittext: JObject; _actionIconIdentifier: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetActionIconIdentifier', '(Ljava/lang/String;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_actionIconIdentifier));
+
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jEditText_ShowActionIcon(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'ShowActionIcon', '()V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  env^.CallVoidMethod(env, _jedittext, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jEditText_HideActionIcon(env: PJNIEnv; _jedittext: JObject);
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'HideActionIcon', '()V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  env^.CallVoidMethod(env, _jedittext, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jEditText_IsActionIconShowing(env: PJNIEnv; _jedittext: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'IsActionIconShowing', '()Z');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jBoo:= env^.CallBooleanMethod(env, _jedittext, jMethod);
+
+  Result:= boolean(jBoo);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jEditText_GetTextLength(env: PJNIEnv; _jedittext: JObject): int64;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextLength', '()J');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  Result:= env^.CallLongMethod(env, _jedittext, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jEditText_IsEmpty(env: PJNIEnv; _jedittext: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'IsEmpty', '()Z');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jBoo:= env^.CallBooleanMethod(env, _jedittext, jMethod);
+
+  Result:= boolean(jBoo);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 //------------------------------------------------------------------------------
 // Button

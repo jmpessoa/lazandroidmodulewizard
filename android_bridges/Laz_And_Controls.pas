@@ -1047,8 +1047,14 @@ type
     property OnLayouting: TOnLayouting read FOnLayouting write FOnLayouting;
   end;
 
+  TEditTextOnActionIconTouchUp=procedure(Sender:TObject;textContent:string) of object;
+  TEditTextOnActionIconTouchDown=procedure(Sender:TObject;textContent:string) of object;
+
   jEditText = class(jVisualControl)
   private
+    FActionIconIdentifier: string;
+    FOnActionIconTouchUp: TEditTextOnActionIconTouchUp;
+    FOnActionIconTouchDown: TEditTextOnActionIconTouchDown;
     FInputTypeEx: TInputTypeEx;
     FHint     : string;
     FMaxTextLength : integer;
@@ -1113,6 +1119,9 @@ type
     procedure GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnAfterDispatchDraw(Obj: TObject; canvas: JObject; tag: integer);
     procedure GenEvent_OnOnLayouting(Obj: TObject; changed: boolean);
+
+    procedure GenEvent_EditTextOnActionIconTouchUp(Sender:TObject;textContent:string);
+    procedure GenEvent_EditTextOnActionIconTouchDown(Sender:TObject;textContent:string);
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -1185,6 +1194,14 @@ type
     procedure SetAllLowerCase( _lowercase : boolean );
     procedure SetAllUpperCase( _uppercase : boolean );
 
+    procedure SetActionIconIdentifier(_actionIconIdentifier: string);
+    procedure ShowActionIcon();
+    procedure HideActionIcon();
+     function IsActionIconShowing(): boolean;
+
+    function GetTextLength(): int64;
+    function IsEmpty(): boolean;
+
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
@@ -1226,6 +1243,11 @@ type
     property OnBeforeDispatchDraw: TOnBeforeDispatchDraw read FOnBeforeDispatchDraw write FOnBeforeDispatchDraw;
     property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
     property OnLayouting: TOnLayouting read FOnLayouting write FOnLayouting;
+
+    property ActionIconIdentifier: string read FActionIconIdentifier write SetActionIconIdentifier;
+    property OnActionIconTouchUp: TEditTextOnActionIconTouchUp read FOnActionIconTouchUp write FOnActionIconTouchUp;
+    property OnActionIconTouchDown: TEditTextOnActionIconTouchDown read FOnActionIconTouchDown write FOnActionIconTouchDown;
+
 
   end;
 
@@ -2260,8 +2282,8 @@ type
 
   jImageBtn = class(jVisualControl)
   private
-    FOnDown : TOnNotify; // by ADiV
-    FOnUp : TOnNotify; // by ADiV
+    FOnDown : TOnNotify; //by ADiV
+    FOnUp : TOnNotify;   //by ADiV
 
     FImageUpName: string;
     FImageDownName: string;
@@ -2542,6 +2564,10 @@ type
   Procedure Java_Event_pOnLongClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
   procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
   procedure Java_Event_pOnImageViewPopupItemSelected(env:PJNIEnv;this:JObject;Sender:TObject;caption:jString);
+
+
+  procedure Java_Event_pEditTextOnActionIconTouchUp(env:PJNIEnv;this:JObject;Sender:TObject;textContent:jString);
+  procedure Java_Event_pEditTextOnActionIconTouchDown(env:PJNIEnv;this:JObject;Sender:TObject;textContent:jString);
 
   //thanks to WayneSherman
  procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject;tag:integer);
@@ -4988,6 +5014,9 @@ begin
 
    jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
+   if FActionIconIdentifier <> '' then
+      jEditText_SetActionIconIdentifier(FjEnv, FjObject, FActionIconIdentifier);
+
    if  FHint <> '' then
     SetHint(FHint);
 
@@ -5699,6 +5728,82 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_i(FjEnv, FjObject, 'SetRoundBackgroundColor', GetARGB(FCustomColor, _color));
+end;
+
+
+procedure jEditText.SetActionIconIdentifier(_actionIconIdentifier: string);
+begin
+  //in designing component state: set value here...
+  FActionIconIdentifier:=  _actionIconIdentifier;
+  if FInitialized then
+     jEditText_SetActionIconIdentifier(FjEnv, FjObject, _actionIconIdentifier);
+end;
+
+procedure jEditText.ShowActionIcon();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_ShowActionIcon(FjEnv, FjObject);
+end;
+
+procedure jEditText.HideActionIcon();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_HideActionIcon(FjEnv, FjObject);
+end;
+
+function jEditText.IsActionIconShowing(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jEditText_IsActionIconShowing(FjEnv, FjObject);
+end;
+
+function jEditText.GetTextLength(): int64;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jEditText_GetTextLength(FjEnv, FjObject);
+end;
+
+function jEditText.IsEmpty(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jEditText_IsEmpty(FjEnv, FjObject);
+end;
+
+
+procedure Java_Event_pEditTextOnActionIconTouchUp(env:PJNIEnv;this:JObject;Sender:TObject;textContent:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jEditText then
+  begin
+    jForm(jEditText(Sender).Owner).UpdateJNI(gApp);
+    jEditText(Sender).GenEvent_EditTextOnActionIconTouchUp(Sender,GetPStringAndDeleteLocalRef(env,textContent));
+  end;
+end;
+
+procedure Java_Event_pEditTextOnActionIconTouchDown(env:PJNIEnv;this:JObject;Sender:TObject;textContent:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jEditText then
+  begin
+    jForm(jEditText(Sender).Owner).UpdateJNI(gApp);
+    jEditText(Sender).GenEvent_EditTextOnActionIconTouchDown(Sender,GetPStringAndDeleteLocalRef(env,textContent));
+  end;
+end;
+
+procedure jEditText.GenEvent_EditTextOnActionIconTouchUp(Sender:TObject;textContent:string);
+begin
+  if Assigned(FOnActionIconTouchUp) then FOnActionIconTouchUp(Sender,textContent);
+end;
+procedure jEditText.GenEvent_EditTextOnActionIconTouchDown(Sender:TObject;textContent:string);
+begin
+  if Assigned(FOnActionIconTouchDown) then FOnActionIconTouchDown(Sender,textContent);
 end;
 
 //------------------------------------------------------------------------------

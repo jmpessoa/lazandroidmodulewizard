@@ -1,4 +1,4 @@
-package org.lamw.appedittextdemo1;
+package org.lamw.appedittextactionicondemo1;
 
 import java.io.BufferedReader;
 import java.io.File;

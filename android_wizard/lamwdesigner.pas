@@ -168,6 +168,9 @@ type
   { TDraftEditText }
 
   TDraftEditText = class(TDraftDrawableWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
@@ -2992,11 +2995,58 @@ begin
   FontColor := jEditText(AWidget).FontColor;
 end;
 
+{
+procedure TDraftImageBtn.Draw;
+var
+  r: TRect;
+  w, h: integer;
+begin
+
+  if Color <> colbrDefault then
+     Fcanvas.Brush.Color := ToTColor(Color)
+  else
+  begin
+     Fcanvas.Brush.Color:= clNone;
+     Fcanvas.Brush.Style:= bsClear;
+  end;
+
+  if GetImage <> nil then
+  begin
+
+    w:= Trunc(FImage.Width/3);
+    h:= Trunc(FImage.Height/3);
+
+    w:= Max(w,h);
+    h:= w;
+
+    if w < 64 then
+    begin
+      w:= 64;
+      h:= 64;
+    end;
+
+    Fcanvas.RoundRect(0, 0, w+8, h+8, 12, 12);    // outer frame
+
+    r:= Rect(4, 4, w+4, h+4);
+    Fcanvas.StretchDraw(r, GetImage);
+  end
+  else
+  begin
+    Fcanvas.RoundRect(0, 0, 72, 72, 12,12);  //outer frame
+    Fcanvas.Ellipse(4,4,68,68);            //inner
+  end;
+
+end;
+
+}
 procedure TDraftEditText.Draw;
 var
   ls: Integer;
   r: TRect;
   auxText: string;
+
+  r2: TRect;
+  w, h: integer;
 begin
   with FCanvas do
   begin
@@ -3032,6 +3082,31 @@ begin
     TextOut(12, 9, auxText);
     Font.Size := ls;
   end;
+
+  if GetImage <> nil then
+  begin
+
+    w:= Trunc(FImage.Width/4);
+    h:= Trunc(FImage.Height/4);
+
+    w:= Max(w,h);
+    h:= w;
+
+    if w < 32 then
+    begin
+      w:= 32;
+      h:= 32;
+    end;
+    //Fcanvas.RoundRect(FAndroidWidget.Width-w, 0, FAndroidWidget.Width, h, 12, 12);    // outer frame
+    r2:= Rect(FAndroidWidget.Width-w, 0, FAndroidWidget.Width, h);
+    Fcanvas.StretchDraw(r2, GetImage);
+  end
+  else
+  begin
+    //Fcanvas.RoundRect(0, 0, 72, 72, 12,12);  //outer frame
+    //Fcanvas.Ellipse(4,4,68,68);            //inner
+  end;
+
 end;
 
 procedure TDraftEditText.UpdateLayout;
@@ -3046,6 +3121,21 @@ begin
       FMinHeight := 29 + (fs - 10) * 4 div 3; // todo: multiline
     end;
   inherited;
+end;
+
+function TDraftEditText.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jEditText(FAndroidWidget) do
+    begin
+      if ActionIconIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ActionIconIdentifier));
+        Result := FImage;
+      end else Result := nil;
+    end;
 end;
 
 { TDraftSTextInput }
@@ -4854,7 +4944,7 @@ initialization
 
   RegisterPropertyEditor(TypeInfo(string), jsNavigationView, 'HeaderBackgroundImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jsNavigationView, 'HeaderLogoImageIdentifier', TImageIdentifierPropertyEditor);
-
+  RegisterPropertyEditor(TypeInfo(string), jEditText, 'ActionIconIdentifier', TImageIdentifierPropertyEditor);
   // DraftClasses registeration:
   //  * default drawing and anchoring => use TDraftWidget
   //    (it is not needed to create draft class without custom drawing)
