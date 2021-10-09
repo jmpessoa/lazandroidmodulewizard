@@ -40,18 +40,49 @@ public class jExpression {
   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
     /*.*/public void SetFormula(String _expression) {
-        mExprBuilder = new ExpressionBuilder(_expression);
+        try {
+            mExprBuilder = new ExpressionBuilder(_expression);
+        } catch (IllegalArgumentException e) {
+            mExpr = null;
+            Toast toast = Toast.makeText(controls.activity, "Error on Formula! ["+e.getMessage()+"]", Toast.LENGTH_LONG);
+            if (toast != null) {
+                //toast.setGravity(Gravity.BOTTOM, 0, 0);
+                toast.show();
+            }
+            Log.e("LAMW", "Exception on Builder Formula!", e);
+        }
     }
    /*.*/public void AddVariables(String[] _variables) {
-       mExprBuilder.variables( _variables);
-       mExpr = mExprBuilder.build();
+       try {
+           mExprBuilder.variables( _variables);
+           mExpr = mExprBuilder.build();
+       } catch (IllegalArgumentException e) {
+           mExpr = null;
+           Toast toast = Toast.makeText(controls.activity, "Error on Formula! ["+e.getMessage()+"]", Toast.LENGTH_LONG);
+           if (toast != null) {
+               //toast.setGravity(Gravity.BOTTOM, 0, 0);
+               toast.show();
+           }
+           Log.e("LAMW", "Exception on Builder Formula!", e);
+       }
    }
 
-    public void SetFormula(String _expression, String[] _variables) {
-        mExprBuilder = new ExpressionBuilder(_expression);
-        mExprBuilder.variables( _variables);
-        mExpr = mExprBuilder.build();
+    public void SetFormula(String _expression, String[] _variables) { //thanks to @guaracy
+        try {
+            mExprBuilder = new ExpressionBuilder(_expression);
+            mExprBuilder.variables( _variables);
+            mExpr = mExprBuilder.build();
+        } catch (IllegalArgumentException e) {
+            mExpr = null;
+            Toast toast = Toast.makeText(controls.activity, "Error on Formula! ["+e.getMessage()+"]", Toast.LENGTH_LONG);
+            if (toast != null) {
+                //toast.setGravity(Gravity.BOTTOM, 0, 0);
+                toast.show();
+            }
+            Log.e("LAMW", "Exception on Builder Formula!", e);
+        }
     }
+
     public void SetValue(String _variable, double _value) {
        mExpr.setVariable( _variable, _value);
    }
