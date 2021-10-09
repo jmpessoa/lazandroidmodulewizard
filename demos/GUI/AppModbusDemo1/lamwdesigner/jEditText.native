@@ -1,0 +1,2 @@
+public native void pEditTextOnActionIconTouchUp(long pasobj, String textContent);
+public native void pEditTextOnActionIconTouchDown(long pasobj, String textContent);

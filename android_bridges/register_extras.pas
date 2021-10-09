@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  modbus,
   batterymanager,
   bluetoothlowenergy,
   netapi,
@@ -76,6 +77,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jmodbus_icon.lrs}
   {$I jbatterymanager_icon.lrs}
   {$I jnetapi_icon.lrs}
   {$I jbarcodegen_icon.lrs}
@@ -145,6 +147,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jModbus,
       jBatteryManager,
       jNetApi,
       jBarcodeGen,

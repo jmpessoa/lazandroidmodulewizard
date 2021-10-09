@@ -290,6 +290,8 @@ uses
    procedure Java_Event_pOnBatteryUnknown(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
    procedure Java_Event_pOnBatteryNotCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
 
+   //jModbus
+   procedure Java_Event_pOnModbusConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean;msg:jString);
 
 implementation
 
@@ -306,7 +308,7 @@ uses
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
    cbillingclient, ctoytimerservice, bluetoothlowenergy,
-   sfirebasepushnotificationlistener, batterymanager;
+   sfirebasepushnotificationlistener, batterymanager, modbus;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3547,6 +3549,18 @@ begin
   begin
     jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
     jBatteryManager(Sender).GenEvent_OnBatteryNotCharging(Sender,batteryAtPercentLevel);
+  end;
+end;
+
+procedure Java_Event_pOnModbusConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean;msg:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  //gApp.Jni.jThis:= this;
+   if this <> nil then gApp.Jni.jThis:= this;
+  if Sender is jModbus then
+  begin
+    jForm(jModbus(Sender).Owner).UpdateJNI(gApp);
+    jModbus(Sender).GenEvent_OnModbusConnect(Sender,boolean(success),GetString(env,msg));
   end;
 end;
 
