@@ -1,0 +1,13 @@
+
+You can get from here: (opendrive.com)
+
+https://od.lk/f/Ml8xOTc0OTIwNzNf
+
+A complete tutorial (from image1 to image34) how to add an "online" library to LAMW [create a new jComponent]!!!
+
+WARNING: the "datalogic"  APIs tested in LAMW demo code returned nothing (nil)...
+
+In fact the library source code pointed by Android Studio is clearly returning null in several APIs....
+
+But the tutorial is OK !!!!
+
