@@ -91,14 +91,12 @@ public class jMenu /*extends ...*/ {
     	}
      }
     
-    public void CheckItemCommute(MenuItem _item){
-    	int flag = 0;
-    	if (_item.isChecked()) flag = 1;
-    	switch (flag) {
-    	  case 0: _item.setChecked(false); 
-    	  case 1: _item.setChecked(true);
-        }
-  	    //Log.i("jMenu_CheckItemCommute", _item.getTitle().toString());
+    public void CheckItemCommute(MenuItem _item){//fixed! thanks to guaracy!
+		if (_item.isChecked()) {
+			_item.setChecked(false);
+		} else {
+			_item.setChecked(true);
+		}
     }
     
     public void CheckItem(MenuItem _item){
