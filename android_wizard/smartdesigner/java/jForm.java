@@ -1,4 +1,4 @@
-package org.lamw.appnavigationdrawerdemo3;
+package org.lamw.appmenudemo2;
 
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.2 - 15 July - 2021 [jForm.java]
@@ -136,6 +136,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
 //-------------------------------------------------------------------------
@@ -175,6 +178,9 @@ public class jForm {
     private int animationDurationOut = 1500;
     private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
 
+    private ClipboardManager mClipBoard = null;
+    private ClipData mClipData = null;
+
     // Constructor
     public jForm(Controls ctrls, long pasobj) {
         PasObj = pasobj;
@@ -190,6 +196,8 @@ public class jForm {
         layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         layout.setLayoutParams(layparam);
+
+        mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
 
         // Init Event
         onClickListener = new OnClickListener() {
@@ -2722,6 +2730,17 @@ public class jForm {
             //text.setText("" + millisUntilFinished / 1000);
             toast.show();
         }
+    }
+
+    public void CopyStringToClipboard(String _txt) {
+        ClipData cdata = ClipData.newPlainText("text", _txt);
+        mClipBoard.setPrimaryClip(cdata);
+    }
+
+    public String PasteStringFromClipboard() {
+        ClipData cdata = mClipBoard.getPrimaryClip();
+        ClipData.Item item = cdata.getItemAt(0);
+        return item.getText().toString();
     }
 
 }
