@@ -63,6 +63,8 @@ jImageFileManager = class(jControl)
     function GetOrientation( _uriAsString: string ): integer; overload;
     function GetBitmapOrientation(_bitmap: jObject; _orientation : integer ): jObject;
 
+    function ImageOpen() : boolean;
+
  published
 
 end;
@@ -120,6 +122,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(FjEnv, FjObject, 'ShowImagesFromGallery');
+end;
+
+function jImageFileManager.ImageOpen() : boolean;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_func_out_z(FjEnv, FjObject, 'ImageOpen');
 end;
 
 function jImageFileManager.LoadFromSdCard(_filename: string): jObject;
