@@ -50,6 +50,9 @@ public class jImageFileManager /*extends ...*/ {
   private Controls controls  = null;   // Control Class -> Java/Pascal Interface ...
   private Context  context   = null;
   
+  private File mImageFile = null;
+  private Uri  mImageUri  = null;
+  
   //Warning: please, preferentially init your news params names with "_", ex: int _flag, String _hello ...
   public jImageFileManager(Controls _ctrls, long _Self) { //Add more here new "_xxx" params if needed!
      //super(contrls.activity);
@@ -64,17 +67,16 @@ public class jImageFileManager /*extends ...*/ {
 
  public boolean SaveToSdCard(Bitmap _image, String _filename) {
 	    if( _image == null ) return false;
-	   	  	   
-	    File file;
+	   	  	   	    
 	    String root = Environment.getExternalStorageDirectory().toString();
 	    
-	    file = new File (root+"/"+_filename);	
+	    mImageFile = new File (root+"/"+_filename);	
 	    
-	    if (file.exists ()) file.delete (); 
+	    if (mImageFile.exists ()) mImageFile.delete (); 
 	    try {
-	       FileOutputStream out = new FileOutputStream(file);	           	           	         
+	       FileOutputStream out = new FileOutputStream(mImageFile);	           	           	         
 	     
-         if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+           if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
 	       if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);	       
 	       
 	       out.flush();
@@ -322,14 +324,14 @@ public class jImageFileManager /*extends ...*/ {
 	    
 	    String root = this.controls.activity.getFilesDir().getAbsolutePath();
 	    
-	    File file = new File (root +"/"+ _filename);
+	    mImageFile = new File (root +"/"+ _filename);
 	    
-	    if( file == null) return false;
+	    if( mImageFile == null) return false;
 	    
-	    if (file.exists()) file.delete ();
+	    if (mImageFile.exists()) mImageFile.delete ();
 	    
 	    try {
-	        FileOutputStream out = new FileOutputStream(file);	  
+	        FileOutputStream out = new FileOutputStream(mImageFile);	  
 	        
 	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
 	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);
@@ -354,16 +356,16 @@ public class jImageFileManager /*extends ...*/ {
 	    
 	    filePath.mkdirs(); // don't forget to make the directory
 	    
-	    File file = new File(_path +"/"+ _filename);
+	    mImageFile = new File(_path +"/"+ _filename);
 	    
-	    if( file == null) return false;
+	    if( mImageFile == null) return false;
 	    
-	    if (file.exists()) file.delete();
+	    if (mImageFile.exists()) mImageFile.delete();
 	    
 	    OutputStream outStream = null;
 	    
 	    try {
-	    	outStream = new FileOutputStream(file);	  
+	    	outStream = new FileOutputStream(mImageFile);	  
 	        
 	        if ( _filename.toLowerCase().contains(".jpg") ) _bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
 	        if ( _filename.toLowerCase().contains(".png") ) _bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
@@ -387,12 +389,12 @@ public class jImageFileManager /*extends ...*/ {
            return controls.activity.getExternalFilesDir(environmentDir);
        }
    }
+   
+ // <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />  
 
  public boolean SaveToGallery(Bitmap bitmap, String folderName, String fileName)
  {
      OutputStream fos;
-     File imageFile = null;
-     Uri  imageUri  = null;
      boolean isPng  = true;
      
      if ( fileName.toLowerCase().contains(".jpg") ) isPng = false;
@@ -409,10 +411,10 @@ public class jImageFileManager /*extends ...*/ {
          
          contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, 
         		 Environment.DIRECTORY_PICTURES + File.separator + folderName);
-         imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+         mImageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
          
          try{
-          fos = resolver.openOutputStream(imageUri);
+          fos = resolver.openOutputStream(mImageUri);
          } catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			return false;
@@ -422,16 +424,16 @@ public class jImageFileManager /*extends ...*/ {
          String imagesDir = getMyEnvDir(Environment.DIRECTORY_PICTURES).toString() 
         		            + File.separator + folderName;
          
-         imageFile = new File(imagesDir);
+         mImageFile = new File(imagesDir);
          
-         if (!imageFile.exists()) {
-             imageFile.mkdir();
+         if (!mImageFile.exists()) {
+        	 mImageFile.mkdir();
          }
          
-         imageFile = new File(imagesDir, fileName);
+         mImageFile = new File(imagesDir, fileName);
          
          try{
-          fos = new FileOutputStream(imageFile);
+          fos = new FileOutputStream(mImageFile);
          } catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			return false;
@@ -451,10 +453,39 @@ public class jImageFileManager /*extends ...*/ {
 		return false;
 	 }
 
-     if ((imageFile != null) && saved)  // pre Q     
-         MediaScannerConnection.scanFile(context, new String[]{imageFile.toString()}, null, null);                               
+     if ((mImageFile != null) && saved)  // pre Q     
+         MediaScannerConnection.scanFile(context, new String[]{mImageFile.toString()}, null, null);                               
 
      return saved;
+ }
+ 
+ public boolean ImageOpen() {
+	 
+	 Uri mediaUri = null;
+	 
+	 if (android.os.Build.VERSION.SDK_INT >= 29){
+		 if (mImageUri == null) return false;
+		 
+		 mediaUri = mImageUri;
+	 }else{
+		 if (mImageFile == null) return false;
+		 
+		 mediaUri = Uri.fromFile(mImageFile);
+	 }
+  	
+     try {
+    	 if( mediaUri == null) return false;
+    	 
+         Intent intent = new Intent();  
+  	     intent.setAction(android.content.Intent.ACTION_VIEW);
+         intent.setDataAndType(mediaUri, "image/*");
+         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+         controls.activity.startActivity(intent);
+         return true;
+     } catch (Exception unused) {
+    	 return false;
+     }
+ 	    	
  }
 
  public Bitmap LoadFromUri(Uri _imageUri) {
