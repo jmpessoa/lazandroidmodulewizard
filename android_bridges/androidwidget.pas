@@ -1928,6 +1928,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure jni_proc(env: PJNIEnv; _jobject: JObject; javaFuncion : string);
   procedure jni_proc_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float: single);
   procedure jni_proc_ff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single);
+  procedure jni_proc_fff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2, _float3: single);
   procedure jni_proc_ffff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2, _float3, _float4: single);
   procedure jni_proc_fffffff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2, _float3, _float4, _float5, _float6, _float7 : single);
   procedure jni_proc_h(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str : String);
@@ -1939,6 +1940,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure jni_proc_iiit(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1, _int2: integer; _str: string);
   procedure jni_proc_iii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1, _int2: integer);
   procedure jni_proc_iiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1, _int2, _int3: integer);
+  procedure jni_proc_iiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1, _int2, _int3, _int4: integer);
   procedure jni_proc_if(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer; _float:single);
   procedure jni_proc_iff(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer; _float0, _float1:single);
   procedure jni_proc_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: int64);
@@ -8048,6 +8050,32 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+procedure jni_proc_fff(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                     _float1, _float2, _float3: single);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FFF)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].f:= _float1;
+  jParams[1].f:= _float2;
+  jParams[2].f:= _float3;
+
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
 procedure jni_proc_ffff(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                      _float1, _float2, _float3, _float4: single);
 var
@@ -8667,6 +8695,34 @@ begin
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
   env^.DeleteLocalRef(env, jCls); 
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jni_proc_iiiii(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                         _int0, _int1, _int2, _int3, _int4: integer);
+var
+  jParams: array[0..4] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IIIII)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _int0;
+  jParams[1].i:= _int1;
+  jParams[2].i:= _int2;
+  jParams[3].i:= _int3;
+  jParams[4].i:= _int4;
+
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;

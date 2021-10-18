@@ -53,7 +53,7 @@ import android.view.MotionEvent;
 
 //-------------------------------------------------------------------------
 // jsRecyclerView
-// Review by ADiV for LAMW on 2021-03-09
+// Review by ADiV for LAMW on 2021-10-18
 //-------------------------------------------------------------------------
 
 class IdObjects{
@@ -413,6 +413,14 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     public boolean mCardStyle;
     public int     mCardRound = 0;
     public int     mCardColor = Color.WHITE;
+    
+    public boolean mUseCompatPadding = true;
+    public int     mPaddingLeft   = 0;
+    public int     mPaddingRight  = 0;
+    public int     mPaddingTop    = 0;
+    public int     mPaddingBottom = 0;
+    public int     mPaddingInside = 0;
+    
     String mFormat="dummy";
     public Controls  controls;
     public long pasObject;
@@ -1343,12 +1351,10 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 	       CardView  cardView = new CardView(ctx);
 	       ViewGroup.LayoutParams paramCardView = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 	       cardView.setLayoutParams(paramCardView);	       
-	       cardView.setUseCompatPadding(true);
-	       //cardView.setCardElevation(20);
-	       //cardView.setContentPadding(10, 10,10, 10);
-	       //cardView.setPadding(30, 40, 30, 40);
-	       cardView.setCardElevation(20);
-	       cardView.setContentPadding(0, 0,0, 0);
+	       
+	       cardView.setCardElevation(20);	       
+	       cardView.setUseCompatPadding(mUseCompatPadding);	       	      
+	       cardView.setContentPadding(0, 0, 0, 0);
 	       cardView.setPadding(0, 0, 0, 0);
 	       
 	       /*TypedValue outValue = new TypedValue();
@@ -1760,14 +1766,11 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
  * Quick way to add padding to first and last item in recyclerview via decorators
  */
 
-class EdgeDecorator extends RecyclerView.ItemDecoration {
+/*class EdgeDecorator extends RecyclerView.ItemDecoration {
 
     private final int edgePadding;
 
-    /**
-     * EdgeDecorator
-     * @param edgePadding padding set on the left side of the first item and the right side of the last item
-     */
+    
     public EdgeDecorator(int edgePadding) {
         this.edgePadding = edgePadding;
     }
@@ -1798,18 +1801,26 @@ class EdgeDecorator extends RecyclerView.ItemDecoration {
             outRect.set(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
         }
     }
-}
+}*/
 
 class TopBottomDecorator extends RecyclerView.ItemDecoration {
 
-    private final int edgePadding;
-
+	private final int paddingInside;
+    private final int paddingLeft;
+    private final int paddingTop;
+    private final int paddingRight;
+    private final int paddingBottom;    
+    
     /**
      * EdgeDecorator
      * @param edgePadding padding set on the left side of the first item and the right side of the last item
      */
-    public TopBottomDecorator(int edgePadding) {
-        this.edgePadding = edgePadding;
+    public TopBottomDecorator(int _paddingInside, int _paddingLeft, int _paddingTop, int _paddingRight, int _paddingBottom) {
+        this.paddingInside = _paddingInside;
+        this.paddingLeft = _paddingLeft;
+        this.paddingTop = _paddingTop;
+        this.paddingRight = _paddingRight;
+        this.paddingBottom = _paddingBottom;
     }
 
     @Override
@@ -1821,24 +1832,22 @@ class TopBottomDecorator extends RecyclerView.ItemDecoration {
         final int itemPosition = parent.getChildAdapterPosition(view);
 
         // no position, leave it alone
-        if (itemPosition == RecyclerView.NO_POSITION) {
-            return;
-        }
+        if (itemPosition == RecyclerView.NO_POSITION) return;        
 
         // first item
         if (itemPosition == 0) {
             //outRect.set(view.getPaddingLeft(), edgePadding, view.getPaddingRight(), view.getPaddingBottom());
-            outRect.set(view.getPaddingLeft(), edgePadding, view.getPaddingRight(), 0);
+            outRect.set(this.paddingLeft, this.paddingTop, this.paddingRight, 0);
         }
         // last item
-        else if (itemCount > 0 && itemPosition == itemCount - 1) {
+        else if ((itemCount > 0) && (itemPosition == (itemCount - 1))) {
             //outRect.set(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), edgePadding);
-            outRect.set(view.getPaddingLeft(), edgePadding, view.getPaddingRight(), edgePadding);
+            outRect.set(this.paddingLeft, this.paddingInside, this.paddingRight, this.paddingBottom);
         }
         // every other item
         else {
             //outRect.set(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
-            outRect.set(view.getPaddingLeft(), edgePadding, view.getPaddingRight(), 0);
+            outRect.set(this.paddingLeft, this.paddingInside, this.paddingRight, 0);
         }
     }
 }
@@ -1847,6 +1856,12 @@ class TopBottomDecorator extends RecyclerView.ItemDecoration {
 class SeparatorDecoration extends RecyclerView.ItemDecoration {
 
     private final Paint mPaint;
+    
+    private final int paddingInside;
+    private final int paddingLeft;
+    private final int paddingTop;
+    private final int paddingRight;
+    private final int paddingBottom;
 
     /**
      * Create a decoration that draws a line in the given color and width between the items in the view.
@@ -1855,7 +1870,13 @@ class SeparatorDecoration extends RecyclerView.ItemDecoration {
      * @param color    the color of the separator to draw.
      * @param heightDp the height of the separator in dp.
      */
-    public SeparatorDecoration(Context context, int color, float heightDp) {
+    public SeparatorDecoration(Context context, int color, float heightDp,int _paddingInside, int _paddingLeft, int _paddingTop, int _paddingRight, int _paddingBottom) {
+        this.paddingInside = _paddingInside;
+        this.paddingLeft = _paddingLeft;
+        this.paddingTop = _paddingTop;
+        this.paddingRight = _paddingRight;
+        this.paddingBottom = _paddingBottom;
+        		
         mPaint = new Paint();
         mPaint.setColor(color);
         final float thickness = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -1867,15 +1888,35 @@ class SeparatorDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
 
-        // we want to retrieve the position in the list
-        final int position = params.getViewAdapterPosition();
+        int itemCount = state.getItemCount();
+
+        final int itemPosition = parent.getChildAdapterPosition(view);
+
+        // no position, leave it alone
+        if (itemPosition == RecyclerView.NO_POSITION) return;
+        
+        // first item
+        if (itemPosition == 0) {
+            //outRect.set(view.getPaddingLeft(), edgePadding, view.getPaddingRight(), view.getPaddingBottom());
+            outRect.set(this.paddingLeft, this.paddingTop, this.paddingRight, 0);
+        }
+        // last item
+        else if ((itemCount > 0) && (itemPosition == (itemCount - 1))) {
+            //outRect.set(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), edgePadding);
+            outRect.set(this.paddingLeft, this.paddingInside, this.paddingRight, this.paddingBottom);
+        }
+        // every other item
+        else {
+            //outRect.set(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+            outRect.set(this.paddingLeft, this.paddingInside, this.paddingRight, (int) mPaint.getStrokeWidth());
+        }
 
         // and add a separator to any view but the last one
-        if (position < state.getItemCount()) {
-            outRect.set(0, 0, 0, (int) mPaint.getStrokeWidth()); // left, top, right, bottom
+        /*if (position < state.getItemCount()) {
+            outRect.set(0, 0, 0, (int) mPaint.getStrokeWidth()+100); // left, top, right, bottom
         } else {
             outRect.setEmpty(); // 0, 0, 0, 0
-        }
+        }*/
     }
 
     @Override
@@ -2168,6 +2209,15 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
 		   mSeparatorHeight = 0;  
    }
    
+   public void SetItemPadding( int _paddingInside, int _paddingLeft, int _paddingTop, int _paddingRight, int _paddingBottom ){
+	   rcAdapter.mUseCompatPadding = false;
+	   rcAdapter.mPaddingInside = _paddingInside; 
+	   rcAdapter.mPaddingLeft   = _paddingLeft;
+	   rcAdapter.mPaddingTop    = _paddingTop;
+	   rcAdapter.mPaddingRight  = _paddingRight;
+	   rcAdapter.mPaddingBottom = _paddingBottom;
+   }
+   
    public void SetItemViewLayout(View _itemViewLayout, boolean _forceCardStyle) {
 	   
 	   ViewGroup parent = (ViewGroup) _itemViewLayout.getParent();
@@ -2176,15 +2226,16 @@ public class jsRecyclerView extends RecyclerView /*dummy*/ { //please, fix what 
 		   parent.removeView(_itemViewLayout);
 	       //add the decoration to the recyclerView
 	   if (!_forceCardStyle) {
-	       SeparatorDecoration decoration = new SeparatorDecoration(context, mSeparatorColor, mSeparatorHeight);
+	       SeparatorDecoration decoration = new SeparatorDecoration(context, mSeparatorColor, mSeparatorHeight, 
+	    		                                rcAdapter.mPaddingInside, rcAdapter.mPaddingLeft, rcAdapter.mPaddingTop, rcAdapter.mPaddingRight, rcAdapter.mPaddingBottom);
 	       this.addItemDecoration(decoration);
 	   }
 	   else {		   
-		   TopBottomDecorator  decoration = new TopBottomDecorator(Math.round(mSeparatorHeight));  //EdgeDecorator 
+		   TopBottomDecorator  decoration = new TopBottomDecorator(rcAdapter.mPaddingInside, rcAdapter.mPaddingLeft, rcAdapter.mPaddingTop, rcAdapter.mPaddingRight, rcAdapter.mPaddingBottom);  //EdgeDecorator 
 	       this.addItemDecoration(decoration);		   
 	   }
 	      	   	   	   
-	   rcAdapter.setlayoutView(_itemViewLayout, _forceCardStyle);  //true = cardStyle	   
+	   rcAdapter.setlayoutView(_itemViewLayout, _forceCardStyle);  //true = cardStyle
    }
    
    public void SetItemViewLayout(View _itemViewLayout) {	   
