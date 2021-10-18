@@ -107,6 +107,7 @@ jsRecyclerView = class(jVisualControl)
     procedure SetItemContentLayout(_itemViewLayout: jObject); overload;
     procedure SetItemContentLayout(_itemViewLayout: jObject; _forceCardStyle: boolean);  overload;
     procedure SetItemSeparatorColorHeight(_color: TARGBColorBridge; _height : single );
+    procedure SetItemPadding( _paddingInside, _paddingLeft, _paddingTop, _paddingRight, _paddingBottom : integer );
     procedure SetAppBarLayoutScrollingViewBehavior();
     procedure RemoveAll;
     procedure Remove(_position: integer);
@@ -234,7 +235,7 @@ begin
      SetLGravity(FGravityInParent);
 
    SetViewParent(FjPRLayout);
-   jni_proc_i(FjEnv, FjObject, 'setId', Self.Id);
+   View_setId(FjEnv, FjObject, Self.Id);
   end;
 
   View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
@@ -527,6 +528,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_if(FjEnv, FjObject, 'SetItemSeparatorColorHeight', GetARGB(FCustomColor, _color), _height );
+end;
+
+procedure jsRecyclerView.SetItemPadding( _paddingInside, _paddingLeft, _paddingTop, _paddingRight, _paddingBottom : integer );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_iiiii(FjEnv, FjObject, 'SetItemPadding', _paddingInside, _paddingLeft, _paddingTop, _paddingRight, _paddingBottom );
 end;
 
 procedure jsRecyclerView.SetAppBarLayoutScrollingViewBehavior();
