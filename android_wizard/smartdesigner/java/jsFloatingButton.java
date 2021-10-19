@@ -41,7 +41,7 @@ public class jsFloatingButton extends FloatingActionButton /*dummy*/ { //please,
            };
       };
       setOnClickListener(onClickListener);      
-      this.setCompatElevation(20);            
+      this.setCompatElevation(20);      
    } //end constructor
 
    public void jFree() {
@@ -197,13 +197,9 @@ public class jsFloatingButton extends FloatingActionButton /*dummy*/ { //please,
    
    public void BringToFront() {
 		this.bringToFront();	
-		if (Build.VERSION.SDK_INT < 19 ) {			
-			ViewGroup parent = LAMWCommon.getParent();
-	       	if (parent!= null) {
-	       		parent.requestLayout();
-	       		parent.invalidate();	
-	       	}
-		}		
+		
+		LAMWCommon.BringToFront();
+		
 		this.setVisibility(android.view.View.VISIBLE);
    }
 }
