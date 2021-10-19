@@ -332,7 +332,7 @@ begin
   case Event of
   beConsumedOK:
     begin
-      /jcBillingClient1.Tag := 11; // trigger "Consumed" message page
+      jcBillingClient1.Tag := 11; // trigger "Consumed" message page
 
       //TestUpdateUI;
       jWebView1.LoadFromHtmlString(TestHtml);
