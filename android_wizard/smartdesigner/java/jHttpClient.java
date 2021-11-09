@@ -1185,7 +1185,8 @@ public class jHttpClient /*extends ...*/ {
 	 	        //Match the pattern string in provided string
 	 	        Matcher matcher = pattern.matcher(inputString);
 	 	        
-	 	        if ((null != matcher) && matcher.find())
+	 	        if (matcher != null)
+	 	         if (matcher.find())
 	 	            return matcher.group(1);	 	        
 
 	 	    }catch (PatternSyntaxException ex) {
@@ -1207,6 +1208,8 @@ public class jHttpClient /*extends ...*/ {
 	     	    URLConnection uc = null;
 	     	    StringBuilder urlData = new StringBuilder();
 	     	    
+	     	    if (urlData == null) return "";
+	     	    
 	     	    URL url;
 	     	   
 	     	    try{
@@ -1214,6 +1217,8 @@ public class jHttpClient /*extends ...*/ {
 	     	    } catch (MalformedURLException e) {
 	     	     return "";
 	     	    }
+	     	    
+	     	    if(url == null) return "";
 	     	    
 	     	    try{
 	     	     uc = url.openConnection();
@@ -1224,7 +1229,7 @@ public class jHttpClient /*extends ...*/ {
 	     	     
 	     	     inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
 	     	     
-	     	     if (null != inReader) {
+	     	     if (inReader != null) {
 	     	        String str = "";
 	     	        while ((str = inReader.readLine()) != null) {
 	     	                       urlData.append(str);
