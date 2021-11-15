@@ -89,6 +89,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetSelectedPaddingTop(_paddingTop: integer);
     procedure SetSelectedPaddingBottom(_paddingBottom: integer);
     procedure SetLGravity(_value: TLayoutGravity);
+     procedure SetColorFilter(_color: TARGBColorBridge);
 
     procedure GenEvent_OnSpinnerItemSelected(Obj: TObject; caption: string; position: integer);
 
@@ -120,10 +121,10 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
   end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-
 procedure jSpinner_SetFontAndTextTypeFace(env: PJNIEnv; _jspinner: JObject; _fontFace: integer; _fontStyle: integer);
-
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string; _strTag: string);
+procedure jSpinner_SetColorFilter(env: PJNIEnv; _jspinner: JObject; _color: integer);
+
 
 implementation
 
@@ -682,6 +683,13 @@ begin
    View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 end;
 
+procedure jSpinner.SetColorFilter(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSpinner_SetColorFilter(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+end;
+
 //TODO
 (*
 procedure jSpinner.ListViewChange(Sender: TObject);
@@ -783,5 +791,29 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+procedure jSpinner_SetColorFilter(env: PJNIEnv; _jspinner: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetColorFilter', '(I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _color;
+
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 end.

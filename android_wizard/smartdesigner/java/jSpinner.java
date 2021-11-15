@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.View;
@@ -500,6 +501,10 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
    public void SetFrameGravity(int _value) {	   
       LAMWCommon.setLGravity(_value);
    }
-    
+
+   public void SetColorFilter(int _color) {
+       this.getBackground().setColorFilter(_color, PorterDuff.Mode.SRC_ATOP);
+   }
+
 }  //end class
 
