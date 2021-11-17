@@ -21,7 +21,7 @@
 	About MacOs Install:  [adapted from ".../docs/linux/tutorial_by_waynesherman]
 		.Install [I] Infrastructure
 		.Install FPCUpdeluxe
-                        https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/download/1.6.2y2/fpcupdeluxe-x86_64-darwin-cocoa.zip
+                        https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases       [for Mac...]
 		.Use FPCUpdeluxe to Install FPC+Laz   [trunk or  stable or ...]
 		.Use FPCUpdeluxe to Install arm/android cross-compile		
 					  
@@ -48,12 +48,14 @@ I. Infrastructure
 	Hint:	
 		0)unpacked/install to a "sdk" folder
 		1)after unpacked/install, open a command line Terminal and go to folder "sdk/tools"
-		2)run the command  ">android update sdk"   to open a GUI "SDK Manager"
+		2)go to cmd console and run the command  >> "android update sdk"  to open a GUI "SDK Manager"
 		3)check "Android SDK Tools"
 		4)check "Android SDK Platform-Tools"		
-		6)check "Android SDK Build-Tools 29.0.3"  	
-		8)go to "Android 10 (API 29)" and check only "SDK Platform"
-		9)go to "Extras" and check: 
+		6)check "Android SDK Build-Tools 29.0.3"  [and others updated version]
+                6)check "Android SDK Build-Tools 28.0.3"  [and others updated version]	
+		8)go to "Android 10 (API 29)" and check only "SDK Platform" [and others updated version]
+                9)go to "Android 9 (API 28)" and check only "SDK Platform"  [and others updated version] 
+		10)go to "Extras" and check: 
 				"Android Support Repository"				
 				"Android Support Library"				
 				"Google USB Drive"	//windows only...
@@ -67,6 +69,7 @@ I. Infrastructure
 	[Mac]		https://dl.google.com/android/repository/sdk-tools-darwin-3859397.zip
 
 .Android NDK
+
 	https://developer.android.com/ndk/downloads/index.html
 
 .Lazarus for Android
@@ -75,43 +78,48 @@ I. Infrastructure
 			http://sourceforge.net/projects/laz4android/files/?source=navbar
 			Hint: Install here: "C:\Laz4Android2.0.0"   [not "Program Files"  !!!]
 				
-			warning: Laz4Android2.0.0 don't support android-aarch64
+			warning: Laz4Android2.0.0 "out of box" don't support android-aarch64 only 32 bits "Armv7a + Soft"
 			
-	.Option 2) Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
-		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases
 
-	.Option 3) New! LAMW Manager https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html
+	.Option 2) New! LAMW Manager https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html  ["All in One"]
 	
 		https://github.com/DanielOliveiraSouza/LAMW4Linux-installer
 		https://github.com/DanielOliveiraSouza/LAMW4Windows-installer
+
+	.Option 3) Fpcupdeluxe [Linux and windows]  [NEW! support to aarch64-android!] 
+		https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases
 	
 
 	.Option 4) Lazarus + FPC 3.2.0 [canonical/windows] "Do It Yourself"			
 
-		win64:  [need FPC 3.2.0 to support android-64 bits]
-		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2064/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593-win64.exe/download
-		
-		win32: [need FPC 3.2.0 to support android-64 bits]
-		https://sourceforge.net/projects/lazarus-snapshots/files/Window%2032/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593/lazarus-2.0.4-61666-fpc-3.2.0-beta-42593-win32.exe/download
+		win64:  [need FPC 3.2.0 to support android-64 bits]		
+		win32:  [need FPC 3.2.0 to support android-64 bits]
 
 			After install the LAMW packages [section II] go to:
-			1. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Get FPC Source [Trunk]"
-			2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
 
-				[ex. Armv7a + Soft]	<<---- tested!
+                        4.1.  Get the FPC source [trunk] from:
+                            https://gitlab.com/freepascal.org/fpc/source/-/archive/main/source-main.zi
+               '            Unzip it in some folder and point up the path here
+
+			4.2. IDE "Tools" --> "[Lamw] Android Module Wizard" --> "Build FPC Cross Android"
+
+				[ex. Armv7a + Soft]  32bits	<<---- tested!
 				.Build  
 				.Install
 
-				[ex. aarch64]	  	<<---- tested!
+				[ex. aarch64]	     64bits	<<---- tested!
 				.Build  
 				.Install
 
+				If need, [after Build and install] repeat the "Build and install" process  once for each architecture!
 
-			3. After "build" and "install" the cross-compiler and before to create your first LAMW project
+			4.3. After "build" and "install" the cross-compiler try to create your first [New] LAMW project
+				
+				4.3.1 After "save all"   go to Lazarus menu "Run" --> "Build"
 
-				[How to fix "Fatal: Cannot find unit system used by fcllaz of package FCL."]
+				    If you get a "Fatal: Cannot find unit system used by fcllaz of package FCL."
 
-				3.1) Go to "fpc.cfg"  [ex. "lazarus\fpc\3.2.0\bin"]
+				    4.3.1.1) Go to "fpc.cfg"  [ex. "lazarus\fpc\3.2.0\bin"]
 
 					Change:
  
@@ -127,7 +135,7 @@ I. Infrastructure
 					-FuC:\lazarus1864\fpc\3.2.0/units/$fpctarget/*
 					-FuC:\lazarus1864\fpc\3.2.0/units/$fpctarget/rtl
 
-				3.2) Go to Lazarus IDE menu "Tools" --> "Options" --> "Environment"  
+				    4.3.1.2) Go to Lazarus IDE menu "Tools" --> "Options" --> "Environment"  
 
 					[FPC Source]
 
@@ -137,8 +145,22 @@ I. Infrastructure
 						$(LazarusDir)fpc\3.2.0\source
 
 	IMPORTANT!
-		Google Play NOW require APKs to include both 32 and 64 bit version of .so libraries....
-		ref.  https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/how_to_64bits_Apk.txt
+		Google Play NOW require APKs to include both 32 and 64 bits version of ".so" libraries....
+
+		How to get more/others ".so" chipset builds:
+	
+		.warning: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds! 
+
+		1. From LazarusIDE menu:
+			> Project -> Project Options -> Project Options -> [LAMW] Android Project Options -> "Build" -> Chipset [select!] -> [OK]
+
+		2. From LazarusIDE  menu:
+			> Run -> Clean up and Build...
+
+		3. From LazarusIDE menu:
+			> [LAMW] Build Android Apk and Run
+
+		NOTE: If desirable/wanted repeat 1/2/3 steps for other CPUs...
 
 .Ant [to build Apk]
 
@@ -146,9 +168,12 @@ I. Infrastructure
 	Simply extract the zip file to a convenient location...
 
 .Gradle 6.6.1 [ "must have" to build Apk with AndroidX AppCompat/Material theme]
+        https://gradle.org/releases/
 	https://gradle.org/next-steps/?version=6.6.1&format=bin	
 
 	Simply "extract here" the zip file to produce the folder "gradle-6.6.1" in a convenient location...
+
+	Warning: Gradle >= 7  don't supported by LAMW, yet!
 
 	warning: Gradle build process need internet connection!!!
 	Warning: Gradle 6.X  don't support Java > 13!
@@ -160,10 +185,11 @@ I. Infrastructure
 		1. Java JDK 1.8   
 		2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]
 		3. Android SDK "plataforms" 29 + "build-tools" 29.0.3 
-		4. Android SDK/Extra	"Support Repository"
-		5. Android SDK/Extra	"Support Library"
-		6. Android SDK/Extra	"Google Repository"
-		7. Android SDK/Extra	"Google Play Services"		
+                4. Android SDK "plataforms" 28 + "build-tools" 28.0.3 
+		5. Android SDK/Extra	"Support Repository"
+		6. Android SDK/Extra	"Support Library"
+		7. Android SDK/Extra	"Google Repository"
+		8. Android SDK/Extra	"Google Play Services"		
 
 II. LAMW: Lazarus Android Module Wizard
 	.ref. https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip
@@ -214,7 +240,7 @@ III. USING LAMW
 
 	2.6-[MinNkd] Select the  Min. NDK api:
 
-		example: 22         [warning: ndkApi > 22 will not run on old 4.x devices]
+		example: 22         [warning: ndkApi > 22 will not run on old Android 4.x devices]
 
 	2.7-[MinSdk] Select the  Min. Device Api need to run your App:
 
