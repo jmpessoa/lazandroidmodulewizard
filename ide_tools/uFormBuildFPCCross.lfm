@@ -1,12 +1,12 @@
 object FormBuildFPCCross: TFormBuildFPCCross
   Left = 308
-  Height = 502
+  Height = 545
   Top = 116
-  Width = 515
+  Width = 530
   ActiveControl = PageControl1
   Caption = '[LAMW] FPC Android Cross Compiler Builder'
-  ClientHeight = 502
-  ClientWidth = 515
+  ClientHeight = 545
+  ClientWidth = 530
   DesignTimePPI = 120
   FormStyle = fsStayOnTop
   Icon.Data = {
@@ -92,67 +92,66 @@ object FormBuildFPCCross: TFormBuildFPCCross
   OnActivate = FormActivate
   OnClose = FormClose
   Position = poScreenCenter
-  LCLVersion = '2.0.0.4'
   object StatusBar1: TStatusBar
     Left = 0
     Height = 29
-    Top = 473
-    Width = 515
+    Top = 516
+    Width = 530
     Panels = <>
   end
   object Panel3: TPanel
     Left = 0
-    Height = 473
+    Height = 516
     Top = 0
-    Width = 515
+    Width = 530
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 473
-    ClientWidth = 515
+    ClientHeight = 516
+    ClientWidth = 530
     TabOrder = 1
     object PageControl1: TPageControl
       Left = 0
-      Height = 473
+      Height = 453
       Top = 0
-      Width = 515
-      ActivePage = TabSheet2
+      Width = 530
+      ActivePage = TabSheet3
       Align = alClient
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 0
       OnChange = PageControl1Change
       object TabSheet2: TTabSheet
         Caption = 'Build'
-        ClientHeight = 440
-        ClientWidth = 507
+        ClientHeight = 420
+        ClientWidth = 522
         object GroupBox2: TGroupBox
-          Left = 3
-          Height = 312
-          Top = 104
-          Width = 485
+          Left = 0
+          Height = 328
+          Top = 96
+          Width = 504
           Caption = 'Configure Paths'
-          ClientHeight = 287
-          ClientWidth = 481
+          ClientHeight = 303
+          ClientWidth = 500
           TabOrder = 0
           object Label3: TLabel
             Left = 8
             Height = 20
             Top = 0
-            Width = 293
-            Caption = 'Path to Android  NDK [ex.  C:\adt32\ndk10e]'
+            Width = 373
+            Caption = 'Path to Android  NDK [ex.  "C:\lamw\android-ndk-r22b"]'
             ParentColor = False
           end
           object EditPathToNDK: TEdit
             Left = 8
             Height = 28
             Top = 21
-            Width = 435
+            Width = 438
             TabOrder = 0
           end
           object SpeedButton3: TSpeedButton
-            Left = 452
-            Height = 22
-            Top = 21
-            Width = 23
+            Left = 464
+            Height = 28
+            Top = 24
+            Width = 28
             Caption = '...'
             OnClick = SpeedButton3Click
           end
@@ -160,41 +159,32 @@ object FormBuildFPCCross: TFormBuildFPCCross
             Left = 12
             Height = 20
             Top = 64
-            Width = 395
-            Caption = 'Path to FPC "*.exe"  [ex. C\lazarus\fpc\3.0.0\bin\i386-win32]:'
+            Width = 439
+            Caption = 'Path to FPC  "*.exe"   [ex.  "C:\lazarus\fpc\3.2.0\bin\x86_64-win64"]:'
             ParentColor = False
           end
           object EditPathToFpc: TEdit
-            Left = 10
+            Left = 11
             Height = 28
             Top = 84
-            Width = 435
+            Width = 438
             TabOrder = 1
           end
           object SpeedButton4: TSpeedButton
-            Left = 452
-            Height = 22
+            Left = 464
+            Height = 28
             Top = 84
-            Width = 23
+            Width = 28
             Caption = '...'
             OnClick = SpeedButton4Click
-          end
-          object Button2: TButton
-            Left = 395
-            Height = 28
-            Top = 215
-            Width = 80
-            Caption = 'Build'
-            OnClick = Button2Click
-            TabOrder = 2
           end
           object RadioGroupInstruction: TRadioGroup
             Left = 8
             Height = 105
             Top = 138
-            Width = 282
+            Width = 336
             AutoFill = True
-            Caption = 'Architecture'
+            Caption = 'Architecture (*)'
             ChildSizing.LeftRightSpacing = 6
             ChildSizing.TopBottomSpacing = 4
             ChildSizing.HorizontalSpacing = 10
@@ -205,63 +195,166 @@ object FormBuildFPCCross: TFormBuildFPCCross
             ChildSizing.Layout = cclLeftToRightThenTopToBottom
             ChildSizing.ControlsPerLine = 2
             ClientHeight = 80
-            ClientWidth = 278
+            ClientWidth = 332
             Columns = 2
             ItemIndex = 0
             Items.Strings = (
-              'ArmV6'
-              'ArmV7a + Soft'
-              'ArmV7a + VFPv3'
+              'armV6'
+              'armV7a + Soft  (**)'
+              'armV7a + VFPv3 '
               'x86'
-              'Mipsel'
-              'Aarch64'
+              'mipsel '
+              'aarch64 (**)'
             )
             OnClick = RadioGroupInstructionClick
+            TabOrder = 2
+          end
+          object SpeedButton6: TSpeedButton
+            Left = 464
+            Height = 28
+            Top = 56
+            Width = 28
+            Glyph.Data = {
+              36040000424D3604000000000000360000002800000010000000100000000100
+              2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF0086351B1C86351B8086351BD086351BF286351BF28635
+              1BD386351B8686351B22FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF0089381D838E3D1FF3A75323F9B96227FDC06929FFC06929FFB963
+              28FDA85424F9903E1FF489381D86FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF008C3C208EA04E25F7C06B2CFEC26D2DFFC26D2DFFC26D2DFFC26D2DFFC26D
+              2DFFC26D2DFFC06B2DFFA25025F78C3C208EFFFFFF00FFFFFF00FFFFFF009040
+              2483A3532BF7C47132FFC47132FFC47132FFC47132FFC47132FFC47132FFC471
+              32FFC47132FFC47132FFC47132FFA5542AF790402489FFFFFF009445271A9B4E
+              2EF3C57437FEC77638FFC77638FFC77638FFC77638FFFCF9F6FFFCF9F6FFC776
+              38FFC77638FFC77638FFC77638FFC67538FF9B4E2DF394452728984A2B7DB56A
+              3FF9CA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFFCFAF7FFFCFAF7FFCA7B
+              3EFFCA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFB86C3FF9984A2B8C9C502FC4C57B
+              43FDCD8144FFCD8144FFCD8144FFCD8144FFCD8144FFFCFAF7FFFCFAF7FFCD81
+              44FFCD8144FFCD8144FFCD8144FFCD8144FFC77B43FD9C502FD0A05533E7CF86
+              4CFED0874BFFD0874BFFD0874BFFD0874BFFD0874BFFFCFAF7FFFCFAF7FFD087
+              4BFFD0874BFFD0874BFFD0874BFFD0874BFFD0874CFFA05533ECA55A37ECD797
+              61FFD48D52FFD48D52FFD48D52FFD48D52FFD48D52FFFCFAF7FFFCFAF7FFD48D
+              52FFD48D52FFD48D52FFD48D52FFD48D52FFD7955FFFA55A37ECA9603BC4D79F
+              74FDD79358FFD79358FFD79358FFD79358FFD79358FFC18239FFC18239FFD793
+              58FFD79358FFD79358FFD79358FFD79358FFD8A176FDA9603BCAAD653F7DCE99
+              77F9DB9C64FFDA985EFFDA985EFFDA985EFFDA985EFFFFFFFFFFFFFFFFFFDA98
+              5EFFDA985EFFDA985EFFDA985EFFDB9A62FFCE9876F9AD653F7DB16A421AB671
+              4AF3E5B994FEDD9E65FFDD9D64FFDD9D64FFDD9D64FFFFFFFFFFFFFFFFFFDD9D
+              64FFDD9D64FFDD9D64FFDD9D64FFE6B993FEB8754EF3B16A421AFFFFFF00B56E
+              467DC78D69F6EAC29EFFE0A46EFFDFA169FFDFA169FFC4883FFFC4883FFFDFA1
+              69FFDFA169FFE0A36DFFEAC19CFFC9916DF6B56E4683FFFFFF00FFFFFF00FFFF
+              FF00B872498CC88E69F6ECCAABFEE9BD94FFE6B384FFE3AA76FFE3AA75FFE6B3
+              83FFE9BC92FFEDCAACFECB936EF6B872498EFFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00BB754B80BF7C53F3D5A380F8E0B797FBEBCAACFDEBCAADFEE1B8
+              98FBD7A583F8C07D54F3BB754B83FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00BD784D11BD784D72BD784DA5BD784DD6BD784DD8BD78
+              4DA8BD784D78BD784D14FFFFFF00FFFFFF00FFFFFF00FFFFFF00
+            }
+            OnClick = SpeedButton6Click
+          end
+          object Label1: TLabel
+            Left = 8
+            Height = 40
+            Top = 248
+            Width = 471
+            Caption = '(*)   if need, [after install] repeat the "build"  once for each architecture!'#13#10'(**) Tested !  '
+            ParentColor = False
+          end
+          object Button1: TButton
+            Left = 398
+            Height = 38
+            Top = 205
+            Width = 94
+            Caption = 'Build !'
+            OnClick = Button1Click
             TabOrder = 3
           end
         end
         object GroupBox4: TGroupBox
-          Left = 3
+          Left = 0
           Height = 81
-          Top = 16
-          Width = 485
+          Top = 8
+          Width = 504
           Caption = 'FPC Source'
           ClientHeight = 56
-          ClientWidth = 481
+          ClientWidth = 500
           TabOrder = 1
           object Label2: TLabel
             Left = 8
             Height = 20
             Top = 0
-            Width = 315
-            Caption = 'Path to FPC Source Code  [ex. C:\tmp\FPCTrunk]:'
+            Width = 322
+            Caption = 'Path to FPC Source Code  [ex. C:\lamw\FPCtrunk]:'
             ParentColor = False
           end
           object EditPathToFPCTrunk: TEdit
             Left = 8
             Height = 28
             Top = 24
-            Width = 435
+            Width = 438
             TabOrder = 0
           end
           object SpeedButton2: TSpeedButton
-            Left = 452
-            Height = 22
+            Left = 464
+            Height = 28
             Top = 22
-            Width = 23
+            Width = 28
             Caption = '...'
             OnClick = SpeedButton2Click
+          end
+          object SpeedButton1: TSpeedButton
+            Left = 464
+            Height = 28
+            Top = -8
+            Width = 28
+            Glyph.Data = {
+              36040000424D3604000000000000360000002800000010000000100000000100
+              2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF0086351B1C86351B8086351BD086351BF286351BF28635
+              1BD386351B8686351B22FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF0089381D838E3D1FF3A75323F9B96227FDC06929FFC06929FFB963
+              28FDA85424F9903E1FF489381D86FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF008C3C208EA04E25F7C06B2CFEC26D2DFFC26D2DFFC26D2DFFC26D2DFFC26D
+              2DFFC26D2DFFC06B2DFFA25025F78C3C208EFFFFFF00FFFFFF00FFFFFF009040
+              2483A3532BF7C47132FFC47132FFC47132FFC47132FFC47132FFC47132FFC471
+              32FFC47132FFC47132FFC47132FFA5542AF790402489FFFFFF009445271A9B4E
+              2EF3C57437FEC77638FFC77638FFC77638FFC77638FFFCF9F6FFFCF9F6FFC776
+              38FFC77638FFC77638FFC77638FFC67538FF9B4E2DF394452728984A2B7DB56A
+              3FF9CA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFFCFAF7FFFCFAF7FFCA7B
+              3EFFCA7B3EFFCA7B3EFFCA7B3EFFCA7B3EFFB86C3FF9984A2B8C9C502FC4C57B
+              43FDCD8144FFCD8144FFCD8144FFCD8144FFCD8144FFFCFAF7FFFCFAF7FFCD81
+              44FFCD8144FFCD8144FFCD8144FFCD8144FFC77B43FD9C502FD0A05533E7CF86
+              4CFED0874BFFD0874BFFD0874BFFD0874BFFD0874BFFFCFAF7FFFCFAF7FFD087
+              4BFFD0874BFFD0874BFFD0874BFFD0874BFFD0874CFFA05533ECA55A37ECD797
+              61FFD48D52FFD48D52FFD48D52FFD48D52FFD48D52FFFCFAF7FFFCFAF7FFD48D
+              52FFD48D52FFD48D52FFD48D52FFD48D52FFD7955FFFA55A37ECA9603BC4D79F
+              74FDD79358FFD79358FFD79358FFD79358FFD79358FFC18239FFC18239FFD793
+              58FFD79358FFD79358FFD79358FFD79358FFD8A176FDA9603BCAAD653F7DCE99
+              77F9DB9C64FFDA985EFFDA985EFFDA985EFFDA985EFFFFFFFFFFFFFFFFFFDA98
+              5EFFDA985EFFDA985EFFDA985EFFDB9A62FFCE9876F9AD653F7DB16A421AB671
+              4AF3E5B994FEDD9E65FFDD9D64FFDD9D64FFDD9D64FFFFFFFFFFFFFFFFFFDD9D
+              64FFDD9D64FFDD9D64FFDD9D64FFE6B993FEB8754EF3B16A421AFFFFFF00B56E
+              467DC78D69F6EAC29EFFE0A46EFFDFA169FFDFA169FFC4883FFFC4883FFFDFA1
+              69FFDFA169FFE0A36DFFEAC19CFFC9916DF6B56E4683FFFFFF00FFFFFF00FFFF
+              FF00B872498CC88E69F6ECCAABFEE9BD94FFE6B384FFE3AA76FFE3AA75FFE6B3
+              83FFE9BC92FFEDCAACFECB936EF6B872498EFFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00BB754B80BF7C53F3D5A380F8E0B797FBEBCAACFDEBCAADFEE1B8
+              98FBD7A583F8C07D54F3BB754B83FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00BD784D11BD784D72BD784DA5BD784DD6BD784DD8BD78
+              4DA8BD784D78BD784D14FFFFFF00FFFFFF00FFFFFF00FFFFFF00
+            }
+            OnClick = SpeedButton1Click
           end
         end
       end
       object TabSheet3: TTabSheet
         Caption = 'Install'
-        ClientHeight = 440
-        ClientWidth = 507
+        ClientHeight = 420
+        ClientWidth = 522
         object GroupBox3: TGroupBox
-          Left = 16
+          Left = 24
           Height = 400
-          Top = 24
+          Top = 16
           Width = 480
           Caption = 'Install [Android] FPC Cross Compiler'
           ClientHeight = 375
@@ -271,8 +364,8 @@ object FormBuildFPCCross: TFormBuildFPCCross
             Left = 7
             Height = 20
             Top = 7
-            Width = 373
-            Caption = 'Path to FPC "units" Folder: [ex. C:\lazarus\fpc\3.0.0\units]:'
+            Width = 385
+            Caption = 'Path to FPC "units" Folder: [ex. "C:\lazarus\fpc\3.2.0\units"]:'
             ParentColor = False
           end
           object EditPathToFPCUnits: TEdit
@@ -283,44 +376,88 @@ object FormBuildFPCCross: TFormBuildFPCCross
             TabOrder = 0
           end
           object Button3: TButton
-            Left = 384
-            Height = 28
-            Top = 80
-            Width = 80
-            Caption = 'Install'
+            Left = 374
+            Height = 38
+            Top = 150
+            Width = 94
+            Caption = 'Install !'
             OnClick = Button3Click
             TabOrder = 1
           end
           object SpeedButton5: TSpeedButton
             Left = 440
-            Height = 22
+            Height = 28
             Top = 32
-            Width = 23
+            Width = 28
             Caption = '...'
             OnClick = SpeedButton5Click
           end
           object Memo1: TMemo
             Left = 7
-            Height = 248
-            Top = 122
+            Height = 170
+            Top = 200
             Width = 457
             ScrollBars = ssAutoBoth
             TabOrder = 2
           end
           object Label6: TLabel
-            Left = 10
+            Left = 7
             Height = 20
-            Top = 98
+            Top = 168
             Width = 37
             Caption = 'Log....'
             ParentColor = False
           end
+          object Label7: TLabel
+            Left = 7
+            Height = 20
+            Top = 72
+            Width = 439
+            Caption = 'Path to FPC  "*.exe"   [ex.  "C:\lazarus\fpc\3.2.0\bin\x86_64-win64"]:'
+            ParentColor = False
+          end
+          object EditPathToFpcInstall: TEdit
+            Left = 7
+            Height = 28
+            Top = 96
+            Width = 425
+            TabOrder = 3
+          end
+          object SpeedButton7: TSpeedButton
+            Left = 441
+            Height = 28
+            Top = 96
+            Width = 29
+            Caption = '...'
+            OnClick = SpeedButton7Click
+          end
         end
+      end
+    end
+    object Panel1: TPanel
+      Left = 0
+      Height = 63
+      Top = 453
+      Width = 530
+      Align = alBottom
+      ClientHeight = 63
+      ClientWidth = 530
+      TabOrder = 1
+      object BitBtn1: TBitBtn
+        Left = 400
+        Height = 38
+        Top = 16
+        Width = 94
+        Cancel = True
+        DefaultCaption = True
+        Kind = bkCancel
+        ModalResult = 2
+        TabOrder = 0
       end
     end
   end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
-    left = 248
-    top = 120
+    left = 152
+    top = 320
   end
 end

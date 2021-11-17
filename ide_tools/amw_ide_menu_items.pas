@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Dialogs, IDECommands, MenuIntf, Forms,
   uformsettingspaths{, lazandroidtoolsexpert}, ufrmEditor, ufrmCompCreate,
-  uFormBuildFPCCross, uFormGetFPCSource, uimportjavastuff, uimportjavastuffchecked,
+  uFormBuildFPCCross, {uFormGetFPCSource,} uimportjavastuff, uimportjavastuffchecked,
   uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff,
   unitformimportpicture, uformapksigner, unitFormExportProjectAsTemplate;
 
@@ -16,7 +16,7 @@ procedure StartLateTool(Sender: TObject);     //By Thierrydijoux!
 procedure StartResEditor(Sender: TObject);    //By Thierrydijoux!
 procedure StartComponentCreate(Sender: TObject);
 procedure StartPathToBuildFPCCross(Sender: TObject);
-procedure StartFPCTrunkSource(Sender: TObject);
+//procedure StartFPCTrunkSource(Sender: TObject);
 procedure StartEclipseToggleTooling(Sender: TObject);
 procedure StartImportJavaStuff(Sender: TObject);
 procedure StartImportCStuff(Sender: TObject);
@@ -43,11 +43,13 @@ begin
     {$endif}
 end;
 
+{
 procedure StartFPCTrunkSource(Sender: TObject);
 begin
   FormGetFPCSource:= TFormGetFPCSource.Create(Application);
   FormGetFPCSource.ShowModal;
 end;
+}
 
 procedure StartPathTool(Sender: TObject);
 begin
@@ -150,12 +152,12 @@ begin
 
   {$IFDEF linux}
      ShowMessage('Warning: this option [should] not work for linux' +sLineBreak +
-     'you can get some help with LAMW documentation...')
+     'you can get some help from LAMW documentation...')
   {$Endif}
 
   {$IFDEF darwin}
      ShowMessage('Warning: this option [should] not work for MacOS' +sLineBreak +
-     'you can get some help with LAMW documentation...')
+     'you can get some help from LAMW documentation...')
   {$Endif}
 
 end;
@@ -2623,7 +2625,7 @@ begin
  // Adding 5a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathCompCreateCmd', 'New jComponent Create', nil,@StartComponentCreate);
   // Adding 6a. entry
-  RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToFPCTrunkSource', 'Get FPC Source [Trunk]', nil, @StartFPCTrunkSource);
+  //RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToFPCTrunkSource', 'Get FPC Source [Trunk]', nil, @StartFPCTrunkSource);
   // Adding 7a. entry
   RegisterIDEMenuCommand(ideSubMnuAMW, 'PathToBuildFPCCross', 'Build FPC Cross Android', nil,@StartPathToBuildFPCCross);
   // Adding 8a. entry

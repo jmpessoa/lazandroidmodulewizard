@@ -15,8 +15,10 @@ type
 TBuildMode = (bmArmV6, bmArmV7a, bmX86, bmMipsel, bmAarch64);
 
   TFormBuildFPCCross = class(TForm)
-    Button2: TButton;
+    BitBtn1: TBitBtn;
+    Button1: TButton;
     Button3: TButton;
+    EditPathToFpcInstall: TEdit;
     EditPathToNDK: TEdit;
     EditPathToFpc: TEdit;
     EditPathToFPCTrunk: TEdit;
@@ -24,35 +26,47 @@ TBuildMode = (bmArmV6, bmArmV7a, bmX86, bmMipsel, bmAarch64);
     GroupBox2: TGroupBox;
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
+    Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
+    Label7: TLabel;
     Memo1: TMemo;
     PageControl1: TPageControl;
+    Panel1: TPanel;
     Panel3: TPanel;
     RadioGroupInstruction: TRadioGroup;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
+    SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
     SpeedButton5: TSpeedButton;
+    SpeedButton6: TSpeedButton;
+    SpeedButton7: TSpeedButton;
     StatusBar1: TStatusBar;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
-    procedure Button2Click(Sender: TObject);
+
+    procedure Button1Click(Sender: TObject);
+
     procedure Button3Click(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure PageControl1Change(Sender: TObject);
     procedure RadioGroupInstructionClick(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
     procedure SpeedButton3Click(Sender: TObject);
     procedure SpeedButton4Click(Sender: TObject);
     procedure SpeedButton5Click(Sender: TObject);
+    procedure SpeedButton6Click(Sender: TObject);
+    procedure SpeedButton7Click(Sender: TObject);
 
   private
+     { private declarations }
     FBuildMode: TBuildMode;
     FPrebuildOSYS: String;
     FPCSysTarget: string;
@@ -63,7 +77,7 @@ TBuildMode = (bmArmV6, bmArmV7a, bmX86, bmMipsel, bmAarch64);
     FPathToFPCBin: string;
     FPathToFPCUnit: string;
     FBuildModeIndex: string;
-    { private declarations }
+    FBuildSucess: boolean;
   public
     { public declarations }
 
@@ -183,7 +197,7 @@ begin
 
 end;
 
-procedure TFormBuildFPCCross.Button2Click(Sender: TObject);
+procedure TFormBuildFPCCross.Button1Click(Sender: TObject);
 var
    pathToFpcExecutables: string;
    pathToFpcSource: string;
@@ -194,11 +208,14 @@ var
    Params: TStringList;
    strExt, configFile: string;
    p: integer;
-   sucess: boolean;
+   //sucess: boolean;
 begin
 
-   Button2.Enabled:= False;
-   sucess:= True;
+   ShowMessage('Please,  wait until process finished...');
+
+   Button1.Enabled:= False;
+
+   FBuildSucess:= True;
 
    FPathToAndroidNDK:= Trim(EditPathToNDK.Text);
    pathToFpcExecutables:= Trim(EditPathToFpc.Text);
@@ -207,7 +224,7 @@ begin
    if (FPathToAndroidNDK = '') or  (pathToFpcExecutables = '') or (pathToFpcSource = '') then
    begin
      ShowMessage('Sorry... Empty Info...');
-     Button2.Enabled:= True;
+     Button1.Enabled:= True;
      Exit;
    end;
 
@@ -261,7 +278,7 @@ begin
      if not DirectoryExists(binutilsPath)  then
      begin
         ShowMessage('Directory not exist [1]! :"'+binutilsPath+'"');
-        Button2.Enabled:= True;
+        Button1.Enabled:= True;
         Exit;
      end;
 
@@ -363,7 +380,7 @@ begin
        if not DirectoryExists(crossBinDIR)  then
        begin
           ShowMessage('Directory not exist [2]! :"'+crossBinDIR+'"');
-          Button2.Enabled:= True;
+          Button1.Enabled:= True;
           Exit;
        end;
 
@@ -380,7 +397,7 @@ begin
        {$ENDIF}
        if not RunExternalTool(Tool) then
        begin
-         sucess:= False;
+         FBuildSucess:= False;
          raise Exception.Create('Cannot Running Extern Tool [make]!');
        end;
 
@@ -389,7 +406,7 @@ begin
        Params.Free;
        if  FBuildMode <> bmAarch64 then
        begin
-          if sucess then
+          if FBuildSucess then
           begin
              StatusBar1.SimpleText:='Success! FPC cross Arm [Android] was Build!';
              ShowMessage('Success! FPC cross Arm [Android] was Build!');
@@ -401,7 +418,7 @@ begin
        end
        else
        begin
-         if sucess then
+         if FBuildSucess then
          begin
             ShowMessage('Success! FPC cross aarch64 [Android] was Build!');
             StatusBar1.SimpleText:='Success! FPC cross aarch64 [Android] was Build!';
@@ -428,7 +445,7 @@ begin
      if not DirectoryExists(binutilsPath)  then
      begin
        ShowMessage('Directory not exist[1]! :"'+binutilsPath+'"');
-       Button2.Enabled:= True;
+       Button1.Enabled:= True;
        Exit;
      end;
 
@@ -473,7 +490,7 @@ begin
        if not DirectoryExists(crossBinDIR)  then
        begin
           ShowMessage('Directory not exist[2]! :"'+crossBinDIR+'"');
-          Button2.Enabled:= True;
+          Button1.Enabled:= True;
           Exit;
        end;
 
@@ -491,13 +508,13 @@ begin
 
        if not RunExternalTool(Tool) then
        begin
-         sucess:= False;
+         FBuildSucess:= False;
          raise Exception.Create('Cannot Run Extern [make] Tool!');
        end;
      finally
        Tool.Free;
        Params.Free;
-       if sucess then
+       if FBuildSucess then
        begin
           ShowMessage('Success! FPC cross x86 [Android] was Build!');
           StatusBar1.SimpleText:='Success! FPC cross x86 [Android] was Build!';
@@ -522,7 +539,7 @@ begin
      if not DirectoryExists(binutilsPath)  then
      begin
        ShowMessage('Directory not exist[1]! :"'+binutilsPath+'"');
-       Button2.Enabled:= True;
+       Button1.Enabled:= True;
        Exit;
      end;
 
@@ -567,7 +584,7 @@ begin
        if not DirectoryExists(crossBinDIR)  then
        begin
           ShowMessage('Directory not exist[2]! :"'+crossBinDIR+'"');
-          Button2.Enabled:= True;
+          Button1.Enabled:= True;
           Exit;
        end;
 
@@ -586,13 +603,13 @@ begin
 
        if not RunExternalTool(Tool) then
        begin
-         sucess:= False;
+         FBuildSucess:= False;
          raise Exception.Create('Cannot Run Extern [make] Tool!');
        end;
      finally
        Tool.Free;
        Params.Free;
-       if sucess then
+       if FBuildSucess then
        begin
           ShowMessage('Success! FPC cross Mipsel [Android] was Build!');
           StatusBar1.SimpleText:='Success! FPC cross Mipsel [Android] was Build!';
@@ -604,7 +621,7 @@ begin
      end;
    end;
 
-   Button2.Enabled:= False;
+   Button1.Enabled:= False;
 
 end;
 
@@ -621,7 +638,14 @@ var
 begin
 
   Button3.Enabled:= False;
-  fpcExecutablesPath:= Trim(EditPathToFpc.Text); //C:\laz4android\fpc\3.0.0\bin\i386-win32
+  fpcExecutablesPath:= Trim(EditPathToFpcInstall.Text); //C:\lazarus\fpc\3.2.0\bin\x86_64-win64
+
+  if fpcExecutablesPath = '' then
+  begin
+    ShowMessage('Path to FPC ".exe"  not found! [ex:"C:\lazarus\fpc\3.2.0\bin\x86_64-win64]');
+    Button3.Enabled:= True;
+    Exit
+  end;
 
   auxList:= TStringList.Create;
   auxList.Delimiter:= DirectorySeparator;
@@ -958,25 +982,11 @@ end;
 procedure TFormBuildFPCCross.PageControl1Change(Sender: TObject);
 begin
 
-  StatusBar1.SimpleText:='';
-  if PageControl1.ActivePageIndex <> 0 then
-  begin
-    if EditPathToFPCTrunk.Text = '' then
-    begin
-       ShowMessage('Please, Enter Path to FPC Source [trunk]...');
-       PageControl1.ActivePageIndex:= 0;
-       Exit;
-    end;
-    if EditPathToFpc.Text = '' then
-    begin
-       ShowMessage('Please, Enter Path to FPC [make]...');
-       PageControl1.ActivePageIndex:= 0;
-       Exit;
-    end;
-  end;
+  Self.EditPathToFpcInstall.Text:= Self.EditPathToFpc.Text;
 
   if PageControl1.PageIndex = 1 then
   begin
+
      case FBuildMode of
         bmArmV6: GroupBox3.Caption:= 'Install Cross ArmV6 Android';
         bmArmV7a: GroupBox3.Caption:= 'Install Cross ArmV7a Android';
@@ -984,6 +994,10 @@ begin
         bmMipsel: GroupBox3.Caption:= 'Install Cross Mipsel Android';
         bmAarch64: GroupBox3.Caption:= 'Install Cross aarch64 Android';
      end;
+
+      if not FBuildSucess  then
+         ShowMessage('warning: are you sure your "build" was a success?');
+
   end;
 
 end;
@@ -1008,6 +1022,13 @@ begin
 
 end;
 
+procedure TFormBuildFPCCross.SpeedButton1Click(Sender: TObject);
+begin
+  ShowMessage('Hint: you can get FPC source [trunk] from:'+sLineBreak+
+              'gitlab.com/freepascal.org/fpc/source/-/archive/main/source-main.zip'+sLineBreak+
+               'Unzip it in some folder and point up the path here!')
+end;
+
 procedure TFormBuildFPCCross.SpeedButton2Click(Sender: TObject);
 begin
   if SelectDirectoryDialog1.Execute then
@@ -1030,6 +1051,18 @@ procedure TFormBuildFPCCross.SpeedButton5Click(Sender: TObject);
 begin
   if SelectDirectoryDialog1.Execute then
      EditPathToFPCUnits.Text:=SelectDirectoryDialog1.FileName;
+end;
+
+procedure TFormBuildFPCCross.SpeedButton6Click(Sender: TObject);
+begin
+  ShowMessage('warning: you need FCP >= 3.2.0! '+sLineBreak+
+              'to produce an "aarch64" cross-compiler')
+end;
+
+procedure TFormBuildFPCCross.SpeedButton7Click(Sender: TObject);
+begin
+    if SelectDirectoryDialog1.Execute then
+     EditPathToFpcInstall.Text:=SelectDirectoryDialog1.FileName;
 end;
 
 //ref. http://stackoverflow.com/questions/9278513/lazarus-free-pascal-how-to-recursively-copy-a-source-directory-of-files-to-a

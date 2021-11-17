@@ -9,11 +9,11 @@ interface
 
 uses
   amw_ide_menu_items, AndroidProjOptions, ApkBuild, uFormBuildFPCCross, 
-  uFormGetFPCSource, uformsettingspaths, uFormStartEmulator, ufrmCompCreate, 
-  ufrmEditor, uimportcstuff, uimportjavastuff, uimportjavastuffchecked, 
-  uregistercompform, uformimportlamwstuff, unitformimportpicture, 
-  uFormComplements, uformimportjarstuff, lamwtoolsoptions, 
-  GDBMIServerDebuggerLAMW, uFormApksigner, LazarusPackageIntf;
+  uformsettingspaths, uFormStartEmulator, ufrmCompCreate, ufrmEditor, 
+  uimportcstuff, uimportjavastuff, uimportjavastuffchecked, uregistercompform, 
+  uformimportlamwstuff, unitformimportpicture, uFormComplements, 
+  uformimportjarstuff, lamwtoolsoptions, GDBMIServerDebuggerLAMW, 
+  uFormApksigner, LazarusPackageIntf;
 
 implementation
 
