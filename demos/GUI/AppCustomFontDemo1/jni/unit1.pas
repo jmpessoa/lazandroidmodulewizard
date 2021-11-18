@@ -16,6 +16,7 @@ type
     jButton1: jButton;
     jCheckBox1: jCheckBox;
     jEditText1: jEditText;
+    jListView1: jListView;
     jRadioButton1: jRadioButton;
     jTextView1: jTextView;
     jTextView2: jTextView;
@@ -23,6 +24,8 @@ type
     jTextView4: jTextView;
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
+    procedure jListView1DrawItemCustomFont(Sender: TObject; position: integer;
+      caption: string; var outCustomFontName: string);
   private
     {private declarations}
   public
@@ -62,6 +65,13 @@ end;
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
   ShowMessage('Fonts Loaded from "\assets"');
+end;
+
+procedure TAndroidModule1.jListView1DrawItemCustomFont(Sender: TObject;
+  position: integer; caption: string; var outCustomFontName: string);
+begin
+   //if position = 0 then outCustomFontName:= 'ARBONNIE.TTF';
+   outCustomFontName:= 'ARBONNIE.TTF';    // From folder "assets" !!
 end;
 
 end.

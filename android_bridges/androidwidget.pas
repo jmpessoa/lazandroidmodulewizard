@@ -114,6 +114,15 @@ const
     $8A2BE2,$8B0000,$8B008B,$8B4513,$8FBC8F,
     $90EE90,$9370D8,$9400D3,$000000,$000000); //colbrDefault
 
+  //https://coderwall.com/p/dedqca/argb-colors-in-android
+  //https://stackoverflow.com/questions/5445085/understanding-colors-on-android-six-characters/25170174#25170174
+  {
+  AA - Alpha component [0..255] of the color
+  RR - Red component [0..255] of the color
+  GG - Green component [0..255] of the color
+  BB - Blue component [0..255] of the color
+  }
+  //https://www.rapidtables.com/web/color/RGB_Color.html
   TARGBColorBridgeArray: array[0..144] of DWord = (
     $FF000000,$FF98FB98,$FF9932CC,$FF9ACD32,$FFA0522D,
     $FFA52A2A,$FFA9A9A9,$FFADD8E6,$FFADFF2F,$FFAFEEEE,
@@ -444,6 +453,7 @@ type
   end;
 
   //ref. http://www.abpsoft.com/criacaoweb/tabcores.html
+  //https://coderwall.com/p/dedqca/argb-colors-in-android
   TARGBColorBridge = (
   colbrBlack,colbrPaleGreen,colbrDarkOrchid,colbrYellowGreen,colbrSienna,
   colbrBrown,colbrDarkGray,colbrLightBlue,colbrHoneyDew,colbrPaleTurquoise,
@@ -750,6 +760,8 @@ type
 
   TOnDrawItemBitmap  = Procedure(Sender: TObject; itemIndex: integer; itemCaption: string; out bimap: JObject) of Object;
   TOnDrawItemWidgetBitmap  = Procedure(Sender: TObject; itemIndex: integer; widgetText: string; out bimap: JObject) of Object;
+
+  TOnDrawItemCustomFont=procedure(Sender:TObject;position:integer;caption:string; var outCustomFontName:string) of object;
 
   TOnWebViewStatus   = Procedure(Sender: TObject; Status : TWebViewStatus;
                                  URL : String; Var CanNavi : Boolean) of object;

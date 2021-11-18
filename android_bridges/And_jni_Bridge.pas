@@ -193,7 +193,7 @@ Procedure jListView_setWidgetItem3(env:PJNIEnv; ListView : jObject; value: integ
 procedure jListView_setWidgetCheck(env: PJNIEnv; _jlistview: JObject; _value: boolean; _index: integer);
 function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 function jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
-
+procedure jListView_DispatchOnDrawItemTextCustomFont(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
 function  jScrollView_jCreate(env: PJNIEnv;_Self: int64; _innerLayout: integer; this: jObject): jObject;
@@ -1664,6 +1664,29 @@ begin
   end;
 
   env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jListView_DispatchOnDrawItemTextCustomFont(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnDrawItemTextCustomFont', '(Z)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].z:= JBool(_value);
+
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);

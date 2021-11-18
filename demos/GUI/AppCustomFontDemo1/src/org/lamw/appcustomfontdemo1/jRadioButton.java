@@ -10,6 +10,8 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
+import android.view.Gravity;
+import android.content.res.ColorStateList;
 
 public class jRadioButton extends RadioButton {
 	//Java-Pascal Interface
@@ -51,7 +53,7 @@ public class jRadioButton extends RadioButton {
 		return LAMWCommon.getPasObj();
 	}
 	
-	public void setLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
+	public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		LAMWCommon.setLeftTopRightBottomWidthHeight(_left,_top,_right,_bottom,_w,_h);
 	}
 
@@ -59,46 +61,35 @@ public class jRadioButton extends RadioButton {
 		return LAMWCommon.getParent();
 	}
 	
-	public  void setParent( android.view.ViewGroup _viewgroup ) {
+	public  void SetViewParent( android.view.ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
-
-	public  void setParent2( android.view.ViewGroup _viewgroup ) { //need by RadioGroup [LinearLayout!]
-		ViewGroup parent = LAMWCommon.getParent();
-		if (parent != null) { parent.removeView(this); }
-		parent = _viewgroup;
-		parent.addView(this, 0); //LinearLayout [no lparams], insert at index O ...
-		// ?? better !!?? not sure
-		// parent.addView(this,newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
-		// lparams = null;
-		// lparams = (ViewGroup.MarginLayoutParams)this.getLayoutParams();
-	}
 	
-	public void setLParamWidth(int _w) {
+	public void SetLParamWidth(int _w) {
 		LAMWCommon.setLParamWidth(_w);
 	}
 
-	public void setLParamHeight(int _h) {
+	public void SetLParamHeight(int _h) {
 		LAMWCommon.setLParamHeight(_h);
 	}
 
-	public void setLGravity(int _g) {
+	public void SetLGravity(int _g) {
 		LAMWCommon.setLGravity(_g);
 	}
 
-	public void setLWeight(float _w) {
+	public void SetLWeight(float _w) {
 		LAMWCommon.setLWeight(_w);
 	}
 
-	public void addLParamsAnchorRule(int rule) {
+	public void AddLParamsAnchorRule(int rule) {
 		LAMWCommon.addLParamsAnchorRule(rule);
 	}
 
-	public void addLParamsParentRule(int rule) {
+	public void AddLParamsParentRule(int rule) {
 		LAMWCommon.addLParamsParentRule(rule);
 	}
 
-	public void setLayoutAll(int idAnchor) {
+	public void SetLayoutAll(int idAnchor) {
 		LAMWCommon.setLayoutAll(idAnchor);
 	}
 
@@ -114,42 +105,30 @@ public class jRadioButton extends RadioButton {
 	}
 
 
-	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitInches, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
+	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
 	public void SetFontSizeUnit(int _unit) {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
-	}
-	
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-	
+	}	
 	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+				
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -164,8 +143,15 @@ public class jRadioButton extends RadioButton {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -182,5 +168,13 @@ public class jRadioButton extends RadioButton {
         Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
         this.setTypeface(customfont);
     }
-
+	
+	public void SetRoundColor( int _color ){
+		
+		 if(android.os.Build.VERSION.SDK_INT>=21){		   
+		    this.setButtonTintList(ColorStateList.valueOf(_color));		    
+		    this.invalidate(); //could not be necessary
+		 }
+		 
+	}
 }

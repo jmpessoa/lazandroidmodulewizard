@@ -28,14 +28,7 @@ jRatingBar = class(jVisualControl)
     FOnRatingChanged: TOnRatingChanged;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-
-    function GetRating(): single;
-    procedure SetRating(_rating: single);
-    procedure SetNumStars(_numStars: integer);
-    function GetNumStars(): integer;
-    function GetStepSize(): single;
-    procedure SetStepSize(_step: single);
-
+    
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
@@ -57,6 +50,13 @@ jRatingBar = class(jVisualControl)
     procedure AddLParamsParentRule(_rule: integer);
     procedure SetLayoutAll(_idAnchor: integer);
     procedure ClearLayout();
+    function GetRating(): single;
+
+    procedure SetRating(_rating: single);
+    procedure SetNumStars(_numStars: integer);
+    function GetNumStars(): integer;
+    function GetStepSize(): single;
+    procedure SetStepSize(_step: single);
     procedure SetIsIndicator(_isIndicator: boolean);
     procedure SetMax(_max: integer);
     procedure SetLGravity(_value: TLayoutGravity);

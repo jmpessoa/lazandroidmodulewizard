@@ -1609,6 +1609,7 @@ type
     FOnWidgeItemLostFocus: TOnWidgeItemLostFocus;
     FOnScrollStateChanged: TOnScrollStateChanged;
     FOnDrawItemWidgetBitmap: TOnDrawItemWidgetBitmap;
+    FOnDrawItemCustomFont: TOnDrawItemCustomFont;
 
     FItems        : TStrings;
     FWidgetItem   : TWidgetItem;
@@ -1671,6 +1672,8 @@ type
     procedure GenEvent_OnLongClickCaptionItem(Obj: TObject; index: integer; caption: string);
 
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
+    procedure GenEvent_OnListViewDrawItemCustomFont(Sender:TObject;position:integer;caption:string;var outCustomFontName:string);
+
     procedure GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword); // by ADiV
 
     procedure GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: integer; caption: string;  out color: dword);
@@ -1797,6 +1800,7 @@ type
     procedure DisableScroll(_disable : boolean); // by ADiV
     procedure SetFastScrollEnabled(_enable : boolean); // by ADiV
 
+    procedure DispatchOnDrawItemTextCustomFont(_value: boolean);
     //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
@@ -1846,7 +1850,10 @@ type
     property OnClickWidgetItem: TOnClickWidgetItem read FOnClickWidgetItem write FOnClickWidgetItem;
     property OnClickImageItem: TOnClickImageItem read FOnClickImageItem write FOnClickImageItem;
     property OnLongClickItem: TOnClickCaptionItem read FOnLongClickItem write FOnLongClickItem;
+
     property OnDrawItemTextColor: TOnDrawItemTextColor read FOnDrawItemTextColor write FOnDrawItemTextColor;
+    property OnDrawItemCustomFont: TOnDrawItemCustomFont read FOnDrawItemCustomFont write FOnDrawItemCustomFont;
+
     property OnDrawItemBackColor: TOnDrawItemBackColor read FOnDrawItemBackColor write FOnDrawItemBackColor; // by ADiV
     property OnDrawItemWidgetTextColor: TOnDrawItemWidgetTextColor read FOnDrawItemWidgetTextColor write FOnDrawItemWidgetTextColor;
     property OnDrawItemWidgetText: TOnDrawItemWidgetText read FOnDrawItemWidgetText write FOnDrawItemWidgetText;
@@ -2480,7 +2487,10 @@ type
 
   Procedure Java_Event_pOnClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
+
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
+  function Java_Event_pOnListViewDrawItemCustomFont(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;caption:jString):jString;
+
   function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt; // by ADiV
   function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
   function Java_Event_pOnListViewDrawItemWidgetText(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JString;
@@ -3576,6 +3586,21 @@ begin
     jListVIew(Obj).GenEvent_OnDrawItemCaptionColor(Obj, index, pasCaption, outColor);
   end;
   Result:= JInt(outColor);
+end;
+
+function Java_Event_pOnListViewDrawItemCustomFont(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;caption:jString):jString;
+var
+  outReturnCustomFontname: string;
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  outReturnCustomFontname:= '';
+  if Sender is jListView then
+  begin
+    jForm(jListView(Sender).Owner).UpdateJNI(gApp);
+    jListView(Sender).GenEvent_OnListViewDrawItemCustomFont(Sender,position,GetPascalString(env,caption),outReturnCustomFontname);
+  end;
+  Result:= Get_jString(outReturnCustomFontname);
 end;
 
 function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
@@ -9321,6 +9346,19 @@ begin
       color:= GetARGB(FCustomColor, outColor);
 end;
 
+procedure jListView.GenEvent_OnListViewDrawItemCustomFont(Sender:TObject;position:integer;caption:string;var outCustomFontName:string);
+var
+  outFontName: string;
+begin
+  outFontName:= '';
+
+  if Assigned(FOnDrawItemCustomFont) then FOnDrawItemCustomFont(Sender,position,caption,outFontName);
+
+  outCustomFontName:= outFontName;
+
+end;
+
+
 // by ADiV
 procedure jListView.GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword);
 var
@@ -9875,6 +9913,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_i(FjEnv, FjObject, 'SetDrawItemBackColorAlpha', _alpha);
+end;
+
+procedure jListView.DispatchOnDrawItemTextCustomFont(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_DispatchOnDrawItemTextCustomFont(FjEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------

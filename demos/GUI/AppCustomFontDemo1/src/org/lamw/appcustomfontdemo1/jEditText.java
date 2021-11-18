@@ -1,15 +1,28 @@
 package org.lamw.appcustomfontdemo1;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+//import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -19,6 +32,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -26,10 +40,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
 import android.view.Gravity;
+import android.widget.TextView;
+
+//Reviewed by TR3E on 08/20/2019
 
 public class jEditText extends EditText {
+
 	//Pascal Interface
-	//private long           PasObj   = 0;      // Pascal Obj
+	//private long           pascalObj   = 0;      // Pascal Obj
+
 	private Controls      controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
 	//
@@ -37,27 +56,50 @@ public class jEditText extends EditText {
 	private TextWatcher   textwatcher;       // OnChange
 
 	private OnClickListener onClickListener;   // event
+	
+	private EditText mEdit = null;
 
 	String bufStr;
 	private boolean canDispatchChangeEvent = false;
 	private boolean canDispatchChangedEvent = false;
 	private boolean mFlagSuggestion = false;
+	private boolean mFlagCapSentence = false;
+	private boolean mFlagCaptureBackPressed = false; // by tr3e
 
 	private ClipboardManager mClipBoard = null;
 	private ClipData mClipData = null;
 
-	float mTextSize = 0; //default
-	int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+	private float mTextSize = 0; //default
+	private int mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; //default
+
+	private boolean mCloseSoftInputOnEnter = true;
+
+	boolean mIsRounded = false;
+	int mBackgroundColor = Color.TRANSPARENT;
+
+	int mRoundRadius = 8;
+	int mRoundBorderColor = Color.CYAN;
+	int mRoundBorderWidth = 3;
+	int mRoundBackgroundColor= Color.TRANSPARENT;
+	
+	boolean mAllUpperCase = false;
+	boolean mAllLowerCase = false;
+
+	Drawable mActionIcon = null;
+	boolean mActionIconActived = false;
 
 	//Constructor
 	public  jEditText(android.content.Context context,
 					  Controls ctrls,long pasobj ) {
 		super(context);
+
 		canDispatchChangeEvent = false;
 		canDispatchChangedEvent = false;
 
 		controls = ctrls;
 		LAMWCommon = new jCommons(this,context,pasobj);
+		
+		mEdit = this;
 
 		mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
 
@@ -65,10 +107,12 @@ public class jEditText extends EditText {
 			public void onFocusChange(View v, boolean hasFocus) {
 				final int p = v.getId();
 				final EditText Caption = (EditText)v;
-				if (!hasFocus){
-					if (p >= 0) {
-						controls.pOnLostFocus(LAMWCommon.getPasObj(), Caption.getText().toString());
-					}
+				
+				if (p >= 0){
+				 if (!hasFocus)
+					controls.pOnLostFocus(LAMWCommon.getPasObj(), Caption.getText().toString());
+				 else
+					controls.pOnFocus(LAMWCommon.getPasObj(), Caption.getText().toString());					
 				}
 			}
 		});
@@ -82,25 +126,62 @@ public class jEditText extends EditText {
 			};
 		};
 		setOnClickListener(onClickListener);
-
-		//Init Event : http://socome.tistory.com/15
+		
+		// Fixed "Go / Next / Done / Ok" command capture [by TR3E]
+		setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			        @Override
+			        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+			            if (actionId != 0) {
+			            	final EditText caption = (EditText)v;
+						    
+			            	if (mCloseSoftInputOnEnter) {
+								InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+								imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							}
+						    
+							if (!caption.getText().toString().equals("")){  //try fix program logic...
+								controls.pOnEnter(LAMWCommon.getPasObj());							
+							}
+											    
+			                return true;
+			            } else {
+			                return false;
+			            }
+			        }
+	     });
+		
 		onKeyListener = new OnKeyListener() {
 			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
-				if (event.getAction() == KeyEvent.ACTION_UP) {
-					if (keyCode == KeyEvent.KEYCODE_ENTER) {
-						InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+				
+				    final EditText caption = (EditText)v;
+				    
+				    // by tr3e fix back_key close app
+				    if( mFlagCaptureBackPressed && (event.getAction() == KeyEvent.ACTION_DOWN) &&
+					   	(KeyEvent.KEYCODE_BACK == keyCode) )
+				    {			            
+				    	InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-						//Log.i("OnKeyListener","OnEnter, Hide KeyBoard");
-						// LoadMan
-						controls.pOnEnter(LAMWCommon.getPasObj());  //just Enter/Done/Next/backbutton ....!
+						controls.pOnBackPressed(LAMWCommon.getPasObj());
 						return true;
+			        }
+				    					
+				    if( (event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)){
+						if (mCloseSoftInputOnEnter) {
+							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+						}
+						if (! caption.getText().toString().equals("")){  //try fix program logic...
+						 controls.pOnEnter(LAMWCommon.getPasObj());
+						}
+						return mCloseSoftInputOnEnter;
 					}
-				}
+				
 				return false;
 			}
 		};
 
 		setOnKeyListener(onKeyListener);
+		
 		//Event
 		textwatcher = new TextWatcher() {
 			@Override
@@ -116,12 +197,83 @@ public class jEditText extends EditText {
 				}
 			}
 			@Override
-			public  void afterTextChanged(Editable s) {
-				//
+			public  void afterTextChanged(Editable et) {
+				  String s=et.toString();
+				  
+				  if(mAllUpperCase)
+			       if(!s.equals(s.toUpperCase()))
+			       {
+			         s=s.toUpperCase();
+			         mEdit.setText(s);
+			         mEdit.setSelection(mEdit.length()); //fix reverse texting
+			       }
+				  
+				  if(mAllLowerCase)
+				       if(!s.equals(s.toLowerCase()))
+				       {
+				         s=s.toLowerCase();
+				         mEdit.setText(s);
+				         mEdit.setSelection(mEdit.length()); //fix reverse texting
+				       }
 			}
 		};
 
 		addTextChangedListener(textwatcher);
+
+		//https://google-developer-training.github.io/android-developer-advanced-course-practicals/unit-5-advanced-graphics-and-views/lesson-10-custom-views/10-1a-p-using-custom-views/10-1a-p-using-custom-views.html
+		setOnTouchListener(new OnTouchListener() {   //to handle ActionIcon
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+
+				float actionIconStart; // Used for LTR languages
+				float actionIconEnd;  // Used for RTL languages
+				boolean isActionIconClicked = false;
+
+				// Use the getCompoundDrawables()[2] expression to check
+				// if the drawable is on the "end" of text [2].
+
+				if (GetCompoundDrawablesRelative() != null) {
+
+					// Detect the touch in RTL or LTR layout direction.
+					if (IsLayoutDirectionRTL()) {
+						// If RTL, get the end of the button on the left side.
+						actionIconEnd = mActionIcon.getIntrinsicWidth() + GetPaddingStart();
+						// If the touch occurred before the end of the button,
+						// set isClearButtonClicked to true.
+						if (event.getX() < actionIconEnd) {
+							isActionIconClicked = true;
+						}
+					} else {
+						// Layout is LTR.
+						// Get the start of the button on the right side.
+						actionIconStart = (GetWidth() - GetPaddingEnd() - mActionIcon.getIntrinsicWidth());
+						// If the touch occurred after the start of the button,
+						// set isClearButtonClicked to true.
+						if (event.getX() > actionIconStart) {
+							isActionIconClicked = true;
+						}
+					}
+
+					// Check for actions if the button is tapped.
+					if (isActionIconClicked) {
+
+						if (event.getAction() == MotionEvent.ACTION_DOWN) {
+							controls.pEditTextOnActionIconTouchDown(LAMWCommon.getPasObj(), mEdit.getText().toString());
+		}
+						if (event.getAction() == MotionEvent.ACTION_UP) {
+							controls.pEditTextOnActionIconTouchUp(LAMWCommon.getPasObj(), mEdit.getText().toString());
+
+							return true;
+						}
+					} else {
+						return false;
+					}
+
+				}
+				return false;
+			}
+		});
+
 	}
 
 	//Free object except Self, Pascal Code Free the class.
@@ -129,9 +281,7 @@ public class jEditText extends EditText {
 		removeTextChangedListener(textwatcher);
 		textwatcher = null;
 		setOnKeyListener(null);	
-		setText("");
 		LAMWCommon.free();
-	
 	}
 	
 	public long GetPasObj() {
@@ -197,6 +347,15 @@ public class jEditText extends EditText {
 	public View GetView() {
 	   return this;
     }
+	
+	public void SetAllLowerCase( boolean _lowercase ){
+		mAllLowerCase = _lowercase;
+	}
+	
+	public void SetAllUpperCase( boolean _uppercase ){
+		mAllUpperCase = _uppercase;
+	}
+	
 	//CURRENCY   
 	public  void SetInputTypeEx(String str) {  
 		bufStr = new String(str.toString());
@@ -207,31 +366,31 @@ public class jEditText extends EditText {
 			this.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED);
 		}
 		else if (str.equals("CAPCHARACTERS")) {
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 		}
 		else if (str.equals("TEXT")) {
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
 		}
 		else if (str.equals("PHONE"))       {this.setInputType(android.text.InputType.TYPE_CLASS_PHONE); }
 		else if (str.equals("PASSNUMBER"))  {this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
-		else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+		else if (str.equals("PASSTEXT"))    {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
 			this.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance()); }
 
 		else if (str.equals("TEXTMULTILINE")){
-			if (!mFlagSuggestion)
-				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			else
 				this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		}
-
+		else if (str.equals("NULL")){
+			this.setInputType(InputType.TYPE_NULL);
+		}
 		else {this.setInputType(android.text.InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);};
+
+		if (!mFlagSuggestion) {
+		  this.setInputType(this.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                }
+		if (mFlagCapSentence) {
+		  this.setInputType(this.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+                }
 
 	}
 
@@ -242,22 +401,23 @@ public class jEditText extends EditText {
             case 0 : { setGravity( Gravity.START             ); }; break;
             case 1 : { setGravity( Gravity.END               ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             case 0 : { setGravity( Gravity.LEFT              ); }; break;
             case 1 : { setGravity( Gravity.RIGHT             ); }; break;
  //[ifdef_api14up] */
-            case 2 : { setGravity( Gravity.TOP               ); }; break;
-            case 3 : { setGravity( Gravity.BOTTOM            ); }; break;
-            case 4 : { setGravity( Gravity.CENTER            ); }; break;
-            case 5 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
-            case 6 : { setGravity( Gravity.CENTER_VERTICAL   ); }; break;
+            
+            case 2 : { setGravity( Gravity.CENTER_HORIZONTAL ); }; break;
+            
  //[ifdef_api14up]
             default : { setGravity( Gravity.START            ); }; break;
  //[endif_api14up]
+            
  /* //[endif_api14up]
             default : { setGravity( Gravity.LEFT             ); }; break;
  //[ifdef_api14up] */
-        };
+            
+        }
     }
 
 	//by jmpessoa
@@ -271,7 +431,9 @@ public class jEditText extends EditText {
 
 	public  void InputMethodShow() {
 		InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+		//Repaired forever show the "softInput" by TR3E
+		this.requestFocus();
+		imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
 	}
 
 
@@ -392,6 +554,15 @@ public class jEditText extends EditText {
 		mFlagSuggestion = _value;
 	}
 
+	public void SetCapSentence(boolean _value) {
+		mFlagCapSentence = _value;
+	}
+	
+	// by tr3e
+	public void SetCaptureBackPressed(boolean _value) {
+		mFlagCaptureBackPressed = _value;
+	}
+
 	public void CopyToClipboard() {
 		mClipData = ClipData.newPlainText("text", this.getText().toString());
 		mClipBoard.setPrimaryClip(mClipData);
@@ -407,6 +578,15 @@ public class jEditText extends EditText {
 		this.setText("");
 	}
 
+	public long GetTextLength() {
+		return this.getText().length();
+	}
+
+	public boolean IsEmpty() {
+		if (this.getText().length() == 0) return true;
+		else return false;
+	}
+
 	public void SetTextSize(float size) {
 		mTextSize = size;
 		String t = this.getText().toString();
@@ -414,20 +594,24 @@ public class jEditText extends EditText {
 		this.setText(t);
 	}
 
-	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitInches, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
+	//TTextSizeTyped =(tsDefault, tsUnitPixels, tsUnitDIP, tsUnitMillimeters, tsUnitPoints, tsUnitScaledPixel);
 	public void SetFontSizeUnit(int _unit) {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
-			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; //default
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break; //default
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; //default
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; //default
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; //default
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; //default
+			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
 		this.setText(t);
+	}
+	
+	//by TR3E
+	public void SetSelection(int _value){
+		this.setSelection(_value);
 	}
 
 	public void SetSelectAllOnFocus(boolean _value){
@@ -436,30 +620,18 @@ public class jEditText extends EditText {
 
 	public void SelectAll() {
 		this.selectAll();
-	}
-	
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
 	}	
 	
-	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));
+	public void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource(controls.GetDrawableResourceId(_imgResIdentifier));
 	}		
 
-	public void SetBackgroundByImage(Bitmap _image) {	
+	public void SetBackgroundByImage(Bitmap _image) {
+		if( _image == null ) return;
+		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		if( d == null ) return;
 //[ifdef_api16up]
 	if(Build.VERSION.SDK_INT >= 16) 
              this.setBackground(d);
@@ -477,6 +649,13 @@ public class jEditText extends EditText {
 	
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+				
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -490,8 +669,15 @@ public class jEditText extends EditText {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		// by TR3E
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -525,7 +711,7 @@ public class jEditText extends EditText {
 				case 4: this.setTextDirection(View.TEXT_DIRECTION_RTL); 
 					 		  		  		   
 				}			
-				Log.i("SetTextDirection", "SetTextDirection");
+				//Log.i("SetTextDirection", "SetTextDirection");
 		 }	
        //[endif_api17up]				
 	}
@@ -535,5 +721,238 @@ public class jEditText extends EditText {
         this.setTypeface(customfont);
     }
 	
-}
+	public void RequestFocus() {
+		this.requestFocus();
+	}
 
+	public void SetCloseSoftInputOnEnter(boolean _closeSoftInput) {
+		mCloseSoftInputOnEnter = _closeSoftInput;
+	}
+	
+	public void LoadFromFile(String _path, String _filename) {
+		
+		File file = new File(_path, _filename);
+		StringBuilder content = new StringBuilder();
+		
+		try {
+		    BufferedReader br = new BufferedReader(new FileReader(file));
+		    String line;
+
+		    while ((line = br.readLine()) != null) {
+		    	content.append(line);
+		    	content.append('\n');
+		    }
+		    br.close();
+		}
+		catch (IOException e) {
+			//
+		}
+		this.setText(content.toString());
+	}
+	
+	
+	public void LoadFromFile(String _filename) {
+		     String retStr = "";
+		     try {
+		         FileInputStream inputStream = new FileInputStream(new File(_filename));
+		         if ( inputStream != null ) {
+		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		             String receiveString = "";
+		             StringBuilder stringBuilder = new StringBuilder();
+		             while ( (receiveString = bufferedReader.readLine()) != null ) {
+		                 stringBuilder.append(receiveString);
+		             }
+		             inputStream.close();
+		             retStr = stringBuilder.toString();
+		         }
+		     }
+		     catch (IOException e) {
+		        Log.i("LAMW", "LoadFromFile error: " + e.toString());
+		     }
+		     this.setText(retStr);
+    }
+	
+	public void SaveToFile(String _path, String _filename){
+		     FileWriter fWriter;     
+		     try{ // Environment.getExternalStorageDirectory().getPath()
+		          fWriter = new FileWriter(_path +"/"+ _filename);
+		          fWriter.write(this.getText().toString());
+		          fWriter.flush();
+		          fWriter.close();
+		      }catch(Exception e){
+		          e.printStackTrace();
+		      }
+	}
+	
+	public void SaveToFile(String _filename) {	  	 
+		     try {
+		         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(controls.activity.openFileOutput(_filename, Context.MODE_PRIVATE));
+		         //outputStreamWriter.write("_header");
+		         outputStreamWriter.write(this.getText().toString());
+		         //outputStreamWriter.write("_footer");
+		         outputStreamWriter.close();
+		     }
+		     catch (IOException e) {
+		        // Log.i("jTextFileManager", "SaveToFile failed: " + e.toString());
+		     }
+    }
+
+    public void SetSoftInputShownOnFocus(boolean _show) {
+		//[ifdef_api21up]
+		if (Build.VERSION.SDK_INT >= 21) {
+			this.setShowSoftInputOnFocus(_show);
+		} //[endif_api21up]
+	}
+
+	//https://stackoverflow.com/questions/44071755/android-how-to-set-corner-radius-programmatically
+	public void SetRoundCorner() {
+		if (this != null) {
+			GradientDrawable shape =  new GradientDrawable();
+			shape.setCornerRadius(mRoundRadius);
+			shape.setStroke(mRoundBorderWidth, mRoundBorderColor);
+			shape.setColor(mRoundBackgroundColor); //
+
+			int color;
+			Drawable background = this.getBackground();
+			if (background instanceof ColorDrawable) {
+				color = ((ColorDrawable)this.getBackground()).getColor();
+				shape.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+				shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
+			}
+
+			if(Build.VERSION.SDK_INT >= 16) {
+				//[ifdef_api16up]
+				this.setBackground(shape); //(Drawable)
+				//[endif_api16up]
+			}
+			else {
+				this.setBackgroundDrawable(shape);
+			}
+		}
+	}
+
+	public void SetRoundRadiusCorner(int _radius) {
+		mRoundRadius =  _radius;  //8
+	}
+
+	public void SetRoundBorderColor(int _color) {
+		mRoundBorderColor =  _color; //Color.CYAN
+	}
+
+	public void SetRoundBorderWidth(int _strokeWidth) {
+		mRoundBorderWidth =  _strokeWidth;  //3
+	}
+
+	public void SetRoundBackgroundColor(int _color) {
+		mRoundBackgroundColor =  _color;
+	}
+
+
+	public float GetPaddingStart() {
+		if (Build.VERSION.SDK_INT >= 17) {
+			return  this.getPaddingStart();
+		} else return 0;
+	}
+
+	public float GetPaddingEnd() {
+		if (Build.VERSION.SDK_INT >= 17) {
+			return  this.getPaddingEnd();
+		} else return 0;
+	}
+
+	public float GetWidth() {
+		return  this.getWidth();
+	}
+
+	public boolean IsLayoutDirectionRTL() {
+        boolean isRTL = false;
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			if ( this.getLayoutDirection() == LAYOUT_DIRECTION_RTL ) {
+				isRTL =  true;
+			}
+			//[endif_api17up]
+		}
+		return isRTL;
+	}
+
+	// Use the getCompoundDrawables()[2] expression to check
+	// if the drawable is on the "end" of text [2].
+	private Drawable GetCompoundDrawablesRelative() {
+		Drawable drawable = null;
+		if (android.os.Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			drawable = this.getCompoundDrawablesRelative()[2];
+			//[endif_api17up]
+		}
+		return drawable;
+	}
+
+	private int GetDrawableResourceId(String _resName) {
+		try {
+			Class<?> res = R.drawable.class;
+			Field field = res.getField(_resName);  //"drawableName"
+			return field.getInt(null);
+		} catch (Exception e) {
+			Log.e("LAMW", "Failure to get drawable id.", e);
+			return 0;
+		}
+	}
+
+	private Drawable GetDrawableResourceById(int _resID) {
+		if (_resID == 0) {
+			return null; // by ADiV
+		}
+
+		Drawable res = null;
+
+		if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
+			res = this.controls.activity.getResources().getDrawable(_resID);
+		}
+
+		//[ifdef_api21up]
+		if (Build.VERSION.SDK_INT >= 21) {
+			res = this.controls.activity.getResources().getDrawable(_resID, null);
+		}//[endif_api21up]
+
+		return res;
+	}
+
+	//https://google-developer-training.github.io/android-developer-advanced-course-practicals/unit-5-advanced-graphics-and-views/lesson-10-custom-views/10-1a-p-using-custom-views/10-1a-p-using-custom-views.html
+	public void SetActionIconIdentifier(String _actionIconIdentifier) {
+		mActionIcon = GetDrawableResourceById(GetDrawableResourceId(_actionIconIdentifier));
+	}
+
+	public void ShowActionIcon() {
+		if (mActionIcon == null) return;
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			this.setCompoundDrawablesRelativeWithIntrinsicBounds
+					(null,                      // Start of text.
+							null,               // Above text.
+							mActionIcon,  // End of text.
+							null);              // Below text.
+			//[endif_api17up]
+		}
+		mActionIconActived = true;
+	}
+
+	public void HideActionIcon() {
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			this.setCompoundDrawablesRelativeWithIntrinsicBounds
+					(null,                      // Start of text.
+							null,                // Above text.
+							null,                // End of text.
+							null);             // Below text.
+			//[endif_api17up]
+		}
+		mActionIconActived = false;
+	}
+
+	public boolean IsActionIconShowing() {
+		return mActionIconActived;
+	}
+
+}
