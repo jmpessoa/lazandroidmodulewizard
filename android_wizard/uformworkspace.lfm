@@ -95,7 +95,6 @@ object FormWorkspace: TFormWorkspace
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.0.4'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
@@ -166,8 +165,8 @@ object FormWorkspace: TFormWorkspace
         'ARMv7a+VFPv3  (*) '
         'x86'
         'Mipsel'
-        'Aarch64 (*)'
-        'x86_64  (*)'
+        'Aarch64'
+        'x86_64'
       )
       OnClick = RGInstructionClick
       ParentFont = False
@@ -1480,9 +1479,9 @@ object FormWorkspace: TFormWorkspace
       Left = 174
       Height = 20
       Top = 96
-      Width = 100
+      Width = 204
       BorderSpacing.Left = 12
-      Caption = '(*)Fpcupdeluxe'
+      Caption = '(*)Fpcupdeluxe/LamwManager'
       ParentColor = False
       ParentFont = False
     end
@@ -1929,8 +1928,8 @@ object FormWorkspace: TFormWorkspace
     left = 216
   end
   object ImageList1: TImageList
-    left = 112
-    top = 416
+    left = 200
+    top = 328
     Bitmap = {
       4C690B0000001000000010000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

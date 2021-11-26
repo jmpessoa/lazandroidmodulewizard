@@ -78,10 +78,11 @@ type
     procedure SpeedButtonSDKPlusClick(Sender: TObject);
     procedure SpeedButtonHintThemeClick(Sender: TObject);
     function IsLaz4Android(): boolean;
+    function IsLaz4Android2012(): boolean;
   private
     { private declarations }
     FFilename: string;
-    FPathToWorkspace: string; {C:\adt32\eclipse\workspace}
+    FPathToWorkspace: string; {C:\lamw\workspace}
     FInstructionSet: string;      {ArmV6}
     FFPUSet: string;              {Soft}
     FPathToJavaTemplates: string;
@@ -434,20 +435,26 @@ begin
 
   if (FInstructionSetIndex = 2) and (IsLaz4Android) then
   begin
-     ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0" [out-of-box]'+ sLineBreak + 'don''t support "ARMV7a + VFPv3"' + sLineBreak +
+     ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0/2.0.12" [out-of-box]'+ sLineBreak + 'don''t support "ARMV7a + VFPv3"' + sLineBreak +
      sLineBreak +'Hint: Select "ARMv7a + Soft"');
   end;
 
   if (FInstructionSetIndex = 5) and (IsLaz4Android) then
   begin
-    ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0" [out-of-box]' + sLineBreak + 'don''t support "aarch64"' + sLineBreak +
-    sLineBreak +'Hint: Select "ARMv7a + Soft"');
+    if not IsLaz4Android2012() then
+    begin
+       ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0" [out-of-box]' + sLineBreak + 'don''t support "aarch64"' + sLineBreak +
+       sLineBreak +'Hint: Select "ARMv7a + Soft"');
+    end;
   end;
 
   if (FInstructionSetIndex = 6) and (IsLaz4Android) then
   begin
-    ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0" [out-of-box]' + sLineBreak + 'don''t support "x86_64"' + sLineBreak +
-    sLineBreak +'Hint: Select "x86"');
+    if not IsLaz4Android2012() then
+    begin
+      ShowMessage('WARNING: "laz4Android 1.8.0/2.0.0" [out-of-box]' + sLineBreak + 'don''t support "x86_64"' + sLineBreak +
+      sLineBreak +'Hint: Select "x86"');
+    end;
   end;
 
   if FInstructionSetIndex = 5 then
@@ -482,6 +489,33 @@ begin
  {$endif}
 end;
 
+function TFormWorkspace.IsLaz4Android2012(): boolean;
+var
+  pathToConfig, pathToLaz: string;
+  p: integer;
+  list: TStringList;
+begin
+ Result:= False;
+ {$ifdef windows}
+ pathToConfig:= LazarusIDE.GetPrimaryConfigPath();
+ p:= Pos('config',pathToConfig);
+ if p > 0 then
+ begin
+   pathToLaz:= Copy(pathToConfig,1,p-1);
+   if FileExists(pathToLaz+'laz4android_readme.txt') then
+   begin
+     list:= TStringList.Create;
+     list.LoadFromFile(pathToLaz+'laz4android_readme.txt');
+
+     if Pos('aarch64-android', list.Text)  > 0 then
+       Result:= True;
+
+     list.Free;
+
+   end;
+ end;
+ {$endif}
+end;
 
 function TFormWorkspace.GetFullJavaSrcPath(fullProjectName: string): string;
 var
@@ -968,7 +1002,7 @@ begin
       if  FPathToAntBin = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
-          frm.LabelPathTo.Caption:= 'WARNING! Path to Ant bin: [ex. C:\adt32\ant\bin]';
+          frm.LabelPathTo.Caption:= 'WARNING! Path to Ant bin: [ex. C:\lamw\ant\bin]';
           if frm.ShowModal = mrOK then
           begin
              FPathToAntBin:= frm.PathMissing;
@@ -985,7 +1019,7 @@ begin
       if  FPathToAndroidSDK = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
-          frm.LabelPathTo.Caption:= 'WARNING! Path to Android SDK: [ex. C:\adt32\sdk]';
+          frm.LabelPathTo.Caption:= 'WARNING! Path to Android SDK: [ex. C:\lamw\sdk]';
           if frm.ShowModal = mrOK then
           begin
              FPathToAndroidSDK:= frm.PathMissing;
@@ -1002,7 +1036,7 @@ begin
       if  FPathToAndroidNDK = '' then
       begin
           frm:= TFormPathMissing.Create(nil);
-          frm.LabelPathTo.Caption:= 'WARNING! Path to Android NDK:  [ex. C:\lamw\ndk10e]';
+          frm.LabelPathTo.Caption:= 'WARNING! Path to Android NDK:  [ex. C:\lamw\android-ndk-r22b]';
           if frm.ShowModal = mrOK then
           begin
              FPathToAndroidNDK:= frm.PathMissing;
@@ -1433,7 +1467,6 @@ begin
 
 end;
 
-
 procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
   var Key: char);
 begin
@@ -1654,9 +1687,11 @@ begin
   try
 
     DoNewPathToJavaTemplate();
+
     FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
 
     FPackagePrefaceName:= ReadString('NewProject','PackagePrefaceName', '');
+
     if FPackagePrefaceName = '' then FPackagePrefaceName:=  'org.lamw';
 
     FAntBuildMode:= 'debug';    //default...
@@ -1676,7 +1711,9 @@ begin
     FInstructionSetIndex:= StrToInt(auxInstSet);
 
     ComboSelectProjectName.Items.Clear;
-    FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
+
+    if  FPathToWorkspace <> '' then
+      FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
 
     FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
     FPathToGradle:= ReadString('NewProject','PathToGradle', '');

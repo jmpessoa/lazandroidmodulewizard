@@ -1584,7 +1584,8 @@ begin
    listInfo.Add(' ');
    listInfo.Add('Hint1: Lazarus needs to be prepared [cross-compile] for selected chipset!');
    listInfo.Add(' ');
-   listInfo.Add('Hint2: Laz4Android supports only 32bits: "armV6", "armV7a+Soft", "x86"!');
+   listInfo.Add('Hint2: Laz4Android 1.8/2.0.0 support only 32bits: "armV6", "armV7a+Soft", "x86"!');
+   listInfo.Add('Hint3: Laz4Android 2.0.12 support "aarch64","x86_64","armV6","armV7a+Soft","x86"!');
    listInfo.Add(' ');
    listInfo.Add('1.  > Chipset [select!] -> [OK]');
    listInfo.Add(' ');
