@@ -522,10 +522,12 @@ type
 
   TBitmapCompressFormat = (cfJPG, cfPNG, cfNone);
 
+  { jBitmap }
+
   jBitmap = class(jControl)
   private
-    FWidth: integer;
-    FHeight: integer;
+    //FWidth: integer;
+    //FHeight: integer;
     FStride: Cardinal;
     FFormat: Integer;
     FFlags: Cardinal;
@@ -619,14 +621,18 @@ type
     function GetImageFromBase64String(_imageBase64String: string): jObject;
     function GetBase64StringFromImageFile(_fullPathToImageFile: string): string;
 
+    function GetWidth(): integer;
+    function GetHeight(): integer;
+
+
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
     property ImageIndex: TImageListIndex read FImageIndex write SetImageIndex default -1;
     property Images: jImageList read FImageList write SetImages;
     property ImageIdentifier: string read FImageName write SetImageIdentifier;
-    //property ImageName: string read FImageName write SetImageName;
-    property Width: integer read FWidth write FWidth;
-    property Height: integer read FHeight write FHeight;
+    property Width: integer read GetWidth;
+    property Height: integer read GetHeight;
+
   end;
 
   jDialogYN = class(jControl)
@@ -11211,8 +11217,8 @@ constructor jBitmap.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   // Init
-  FWidth    := 0;
-  FHeight   := 0;
+  //FWidth    := 0;
+  //FHeight   := 0;
   FImageName:='';
   FImageIndex:= -1;
 
@@ -11221,7 +11227,7 @@ begin
   FjObject   := nil;
 end;
 
-Destructor jBitmap.Destroy;
+destructor jBitmap.Destroy;
  begin
   if not (csDesigning in ComponentState) then
   begin
@@ -11234,7 +11240,7 @@ Destructor jBitmap.Destroy;
   inherited Destroy;
 end;
 
-Procedure jBitmap.Init(refApp: jApp);
+procedure jBitmap.Init(refApp: jApp);
 begin
   if FInitialized  then Exit;
   inherited Init(refApp);
@@ -11265,7 +11271,7 @@ begin
   if Pos(path, fileName) > 0 then Result:= True;
 end;
 
-procedure jBitmap.LoadFromFile(fullFileName : string);
+procedure jBitmap.LoadFromFile(fullFileName: String);
 var
   path: string;
 begin
@@ -11285,35 +11291,35 @@ begin
 
        jBitmap_loadFile(FjEnv, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
 
-       FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-       FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+       //FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
+       //FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
      end;
   end;
 end;
 
-Procedure jBitmap.LoadFromRes(imgResIdentifier: String);  // ..res/drawable
+procedure jBitmap.LoadFromRes(imgResIdentifier: String);  // ..res/drawable
 begin
    if FInitialized then
    begin
        jni_proc_t(FjEnv, FjObject, 'loadRes', imgResIdentifier);
-       FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-       FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+       //FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
+       //FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
    end;
 end;
 
-Procedure jBitmap.CreateJavaBitmap(w, h: Integer);
+procedure jBitmap.CreateJavaBitmap(w, h: Integer);
 begin
-  FWidth  := 0;
-  FHeight := 0;
+  //FWidth  := 0;
+  //FHeight := 0;
   if FInitialized then
   begin
-    FWidth  := w;
-    FHeight := h;
-    jni_proc_ii(FjEnv, FjObject, 'createBitmap', FWidth, FHeight);
+    //FWidth  := w;
+    //FHeight := h;
+    jni_proc_ii(FjEnv, FjObject, 'createBitmap', w, h);
   end;
 end;
 
-Function jBitmap.GetJavaBitmap: jObject;
+function jBitmap.GetJavaBitmap: jObject;
 begin
   if FInitialized then
   begin
@@ -11321,7 +11327,7 @@ begin
   end;
 end;
 
-Function jBitmap.GetImage(): jObject;
+function jBitmap.GetImage(): jObject;
 begin
   if FInitialized then
   begin
@@ -11330,7 +11336,7 @@ begin
 end;
 
 //by Tomash
-function jBitmap.GetCanvas: jObject;
+function jBitmap.GetCanvas(): jObject;
 begin
   if FInitialized then
   begin
@@ -11422,7 +11428,21 @@ begin
 
 end;
 
-Procedure jBitmap.SetImageByIndex(Value: integer);
+function jBitmap.GetHeight: integer;
+begin
+   //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetWidth');
+end;
+
+function jBitmap.GetWidth: integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_i(FjEnv, FjObject, 'GetHeight');
+end;
+
+procedure jBitmap.SetImageByIndex(Value: integer);
 begin
    if FjObject = nil then exit;
 
@@ -11434,7 +11454,7 @@ begin
       if  (FImageName <> '') then
       begin
         jBitmap_loadFile(FjEnv, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
-        jBitmap_getWH(FjEnv, FjObject , integer(FWidth),integer(FHeight));
+        //jBitmap_getWH(FjEnv, FjObject , integer(FWidth),integer(FHeight));
       end;
    end;
 end;
@@ -11500,8 +11520,8 @@ begin
     case rtn = 0 of
       True  :begin
                  Result:= True;
-                 FWidth:= FBitmapInfo.width;   //uint32_t
-                 FHeight:= FBitmapInfo.height;  ////uint32_t
+                 //FWidth:= FBitmapInfo.width;   //uint32_t
+                 //FHeight:= FBitmapInfo.height;  ////uint32_t
                  FStride:= FBitmapInfo.stride;  //uint32_t
                  FFormat:= FBitmapInfo.format;  //int32_t
                  FFlags:= FBitmapInfo.flags;   //uint32_t      // 0 for now
@@ -11790,8 +11810,8 @@ begin
   if FInitialized then
   begin
      jni_proc_bmp(FjEnv, FjObject, 'SetImage', _bitmapImage);
-     FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-     FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+     //FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
+     //FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
   end;
 end;
 
@@ -11840,7 +11860,8 @@ begin
    Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
-function jBitmap.GetThumbnailImageFromAssets(_fileName: string; thumbnailSize: integer): jObject;
+function jBitmap.GetThumbnailImageFromAssets(_filename: string;
+  thumbnailSize: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
