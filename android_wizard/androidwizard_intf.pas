@@ -2202,8 +2202,11 @@ begin
           strList.Add('set JAVA_TOOL_OPTIONS=-Duser.language=en');
           strList.Add('cd '+FAndroidProjectName);
           //strList.Add('if exist "'+Lowercase(FSmallProjName)+'-release.keystore" goto Error');
-          strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
+
+          //https://forum.lazarus.freepascal.org/index.php/topic,56830.0.html  [by guaracy]
+          strList.Add('LC_ALL=C keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
                       FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
+
           strList.Add(':Error');
           strList.Add('echo off');
           strList.Add('cls');
@@ -2406,7 +2409,7 @@ begin
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('cd '+linuxAndroidProjectName);
-          strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
+          strList.Add('LC_ALL=C keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
                        linuxAndroidProjectName+'/keytool_input.txt');
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'release-keystore.sh');
 
