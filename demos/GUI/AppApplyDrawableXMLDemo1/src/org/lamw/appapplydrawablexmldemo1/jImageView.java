@@ -1,4 +1,4 @@
-package org.lamw.appimageviewloadingxml;
+package org.lamw.appapplydrawablexmldemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

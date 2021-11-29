@@ -1033,6 +1033,9 @@ type
     procedure BringToFront;
     procedure SetUnderline( _on : boolean ); // by ADiV
 
+
+    procedure ApplyDrawableXML(_xmlIdentifier: string);
+
   published
     property Text: string read GetText write SetText;
     property Alignment : TTextAlignment read FTextAlignment write SetTextAlignment;
@@ -1208,6 +1211,8 @@ type
     function GetTextLength(): int64;
     function IsEmpty(): boolean;
 
+    procedure ApplyDrawableXML(_xmlIdentifier: string);
+
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
     //property Scroller: boolean  read FScroller write SetScroller;
@@ -1308,6 +1313,8 @@ type
     procedure SetFocus();
 
     procedure BringToFront; // By ADiV
+    procedure ApplyDrawableXML(_xmlIdentifier: string);
+
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -1568,6 +1575,9 @@ type
 
     procedure SetImageDrawable(_imageAnimation: jObject);
     procedure Clear();
+
+
+    procedure ApplyDrawableXML(_xmlIdentifier: string);
 
     procedure GenEvent_OnImageViewPopupItemSelected(Sender:TObject; caption:string);
 
@@ -4933,6 +4943,13 @@ begin
   View_BringToFront( FjEnv, FjObject);
 end;
 
+procedure jTextView.ApplyDrawableXML(_xmlIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -5805,7 +5822,6 @@ begin
    Result:= jEditText_IsEmpty(FjEnv, FjObject);
 end;
 
-
 procedure Java_Event_pEditTextOnActionIconTouchUp(env:PJNIEnv;this:JObject;Sender:TObject;textContent:jString);
 begin
   gApp.Jni.jEnv:= env;
@@ -5828,6 +5844,13 @@ begin
   end;
 end;
 
+procedure jEditText.ApplyDrawableXML(_xmlIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
+end;
+
 procedure jEditText.GenEvent_EditTextOnActionIconTouchUp(Sender:TObject;textContent:string);
 begin
   if Assigned(FOnActionIconTouchUp) then FOnActionIconTouchUp(Sender,textContent);
@@ -5836,6 +5859,7 @@ procedure jEditText.GenEvent_EditTextOnActionIconTouchDown(Sender:TObject;textCo
 begin
   if Assigned(FOnActionIconTouchDown) then FOnActionIconTouchDown(Sender,textContent);
 end;
+
 
 //------------------------------------------------------------------------------
 // jButton
@@ -6209,6 +6233,13 @@ begin
  //in designing component state: set value here...
  if FInitialized then
     View_BringToFront(FjEnv, FjObject);
+end;
+
+procedure jButton.ApplyDrawableXML(_xmlIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
 end;
 
 //------------------------------------------------------------------------------
@@ -7719,6 +7750,13 @@ begin
     jForm(jImageView(Sender).Owner).UpdateJNI(gApp);
     jImageView(Sender).GenEvent_OnImageViewPopupItemSelected(Sender,GetPStringAndDeleteLocalRef(env,caption));
   end;
+end;
+
+procedure jImageView.ApplyDrawableXML(_xmlIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
 end;
 
   { jImageList }
