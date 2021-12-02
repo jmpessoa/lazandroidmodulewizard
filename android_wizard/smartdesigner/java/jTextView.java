@@ -1,4 +1,4 @@
-package org.lamw.appapplydrawablexmldemo1;
+package com.example.appspinnerdemo;
 
 import java.lang.reflect.Field;
 
@@ -536,52 +536,9 @@ public class jTextView extends TextView {
 		}else //[endif_api24up]
 			this.setText(Html.fromHtml(_htmlText)); //Html.fromHtml("5x<sup>2</sup>")
 	}
-
-	public int GetDrawableResourceId(String _resName) {
-		Log.i("LAMW", "drawable file = "+ _resName);
-		try {
-			Class<?> res = R.drawable.class;
-			Field field = res.getField(_resName);  //"drawableName"
-			int drawableId = field.getInt(null);
-			return drawableId;
-		} catch (Exception e) {
-			Log.e("LAMW", "Failure to get drawable id.", e);
-			return 0;
-		}
-	}
-
-	/*
-        public Drawable GetDrawableResourceById(int _resID) {
-            if (_resID == 0) {
-                return null; // by ADiV
-            }
-
-            Drawable res = null;
-
-            if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
-                res = this.controls.activity.getResources().getDrawable(_resID);
-            }
-
-            //[ifdef_api21up]
-            if (Build.VERSION.SDK_INT >= 21) {
-                res = this.controls.activity.getResources().getDrawable(_resID, null);
-            }//[endif_api21up]
-
-            return res;
-        }
-    */
-	public void ApplyDrawableXML(String _xmlIdentifier) {
-		//Drawable d = GetDrawableResourceById(GetDrawableResourceId(_xmlFilename));
-		this.setBackgroundResource(GetDrawableResourceId(_xmlIdentifier));
-		/*
-		if(d != null) {
-			if (Build.VERSION.SDK_INT >= 16) {
-				//[ifdef_api16up]
-				this.setBackground(d);
-				//[endif_api16up]
-			}
-		}*/
-	}
-
+	
+	public void ApplyDrawableXML(String _xmlIdentifier) {	    
+		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
+    }
 
 }

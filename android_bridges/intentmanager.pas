@@ -145,6 +145,8 @@ jIntentManager = class(jControl)
     function  GetShareItemPackageName(_pos: integer) : String;
     function  GetShareItemBitmap( _pos : integer ) : jObject;
 
+    procedure SetDataPackage;
+
     //https://forum.lazarus.freepascal.org/index.php/topic,55344.0.html
     //thanks to schumi !
     function GetExtraByteArray(_intent: jObject; _dataName: string): TDynArrayOfJByte;
@@ -505,6 +507,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jIntentManager_SetDataUri(FjEnv, FjObject, _dataUri);
+end;
+
+procedure jIntentManager.SetDataPackage;
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc(FjEnv, FjObject, 'SetDataPackage');
 end;
 
 function jIntentManager.GetDataUri(_intent: jObject): jObject;
@@ -2242,7 +2251,6 @@ end;
 function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; keyValueDelimiter: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..1] of jValue;
@@ -2252,7 +2260,7 @@ var
 label
   _exceptionOcurred;
 begin
-
+  Result := nil;
   jCls:= env^.GetObjectClass(env, _jintentmanager);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetBundleContent', '(Landroid/content/Intent;Ljava/lang/String;)[Ljava/lang/String;');

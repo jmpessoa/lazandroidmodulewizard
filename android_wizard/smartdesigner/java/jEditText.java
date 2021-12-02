@@ -1,4 +1,4 @@
-package org.lamw.appapplydrawablexmldemo1;
+package org.lamw.appedittextdemo1;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -889,39 +889,9 @@ public class jEditText extends EditText {
 		return drawable;
 	}
 
-	private int GetDrawableResourceId(String _resName) {
-		try {
-			Class<?> res = R.drawable.class;
-			Field field = res.getField(_resName);  //"drawableName"
-			return field.getInt(null);
-		} catch (Exception e) {
-			Log.e("LAMW", "Failure to get drawable id.", e);
-			return 0;
-		}
-	}
-
-	private Drawable GetDrawableResourceById(int _resID) {
-		if (_resID == 0) {
-			return null; // by ADiV
-		}
-
-		Drawable res = null;
-
-		if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
-			res = this.controls.activity.getResources().getDrawable(_resID);
-		}
-
-		//[ifdef_api21up]
-		if (Build.VERSION.SDK_INT >= 21) {
-			res = this.controls.activity.getResources().getDrawable(_resID, null);
-		}//[endif_api21up]
-
-		return res;
-	}
-
 	//https://google-developer-training.github.io/android-developer-advanced-course-practicals/unit-5-advanced-graphics-and-views/lesson-10-custom-views/10-1a-p-using-custom-views/10-1a-p-using-custom-views.html
-	public void SetActionIconIdentifier(String _actionIconIdentifier) {
-		mActionIcon = GetDrawableResourceById(GetDrawableResourceId(_actionIconIdentifier));
+	public void SetActionIconIdentifier(String _actionIconIdentifier) {		
+		mActionIcon = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_actionIconIdentifier));
 	}
 
 	public void ShowActionIcon() {
@@ -954,18 +924,9 @@ public class jEditText extends EditText {
 	public boolean IsActionIconShowing() {
 		return mActionIconActived;
 	}
-
+	
 	public void ApplyDrawableXML(String _xmlIdentifier) {
-		//Drawable d = GetDrawableResourceById(GetDrawableResourceId(_xmlFilename));
-		this.setBackgroundResource(GetDrawableResourceId(_xmlIdentifier));
-		/*
-		if(d != null) {
-			if (Build.VERSION.SDK_INT >= 16) {
-				//[ifdef_api16up]
-				this.setBackground(d);
-				//[endif_api16up]
-			}
-		}*/
-	}
+		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
+    }
 
 }
