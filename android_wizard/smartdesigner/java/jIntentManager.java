@@ -902,7 +902,13 @@ Sending Data: Extras vs. URI Parameters
    public void SetDataAndType(String _uriAsString, String _mimeType) {	// thanks to @alexc   
 	   mIntent.setDataAndType(Uri.parse(_uriAsString), _mimeType);
    }
-
+   
+   public void SetDataPackage() {	
+	   Uri uri = Uri.fromParts("package", controls.activity.getPackageName(), null);
+	   
+	   mIntent.setData(uri);
+   }
+   
    /*
  public void SetDataUriAsString(String _uriAsString) { //Uri.parse(fileUrl) - just Strings!
 	   

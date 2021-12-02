@@ -522,7 +522,7 @@ type
 
   TBitmapCompressFormat = (cfJPG, cfPNG, cfNone);
 
-  { jBitmap }
+   { jBitmap }
 
   jBitmap = class(jControl)
   private
@@ -624,15 +624,14 @@ type
     function GetWidth(): integer;
     function GetHeight(): integer;
 
-
   published
     property FilePath: TFilePath read FFilePath write FFilePath;
     property ImageIndex: TImageListIndex read FImageIndex write SetImageIndex default -1;
     property Images: jImageList read FImageList write SetImages;
     property ImageIdentifier: string read FImageName write SetImageIdentifier;
+    //property ImageName: string read FImageName write SetImageName;
     property Width: integer read GetWidth;
     property Height: integer read GetHeight;
-
   end;
 
   jDialogYN = class(jControl)
@@ -1033,7 +1032,6 @@ type
     procedure BringToFront;
     procedure SetUnderline( _on : boolean ); // by ADiV
 
-
     procedure ApplyDrawableXML(_xmlIdentifier: string);
 
   published
@@ -1313,6 +1311,7 @@ type
     procedure SetFocus();
 
     procedure BringToFront; // By ADiV
+
     procedure ApplyDrawableXML(_xmlIdentifier: string);
 
   published
@@ -1576,7 +1575,6 @@ type
     procedure SetImageDrawable(_imageAnimation: jObject);
     procedure Clear();
 
-
     procedure ApplyDrawableXML(_xmlIdentifier: string);
 
     procedure GenEvent_OnImageViewPopupItemSelected(Sender:TObject; caption:string);
@@ -1689,7 +1687,6 @@ type
 
     procedure GenEvent_OnDrawItemCaptionColor(Obj: TObject; index: integer; caption: string;  out color: dword);
     procedure GenEvent_OnListViewDrawItemCustomFont(Sender:TObject;position:integer;caption:string;var outCustomFontName:string);
-
     procedure GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword); // by ADiV
 
     procedure GenEvent_OnDrawItemWidgetTextColor(Obj: TObject; index: integer; caption: string;  out color: dword);
@@ -1815,8 +1812,8 @@ type
 
     procedure DisableScroll(_disable : boolean); // by ADiV
     procedure SetFastScrollEnabled(_enable : boolean); // by ADiV
-
     procedure DispatchOnDrawItemTextCustomFont(_value: boolean);
+
     //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
@@ -2505,7 +2502,7 @@ type
   Procedure Java_Event_pOnListViewLongClickCaptionItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; caption: JString);
 
   function  Java_Event_pOnListViewDrawItemCaptionColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
-  function Java_Event_pOnListViewDrawItemCustomFont(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;caption:jString):jString;
+  function  Java_Event_pOnListViewDrawItemCustomFont(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;caption:jString):jString;
 
   function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer): JInt; // by ADiV
   function Java_Event_pOnListViewDrawItemWidgetTextColor(env: PJNIEnv; this: jobject; Obj: TObject; index: integer; caption: JString): JInt;
@@ -4947,7 +4944,7 @@ procedure jTextView.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 //------------------------------------------------------------------------------
@@ -5822,6 +5819,7 @@ begin
    Result:= jEditText_IsEmpty(FjEnv, FjObject);
 end;
 
+
 procedure Java_Event_pEditTextOnActionIconTouchUp(env:PJNIEnv;this:JObject;Sender:TObject;textContent:jString);
 begin
   gApp.Jni.jEnv:= env;
@@ -5848,7 +5846,7 @@ procedure jEditText.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 procedure jEditText.GenEvent_EditTextOnActionIconTouchUp(Sender:TObject;textContent:string);
@@ -5859,7 +5857,6 @@ procedure jEditText.GenEvent_EditTextOnActionIconTouchDown(Sender:TObject;textCo
 begin
   if Assigned(FOnActionIconTouchDown) then FOnActionIconTouchDown(Sender,textContent);
 end;
-
 
 //------------------------------------------------------------------------------
 // jButton
@@ -6239,7 +6236,7 @@ procedure jButton.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jButton_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 //------------------------------------------------------------------------------
@@ -7756,7 +7753,7 @@ procedure jImageView.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
   { jImageList }
@@ -9401,7 +9398,6 @@ begin
   outCustomFontName:= outFontName;
 
 end;
-
 
 // by ADiV
 procedure jListView.GenEvent_OnDrawItemBackgroundColor(Obj: TObject; index: integer; out color: dword);
@@ -11309,7 +11305,7 @@ begin
   if Pos(path, fileName) > 0 then Result:= True;
 end;
 
-procedure jBitmap.LoadFromFile(fullFileName: String);
+procedure jBitmap.LoadFromFile(fullFileName : string);
 var
   path: string;
 begin
@@ -11898,8 +11894,7 @@ begin
    Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
-function jBitmap.GetThumbnailImageFromAssets(_filename: string;
-  thumbnailSize: integer): jObject;
+function jBitmap.GetThumbnailImageFromAssets(_fileName: string; thumbnailSize: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then

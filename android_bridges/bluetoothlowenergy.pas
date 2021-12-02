@@ -426,6 +426,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].i:= _serviceIndex;
   jCls:= env^.GetObjectClass(env, _jbluetoothlowenergy);
   jMethod:= env^.GetMethodID(env, jCls, 'GetCharacteristics', '(I)[Ljava/lang/String;');
@@ -476,6 +477,7 @@ var
   jCls: jClass=nil;
   i: integer;
 begin
+  Result := nil;
   jParams[0].i:= _serviceIndex;
   jParams[1].i:= _characteristicIndex;
   jCls:= env^.GetObjectClass(env, _jbluetoothlowenergy);

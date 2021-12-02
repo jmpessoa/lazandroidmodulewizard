@@ -126,6 +126,7 @@ end;
 
 function jImageFileManager.ImageOpen() : boolean;
 begin
+  Result := false;
   //in designing component state: set value here...
   if FInitialized then
      jni_func_out_z(FjEnv, FjObject, 'ImageOpen');

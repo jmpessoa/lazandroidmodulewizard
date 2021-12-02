@@ -4979,7 +4979,6 @@ end;
 function jForm_PasteStringFromClipboard(env: PJNIEnv; _jform: JObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 label

@@ -103,11 +103,11 @@ Function  jgetTick                     (env:PJNIEnv;this:jobject) : LongInt;
 //-----------------------
 
 function  jTextView_Create(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
+
 procedure jTextView_SetShadowLayer(env: PJNIEnv; _jtextview: JObject; _radius: single; _dx: single; _dy: single; _color: integer);
-procedure jTextView_ApplyDrawableXML(env: PJNIEnv; _jtextview: JObject; _xmlIdentifier: string);
 
 //-----------------------------------
-// EditText
+// EditText  :: changed by jmpessoa [support Api > 13]
 //--------------------------------------
 
 Function  jEditText_Create             (env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
@@ -123,11 +123,9 @@ function jEditText_IsActionIconShowing(env: PJNIEnv; _jedittext: JObject): boole
 
 function jEditText_GetTextLength(env: PJNIEnv; _jedittext: JObject): int64;
 function jEditText_IsEmpty(env: PJNIEnv; _jedittext: JObject): boolean;
-procedure jEditText_ApplyDrawableXML(env: PJNIEnv; _jedittext: JObject; _xmlIdentifier: string);
 
 // Button
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
-procedure jButton_ApplyDrawableXML(env: PJNIEnv; _jbutton: JObject; _xmlIdentifier: string);
 
 // CheckBox
 Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -158,7 +156,7 @@ procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; var _item
 procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: array of string); overload;
 
 procedure jImageView_SetImageDrawable(env: PJNIEnv; _jimageview: JObject; _imageAnimation: jObject);
-procedure jImageView_ApplyDrawableXML(env: PJNIEnv; _jimageview: JObject; _xmlIdentifier: string);
+
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
                                          widget: integer;
@@ -193,9 +191,10 @@ Procedure jListView_add4                (env:PJNIEnv;
 Procedure jListView_setWidgetItem3(env:PJNIEnv; ListView : jObject; value: integer; txt: string; index: integer);
 
 procedure jListView_setWidgetCheck(env: PJNIEnv; _jlistview: JObject; _value: boolean; _index: integer);
-function jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
-function jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
+function  jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
+function  jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
 procedure jListView_DispatchOnDrawItemTextCustomFont(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
 function  jScrollView_jCreate(env: PJNIEnv;_Self: int64; _innerLayout: integer; this: jObject): jObject;
@@ -584,30 +583,6 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
-procedure jTextView_ApplyDrawableXML(env: PJNIEnv; _jtextview: JObject; _xmlIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jtextview);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'ApplyDrawableXML', '(Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_xmlIdentifier));
-
-  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
 //------------------------------------------------------------------------------
 // EditText
 //------------------------------------------------------------------------------
@@ -826,35 +801,12 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
-procedure jEditText_ApplyDrawableXML(env: PJNIEnv; _jedittext: JObject; _xmlIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jedittext);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'ApplyDrawableXML', '(Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_xmlIdentifier));
-
-  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
 
 //------------------------------------------------------------------------------
 // Button
 //------------------------------------------------------------------------------
 
+//by jmpessoa
 Function jButton_Create(env: PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 var
  jMethod : jMethodID = nil;
@@ -877,30 +829,6 @@ begin
   Result := env^.NewGlobalRef(env,Result);
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
-end;
-
-procedure jButton_ApplyDrawableXML(env: PJNIEnv; _jbutton: JObject; _xmlIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jbutton);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'ApplyDrawableXML', '(Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_xmlIdentifier));
-
-  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 //------------------------------------------------------------------------------
@@ -1324,30 +1252,6 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
-
-procedure jImageView_ApplyDrawableXML(env: PJNIEnv; _jimageview: JObject; _xmlIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jimageview);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'ApplyDrawableXML', '(Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_xmlIdentifier));
-
-  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
 
 //------------------------------------------------------------------------------
 // ListView
