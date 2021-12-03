@@ -526,8 +526,8 @@ type
 
   jBitmap = class(jControl)
   private
-    //FWidth: integer;
-    //FHeight: integer;
+    FWidth: integer;
+    FHeight: integer;
     FStride: Cardinal;
     FFormat: Integer;
     FFlags: Cardinal;
@@ -630,8 +630,8 @@ type
     property Images: jImageList read FImageList write SetImages;
     property ImageIdentifier: string read FImageName write SetImageIdentifier;
     //property ImageName: string read FImageName write SetImageName;
-    property Width: integer read GetWidth;
-    property Height: integer read GetHeight;
+    property Width: integer read GetWidth write FWidth;
+    property Height: integer read GetHeight write FHeight;
   end;
 
   jDialogYN = class(jControl)
@@ -11251,8 +11251,8 @@ constructor jBitmap.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   // Init
-  //FWidth    := 0;
-  //FHeight   := 0;
+  FWidth    := 0;
+  FHeight   := 0;
   FImageName:='';
   FImageIndex:= -1;
 
@@ -11325,8 +11325,8 @@ begin
 
        jBitmap_loadFile(FjEnv, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
 
-       //FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-       //FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+       FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
+       FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
      end;
   end;
 end;
@@ -11336,19 +11336,19 @@ begin
    if FInitialized then
    begin
        jni_proc_t(FjEnv, FjObject, 'loadRes', imgResIdentifier);
-       //FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-       //FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+       FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
+       FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
    end;
 end;
 
 procedure jBitmap.CreateJavaBitmap(w, h: Integer);
 begin
-  //FWidth  := 0;
-  //FHeight := 0;
+  FWidth  := 0;
+  FHeight := 0;
   if FInitialized then
   begin
-    //FWidth  := w;
-    //FHeight := h;
+    FWidth  := w;
+    FHeight := h;
     jni_proc_ii(FjEnv, FjObject, 'createBitmap', w, h);
   end;
 end;
@@ -11488,7 +11488,7 @@ begin
       if  (FImageName <> '') then
       begin
         jBitmap_loadFile(FjEnv, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
-        //jBitmap_getWH(FjEnv, FjObject , integer(FWidth),integer(FHeight));
+        jBitmap_getWH(FjEnv, FjObject , integer(FWidth),integer(FHeight));
       end;
    end;
 end;
@@ -11554,8 +11554,8 @@ begin
     case rtn = 0 of
       True  :begin
                  Result:= True;
-                 //FWidth:= FBitmapInfo.width;   //uint32_t
-                 //FHeight:= FBitmapInfo.height;  ////uint32_t
+                 FWidth:= FBitmapInfo.width;   //uint32_t
+                 FHeight:= FBitmapInfo.height;  ////uint32_t
                  FStride:= FBitmapInfo.stride;  //uint32_t
                  FFormat:= FBitmapInfo.format;  //int32_t
                  FFlags:= FBitmapInfo.flags;   //uint32_t      // 0 for now
@@ -11844,8 +11844,8 @@ begin
   if FInitialized then
   begin
      jni_proc_bmp(FjEnv, FjObject, 'SetImage', _bitmapImage);
-     //FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-     //FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+     FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
+     FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
   end;
 end;
 
