@@ -134,16 +134,11 @@ public
   procedure DrawBackground(_color: integer);
 
   procedure DrawRect(_left: single; _top: single; _right: single; _bottom: single); overload;
-  //procedure DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single); overload;
   procedure DrawRect(var _xyArray8: TDynArrayOfSingle); overload;
   procedure DrawRect(var _xyArray8: array of single); overload;
 
   procedure SetImageByResourceIdentifier(_imageResIdentifier: string);    // ../res/drawable
   procedure DrawBitmap(_bitmap: jObject);  overload;
-
-    //procedure DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom: Integer); overload; // by Kordal
-    //procedure DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH, X, Y, W, H: Integer; rotateDegree: Single=0); overload; // by Kordal
-    //procedure DrawFrame(bitMap: jObject; X, Y, Index, Size: Integer; scaleFactor: Single=1; rotateDegree: Single=0); overload;
 
   //by Kordal
   procedure DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom: Integer; dstLeft, dstTop, dstRight, dstBottom: Single); overload;
@@ -796,9 +791,12 @@ end;
 procedure jDrawingView.SetPaintColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
+  FPaintColor:= _color;
+
   FFontColor:= _color;
+
   if FInitialized then
-     jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+     jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jDrawingView.SetTextSize(_textsize: DWord);

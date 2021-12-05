@@ -1,5 +1,6 @@
 C:\android\workspace\AppDrawingInBitmap\gen\org\lamw\appdrawinginbitmap\R.java \
  : C:\android\workspace\AppDrawingInBitmap\res\drawable\android.png \
+C:\android\workspace\AppDrawingInBitmap\res\drawable\smiley64.png \
 C:\android\workspace\AppDrawingInBitmap\res\drawable-hdpi\ic_launcher.png \
 C:\android\workspace\AppDrawingInBitmap\res\drawable-ldpi\ic_launcher.png \
 C:\android\workspace\AppDrawingInBitmap\res\drawable-mdpi\ic_launcher.png \

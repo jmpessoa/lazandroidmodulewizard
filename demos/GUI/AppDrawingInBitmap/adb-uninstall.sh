@@ -1,1 +1,1 @@
-/adt32/sdk/platform-tools/adb uninstall org.lamw.appdrawinginbitmap
+/android/sdkr25/platform-tools/adb uninstall org.lamw.appdrawinginbitmap

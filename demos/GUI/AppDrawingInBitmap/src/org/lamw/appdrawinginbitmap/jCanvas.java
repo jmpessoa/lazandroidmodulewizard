@@ -1,6 +1,7 @@
 package org.lamw.appdrawinginbitmap;
 
 import javax.microedition.khronos.opengles.GL10;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,14 +16,22 @@ import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
+//-------------------------------------------------------------------------
+// jCanvas
+// Reviewed by TR3E on 19/10/2019
+//-------------------------------------------------------------------------
+
 public class jCanvas {
 	//Java-Pascal Interface
-	private long             PasObj   = 0;      // Pascal Obj
+	private long             PasObj   = 0;     // Pascal Obj
 	private Controls        controls = null;   // Control Class for Event
 	//
 	private Canvas          mCanvas = null;
 	private Paint           paint  = null;
-	private TextPaint mTextPaint = null;
+	private TextPaint       mTextPaint = null;
 	private Paint.Style mStyle;
 
 	float scale = 1; // p.setTextSize(48*scale);
@@ -35,13 +44,19 @@ public class jCanvas {
 		controls = ctrls;
 		//Init Class
 		paint = new Paint();
+		
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        
 		mTextPaint = new TextPaint();//new Paint();
+		
 		mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-		float ts = mTextPaint.getTextSize();  //default 12
-		scale = controls.activity.getResources().getDisplayMetrics().density; //0.75/1.0/1.5/2.0）
-		mTextPaint.setTextSize(ts*scale); //ts * unit
+		
 		mStyle = mTextPaint.getStyle();
+		
+		if (controls.GetDensityAssets() > 0) // Defined density
+			scale = 1;
+		else
+			scale = controls.activity.getResources().getDisplayMetrics().density; //0.75/1.0/1.5/2.0）
 	}
 
 	public  void setCanvas(Canvas _canvas) {
@@ -75,14 +90,21 @@ public class jCanvas {
 
 	public  void setColor(int color) {
 		paint.setColor(color);
+		mTextPaint.setColor(color);
 	}
 
 	public void drawBackground(int _color) {
-		mCanvas.drawColor(_color);
+		if( mCanvas != null )
+		 mCanvas.drawColor(_color);
 	}
 
 	public void setTextSize(float textsize) {
-		paint.setTextSize(scale*textsize);
+		mTextPaint.setTextSize(scale*textsize);
+	}
+
+	//by Tomash
+    public void rotate(float rotation) {
+		mCanvas.rotate(rotation);
 	}
 
 	public  void setTypeface(int _typeface) {
@@ -97,31 +119,45 @@ public class jCanvas {
 	}
 
 	public  void drawText(String text, float x, float y ) {
-		mCanvas.drawText(text,x,y,mTextPaint);
+		
+		if( mCanvas != null )
+		 mCanvas.drawText(text,x,y,mTextPaint);
 	}
 
 	public void drawPoint(float _x1, float _y1) {
-		mCanvas.drawPoint(_x1,_y1,paint);
+		
+		if( mCanvas != null )
+		 mCanvas.drawPoint(_x1,_y1,paint);
 	}
 
 	public void drawCircle(float _cx, float _cy, float _radius) {
-		mCanvas.drawCircle(_cx, _cy, _radius, paint);
+		if( mCanvas != null )
+		 mCanvas.drawCircle(_cx, _cy, _radius, paint);
 	}
 
 	public void drawOval(float _left, float _top, float _right, float _bottom) {
-		mCanvas.drawOval(new RectF(_left, _top, _right, _bottom), paint);
+		
+		if( mCanvas != null )
+		 mCanvas.drawOval(new RectF(_left, _top, _right, _bottom), paint);
 	}
 
 	public  void drawLine(float x1, float y1, float x2, float y2) {
-		mCanvas.drawLine(x1,y1,x2,y2,paint);
+		
+		if( mCanvas != null )		
+		 mCanvas.drawLine(x1,y1,x2,y2,paint);
+		
 	}
 
 	public void drawRect(float _left, float _top, float _right, float _bottom) {
-		mCanvas.drawRect(_left, _top, _right, _bottom, paint);
+		
+		if( mCanvas != null )
+		 mCanvas.drawRect(_left, _top, _right, _bottom, paint);
 	}
 
 	public void drawRoundRect(float _left, float _top, float _right, float _bottom, float _rx, float _ry) {
-		mCanvas.drawRoundRect(new RectF(_left, _top, _right, _bottom), _rx, _ry, paint);
+		
+		if( mCanvas != null )
+		 mCanvas.drawRoundRect(new RectF(_left, _top, _right, _bottom), _rx, _ry, paint);
 	}
 
 	private Bitmap GetResizedBitmap(Bitmap _bmp, int _newWidth, int _newHeight){
@@ -133,15 +169,18 @@ public class jCanvas {
 		
 		Bitmap bm = Bitmap.createScaledBitmap(_bmp,
 				(int) (_bmp.getWidth() * factorToUse),
-				(int) (_bmp.getHeight() * factorToUse),false);
+				(int) (_bmp.getHeight() * factorToUse), true);
 		
 		return bm;
 	}
 
 	public void drawBitmap(Bitmap _bitmap, int _width, int _height) {
-		if( (_bitmap == null) || (_width <= 0) || (_height <= 0) ) return; // Fix by tr3e
+		if( (mCanvas == null) || (_bitmap == null) || (_width <= 0) || (_height <= 0) ) return; // Fix by tr3e
+		
 		Bitmap b = GetResizedBitmap(_bitmap, _width, _height);
+		
 		Rect rect = new Rect(0, 0, _width, _height);
+		
 		mCanvas.drawBitmap(b,null,rect,null); //
 	}
 
@@ -154,12 +193,19 @@ public class jCanvas {
     		scaleFactor = Math.min(bitmap.getWidth()/(right-left), bitmap.getHeight()/(bottom-top));
 }	
 		*/
-		if( bitmap == null ) return;
+		if( (mCanvas == null) || (bitmap == null) ) return;
 
 		Rect rect = new Rect(left,top, right, bottom);
+		
 		if ( (bitmap.getHeight() > GL10.GL_MAX_TEXTURE_SIZE) || (bitmap.getWidth() > GL10.GL_MAX_TEXTURE_SIZE)) {
 			int nh = (int) ( bitmap.getHeight() * (512.0 / bitmap.getWidth()) );
+			
 			Bitmap scaled = Bitmap.createScaledBitmap(bitmap,512, nh, true);
+			
+			if( scaled == null ) return;
+			
+			scaled.setDensity(bitmap.getDensity());
+						
 			mCanvas.drawBitmap(scaled,null,rect,paint);
 		}
 		else {
@@ -169,14 +215,21 @@ public class jCanvas {
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		paint = null;
+		mCanvas = null;
 	}
 	
 	//by CC
 	public  void drawTextAligned(String text, float _left, float _top, float _right, float _bottom, float _alignhorizontal , float _alignvertical ) {
+		
+		if( mCanvas == null ) return;
+			
         Rect bounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), bounds);
+        
+        mTextPaint.getTextBounds(text, 0, text.length(), bounds);
+        
         float x = _left + (_right - _left  - bounds.width()) * _alignhorizontal;
         float y = _top + (_bottom - _top  - bounds.height()) * _alignvertical + bounds.height();
+        
 		mCanvas.drawText(text,x,y,mTextPaint);//paint
     }
 
@@ -192,17 +245,21 @@ public class jCanvas {
 		return path;
 	}
 	public void DrawPath(float[] _points) {
-		//mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
-		mCanvas.drawPath(GetNewPath(_points), paint);
+		
+		if( mCanvas != null )
+		 mCanvas.drawPath(GetNewPath(_points), paint);
 	}
 
 	public void DrawPath(Path _path) {
-		//mPaint.setStyle(Paint.Style.STROKE);  //<----- important!  //seted in pascal side
-		mCanvas.drawPath(_path, paint);
+		
+		if( mCanvas != null )
+		 mCanvas.drawPath(_path, paint);
 	}
     
     //https://thoughtbot.com/blog/android-canvas-drawarc-method-a-visual-guide
     public void DrawArc(float _leftRectF, float _topRectF, float _rightRectF, float _bottomRectF, float _startAngle, float _sweepAngle, boolean _useCenter) {
+    	if( mCanvas == null ) return;
+    	
         RectF oval = new RectF(_leftRectF, _topRectF, _rightRectF, _bottomRectF);
 		mCanvas.drawArc(oval, _startAngle, _sweepAngle, _useCenter, paint);
     }
@@ -213,8 +270,23 @@ public class jCanvas {
 	}
 
     public Bitmap CreateBitmap(int _width, int _height, int _backgroundColor) {
-		innerBitmap = Bitmap.createBitmap(_width,_height, Bitmap.Config.ARGB_8888); //Returns a mutable bitmap
-		mCanvas = new Canvas(innerBitmap);
+    	
+    	if( (_width <= 0) || (_height <=0) ) return null;
+		
+    	innerBitmap = Bitmap.createBitmap(_width,_height, Bitmap.Config.ARGB_8888); //Returns a mutable bitmap
+    	
+    	if( innerBitmap == null ) return null;
+    	    	    
+        mTextPaint.setTextSize(scale*mTextPaint.getTextSize()); //default 12    	
+    	
+    	if( controls.GetDensityAssets() > 0 )
+			innerBitmap.setDensity( controls.GetDensityAssets() );
+		
+		mCanvas = new Canvas(innerBitmap);		
+		
+		if( (mCanvas != null) &&  (controls.GetDensityAssets() > 0) )
+			mCanvas.setDensity( controls.GetDensityAssets() );
+		
 		Paint paintBg = new Paint();
 		paintBg.setColor(_backgroundColor); //Color.GRAY
 		mCanvas.drawRect(0, 0, innerBitmap.getWidth(), innerBitmap.getHeight(), paintBg);
@@ -223,29 +295,54 @@ public class jCanvas {
 	}
 
 	public void SetBitmap(Bitmap _bitmap) {
+		if( _bitmap == null ) return;
+		
 		Bitmap mutableBitmap = _bitmap.copy(Bitmap.Config.ARGB_8888, true);
+		
 		innerBitmap = mutableBitmap;
+		
+		if( innerBitmap != null )
+			innerBitmap.setDensity( _bitmap.getDensity() );
+				
 		if (mCanvas == null)
 			mCanvas = new Canvas(innerBitmap);
 		else
 			mCanvas.setBitmap(innerBitmap);
+				
+		mCanvas.setDensity( _bitmap.getDensity() );
 	}
 
 	public void SetBitmap(Bitmap _bitmap, int _width, int _height) {
+		if( _bitmap == null ) return;
+		
 		Bitmap mutableBitmap = _bitmap.copy(Bitmap.Config.ARGB_8888, true);
+		
 		innerBitmap = GetResizedBitmap(mutableBitmap, _width, _height);
+		
+		if( innerBitmap != null )
+			innerBitmap.setDensity( _bitmap.getDensity() );
+				
 		if (mCanvas == null)
 			mCanvas = new Canvas(innerBitmap);
 		else
 			mCanvas.setBitmap(innerBitmap);
+		
+		mCanvas.setDensity( _bitmap.getDensity() );
 	}
 
 	public Bitmap GetBitmap() {
 		return innerBitmap;
 	}
-
+	
+	// by Kordal
+	public Paint GetPaint() {
+		return paint; // uses jPaintShader
+	}	
+	
 	public void DrawBitmap(float _left, float _top, Bitmap _bitmap) {
-		if( _bitmap == null ) return;
+		
+		if((mCanvas == null) || (_bitmap == null)) return;
+				
 		mCanvas.drawBitmap(_bitmap, _left, _top, null);
 	}
 
@@ -254,13 +351,16 @@ public class jCanvas {
 		else scale = 1;
 	}
 
-	private float getTextHeight(String text, Paint paint /*textPaint*/) {
+	private float getTextHeight(String text, TextPaint textPaint) {
 		Rect rect = new Rect();
-		paint.getTextBounds(text, 0, text.length(), rect);
+		textPaint.getTextBounds(text, 0, text.length(), rect);
 		return rect.height();
 	}
 
 	public void DrawText(String _text, float _x, float _y, float _angleDegree, boolean _rotateCenter) {
+		
+		if( mCanvas == null ) return;
+			
 		Rect rect = new Rect();
 		mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
 		mCanvas.save();
@@ -300,6 +400,9 @@ public class jCanvas {
 	}
 
 	public void DrawTextMultiLine(String _text, float _left, float _top, float _right, float _bottom) {
+		
+		if(mCanvas == null) return;
+		
 		Rect bounds = new Rect((int) _left, (int) _top, (int) _right, (int) _bottom);
 		//Static layout which will be drawn on canvas
 		//bounds.width - width of the layout
@@ -312,9 +415,15 @@ public class jCanvas {
 		//calculate X and Y coordinates - In this case we want to draw the text in the
 		//center of canvas so we calculate
 		//text height and number of lines to move Y coordinate to center.
-		float textHeight = getTextHeight(_text, mTextPaint);
+		 Rect rect = new Rect();
+        
+        mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+        
 		int numberOfTextLines = sl.getLineCount();
-		float textYCoordinate = bounds.exactCenterY() - ((numberOfTextLines * textHeight) / 2);
+		
+		float textHeight = numberOfTextLines * rect.height();
+		
+		float textYCoordinate = _top + (_bottom - _top  - textHeight)/2 - (rect.height()/2);
 		//text will be drawn from left
 		float textXCoordinate = bounds.left;
 		mCanvas.translate(textXCoordinate, textYCoordinate);
@@ -330,37 +439,82 @@ public class jCanvas {
 			mCanvas.drawColor(Color.WHITE);
 	}
 
-	public Canvas GetInstance() {
-		return mCanvas;
-	}
-
 	// by Kordal
-	public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, int _dstLeft, int _dstTop, int _dstRight, int _dstBottom) {
-		Rect srcRect = new Rect(_srcLeft, _srcTop, _srcRight, _srcBottom);
-		Rect dstRect = new Rect(_dstLeft, _dstTop, _dstRight, _dstBottom);
-
-		mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+	public float GetDensity() {
+		return controls.activity.getResources().getDisplayMetrics().density;
 	}
+	
+	public void ClipRect(float _left, float _top, float _right, float _bottom) {
+        if (mCanvas == null) return;
+        mCanvas.clipRect(_left, _top, _right, _bottom);
+    }
+	
+	public void DrawBitmap(Bitmap _bitMap, int _srcLeft, int _srcTop, int _srcRight, int _srcBottom, float _dstLeft, float _dstTop, float _dstRight, float _dstBottom) {
+        if (mCanvas == null) return;
+        Rect srcRect = new Rect(_srcLeft, _srcTop, _srcRight, _srcBottom);
+        RectF dstRect = new RectF(_dstLeft, _dstTop, _dstRight, _dstBottom);
+               
+        mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+    }
+       
+    public void DrawFrame(Bitmap _bitMap, int _srcX, int _srcY, int _srcW, int _srcH, float _X, float _Y, float _Wh, float _Ht, float _rotateDegree) {
+        if (mCanvas == null) return;
+        Rect srcRect = new Rect(_srcX, _srcY, _srcX + _srcW, _srcY + _srcH);
+        RectF dstRect = new RectF(_X, _Y, _X + _Wh, _Y + _Ht);
+               
+        if (_rotateDegree != 0) {
+            mCanvas.save();
+            mCanvas.rotate(_rotateDegree, _X + _Wh / 2, _Y + _Ht / 2);
+            mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+            mCanvas.restore();
+         } else {
+            mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+         }
+    }
+       
+    public void DrawFrame(Bitmap _bitMap, float _X, float _Y, int _Index, int _Size, float _scaleFactor, float _rotateDegree) {
+          float sf = _Size * _scaleFactor;
+          DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
+    }
+	
+    public void DrawGrid(float _left, float _top, float _width, float _height, int _cellsX, int _cellsY) {
+        if (mCanvas == null) return;
 
-    // by Kordal
-    public void DrawFrame(Bitmap _bitMap, int _srcX, int _srcY, int _srcW, int _srcH, int _X, int _Y, int _Wh, int _Ht, float _rotateDegree) {
-		Rect srcRect = new Rect(_srcX, _srcY, _srcX + _srcW, _srcY + _srcH);
-		Rect dstRect = new Rect(_X, _Y, _X + _Wh, _Y + _Ht);
+        float cw = _width / _cellsX;
+        float ch = _height / _cellsY;
+        for (int i = 0; i < _cellsX + 1; i++) {
+            mCanvas.drawLine(_left + i * cw, _top, _left + i * cw, _top + _height, paint); // draw Y lines
+        }
+        for (int i = 0; i < _cellsY + 1; i++) {
+            mCanvas.drawLine(_left, _top + i * ch, _left + _width, _top + i * ch, paint); // draw X lines
+        }
+    }	
+	
+	public void SaveBitmapJPG(String _fullPathFileName) {
+		if (innerBitmap == null) return;
 
-		if (_rotateDegree != 0) {
-			mCanvas.save();
-			mCanvas.rotate(_rotateDegree, _X + _Wh / 2, _Y + _Ht / 2);
-			mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
-			mCanvas.restore();
-		} else {
-			mCanvas.drawBitmap(_bitMap, srcRect, dstRect, paint);
+		File file;
+
+		String f = _fullPathFileName.toLowerCase();
+		if (f.contains(".jpg"))
+		    file = new File(_fullPathFileName);
+		else
+			file = new File(_fullPathFileName+".jpg");
+
+		if (file.exists ()) file.delete();
+		try {
+			FileOutputStream out = new FileOutputStream(file);
+			innerBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	// by Kordal
-	public void DrawFrame(Bitmap _bitMap, int _X, int _Y, int _Index, int _Size, float _scaleFactor, float _rotateDegree) {
-		int sf = (int) (_Size * _scaleFactor);
-		DrawFrame(_bitMap, _Index % (_bitMap.getWidth() / _Size) * _Size, _Index / (_bitMap.getWidth() / _Size) * _Size, _Size, _Size, _X, _Y, sf, sf, _rotateDegree);
+	public Canvas GetJInstance() {
+		if (mCanvas ==null) mCanvas = new Canvas();
+		return mCanvas;
 	}
 
 }

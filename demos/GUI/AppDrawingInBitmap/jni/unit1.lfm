@@ -1,13 +1,13 @@
 object AndroidModule1: TAndroidModule1
-  Left = 370
-  Top = 32
-  Width = 320
-  Height = 509
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
   Enabled = True
+  Left = 293
+  Top = 183
+  Width = 320
+  Height = 509
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
@@ -16,17 +16,16 @@ object AndroidModule1: TAndroidModule1
   AnimationDurationOut = 1500
   AnimationMode = animNone
   object jTextView1: jTextView
-    Left = 71
-    Top = 5
-    Width = 177
-    Height = 26
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 71
+    Top = 5
+    Width = 177
+    Height = 26
     Visible = True
-    Id = 1
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -40,45 +39,77 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     GravityInParent = lgNone
   end
-  object jImageView1: jImageView
-    Left = 0
-    Top = 36
-    Width = 320
-    Height = 254
+  object jScrollView1: jScrollView
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
     Enabled = True
+    Left = 0
+    Top = 36
+    Width = 320
+    Height = 339
     Visible = True
     Anchor = jTextView1
-    Id = 2
     PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = [rpCenterHorizontal]
+    PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpHalfOfParent
-    BackgroundColor = colbrGhostWhite
-    ImageScaleType = scaleCenterCrop
-    GravityInParent = lgNone
-    RoundedShape = False
-    AnimationDurationIn = 1500
-    AnimationMode = animNone
+    LayoutParamHeight = lpTwoThirdOfParent
+    InnerLayout = ilLinear
+    FillViewportEnabled = False
+    ScrollSize = 800
+    BackgroundColor = colbrDefault
   end
-  object jButton1: jButton
-    Left = 5
-    Top = 295
-    Width = 310
-    Height = 57
+  object jEditText1: jEditText
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
+    Left = 5
+    Top = 380
+    Width = 310
+    Height = 39
     Visible = True
-    Anchor = jImageView1
-    Id = 3
+    Anchor = jScrollView1
     PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = [rpCenterHorizontal]
+    PosRelativeToParent = []
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Johann Wolfgang von Goethe.'
+    Alignment = taLeft
+    InputTypeEx = itxText
+    MaxTextLength = -1
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    HintTextColor = colbrDefault
+    ScrollBarStyle = scrNone
+    MaxLines = 1
+    HorScrollBar = True
+    VerScrollBar = True
+    WrappingLine = False
+    Editable = True
+    FontSizeUnit = unitDefault
+    CloseSoftInputOnEnter = True
+    CapSentence = False
+    CaptureBackPressed = False
+    GravityInParent = lgNone
+  end
+  object jButton1: jButton
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 5
+    Top = 429
+    Width = 310
+    Height = 57
+    Visible = True
+    Anchor = jEditText1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
     Text = 'Draw!'
@@ -91,19 +122,19 @@ object AndroidModule1: TAndroidModule1
   end
   object jBitmap1: jBitmap
     FilePath = fpathData
-    ImageIdentifier = 'ic_launcher'
+    ImageIdentifier = 'smiley64'
     Width = 0
     Height = 0
-    left = 56
-    top = 384
+    Left = 56
+    Top = 384
   end
   object jCanvas1: jCanvas
     PaintStrokeWidth = 1
     PaintStyle = psStroke
-    PaintTextSize = 12
+    PaintTextSize = 14
     PaintColor = colbrBlue
     Typeface = ffNormal
-    left = 152
-    top = 384
+    Left = 152
+    Top = 384
   end
 end

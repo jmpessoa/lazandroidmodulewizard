@@ -11465,6 +11465,7 @@ end;
 function jBitmap.GetHeight: integer;
 begin
    //in designing component state: result value here...
+  Result:= FHeight;
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetWidth');
 end;
@@ -11472,6 +11473,7 @@ end;
 function jBitmap.GetWidth: integer;
 begin
   //in designing component state: result value here...
+   Result:= FWidth;
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetHeight');
 end;

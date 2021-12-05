@@ -1,0 +1,3 @@
+public native void pOnScrollViewChanged(long pasobj, int currenthorizontal, int currentVertical, int previousHorizontal, int previousVertical, int onPosition, int scrolldiff);
+public native void pOnScrollViewInnerItemClick(long pasobj, int itemId);
+public native void pOnScrollViewInnerItemLongClick(long pasobj, int index, int itemId);

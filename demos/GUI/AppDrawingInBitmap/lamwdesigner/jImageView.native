@@ -1,1 +1,0 @@
-public native void pOnImageViewPopupItemSelected(long pasobj, String caption);
