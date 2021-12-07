@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  tonegenerator,
   modbus,
   batterymanager,
   bluetoothlowenergy,
@@ -77,6 +78,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jtonegenerator_icon.lrs}
   {$I jmodbus_icon.lrs}
   {$I jbatterymanager_icon.lrs}
   {$I jnetapi_icon.lrs}
@@ -147,6 +149,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jToneGenerator,
       jModbus,
       jBatteryManager,
       jNetApi,

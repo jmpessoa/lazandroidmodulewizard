@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:60
+-keep class org.lamw.apptonegeneratordemo1.App { <init>(...); }
+
