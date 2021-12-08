@@ -79,8 +79,7 @@ I - Lazarus for Android
 
 				If need, [after Build and install] repeat the "Build and install" process  once for each architecture!
 
-				Hint:  After "build" and "install" the cross-compilers and all "II. Infrastructure"  
-                                       go to "III. USING LAMW" and try to create your first [New] LAMW project! 
+				Hint:  After "build" and "install" the cross-compilers and all "II. Infrastructure" go to "III. USING LAMW" and try to create your first [New] LAMW project! 
 				
 
 					If you get a error "Fatal: Cannot find unit system used by fcllaz of package FCL."
@@ -177,9 +176,10 @@ III. USING LAMW
 
 1. Configure Paths:
 
-	Lazarus IDE menu "Tools" ---> "[LAMW] Android Module Wizard" -->  "Path Settings ..."
+	Lazarus IDE menu "Tools" ---> "[LAMW] Android Module Wizard" -->  "Paths Settings ..."
 
 	NOTE: [MacOs >= 10.5] path to Java JDK auto setting as: ${/usr/libexec/java_home}
+
 
 2. [How to] New Project [Thanks to Ahmad Bohloolbandi (a.k.a. @developing)]
 
@@ -226,7 +226,7 @@ III. USING LAMW
 		example: ARMv7a + Soft
 		
 		NOTE: 	.laz4android2.0.12 support "ARMv7a + Soft" and "Aarch64" and others!
-			.Fpcupdeluxe support  "ARMv7a + VFPv3" and "Aarch64"
+			.Fpcupdeluxe support  "ARMv7a + VFPv3" and "Aarch64" and others!
 			.LAMW Manager support  "ARMv7a + VFPv3" and "Aarch64"
 		
         2.9. Select Android Theme
