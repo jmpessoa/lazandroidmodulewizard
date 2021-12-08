@@ -42,7 +42,7 @@
 
 - - - d.2 Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
 - - - - Download LAMW and unzip it in some folder 
-- - - - - recommended folder "C:\laz4android2.0.12\components"
+- - - - - recommended folder "C:\lazarus2.0.12\components"
 - - - - Packages Installations order:
 - - - - - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
 - - - - - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
@@ -59,18 +59,18 @@
 - - - - - Build
 - - - - - Install
 
-- - - - hint: After "build" and "install" the cross-compilers and to do  all "II. Infrastructure" go to "3. Using LAMW" and try to create your first [New] LAMW project!
-- - - - - If you get an error "Fatal: Cannot find unit system used by fcllaz of package FCL." when trying "Run" --> "Build"  your project try fix the "fpc.cfg" file:Go to "fpc.cfg"  (ex. "lazarus\fpc\3.2.0\bin")
+- - - - hint: After "build" and "install" the cross-compilers and to do  all "2. Infrastructure" go to "3. Using LAMW" and try to create your first [New] LAMW project!
+- - - - - If you get an error "Fatal: Cannot find unit system used by fcllaz of package FCL." when trying "Run" --> "Build"  your project try fix the "fpc.cfg" file. Go to "fpc.cfg"  (ex. "lazarus\fpc\3.2.0\bin")
 - - - - - - change:
 - - - - - - - '# searchpath for units and other system dependent things
-- - - - - - - -FuC:\laz4android2.0.12\fpc\$FPCVERSION/units/$fpctarget 
-- - - - - - - -FuC:\laz4android2.0.12\fpc\$FPCVERSION/units/$fpctarget/*  
-- - - - - - - -FuC:\laz4android2.0.12\fpc\$FPCVERSION/units/$fpctarget/rtl
+- - - - - - - -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget 
+- - - - - - - -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget/*  
+- - - - - - - -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget/rtl
 - - - - - - to:
 - - - - - - - '# searchpath for units and other system dependent things
-- - - - - - - -FuC:\laz4android2.0.12\fpc\3.2.0/units/$fpctarget 
-- - - - - - - -FuC:\laz4android2.0.12\fpc\3.2.0/units/$fpctarget/*  
-- - - - - - - -FuC:\laz4android2.0.12\fpc\3.2.0/units/$fpctarget/rtl
+- - - - - - - -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget 
+- - - - - - - -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget/*  
+- - - - - - - -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget/rtl
 - - - - - - and Go to Lazarus IDE menu "Tools" -> "Options" -> "Environment"
 - - - - - - - "FPC Source"
 - - - - - - - - Change:
