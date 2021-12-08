@@ -269,6 +269,10 @@ function jCanvas_CreateBitmap(env: PJNIEnv; _jcanvas: JObject; _width: integer; 
 function jCanvas_GetBitmap(env: PJNIEnv; _jcanvas: JObject): jObject;
 procedure jCanvas_DrawBitmap(env: PJNIEnv; _jcanvas: JObject; _left: single; _top: single; _bitmap: jObject);overload;
 
+function jCanvas_GetTextHeight(env: PJNIEnv; _jcanvas: JObject; _text: string): single;
+function jCanvas_GetTextWidth(env: PJNIEnv; _jcanvas: JObject; _text: string): single;
+procedure jCanvas_SetFontAndTextTypeFace(env: PJNIEnv; _jcanvas: JObject; _fontFace: integer; _fontStyle: integer);
+
 // by Kordal
 function jCanvas_GetPaint(env: PJNIEnv; _jcanvas: JObject): JObject; // uses JPaintShader
 
@@ -3197,6 +3201,80 @@ begin
   jParams[4].i:= _Size;
   jParams[5].f:= _scaleFactor;
   jParams[6].f:= _rotateDegree;
+
+  env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jCanvas_GetTextHeight(env: PJNIEnv; _jcanvas: JObject; _text: string): single;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextHeight', '(Ljava/lang/String;)F');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+
+  Result:= env^.CallFloatMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jCanvas_GetTextWidth(env: PJNIEnv; _jcanvas: JObject; _text: string): single;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextWidth', '(Ljava/lang/String;)F');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+
+  Result:= env^.CallFloatMethodA(env, _jcanvas, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jCanvas_SetFontAndTextTypeFace(env: PJNIEnv; _jcanvas: JObject; _fontFace: integer; _fontStyle: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jcanvas);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFontAndTextTypeFace', '(II)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _fontFace;
+  jParams[1].i:= _fontStyle;
 
   env^.CallVoidMethodA(env, _jcanvas, jMethod, @jParams);
 

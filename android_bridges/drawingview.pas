@@ -1415,8 +1415,6 @@ begin
    Result:= jDrawingView_GetTextBottom(FjEnv, FjObject, _text);
 end;
 
-
-
 procedure jDrawingView.SetFontFace(AValue: TFontFace);
 begin
  FFontFace:= AValue;

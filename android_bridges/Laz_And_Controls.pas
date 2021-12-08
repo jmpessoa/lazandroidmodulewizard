@@ -2154,13 +2154,17 @@ type
     FPaintTextSize: single;
     FPaintRotation: single;
     FPaintColor: TARGBColorBridge;
-    FTypeface: TFontFace;
+
+    //FTypeface: TFontFace; //deprecated
+
+    FFontFace: TFontFace;
+    FTextTypeFace: TTextTypeFace;
 
     Procedure SetStrokeWidth       (Value : single);
     Procedure SetStyle             (Value : TPaintStyle);
     Procedure SetColor             (Value : TARGBColorBridge);
     Procedure SetTextSize          (Value : single );
-    Procedure SetTypeface          (Value : TFontFace);
+    //Procedure SetTypeface          (Value : TFontFace);
 
     procedure SetPaintShader(Value: jPaintShader);//by kordal
 
@@ -2233,6 +2237,14 @@ type
     procedure DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH: Integer; X, Y, Wh, Ht, rotateDegree: single); overload;
     procedure DrawFrame(bitMap: jObject; X, Y: single; Index, Size: Integer; scaleFactor, rotateDegree: single); overload;
 
+    function GetTextHeight(_text: string): single;
+    function GetTextWidth(_text: string): single;
+
+     procedure SetFontFace(AValue: TFontFace);
+     procedure SetTextTypeFace(AValue: TTextTypeFace);
+
+    procedure SetFontAndTextTypeFace(_fontFace: integer; _fontStyle: integer);
+
     //Property
     property CustomColor : DWord read FCustomColor write FCustomColor;
     property Density: single read GetDensity;
@@ -2243,7 +2255,12 @@ type
     property PaintStyle: TPaintStyle read FPaintStyle write setStyle;
     property PaintTextSize: single read FPaintTextSize write setTextSize;
     property PaintColor: TARGBColorBridge read FPaintColor write setColor;
-    property Typeface: TFontFace read FTypeFace write setTypeFace;
+
+    //property Typeface: TFontFace read FTypeFace write setTypeFace; //deprecated
+
+    property FontFace: TFontFace read FFontFace write SetFontface;
+    property TextTypeFace: TTextTypeFace read FTextTypeFace write SetTextTypeFace;
+
 
   end;
 
@@ -11958,6 +11975,10 @@ begin
   FPaintTextSize:= 12;
   FPaintColor:= colbrBlue;
   FInitialized:= False;
+
+  FFontFace:= ffNormal;
+  FTextTypeFace:= tfNormal;
+
 end;
 
 destructor jCanvas.Destroy;
@@ -11986,6 +12007,10 @@ begin
   SetColor(FPaintColor);
   SetTextSize(FPaintTextSize);
   FInitialized:= True;
+
+  //new!
+  if (FFontFace <> ffNormal) or (FTextTypeFace <> tfNormal) then
+    jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
   // PaintShader new! //by kordal
   if FPaintShader <> nil then
@@ -12031,15 +12056,6 @@ begin
   if FjObject = nil then exit;
 
   jni_proc_f(FjEnv, FjObject, 'setTextSize', FPaintTextSize);
-end;
-
-procedure jCanvas.SetTypeface(Value: TFontFace);
-begin
-  //in designing component state: set value here...
-  FTypeFace:= Value;
-  if FjObject = nil then exit;
-
-  jni_proc_i(FjEnv, FjObject, 'setTypeface', Ord(FTypeFace));
 end;
 
 procedure jCanvas.SetPaintShader(Value: jPaintShader);
@@ -12416,6 +12432,52 @@ begin
   if FInitialized then
      jni_proc_t(FjEnv, FjObject, 'SaveBitmapJPG', _fullPathFileName);
 end;
+
+function jCanvas.GetTextHeight(_text: string): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_GetTextHeight(FjEnv, FjObject, _text);
+end;
+
+function jCanvas.GetTextWidth(_text: string): single;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jCanvas_GetTextWidth(FjEnv, FjObject, _text);
+end;
+
+procedure jCanvas.SetFontAndTextTypeFace(_fontFace: integer; _fontStyle: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, _fontFace ,_fontStyle);
+end;
+
+procedure jCanvas.SetFontFace(AValue: TFontFace);
+begin
+ FFontFace:= AValue;
+ if(FInitialized) then
+   jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+
+{  //deprecated
+procedure jCanvas.SetTypeface(Value: TFontFace); //deprecated
+begin
+  //in designing component state: set value here...
+  FTypeFace:= Value; //deprecated
+  if(FInitialized) then
+   jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+}
+
+procedure jCanvas.SetTextTypeFace(AValue: TTextTypeFace);
+begin
+  FTextTypeFace:= AValue ;
+  if(FInitialized) then
+   jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+end;
+
 
 //------------------------------------------------------------------------------
 // jView
