@@ -1,9 +1,10 @@
 [![N|Solid](https://i.imgur.com/eAIuo9U.png)](https://www.lazarus-ide.org/)
+
 # LAMW: Lazarus Android Module Wizard
 ##### RAD Android! Form Designer and Components Development Model!
 - LAMW is a wizard to create JNI Android loadable module (.so) and Android Apk using Lazarus/Free Pascal.
 
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+[![Version](https://img.shields.io/badge/Version-0.8.6.1-blue)](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
 
 ##### Features
 - Native Android GUI
@@ -126,3 +127,5 @@
 ###### [Getting_Started "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 ###### [History and Change Log "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_History_and_Change_Log.txt)
 ###### [Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
+
+[![N|Solid](https://i.imgur.com/xlfiR4A.png)](https://www.lazarus-ide.org/)
