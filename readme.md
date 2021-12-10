@@ -14,7 +14,7 @@
 
 ### 1. Get Lazarus for Android
 - Option a) [Laz4Android 2.0.12](http://sourceforge.net/projects/laz4android/files/?source=navbar) (Windows) 
-   - all cross-android compilers already installed!
+   - All cross-android compilers already installed!
       - arm-android/aarch64-android/i386-android/x86_64-android/jvm-android
      - hint: Install here: "C:\laz4android2.0.12"   (not "Program Files" !!!)
    - How to:
@@ -30,10 +30,11 @@
 
 - Option b) [LAMW Manager](https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html) 
    - All in One! LAMW Manage produces a complete Lazarus for Android environment by automating the step "2. Infrastructure"!   
-      - [LAMW Manager Installer for Windows](https://github.com/DanielOliveiraSouza/LAMW4Linux-installer)
-      - [LAMW Manager Installer for Linux](https://github.com/DanielOliveiraSouza/LAMW4Windows-installer)
+      - [LAMW Manager Installer for Linux](https://github.com/dosza/LAMWManager-linux)
+      - [LAMW Manager Installer for Windows](https://github.com/dosza/LAMWManager-win)
 
-- Option c) [Fpcupdeluxe](https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases) (Linux and Windows)
+- Option c) [Fpcupdeluxe](https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases) (Linux and Windows) 
+   - [Linux + Fpcupdeluxe + LAMW](https://github.com/DanielOliveiraSouza/LAMW4Linux-installer)
 - Option d) How to: Do It Yourself! 
     - d.1) Get [Lazarus 2.0.12](https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.0.12/lazarus-2.0.12-fpc-3.2.0-win64.exe/download)
     - d.2) Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
@@ -77,7 +78,7 @@
 ##### 2.1 Get [Java JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 - warning:  Java JDK > 8 don't support [anymore] "Ant" Apk builder!
 
-##### 2.2 Get Android SDK (recommended version!)
+##### 2.2 Get Android SDK
 - recommended version for supporting "Ant" and "Gradle" Apk builders
   - [r25.2.5-windows](https://dl.google.com/android/repository/tools_r25.2.5-windows.zip)
    - [r25.2.5-linux](https://dl.google.com/android/repository/tools_r25.2.5-linux.zip)
@@ -85,17 +86,19 @@
 - hints:
     - unpacked/install to a "sdk" folder
     - open a command line terminal and go to folder "sdk/tools"
-    - run the command  >> "android update sdk"  to open a GUI "SDK Manager"
-    - check "Android SDK Tools"
-    - check "Android SDK Platform-Tools"
-    - check "Android SDK Build-Tools 29.0.3 (and others more recent) 
-    - go to "Android 10 (API 29)" and check only "SDK Platform" (and others more recent)
-    - go to "Extras" and check:
-       - "Android Support Repository"
-       - "Android Support Library"
-       - "Google USB Drive"	(windows only...)
-       - "Google Repository"
-       - "Google Play Services"
+    - run the command  >> "android update sdk"  to open a GUI [SDK Manager](https://i.imgur.com/UbdoENt.png) 
+       - go to [Tools](https://i.imgur.com/UbdoENt.png) and keep as is
+          - Android SDK Tools  (installed)
+          - (x) Android SDK Platform-Tools
+          - (x) Android SDK Build-Tools 29.0.3 (and others more recent)
+       - go to [Android R](https://i.imgur.com/JvtPqpq.png) and uncheck all! 
+       - go to [Android 10 API 29](https://i.imgur.com/JvtPqpq.png) uncheck all and check only 
+         - (x)SDK Platform
+       - go to [Extras]([Imgur](https://i.imgur.com/pTpG3JO.png)) and check:
+          - (x)Android Support Repository
+          - (x)Google USB Drive	(Windows only...)
+          - (x)Google Repository
+          - (x)Google Play Services
        
 ##### 2.3 Get [Android NDK](https://developer.android.com/ndk/downloads/index.html)
 - recommended version
@@ -125,14 +128,14 @@
       - hint: Accept "default" options!
   - 3.2.4) From Lazarus IDE select "Run" -> "Build"
      - Success! Your sistem is up to produce your first Android Apk!
-  - 3.2.5) Configure you phone device to "debug mode" and plug it to computer usb port
+  - 3.2.5) Configure you phone device to "debug mode" and plug it to the computer usb port
   - 3.2.6) From Lazarus IDE select "Run" -> "[LAMW] Build Apk and Run"
      - Congratulations! You are now an Android Developer!
 
 ### 4. Others References
-
+###### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/HelloWorld.md)
 ###### [Getting_Started "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 ###### [History and Change Log "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_History_and_Change_Log.txt)
-###### [Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
+###### [Getting Help: Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
 
 [![N|Solid](https://i.imgur.com/xlfiR4A.png)](https://www.lazarus-ide.org/)
