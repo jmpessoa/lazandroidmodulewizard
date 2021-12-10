@@ -34,7 +34,7 @@
       - [LAMW Manager Installer for Windows](https://github.com/dosza/LAMWManager-win)
 
 - Option c) [Fpcupdeluxe](https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases) (Linux and Windows) 
-   - [Linux + Fpcupdeluxe + LAMW](https://github.com/DanielOliveiraSouza/LAMW4Linux-installer)
+  - [Linux + Fpcupdeluxe + LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs/linux/tutorial_by_waynesherman)
 - Option d) How to: Do It Yourself! 
     - d.1) Get [Lazarus 2.0.12](https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.0.12/lazarus-2.0.12-fpc-3.2.0-win64.exe/download)
     - d.2) Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
