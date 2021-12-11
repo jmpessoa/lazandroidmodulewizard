@@ -22,7 +22,7 @@
       - Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
          - Download LAMW and unzip it in some folder 
             - recommended folder: "C:\laz4android2.0.12\components"
-         - Packages Installations order:
+         - Packages installations order/sequence:
             - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
             - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
             - amw_ide_tools.lpk		(in "..../ide_tools" folder)
@@ -40,7 +40,7 @@
     - d.2) Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
          - Download LAMW and unzip it in some folder 
             - recommended folder "C:\lazarus2.0.12\components"
-         - Packages Installations order:
+         - Packages installations order/sequence:
             - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
             - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
             - amw_ide_tools.lpk		(in "..../ide_tools" folder)
@@ -54,24 +54,32 @@
         - Build
         - Install
 
-      - hint: After "build" and "install" the cross-compilers and to do  all "2. Infrastructure" go to "3. Using LAMW" and try to create your first [New] LAMW project!
-      - If you get an error "Fatal: Cannot find unit system used by fcllaz of package FCL." when trying "Run" --> "Build"  your project try fix the "fpc.cfg" file. Go to "fpc.cfg"  (ex. "C:\lazarus2.0.12\fpc\3.2.0\bin")
+      - hint: After "build" and "install" the cross-compilers and after to do  all "2. Infrastructure" go to "3. Using LAMW" and try to create your first [New] LAMW project!
+      - If you get an error "Fatal: Cannot find unit system used by fcllaz of package FCL." when trying "Run" --> "Build"  your project then go to "fpc.cfg"  (ex. "C:\lazarus2.0.12\fpc\3.2.0\bin") and:
          - change:
-           - '# searchpath for units and other system dependent things
-           - -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget 
-           - -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget/*  
-           - -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget/rtl
-         - to:
-           - '# searchpath for units and other system dependent things
-           - -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget 
-           - -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget/*  
-           - -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget/rtl
+            ```cfg
+                    #searchpath for units and other system dependent things
+                    -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget 
+                    -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget/*  
+                    -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget/rtl
+            ```
+         - to:        
+            ```cfg
+                   #searchpath for units and other system dependent things
+                   -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget 
+                   -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget/*  
+                   -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget/rtl
+           ```
          - and go to Lazarus IDE menu "Tools" -> "Options" -> "Environment"
            - "FPC Source"
              - change:
-               - $(LazarusDir)fpc\$(FPCVer)\source 
+               ```cfg
+                       $(LazarusDir)fpc\$(FPCVer)\source 
+               ```
              - to:
-               - $(LazarusDir)fpc\3.2.0\source
+               ```cfg             
+                       $(LazarusDir)fpc\3.2.0\source
+               ```
 
 ### 2. Infrastructure  :: only for non-users of  "LAMW Manager" !!
 
@@ -99,6 +107,7 @@
           - (x)Google USB Drive	(Windows only...)
           - (x)Google Repository
           - (x)Google Play Services
+       - Install 7 package!
        
 ##### 2.3 Get [Android NDK](https://developer.android.com/ndk/downloads/index.html)
 - recommended version
@@ -122,18 +131,18 @@
     - hint: [MacOs >= 10.5] Path to Java JDK auto setting as: ${/usr/libexec/java_home}
 - 3.2) How to: Create and Run your first Android Apk!
     - 3.2.1) From Lazarus IDE select "Project" -> "New Project" 
-    - 3.2.2) From displayed dialog select "[LAMW] GUI Android Module" and "Ok"
-    - 3.2.3) Fill the form/dialog fields and "Ok" and "Save"
+    - 3.2.2) From [displayed dialog]([Imgur](https://i.imgur.com/34lqo0N.png)) select "[LAMW] GUI Android Module" and "Ok"
+    - 3.2.3) Fill the [form/dialog]([Imgur](https://i.imgur.com/6pn9cyP.png)) fields and "Ok" and "Save"
       - hint: "Path to Workspace" is your projects folder!
-      - hint: Accept "default" options!
+      - hint: Accept "default" options! (but pay attention to the * signage)
   - 3.2.4) From Lazarus IDE select "Run" -> "Build"
      - Success! Your sistem is up to produce your first Android Apk!
-  - 3.2.5) Configure you phone device to "debug mode" and plug it to the computer usb port
+  - 3.2.5) Configure you phone device to [debug mode](https://developer.android.com/studio/debug/dev-options) and plug it to the computer usb port
   - 3.2.6) From Lazarus IDE select "Run" -> "[LAMW] Build Apk and Run"
      - Congratulations! You are now an Android Developer!
 
 ### 4. Others References
-###### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/HelloWorld.md)
+###### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/AppHelloWorld.md)
 ###### [Getting_Started "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 ###### [History and Change Log "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_History_and_Change_Log.txt)
 ###### [Getting Help: Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
