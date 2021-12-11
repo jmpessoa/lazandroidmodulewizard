@@ -136,7 +136,7 @@
       - hint: "Path to Workspace" is your projects folder!
       - hint: Accept "default" options! (but pay attention to the * signage)
   - 3.2.4) From Lazarus IDE select "Run" -> "Build"
-     - Success! Your sistem is up to produce your first Android Apk!
+     - Success! Your system is up to produce your first Android Apk!
   - 3.2.5) Configure you phone device to [debug mode](https://developer.android.com/studio/debug/dev-options) and plug it to the computer usb port
   - 3.2.6) From Lazarus IDE select "Run" -> "[LAMW] Build Apk and Run"
      - Congratulations! You are now an Android Developer!
