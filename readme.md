@@ -142,7 +142,7 @@
      - Congratulations! You are now an Android Developer!
 
 ### 4. Others References
-###### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/HelloWorld.md)
+###### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/AppHelloWorld.md)
 ###### [Getting_Started "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 ###### [History and Change Log "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_History_and_Change_Log.txt)
 ###### [Getting Help: Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
