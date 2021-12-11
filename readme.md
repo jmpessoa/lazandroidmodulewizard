@@ -102,7 +102,7 @@
        - go to [Android R](https://i.imgur.com/JvtPqpq.png) and uncheck all! 
        - go to [Android 10 API 29](https://i.imgur.com/JvtPqpq.png) uncheck all and check only 
          - (x)SDK Platform
-       - go to [Extras]([Imgur](https://i.imgur.com/pTpG3JO.png)) and check:
+       - go to [Extras](https://i.imgur.com/pTpG3JO.png) and check:
           - (x)Android Support Repository
           - (x)Google USB Drive	(Windows only...)
           - (x)Google Repository
@@ -131,18 +131,18 @@
     - hint: [MacOs >= 10.5] Path to Java JDK auto setting as: ${/usr/libexec/java_home}
 - 3.2) How to: Create and Run your first Android Apk!
     - 3.2.1) From Lazarus IDE select "Project" -> "New Project" 
-    - 3.2.2) From [displayed dialog]([Imgur](https://i.imgur.com/34lqo0N.png)) select "[LAMW] GUI Android Module" and "Ok"
-    - 3.2.3) Fill the [form/dialog]([Imgur](https://i.imgur.com/6pn9cyP.png)) fields and "Ok" and "Save"
+    - 3.2.2) From [displayed dialog](https://i.imgur.com/34lqo0N.png) select "[LAMW] GUI Android Module" and "Ok"
+    - 3.2.3) Fill the [displayed form](https://i.imgur.com/6pn9cyP.png) fields and "Ok" and "Save"
       - hint: "Path to Workspace" is your projects folder!
       - hint: Accept "default" options! (but pay attention to the * signage)
   - 3.2.4) From Lazarus IDE select "Run" -> "Build"
-     - Success! Your system is up to produce your first Android Apk!
+     - Success! Your sistem is up to produce your first Android Apk!
   - 3.2.5) Configure you phone device to [debug mode](https://developer.android.com/studio/debug/dev-options) and plug it to the computer usb port
   - 3.2.6) From Lazarus IDE select "Run" -> "[LAMW] Build Apk and Run"
      - Congratulations! You are now an Android Developer!
 
 ### 4. Others References
-###### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/AppHelloWorld.md)
+###### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/HelloWorld.md)
 ###### [Getting_Started "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 ###### [History and Change Log "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_History_and_Change_Log.txt)
 ###### [Getting Help: Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
