@@ -8,7 +8,9 @@
 
 ##### Features
 - Native Android GUI
+- - AppCompat and Material Design supported!
 - RAD! Form designer and drag&drop component development model!
+- More than 140 components 
 
 # [Getting Started](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 
@@ -135,6 +137,7 @@
     - 3.2.3) Fill the [displayed form](https://i.imgur.com/6pn9cyP.png) fields and "Ok" and "Save"
       - hint: "Path to Workspace" is your projects folder!
       - hint: Accept "default" options! (but pay attention to the * signage)
+      - hint: search your project folder... you will find many treasures there! (look for lazarus project in ".../jni" folder)    
   - 3.2.4) From Lazarus IDE select "Run" -> "Build"
      - Success! Your sistem is up to produce your first Android Apk!
   - 3.2.5) Configure you phone device to [debug mode](https://developer.android.com/studio/debug/dev-options) and plug it to the computer usb port
@@ -143,8 +146,9 @@
 
 ### 4. Others References
 ###### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/AppHelloWorld.md)
-###### [Getting_Started "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
-###### [History and Change Log "doc"](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_History_and_Change_Log.txt)
+###### ["Getting Started" doc](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
+###### ["History and Change Log" doc](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_History_and_Change_Log.txt)
 ###### [Getting Help: Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
 
 [![N|Solid](https://i.imgur.com/xlfiR4A.png)](https://www.lazarus-ide.org/)
+

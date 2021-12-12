@@ -14,6 +14,7 @@
 1.2) Fill the [form/dialog]([Imgur](https://i.imgur.com/6pn9cyP.png)) fields and "Ok" and "Save" to path that is showed ...
    - hint: "Path to Workspace" is your projects folder
    - hint: Accept "default" options! (but pay attention to the * signage)
+   - hint: search your project folder... you will find many treasures there! (look for lazarus project in ".../jni" folder)    
    
 1.3) From Lazarus IDE select "Run" -> "Build" 
    - Success! Your sistem is up to produce your first Android Apk!
@@ -57,5 +58,16 @@
     - From LazarusIDE menu:
        - [LAMW] Build Android Apk and Run
 
+2.1) About LAMW components palettes:
+- [Android Bridges] and [Android Bridges Extra] need only "Ant" builder
+- [Android Bridges AppCompat] and [Android Bridges jCenter] need "Gradle" builder
+
+2.2) About multi-form App 
+- Open demo project AppTest1  (project folde ..../jni)
+
 ### Others references...
-##### [LAMW demos](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI)
+##### [GUI Design WYSIWYG](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs/GUIDesignWYSIWYG.md)
+##### [Muli-Form demo](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI/AppTest1)
+##### [All LAMW GUI demos](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI)
+
+
