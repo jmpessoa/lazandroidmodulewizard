@@ -60,14 +60,11 @@
 
 2.1) About LAMW components palettes:
 - [Android Bridges] and [Android Bridges Extra] need only "Ant" builder
-- [Android Bridges AppCompat] and [Android Bridges jCenter] need "Gradle" builder
+- [Android Bridges AppCompat] and [Android Bridges jCenter] are online libraries and need "Gradle" builder and Internet connection
 
-2.2) About multi-form App 
-- Open demo project AppTest1  (project folde ..../jni)
 
 ### Others references...
 ##### [GUI Design WYSIWYG](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs/GUIDesignWYSIWYG.md)
-##### [Muli-Form demo](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI/AppTest1)
-##### [All LAMW GUI demos](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI)
-
+##### [Multi-Form demo](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI/AppTest1)
+##### [All GUI demos](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI)
 

@@ -48,12 +48,12 @@
 
 		  (Because we want it to be bellow the jEditText1)
 
-  - 3 - Hint:
+  - 4 - Hint:
  
-           To Change width/height of each visual components you should 
+           To Change width/height of a visual component you should 
            configure LayoutParamWhidth and LayoutParamHeight!
 
 ### Others references...
 ##### [Tutorial: My First "Hello Word" App](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/AppHelloWorld.md)
 ##### [Multi-Form demo](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI/AppTest1)
-##### [All LAMW GUI demos](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI)
+##### [All GUI demos](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/demos/GUI)

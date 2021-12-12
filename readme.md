@@ -10,7 +10,7 @@
 - Native Android GUI
 - - AppCompat and Material Design supported!
 - RAD! Form designer and drag&drop component development model!
-- More than 140 components 
+- - More than 140 components! 
 
 # [Getting Started](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 
