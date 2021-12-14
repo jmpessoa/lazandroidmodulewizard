@@ -1479,9 +1479,9 @@ object FormWorkspace: TFormWorkspace
       Left = 174
       Height = 20
       Top = 96
-      Width = 204
+      Width = 208
       BorderSpacing.Left = 12
-      Caption = '(*)Fpcupdeluxe/LamwManager'
+      Caption = '(*) Fpcupdeluxe/LamwManager'
       ParentColor = False
       ParentFont = False
     end
@@ -1925,11 +1925,11 @@ object FormWorkspace: TFormWorkspace
     end
   end
   object SelDirDlgPathToWorkspace: TSelectDirectoryDialog
-    left = 216
+    Left = 216
   end
   object ImageList1: TImageList
-    left = 200
-    top = 328
+    Left = 200
+    Top = 328
     Bitmap = {
       4C690B0000001000000010000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

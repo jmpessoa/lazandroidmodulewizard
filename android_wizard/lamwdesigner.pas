@@ -2136,11 +2136,38 @@ begin
 end;
 
 procedure TAndroidWidgetMediator.InitComponent(AComponent, NewParent: TComponent; NewBounds: TRect);
+var
+  newName: string;
+  i: Integer;
+  oldName: string;
 begin
   if AComponent <> AndroidForm then // to preserve jForm size
   begin
     if AComponent is TAndroidWidget then
     begin
+      if AComponent.Name.StartsWith(AComponent.ClassName) and (AComponent.Name[1] = 'j') then
+      begin
+
+        newName := AComponent.ClassName;
+        Delete(newName, 1, 1);
+
+        i := 1;
+
+        //begin legacy
+        oldName:=  AComponent.ClassName;
+        while (Root.FindComponent(oldName + IntToStr(i)) <> nil)  do
+        begin
+           Inc(i);
+        end;
+        //end legacy
+
+        if i > 1 then i := i - 1;
+        while (Root.FindComponent(newName + IntToStr(i)) <> nil)  do
+        begin
+           Inc(i);
+        end;
+        AComponent.Name := newName + IntToStr(i);
+      end;
       with NewBounds do
         if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
         begin

@@ -35,7 +35,7 @@ implementation
 { TAndroidModule1 }
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  SowMessage('Hello Android World!');
+  ShowMessage('Hello Android World!');
 end;
 
 end.
