@@ -2145,11 +2145,18 @@ begin
   begin
     if AComponent is TAndroidWidget then
     begin
+
       if AComponent.Name.StartsWith(AComponent.ClassName) and (AComponent.Name[1] = 'j') then
       begin
 
         newName := AComponent.ClassName;
-        Delete(newName, 1, 1);
+        Delete(newName, 1, 1); // drop j
+
+        //for jc or js  prefix
+        if (newName[1] = 'c') or  (newName[1] = 's') then
+        begin
+           Delete(newName, 1, 1); //drop c or s
+        end;
 
         i := 1;
 
