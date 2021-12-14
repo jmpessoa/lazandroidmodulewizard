@@ -1341,6 +1341,7 @@ begin
   else if (gradleVersNumber >= 4400) and (gradleVersNumber < 4600) then Result:= '3.1.0'
   else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then Result:= '3.2.1'
   else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then Result:= '3.3.2'
+  else if (gradleVersNumber >= 7000) and (gradleVersNumber < 7999) then Result:= '7.0.0'
   else Result:= '3.4.3'; //gradleVersNumber >= 5110)
 end;
 
@@ -2178,6 +2179,17 @@ begin
 
           if Pos('AppCompat', FAndroidTheme) > 0 then
              strList.Add('android.useAndroidX=true');
+
+          if DirectoryExists(FPathToJavaJDK) then
+          begin
+            tempStr:=FPathToJavaJDK;
+            {$ifdef MSWindows}
+            tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
+            tempStr:=StringReplace(tempStr,':','\:',[]);
+            tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]);
+            {$endif}
+            strList.Add('org.gradle.java.home='+tempStr);
+          end;
 
           strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle.properties');  //if need configure proxy here, too
 
