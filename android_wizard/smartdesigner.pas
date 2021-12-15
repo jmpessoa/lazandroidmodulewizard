@@ -29,6 +29,8 @@ type
     FPathToAndroidSDK: string;  //Included Path Delimiter!
     FPathToAndroidNDK: string;  //Included Path Delimiter!
 
+    FPathToJavaJDK: string;
+
     FInstructionSet: string;
     FFPUSet: string;
     FSmallProjName: string;
@@ -637,7 +639,8 @@ begin
   else if (gradleVersNumber >= 4400) and (gradleVersNumber < 4600) then Result:= '3.1.0'
   else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then Result:= '3.2.1'
   else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then Result:= '3.3.2'
-  else Result:= '3.4.3'; //gradleVersNumber >= 5110
+  else if (gradleVersNumber >= 7000) and (gradleVersNumber < 7999) then Result:= '7.0.0'
+  else Result:= '3.4.3'; //gradleVersNumber >= 5110)
 end;
 
 //https://developer.android.com/studio/releases/gradle-plugin.html#updating-plugin
@@ -1346,15 +1349,32 @@ begin
          strList.SaveToFile(FPathToAndroidProject+'build.gradle');
 
          strList.Clear;
+         strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
+
          if Pos('AppCompat', FAndroidTheme) > 0 then
          begin
-           strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
            if Pos(Uppercase('android.useAndroidX'), Uppercase(strList.Text) ) <= 0 then
            begin
               strList.Add('android.useAndroidX=true');
-              strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
            end;
          end;
+
+         //apply change suggested by DonAlfred
+         if Pos('org.gradle.java.home=', strList.Text ) <= 0 then
+         begin
+           if DirectoryExists(FPathToJavaJDK) then
+           begin
+             tempStr:=FPathToJavaJDK;
+             {$ifdef MSWindows}
+             tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
+             tempStr:=StringReplace(tempStr,':','\:',[]);
+             tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]);
+             {$endif}
+             strList.Add('org.gradle.java.home='+tempStr);
+           end;
+         end;
+
+         strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
 
        end;
     end;
@@ -1674,6 +1694,8 @@ begin
   begin
     FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
     FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
+    FPathToJavaJDK:=     LamwGlobalSettings.PathToJavaJDK;    //Included Path Delimiter!
+
     FPrebuildOSYS:= LamwGlobalSettings.PrebuildOSYS;
     FPathToSmartDesigner:= LamwGlobalSettings.PathToSmartDesigner;
 
