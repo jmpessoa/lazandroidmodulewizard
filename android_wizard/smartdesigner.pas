@@ -913,6 +913,15 @@ begin
     strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
   end;
 
+  //Apply to "smartdesigner.pas" improvement by LongDirtyAnimAlf in "AndroidWizard_intf"
+  strList.Clear;
+  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+  tempStr:= strList.Text;
+  tempStr:= StringReplace(tempStr, 'android:enabled="true"' , 'android:enabled="true" android:exported="true"', [rfReplaceAll,rfIgnoreCase]);
+  strList.Text:= tempStr;
+  strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+
+
   sdkManifestTarqet:= GetTargetFromManifest();
 
   if sdkManifestTarqet <> '' then
