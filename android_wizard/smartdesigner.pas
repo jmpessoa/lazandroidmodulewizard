@@ -1377,7 +1377,7 @@ begin
              {$ifdef MSWindows}
              tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
              tempStr:=StringReplace(tempStr,':','\:',[]);
-             tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]);
+             //tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]); //fix "invalid string escape"
              {$endif}
              strList.Add('org.gradle.java.home='+tempStr);
            end;
