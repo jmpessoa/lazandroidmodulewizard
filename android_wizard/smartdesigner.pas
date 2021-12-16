@@ -917,10 +917,13 @@ begin
   strList.Clear;
   strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
   tempStr:= strList.Text;
-  tempStr:= StringReplace(tempStr, 'android:enabled="true"' , 'android:enabled="true" android:exported="true"', [rfReplaceAll,rfIgnoreCase]);
-  strList.Text:= tempStr;
-  strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-
+  if Pos('android:exported="true"', tempStr) <= 0 then
+  begin
+   tempStr:= StringReplace(tempStr, 'android:enabled="true"' , 'android:enabled="true" android:exported="true"', [rfReplaceAll,rfIgnoreCase]);
+   strList.Text:= tempStr;
+   strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+  end;
+  strList.Clear;
 
   sdkManifestTarqet:= GetTargetFromManifest();
 
