@@ -755,6 +755,12 @@ begin
 
   strList:= TStringList.Create;
 
+  if not FileExists(FPathToAndroidProject + 'gradle.properties') then
+  begin
+    strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
+  end;
+  strList.Clear;
+
   targetpath:=ConcatPaths([FPathToAndroidProject,'res','values']);
   ForceDirectories(targetpath);
 
@@ -1361,32 +1367,36 @@ begin
          strList.SaveToFile(FPathToAndroidProject+'build.gradle');
 
          strList.Clear;
-         strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
 
-         if Pos('AppCompat', FAndroidTheme) > 0 then
+         if fileExists(FPathToAndroidProject+'gradle.properties') then
          begin
-           if Pos(Uppercase('android.useAndroidX'), Uppercase(strList.Text) ) <= 0 then
-           begin
-              strList.Add('android.useAndroidX=true');
-           end;
-         end;
+           strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
 
-         //apply change suggested by DonAlfred
-         if Pos('org.gradle.java.home=', strList.Text ) <= 0 then
-         begin
-           if DirectoryExists(FPathToJavaJDK) then
+           if Pos('AppCompat', FAndroidTheme) > 0 then
            begin
-             tempStr:=FPathToJavaJDK;
-             {$ifdef MSWindows}
-             tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
-             tempStr:=StringReplace(tempStr,':','\:',[]);
-             //tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]); //fix "invalid string escape"
-             {$endif}
-             strList.Add('org.gradle.java.home='+tempStr);
+             if Pos(Uppercase('android.useAndroidX'), Uppercase(strList.Text) ) <= 0 then
+             begin
+                strList.Add('android.useAndroidX=true');
+             end;
            end;
-         end;
 
-         strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
+           //apply change suggested by DonAlfred
+           if Pos('org.gradle.java.home=', strList.Text ) <= 0 then
+           begin
+             if DirectoryExists(FPathToJavaJDK) then
+             begin
+               tempStr:=FPathToJavaJDK;
+               {$ifdef MSWindows}
+               tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
+               tempStr:=StringReplace(tempStr,':','\:',[]);
+               //tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]); //fix "invalid string escape"
+               {$endif}
+               strList.Add('org.gradle.java.home='+tempStr);
+             end;
+           end;
+
+           strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
+         end;
 
        end;
     end;
@@ -1477,12 +1487,6 @@ begin
     //strList.Add('.\gradle run');
     strList.Add('gradle run');
     SaveShellScript(strList, FPathToAndroidProject+'gradle-local-run.sh');
-
-    if not FileExists(FPathToAndroidProject + 'gradle.properties') then
-    begin
-      strList.Clear;
-      strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
-    end;
 
   end;
 
