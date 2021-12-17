@@ -413,13 +413,13 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         marker.setRotation(_rotationAngleDeg);
         //marker.setInfoWindow(null);
-        marker.setDraggable(true);
+        marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
-                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(),  marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(),  marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                 return false;
             }
         });
@@ -438,13 +438,13 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         marker.setAnchor(mX, mY);
         marker.setIcon(controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier)));
         //marker.setInfoWindow(null);
-        marker.setDraggable(true);
+        marker.setDraggable(IsMarkerDraggable);
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
-                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(),  marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(),  marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                 return false;
             }
         });
@@ -473,7 +473,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
-                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                 return false;
             }
         });
@@ -501,7 +501,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
-                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                 return false;
             }
         });
@@ -527,7 +527,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
-                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                 return false;
             }
         });
@@ -557,7 +557,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
                     marker.showInfoWindow();
                     mapView.getController().animateTo(marker.getPosition());
-                    controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                    controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                     return false;
                 }
             });
@@ -587,7 +587,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
                     marker.showInfoWindow();
                     mapView.getController().animateTo(marker.getPosition());
-                    controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                    controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                     return false;
                 }
             });
@@ -615,7 +615,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
-                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                 return false;
             }
         });
@@ -639,7 +639,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
-                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                 return false;
             }
         });
@@ -662,7 +662,7 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 marker.showInfoWindow();
                 mapView.getController().animateTo(marker.getPosition());
-                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLatitude());
+                controls.pOnOpenMapViewMarkerClick(pascalObj, marker.getTitle(), marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
                 return false;
             }
         });
