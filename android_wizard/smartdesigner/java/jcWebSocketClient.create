@@ -1,0 +1,3 @@
+public java.lang.Object jcWebSocketClient_jCreate(long _Self, String strUri) {
+  return (java.lang.Object)(new jcWebSocketClient(this,_Self,strUri));
+}

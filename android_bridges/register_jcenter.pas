@@ -6,6 +6,7 @@ interface
   
 uses
   Classes,
+  cwebsocketclient,
   ctoytimerservice,
   cbillingclient,
   cqrgen,
@@ -25,6 +26,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jcwebsocketclient_icon.lrs}
   {$I jctoytimerservice_icon.lrs}
   {$I jcbillingclient_icon.lrs}
   {$I jcqrgen_icon.lrs}
@@ -37,6 +39,7 @@ begin
   {$I jcmikrotikrouteros_icon.lrs}
   RegisterComponents('Android Bridges jCenter',
     [
+      jcWebSocketClient,
       jcToyTimerService,
       jcBillingClient,
       jcQRGen,

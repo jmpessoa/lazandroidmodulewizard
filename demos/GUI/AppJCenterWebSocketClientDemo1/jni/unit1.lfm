@@ -1,0 +1,70 @@
+object AndroidModule1: TAndroidModule1
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Left = 350
+  Top = 32
+  Width = 320
+  Height = 400
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  object TextView1: jTextView
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 45
+    Top = 5
+    Width = 230
+    Height = 26
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App WebSocket Client Demo1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object Button1: jButton
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 53
+    Top = 171
+    Width = 213
+    Height = 57
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpCenterInParent]
+    LayoutParamWidth = lpTwoThirdOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'WS Connect'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = Button1Click
+  end
+  object WebSocketClient1: jcWebSocketClient
+    OnOpen = WebSocketClient1Open
+    Left = 72
+    Top = 56
+  end
+end

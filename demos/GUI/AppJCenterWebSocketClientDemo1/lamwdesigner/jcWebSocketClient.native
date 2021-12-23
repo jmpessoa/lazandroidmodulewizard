@@ -1,0 +1,7 @@
+public native void pWebSocketClientOnOpen(long pasobj);
+public native void pWebSocketClientOnTextReceived(long pasobj, String msgContent);
+public native void pWebSocketClientOnBinaryReceived(long pasobj, byte[] data);
+public native void pWebSocketClientOnPingReceived(long pasobj, byte[] data);
+public native void pWebSocketClientOnPongReceived(long pasobj, byte[] data);
+public native void pWebSocketClientOnException(long pasobj, String exceptionMessage);
+public native void pWebSocketClientOnCloseReceived(long pasobj);

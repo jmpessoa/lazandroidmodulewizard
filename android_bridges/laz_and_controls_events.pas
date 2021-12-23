@@ -293,6 +293,15 @@ uses
    //jModbus
    procedure Java_Event_pOnModbusConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean;msg:jString);
 
+   // jcWebSocketClient
+   procedure Java_Event_pWebSocketClientOnOpen(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pWebSocketClientOnTextReceived(env:PJNIEnv;this:JObject;Sender:TObject;msgContent:jString);
+   procedure Java_Event_pWebSocketClientOnBinaryReceived(env:PJNIEnv;this:JObject;Sender:TObject;data:jbyteArray);
+   procedure Java_Event_pWebSocketClientOnPingReceived(env:PJNIEnv;this:JObject;Sender:TObject;data:jbyteArray);
+   procedure Java_Event_pWebSocketClientOnPongReceived(env:PJNIEnv;this:JObject;Sender:TObject;data:jbyteArray);
+   procedure Java_Event_pWebSocketClientOnException(env:PJNIEnv;this:JObject;Sender:TObject;exceptionMessage:jString);
+   procedure Java_Event_pWebSocketClientOnCloseReceived(env:PJNIEnv;this:JObject;Sender:TObject);
+
 implementation
 
 uses
@@ -308,7 +317,7 @@ uses
    midimanager, copenmapview, csignaturepad, soundpool, gdxform, cmail, sftpclient,
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
    cbillingclient, ctoytimerservice, bluetoothlowenergy,
-   sfirebasepushnotificationlistener, batterymanager, modbus;
+   sfirebasepushnotificationlistener, batterymanager, modbus, cwebsocketclient;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3561,6 +3570,83 @@ begin
   begin
     jForm(jModbus(Sender).Owner).UpdateJNI(gApp);
     jModbus(Sender).GenEvent_OnModbusConnect(Sender,boolean(success),GetString(env,msg));
+  end;
+end;
+
+procedure Java_Event_pWebSocketClientOnOpen(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  if this <> nil then gApp.Jni.jThis:= this;
+  if Sender is jcWebSocketClient then
+  begin
+    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
+    jcWebSocketClient(Sender).GenEvent_WebSocketClientOnOpen(Sender);
+  end;
+end;
+
+procedure Java_Event_pWebSocketClientOnTextReceived(env:PJNIEnv;this:JObject;Sender:TObject;msgContent:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  if this <> nil then gApp.Jni.jThis:= this;
+  if Sender is jcWebSocketClient then
+  begin
+    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
+    jcWebSocketClient(Sender).GenEvent_WebSocketClientOnTextReceived(Sender,GetString(env,msgContent));
+  end;
+end;
+
+procedure Java_Event_pWebSocketClientOnBinaryReceived(env:PJNIEnv;this:JObject;Sender:TObject;data:jbyteArray);
+begin
+  gApp.Jni.jEnv:= env;
+  if this <> nil then gApp.Jni.jThis:= this;
+  if Sender is jcWebSocketClient then
+  begin
+    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
+    jcWebSocketClient(Sender).GenEvent_WebSocketClientOnBinaryReceived(Sender,GetDynArrayOfJByte(env,data));
+  end;
+end;
+
+procedure Java_Event_pWebSocketClientOnPingReceived(env:PJNIEnv;this:JObject;Sender:TObject;data:jbyteArray);
+begin
+  gApp.Jni.jEnv:= env;
+  if this <> nil then gApp.Jni.jThis:= this;
+  if Sender is jcWebSocketClient then
+  begin
+    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
+    jcWebSocketClient(Sender).GenEvent_WebSocketClientOnPingReceived(Sender,GetDynArrayOfJByte(env,data));
+  end;
+end;
+
+procedure Java_Event_pWebSocketClientOnPongReceived(env:PJNIEnv;this:JObject;Sender:TObject;data:jbyteArray);
+begin
+  gApp.Jni.jEnv:= env;
+  if this <> nil then gApp.Jni.jThis:= this;
+  if Sender is jcWebSocketClient then
+  begin
+    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
+    jcWebSocketClient(Sender).GenEvent_WebSocketClientOnPongReceived(Sender,GetDynArrayOfJByte(env,data));
+  end;
+end;
+
+procedure Java_Event_pWebSocketClientOnException(env:PJNIEnv;this:JObject;Sender:TObject;exceptionMessage:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  if this <> nil then gApp.Jni.jThis:= this;
+  if Sender is jcWebSocketClient then
+  begin
+    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
+    jcWebSocketClient(Sender).GenEvent_WebSocketClientOnException(Sender,GetString(env,exceptionMessage));
+  end;
+end;
+
+procedure Java_Event_pWebSocketClientOnCloseReceived(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  if this <> nil then gApp.Jni.jThis:= this;
+  if Sender is jcWebSocketClient then
+  begin
+    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
+    jcWebSocketClient(Sender).GenEvent_WebSocketClientOnCloseReceived(Sender);
   end;
 end;
 

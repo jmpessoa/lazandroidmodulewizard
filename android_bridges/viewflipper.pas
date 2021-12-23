@@ -19,7 +19,7 @@ jViewFlipper = class(jVisualControl)
     FOnFling: TOnFling;
     procedure SetVisible(Value: Boolean);
     procedure SetColor(Value: TARGBColorBridge); //background
-    
+
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
