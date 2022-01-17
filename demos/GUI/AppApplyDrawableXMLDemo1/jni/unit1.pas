@@ -22,6 +22,7 @@ type
     jImageView2: jImageView;
     jTextView1: jTextView;
     jTextView2: jTextView;
+    ProgressBar1: jProgressBar;
     procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure jButton1Click(Sender: TObject);
   private
@@ -50,11 +51,19 @@ begin
   jImageView1.ApplyDrawableXML('imagelayer');  //from ...res/drawable
 
   jButton1.ApplyDrawableXML('buttonshape');   //from ...res/drawable
+
+  ProgressBar1.ApplyDrawableXML('progressbarshape');   //from ...res/drawable
+
 end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
     jImageView2.ApplyDrawableXML('imageshape'); //from ...res/drawable
+
+    //just as a side hint...
+    ProgressBar1.Progress:= ProgressBar1.Progress + 10;
+    if ProgressBar1.Progress > 50 then ProgressBar1.SetMarkerColor(colbrRed);
+
 end;
 
 end.

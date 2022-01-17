@@ -128,14 +128,16 @@ function jEditText_IsEmpty(env: PJNIEnv; _jedittext: JObject): boolean;
 Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 
 // CheckBox
-Function  jCheckBox_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
+Function  jCheckBox_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
 
 // RadioButton
 
 Function  jRadioButton_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
 
 // ProgressBar
-Function  jProgressBar_Create          (env:PJNIEnv;  this:jobject; SelfObj: TObject; Style: DWord ): jObject;
+Function  jProgressBar_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject; Style: DWord ): jObject;
+procedure jProgressBar_ApplyDrawableXML(env: PJNIEnv; _jprogressbar: JObject; _xmlIdentifier: string);
+procedure jProgressBar_SetMarkerColor(env: PJNIEnv; _jprogressbar: JObject; _color: integer);
 
  { jImageView }
 
@@ -919,6 +921,53 @@ begin
   Result := env^.NewGlobalRef(env,Result);
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
+end;
+
+procedure jProgressBar_ApplyDrawableXML(env: PJNIEnv; _jprogressbar: JObject; _xmlIdentifier: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jprogressbar);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'ApplyDrawableXML', '(Ljava/lang/String;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_xmlIdentifier));
+
+  env^.CallVoidMethodA(env, _jprogressbar, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jProgressBar_SetMarkerColor(env: PJNIEnv; _jprogressbar: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jprogressbar);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetMarkerColor', '(I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _color;
+
+  env^.CallVoidMethodA(env, _jprogressbar, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 //------------------------------------------------------------------------------

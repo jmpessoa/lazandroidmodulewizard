@@ -1444,6 +1444,10 @@ public  java.lang.Object jImageView_Create(long pasobj ) {
 }
 public native void pOnImageViewPopupItemSelected(long pasobj, String caption);
 
+public  java.lang.Object jProgressBar_Create(long pasobj, int style ) {
+  return (java.lang.Object)( new jProgressBar(this.activity,this,pasobj,style));
+}
+
 public  java.lang.Object jTextView_Create(long pasobj) {
   return (java.lang.Object)( new jTextView(this.activity,this,pasobj));
 }

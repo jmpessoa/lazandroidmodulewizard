@@ -1445,6 +1445,8 @@ type
 
     procedure BringToFront;
     procedure SetColors( _color, _colorBack : TARGBColorBridge );
+    procedure ApplyDrawableXML(_xmlIdentifier: string);
+    procedure SetMarkerColor(_color: TARGBColorBridge);
 
   published
     property Style: TProgressBarStyle read FStyle write FStyle;
@@ -7031,6 +7033,20 @@ begin
   FGravityInParent:=  _value;
   if FInitialized then
      View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+end;
+
+procedure jProgressBar.ApplyDrawableXML(_xmlIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jProgressBar_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
+end;
+
+procedure jProgressBar.SetMarkerColor(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jProgressBar_SetMarkerColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 //------------------------------------------------------------------------------

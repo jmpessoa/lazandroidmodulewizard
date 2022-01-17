@@ -7,7 +7,10 @@ package org.lamw.appapplydrawablexmldemo1;
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 
+import android.content.ContentValues;
+import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
+import android.provider.OpenableColumns;
 import android.provider.Settings.Secure;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -88,6 +91,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.io.*;
 import java.lang.Class;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -98,6 +102,7 @@ import java.util.Iterator;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -808,6 +813,12 @@ public class jForm {
                     absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/cache";
                     break;
 
+                case 13:
+                    if (Build.VERSION.SDK_INT < 19)
+                        filePath = getMyEnvDir(Environment.DIRECTORY_DOWNLOADS);
+                    else
+                        filePath = getMyEnvDir(Environment.DIRECTORY_DOCUMENTS);
+                    break;
             }
 
             //Make sure the directory exists.
@@ -2326,7 +2337,7 @@ public class jForm {
 
     //RequestRuntimePermission
     public void RequestUsageStatsPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= 23 ) {  //Build.VERSION_CODES.M
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
             if (intent == null) {
                 return;
@@ -2337,7 +2348,7 @@ public class jForm {
 
     //Check USAGE_STATS permission
     public boolean isUsageStatsAllowed() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT < 23 ) {  //Build.VERSION_CODES.M
             return true;
         } else {
             AppOpsManager appOps = (AppOpsManager) controls.activity.getSystemService(Context.APP_OPS_SERVICE);
@@ -2741,6 +2752,221 @@ public class jForm {
         ClipData cdata = mClipBoard.getPrimaryClip();
         ClipData.Item item = cdata.getItemAt(0);
         return item.getText().toString();
+    }
+
+
+    //creating a document.
+    public void RequestCreateFile(String _uriAsString, String _fileMimeType, String _fileName, int _requestCode) {
+
+        Uri pickerInitialUri = Uri.parse(_uriAsString);
+
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(_fileMimeType); //"application/pdf"
+        intent.putExtra(Intent.EXTRA_TITLE, _fileName); //"invoice.pdf"
+
+        // Optionally, specify a URI for the directory that should be opened in
+        // the system file picker when your app creates the document.
+        if (Build.VERSION.SDK_INT >= 26) {
+            //[ifdef_api26up]
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+            //[endif_api26up]
+        }
+        controls.activity.startActivityForResult(intent, _requestCode);
+    }
+
+    // Request code for selecting  document.
+    public void RequestOpenFile(String _uriAsString, String _fileMimeType, String _fileName, int _requestCode) {
+
+        Uri pickerInitialUri = Uri.parse(_uriAsString);
+
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(_fileMimeType); //"application/pdf"
+
+        // Optionally, specify a URI for the file that should appear in the
+        // system file picker when it loads.
+        if (Build.VERSION.SDK_INT >= 26) {
+            //[ifdef_api26up]
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+            //[endif_api26up]
+        }
+        controls.activity.startActivityForResult(intent, _requestCode);
+    }
+
+    public void RequestOpenDirectory(String _uriAsString, int _requestCode) {
+
+        Uri uriToLoad = Uri.parse(_uriAsString);
+
+        // Choose a directory using the system's file picker.
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+        // Provide read access to files and sub-directories in the user-selected
+        // directory.
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        // Optionally, specify a URI for the directory that should be opened in
+        // the system file picker when it loads.
+        if (Build.VERSION.SDK_INT >= 26) {
+            //[ifdef_api26up]
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uriToLoad);
+            //[endif_api26up]
+        }
+        controls.activity.startActivityForResult(intent, _requestCode);
+    }
+
+
+    //https://developer.android.com/training/data-storage/shared/documents-files#java
+    public String[] GetUriMetaData(Uri _uri) {
+
+        Cursor cursor= null;
+        Uri uri = _uri;
+
+        ArrayList<String> data = new ArrayList<String>();
+        Uri docUriTree = null;
+        // The query, because it only applies to a single document, returns only
+        // one row. There's no need to filter, sort, or select fields,
+        // because we want all fields for one document.
+        if (Build.VERSION.SDK_INT >= 16) {   //android 4.1
+
+            if (Build.VERSION.SDK_INT >= 21) {
+                //[ifdef_api21up]
+                uri = DocumentsContract.buildDocumentUriUsingTree(_uri, DocumentsContract.getTreeDocumentId(_uri));
+                //[ifdef_api21up]
+            }
+
+            try {
+
+                    cursor = controls.activity.getContentResolver().query(uri, null, null, null, null, null);
+                    // moveToFirst() returns false if the cursor has 0 rows. Very handy for
+                    // "if there's anything to look at, look at it" conditionals.
+
+                    if (cursor != null && cursor.moveToFirst()) {
+
+                        // Note it's called "Display Name". This is
+                        // provider-specific, and might not necessarily be the file name.
+                        String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+
+                        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                        // If the size is unknown, the value stored is null. But because an
+                        // int can't be null, the behavior is implementation-specific,
+                        // and unpredictable. So as
+                        // a rule, check if it's null before assigning to an int. This will
+                        // happen often: The storage API allows for remote files, whose
+                        // size might not be locally known.
+                        String size = null;
+                        if (!cursor.isNull(sizeIndex)) {
+                            // Technically the column stores an int, but cursor.getString()
+                            // will do the conversion automatically.
+                            size = cursor.getString(sizeIndex);
+                        } else {
+                            size = "Unknown";
+                        }
+                        //data.add(displayName+"="+size);
+                        data.add(displayName);
+                    }
+                } finally {
+                    if (cursor != null) cursor.close();
+                }
+
+        }
+
+        return data.toArray(new String[data.size()]);
+    }
+
+    public Bitmap GetBitmapFromUri(Uri _uri){
+        Bitmap image=null;
+        ParcelFileDescriptor parcelFileDescriptor=null;
+        try {
+
+            parcelFileDescriptor = controls.activity.getContentResolver().openFileDescriptor(_uri, "r");
+
+            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+
+            image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+
+            parcelFileDescriptor.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    public String GetTextFromUri(Uri _uri) {
+        StringBuilder stringBuilder = new StringBuilder();
+        InputStream inputStream = null;
+        BufferedReader reader = null;
+        try {
+             inputStream = controls.activity.getContentResolver().openInputStream(_uri);
+             reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
+             String line;
+             while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
+    }
+
+    public void TakePersistableUriPermission(Uri _uri) {
+        final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+
+        // Check for the freshest data.
+        if (Build.VERSION.SDK_INT >= 19) {
+            //[ifdef_api19up]
+            controls.activity.getContentResolver().takePersistableUriPermission(_uri, takeFlags);
+            //[endif_api19up]
+        }
+    }
+
+    public void CopyFile(Uri _fromUri, Uri _toUri)  {
+        InputStream in=null;
+        OutputStream out=null;
+        try {
+            in = controls.activity.getContentResolver().openInputStream(_fromUri);
+            out = controls.activity.getContentResolver().openOutputStream(_toUri);
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void SaveImageToUri(Bitmap _bitmap, Uri _toUri) {
+        OutputStream out;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toUri, "w");
+            _bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.close();
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void SaveTextToUri(String _text, Uri _toUri) {
+        OutputStream out=null;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toUri, "w");
+            byte[] bytes = _text.getBytes();
+            out.write(bytes);
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
