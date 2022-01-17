@@ -2164,6 +2164,8 @@ begin
           apk_aliaskey:= LowerCase(FSmallProjName)+'.keyalias';
 
           strList.Clear;
+          strList.Add('java.source=1.8');
+          strList.Add('java.target=1.8');
           strList.Add('key.store='+LowerCase(FSmallProjName)+'-release.keystore');
           strList.Add('key.alias='+apk_aliaskey);
           strList.Add('key.store.password=123456');

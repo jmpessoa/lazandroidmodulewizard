@@ -638,7 +638,8 @@ type
                     dirInternalAppStorage,
                     dirDatabase,
                     dirSharedPrefs,
-                    dirCache);
+                    dirCache,
+                    dirDocuments); //warning: if Device Api < 19 then return dirDownloads!
 
   TEffect        = DWord;
 
@@ -1460,6 +1461,22 @@ type
     procedure CopyStringToClipboard(_txt: string);
     function PasteStringFromClipboard(): string;
 
+    // Android 11 - Api 30  has restricted developers to access devices folders (ex: "Download, Documents, ..., etc")
+    //Developers no longer have access to a file via its path. Instead, you need to use via “Uri“.
+
+    //get user permission... and an uri
+    procedure RequestCreateFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+    procedure RequestOpenFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+    procedure RequestOpenDirectory(_uriAsString: string; _requestCode: integer);
+    procedure TakePersistableUriPermission(_uri: jObject);
+
+     //handling file by uri....
+    function GetUriMetaData(_uri: jObject): TDynArrayOfString;
+    function GetBitmapFromUri(_uri: jObject): jObject;
+    function GetTextFromUri(_uri: jObject): string;
+    procedure SaveImageToUri(_bitmap: jObject; _toUri: jObject);
+    procedure SaveTextToUri(_text: string; _toUri: jObject);
+
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
@@ -1705,7 +1722,18 @@ end;
   procedure jForm_CopyStringToClipboard(env: PJNIEnv; _jform: JObject; _txt: string);
   function jForm_PasteStringFromClipboard(env: PJNIEnv; _jform: JObject): string;
 
-//jni API Bridge
+  procedure jForm_RequestCreateFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+  procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+  procedure jForm_RequestOpenDirectory(env: PJNIEnv; _jform: JObject; _uriAsString: string; _requestCode: integer);
+
+  function jForm_GetUriMetaData(env: PJNIEnv; _jform: JObject; _uri: jObject): TDynArrayOfString;
+  function jForm_GetBitmapFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): jObject;
+  function jForm_GetTextFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
+  procedure jForm_TakePersistableUriPermission(env: PJNIEnv; _jform: JObject; _uri: jObject);
+  procedure jForm_SaveImageToUri(env: PJNIEnv; _jform: JObject; _bitmap: jObject; _toUri: jObject);
+  procedure jForm_SaveTextToUri(env: PJNIEnv; _jform: JObject; _text: string; _toUri: jObject);
+
+  //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
 function Get_jClassLocalRef(fullClassName: string): jClass;
 function Get_jObjectArrayElement(jobjectArray: jObject; index: integer): jObject;
@@ -4949,6 +4977,69 @@ begin
    Result:= jForm_PasteStringFromClipboard(FjEnv, FjObject);
 end;
 
+procedure jForm.RequestCreateFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_RequestCreateFile(FjEnv, FjObject, _uriAsString ,_fileMimeType ,_fileName ,_requestCode);
+end;
+
+procedure jForm.RequestOpenFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_RequestOpenFile(FjEnv, FjObject, _uriAsString ,_fileMimeType ,_fileName ,_requestCode);
+end;
+
+procedure jForm.RequestOpenDirectory(_uriAsString: string; _requestCode: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_RequestOpenDirectory(FjEnv, FjObject, _uriAsString ,_requestCode);
+end;
+
+function jForm.GetUriMetaData(_uri: jObject): TDynArrayOfString;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetUriMetaData(FjEnv, FjObject, _uri);
+end;
+
+function jForm.GetBitmapFromUri(_uri: jObject): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetBitmapFromUri(FjEnv, FjObject, _uri);
+end;
+
+function jForm.GetTextFromUri(_uri: jObject): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetTextFromUri(FjEnv, FjObject, _uri);
+end;
+
+procedure jForm.TakePersistableUriPermission(_uri: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_TakePersistableUriPermission(FjEnv, FjObject, _uri);
+end;
+
+procedure jForm.SaveImageToUri(_bitmap: jObject; _toUri: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SaveImageToUri(FjEnv, FjObject, _bitmap ,_toUri);
+end;
+
+procedure jForm.SaveTextToUri(_text: string; _toUri: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SaveTextToUri(FjEnv, FjObject, _text ,_toUri);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 procedure jForm_CopyStringToClipboard(env: PJNIEnv; _jform: JObject; _txt: string);
@@ -4993,6 +5084,259 @@ begin
   jStr:= env^.CallObjectMethod(env, _jform, jMethod);
 
   Result := GetPStringAndDeleteLocalRef(env, jStr);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jForm_RequestCreateFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestCreateFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_fileMimeType));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_fileName));
+  jParams[3].i:= _requestCode;
+
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestOpenFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_fileMimeType));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_fileName));
+  jParams[3].i:= _requestCode;
+
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jForm_RequestOpenDirectory(env: PJNIEnv; _jform: JObject; _uriAsString: string; _requestCode: integer);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestOpenDirectory', '(Ljava/lang/String;I)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
+  jParams[1].i:= _requestCode;
+
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jForm_GetUriMetaData(env: PJNIEnv; _jform: JObject; _uri: jObject): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetUriMetaData', '(Landroid/net/Uri;)[Ljava/lang/String;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _uri;
+
+  jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);
+    end;
+  end;
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jForm_GetBitmapFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromUri', '(Landroid/net/Uri;)Landroid/graphics/Bitmap;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _uri;
+
+
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jForm_GetTextFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetTextFromUri', '(Landroid/net/Uri;)Ljava/lang/String;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _uri;
+
+
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jForm_TakePersistableUriPermission(env: PJNIEnv; _jform: JObject; _uri: jObject);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'TakePersistableUriPermission', '(Landroid/net/Uri;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _uri;
+
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jForm_SaveImageToUri(env: PJNIEnv; _jform: JObject; _bitmap: jObject; _toUri: jObject);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveImageToUri', '(Landroid/graphics/Bitmap;Landroid/net/Uri;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _bitmap;
+  jParams[1].l:= _toUri;
+
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jForm_SaveTextToUri(env: PJNIEnv; _jform: JObject; _text: string; _toUri: jObject);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveTextToUri', '(Ljava/lang/String;Landroid/net/Uri;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+  jParams[1].l:= _toUri;
+
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
 
   env^.DeleteLocalRef(env, jCls);
 
