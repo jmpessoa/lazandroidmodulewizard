@@ -110,42 +110,36 @@ procedure jTextView_SetShadowLayer(env: PJNIEnv; _jtextview: JObject; _radius: s
 // EditText  :: changed by jmpessoa [support Api > 13]
 //--------------------------------------
 
-Function  jEditText_Create             (env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
+function  jEditText_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
 
-Procedure jEditText_GetCursorPos       (env:PJNIEnv; EditText : jObject; Var x,y : Integer);
-
-procedure jEditText_setFontAndTextTypeFace(env: PJNIEnv; EditText: jObject; FontFace, TextTypeFace: DWord); 
-
+procedure jEditText_GetCursorPos(env:PJNIEnv; EditText : jObject; Var x,y : Integer);
+procedure jEditText_setFontAndTextTypeFace(env: PJNIEnv; EditText: jObject; FontFace, TextTypeFace: DWord);
 procedure jEditText_SetActionIconIdentifier(env: PJNIEnv; _jedittext: JObject; _actionIconIdentifier: string);
 procedure jEditText_ShowActionIcon(env: PJNIEnv; _jedittext: JObject);
 procedure jEditText_HideActionIcon(env: PJNIEnv; _jedittext: JObject);
-function jEditText_IsActionIconShowing(env: PJNIEnv; _jedittext: JObject): boolean;
 
+function jEditText_IsActionIconShowing(env: PJNIEnv; _jedittext: JObject): boolean;
 function jEditText_GetTextLength(env: PJNIEnv; _jedittext: JObject): int64;
 function jEditText_IsEmpty(env: PJNIEnv; _jedittext: JObject): boolean;
 
 // Button
-Function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
+function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
 
 // CheckBox
-Function  jCheckBox_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
+function  jCheckBox_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
 
 // RadioButton
-
-Function  jRadioButton_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
+function  jRadioButton_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
 
 // ProgressBar
-Function  jProgressBar_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject; Style: DWord ): jObject;
-procedure jProgressBar_ApplyDrawableXML(env: PJNIEnv; _jprogressbar: JObject; _xmlIdentifier: string);
-procedure jProgressBar_SetMarkerColor(env: PJNIEnv; _jprogressbar: JObject; _color: integer);
+function  jProgressBar_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject; Style: DWord ): jObject;
 
  { jImageView }
 
-Function  jImageView_Create            (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
+function  jImageView_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
 
-Procedure jImageView_setImage          (env:PJNIEnv;
-                                        ImageView : jObject; fullPath : String);
-function jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
+procedure jImageView_setImage(env:PJNIEnv; ImageView : jObject; fullPath : String);
+function  jImageView_GetBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
 procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
 procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
@@ -921,53 +915,6 @@ begin
   Result := env^.NewGlobalRef(env,Result);
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
-end;
-
-procedure jProgressBar_ApplyDrawableXML(env: PJNIEnv; _jprogressbar: JObject; _xmlIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jprogressbar);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'ApplyDrawableXML', '(Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_xmlIdentifier));
-
-  env^.CallVoidMethodA(env, _jprogressbar, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-procedure jProgressBar_SetMarkerColor(env: PJNIEnv; _jprogressbar: JObject; _color: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jprogressbar);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'SetMarkerColor', '(I)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].i:= _color;
-
-  env^.CallVoidMethodA(env, _jprogressbar, jMethod, @jParams);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 //------------------------------------------------------------------------------

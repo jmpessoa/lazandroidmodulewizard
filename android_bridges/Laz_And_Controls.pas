@@ -7039,14 +7039,14 @@ procedure jProgressBar.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jProgressBar_ApplyDrawableXML(FjEnv, FjObject, _xmlIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 procedure jProgressBar.SetMarkerColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jProgressBar_SetMarkerColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jni_proc_i(FjEnv, FjObject, 'SetMarkerColor', GetARGB(FCustomColor, _color));
 end;
 
 //------------------------------------------------------------------------------
