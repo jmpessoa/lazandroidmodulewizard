@@ -33,7 +33,7 @@ public class jWifiManager /*extends ...*/ {
 
     private boolean locationServicesRequested;
 
-    private boolean hotSpotEnable;
+    private boolean hotSpotEnable;  
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
@@ -44,8 +44,9 @@ public class jWifiManager /*extends ...*/ {
         controls = _ctrls;
 
         locationServicesRequested = false;
-
+        
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+          
         //wifiManager = (WifiManager)Context.getSystemService(Context.WIFI_SERVICE);
         
         // Better to start the app with the wifi deactivated to be able to use it for more purposes.
@@ -65,9 +66,14 @@ public class jWifiManager /*extends ...*/ {
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
     public void SetWifiEnabled(boolean _value) {
-        if (wifiManager!= null) {
-            wifiManager.setWifiEnabled(_value);
-        }
+    	
+    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {    	        		
+    		controls.activity.startActivityForResult(new Intent(Settings.Panel.ACTION_WIFI), 0);    		
+    	} else {
+    		if (wifiManager!= null) 
+                wifiManager.setWifiEnabled(_value);            
+    	}     	
+        
     }
 
     public String[] Scan() {
@@ -168,12 +174,13 @@ public class jWifiManager /*extends ...*/ {
      * Notifies the receiver to connect to a specified wifi
      */
     private static final String ACTION_CONNECT_TO_WIFI = "android.intent.action.CONNECT_TO_WIFI";
-
+    
 
     public boolean Connect(String _networkSSID, String _password) {
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
-        }
+        }        
+        
         try {
            WifiConfiguration conf = new WifiConfiguration();
            conf.SSID = String.format("\"%s\"", _networkSSID);
@@ -225,6 +232,7 @@ public class jWifiManager /*extends ...*/ {
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
         }
+        
         try {
             WifiConfiguration conf = new WifiConfiguration();
             conf.SSID = "\"" + _networkSSID + "\"";   // Please note the quotes. String should contain SSID in quotes
@@ -237,6 +245,7 @@ public class jWifiManager /*extends ...*/ {
             conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
             //Log.d("connecting", conf.SSID + " " + conf.preSharedKey);
             //WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            
             wifiManager.addNetwork(conf);
             //Log.d("after connecting", conf.SSID + " " + conf.preSharedKey);
             List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
@@ -255,6 +264,7 @@ public class jWifiManager /*extends ...*/ {
             //System.out.println(Arrays.toString(ex.getStackTrace()));
             return false;
         }
+        
     }
 
     //https://medium.com/@droidbyme/android-turn-on-gps-programmatically-d585cf29c1ef
