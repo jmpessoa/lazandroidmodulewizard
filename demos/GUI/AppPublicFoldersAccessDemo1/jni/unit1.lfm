@@ -112,9 +112,52 @@ object AndroidModule1: TAndroidModule1
     GravityInParent = lgNone
     OnClick = Button3Click
   end
+  object ListView1: jListView
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Left = 40
+    Top = 237
+    Width = 240
+    Height = 96
+    Visible = True
+    Anchor = Button3
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpThreeQuarterOfParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    WidgetItem = wgNone
+    Delimiter = '|'
+    TextColorInfo = colbrDefault
+    TextDecorated = txtNormal
+    ItemLayout = layText
+    TextSizeDecorated = sdNone
+    TextAlign = alLeft
+    TextPosition = posCenter
+    TextWordWrap = False
+    EnableOnClickTextLeft = False
+    EnableOnClickTextCenter = False
+    EnableOnClickTextRight = False
+    HighLightSelectedItemColor = colbrDefault
+    FontSizeUnit = unitDefault
+    ItemPaddingTop = 10
+    ItemPaddingBottom = 10
+    ItemPaddingLeft = 10
+    ItemPaddingRight = 10
+    TextMarginLeft = 10
+    TextMarginRight = 10
+    TextMarginInner = 2
+    WidgetTextColor = colbrDefault
+    OnClickItem = ListView1ClickItem
+  end
   object IntentManager1: jIntentManager
     IntentAction = iaNone
-    Left = 80
-    Top = 296
+    Left = 24
+    Top = 24
   end
 end

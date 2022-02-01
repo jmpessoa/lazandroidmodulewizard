@@ -1346,7 +1346,7 @@ type
     function GetAssetContentList(_path: string): TDynArrayOfString;
     function GetDriverList(): TDynArrayOfString;
     function GetFolderList(_envPath: string): TDynArrayOfString;
-    function GetFileList(_envPath: string): TDynArrayOfString;
+    function GetFileList(_envPath: string): TDynArrayOfString;  overload;
     function ToStringList(_dynArrayOfString: TDynArrayOfString; _delimiter: char): TStringList;
 
     function FileExists(_fullFileName: string): boolean;
@@ -1465,17 +1465,18 @@ type
     //Developers no longer have access to a file via its path. Instead, you need to use via “Uri“.
 
     //get user permission... and an uri
-    procedure RequestCreateFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
-    procedure RequestOpenFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
-    procedure RequestOpenDirectory(_uriAsString: string; _requestCode: integer);
-    procedure TakePersistableUriPermission(_uri: jObject);
+    procedure RequestCreateFile(_envPath: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+    procedure RequestOpenFile(_envPath: string; _fileMimeType: string; _requestCode: integer);
+    procedure RequestOpenDirectory(_envPath: string; _requestCode: integer);
+    procedure TakePersistableUriPermission(_treeUri: jObject);
 
      //handling file by uri....
-    function GetUriMetaData(_uri: jObject): TDynArrayOfString;
-    function GetBitmapFromUri(_uri: jObject): jObject;
-    function GetTextFromUri(_uri: jObject): string;
-    procedure SaveImageToUri(_bitmap: jObject; _toUri: jObject);
-    procedure SaveTextToUri(_text: string; _toUri: jObject);
+    function GetBitmapFromUri(_treeUri: jObject): jObject;
+    function GetTextFromUri(_treeUri: jObject): string;
+    procedure SaveImageToUri(_bitmap: jObject; _toTreeUri: jObject);
+    procedure SaveTextToUri(_text: string; _toTreeUri: jObject);
+    function GetFileList(_treeUri: jObject): TDynArrayOfString; overload;
+    function GetFileList(_treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -1723,15 +1724,16 @@ end;
   function jForm_PasteStringFromClipboard(env: PJNIEnv; _jform: JObject): string;
 
   procedure jForm_RequestCreateFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
-  procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+  procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _requestCode: integer);
   procedure jForm_RequestOpenDirectory(env: PJNIEnv; _jform: JObject; _uriAsString: string; _requestCode: integer);
 
-  function jForm_GetUriMetaData(env: PJNIEnv; _jform: JObject; _uri: jObject): TDynArrayOfString;
   function jForm_GetBitmapFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): jObject;
   function jForm_GetTextFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
   procedure jForm_TakePersistableUriPermission(env: PJNIEnv; _jform: JObject; _uri: jObject);
   procedure jForm_SaveImageToUri(env: PJNIEnv; _jform: JObject; _bitmap: jObject; _toUri: jObject);
   procedure jForm_SaveTextToUri(env: PJNIEnv; _jform: JObject; _text: string; _toUri: jObject);
+  function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject): TDynArrayOfString; overload;
+  function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
 
   //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -1814,7 +1816,7 @@ function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImag
 function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string): TDynArrayOfString;
 function jForm_GetDriverList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
 function jForm_GetFolderList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
-function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString;
+function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _envPath: string): TDynArrayOfString; overload;
 
 procedure jForm_HideSoftInput(env: PJNIEnv; _jform: JObject; _view: jObject);  overload;
 procedure jForm_SetViewParent(env: PJNIEnv; _jform: JObject; _viewgroup: jObject);
@@ -4977,67 +4979,75 @@ begin
    Result:= jForm_PasteStringFromClipboard(FjEnv, FjObject);
 end;
 
-procedure jForm.RequestCreateFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+procedure jForm.RequestCreateFile(_envPath: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestCreateFile(FjEnv, FjObject, _uriAsString ,_fileMimeType ,_fileName ,_requestCode);
+     jForm_RequestCreateFile(FjEnv, FjObject, _envPath ,_fileMimeType ,_fileName ,_requestCode);
 end;
 
-procedure jForm.RequestOpenFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+procedure jForm.RequestOpenFile(_envPath: string; _fileMimeType: string;  _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestOpenFile(FjEnv, FjObject, _uriAsString ,_fileMimeType ,_fileName ,_requestCode);
+     jForm_RequestOpenFile(FjEnv, FjObject, _envPath ,_fileMimeType ,_requestCode);
 end;
 
-procedure jForm.RequestOpenDirectory(_uriAsString: string; _requestCode: integer);
+procedure jForm.RequestOpenDirectory(_envPath: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestOpenDirectory(FjEnv, FjObject, _uriAsString ,_requestCode);
+     jForm_RequestOpenDirectory(FjEnv, FjObject, _envPath ,_requestCode);
 end;
 
-function jForm.GetUriMetaData(_uri: jObject): TDynArrayOfString;
+function jForm.GetBitmapFromUri(_treeUri: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetUriMetaData(FjEnv, FjObject, _uri);
+   Result:= jForm_GetBitmapFromUri(FjEnv, FjObject, _treeUri);
 end;
 
-function jForm.GetBitmapFromUri(_uri: jObject): jObject;
+function jForm.GetTextFromUri(_treeUri: jObject): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetBitmapFromUri(FjEnv, FjObject, _uri);
+   Result:= jForm_GetTextFromUri(FjEnv, FjObject, _treeUri);
 end;
 
-function jForm.GetTextFromUri(_uri: jObject): string;
+procedure jForm.TakePersistableUriPermission(_treeUri: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_TakePersistableUriPermission(FjEnv, FjObject, _treeUri);
+end;
+
+procedure jForm.SaveImageToUri(_bitmap: jObject; _toTreeUri: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SaveImageToUri(FjEnv, FjObject, _bitmap ,_toTreeUri);
+end;
+
+procedure jForm.SaveTextToUri(_text: string; _toTreeUri: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SaveTextToUri(FjEnv, FjObject, _text ,_toTreeUri);
+end;
+
+function jForm.GetFileList(_treeUri: jObject): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetTextFromUri(FjEnv, FjObject, _uri);
+   Result:= jForm_GetFileList(FjEnv, FjObject, _treeUri);
 end;
 
-procedure jForm.TakePersistableUriPermission(_uri: jObject);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jForm_TakePersistableUriPermission(FjEnv, FjObject, _uri);
-end;
 
-procedure jForm.SaveImageToUri(_bitmap: jObject; _toUri: jObject);
+function jForm.GetFileList(_treeUri: jObject; _fileExtension: string): TDynArrayOfString;
 begin
-  //in designing component state: set value here...
+  //in designing component state: result value here...
   if FInitialized then
-     jForm_SaveImageToUri(FjEnv, FjObject, _bitmap ,_toUri);
-end;
-
-procedure jForm.SaveTextToUri(_text: string; _toUri: jObject);
-begin
-  //in designing component state: set value here...
-  if FInitialized then
-     jForm_SaveTextToUri(FjEnv, FjObject, _text ,_toUri);
+   Result:= jForm_GetFileList(FjEnv, FjObject, _treeUri ,_fileExtension);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -5121,9 +5131,9 @@ begin
 end;
 
 
-procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _requestCode: integer);
 var
-  jParams: array[0..3] of jValue;
+  jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 label
@@ -5132,18 +5142,16 @@ begin
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestOpenFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestOpenFile', '(Ljava/lang/String;Ljava/lang/String;I)V');
   if jMethod = nil then goto _exceptionOcurred;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_fileMimeType));
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_fileName));
-  jParams[3].i:= _requestCode;
+  jParams[2].i:= _requestCode;
 
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env,jParams[2].l);
 
   env^.DeleteLocalRef(env, jCls);
 
@@ -5175,45 +5183,6 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
-
-function jForm_GetUriMetaData(env: PJNIEnv; _jform: JObject; _uri: jObject): TDynArrayOfString;
-var
-  jStr: JString;
-  jBoo: JBoolean;
-  resultSize: integer;
-  jResultArray: jObject;
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-  i: integer;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jform);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'GetUriMetaData', '(Landroid/net/Uri;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= _uri;
-
-  jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
-  if jResultArray <> nil then
-  begin
-    resultSize:= env^.GetArrayLength(env, jResultArray);
-    SetLength(Result, resultSize);
-    for i:= 0 to resultsize - 1 do
-    begin
-      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
-      Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);
-    end;
-  end;
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
 
 function jForm_GetBitmapFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): jObject;
 var
@@ -5343,6 +5312,84 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+
+function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetFileList', '(Landroid/net/Uri;)[Ljava/lang/String;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _treeUri;
+
+  jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);
+    end;
+  end;
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject; _fileExtension: string): TDynArrayOfString;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  resultSize: integer;
+  jResultArray: jObject;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  i: integer;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetFileList', '(Landroid/net/Uri;Ljava/lang/String;)[Ljava/lang/String;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _treeUri;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_fileExtension));
+
+  jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
+  if jResultArray <> nil then
+  begin
+    resultSize:= env^.GetArrayLength(env, jResultArray);
+    SetLength(Result, resultSize);
+    for i:= 0 to resultsize - 1 do
+    begin
+      jStr:= env^.GetObjectArrayElement(env, jresultArray, i);
+      Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);
+    end;
+  end;
+env^.DeleteLocalRef(env,jParams[1].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 function jForm.IsExternalStorageReadWriteAvailable(): boolean;
 begin

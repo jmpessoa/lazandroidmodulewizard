@@ -20,12 +20,14 @@ type
     Button2: jButton;
     Button3: jButton;
     IntentManager1: jIntentManager;
+    ListView1: jListView;
     TextView1: jTextView;
     procedure AndroidModule1ActivityResult(Sender: TObject;
       requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure ListView1ClickItem(Sender: TObject; itemIndex: integer; itemCaption: string);
   private
     {private declarations}
   public
@@ -53,16 +55,19 @@ ref: https://petrakeas.medium.com/android-10-11-storage-cheat-sheet-76866a989df4
 
  LAMW: NEW jForm Uri based Api!
 
- //get user permission... and an uri
- procedure RequestCreateFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
- procedure RequestOpenFile(_uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
- procedure RequestOpenDirectory(_uriAsString: string; _requestCode: integer);
+ //get user permission... and an valid "uri"
+ procedure RequestCreateFile(_envPath: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
+ procedure RequestOpenFile(_envPath: string; _fileMimeType: string; _requestCode: integer);
+ procedure RequestOpenDirectory(_envPath: string; _requestCode: integer);
 
  //handling file by uri....
- function GetUriMetaData(_uri: jObject): TDynArrayOfString;
  function GetBitmapFromUri(_uri: jObject): jObject;
  function GetTextFromUri(_uri: jObject): string;
  procedure TakePersistableUriPermission(_uri: jObject);
+
+ function GetFileList(_treeUri: jObject): TDynArrayOfString; overload;
+ function GetFileList(_treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
+
  procedure SaveImageToUri(bitmap: jObject; _toUri: jObject);
  procedure SaveTextToUri(_text: string; _toUri: jObject);
 
@@ -71,79 +76,94 @@ ref: https://petrakeas.medium.com/android-10-11-storage-cheat-sheet-76866a989df4
 procedure TAndroidModule1.AndroidModule1ActivityResult(Sender: TObject;
   requestCode: integer; resultCode: TAndroidResult; intentData: jObject);
 var
-  uri: jObject;
+  treeUri: jObject;
   arrayData: TDynArrayOfString;
+  listData: TstringList;
   count, i: integer;
   contentText: string;
+
+  outFileName, outUriValue: string;
 begin
    if resultCode = RESULT_OK then
    begin
 
-      if  intentData = nil then
+      if intentData = nil then
       begin
          ShowMessage('Sorry... data nil received...');
          Exit;
       end;
 
-      uri:= IntentManager1.GetDataUri(intentData);
+      treeUri:= IntentManager1.GetDataUri(intentData);
 
-      if uri = nil then
+      //ShowMessage('dataUri = ' + IntentManager1.GetDataUriAsString(intentData) );
+
+      if treeUri = nil then
       begin
          ShowMessage('Sorry... Uri nil received...');
          Exit;
       end;
 
-      ShowMessage('Uri =' +Self.UriToString(uri));
+      //ShowMessage('treeUri =' +Self.UriToString(treeUri));
 
-
-      //Self.TakePersistableUriPermission(uri); //so, you don't need a new request for user when app resume from background
-
+      //Self.TakePersistableUriPermission(treeUri); //so, you don't need a new request for user when app resume from background
 
       if requestCode = 111 then  //create file
       begin
          ShowMessage('Success! Created File!');
-         Self.SaveTextToUri('1. Hello Android 11 World!' + sLineBreak, uri);
+
+         //Add content...
+         Self.SaveTextToUri('1. Hello Android 11 World!' + sLineBreak, treeUri);
       end;
 
       if requestCode = 222 then  //open file
       begin
 
-         ShowMessage('Success! Open File!');
+         //ShowMessage('Success! Open File!');
 
-         contentText:= Self.GetTextFromUri(uri);
+         contentText:= Self.GetTextFromUri(treeUri); //get content
          ShowMessage(contentText);
 
-         Self.SaveTextToUri(contentText + '2. New Text Content!' + sLineBreak , uri);
-
-         //or if mimetype is "image/*"
-         //ImageView.SetImage(Self.GetBitmapFromUri(uri));
+         //Add content..
+         Self.SaveTextToUri(contentText + '2. New Text Content!' + sLineBreak , treeUri);
 
          // or....
          //IntentManager1.SetAction(iaView);
-         //IntentManager1.SetDataAndType(uri, 'text/plain');
+         //IntentManager1.SetDataAndType(treeUri, 'text/plain');
          //IntentManager1.StartActivity();
 
+         //or if mimetype is "image/*"
+         //ImageView.SetImage(Self.GetBitmapFromUri(treeUri));
+
+         //or
+         //IntentManager1.SetAction(iaView);
+         //IntentManager1.SetDataAndType(treeUri, 'image/*');
+         //IntentManager1.StartActivity();
 
       end;
 
       if requestCode = 333 then  //open directory tree
       begin
 
+        arrayData:= Self.GetFileList(treeUri, '.txt'); //filter by file extension
 
-        arrayData:= Self.GetUriMetaData(uri);
+        //or
+        //arrayData:= Self.GetFileList(treeUri); // no filter
 
-        count:= Length(arrayData);
+        listData:= Self.ToStringList(arrayData, ' ');
 
-         ShowMessage('Success! Open Directory "count = '+ IntToStr(count)+'"' );
-
+        count:= listData.Count;
         for i:= 0 to count-1 do
         begin
-           ShowMessage(arrayData[i]);
+          listData.GetNameValue(i , outFileName, outUriValue);
+          ListView1.Add(outFileName);
+          ListView1.SetItemTagString(outUriValue, i); //hiden information
         end;
 
         SetLength(arrayData, 0);
+        listData.Free;
 
       end;
+
 
    end;
 end;
@@ -160,13 +180,31 @@ procedure TAndroidModule1.Button2Click(Sender: TObject);
 begin
    Self.RequestOpenFile(Self.GetEnvironmentDirectoryPath(dirDownloads),
                           'text/plain',
-                          'myhello.txt', 222);  //handled by "OnActivityResult"
+                           222);  //handled by "OnActivityResult"
 
 end;
 
-procedure TAndroidModule1.Button3Click(Sender: TObject);
+procedure TAndroidModule1.Button3Click(Sender: TObject); //list directory content
 begin
     Self.RequestOpenDirectory(Self.GetEnvironmentDirectoryPath(dirDownloads), 333); //handled by "OnActivityResult"
 end;
+
+procedure TAndroidModule1.ListView1ClickItem(Sender: TObject; itemIndex: integer; itemCaption: string);
+var
+  treeUri: jObject;
+  contentText: string;
+begin
+  treeUri:= Self.ParseUri(ListView1.GetItemTagString(itemIndex)); // get hiden information
+
+  contentText:= Self.GetTextFromUri(treeUri); //get file content
+  ShowMessage('File: ' +itemCaption + sLineBreak + contentText);  //show content
+
+  //or
+  //IntentManager1.SetAction(iaView);
+  //IntentManager1.SetDataAndType(treeUri, 'text/plain');  //or 'image/*'  or 'audio/mp3' or 'audio/*' or 'video/mp4'
+  //IntentManager1.StartActivity();
+
+end;
+
 
 end.
