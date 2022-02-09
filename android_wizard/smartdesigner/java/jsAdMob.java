@@ -69,7 +69,7 @@ public class jsAdMob extends FrameLayout {
    private int admobBannerWidthAdaptive = 0; // Adaptive width
    private boolean admobBannerIsLoading = false;
    
-   private Boolean    admobInit    = false;
+   private Boolean    isAdmobInit    = false;
 
    //--- Banner ---//
    private AdView     admobBannerView    = null;
@@ -98,7 +98,7 @@ public class jsAdMob extends FrameLayout {
       pascalObj = _Self;
       controls  = _ctrls;
 
-      admobInit = false;
+      isAdmobInit = false;
       admobBannerView = null;
       
       admobBannerIsLoading = false;
@@ -161,13 +161,15 @@ public class jsAdMob extends FrameLayout {
    
    public void AdMobInit(){	  	   
 	   
-	   if( admobInit ) return; 
+	   if( isAdmobInit ) return;	   
+	   if( controls.activity == null ) return;
 	   
 	   // Initialize the Mobile Ads SDK.
        MobileAds.initialize(controls.activity, 
     	   new OnInitializationCompleteListener() {    	           
            @Override
            public void onInitializationComplete(InitializationStatus initializationStatus) {
+        	   isAdmobInit = true;
         	   controls.pOnAdMobInitializationComplete(pascalObj);
            }
        });
