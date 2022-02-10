@@ -45,9 +45,7 @@ public class jWifiManager /*extends ...*/ {
 
         locationServicesRequested = false;
         
-        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-          
-        //wifiManager = (WifiManager)Context.getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);         
         
         // Better to start the app with the wifi deactivated to be able to use it for more purposes.
         /*if (wifiManager!= null) {
