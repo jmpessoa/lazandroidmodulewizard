@@ -850,8 +850,9 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   byte[] image_byte = stream.toByteArray();
   //Log.i("UpdateImage","UPDATE " + tabName + " SET "+imageFieldName+" = ? WHERE "+keyFieldName+" = ?");
 
+  mydb.beginTransaction();
+  
   try {
-   mydb.beginTransaction();
 	  
    mydb.execSQL("UPDATE " + tabName + " SET " + imageFieldName + " = ? WHERE " + keyFieldName + " = ?", new Object[] {
     image_byte,
@@ -879,8 +880,9 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   
   boolean result = false;
   
-  try {
-   mydb.beginTransaction();
+  mydb.beginTransaction();
+  
+  try { 
 	  
    mydb.execSQL("UPDATE " + tabName + " SET " + imageFieldName + " = ? WHERE " + keyFieldName + " = ?", new Object[] {
     imageValue,
@@ -898,7 +900,6 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   }
   
   return result;
-  
  }
 
  public String Select(String selectQuery) { //return String
@@ -1161,27 +1162,21 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
         if( mydb == null ) return false;
 
         boolean result = false;
+        
+        mydb.beginTransaction();
 
         try {
-            mydb.beginTransaction();
-
-            try {
                 mydb.execSQL(execQuery); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
                 //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
                 mydb.setTransactionSuccessful();
                 result = true;
-            } catch (Exception e) {
+        } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
+        } finally {
                 // transaction over
-                mydb.endTransaction();                
-            }                        
-
-        } catch (SQLiteException e) {
-            Log.e(getClass().getSimpleName(), "Could not execute: " + execQuery);
-        }
-        
-        mydb.close();
+                mydb.endTransaction();
+                mydb.close();
+        }                        
 
         return result;
 
@@ -1209,9 +1204,10 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   bufBmp.compress(CompressFormat.PNG, 0, stream);        	
   byte[] image_byte = stream.toByteArray();
   
+  mydb.beginTransaction();
+  
   try {
-   mydb.beginTransaction();
-	  
+   	  
    mydb.execSQL("UPDATE " + _tabName + " SET " + _imageFieldName + " = ? WHERE " + _keyFieldName + " = ?", new Object[] {
     image_byte,
     _keyValue
@@ -1235,30 +1231,29 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
  public boolean InsertIntoTableBatch(String[] _insertQueries) {
      SQLiteDatabase mydb = getWritableDatabase();
-     boolean r = false;
+     
      if( mydb == null ) return false;
+     
+     boolean result = false;
+     
+     mydb.beginTransaction();
+     
      try {
-         mydb.beginTransaction();
-         int i;
-         int len = _insertQueries.length;
-         for (i = 0; i < len; i++) {
+                  
+         for (int i = 0; i < _insertQueries.length; i++) {
              mydb.execSQL(_insertQueries[i]);
          }
          //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
          mydb.setTransactionSuccessful();
-         r = true;
-     } catch (Exception e) {
-         r = false;
+         result = true;
+     } catch (Exception e) {    	 
          e.printStackTrace();
      } finally {
          //transaction over
-         if (r)
-             mydb.endTransaction();
-         else
-             r = false;
+         mydb.endTransaction();
          mydb.close();
      }
-     return r;
+     return result;
  }
 
  public boolean UpdateTableBatch(String[] _updateQueries) {
@@ -1266,31 +1261,27 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
      
      if(mydb == null) return false;
 
-     boolean r = false;
-     int i;
-     int len = _updateQueries.length;
+     boolean result = false;     
 
+     mydb.beginTransaction();
+     
      try {
-         mydb.beginTransaction();
-         for (i = 0; i < len; i++) {
+        
+         for (int i = 0; i < _updateQueries.length; i++) {
              mydb.execSQL(_updateQueries[i]);
          }
         //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
          mydb.setTransactionSuccessful();
-         r = true;
-     } catch (Exception e) {
-         r = false;
+         result = true;
+     } catch (Exception e) {    	 
          e.printStackTrace();
      } finally {
-         // transaction over
-         if (r)
-             mydb.endTransaction();
-         else
-             r = false;
-
+         // transaction over         
+         mydb.endTransaction();         
          mydb.close();
      }
-     return r;
+     
+     return result;
  }
 
 	//Check if the database exist... 
@@ -1394,12 +1385,12 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
         @Override
         protected String doInBackground(String... args) {
-                data = args;
-                int i;
-                int len = data.length;
-                try {
-                    mydb.beginTransaction();
-                    for (i = 0; i < len; i++) {
+                data = args;                
+                
+                mydb.beginTransaction();
+                
+                try {                   
+                    for (int i = 0; i < data.length; i++) {
                         mydb.execSQL(data[i]);
                         count++;
                     }
