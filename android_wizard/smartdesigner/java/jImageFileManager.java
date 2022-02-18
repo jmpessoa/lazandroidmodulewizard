@@ -426,9 +426,7 @@ public class jImageFileManager /*extends ...*/ {
          
          mImageFile = new File(imagesDir);
          
-         if (!mImageFile.exists()) {
-        	 mImageFile.mkdir();
-         }
+         if (!mImageFile.exists()) mImageFile.mkdirs();        
          
          mImageFile = new File(imagesDir, fileName);
          
