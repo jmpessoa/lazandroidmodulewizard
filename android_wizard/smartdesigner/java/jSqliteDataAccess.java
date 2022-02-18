@@ -497,7 +497,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
         try {
         	File file1 = new File(DB_PATH);
         	if(!file1.exists()){
-        		file1.mkdir();
+        		file1.mkdirs();
         	}
         	
         	File file = new File(DB_PATH + "/" + DATABASE_NAME);
@@ -565,7 +565,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
 
         try {
             File f = new File(DB_PATH + "/");
-            if (!f.exists()) { f.mkdir(); }
+            if (!f.exists()) { f.mkdirs(); }
             if (isZip) {
                 ZipInputStream zis = Utils.getFileFromZip(is);
                 if (zis == null) {
