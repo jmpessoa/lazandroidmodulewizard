@@ -1,0 +1,4 @@
+﻿TBGRABitmap
+
+C:\fpcupdeluxe\ccr\bgrabitmap\bgrabitmap
+
