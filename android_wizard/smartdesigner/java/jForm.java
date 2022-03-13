@@ -2895,6 +2895,7 @@ public class jForm {
 
     //Android 11:
     public Bitmap GetBitmapFromUri(Uri _treeUri){
+       
         Bitmap image=null;
         ParcelFileDescriptor parcelFileDescriptor=null;
         try {
@@ -2913,6 +2914,7 @@ public class jForm {
             e.printStackTrace();
         }
         return image;
+        
     }
 
     //Android 11:
@@ -3001,6 +3003,20 @@ public class jForm {
         }
     }
 
+    //Android 11:
+    public void SaveBytesToUri(byte[] _bytes, Uri _toTreeUri) {
+        OutputStream out=null;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
+            out.write(_bytes);
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }	
+	
     //Android 11:
     public void SaveTextToUri(String _text, Uri _toTreeUri) {
         OutputStream out=null;
