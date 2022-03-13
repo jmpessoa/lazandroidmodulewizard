@@ -1474,6 +1474,7 @@ type
     function GetBitmapFromUri(_treeUri: jObject): jObject;
     function GetTextFromUri(_treeUri: jObject): string;
     procedure SaveImageToUri(_bitmap: jObject; _toTreeUri: jObject);
+    procedure SaveBytesToUri(_bytes: TDynArrayOfJByte; _toTreeUri: jObject);
     procedure SaveTextToUri(_text: string; _toTreeUri: jObject);
     function GetFileList(_treeUri: jObject): TDynArrayOfString; overload;
     function GetFileList(_treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
@@ -1731,6 +1732,7 @@ end;
   function jForm_GetTextFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
   procedure jForm_TakePersistableUriPermission(env: PJNIEnv; _jform: JObject; _uri: jObject);
   procedure jForm_SaveImageToUri(env: PJNIEnv; _jform: JObject; _bitmap: jObject; _toUri: jObject);
+  procedure jForm_SaveBytesToUri(env: PJNIEnv; _jform: JObject; _bytes: TDynArrayOfJByte; _toUri: jObject);
   procedure jForm_SaveTextToUri(env: PJNIEnv; _jform: JObject; _text: string; _toUri: jObject);
   function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject): TDynArrayOfString; overload;
   function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
@@ -5028,6 +5030,16 @@ begin
      jForm_SaveImageToUri(FjEnv, FjObject, _bitmap ,_toTreeUri);
 end;
 
+
+
+procedure jForm.SaveBytesToUri(_bytes: TDynArrayOfJByte; _toTreeUri: jObject);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jForm_SaveBytesToUri(FjEnv, FjObject, _bytes ,_toTreeUri);
+end;
+
+
 procedure jForm.SaveTextToUri(_text: string; _toTreeUri: jObject);
 begin
   //in designing component state: set value here...
@@ -5133,7 +5145,7 @@ end;
 
 procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _requestCode: integer);
 var
-  jParams: array[0..2] of jValue;
+  jParams: array[0..3] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
 label
@@ -5142,16 +5154,18 @@ begin
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestOpenFile', '(Ljava/lang/String;Ljava/lang/String;I)V');
+  jMethod:= env^.GetMethodID(env, jCls, 'RequestOpenFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
   if jMethod = nil then goto _exceptionOcurred;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_fileMimeType));
-  jParams[2].i:= _requestCode;
+  jParams[2].l:= env^.NewStringUTF(env, PChar(nil));
+  jParams[3].i:= _requestCode; 
 
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
 
   env^.DeleteLocalRef(env, jCls);
 
@@ -5280,6 +5294,40 @@ begin
   jParams[1].l:= _toUri;
 
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jForm_SaveBytesToUri(env: PJNIEnv; _jform: JObject; _bytes: TDynArrayOfJByte; _toUri: jObject);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+
+  byteArray: jByteArray;
+  len: SizeInt;
+
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SaveBytesToUri', '([BLandroid/net/Uri;)V');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  len := Length(_bytes);
+  byteArray:= env^.NewByteArray(env, len);
+  env^.SetByteArrayRegion(env, byteArray, 0 , len, @_bytes[0]);
+
+  jParams[0].l:= byteArray;
+  jParams[1].l:= _toUri;
+
+  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
 
   env^.DeleteLocalRef(env, jCls);
 
