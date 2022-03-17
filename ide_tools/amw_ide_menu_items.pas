@@ -70,7 +70,8 @@ begin
   Project:= LazarusIDE.ActiveProject;
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '' ) then
   begin
-     linkLibrariesPath:='';                       //C:\adt32\ndk10e\platforms\android-15\arch-x86\usr\lib\
+
+	 linkLibrariesPath:='';                       //C:\adt32\ndk10e\platforms\android-15\arch-x86\usr\lib\
      aux:= Project.LazCompilerOptions.Libraries;  //C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\; .....
      p:= Pos(';', aux);
      if p > 0 then
@@ -80,7 +81,7 @@ begin
         if Pos('-x86', linkLibrariesPath) > 0 then chip:= 'x86';
         if chip = 'arm' then
         begin
-           libChip:= 'armeabi';       //armeabi armeabi-v7a x86
+           libChip:= 'armeabi';       //armeabi-v7a arm64-v8a x86 x86_64	  		   
            if Pos('-CpARMV7', Project.LazCompilerOptions.CustomOptions) > 0 then
              libChip:= 'armeabi-v7a'; //-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi-
         end
@@ -209,13 +210,14 @@ begin
   auxList.Add('LOCAL_MODULE:= '+libname);
   auxList.Add('');
   auxList.Add('include $(BUILD_SHARED_LIBRARY)');
-  auxList.SaveToFile(pathToProject+'jni'+DirectorySeparator+'Android.mk');
+
+  if FormImportCStuff.AndroidmkComboBox.ItemIndex = 0 then
+  auxList.SaveToFile(pathToProject+'jni'+DirectorySeparator+'Android.mk');  
 
   auxList.Clear;
-  auxList.Add('APP_ABI := '+libChip);  //armeabi armeabi-v7a x86
+  auxList.Add('APP_ABI := '+libChip);  //armeabi-v7a arm64-v8a x86 x86_64
   auxList.Add('APP_PLATFORM := '+ndkPlataform);  //android-13
   auxList.SaveToFile(pathToProject+'jni'+DirectorySeparator+'Application.mk');
-
   auxList.Clear;
 
   {$IFDEF Windows}
@@ -331,6 +333,11 @@ var
   index_IFDEF_line: integer;
   new_TYPE: string;
 begin
+
+  if FormImportCStuff.h2pasComboBox.ItemIndex <> 0 then
+  Exit;
+
+
   mylib:= 'lib'+libName+'.so';
 
   pathToHFile:= pathToProject+libName;
@@ -674,7 +681,15 @@ var
   aux: string;
   listBackup: TStringList;
   saveLibBackupTo: string;
+
+  ini_int_result: integer;
+  ini_bool_result: boolean;
+  ini_string_result: string;
+  
 begin
+
+
+
   Project:= LazarusIDE.ActiveProject;
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '' ) then
   begin
@@ -688,17 +703,19 @@ begin
        if p > 0 then
        begin
           linkLibrariesPath:= Trim(Copy(aux, 1, p-1)); //arch-arm :: arch-arm64 ::  arch-x86 :: arch-x86_64
-          libChip:= 'arm';  //dummy
-          if Pos('arch-x86_64', linkLibrariesPath) > 0 then libChip:= 'x86_64'
-          else if Pos('arch-x86', linkLibrariesPath) > 0 then libChip:= 'x86'
-          else if Pos('arch-arm64', linkLibrariesPath) > 0 then libChip:= 'arm64-v8a';
-
-          if libChip = 'arm' then
-          begin
-             libChip:= 'armeabi';
-             if Pos('-CpARMV7', Project.LazCompilerOptions.CustomOptions) > 0 then //-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi-
-               libChip:= 'armeabi-v7a';
-          end
+		  
+		// string values for searching were taken from file "smartdesigner.pas"
+		if Pos('-CpARMV7', Project.LazCompilerOptions.CustomOptions) > 0 then //-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\Users\username\AppData\Local\Android\Sdk\ndk\22.1.7171670\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin
+           libChip:= 'armeabi-v7a'
+		else if Pos('-XPaarch64', Project.LazCompilerOptions.CustomOptions) > 0 then //-Xd -XPaarch64-linux-android- -FDC:\Users\username\AppData\Local\Android\Sdk\ndk\22.1.7171670\toolchains\aarch64-linux-android-4.9\prebuilt\windows-x86_64\bin
+		   libChip:= 'arm64-v8a'
+		else if Pos('-XPi686', Project.LazCompilerOptions.CustomOptions) > 0 then //-Xd -XPi686-linux-android- -FDC:\Users\username\AppData\Local\Android\Sdk\ndk\22.1.7171670\toolchains\x86-4.9\prebuilt\windows-x86_64\bin
+		   libChip:= 'x86'
+		else if Pos('-XPx86_64', Project.LazCompilerOptions.CustomOptions) > 0 then //-Xd -XPx86_64-linux-android- -FDC:\Users\username\AppData\Local\Android\Sdk\ndk\22.1.7171670\toolchains\x86_64-4.9\prebuilt\windows-x86_64\bin
+		   libChip:= 'x86_64'
+		else   
+		libChip:= 'arm'; //dummy
+				
 
        end;
 
@@ -707,6 +724,60 @@ begin
 
        p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
        pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
+
+
+      with TIniFile.Create(pathToProject+'jni'+DirectorySeparator + 'ImportCStuff.ini') do
+      try	
+		
+        ini_string_result := ReadString('ImportCStuff', 'EditImportC', '');
+        if (CompareStr(FormImportCStuff.EditImportC.Text, ini_string_result) <> 0) then
+        begin
+           WriteString('ImportCStuff', 'EditImportC', FormImportCStuff.EditImportC.Text);
+        end;				
+		
+        ini_bool_result := ReadBool('ImportCStuff', 'CheckBoxAllC', False);
+        if (FormImportCStuff.CheckBoxAllC.Checked <> ini_bool_result) then
+        begin
+           WriteBool('ImportCStuff', 'CheckBoxAllC', FormImportCStuff.CheckBoxAllC.Checked);
+        end;		
+		
+        ini_string_result := ReadString('ImportCStuff', 'EditImportH', '');
+        if (CompareStr(FormImportCStuff.EditImportH.Text, ini_string_result) <> 0) then
+        begin
+           WriteString('ImportCStuff', 'EditImportH', FormImportCStuff.EditImportH.Text);
+        end;			
+				
+        ini_bool_result := ReadBool('ImportCStuff', 'CheckBoxAllH', False);
+        if (FormImportCStuff.CheckBoxAllH.Checked <> ini_bool_result) then
+        begin
+           WriteBool('ImportCStuff', 'CheckBoxAllH', FormImportCStuff.CheckBoxAllH.Checked);
+        end;		
+
+		
+        ini_string_result := ReadString('ImportCStuff', 'EditLibName', '');
+        if (CompareStr(FormImportCStuff.EditLibName.Text, ini_string_result) <> 0) then
+        begin
+           WriteString('ImportCStuff', 'EditLibName', FormImportCStuff.EditLibName.Text);
+        end;			
+
+        ini_int_result := ReadInteger('ImportCStuff', 'AndroidmkComboBox', 0);
+        if (FormImportCStuff.AndroidmkComboBox.ItemIndex <> ini_int_result) then
+        begin
+           WriteInteger('ImportCStuff', 'AndroidmkComboBox', FormImportCStuff.AndroidmkComboBox.ItemIndex);
+        end;	
+		
+		
+        ini_int_result := ReadInteger('ImportCStuff', 'h2pasComboBox', 0);
+        if (FormImportCStuff.h2pasComboBox.ItemIndex <> ini_int_result) then
+        begin
+           WriteInteger('ImportCStuff', 'h2pasComboBox', FormImportCStuff.h2pasComboBox.ItemIndex);
+        end;		
+		
+      finally
+        Free;
+      end;
+
+
 
        pathToImportCcode:= Trim(FormImportCStuff.EditImportC.Text);
        pathToImportHCode:= Trim(FormImportCStuff.EditImportH.Text);
