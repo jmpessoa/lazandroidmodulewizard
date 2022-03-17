@@ -1,12 +1,11 @@
 object FormImportCStuff: TFormImportCStuff
   Left = 325
-  Height = 312
+  Height = 367
   Top = 363
-  Width = 641
+  Width = 620
   Caption = 'LAMW Import C Stuff to Produce a Custom Library'
-  ClientHeight = 312
-  ClientWidth = 641
-  DesignTimePPI = 120
+  ClientHeight = 367
+  ClientWidth = 620
   FormStyle = fsStayOnTop
   Icon.Data = {
     9E09000000000100010018180000010020008809000016000000280000001800
@@ -88,45 +87,47 @@ object FormImportCStuff: TFormImportCStuff
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
+  OnShow = FormShow
+  LCLVersion = '2.2.0.4'
   object Label1: TLabel
-    Left = 26
-    Height = 20
-    Top = 30
-    Width = 73
+    Left = 8
+    Height = 15
+    Top = 24
+    Width = 59
     Caption = 'Import   *.c'
-    ParentColor = False
     ParentFont = False
   end
   object EditImportC: TEdit
-    Left = 26
-    Height = 28
-    Top = 56
-    Width = 392
+    Left = 8
+    Height = 23
+    Top = 45
+    Width = 440
+    Anchors = [akTop, akLeft, akRight]
     ParentFont = False
     TabOrder = 0
   end
   object Label2: TLabel
-    Left = 26
-    Height = 20
-    Top = 109
-    Width = 311
+    Left = 8
+    Height = 15
+    Top = 87
+    Width = 248
     Caption = 'Import   *.h [including some "extern" to export]'
-    ParentColor = False
     ParentFont = False
   end
   object EditImportH: TEdit
-    Left = 26
-    Height = 28
-    Top = 132
-    Width = 390
+    Left = 8
+    Height = 23
+    Top = 106
+    Width = 440
+    Anchors = [akTop, akLeft, akRight]
     ParentFont = False
     TabOrder = 1
   end
   object BitBtn1: TBitBtn
-    Left = 420
-    Height = 38
-    Top = 234
-    Width = 94
+    Left = 424
+    Height = 30
+    Top = 304
+    Width = 75
     Cancel = True
     DefaultCaption = True
     GlyphShowMode = gsmAlways
@@ -137,9 +138,9 @@ object FormImportCStuff: TFormImportCStuff
   end
   object BitBtn2: TBitBtn
     Left = 520
-    Height = 38
-    Top = 234
-    Width = 94
+    Height = 30
+    Top = 304
+    Width = 75
     Default = True
     DefaultCaption = True
     GlyphShowMode = gsmAlways
@@ -149,96 +150,132 @@ object FormImportCStuff: TFormImportCStuff
     TabOrder = 3
   end
   object SpeedButton1: TSpeedButton
-    Left = 522
-    Height = 28
-    Top = 56
-    Width = 29
+    Left = 536
+    Height = 22
+    Top = 45
+    Width = 23
+    Anchors = [akTop, akRight]
     Caption = '...'
     OnClick = SpeedButton1Click
     ParentFont = False
   end
   object SpeedButton2: TSpeedButton
-    Left = 585
-    Height = 28
-    Top = 56
-    Width = 29
+    Left = 586
+    Height = 22
+    Top = 45
+    Width = 23
+    Anchors = [akTop, akRight]
     ParentFont = False
   end
   object SpeedButton3: TSpeedButton
-    Left = 522
-    Height = 28
-    Top = 132
-    Width = 29
+    Left = 536
+    Height = 22
+    Top = 106
+    Width = 23
+    Anchors = [akTop, akRight]
     Caption = '...'
     OnClick = SpeedButton3Click
     ParentFont = False
   end
   object SpeedButton4: TSpeedButton
-    Left = 585
-    Height = 28
-    Top = 132
-    Width = 29
+    Left = 586
+    Height = 22
+    Top = 106
+    Width = 23
+    Anchors = [akTop, akRight]
     ParentFont = False
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 29
-    Top = 283
-    Width = 641
+    Height = 23
+    Top = 344
+    Width = 620
     Panels = <>
     ParentFont = False
   end
   object CheckBoxAllC: TCheckBox
-    Left = 430
-    Height = 24
-    Top = 56
-    Width = 66
+    Left = 462
+    Height = 19
+    Top = 45
+    Width = 54
+    Anchors = [akTop, akRight]
     Caption = 'All  *.c'
     ParentFont = False
     TabOrder = 5
   end
   object CheckBoxAllH: TCheckBox
-    Left = 430
-    Height = 24
-    Top = 136
-    Width = 67
+    Left = 462
+    Height = 19
+    Top = 109
+    Width = 55
+    Anchors = [akTop, akRight]
     Caption = 'All  *.h'
     ParentFont = False
     TabOrder = 6
   end
   object Label3: TLabel
-    Left = 26
-    Height = 20
-    Top = 181
-    Width = 121
-    Caption = 'Custom Lib Name:'
-    ParentColor = False
+    Left = 8
+    Height = 15
+    Top = 145
+    Width = 580
+    Caption = 'Custom Lib Name: (matches the name of subdirectory in project’s folder, Lib source files must be placed here)'
     ParentFont = False
   end
   object EditLibName: TEdit
-    Left = 26
-    Height = 28
-    Top = 201
-    Width = 390
+    Left = 8
+    Height = 23
+    Top = 161
+    Width = 320
     ParentFont = False
     TabOrder = 7
     Text = 'mycstuff1'
   end
   object LabelWarnig: TLabel
-    Left = 32
-    Height = 20
-    Top = 246
-    Width = 241
-    Caption = 'Warning: ["as is" nedd Android 4.1+]'
-    ParentColor = False
+    Left = 8
+    Height = 15
+    Top = 320
+    Width = 154
+    Caption = 'Warning: needs Android 4.1+'
     ParentFont = False
   end
+  object AndroidmkComboBox: TComboBox
+    Left = 8
+    Height = 23
+    Top = 203
+    Width = 601
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 15
+    ItemIndex = 0
+    Items.Strings = (
+      '“Android.mk” automatic file generation (suitable only for small simple C projects)'
+      'Do not generate Android.mk file (I will use my own “./jni/Android.mk” file)'
+    )
+    Style = csDropDownList
+    TabOrder = 8
+    Text = '“Android.mk” automatic file generation (suitable only for small simple C projects)'
+  end
+  object h2pasComboBox: TComboBox
+    Left = 8
+    Height = 23
+    Top = 242
+    Width = 601
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 15
+    ItemIndex = 0
+    Items.Strings = (
+      '*.pp file automatic generation using H2PAS (free Pascal C header to Pascal unit translator)'
+      'Do not generate *.pp files (I will use my own “./jni/*.pp” files)'
+    )
+    Style = csDropDownList
+    TabOrder = 9
+    Text = '*.pp file automatic generation using H2PAS (free Pascal C header to Pascal unit translator)'
+  end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
-    left = 260
-    top = 20
+    Left = 208
+    Top = 16
   end
   object SelectDirectoryDialog2: TSelectDirectoryDialog
-    left = 380
-    top = 130
+    Left = 296
+    Top = 96
   end
 end
