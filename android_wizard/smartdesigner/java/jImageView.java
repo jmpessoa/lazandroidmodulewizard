@@ -446,7 +446,7 @@ public class jImageView extends ImageView {
 	
 	public Bitmap GetBitmapImage( int _x, int _y, int _width, int _height ){
 		if (bmp == null) return null;
-		if ((_x < 0) || (_y < 0) || (_width <= 0) || (_height <= 0) || (_x >= _width) || (_y >= _height)) return null; 
+		if ((_x < 0) || (_y < 0) || (_width <= 0) || (_height <= 0)) return null; 
 		
 		return Bitmap.createBitmap(bmp, _x, _y, _width, _height);
 	}
