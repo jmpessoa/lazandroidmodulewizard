@@ -1531,7 +1531,8 @@ type
 
     procedure SetScaleType(_scaleType: TImageScaleType);
 
-    function GetBitmapImage(): jObject;  //deprecated ..
+    function GetBitmapImage(): jObject; overload;
+    function GetBitmapImage(_x, _y, _width, _height: integer): jObject; overload;
     function GetImage(): jObject;
 
     procedure SetRotation(angle: integer);
@@ -4494,6 +4495,7 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
+
   if not FInitialized then
   begin
    inherited Init(refApp);
@@ -7514,8 +7516,10 @@ begin
   jni_proc_i(FjEnv, FjObject, 'SetScaleType', Ord(_scaleType));
 end;
 
-function jImageView.GetBitmapImage(): jObject; //deprecated ...
+function jImageView.GetBitmapImage(): jObject;
 begin
+  Result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jImageView_GetBitmapImage(FjEnv, FjObject);
@@ -7523,11 +7527,21 @@ end;
 
 function jImageView.GetImage(): jObject;
 begin
+  Result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jImageView_GetBitmapImage(FjEnv, FjObject);
 end;
 
+function jImageView.GetBitmapImage(_x, _y, _width, _height: integer): jObject;
+begin
+  Result := nil;
+
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageView_getBitmapImage(FjEnv, FjObject, _x, _y, _width, _height);
+end;
 
 procedure jImageView.SetImageFromURI(_uri: jObject);
 begin
