@@ -443,6 +443,13 @@ public class jImageView extends ImageView {
 	public Bitmap GetBitmapImage() {
 		return bmp;
 	}
+	
+	public Bitmap GetBitmapImage( int _x, int _y, int _width, int _height ){
+		if (bmp == null) return null;
+		if ((_x < 0) || (_y < 0) || (_width <= 0) || (_height <= 0) || (_x >= _width) || (_y >= _height)) return null; 
+		
+		return Bitmap.createBitmap(bmp, _x, _y, _width, _height);
+	}
 
 
 	public void SetImageFromIntentResult(Intent _intentData) {
@@ -561,25 +568,21 @@ public class jImageView extends ImageView {
 	}
 	
 	public void SetRoundCorner() {
-		   if (this != null) {  		
-			        PaintDrawable  shape =  new PaintDrawable();
-			        
-			        shape.setCornerRadius(mRadius);
-			        
-			        int color = Color.TRANSPARENT;
-			        
-			        Drawable background = this.getBackground();
-			        
-			        if (background instanceof ColorDrawable) {
-			            color = ((ColorDrawable)this.getBackground()).getColor();
-				        shape.setColorFilter(color, Mode.SRC_ATOP);
-				        shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
-				        //[ifdef_api16up]
-				  	    if(Build.VERSION.SDK_INT >= 16) 
-				             this.setBackground((Drawable)shape);
-				        //[endif_api16up]			          
-			        }                		  	  
-		    }
+		if (this != null) {  		
+	        PaintDrawable  shape =  new PaintDrawable();
+	        shape.setCornerRadius(mRadius);                
+	        int color = Color.TRANSPARENT;
+	        Drawable background = this.getBackground();        
+	        if (background instanceof ColorDrawable) {
+	            color = ((ColorDrawable)this.getBackground()).getColor();
+		        shape.setColorFilter(color, Mode.SRC_ATOP);
+		        shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
+		        //[ifdef_api16up]
+		  	    if(Build.VERSION.SDK_INT >= 16) 
+		             this.setBackground((Drawable)shape);
+		        //[endif_api16up]		          
+	        }                		  	  
+        }		
 	}
 	
 	public void SetRotation( int angle ){
