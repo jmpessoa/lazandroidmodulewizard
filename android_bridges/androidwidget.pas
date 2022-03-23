@@ -2039,6 +2039,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_i_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): boolean;
   function jni_func_i_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): string;
   function jni_func_i_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int : integer): jObject;
+  function jni_func_iiii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1, _int2, _int3 : integer): jObject;
   function jni_func_ii_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int0, _int1: integer): string;
   function jni_func_it_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _int: integer; _str: string): boolean;
   function jni_func_it_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer; _str: string): string;
@@ -9909,6 +9910,35 @@ begin
   env^.DeleteLocalRef(env, jCls);   
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
+end;
+
+function  jni_func_iiii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                                    _int0, _int1, _int2, _int3: integer): jObject;
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  result := nil;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IIII)Landroid/graphics/Bitmap;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].i:= _int0;
+  jParams[1].i:= _int1;
+  jParams[2].i:= _int2;
+  jParams[3].i:= _int3;
+
+  Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
+
 end;
 
 

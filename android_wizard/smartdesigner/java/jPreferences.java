@@ -60,7 +60,7 @@ public class jPreferences /*extends ...*/ {
 		if( edt == null ) return;
 		
 		edt.putInt(_key, _value);
-		edt.commit();		
+		edt.apply();		
 	}
 	
 	public long GetLongData(String _key, long _defaultValue) {
@@ -80,7 +80,7 @@ public class jPreferences /*extends ...*/ {
 			if( edt == null ) return;
 			
 			edt.putLong(_key, _value);
-			edt.commit();			
+			edt.apply();			
 	}
 	
 	public float GetFloatData(String _key, float _defaultValue) {
@@ -100,7 +100,7 @@ public class jPreferences /*extends ...*/ {
 			if( edt == null ) return;
 			
 			edt.putFloat(_key, _value);
-			edt.commit();			
+			edt.apply();			
 	}
 
 	public String GetStringData(String _key, String _defaultValue) {
@@ -121,7 +121,7 @@ public class jPreferences /*extends ...*/ {
 		if( edt == null ) return;
 		
 		edt.putString(_key, _value);
-		edt.commit();		
+		edt.apply();		
 	}
 
 	public boolean GetBoolData(String _key, boolean _defaultValue) {
@@ -141,7 +141,7 @@ public class jPreferences /*extends ...*/ {
 		if( edt == null ) return;
 		
 		edt.putBoolean(_key, _value);
-		edt.commit();		
+		edt.apply();		
 	}
 	
     public void Clear() {
@@ -153,7 +153,7 @@ public class jPreferences /*extends ...*/ {
 		if( edt == null ) return;
 		
 		edt.clear();
-		edt.commit();
+		edt.apply();
 	}
     
     public void Remove(String _key) {
@@ -165,7 +165,7 @@ public class jPreferences /*extends ...*/ {
 		if( edt == null ) return;
 		
 		edt.remove(_key);
-		edt.commit();		
+		edt.apply();		
 	}
 }
 

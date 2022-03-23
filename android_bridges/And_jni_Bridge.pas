@@ -139,8 +139,7 @@ function  jProgressBar_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject; Styl
 function  jImageView_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
 
 procedure jImageView_setImage(env:PJNIEnv; ImageView : jObject; fullPath : String);
-function  jImageView_getBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject; overload;
-function  jImageView_getBitmapImage(env: PJNIEnv; _jimageview: JObject;  _x, _y, _width, _height: integer): jObject; overload;
+function  jImageView_getBitmapImage(env: PJNIEnv; _jimageview: JObject): jObject;
 procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
 procedure jImageView_SetImageFromIntentResult(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
 procedure jImageView_SetImageThumbnailFromCamera(env: PJNIEnv; _jimageview: JObject; _intentData: jObject);
@@ -990,34 +989,6 @@ begin
   env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
-end;
-
-function  jImageView_getBitmapImage(env: PJNIEnv; _jimageview: JObject;  _x, _y, _width, _height: integer): jObject;
-var
-  jParams: array[0..3] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-  result := nil;
-
-  jCls:= env^.GetObjectClass(env, _jimageview);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapImage', '(IIII)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].i:= _x;
-  jParams[1].i:= _y;
-  jParams[2].i:= _width;
-  jParams[3].i:= _height;
-
-  Result:= env^.CallObjectMethodA(env, _jimageview, jMethod, @jParams);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
-
 end;
 
 procedure jImageView_SetImageFromURI(env: PJNIEnv; _jimageview: JObject; _uri: jObject);
