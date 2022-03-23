@@ -7540,7 +7540,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageView_getBitmapImage(FjEnv, FjObject, _x, _y, _width, _height);
+   Result:= jni_func_iiii_out_bmp(FjEnv, FjObject, 'GetBitmapImage', _x, _y, _width, _height);
 end;
 
 procedure jImageView.SetImageFromURI(_uri: jObject);
