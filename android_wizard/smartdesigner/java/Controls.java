@@ -727,10 +727,8 @@ public  String getStrDateTime() {
 // -------------------------------------------------------------------------
 // Result : /data/app/com.kredix-1.apk
   public String getPathApp(android.content.Context context, String pkgName) {
-    if (context == null) {
-      return "";
-    }
-
+    if (context == null) return "";
+    
     String PathApp = "";
 
     try {
@@ -738,26 +736,20 @@ public  String getStrDateTime() {
     } catch (NameNotFoundException e) {
     }
 
-    if (PathApp == null) {
-      return "";
-    }
-
+    if (PathApp == null) return "";
+    
     return PathApp;
   }
 
   // Result : /data/data/com/kredix/files
   public String getPathDat(android.content.Context context) {
-    if (context == null) {
-      return "";
-    }
-
+    if (context == null) return "";
+    
     //String version = Build.VERSION.RELEASE;
     String PathDat = context.getFilesDir().getAbsolutePath();
 
-    if (PathDat == null) {
-      return "";
-    }
-
+    if (PathDat == null) return "";
+    
     return (PathDat);
   }
 
@@ -765,44 +757,34 @@ public  String getStrDateTime() {
   public String getPathExt() {
     File FileExt = Environment.getExternalStorageDirectory();
 
-    if (FileExt == null) {
-      return "";
-    }
+    if (FileExt == null) return "";
 
     return (FileExt.getPath());
   }
 
   private File getMyEnvDir(String environmentDir) {
-       if (Build.VERSION.SDK_INT <=  29) {
+       if (Build.VERSION.SDK_INT <=  29) 
            return Environment.getExternalStoragePublicDirectory(environmentDir);
-       }
-       else {
-           return this.activity.getExternalFilesDir(environmentDir);
-       }
+       else 
+           return this.activity.getExternalFilesDir(environmentDir);       
    }
 
   // Result : /storage/emulated/0/DCIM
   public String getPathDCIM() {
     File FileDCIM = getMyEnvDir(Environment.DIRECTORY_DCIM);
 
-    if (FileDCIM == null) {
-      return "";
-    }
+    if (FileDCIM == null) return "";
 
     return FileDCIM.getPath();
   }
 
   //by jmpessoa
   public String getPathDataBase(android.content.Context context) {
-    if (context == null) {
-      return "";
-    }
+    if (context == null) return "";    
 
     String destPath = context.getFilesDir().getAbsolutePath();
 
-    if (destPath == null) {
-      return "";
-    }
+    if (destPath == null) return "";    
 
     destPath = destPath.substring(0, destPath.lastIndexOf("/")) + "/databases";
     return destPath;
@@ -1241,6 +1223,9 @@ public  int Image_getWH (String filename ) {
   /// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
 	public void fadeInAnimation(final View view, int duration) {
 		Animation fadeIn = new AlphaAnimation(0, 1);
+		
+		if(fadeIn == null) return;
+		
 		fadeIn.setInterpolator(new DecelerateInterpolator());
 		fadeIn.setDuration(duration);
 		fadeIn.setFillAfter(true);
@@ -1262,6 +1247,9 @@ public  int Image_getWH (String filename ) {
 
 	public void fadeOutAnimation(final View view, int duration) {
 		Animation fadeOut = new AlphaAnimation(1, 0);
+		
+		if(fadeOut == null) return;
+		
 		fadeOut.setInterpolator(new AccelerateInterpolator());
 		fadeOut.setStartOffset(duration);
 		fadeOut.setDuration(duration);
@@ -1288,6 +1276,8 @@ public  int Image_getWH (String filename ) {
 		//animate = new TranslateAnimation(appLayout.getWidth(), 0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 		animate = new TranslateAnimation(appLayout.getWidth()-view.getX(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 		
+		if(animate == null) return;
+		
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
 		view.startAnimation(animate);
@@ -1299,6 +1289,8 @@ public  int Image_getWH (String filename ) {
 		
 		//animate = new TranslateAnimation(0,-appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
 		animate = new TranslateAnimation(0,-view.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 		
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1312,6 +1304,8 @@ public  int Image_getWH (String filename ) {
 		
 		//animate = new TranslateAnimation(0, appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
 		animate = new TranslateAnimation(0, appLayout.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1325,6 +1319,8 @@ public  int Image_getWH (String filename ) {
 		
 		//animate = new TranslateAnimation(-appLayout.getWidth(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
 		animate = new TranslateAnimation(-view.getWidth()-view.getX(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1336,7 +1332,9 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0, 0, 0, appLayout.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)		
+		animate = new TranslateAnimation(0, 0, 0, appLayout.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1350,6 +1348,8 @@ public  int Image_getWH (String filename ) {
 		
 		//animate = new TranslateAnimation(0,	0, -appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)
 		animate = new TranslateAnimation(0,	0, -view.getHeight()-view.getY(), 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1363,6 +1363,8 @@ public  int Image_getWH (String filename ) {
 		
 		//animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)
 		animate = new TranslateAnimation(0,	0, 0, -view.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1376,6 +1378,8 @@ public  int Image_getWH (String filename ) {
 		
 		//animate = new TranslateAnimation(0,	0, appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)
 		animate = new TranslateAnimation(0, 0, appLayout.getHeight()-view.getY(), 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1387,7 +1391,9 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(_xFrom, 0, _yFrom, 0); //(xFrom,xTo, yFrom,yTo)		
+		animate = new TranslateAnimation(_xFrom, 0, _yFrom, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1399,7 +1405,9 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0, _xTo, 0, _yTo); //(xFrom,xTo, yFrom,yTo)		
+		animate = new TranslateAnimation(0, _xTo, 0, _yTo); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
 
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
@@ -1411,6 +1419,8 @@ public  int Image_getWH (String filename ) {
 		RotateAnimation animate; 
 		
 		animate = new RotateAnimation(_angleFrom, _angleTo, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+		
+		if(animate == null) return;
 		
 		animate.setDuration(duration);
 		animate.setFillAfter(true);
