@@ -2916,6 +2916,34 @@ public class jForm {
         return image;
         
     }
+    
+    
+    //Android 11:
+    public byte[] LoadBytesFromUri(Uri _toTreeUri) {
+
+        byte[] bytes = new byte[1];
+
+        try {
+
+            ParcelFileDescriptor pfd = controls.activity.getContentResolver().openFileDescriptor(_toTreeUri, "r");
+            assert pfd != null;
+            assert pfd.getStatSize() <= Integer.MAX_VALUE;
+            FileDescriptor fd = pfd.getFileDescriptor();
+            FileInputStream input_file_stream = new FileInputStream(fd);
+            bytes = new byte[input_file_stream.available()];
+            input_file_stream.read(bytes);
+            input_file_stream.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bytes;
+    }    
+    
+    
 
     //Android 11:
     public String GetTextFromUri(Uri _treeUri) {
@@ -3003,6 +3031,37 @@ public class jForm {
         }
     }
 
+	
+    //Android 11:
+    public void SaveImageTypeToUri(Bitmap _bitmap, Uri _toTreeUri, int _type) {
+        OutputStream out;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
+
+
+			if(_type == 1)
+            {_bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);}
+			else if(_type == 2)		
+            {	_bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);}
+			else if(_type == 3)		
+            {	
+               if (android.os.Build.VERSION.SDK_INT >= 30) // needs targetSdkVersion API 30, comment out this line if your targetSdkVersion is less than 30
+               {   _bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 90, out);} // needs targetSdkVersion API 30, comment out this line if your targetSdkVersion is less than 30
+            //{	_bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 90, out);}							 
+               else
+               {   _bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out);} // Added in API level 14, Deprecated in API level 30				 
+            } 
+				
+            out.close();
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }	
+	
+	
     //Android 11:
     public void SaveBytesToUri(byte[] _bytes, Uri _toTreeUri) {
         OutputStream out=null;
