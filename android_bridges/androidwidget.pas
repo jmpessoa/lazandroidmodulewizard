@@ -5288,7 +5288,6 @@ end;
 function jForm_GetFileNameByUri(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -5317,7 +5316,6 @@ end;
 function jForm_GetTextFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -5482,7 +5480,6 @@ end;
 function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..0] of jValue;
@@ -5492,6 +5489,8 @@ var
 label
   _exceptionOcurred;
 begin
+
+  result := nil;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
@@ -5520,7 +5519,6 @@ end;
 function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject; _fileExtension: string): TDynArrayOfString;
 var
   jStr: JString;
-  jBoo: JBoolean;
   resultSize: integer;
   jResultArray: jObject;
   jParams: array[0..1] of jValue;
@@ -5530,6 +5528,8 @@ var
 label
   _exceptionOcurred;
 begin
+
+  result := nil;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;

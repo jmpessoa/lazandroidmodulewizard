@@ -347,7 +347,8 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     public void SetSelection(int _index) {
     	if (mStrList.size() <= 0) return;
     	if ((_index < 0) || (_index >= mStrList.size())) return;
-    	    			    		    
+    	
+    	mSelectedIndex = _index;
     	setSelection(_index);    	   		    	  
     }
    
@@ -424,6 +425,7 @@ public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object 
     	if (mStrList.size() <= 0) return;
     	if ((_index < 0) || (_index >= mStrList.size())) return;
     	
+    	mSelectedIndex = _index;
     	setSelection(_index);    	
     }
 
