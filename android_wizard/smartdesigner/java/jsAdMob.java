@@ -301,35 +301,39 @@ public class jsAdMob extends FrameLayout {
 	            public void onAdLoaded() {
 	            	            	
 	                //showToast("Ad loaded.");
-	                if (admobBannerView.getVisibility() == View.GONE) {                	
+	            	if (!admobBannerStop){
+	                 if (admobBannerView.getVisibility() == View.GONE) {                	
 	                	admobBannerView.setVisibility(View.VISIBLE);                	
-	                }
+	                 }
 	                
-	                controls.pOnAdMobLoaded(pascalObj, ADMOB_BANNER);
-	                
-	                admobBannerIsLoading = false;
-	                
-	                if (admobBannerStop)
-	                	AdMobBannerStop();
+	                 admobBannerIsLoading = false;
+	                 controls.pOnAdMobLoaded(pascalObj, ADMOB_BANNER);	                	                              
+	            	}else{
+	            	 admobBannerIsLoading = false;	
+	                 AdMobBannerStop();
+	            	}
+	            	
+	            		   
 	            }
 
 	            @Override
 	            public void onAdFailedToLoad(int errorCode) {
-	            		            		            	                     
-	            	controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_BANNER, errorCode);
-	                //showToast(String.format("Domain: " + errorDomain + " Message: " + errorMessage + " Error: " + adsError.toString()));
+	            	
+	            	if (!admobBannerStop){	            		
+	            	 admobBannerIsLoading = false;
+	            	 controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_BANNER, errorCode);
+	                 //showToast(String.format("Domain: " + errorDomain + " Message: " + errorMessage + " Error: " + adsError.toString()));
 	                
-	                /*switch(errorCode){
+	                 /*switch(errorCode){
 	                 	case AdRequest.ERROR_CODE_INTERNAL_ERROR: showToast("INTERNAL ERROR"); break; 
 	                 	case AdRequest.ERROR_CODE_INVALID_REQUEST: showToast("INVALID REQUEST"); break;
 	                 	case AdRequest.ERROR_CODE_NETWORK_ERROR: showToast("NETWORK ERROR"); break;
 	                 	case AdRequest.ERROR_CODE_NO_FILL: showToast("NO FILL"); break;
-	                }*/
-	            	
-	            	admobBannerIsLoading = false;
-	                
-	                if (admobBannerStop)
+	                 }*/	            	
+	            	} else{
+	            		admobBannerIsLoading = false;
 	                	AdMobBannerStop();
+	            	}
 	            }
 	            @Override
 	            public void onAdOpened() {
@@ -359,43 +363,44 @@ public class jsAdMob extends FrameLayout {
         	return;
         }
         
-        admobBannerView.setAdListener(admobListener);
+        if( !admobBannerStop ){
+         admobBannerView.setAdListener(admobListener);
 
-        admobBannerView.setLayoutParams(bannerLParams);
+         admobBannerView.setLayoutParams(bannerLParams);
                 
-        switch (admobBannerSize) {		 
-         case 1: // 320x50	Banner	Phones and Tablets	BANNER
+         switch (admobBannerSize) {		 
+          case 1: // 320x50	Banner	Phones and Tablets	BANNER
         	  admobBannerView.setAdSize(AdSize.BANNER);
 			  break;
-		 case 2: // 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
+		  case 2: // 320x100	Large Banner	Phones and Tablets	LARGE_BANNER
 			  admobBannerView.setAdSize(AdSize.LARGE_BANNER);
 			  break;
-		 case 3: // 300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
+		  case 3: // 300x250	IAB Medium Rectangle	Phones and Tablets	MEDIUM_RECTANGLE
 			  admobBannerView.setAdSize(AdSize.MEDIUM_RECTANGLE);
 			  break;		 
-		 case 4: // 468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
+		  case 4: // 468x60	IAB Full-Size Banner	Tablets	FULL_BANNER
 			  admobBannerView.setAdSize(AdSize.FULL_BANNER);
 			  break;		 
-		 case 5: // 728x90	IAB Leaderboard	Tablets	LEADERBOARD
+		  case 5: // 728x90	IAB Leaderboard	Tablets	LEADERBOARD
 			  admobBannerView.setAdSize(AdSize.LEADERBOARD);
 			  break;
-		 case 6:
+		  case 6:
 			    admobBannerAdSize = getBannerAdSize();		        
 			    admobBannerView.setAdSize(admobBannerAdSize); 
 			 break;
-		 default: // screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
+		  default: // screen width x 32|50|90	Smart Banner	Phones and Tablets	SMART_BANNER
 			  admobBannerView.setAdSize(AdSize.SMART_BANNER);			
-		}
+		 }               
         
-        
-        admobBannerView.setAdUnitId(admobBannerId);
+         admobBannerView.setAdUnitId(admobBannerId);
 
-        this.addView(admobBannerView);        
+         this.addView(admobBannerView);        
 
-        // Start loading the ad in the background.
-        admobBannerView.loadAd(new AdRequest.Builder().build());
+         // Start loading the ad in the background.
+         admobBannerView.loadAd(new AdRequest.Builder().build());
         
-        admobBannerWidth = this.getWidth();
+         admobBannerWidth = this.getWidth();
+        }
    }
    
    private AdSize getBannerAdSize() {
