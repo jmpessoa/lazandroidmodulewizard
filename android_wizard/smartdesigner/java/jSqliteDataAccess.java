@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,6 +47,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import java.nio.channels.FileChannel;
+
+import android.net.Uri;
 
 /**[by renabor]
  * A helper class to manage database creation and version management using 
@@ -765,12 +768,30 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
  }
  
  public boolean DBExport(String dbExportDir, String dbExportFileName) {
+	 
+	 /*InputStream in=null;
+     OutputStream out=null;
+     try {
+         in  = controls.activity.getContentResolver().openInputStream(_fromTreeUri);
+         out = controls.activity.getContentResolver().openOutputStream(_toTreeUri);
+             byte[] buf = new byte[1024];
+             int len;
+             while ((len = in.read(buf)) > 0) {
+                 out.write(buf, 0, len);
+             }
+     } catch (FileNotFoundException e) {
+         e.printStackTrace();
+     } catch (IOException e) {
+         e.printStackTrace();
+     }*/
      
 	 // RequestRuntimePermission 'android.permission.WRITE_EXTERNAL_STORAGE'
      try {         
-             File currentDB = new File(controls.activity.getDatabasePath(DATABASE_NAME).getAbsolutePath());
-             
+    	     File currentDB = new File(controls.activity.getDatabasePath(DATABASE_NAME).getAbsolutePath());
+         
              if(currentDB == null) return false;
+             
+             //Uri.fromFile(currentDB)
              
              File fileDir = new File(dbExportDir);
  	         fileDir.mkdirs();
@@ -792,6 +813,76 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
     	 return false;         
 
      }
+ }
+
+ // Android 11
+ public boolean DBExport(Uri _toTreeUri) {
+	 
+	 if( _toTreeUri == null ) return false;
+	 
+	 File currentDB = new File(controls.activity.getDatabasePath(DATABASE_NAME).getAbsolutePath());
+     
+     if(currentDB == null) return false;
+     
+     Uri _fromTreeUri = Uri.fromFile(currentDB);
+	 
+	 InputStream  in  = null;
+     OutputStream out = null;
+     try {
+         in  = controls.activity.getContentResolver().openInputStream(_fromTreeUri);
+         out = controls.activity.getContentResolver().openOutputStream(_toTreeUri);
+         
+         byte[] buf = new byte[1024];
+         int len;
+             
+         while ((len = in.read(buf)) > 0) 
+            out.write(buf, 0, len);
+             
+     } catch (FileNotFoundException e) {
+         e.printStackTrace();
+         return false;
+     } catch (IOException e) {
+         e.printStackTrace();
+         return false;
+     }
+     
+     return true;
+ }
+ 
+ // Android 11
+ public boolean DBImport(Uri _fromTreeUri) {
+	
+	if( _fromTreeUri == null ) return false;
+	
+	this.Free();
+	
+	File currentDB = new File(controls.activity.getDatabasePath(DATABASE_NAME).getAbsolutePath());
+    
+    if(currentDB == null) return false;
+    
+    Uri _toTreeUri = Uri.fromFile(currentDB);
+	 
+	InputStream  in  = null;
+    OutputStream out = null;
+    try {
+        in  = controls.activity.getContentResolver().openInputStream(_fromTreeUri);
+        out = controls.activity.getContentResolver().openOutputStream(_toTreeUri);
+        
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) 
+                out.write(buf, 0, len);        
+            
+        OpenOrCreate(DATABASE_NAME);
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+        return false;
+    } catch (IOException e) {
+        e.printStackTrace();
+        return false;
+    }
+      
+    return true;
  }
  
  public boolean DBImport(String dbImportFileFull) {

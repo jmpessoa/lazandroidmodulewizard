@@ -2034,6 +2034,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_t_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _str: string): boolean;
   function jni_func_uri_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): jObject;
   function jni_func_uri_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): integer;
+  function jni_func_uri_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): boolean;
   function jni_func_dab_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte): jObject;
   function jni_func_dab_z_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; var _byteArray: TDynArrayOfJByte; _bool1: boolean): boolean;
   function jni_func_dd_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _double1, _double2: double): string;
@@ -10130,6 +10131,33 @@ begin
   Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
 
   env^.DeleteLocalRef(env, jCls); 
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jni_func_uri_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                              _uri: jObject): boolean;
+var
+  jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/net/Uri;)Z');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= _uri;
+
+  jBoo   := env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
+
+  Result := boolean(jBoo);
+
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
