@@ -3002,7 +3002,7 @@ public class jForm {
         InputStream in=null;
         OutputStream out=null;
         try {
-            in = controls.activity.getContentResolver().openInputStream(_fromTreeUri);
+            in  = controls.activity.getContentResolver().openInputStream(_fromTreeUri);
             out = controls.activity.getContentResolver().openOutputStream(_toTreeUri);
                 byte[] buf = new byte[1024];
                 int len;

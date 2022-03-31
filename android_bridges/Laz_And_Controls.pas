@@ -858,8 +858,10 @@ type
     procedure SetDataBaseName(_dbName: string);
     function GetFullPathDataBaseName(): string;
 
-    function DBExport( _dbExportDir, _dbExportFileName : string ) : boolean;
-    function DBImport( _dbImportFileFull : string ) : boolean;
+    function DBExport( _dbExportDir, _dbExportFileName : string ) : boolean;  overload;
+    function DBExport( _dbExportUri : jObject ) : boolean; overload;
+    function DBImport( _dbImportFileFull : string ) : boolean; overload;
+    function DBImport( _dbImportUri : jObject ) : boolean; overload;
 
     function DatabaseExists(_databaseName: string): boolean;
     procedure SetAssetsSearchFolder(_folderName: string);
@@ -14140,6 +14142,16 @@ begin
 
 end;
 
+function jSqliteDataAccess.DBExport( _dbExportUri : jObject ) : boolean;
+begin
+
+  result := false;
+
+  if FInitialized then
+    result := jni_func_uri_out_z( FjEnv, FjObject, 'DBExport', _dbExportUri );
+
+end;
+
 function jSqliteDataAccess.DBImport( _dbImportFileFull : string ) : boolean;
 begin
 
@@ -14147,6 +14159,16 @@ begin
 
   if FInitialized then
     result := jni_func_t_out_z(FjEnv, FjObject, 'DBImport', _dbImportFileFull);
+
+end;
+
+function jSqliteDataAccess.DBImport( _dbImportUri : jObject ) : boolean;
+begin
+
+  result := false;
+
+  if FInitialized then
+    result := jni_func_uri_out_z( FjEnv, FjObject, 'DBImport', _dbImportUri );
 
 end;
 
