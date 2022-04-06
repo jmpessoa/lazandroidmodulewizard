@@ -1188,6 +1188,14 @@ public class jForm {
             return null;
         }
     }
+    
+    // By ADiV
+    public String GetStringReplace(String _strIn, String _strFind, String _strReplace){
+    	if(_strIn == null) return "";
+    	if( (_strIn.length() <= 0) || (_strIn.length() < _strFind.length()) ) return "";
+    	
+    	return _strIn.replace(_strFind, _strReplace);
+    }
 
     // BY ADiV
     public int GetBatteryPercent() {

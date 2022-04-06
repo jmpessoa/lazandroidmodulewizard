@@ -1277,6 +1277,7 @@ type
     function GetDrawableResourceById(_resID: integer): jObject;
     function GetQuantityStringByName(_resName: string; _quantity: integer): string;
     function GetStringResourceByName(_resName: string): string;
+    function GetStringReplace(_strIn, _strFind, _strReplace: string): string; // By ADiV
 
     //needed: <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     function GetSystemVersion: Integer;
@@ -2031,6 +2032,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_t_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): single;
   function jni_func_t_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): int64;
   function jni_func_t_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): string;
+  function jni_func_ttt_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1, _str2 : string): string;
   function jni_func_t_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _str: string): boolean;
   function jni_func_uri_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): jObject;
   function jni_func_uri_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _uri: jObject): integer;
@@ -4025,62 +4027,88 @@ end;
 
 function jForm.GetStringResourceId(_resName: string): integer;
 begin
+  result := 0;
+
   if FInitialized then
-   Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetStringResourceId', _resName);
+   result:= jni_func_t_out_i(FjEnv, FjObject, 'GetStringResourceId', _resName);
+end;
+
+function jForm.GetStringReplace(_strIn, _strFind, _strReplace: string): string;
+begin
+  result := '';
+
+  if FInitialized then
+   result:= jni_func_ttt_out_t(FjEnv, FjObject, 'GetStringReplace', _strIn, _strFind, _strReplace);
 end;
 
 function jForm.GetStringResourceById(_resID: integer): string;
 begin
+  result := '';
+
   if FInitialized then
-   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetStringResourceById', _resID);
+   result:= jni_func_i_out_t(FjEnv, FjObject, 'GetStringResourceById', _resID);
 end;
 
 function jForm.GetDrawableResourceId(_resName: string): integer;
 begin
+  result := 0;
+
   if FInitialized then
-    Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetDrawableResourceId', _resName);
+    result:= jni_func_t_out_i(FjEnv, FjObject, 'GetDrawableResourceId', _resName);
 end;
 
 function jForm.GetDrawableResourceById(_resID: integer): jObject;
 begin
+  result := 0;
+
   if FInitialized then
-   Result:= jForm_GetDrawableResourceById(FjEnv, FjObject, _resID);
+   result:= jForm_GetDrawableResourceById(FjEnv, FjObject, _resID);
 end;
 
 function jForm.GetQuantityStringByName(_resName: string; _quantity: integer): string;
 begin
+  result := '';
+
   if FInitialized then
-   Result:= jni_func_ti_out_t(FjEnv, FjObject, 'GetQuantityStringByName', _resName ,_quantity);
+   result:= jni_func_ti_out_t(FjEnv, FjObject, 'GetQuantityStringByName', _resName ,_quantity);
 end;
 
 function jForm.GetStringResourceByName(_resName: string): string;
 begin
+  result := '';
+
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStringResourceByName', _resName);
+   result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStringResourceByName', _resName);
 end;
 
 function jForm.GetSystemVersion: Integer;
 begin
+  result := 0;
+
   if(FInitialized) then
-    Result:= jni_func_out_i(FjEnv, FjObject, 'GetSystemVersion');
+    result:= jni_func_out_i(FjEnv, FjObject, 'GetSystemVersion');
 end;
 
 function jForm.GetDevicePhoneNumber: String;
 begin
-   Result := '';
+   result := '';
+
    if FInitialized then
-    Result:= jni_func_out_t(FjEnv, FjObject, 'GetDevPhoneNumber');
+    result:= jni_func_out_t(FjEnv, FjObject, 'GetDevPhoneNumber');
 end;
 
 function jForm.GetDeviceID: String;
 begin
-   Result := '';
+   result := '';
+
    if FInitialized then
-   Result:=jni_func_out_t(FjEnv, FjObject, 'GetDevDeviceID');
+   result:=jni_func_out_t(FjEnv, FjObject, 'GetDevDeviceID');
 end;
 
 function jForm.IsPackageInstalled(_packagename: string): boolean;
 begin
+  result := false;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsPackageInstalled', _packagename);
@@ -11146,6 +11174,36 @@ begin
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);     
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jni_func_ttt_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1, _str2 : string): string;
+var
+  jStr: JString;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
+  if jMethod = nil then goto _exceptionOcurred;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_str2));
+
+  jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
