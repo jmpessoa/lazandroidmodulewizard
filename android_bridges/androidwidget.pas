@@ -4059,7 +4059,7 @@ end;
 
 function jForm.GetDrawableResourceById(_resID: integer): jObject;
 begin
-  result := 0;
+  result := nil;
 
   if FInitialized then
    result:= jForm_GetDrawableResourceById(FjEnv, FjObject, _resID);
