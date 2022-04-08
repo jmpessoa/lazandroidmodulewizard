@@ -3052,12 +3052,22 @@ public class jForm {
 			else if(_type == 2)		
             {	_bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);}
 			else if(_type == 3)		
-            {	
-               if (android.os.Build.VERSION.SDK_INT >= 30) // needs targetSdkVersion API 30, comment out this line if your targetSdkVersion is less than 30
-               {   _bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 90, out);} // needs targetSdkVersion API 30, comment out this line if your targetSdkVersion is less than 30
-            //{	_bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 90, out);}							 
-               else
-               {   _bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out);} // Added in API level 14, Deprecated in API level 30				 
+            {
+                //_bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 90, out);
+                if (android.os.Build.VERSION.SDK_INT < 30)
+                {
+                   _bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out); // Added in API level 14, Deprecated in API level 30
+                }
+                else // needs targetSdkVersion API 30
+                {
+                    _bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out);        // comment here for targetSdkVersion API >= 30!
+
+                    //[ifdef_api30up]
+
+                    // _bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 90, out);   //uncomment only here for targetSdkVersion API >= 30!
+
+                     //[endif_api30up]
+                }
             } 
 				
             out.close();
