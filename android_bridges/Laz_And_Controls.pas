@@ -2368,6 +2368,9 @@ type
     procedure GenEvent_OnDown(Obj: TObject); // by ADiV
     procedure GenEvent_OnUp(Obj: TObject);
 
+    function  GetLParamWidth(): integer;
+    function  GetLParamHeight(): integer;
+
     procedure BringToFront; // By ADiV
     
     procedure Init(refApp: jApp); override;
@@ -13469,6 +13472,20 @@ begin
   if FjObject = nil then exit;
 
   SetImageDownByIndex(Value);
+end;
+
+function jImageBtn.GetLParamWidth(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= View_GetLParamWidth(FjEnv, FjObject);
+end;
+
+function jImageBtn.GetLParamHeight(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= View_GetLParamHeight(FjEnv, FjObject);
 end;
 
 procedure jImageBtn.BringToFront;
