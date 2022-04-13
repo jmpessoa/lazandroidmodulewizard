@@ -2789,7 +2789,7 @@ begin
                 strList.Add('             systemProp.https.proxyHost=10.0.16.1');
                 strList.Add('             systemProp.https.proxyPort=3128');
                 strList.Add(' ');
-                strList.Add('        Note 5. Java Jdk 1.8, Android SDK "platform" 29 [or up],  "build-tools" 29.0.3, Android SDK Extra "support library/repository" and "Gradle 6.6.1" are "must have" to support AppCompat material theme in LAMW 0.8.6.1');
+                strList.Add('        Note 5. Java Jdk 1.8, Android SDK "platform" 30 [or up],  "build-tools" 30.0.2, Android SDK Extra "support library/repository" and "Gradle 6.6.1" are "must have" to support AppCompat material theme in LAMW 0.8.6.2');
                 strList.Add(' ');
                 strList.Add(' ');
                 strList.Add('***SETTING ENVIRONMENT VARIABLES...');

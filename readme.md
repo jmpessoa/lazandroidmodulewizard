@@ -4,7 +4,7 @@
 ##### RAD Android! Form Designer and Components Development Model!
 - LAMW is a wizard to create JNI Android loadable module (.so) and Android Apk using Lazarus/Free Pascal.
 
-[![Version](https://img.shields.io/badge/Version-0.8.6.1-blue)](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
+[![Version](https://img.shields.io/badge/Version-0.8.6.2-blue)](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
 
 ##### Features
 - Native Android GUI
@@ -96,7 +96,7 @@
 - hints:
     - unpacked/install to a "sdk" folder
     - open a command line terminal and go to folder "sdk/tools"
-    - run the command  >> "android update sdk"  to open a GUI [SDK Manager](https://i.imgur.com/UbdoENt.png) 
+    - run the command  >>android update sdk    //to open a GUI [SDK Manager](https://i.imgur.com/UbdoENt.png) 
        - go to [Tools](https://i.imgur.com/UbdoENt.png) and keep as is
           - Android SDK Tools  (installed)
           - (x) Android SDK Platform-Tools
@@ -110,6 +110,9 @@
           - (x)Google Repository
           - (x)Google Play Services
        - Install 7 package!
+    - on command line terminal go to folder "sdk/tools/bin"
+       - run the command  >>sdkmanager --update
+       - run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"
        
 ##### 2.3 Get [Android NDK](https://developer.android.com/ndk/downloads/index.html)
 - recommended version

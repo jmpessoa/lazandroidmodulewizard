@@ -1055,7 +1055,7 @@ begin
        end
        else
        begin
-         buildToolApi:= '29';
+         buildToolApi:= '30';
          pluginVersion:= '3.1.0';  //gradle 4.4.1
        end;
 
@@ -1714,6 +1714,8 @@ var
   isBrandNew: boolean;
   projectTarget, projectCustom, alertMsg: string;
   ndkRelease, aux: string;
+  updateTargetApi: integer;
+  updateBuildTool: string;
 begin
   if AProject.CustomData.Contains('LAMW') then
   begin
@@ -1844,31 +1846,47 @@ begin
 
       if IsAllCharNumber(PChar(sdkManifestTargetApi))  then
           manifestTargetApi:= StrToInt(sdkManifestTargetApi)
-      else manifestTargetApi:= 29;
+      else manifestTargetApi:= 30;
 
       buildTool:=  GetBuildTool(manifestTargetApi);
 
-      if manifestTargetApi < 29 then
+      if manifestTargetApi < 30 then
       begin
-         queryValue:= '29';
 
-         if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 29',
-                       '[Suggestion] Change Target API to 29'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
+         updateTargetApi:= GetMaxSdkPlatform(updateBuildTool);
+
+         if updateTargetApi >= 30 then
          begin
-           if ( IsAllCharNumber(PChar(queryValue)) AND (queryValue <> '29') ) then
-              begin
-                 manifestTargetApi:= StrToInt(queryValue);
-                 buildTool:= GetBuildTool(manifestTargetApi);
-           end
-           else
+           queryValue:= '30';
+
+           if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 30',
+                         '[Suggestion] Change Target API to 30'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
            begin
-             manifestTargetApi:= 29;
-             buildTool:= GetBuildTool(29);
-           end;  ;
-         end; //if input...
+             if ( IsAllCharNumber(PChar(queryValue)) AND (queryValue <> '30') ) then
+             begin
+                   manifestTargetApi:= StrToInt(queryValue);
+                   buildTool:= GetBuildTool(manifestTargetApi);
+             end
+             else
+             begin
+               manifestTargetApi:= 30;
+               buildTool:= GetBuildTool(30);
+             end;  ;
+           end; //if InputQuery
+
+         end
+         else
+         begin
+            ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+                         'Please, update your android sdk/platforms folder!' + sLineBreak +
+                         'How to:'+ sLineBreak +
+                         '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                         '.run the command> sdkmanager --update'+ sLineBreak +
+                         '.run the command> sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+         end;
 
       end
-      else //target >= 29
+      else //target >= 30
       begin
         outMaxBuildTool:= FCandidateSdkBuild;
         if not LamwGlobalSettings.KeepManifestTargetApi  then

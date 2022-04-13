@@ -92,7 +92,7 @@ object FormSettingsPaths: TFormSettingsPaths
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.0.4'
+  LCLVersion = '2.0.12.0'
   object BitBtnOK: TBitBtn
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Side = asrBottom
@@ -1618,7 +1618,7 @@ object FormSettingsPaths: TFormSettingsPaths
     ParentColor = False
   end
   object SelDirDlgPathTo: TSelectDirectoryDialog
-    left = 248
-    top = 408
+    Left = 248
+    Top = 408
   end
 end

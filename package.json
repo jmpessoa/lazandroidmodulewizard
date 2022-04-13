@@ -1,6 +1,6 @@
 {
 	"name": "Lazarus Android Module Wizard",
-	"version": "0.8.6.1",
+	"version": "0.8.6.2",
 	"packages":[
 		"android_bridges/tfpandroidbridge_pack.lpk",
 		"android_wizard/lazandroidwizardpack.lpk",
@@ -10,8 +10,8 @@
 	"dependencies":{
 		"gradle": "6.6.1",
 		"android":{
-			"platform": "29",
-			"buildTools" : "29.0.3"
+			"platform": "30",
+			"buildTools" : "30.0.2"
 		}
 	}
 }

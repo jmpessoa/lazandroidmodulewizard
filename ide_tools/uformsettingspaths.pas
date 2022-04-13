@@ -53,8 +53,8 @@ type
     procedure SpeedButtonHelpClick(Sender: TObject);
     procedure SpeedButtonInfoClick(Sender: TObject);
     function GetGradleVersion(out tagVersion: integer): string;
-    function GetMaxSdkPlatform(): integer;
-    function HasBuildTools(platform: integer): boolean;
+    function GetMaxSdkPlatform(out outBuildTool: string): integer;
+    function HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
     function GetPathToSmartDesigner(): string;
   private
     { private declarations }
@@ -92,6 +92,18 @@ uses LamwSettings;
 {$R *.lfm}
 
 { TFormSettingsPaths }
+
+function IsAllCharNumber(pcString: PChar): Boolean;
+begin
+  Result := False;
+  if StrLen(pcString)=0 then exit;
+  while pcString^ <> #0 do // 0 indicates the end of a PChar string
+  begin
+    if not (pcString^ in ['0'..'9']) then Exit;
+    Inc(pcString);
+  end;
+  Result := True;
+end;
 
 function SplitStr(var theString: string; delimiter: string): string;
 var
@@ -264,6 +276,7 @@ end;
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
    fName: string;
+   outBuildTool: string;
 begin
   fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
   if FOk then
@@ -276,6 +289,17 @@ begin
     SaveSettings(fName);
     LamwGlobalSettings.ReloadPaths;
   end;
+
+  if GetMaxSdkPlatform(outBuildTool) < 30 then
+  begin
+    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+                 'Please, update your android sdk/platforms folder!' + sLineBreak +
+                 'How to:'+ sLineBreak +
+                 '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                 '.run the command> sdkmanager --update'+ sLineBreak +
+                 '.run the command> sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+  end;
+
 end;
 
 procedure TFormSettingsPaths.FormShow(Sender: TObject);
@@ -341,13 +365,15 @@ begin
 
 end;
 
-function TFormSettingsPaths.HasBuildTools(platform: integer): boolean;
+function TFormSettingsPaths.HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
 var
   lisDir: TStringList;
   numberAsString, auxStr: string;
-  i, builderNumber: integer;
+  i, builderNumber,  savedBuilder: integer;
+  candidateSdkBuild: string;
 begin
   Result:= False;
+  savedBuilder:= 0;
   lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
 
   FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
@@ -365,14 +391,28 @@ begin
        auxStr:= lisDir.Strings[i];
        if  auxStr <> '' then
        begin
-         if  Pos('rc2', auxStr) = 0  then   //escape some alien...
+         if Pos('rc2', auxStr) = 0 then   //escape some alien...
          begin
            numberAsString:= Copy(auxStr, 1 , 2);  //19
-           builderNumber:=  StrToInt(numberAsString);
-           if  platform <= builderNumber then
+           if IsAllCharNumber(PChar(numberAsString))  then
            begin
-             Result:= True;
-             break;
+               builderNumber:=  StrToInt(numberAsString);
+
+               if savedBuilder < builderNumber then
+               begin
+                 savedBuilder:= builderNumber;
+                 if builderNumber > platform then candidateSdkBuild:= auxStr;
+               end;
+
+               if platform <= builderNumber then
+               begin
+                 candidateSdkBuild:= auxStr;
+                 Result:= True;
+               end;
+
+               outBuildTool:= candidateSdkBuild; //19.1.0
+
+               if Result then break;
            end;
          end;
        end;
@@ -468,39 +508,43 @@ begin
   end;
 end;
 
-function TFormSettingsPaths.GetMaxSdkPlatform(): integer;
+function TFormSettingsPaths.GetMaxSdkPlatform(out outBuildTool: string): integer;
 var
   lisDir: TStringList;
-  auxStr: string;
-  i, intAux: integer;
+  strApi: string;
+  i, intApi: integer;
+  tempOutBuildTool: string;
 begin
+
   Result:= 0;
 
   lisDir:= TStringList.Create;
-
   FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'platforms', False);
 
   if lisDir.Count > 0 then
   begin
     for i:=0 to lisDir.Count-1 do
     begin
-       auxStr:= ExtractFileName(lisDir.Strings[i]);
-       if auxStr <> '' then
+       strApi:= ExtractFileName(lisDir.Strings[i]);   //android-21
+       if strApi <> '' then
        begin
-         if Pos('P', auxStr) <= 0  then  //skip android-P
+         strApi:= Copy(strApi, LastDelimiter('-', strApi) + 1, MaxInt);
+         if IsAllCharNumber(PChar(strApi))  then  //skip android-P
          begin
-           auxStr:= Copy(auxStr, LastDelimiter('-', auxStr) + 1, MaxInt);
-           intAux:= StrToInt(auxStr);
-           if Result < intAux then
-           begin
-             if HasBuildTools(intAux) then
-                Result:= intAux;
-           end;
+              intApi:= StrToInt(strApi);
+              if Result < intApi then
+              begin
+                if HasBuildTools(intApi, tempOutBuildTool) then
+                begin
+                   Result:= intApi;
+                   outBuildTool:= tempOutBuildTool;  //26.0.2
+                end;
+              end;
+
          end;
        end;
     end;
   end;
-
   lisDir.free;
 end;
 

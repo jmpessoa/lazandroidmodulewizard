@@ -79,6 +79,11 @@ type
     procedure SpeedButtonHintThemeClick(Sender: TObject);
     function IsLaz4Android(): boolean;
     function IsLaz4Android2012(): boolean;
+
+    function IsLamwManagerForWindows(): boolean; //lamw-ide.bat
+
+    function IsLamwManagerForLinux(): boolean; //startlamw4linux
+
   private
     { private declarations }
     FFilename: string;
@@ -277,6 +282,14 @@ begin
     end;
   end;
 
+  if Result < 30 then
+       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+                   'Please, update your android sdk/platforms folder!' + sLineBreak +
+                   'How to:'+ sLineBreak +
+                   '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                   '.run the command  >>sdkmanager --update'+ sLineBreak +
+                   '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+
   lisDir.free;
 end;
 
@@ -378,11 +391,11 @@ begin
        FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
     if not IsAllCharNumber(PChar(FTargetApi))  then
-      FTargetApi:= '29';
+      FTargetApi:= '30';
 
     intTarqetApi:= StrToInt(FTargetApi);
-    if intTarqetApi  < 29 then
-       ShowMessage('Warning: remember that "google play" store NOW requires Target Api >= 29 !');
+    if intTarqetApi  < 30 then
+       ShowMessage('Warning: remember that "google play" store NOW requires Target Api >= 30 !');
 
   end;
 end;
@@ -395,9 +408,14 @@ begin
   begin
    intApi:= StrToInt(ListBoxTargetAPI.Text);
 
-   if intApi < 29  then
+   if intApi < 30  then
    begin
-     ShowMessage('AppCompat theme need Target Api >= 29'+ sLineBreak + '[android-sdk/platforms/android-29]');
+     ShowMessage('Warning. AppCompat theme and Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+                  'Please, update your android sdk/platforms folder!' + sLineBreak +
+                  'How to:'+ sLineBreak +
+                  '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                  '.run the command  >>sdkmanager --update'+ sLineBreak +
+                  '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
    end;
 
   end;
@@ -479,6 +497,8 @@ begin
  Result:= False;
  {$ifdef windows}
  pathToConfig:= LazarusIDE.GetPrimaryConfigPath();
+
+ LazarusIDE.GetSecondaryConfigPath;
  p:= Pos('config',pathToConfig);
  if p > 0 then
  begin
@@ -515,6 +535,16 @@ begin
    end;
  end;
  {$endif}
+end;
+
+function TFormWorkspace.IsLamwManagerForWindows(): boolean;
+begin
+//TODO
+end;
+
+function TFormWorkspace.IsLamwManagerForLinux(): boolean;
+begin
+ //TODO
 end;
 
 function TFormWorkspace.GetFullJavaSrcPath(fullProjectName: string): string;
@@ -593,6 +623,16 @@ begin
   FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
   apiTarg:= StrToInt(FTargetApi);
+
+  if apiTarg < 30 then
+  begin
+    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+                 'Please, update your android sdk/platforms folder!' + sLineBreak +
+                 'How to:'+ sLineBreak +
+                 '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                 '.run the command  >>sdkmanager --update'+ sLineBreak +
+                 '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+  end;
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
@@ -844,7 +884,7 @@ var
 begin
 
   strTApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 29
+  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 30
   else tApi:= StrToInt(strTApi);
 
   strMApi:= ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex];
@@ -1220,6 +1260,7 @@ begin
 
   ListBoxTargetAPI.Clear;  //SDK
   ListBoxTargetAPI.Items.Add(IntToStr(FMaxSdkPlatform));
+
   ListBoxTargetAPI.ItemIndex:= 0;
   StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 
@@ -1288,14 +1329,14 @@ begin
     CheckBoxSupport.Checked:= True; //inner Supported!!!
     //sCheckBoxSupport.Enabled:= False;
 
-    if (FMaxSdkPlatform < 29) or (FPathToGradle = '')   then
+    if (FMaxSdkPlatform < 30) or (FPathToGradle = '')   then
     begin
       ShowMessage('Warning/Recomendation:'+
                sLineBreak+
-               sLineBreak+'[LAMW 0.8.6.1] "AppCompat" [material] theme need:'+
+               sLineBreak+'[LAMW 0.8.6.2] "AppCompat" [material] theme need:'+
                sLineBreak+' 1. Java JDK 1.8'+
                sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]' +
-               sLineBreak+' 3. Android SDK "plataforms" 29 + "build-tools" 29.0.3'+
+               sLineBreak+' 3. Android SDK "plataforms" 30 + "build-tools" 30.0.2'+
                sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
                sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
                sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1462,7 +1503,7 @@ begin
   begin
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then
-      MessageDlg('[LAMW 0.8.6.1] "AppCompat" [material] theme need JDK 1.8 + Gradle 6.6.1 [or up]!', mtWarning, [mbOk], 0);
+      MessageDlg('[LAMW 0.8.6.2] "AppCompat" [material] theme need JDK 1.8 + Gradle 6.6.1 [or up]!', mtWarning, [mbOk], 0);
   end;
 
 end;
@@ -1515,10 +1556,10 @@ procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.6.1] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.6.2] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin] or up' +
-           sLineBreak+' 3. Android SDK "plataforms" 29 + "build-tools" 29.0.3'+
+           sLineBreak+' 3. Android SDK "plataforms" 30 + "build-tools" 30.0.2'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1575,10 +1616,10 @@ procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.6.1] "AppCompat" [material] theme need:'+
+           sLineBreak+'[LAMW 0.8.6.2] "AppCompat" [material] theme need:'+
            sLineBreak+' 1. Java JDK 1.8'+
            sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 29 + "build-tools" 29.0.3'+
+           sLineBreak+' 3. Android SDK "plataforms" 30 + "build-tools" 30.0.2'+
            sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
            sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
@@ -1761,6 +1802,7 @@ begin
   EditPackagePrefaceName.Text := FPackagePrefaceName;
 
   FMaxSdkPlatform:= Self.GetMaxSdkPlatform();
+
   if FMaxSdkPlatform = 0 then    //  try fix "android-0"
       FMaxSdkPlatform:= FCandidateSdkPlatform;
 
