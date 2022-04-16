@@ -645,7 +645,7 @@ begin
      strList.Add(' ');
      strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
      strList.Add('    public void SetId(int _id) {');  //need by code generation....
-     strList.Add('       this.setId(_id)');
+     strList.Add('       this.setId(_id);');
      strList.Add('    }');
      strList.Add(' ');
      strList.Add('}');
@@ -1455,30 +1455,36 @@ begin
              i:= 0;
              while i < strList.Count-1 do
              begin
-               if Pos('Classes,', strList.strings[i]) > 0 then
+               if (Pos('RegisterClasses', strList.strings[i]) > 0) or (Pos('RegisterNoIcon', strList.strings[i]) > 0) then
                begin
+                 inc(i);
+               end
+               else
+               begin
+                 if Pos('Classes,', strList.strings[i]) > 0 then
+                 begin
+                   Inc(i);
+                   strList.Insert(i, '  '+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+',');
+                 end else if Pos('begin', strList.strings[i]) > 0 then
+                 begin
+                    Inc(i);
+                    strList.Insert(i, '  {$I '+LowerCase(FJavaClassName)+'_icon.lrs}');
+                 end else if Pos('[', strList.strings[i]) > 0 then
+                 begin
+                    if Pos(']', strList.strings[i+1]) > 0 then //empty
+                    begin
+                       Inc(i);
+                       strList.Insert(i, '      '+FJavaClassName); //add first
+                    end
+                    else //not empty
+                    begin
+                       Inc(i);
+                       strList.Insert(i, '      '+FJavaClassName + ',');
+                    end;
+                 end;
                  Inc(i);
-                 strList.Insert(i, '  '+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+',');
-               end else
-               if Pos('begin', strList.strings[i]) > 0 then
-               begin
-                  Inc(i);
-                  strList.Insert(i, '  {$I '+LowerCase(FJavaClassName)+'_icon.lrs}');
-               end else
-               if ( Pos('[', strList.strings[i]) > 0) and ( Pos('RegisterClasses', strList.strings[i+1]) <= 0) then
-               begin
-                  if Pos(']', strList.strings[i+1]) > 0 then
-                  begin
-                     Inc(i);
-                     strList.Insert(i, '      '+FJavaClassName);
-                  end
-                  else
-                  begin
-                     Inc(i);
-                     strList.Insert(i, '      '+FJavaClassName+',');
-                  end;
                end;
-               Inc(i);
+
              end;
              strList.SaveToFile(regFile);
            end;

@@ -8,6 +8,7 @@ interface
 
 uses 
   Classes,
+  tablelayout,
   SysUtils,
   LResources,
   AndroidWidget,
@@ -103,6 +104,7 @@ begin
   {$I jvideoview_icon.lrs}
   {$I jtoolbar_icon.lrs}
   {$I jexpandablelistview_icon.lrs}
+  {$I jtablelayout_icon.lrs}
   {$I jlinearlayout_icon.lrs}
   {$I jframelayout_icon.lrs}
   {$I jcaptionpanel_icon.lrs}
@@ -157,6 +159,7 @@ begin
       jVideoView,
       jToolbar,
       jExpandableListView,
+      jTableLayout,
       jLinearLayout,
       jFrameLayout,
       jCaptionPanel,

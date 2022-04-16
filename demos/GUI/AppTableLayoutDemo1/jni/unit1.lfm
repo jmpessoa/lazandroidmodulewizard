@@ -1,0 +1,61 @@
+object AndroidModule1: TAndroidModule1
+  MarginLeft = 0
+  MarginTop = 0
+  MarginRight = 0
+  MarginBottom = 0
+  Enabled = True
+  Left = 381
+  Top = 32
+  Width = 320
+  Height = 400
+  Text = 'AndroidModule1'
+  ActivityMode = actMain
+  BackgroundColor = colbrDefault
+  ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  OnJNIPrompt = AndroidModule1JNIPrompt
+  object TextView1: jTextView
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 66
+    Top = 5
+    Width = 188
+    Height = 26
+    Visible = True
+    PosRelativeToAnchor = []
+    PosRelativeToParent = [rpTop, rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    Text = 'App TableLayout Demo1'
+    Alignment = taLeft
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    TextTypeFace = tfNormal
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+  end
+  object TableLayout1: jTableLayout
+    MarginLeft = 10
+    MarginTop = 10
+    MarginRight = 10
+    MarginBottom = 10
+    Enabled = True
+    Left = 10
+    Top = 46
+    Width = 300
+    Height = 96
+    Visible = True
+    Anchor = TextView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpMatchParent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+  end
+end

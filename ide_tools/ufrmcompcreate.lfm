@@ -91,6 +91,7 @@ object FrmCompCreate: TFrmCompCreate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
+  LCLVersion = '2.0.12.0'
   object Panel1: TPanel
     Left = 0
     Height = 50
@@ -1546,8 +1547,8 @@ object FrmCompCreate: TFrmCompCreate
     Enabled = False
     CommentAttri.Foreground = clOlive
     KeyAttri.Foreground = clGreen
-    left = 153
-    top = 160
+    Left = 153
+    Top = 160
   end
   object SynPasSyn1: TSynPasSyn
     Enabled = False
@@ -1555,12 +1556,12 @@ object FrmCompCreate: TFrmCompCreate
     KeyAttri.Foreground = clNavy
     CompilerMode = pcmDelphi
     NestedComments = False
-    left = 496
-    top = 296
+    Left = 496
+    Top = 296
   end
   object PopupMenuDraftCode: TPopupMenu
-    left = 368
-    top = 216
+    Left = 368
+    Top = 216
     object MenuItem1: TMenuItem
       Caption = 'Insert Java jControl template'
       OnClick = PopupMenu1Close
@@ -1610,8 +1611,8 @@ object FrmCompCreate: TFrmCompCreate
     end
   end
   object PopupMenuRegister: TPopupMenu
-    left = 544
-    top = 120
+    Left = 544
+    Top = 120
     object MenuItem2: TMenuItem
       Caption = 'Register Component...'
       OnClick = PopupMenu2Close
@@ -1627,7 +1628,7 @@ object FrmCompCreate: TFrmCompCreate
   object OpenDialog1: TOpenDialog
     DefaultExt = '.jar'
     Filter = 'JAR|*.jar'
-    left = 400
-    top = 8
+    Left = 400
+    Top = 8
   end
 end

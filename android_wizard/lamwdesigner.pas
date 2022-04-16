@@ -567,6 +567,13 @@ type
      procedure Draw; override;
   end;
 
+  { TDraftTableLayout }
+
+  TDraftTableLayout = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
   { TDraftCalendarView }
   TDraftCalendarView = class(TDraftWidget)
   public
@@ -768,7 +775,7 @@ uses
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
   sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView},
   customcamera, sadmob, calendarview, searchview, zbarcodescannerview,
-  scontinuousscrollableimageview, copenmapview, csignaturepad, zoomableimageview;
+  scontinuousscrollableimageview, copenmapview, csignaturepad, zoomableimageview, tablelayout;
 
 const
   DrawableSearchPaths: array [0..4] of string = (
@@ -1549,6 +1556,22 @@ begin
   end;
 end;
 
+{ TDraftTableLayout }
+
+procedure TDraftTableLayout.Draw;
+begin
+  with Fcanvas do
+  begin
+    if jTableLayout(FAndroidWidget).BackgroundColor <> colbrDefault then
+      Brush.Color := ToTColor(jTableLayout(FAndroidWidget).BackgroundColor)
+    else begin
+      Brush.Color:= clNone;
+      Brush.Style:= bsClear;
+    end;
+    Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+  end;
+end;
+
 { TDraftCalendarView }
 
 procedure TDraftCalendarView.Draw;
@@ -2143,9 +2166,9 @@ var
 begin
   if AComponent <> AndroidForm then // to preserve jForm size
   begin
-    if AComponent is TAndroidWidget then
-    begin
 
+    if Acomponent is jControl then
+    begin
       if AComponent.Name.StartsWith(AComponent.ClassName) and (AComponent.Name[1] = 'j') then
       begin
 
@@ -2175,17 +2198,27 @@ begin
         end;
         AComponent.Name := newName + IntToStr(i);
       end;
+
+    end; //jControl
+
+    if AComponent is TAndroidWidget then
+    begin
+
       with NewBounds do
+      begin
         if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
         begin
           // restore default size
           Right := Left + TAndroidWidget(AComponent).Width;
           Bottom := Top + TAndroidWidget(AComponent).Height
         end;
-    end;
-    inherited InitComponent(AComponent, NewParent, NewBounds);
-    if (AComponent is jVisualControl)
-    and Assigned(jVisualControl(AComponent).Parent) then
+        inherited InitComponent(AComponent, NewParent, NewBounds);
+      end;
+
+    end; //visual control
+
+    if (AComponent is jVisualControl) and Assigned(jVisualControl(AComponent).Parent) then
+    begin
       with jVisualControl(AComponent) do
       begin
         if not (LayoutParamWidth in [lpWrapContent, lpExact, lpUseWeight]) then
@@ -2193,7 +2226,10 @@ begin
         if not (LayoutParamHeight in [lpWrapContent, lpExact, lpUseWeight]) then
           LayoutParamHeight := GetDesignerLayoutByWH(Height, Parent.Height);
       end;
-  end;
+    end;
+
+  end; //not AndroidForm
+
 end;
 
 procedure TAndroidWidgetMediator.Paint;
@@ -5032,6 +5068,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jZBarcodeScannerView, TDraftZBarcodeScannerView);
 
   RegisterAndroidWidgetDraftClass(jLinearLayout, TDraftLinearLayout);
+  RegisterAndroidWidgetDraftClass(jTableLayout, TDraftTableLayout);
   RegisterAndroidWidgetDraftClass(jCaptionPanel, TDraftCaptionPanel);
   RegisterAndroidWidgetDraftClass(jCalendarView, TDraftCalendarView);
   RegisterAndroidWidgetDraftClass(jSearchView, TDraftSearchView);

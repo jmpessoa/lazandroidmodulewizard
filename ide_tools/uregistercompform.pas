@@ -73,7 +73,7 @@ begin
   EditRegisterPath.ReadOnly:= False;
   index:= RadioGroup1.ItemIndex;
   case index of
-     0: Self.EditRegisterPath.Text:= PathToLAMW +  'regandroidbridge';
+     0: Self.EditRegisterPath.Text:= PathToLAMW +  'regandroidbridge.pas';
      1: Self.EditRegisterPath.Text:= PathToLAMW +  'register_extras.pas';
      2: Self.EditRegisterPath.Text:= PathToLAMW +  'register_support.pas';
      3: Self.EditRegisterPath.Text:= PathToLAMW +  'register_jcenter.pas';

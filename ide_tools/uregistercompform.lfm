@@ -292,7 +292,7 @@ object FormRegisterComp: TFormRegisterComp
   object OpenDialog1: TOpenDialog
     Title = 'Selec 16x16 PNG Icon File'
     Filter = 'PNG|*.png'
-    left = 352
-    top = 16
+    Left = 352
+    Top = 16
   end
 end

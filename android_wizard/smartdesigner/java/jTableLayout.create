@@ -1,0 +1,3 @@
+public java.lang.Object jTableLayout_jCreate(long _Self) {
+  return (java.lang.Object)(new jTableLayout(this,_Self));
+}
