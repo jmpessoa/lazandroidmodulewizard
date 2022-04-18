@@ -5083,10 +5083,10 @@ begin
   begin
    FInitialized:= True;
 
-   jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   SetFontFace(FFontFace);
 
    if FActionIconIdentifier <> '' then
-      jEditText_SetActionIconIdentifier(FjEnv, FjObject, FActionIconIdentifier);
+      SetActionIconIdentifier(FActionIconIdentifier);
 
    if  FHint <> '' then
     SetHint(FHint);
@@ -5239,16 +5239,18 @@ procedure jEditText.SetFontFace(AValue: TFontFace);
 begin 
   //inherited SetFontFace(AValue);
   FFontFace:= AValue;
-  if(FInitialized) then 
-   jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
+  if FjObject = nil then exit;
+
+   jni_proc_ii( FjEnv, FjObject,'setFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end; 
 
 procedure jEditText.SetTextTypeFace(Value: TTextTypeFace); 
 begin 
  //inherited SetTextTypeFace(Value);
  FTextTypeFace:= Value;
- if(FInitialized) then 
-   jEditText_setFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace)); 
+ if FjObject = nil then exit;
+
+ jni_proc_ii( FjEnv, FjObject,'setFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end; 
 
 procedure jEditText.SetHintTextColor(Value: TARGBColorBridge);
@@ -5806,43 +5808,45 @@ procedure jEditText.SetActionIconIdentifier(_actionIconIdentifier: string);
 begin
   //in designing component state: set value here...
   FActionIconIdentifier:=  _actionIconIdentifier;
-  if FInitialized then
-     jEditText_SetActionIconIdentifier(FjEnv, FjObject, _actionIconIdentifier);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetActionIconIdentifier', _actionIconIdentifier);
 end;
 
 procedure jEditText.ShowActionIcon();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_ShowActionIcon(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'ShowActionIcon');
 end;
 
 procedure jEditText.HideActionIcon();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jEditText_HideActionIcon(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'HideActionIcon');
 end;
 
 function jEditText.IsActionIconShowing(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jEditText_IsActionIconShowing(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsActionIconShowing');
 end;
 
 function jEditText.GetTextLength(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jEditText_GetTextLength(FjEnv, FjObject);
+   Result:= jni_func_out_j(FjEnv, FjObject, 'GetTextLength');
 end;
 
 function jEditText.IsEmpty(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jEditText_IsEmpty(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsEmpty');
 end;
 
 
@@ -7246,14 +7250,15 @@ begin
    begin
       FImageIndex:= foundIndex;
       FImageName:= Trim(FImageList.Images.Strings[foundIndex]);
-      jImageView_setImage(FjEnv, FjObject , GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
+      SetImage(GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
    end;
 end;
 
 Procedure jImageView.SetImage(_fullFilename: string);
 begin
-   if FInitialized then
-      jImageView_setImage(FjEnv, FjObject , _fullFilename);
+   if FjObject = nil then exit;
+
+   jni_proc_t(FjEnv, FjObject , 'setImage', _fullFilename);
 end;
 
 procedure jImageView.SetRotation(angle: integer);
@@ -7287,7 +7292,7 @@ begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
       if  (FImageName <> '') and (FImageName <> 'null') then
       begin
-        jImageView_setImage(FjEnv, FjObject , GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
+        SetImage(GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageName);
       end;
    end;
 end;
@@ -8849,13 +8854,13 @@ begin
         SetWidgetTextColor(FWidgetTextColor);
 
     if FFontColor <> colbrDefault then
-       jListView_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+       jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 
     if FFontSizeUnit <> unitDefault then
         SetFontSizeUnit(FFontSizeUnit);
 
     if FFontSize > 0 then
-       jListView_setTextSize(FjEnv, FjObject , FFontSize);
+       jni_proc_i(FjEnv, FjObject, 'setTextSize', FFontSize);
 
     if FFontFace <> ffNormal then
        SetFontFace(FFontFace);
@@ -8903,13 +8908,13 @@ begin
       SetWidgetTextColor(FWidgetTextColor);
 
     if FFontColor <> colbrDefault then
-      jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+      jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 
     if FFontSizeUnit <> unitDefault then
       SetFontSizeUnit(FFontSizeUnit);
 
     if FFontSize > 0 then
-      jListView_setTextSize(FjEnv, FjObject , FFontSize);
+      jni_proc_i(FjEnv, FjObject, 'setTextSize', FFontSize);
 
     if FFontFace <> ffNormal then
       SetFontFace(FFontFace);
@@ -10011,7 +10016,7 @@ procedure jListView.DispatchOnDrawItemTextCustomFont(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_DispatchOnDrawItemTextCustomFont(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemTextCustomFont', _value);
 end;
 
 //------------------------------------------------------------------------------
@@ -10333,7 +10338,7 @@ procedure jScrollView.AddImageFromFile(_path: string; _filename: string; _itemId
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename ,_itemId);
+     jni_proc_tti(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId);
 end;
 
 procedure jScrollView.AddImageFromAssets(_filename: string; _itemId: integer);
@@ -10361,7 +10366,7 @@ procedure jScrollView.AddImageFromFile(_path: string; _filename: string; _itemId
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename ,_itemId ,Ord(_scaleType));
+     jni_proc_ttii(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId ,Ord(_scaleType));
 end;
 
 procedure jScrollView.AddImageFromAssets(_filename: string; _itemId: integer; _scaleType: TImageScaleType);
@@ -10754,7 +10759,7 @@ procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: strin
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHorizontalScrollView_AddImageFromFile(FjEnv, FjObject, _path ,_filename ,_itemId ,Ord(_scaleType));
+     jni_proc_ttii(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId ,Ord(_scaleType));
 end;
 
 procedure jHorizontalScrollView.AddImageFromAssets(_filename: string; _itemId: integer; _scaleType: TImageScaleType);
@@ -10895,7 +10900,7 @@ begin
      SetJavaScript(FJavaScript);
 
    if FDomStorage <> True then
-     jWebView_SetDomStorage(FjEnv, FjObject, FDomStorage);
+     SetDomStorage(FDomStorage);
 
    if FZoomControl <> True then
      SetZoomControl(FZoomControl);
@@ -11174,113 +11179,115 @@ procedure jWebView.SetDomStorage(_domStorage: boolean);
 begin
   //in designing component state: set value here...
   FDomStorage:= _domStorage;
-  if FInitialized then
-     jWebView_SetDomStorage(FjEnv, FjObject, _domStorage);
+
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetDomStorage', _domStorage);
 end;
 
 procedure jWebView.SetLoadWithOverviewMode(_overviewMode: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetLoadWithOverviewMode(FjEnv, FjObject, _overviewMode);
+     jni_proc_z(FjEnv, FjObject, 'SetLoadWithOverviewMode', _overviewMode);
 end;
 
 procedure jWebView.SetUseWideViewPort(_wideViewport: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetUseWideViewPort(FjEnv, FjObject, _wideViewport);
+     jni_proc_z(FjEnv, FjObject, 'SetUseWideViewPort', _wideViewport);
 end;
 
 procedure jWebView.SetAllowContentAccess(_allowContentAccess: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetAllowContentAccess(FjEnv, FjObject, _allowContentAccess);
+     jni_proc_z(FjEnv, FjObject, 'SetAllowContentAccess', _allowContentAccess);
 end;
 
 procedure jWebView.SetAllowFileAccess(_allowFileAccess: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetAllowFileAccess(FjEnv, FjObject, _allowFileAccess);
+     jni_proc_z(FjEnv, FjObject, 'SetAllowFileAccess', _allowFileAccess);
 end;
 
 procedure jWebView.SetAppCacheEnabled(_cacheEnabled: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetAppCacheEnabled(FjEnv, FjObject, _cacheEnabled);
+     jni_proc_z(FjEnv, FjObject, 'SetAppCacheEnabled', _cacheEnabled);
 end;
 
 procedure jWebView.SetDisplayZoomControls(_displayZoomControls: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetDisplayZoomControls(FjEnv, FjObject, _displayZoomControls);
+     jni_proc_z(FjEnv, FjObject, 'SetDisplayZoomControls', _displayZoomControls);
 end;
 
 procedure jWebView.SetGeolocationEnabled(_geolocationEnabled: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetGeolocationEnabled(FjEnv, FjObject, _geolocationEnabled);
+     jni_proc_z(FjEnv, FjObject, 'SetGeolocationEnabled', _geolocationEnabled);
 end;
 
 procedure jWebView.SetJavaScriptCanOpenWindowsAutomatically(_javaScriptCanOpenWindows: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetJavaScriptCanOpenWindowsAutomatically(FjEnv, FjObject, _javaScriptCanOpenWindows);
+     jni_proc_z(FjEnv, FjObject, 'SetJavaScriptCanOpenWindowsAutomatically', _javaScriptCanOpenWindows);
 end;
 
 procedure jWebView.SetLoadsImagesAutomatically(_loadsImagesAutomatically: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetLoadsImagesAutomatically(FjEnv, FjObject, _loadsImagesAutomatically);
+     jni_proc_z(FjEnv, FjObject, 'SetLoadsImagesAutomatically', _loadsImagesAutomatically);
 end;
 
 procedure jWebView.SetSupportMultipleWindows(_supportMultipleWindows: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetSupportMultipleWindows(FjEnv, FjObject, _supportMultipleWindows);
+     jni_proc_z(FjEnv, FjObject, 'SetSupportMultipleWindows', _supportMultipleWindows);
 end;
 
 procedure jWebView.SetAllowUniversalAccessFromFileURLs(_allowUniversalAccessFromFileURLs: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetAllowUniversalAccessFromFileURLs(FjEnv, FjObject, _allowUniversalAccessFromFileURLs);
+     jni_proc_z(FjEnv, FjObject, 'SetAllowUniversalAccessFromFileURLs', _allowUniversalAccessFromFileURLs);
 end;
 
 procedure jWebView.SetMediaPlaybackRequiresUserGesture(_mediaPlaybackRequiresUserGesture: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetMediaPlaybackRequiresUserGesture(FjEnv, FjObject, _mediaPlaybackRequiresUserGesture);
+     jni_proc_z(FjEnv, FjObject, 'SetMediaPlaybackRequiresUserGesture', _mediaPlaybackRequiresUserGesture);
 end;
 
 procedure jWebView.SetSafeBrowsingEnabled(_safeBrowsingEnabled: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetSafeBrowsingEnabled(FjEnv, FjObject, _safeBrowsingEnabled);
+     jni_proc_z(FjEnv, FjObject, 'SetSafeBrowsingEnabled', _safeBrowsingEnabled);
 end;
 
 procedure jWebView.SetSupportZoom(_supportZoom: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetSupportZoom(FjEnv, FjObject, _supportZoom);
+     jni_proc_z(FjEnv, FjObject, 'SetSupportZoom', _supportZoom);
 end;
 
 procedure jWebView.SetUserAgent(_userAgent: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetUserAgent(FjEnv, FjObject, _userAgent);
+     jni_proc_t(FjEnv, FjObject, 'SetUserAgent', _userAgent);
 end;
 
 

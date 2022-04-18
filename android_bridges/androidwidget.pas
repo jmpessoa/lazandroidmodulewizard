@@ -1725,13 +1725,6 @@ end;
 
   function jForm_GetRealPathFromURI(env: PJNIEnv; _jform: JObject; _Uri: jObject): string;
 
-  procedure jForm_CopyStringToClipboard(env: PJNIEnv; _jform: JObject; _txt: string);
-  function jForm_PasteStringFromClipboard(env: PJNIEnv; _jform: JObject): string;
-
-  procedure jForm_RequestCreateFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
-  procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _requestCode: integer);
-  procedure jForm_RequestOpenDirectory(env: PJNIEnv; _jform: JObject; _uriAsString: string; _requestCode: integer);
-
   function jForm_GetBitmapFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): jObject;
   function jForm_LoadBytesFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): TDynArrayOfJByte;
   function jForm_GetFileNameByUri(env: PJNIEnv; _jform: JObject; _uri: jObject): string;
@@ -1819,8 +1812,6 @@ Procedure jForm_FreeLayout              (env:PJNIEnv; Layout    : jObject);
 Procedure jForm_SetEnabled2             (env:PJNIEnv;Form    : jObject; enabled : Boolean);
 
 function jForm_CopyFileFromUri(env: PJNIEnv;  _jform: JObject; _srcUri : JObject; _destDir: string): string;
-
-function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
 
 function jForm_GetAssetContentList(env: PJNIEnv; _jform: JObject; _path: string): TDynArrayOfString;
 function jForm_GetDriverList(env: PJNIEnv; _jform: JObject): TDynArrayOfString;
@@ -2003,7 +1994,9 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure jni_proc_tz(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool : boolean);
   procedure jni_proc_tt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string);
   procedure jni_proc_tti(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string; _int0: integer);
+  procedure jni_proc_ttii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string; _int0,_int1: integer);
   procedure jni_proc_ttt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2, _str3: string);
+  procedure jni_proc_ttti(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2, _str3: string; _int0 : integer);
   procedure jni_proc_ttttt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2, _str3, _str4, _str5: string);
   procedure jni_proc_ttz(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string; _bool : boolean);
   procedure jni_proc_vig(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _viewgroup: jObject);
@@ -4503,6 +4496,7 @@ end;
 
 function jForm.GetStripAccents(_str: string): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStripAccents', _str);
@@ -4510,6 +4504,7 @@ end;
 
 function jForm.GetPathFromAssetsFile(_assetsFileName: string): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetPathFromAssetsFile', _assetsFileName);
@@ -4517,13 +4512,15 @@ end;
 
 function jForm.GetImageFromAssetsFile(_assetsImageFileName: string): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetImageFromAssetsFile(FjEnv, FjObject, _assetsImageFileName);
+   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetImageFromAssetsFile', _assetsImageFileName);
 end;
 
 function jForm.GetAssetContentList(_path: string): TDynArrayOfString;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetAssetContentList(FjEnv, FjObject, _path);
@@ -4531,6 +4528,7 @@ end;
 
 function jForm.GetDriverList(): TDynArrayOfString;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetDriverList(FjEnv, FjObject);
@@ -4538,6 +4536,7 @@ end;
 
 function jForm.GetFolderList(_envPath: string): TDynArrayOfString;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetFolderList(FjEnv, FjObject, _envPath);
@@ -4545,6 +4544,7 @@ end;
 
 function jForm.GetFileList(_envPath: string): TDynArrayOfString;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetFileList(FjEnv, FjObject, _envPath);
@@ -5007,35 +5007,36 @@ procedure jForm.CopyStringToClipboard(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_CopyStringToClipboard(FjEnv, FjObject, _txt);
+     jni_proc_t(FjEnv, FjObject, 'CopyStringToClipboard', _txt);
 end;
 
 function jForm.PasteStringFromClipboard(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_PasteStringFromClipboard(FjEnv, FjObject);
+   Result:= jni_func_out_t(FjEnv, FjObject, 'PasteStringFromClipboard');
 end;
 
 procedure jForm.RequestCreateFile(_envPath: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestCreateFile(FjEnv, FjObject, _envPath ,_fileMimeType ,_fileName ,_requestCode);
+     jni_proc_ttti(FjEnv, FjObject, 'RequestCreateFile', _envPath ,_fileMimeType ,_fileName ,_requestCode);
 end;
 
 procedure jForm.RequestOpenFile(_envPath: string; _fileMimeType: string;  _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestOpenFile(FjEnv, FjObject, _envPath ,_fileMimeType ,_requestCode);
+     jni_proc_tti(FjEnv, FjObject, 'RequestOpenFile', _envPath ,_fileMimeType ,_requestCode);
 end;
 
 procedure jForm.RequestOpenDirectory(_envPath: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestOpenDirectory(FjEnv, FjObject, _envPath ,_requestCode);
+     jni_proc_ti(FjEnv, FjObject, 'RequestOpenDirectory', _envPath ,_requestCode);
 end;
 
 function jForm.GetBitmapFromUri(_treeUri: jObject): jObject;
@@ -5120,140 +5121,6 @@ end;
 
 {-------- jForm_JNI_Bridge ----------}
 
-procedure jForm_CopyStringToClipboard(env: PJNIEnv; _jform: JObject; _txt: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jform);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'CopyStringToClipboard', '(Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_txt));
-
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[0].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-
-function jForm_PasteStringFromClipboard(env: PJNIEnv; _jform: JObject): string;
-var
-  jStr: JString;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jform);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'PasteStringFromClipboard', '()Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
-
-  Result := GetPStringAndDeleteLocalRef(env, jStr);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-
-procedure jForm_RequestCreateFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
-var
-  jParams: array[0..3] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jform);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestCreateFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_fileMimeType));
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_fileName));
-  jParams[3].i:= _requestCode;
-
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env,jParams[2].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-
-procedure jForm_RequestOpenFile(env: PJNIEnv; _jform: JObject; _uriAsString: string; _fileMimeType: string; _requestCode: integer);
-var
-  jParams: array[0..3] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jform);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestOpenFile', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
-  jParams[1].l:= env^.NewStringUTF(env, PChar(_fileMimeType));
-  jParams[2].l:= env^.NewStringUTF(env, PChar(nil));
-  jParams[3].i:= _requestCode; 
-
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env,jParams[2].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-
-procedure jForm_RequestOpenDirectory(env: PJNIEnv; _jform: JObject; _uriAsString: string; _requestCode: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jform);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'RequestOpenDirectory', '(Ljava/lang/String;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
-  jParams[1].i:= _requestCode;
-
-  env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
 function jForm_GetBitmapFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): jObject;
 var
   jParams: array[0..0] of jValue;
@@ -5262,14 +5129,14 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetBitmapFromUri', '(Landroid/net/Uri;)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
-
 
   Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
 
@@ -5289,15 +5156,15 @@ var
 label
   _exceptionOcurred;
 begin
- Result := nil;
+  Result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'LoadBytesFromUri', '(Landroid/net/Uri;)[B');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
-
 
   jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
 
@@ -5323,14 +5190,14 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetFileNameByUri', '(Landroid/net/Uri;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
-
 
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
 
@@ -5351,14 +5218,14 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetTextFromUri', '(Landroid/net/Uri;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
-
 
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
 
@@ -5378,11 +5245,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'TakePersistableUriPermission', '(Landroid/net/Uri;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
 
@@ -5402,11 +5270,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SaveImageToUri', '(Landroid/graphics/Bitmap;Landroid/net/Uri;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].l:= _toUri;
@@ -5428,11 +5297,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SaveImageTypeToUri', '(Landroid/graphics/Bitmap;Landroid/net/Uri;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].l:= _toUri;
@@ -5458,14 +5328,18 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SaveBytesToUri', '([BLandroid/net/Uri;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   len := Length(_bytes);
   byteArray:= env^.NewByteArray(env, len);
+
+  if byteArray = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.SetByteArrayRegion(env, byteArray, 0 , len, @_bytes[0]);
 
   jParams[0].l:= byteArray;
@@ -5488,14 +5362,17 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SaveTextToUri', '(Ljava/lang/String;Landroid/net/Uri;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
   jParams[1].l:= _toUri;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jform, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
@@ -5521,10 +5398,11 @@ begin
 
   result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetFileList', '(Landroid/net/Uri;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _treeUri;
 
@@ -5560,13 +5438,16 @@ begin
 
   result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetFileList', '(Landroid/net/Uri;Ljava/lang/String;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _treeUri;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_fileExtension));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
   if jResultArray <> nil then
@@ -5579,8 +5460,8 @@ begin
       Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);
     end;
   end;
-env^.DeleteLocalRef(env,jParams[1].l);
 
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
@@ -5605,30 +5486,6 @@ begin
   if Assigned(FOnRunOnUiThread) then FOnRunOnUiThread(Sender,tag);
 end;
 
-function jForm_GetImageFromAssetsFile(env: PJNIEnv; _jform: JObject; _assetsImageFileName: string): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-  result := nil;
-
-  jCls:= env^.GetObjectClass(env, _jform);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'GetImageFromAssetsFile', '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_assetsImageFileName));
-
-  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
-
-  env^.DeleteLocalRef(env, jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
-end;
-
 procedure jForm_ShowCustomMessage(env: PJNIEnv; _jform: JObject; _layout: jObject; _gravity: integer);
 var
   jParams: array[0..1] of jValue;
@@ -5637,11 +5494,11 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'ShowCustomMessage', '(Landroid/view/View;I)V'); //RelativeLayout
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _layout;
   jParams[1].i:= _gravity;
@@ -5661,11 +5518,11 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'ShowCustomMessage', '(Landroid/view/View;II)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _layout;
   jParams[1].i:= _gravity;
@@ -5687,14 +5544,16 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetStringExtra', '(Landroid/content/Intent;Ljava/lang/String;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= intentData;
   jParams[1].l:= env^.NewStringUTF(env, PChar(extraName));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
 
@@ -5714,15 +5573,17 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetIntExtra', '(Landroid/content/Intent;Ljava/lang/String;I)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= intentData;
   jParams[1].l:= env^.NewStringUTF(env, PChar(extraName));
   jParams[2].i:= defaultValue;
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
 
@@ -5740,15 +5601,17 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetDoubleExtra', '(Landroid/content/Intent;Ljava/lang/String;D)D');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= intentData;
   jParams[1].l:= env^.NewStringUTF(env, PChar(extraName));
   jParams[2].d:= defaultValue;
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethodA(env, _jform, jMethod, @jParams);
 
@@ -5768,10 +5631,11 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetActionBar', '()Landroid/app/ActionBar;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, _jform, jMethod);
 
@@ -5790,10 +5654,11 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetDrawableResourceById', '(I)Landroid/graphics/drawable/Drawable;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _resID;
 
@@ -5815,14 +5680,17 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'Vibrate', '([J)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   newSize0:= Length(_millisecondsPattern);
   jNewArray0:= env^.NewLongArray(env, newSize0);  // allocate
+
+  if jNewArray0 = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.SetLongArrayRegion(env, jNewArray0, 0 , newSize0, @_millisecondsPattern[0] {source});
   jParams[0].l:= jNewArray0;
 
@@ -5844,12 +5712,15 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'ParseUri', '(Ljava/lang/String;)Landroid/net/Uri;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_uriAsString));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
 
@@ -5868,11 +5739,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'UriToString', '(Landroid/net/Uri;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
 
@@ -5898,12 +5770,15 @@ label
 begin
   Result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_path));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
 
@@ -5938,10 +5813,12 @@ label
   _exceptionOcurred;
 begin
   Result := nil;
+
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetDriverList', '()[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jresultArray:= env^.CallObjectMethod(env, _jform, jMethod);
 
@@ -5956,6 +5833,7 @@ begin
       Result[i]:= GetPStringAndDeleteLocalRef(env, jStr);
     end;
   end;
+
   env^.DeleteLocalRef(env, jCls);  
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
@@ -5976,12 +5854,15 @@ label
 begin
   Result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetFolderList', '(Ljava/lang/String;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_envPath));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
 
@@ -6018,12 +5899,15 @@ label
 begin
   Result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetFileList', '(Ljava/lang/String;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_envPath));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jResultArray:= env^.CallObjectMethodA(env, _jform, jMethod,  @jParams);
 
@@ -6053,11 +5937,11 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'HideSoftInput', '(Landroid/view/View;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _view;
 
@@ -6075,11 +5959,11 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _viewgroup;
 
@@ -6099,10 +5983,11 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, _jform, jMethod);
 
@@ -6123,14 +6008,17 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'RequestRuntimePermission', '([Ljava/lang/String;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   newSize0:= Length(_androidPermissions);
   jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+
+  if jNewArray0 = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   for i:= 0 to newSize0 - 1 do
   begin
      env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_androidPermissions[i])));
@@ -6157,14 +6045,17 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'RequestRuntimePermission', '([Ljava/lang/String;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   newSize0:= Length(_androidPermissions);
   jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+
+  if jNewArray0 = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   for i:= 0 to newSize0 - 1 do
   begin
      env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_androidPermissions[i])));
@@ -6191,11 +6082,11 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundImageMatrix', '(FFFFFFF)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _scaleX;
   jParams[1].f := _scaleY;
@@ -6222,10 +6113,11 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetJByteBuffer', '(II)Ljava/nio/ByteBuffer;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _width;
   jParams[1].i:= _height;
@@ -6247,10 +6139,11 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetByteBufferFromImage', '(Landroid/graphics/Bitmap;)Ljava/nio/ByteBuffer;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
 
@@ -6270,11 +6163,11 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetRealPathFromURI', '(Landroid/net/Uri;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _Uri;
 
@@ -6298,10 +6191,12 @@ label
   _exceptionOcurred;
 begin
   Result := nil;
+
+  if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetInstalledAppList', '()[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jresultArray:= env^.CallObjectMethod(env, _jform, jMethod);
 
@@ -7020,12 +6915,16 @@ end;
 
 function  Is_jInstanceOf(jObj:JObject; cls: jClass): boolean;
 begin
-  Result:= boolean(gApp.Jni.jEnv^.IsInstanceOf(gApp.Jni.jEnv, jObj, cls));
+  result := false; if (jObj = nil) or (cls = nil) then exit;
+
+  result := boolean(gApp.Jni.jEnv^.IsInstanceOf(gApp.Jni.jEnv, jObj, cls));
 end;
 
 function Get_jObjectClass(jObj: jObject): jClass;
 begin
-  Result:=gApp.Jni.jEnv^.GetObjectClass(gApp.Jni.jEnv, jObj);
+  result := nil; if (jObj = nil) then exit;
+
+  Result := gApp.Jni.jEnv^.GetObjectClass(gApp.Jni.jEnv, jObj);
 end;
 
 function Create_jObjectLocalRef(cls: JClass): JObject;
@@ -7034,7 +6933,7 @@ var
 label
   _exceptionOcurred;
 begin
-  Result := nil;
+  Result := nil; if (cls = nil) then exit;
   // Find the class
   try
     //Get its default constructor
@@ -7051,6 +6950,8 @@ end;
 
 function Get_jObjGlobalRef(jObj: jObject): JObject;
 begin
+  result := nil; if (jObj = nil) then exit;
+
   Result := gApp.Jni.jEnv^.NewGlobalRef(gApp.Jni.jEnv,jObj);
 end;
 
@@ -7061,7 +6962,7 @@ var
 label
   _exceptionOcurred;
 begin
-  Result := nil;
+  Result := nil; if (cls = nil) then exit;
   // Find the class
   try
     //Get its default constructor
@@ -7079,7 +6980,8 @@ end;
 
 function Create_jObjectArray(Len: integer; cls: jClass; initialElement: jObject): jObject;
 begin
-  Result := nil;
+  Result := nil; if (cls = nil) or (initialElement = nil) then exit;
+
   try
     Result := gApp.Jni.jEnv^.NewObjectArray(gApp.Jni.jEnv, len, cls, initialElement);
   except
@@ -7089,6 +6991,8 @@ end;
 
 procedure Set_jObjectArrayElement(jobjectArray: jObject; index: integer; element: jObject);
 begin
+  if (jobjectArray = nil) or (element = nil) then exit;
+
   gApp.Jni.jEnv^.SetObjectArrayElement(gApp.Jni.jEnv, jobjectArray, index, element);
 end;
 
@@ -7100,7 +7004,12 @@ var
   jObj_string: jObject;
   jClass_string: jClass;
 begin
-  jClass_string:=  Get_jClassLocalRef('java/lang/String');
+  if (jobjectArray = nil) then exit;
+
+  jClass_string := Get_jClassLocalRef('java/lang/String');
+
+  if (jClass_string = nil) then exit;
+
   len:= Length(elements);
   for i:= indexInitial to len-1 do
   begin
@@ -7113,16 +7022,21 @@ end;
 
 function Get_jObjectArrayElement(jobjectArray: jObject; index: integer): jObject;
 begin
+  Result:= nil; if (jobjectArray = nil) then exit;
+
   Result:= gApp.Jni.jEnv^.GetObjectArrayElement(gApp.Jni.jEnv, jobjectArray, index);
 end;
 
 function Get_jArrayLength(jobjectArray: jObject): integer;
 begin
+  Result:= 0; if (jobjectArray = nil) then exit;
+
   Result:= gApp.Jni.jEnv^.GetArrayLength(gApp.Jni.jEnv, jobjectArray);
 end;
 
 function Get_jStaticMethodID(cls: jClass; funcName, funcSignature : string): jMethodID;
 begin
+  Result:= nil; if (cls = nil) then exit;
     //a jmethodID is not an object. So don't need to convert it to a GlobalRef!
   Result:= gApp.Jni.jEnv^.GetStaticMethodID( gApp.Jni.jEnv, cls , PChar(funcName), PChar(funcSignature));
 end;
@@ -7130,6 +7044,7 @@ end;
 //fixed missing...
 function Get_jMethodID(cls: jClass; funcName, funcSignature : string): jMethodID;
 begin
+  Result:= nil; if (cls = nil) then exit;
     //a jmethodID is not an object. So don't need to convert it to a GlobalRef!
   Result:= gApp.Jni.jEnv^.GetMethodID( gApp.Jni.jEnv, cls , PChar(funcName), PChar(funcSignature));
 end;
@@ -7137,51 +7052,71 @@ end;
 
 function Call_jIntMethodA(jObj:jObject; method: jMethodID; var jParams:array of jValue): integer;
 begin
+  Result:= 0; if (jObj = nil) or (method = nil) then exit;
+
   Result:= gApp.Jni.jEnv^.CallIntMethodA(gApp.Jni.jEnv, jObj, method, @jParams);
 end;
 
 function Call_jDoubleMethodA(jObj:jObject; method: jMethodID; var jParams: array of jValue): double;
 begin
+  Result:= 0; if (jObj = nil) or (method = nil) then exit;
+
   Result:= gApp.Jni.jEnv^.CallDoubleMethodA(gApp.Jni.jEnv, jObj, method, @jParams);
 end;
 
 function Call_jDoubleMethod(jObj:jObject; method: jMethodID): double;
 begin
+  Result:= 0; if (jObj = nil) or (method = nil) then exit;
+
   Result:= gApp.Jni.jEnv^.CallDoubleMethod(gApp.Jni.jEnv, jObj, method);
 end;
 
 function Call_jIntMethod(jObj:jObject; method: jMethodID): integer;
 begin
+  Result:= 0; if (jObj = nil) or (method = nil) then exit;
+
   Result:= gApp.Jni.jEnv^.CallIntMethod(gApp.Jni.jEnv, jObj, method);
 end;
 
 procedure Call_jVoidMethodA(jObj:jObject; method: jMethodID; var jParams:array of jValue);
 begin
+   if (jObj = nil) or (method = nil) then exit;
+
    gApp.Jni.jEnv^.CallVoidMethodA(gApp.Jni.jEnv, jObj, method, @jParams);
 end;
 
 procedure Call_jVoidMethod(jObj:jObject; method: jMethodID);
 begin
+   if (jObj = nil) or (method = nil) then exit;
+
    gApp.Jni.jEnv^.CallVoidMethod(gApp.Jni.jEnv, jObj, method);
 end;
 
 function Call_jObjectMethodA(jObj:jObject; method: jMethodID; var jParams: array of jValue): jObject;
 begin
+   Result:= nil; if (jObj = nil) or (method = nil) then exit;
+
    Result:= gApp.Jni.jEnv^.CallObjectMethodA(gApp.Jni.jEnv, jObj, method, @jParams);
 end;
 
 function Call_jObjectMethod(jObj:jObject; method: jMethodID): jObject;
 begin
+   Result:= nil; if (jObj = nil) or (method = nil) then exit;
+
    Result:= gApp.Jni.jEnv^.CallObjectMethod(gApp.Jni.jEnv, jObj, method);
 end;
 
 function Call_jBooleanMethod(jObj:jObject; method: jMethodID): boolean;
 begin
+   Result:= false; if (jObj = nil) or (method = nil) then exit;
+
    Result:= boolean(gApp.Jni.jEnv^.CallBooleanMethod(gApp.Jni.jEnv, jObj, method));
 end;
 
 function Call_jBooleanMethodA(jObj:jObject; method: jMethodID; var jParams:array of jValue): boolean;
 begin
+     Result:= false; if (jObj = nil) or (method = nil) then exit;
+
      Result:= boolean(gApp.Jni.jEnv^.CallBooleanMethodA(gApp.Jni.jEnv, jObj, method, @jParams));
 end;
 
@@ -7192,13 +7127,16 @@ end;
 
 procedure Delete_jLocalRef(jObj: jObject);
 begin
+  if (jObj = nil) then exit;
+
   gApp.Jni.jEnv^.DeleteLocalRef(gApp.Jni.jEnv, jObj);
 end;
 
 procedure Delete_jGlobalRef(jObj: jObject);
 begin
-  if jObj <> nil then
-    gApp.Jni.jEnv^.DeleteGlobalRef(gApp.Jni.jEnv,jObj);
+  if (jObj = nil) then exit;
+
+  gApp.Jni.jEnv^.DeleteGlobalRef(gApp.Jni.jEnv,jObj);
 end;
 
 function Get_jString(str: string): jObject;
@@ -7227,10 +7165,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0;
+
   cls:= Get_jClassLocalRef(fullClassName);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= Get_jStaticMethodID(cls, funcName, funcSignature);
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin Delete_jLocalRef(cls); goto _exceptionOcurred; end;
 
   Result:= gApp.Jni.jEnv^.CallStaticIntMethodA(gApp.Jni.jEnv, cls, jMethod, @jParams);
 
@@ -7247,10 +7187,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0;
+
   cls:= Get_jClassLocalRef(fullClassName);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= Get_jStaticMethodID(cls, funcName, funcSignature);
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin Delete_jLocalRef(cls); goto _exceptionOcurred; end;
 
   Result:= gApp.Jni.jEnv^.CallStaticIntMethod(gApp.Jni.jEnv, cls, jMethod);
 
@@ -7266,10 +7208,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0;
+
   cls:= Get_jClassLocalRef(fullClassName);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= Get_jStaticMethodID(cls, funcName, funcSignature);
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin Delete_jLocalRef(cls); goto _exceptionOcurred; end;
 
   Result:= gApp.Jni.jEnv^.CallStaticDoubleMethodA(gApp.Jni.jEnv, cls, jMethod, @jParams);
 
@@ -7285,10 +7229,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0;
+
   cls:= Get_jClassLocalRef(fullClassName);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= Get_jStaticMethodID(cls, funcName, funcSignature);
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin Delete_jLocalRef(cls); goto _exceptionOcurred; end;
 
   Result:= gApp.Jni.jEnv^.CallStaticDoubleMethod(gApp.Jni.jEnv, cls, jMethod);
 
@@ -7307,7 +7253,7 @@ begin
   cls:= Get_jClassLocalRef(fullClassName);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= Get_jStaticMethodID(cls, funcName, funcSignature);
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin Delete_jLocalRef(cls); goto _exceptionOcurred; end;
 
   gApp.Jni.jEnv^.CallStaticVoidMethodA(gApp.Jni.jEnv, cls, jMethod, @jParams);
 
@@ -7326,7 +7272,7 @@ begin
   cls:= Get_jClassLocalRef(fullClassName);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= Get_jStaticMethodID(cls, funcName, funcSignature);
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin Delete_jLocalRef(cls); goto _exceptionOcurred; end;
 
   gApp.Jni.jEnv^.CallStaticVoidMethod(gApp.Jni.jEnv, cls, jMethod);
 
@@ -7343,10 +7289,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false;
+
   cls:= Get_jClassLocalRef(fullClassName);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= Get_jStaticMethodID(cls, funcName, funcSignature);
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin Delete_jLocalRef(cls); goto _exceptionOcurred; end;
 
   Result:=  boolean(gApp.Jni.jEnv^.CallStaticBooleanMethodA(gApp.Jni.jEnv, cls, jMethod, @jParams));
 
@@ -7363,10 +7311,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false;
+
   cls:= Get_jClassLocalRef(fullClassName);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= Get_jStaticMethodID(cls, funcName, funcSignature);
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin Delete_jLocalRef(cls); goto _exceptionOcurred; end;
 
   Result:= boolean(gApp.Jni.jEnv^.CallStaticBooleanMethod(gApp.Jni.jEnv, cls, jMethod));
 
@@ -7386,13 +7336,16 @@ function jApp_GetAssetContentList(env: PJNIEnv; this: JObject; Path: string): TD
 label
   _exceptionOcurred;
 begin  
-  Result := nil;
+  Result := nil; if (env = nil) or (this = nil) then exit;
+
   JCls := env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
   JMethod := env^.GetMethodID(env, JCls, 'getAssetContentList', '(Ljava/lang/String;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   JParams[0].l := env^.NewStringUTF(env, PChar(Path));
+
+  if JParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams);
 
@@ -7424,11 +7377,12 @@ function jApp_GetDriverList(env: PJNIEnv; this: JObject): TDynArrayOfString;
 label
   _exceptionOcurred;
 begin
-  Result := nil;
+  Result := nil; if (env = nil) or (this = nil) then exit;
+
   JCls := env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
   JMethod := env^.GetMethodID(env, JCls, 'getDriverList', '()[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   DataArray := env^.CallObjectMethod(env, this, JMethod);
 
@@ -7460,13 +7414,16 @@ function jApp_GetFolderList(env: PJNIEnv; this: JObject; Path: string): TDynArra
 label
   _exceptionOcurred;
 begin
-  Result := nil;
+  Result := nil; if (env = nil) or (this = nil) then exit;
+
   JCls := env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
   JMethod := env^.GetMethodID(env, JCls, 'getFolderList', '(Ljava/lang/String;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   JParams[0].l := env^.NewStringUTF(env, PChar(Path));
+
+  if JParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams);
 
@@ -7499,13 +7456,16 @@ function jApp_GetFileList(env: PJNIEnv; this: JObject; Path: string): TDynArrayO
 label
   _exceptionOcurred;
 begin
-  Result := nil;
+  Result := nil; if (env = nil) or (this = nil) then exit;
+
   JCls := env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
   JMethod := env^.GetMethodID(env, JCls, 'getFileList', '(Ljava/lang/String;)[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   JParams[0].l := env^.NewStringUTF(env, PChar(Path));
+
+  if JParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   DataArray := env^.CallObjectMethodA(env, this, JMethod, @JParams);
 
@@ -7527,19 +7487,19 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
-function  jApp_GetContext(env:PJNIEnv;this:jobject): jObject;
+function  jApp_GetContext(env:PJNIEnv; this:jobject): jObject;
 var
   cls: jClass;
   jMethod: jmethodID;
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (this = nil) then exit;
 
   cls := env^.GetObjectClass(env, this);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'GetContext', '()Landroid/content/Context;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, this, jMethod);
 
@@ -7555,12 +7515,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (Form = nil) then exit;
 
   cls := env^.GetObjectClass(env, Form);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'GetOnViewClickListener', '()Landroid/view/View$OnClickListener;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, Form, jMethod);
 
@@ -7576,12 +7536,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (Form = nil) then exit;
 
   cls := env^.GetObjectClass(env, Form);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'GetOnListItemClickListener', '()Landroid/widget/AdapterView$OnItemClickListener;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, Form, jMethod);
 
@@ -7612,6 +7572,8 @@ var
 label
   _exceptionOcurred;
 begin
+ result := nil; if (env = nil) or (this = nil) or (SelfObj = nil) then exit;
+
  _cls:= Get_gjClass(env);
  if _cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, _cls, 'jForm_Create', '(J)Ljava/lang/Object;');
@@ -7620,7 +7582,8 @@ begin
  _jParam.j := Int64(SelfObj);
 
  Result := env^.CallObjectMethodA(env, this,jMethod,@_jParam);
- Result := env^.NewGlobalRef(env,Result);
+
+ if result <> nil then Result := env^.NewGlobalRef(env,Result);
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
@@ -7629,14 +7592,17 @@ end;
 Procedure jForm_Free2(env:PJNIEnv; Form: jObject);
 begin
 
-  if Form <> nil then
-    jni_proc(env, Form, 'Free');
+ if (env = nil) or (Form = nil) then exit;
+
+ jni_proc(env, Form, 'Free');
 
 end;
 
 //addView( layout )
 Procedure jForm_Show2(env:PJNIEnv; Form: jObject; effect : Integer);
 begin
+    if (env = nil) or (Form = nil) then exit;
+
     jni_proc_i(env, Form, 'Show', effect);
 end;
 
@@ -7648,12 +7614,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (Form = nil) then exit;
 
   cls := env^.GetObjectClass(env, Form);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'GetLayout', '()Landroid/widget/RelativeLayout;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, Form, jMethod);
 
@@ -7670,16 +7636,16 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (Form = nil) then exit;
 
   cls := env^.GetObjectClass(env, Form);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'GetView', '()Landroid/widget/RelativeLayout;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
-  Result:= env^.CallObjectMethod(env, Form, jMethod);
+  Result := env^.CallObjectMethod(env, Form, jMethod);
 
-  Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
+  if result <> nil then Result := env^.NewGlobalRef(env,Result);   //<---- need here for ap1 > 13 - by jmpessoa
   env^.DeleteLocalRef(env, cls);   
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
@@ -7693,12 +7659,12 @@ var
 label
   _exceptionOcurred;
 begin
-    result := nil;
+    result := nil; if (env = nil) or (Form = nil) then exit;
 
     cls := env^.GetObjectClass(env, Form);
     if cls = nil then goto _exceptionOcurred;
     jMethod:= env^.GetMethodID(env, cls, 'GetClikListener', '()Landroid/view/View$OnClickListener;');
-    if jMethod = nil then goto _exceptionOcurred;
+    if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
     Result:= env^.CallObjectMethod(env, Form, jMethod);
 
@@ -7708,15 +7674,18 @@ begin
 end;
 
 //by jmpessoa
-Procedure jForm_FreeLayout(env:PJNIEnv;Layout: jObject);
+Procedure jForm_FreeLayout(env:PJNIEnv; Layout: jObject);
 begin
-  if Layout <> nil then
-     env^.DeleteGlobalRef(env, Layout);
+  if (env = nil) or (Layout = nil) then exit;
+
+  env^.DeleteGlobalRef(env, Layout);
 end;
 
  //by jmpessoa
 Procedure jForm_SetEnabled2(env:PJNIEnv;Form : jObject; enabled : Boolean);
 begin
+    if (env = nil) or (Form = nil) then exit;
+
     jni_proc_z(env, Form, 'SetEnabled', enabled);
 end;
 
@@ -7729,14 +7698,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jform = nil) or (_srcUri = nil) then exit;
 
   _jCls := env^.GetObjectClass(env, _jform);
   if _jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, _jCls, 'CopyFileFromUri', '(Landroid/net/Uri;Ljava/lang/String;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, _jCls); goto _exceptionOcurred; end;
 
   _jParams[0].l:= _srcUri;
   _jParams[1].l:= env^.NewStringUTF(env, pchar(_destDir) );
+
+  if _jParams[1].l = nil then begin env^.DeleteLocalRef(env, _jCls); goto _exceptionOcurred; end;
 
   _jString:= env^.CallObjectMethodA(env, _jform, jMethod,@_jParams);
 
@@ -7760,11 +7732,12 @@ Var
 label
   _exceptionOcurred;
 begin
+   if (env = nil) or (_jobject = nil) then exit;
 
    cls:= env^.GetObjectClass(env, _jobject);
    if cls = nil then goto _exceptionOcurred;
    jMethod:= env^.GetMethodID(env, cls, 'AddLParamsParentRule', '(I)V');
-   if jMethod = nil then goto _exceptionOcurred;
+   if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
    _jParams[0].i := rule;
 
@@ -7783,11 +7756,12 @@ var
 label
   _exceptionOcurred;
 begin
+   if (env = nil) or (_jobject = nil) then exit;
 
    cls := env^.GetObjectClass(env, _jobject);
    if cls = nil then goto _exceptionOcurred;
    jMethod:= env^.GetMethodID(env, cls, 'AddLParamsAnchorRule', '(I)V');
-   if jMethod = nil then goto _exceptionOcurred;
+   if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
    _jParams[0].i := rule;
 
@@ -7806,11 +7780,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _value;
 
@@ -7829,11 +7804,12 @@ var
 label
   _exceptionOcurred;
 begin
+       if (env = nil) or (_jobject = nil) then exit;
 
        jCls := env^.GetObjectClass(env, _jobject);
        if jCls = nil then goto _exceptionOcurred;
        jMethod := env^.GetMethodID(env, jCls, 'SetLWeight', '(F)V');
-       if jMethod = nil then goto _exceptionOcurred;
+       if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
        jParams[0].f := _w;
 
@@ -7841,7 +7817,7 @@ begin
 
        env^.DeleteLocalRef(env, jCls);   
 
-  _exceptionOcurred: jni_ExceptionOccurred(env);
+       _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 Procedure View_SetLParamHeight(env:PJNIEnv; _jobject : jObject; h: DWord);
@@ -7852,11 +7828,12 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (_jobject = nil) then exit;
 
  cls := env^.GetObjectClass(env, _jobject);
  if cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, cls, 'SetLParamHeight', '(I)V');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  _jParams[0].i := h;
 
@@ -7875,11 +7852,12 @@ var
 label
   _exceptionOcurred;
 begin
+   if (env = nil) or (_jobject = nil) then exit;
 
    cls := env^.GetObjectClass(env, _jobject);
    if cls = nil then goto _exceptionOcurred;
     jMethod:= env^.GetMethodID(env, cls, 'SetLParamWidth', '(I)V');
-   if jMethod = nil then goto _exceptionOcurred;
+   if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
    _jParams[0].i := w;
 
@@ -7898,11 +7876,12 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (_jobject = nil) then exit;
 
  cls := env^.GetObjectClass(env, _jobject);
  if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'SetLayoutAll', '(I)V');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  _jParams[0].i := idAnchor;
 
@@ -7920,16 +7899,18 @@ var
 label
   _exceptionOcurred;
 begin
+    if (env = nil) or (_jobject = nil) then exit;
+
     jCls:= env^.GetObjectClass(env, _jobject);
     if jCls = nil then goto _exceptionOcurred;
     jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-    if jMethod = nil then goto _exceptionOcurred;
+    if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
     env^.CallVoidMethod(env, _jobject, jMethod);
 
     env^.DeleteLocalRef(env, jCls); 
 
-  _exceptionOcurred: jni_ExceptionOccurred(env);
+    _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 function View_GetLParamWidth(env:PJNIEnv; _jobject : jObject): integer;
@@ -7939,10 +7920,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
+
   cls := env^.GetObjectClass(env, _jobject);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'GetLParamWidth', '()I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethod(env,_jobject,jMethod);
 
@@ -7958,10 +7941,12 @@ var
 label
   _exceptionOcurred;
 begin
+ result := 0; if (env = nil) or (_jobject = nil) then exit;
+
  cls := env^.GetObjectClass(env, _jobject);
  if cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, cls, 'GetLParamHeight', '()I');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  Result:= env^.CallIntMethod(env,_jobject,jMethod);
 
@@ -7978,11 +7963,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (view = nil) then exit;
 
   cls:= env^.GetObjectClass(env, view);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'setId', '(I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   _jParams[0].i:= Id;
 
@@ -8002,11 +7988,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _left;
   jParams[1].i:= _top;
@@ -8032,6 +8019,7 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (this = nil) or (view = nil) then exit;
 
   cls:= Get_gjClass(env);
   if cls = nil then goto _exceptionOcurred;
@@ -8058,11 +8046,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (view = nil) then exit;
 
   cls:= env^.GetObjectClass(env, view);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'setVisibility', '(I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   case visible of
     True  : _jParams[0].i := 0; // visible
@@ -8086,12 +8075,12 @@ var
 label
   _exceptionOcurred;
 begin
-   Result:= False; // not visible...
+   Result:= False; if (env = nil) or (view = nil) then exit;
 
    jCls:= env^.GetObjectClass(env, view);
    if jCls = nil then goto _exceptionOcurred;
    jMethod:= env^.GetMethodID(env, jCls, 'getVisibility', '()I');
-   if jMethod = nil then goto _exceptionOcurred;
+   if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
    jParams[0].l:= view;
 
@@ -8112,6 +8101,7 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (this = nil) or (view = nil) then exit;
 
  cls:= Get_gjClass(env);
  if cls = nil then goto _exceptionOcurred;
@@ -8134,11 +8124,12 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (view = nil) then exit;
 
  cls:= env^.GetObjectClass(env, view);
  if cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, cls, 'setBackgroundColor', '(I)V');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  _jParams[0].i := color;
 
@@ -8157,6 +8148,7 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (this = nil) or (view = nil) then exit;
 
  cls:= Get_gjClass(env);
  if cls = nil then goto _exceptionOcurred;
@@ -8177,10 +8169,12 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (view = nil) then exit;
+
  cls:= env^.GetObjectClass(env, view);
  if cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, cls, 'invalidate', '()V');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  env^.CallVoidMethod(env,view,jMethod);
 
@@ -8197,11 +8191,12 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (view = nil) then exit;
 
  cls:= env^.GetObjectClass(env, view);
  if cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, cls, 'setTextColor', '(I)V');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  _jParams[0].i := color;
 
@@ -8218,10 +8213,12 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (view = nil) then exit;
+
  cls:= env^.GetObjectClass(env, view);
  if cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, cls, 'postInvalidate', '()V');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  env^.CallVoidMethod(env,view,jMethod);
 
@@ -8237,10 +8234,12 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (view = nil) then exit;
+
  cls:= env^.GetObjectClass(env, view);
  if cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, cls, 'BringToFront', '()V');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  env^.CallVoidMethod(env,view,jMethod);
 
@@ -8257,11 +8256,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (view = nil) or (_viewgroup = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, view);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _viewgroup;
 
@@ -8278,10 +8278,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (view = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, view);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethod(env, view, jMethod);
 
@@ -8297,18 +8299,18 @@ var
 label
   _exceptionOcurred;
 begin
-     result := nil;
+     result := nil; if (env = nil) or (view = nil) then exit;
 
      jCls := env^.GetObjectClass(env, view);
      if jCls = nil then goto _exceptionOcurred;
      jMethod := env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-     if jMethod = nil then goto _exceptionOcurred;
+     if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
      Result := env^.CallObjectMethod(env, view, jMethod);
 
      env^.DeleteLocalRef(env, jCls);  
 
-  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
+     _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
 
 function View_GetViewGroup(env:PJNIEnv; view : jObject) : jObject;
@@ -8318,10 +8320,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := nil; if (env = nil) or (view = nil) then exit;
+
   cls := env^.GetObjectClass(env, view);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'GetView', '()Landroid/view/ViewGroup;'); //Landroid/widget/RelativeLayout;
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   Result := env^.CallObjectMethod(env, view,jMethod);
 
@@ -8337,12 +8341,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (view = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, view);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, view, jMethod);
 
@@ -8365,10 +8369,15 @@ Function  jSysInfo_ScreenWH (env:PJNIEnv;this:jobject;context : jObject) : TWH;
 label
   _exceptionOcurred;
  begin
+  Result.Width  := 0;
+  Result.Height := 0;
+
+  if (env = nil) or (this = nil) or (context = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'getScreenWH', '(Landroid/content/Context;)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   _jParam.l     := context;
   _wh           := env^.CallIntMethodA(env,this,jMethod,@_jParam);
@@ -8390,13 +8399,18 @@ Function  jSysInfo_PathApp(env:PJNIEnv; this:jobject; context : jObject; AppName
 label
   _exceptionOcurred;
  begin
+  result := ''; if (env = nil) or (this = nil) or (context = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'getPathApp', '(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   _jParams[0].l := context;
   _jParams[1].l := env^.NewStringUTF(env, pchar(AppName) );
+
+  if _jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   _jString      := env^.CallObjectMethodA(env,this,jMethod,@_jParams);
 
   Result:= GetPStringAndDeleteLocalRef(env, _jString);
@@ -8418,10 +8432,12 @@ Function  jSysInfo_PathDat  (env:PJNIEnv; this:jobject; context : jObject) : Str
 label
   _exceptionOcurred;
  begin
+  result := ''; if (env = nil) or (this = nil) or (context = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'getPathDat', '(Landroid/content/Context;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   _jParam.l := context;
   _jString  := env^.CallObjectMethodA(env,this,jMethod,@_jParam);
@@ -8442,38 +8458,48 @@ Var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (this = nil) or (context = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'getPathDataBase', '(Landroid/content/Context;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
- _jParam.l := context;
- _jString  := env^.CallObjectMethodA(env,this,jMethod,@_jParam);
+  _jParam.l := context;
+  _jString  := env^.CallObjectMethodA(env,this,jMethod,@_jParam);
 
- Result:= GetPStringAndDeleteLocalRef(env, _jString);
- env^.DeleteLocalRef(env, jCls);
+  Result:= GetPStringAndDeleteLocalRef(env, _jString);
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
 begin
+  result := ''; if (env = nil) or (this = nil) then exit;
+
   Result:= jni_func_out_t(env, this, 'getPathExt');
 end;
 
 Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
 begin
+  result := ''; if (env = nil) or (this = nil) then exit;
+
   Result:= jni_func_out_t(env, this, 'getPathDCIM');
 end;
 
 //by thierrydijoux
 Function jSysInfo_Language (env:PJNIEnv; this: jObject; localeType: TLocaleType): String;
 begin
+ result := ''; if (env = nil) or (this = nil) then exit;
+
  Result:= jni_func_i_out_t(env, this, 'getLocale', Ord(localeType));
 end;
 
 Procedure jSystem_SetOrientation(env:PJNIEnv; this:jobject; orientation : Integer);
 begin
+ if (env = nil) or (this = nil) then exit;
+
  jni_proc_i(env, this, 'systemSetOrientation', orientation);
 end;
 
@@ -8485,14 +8511,20 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (this = nil) then exit;
+
  jCls:= env^.GetObjectClass(env, this);
  if jCls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, jCls, 'ShowAlert', '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env,jCls); goto _exceptionOcurred; end;
 
  _jParams[0].l := env^.NewStringUTF(env, pchar(_title) );
  _jParams[1].l := env^.NewStringUTF(env, pchar(_message));
  _jParams[2].l := env^.NewStringUTF(env, pchar(_btnText));
+
+ if (_jParams[0].l = nil) then begin env^.DeleteLocalRef(env,jCls); goto _exceptionOcurred; end;
+ if (_jParams[1].l = nil) then begin env^.DeleteLocalRef(env,_jParams[0].l); env^.DeleteLocalRef(env,jCls); goto _exceptionOcurred; end;
+ if (_jParams[2].l = nil) then begin env^.DeleteLocalRef(env,_jParams[0].l); env^.DeleteLocalRef(env,_jParams[1].l); env^.DeleteLocalRef(env,jCls); goto _exceptionOcurred; end;
 
  env^.CallVoidMethodA(env,this,jMethod,@_jParams);
 
@@ -8506,12 +8538,16 @@ end;
 
 function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
 begin
+  result := 0; if (env = nil) or (this = nil) then exit;
+
   Result := jni_func_out_i(env, this, 'getAPILevel');
 end;
 
 //by jmpessoa
 function jSystem_GetOrientation(env:PJNIEnv; this:jobject): integer;
 begin
+  result := 0; if (env = nil) or (this = nil) then exit;
+
   Result := jni_func_out_i(env, this, 'systemGetOrientation');
 end;
 
@@ -8525,7 +8561,8 @@ var
   clazz : jClass=nil;
   jlc   : jClass=nil;
 begin
-  Result := false;
+  Result := false; if (env = nil) then exit;
+
   exc := env^.ExceptionOccurred(env);
 
   if exc <> nil then
@@ -8568,10 +8605,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (this = nil) then exit;
+
   cls:= env^.GetObjectClass(env, this);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, 'Free', '()V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethod(env, this, jMethod);
 
@@ -8588,10 +8627,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethod(env, _jobject, jMethod);
 
@@ -8609,10 +8650,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(F)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f:= _float;
 
@@ -8632,11 +8675,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FF)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f:= _float1;
   jParams[1].f:= _float2;
@@ -8656,11 +8700,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FFF)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f:= _float1;
   jParams[1].f:= _float2;
@@ -8682,11 +8727,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FFFF)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f:= _float1;
   jParams[1].f:= _float2;
@@ -8709,11 +8755,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FFFFFFF)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f:= _float1;
   jParams[1].f:= _float2;
@@ -8739,11 +8786,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) or (_viewgroup = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/view/ViewGroup;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _viewgroup;
 
@@ -8762,11 +8810,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) or (_view = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/view/View;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _view;
 
@@ -8786,11 +8835,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IZ)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
   jParams[1].z:= JBool(_bool);
@@ -8811,11 +8861,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Z)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].z:= JBool(_bool);
 
@@ -8835,11 +8886,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(ZII)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].z:= JBool(_bool);
   jParams[1].i:= _int0;
@@ -8861,11 +8913,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
 
@@ -8885,11 +8938,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(II)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
@@ -8910,11 +8964,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
 
@@ -8934,11 +8989,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;IIII)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].i:= _int0;
@@ -8962,11 +9018,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;II)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].i:= _int0;
@@ -8988,11 +9045,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].i:= _int;
@@ -9013,14 +9071,17 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9039,14 +9100,17 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(ILjava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9065,14 +9129,17 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;F)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].f:= _single;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9091,14 +9158,17 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].i:= _int0;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9117,21 +9187,57 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
   jParams[2].i:= _int0;
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);   
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jni_proc_ttii(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                       _str0, _str1: string; _int0,_int1: integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+ label
+   _exceptionOcurred;
+begin
+  if (env = nil) or (_jobject = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;II)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
+  jParams[2].i:= _int0;
+  jParams[3].i:= _int1;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
@@ -9145,15 +9251,18 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;II)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].i:= _int0;
   jParams[2].i:= _int1;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9171,11 +9280,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;J)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].j:= _long;
@@ -9197,15 +9307,18 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IILjava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
   jParams[2].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[2].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9224,16 +9337,19 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IIILjava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
   jParams[2].i:= _int2;
   jParams[3].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[3].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9252,11 +9368,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(III)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
@@ -9278,11 +9395,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IIII)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
@@ -9305,11 +9423,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IIIII)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
@@ -9333,11 +9452,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IF)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
   jParams[1].f:= _float;
@@ -9358,11 +9478,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IFF)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
   jParams[1].f:= _float0;
@@ -9384,11 +9505,12 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(J)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].j:= _long;
 
@@ -9407,13 +9529,16 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9432,13 +9557,16 @@ var
 label
   _exceptionOcurred;
 begin
+ if (env = nil) or (_jobject = nil) then exit;
 
  cls := env^.GetObjectClass(env, _jobject);
  if cls = nil then goto _exceptionOcurred;
  jMethod:= env^.GetMethodID(env, cls, PChar(javaFuncion), '(Ljava/lang/CharSequence;)V'); //direct jni api
- if jMethod = nil then goto _exceptionOcurred;
+ if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  _jParams[0].l := env^.NewStringUTF(env, pchar(_str) );
+
+ if _jParams[0].l = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
  env^.CallVoidMethodA(env,_jobject,jMethod,@_jParams);
 
@@ -9457,14 +9585,17 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Z)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].z:= JBool(_bool);
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
@@ -9482,14 +9613,18 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l := env^.NewStringUTF(env, PChar(_str1));
   jParams[1].l := env^.NewStringUTF(env, PChar(_str2));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9509,15 +9644,20 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str1));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str2));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_str3));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[2].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9525,6 +9665,41 @@ begin
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);  
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jni_proc_ttti(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                      _str1, _str2, _str3: string; _int0 : integer);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  if (env = nil) or (_jobject = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str1));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str2));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_str3));
+  jParams[3].i:= _int0;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if jParams[2].l = nil then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
@@ -9538,17 +9713,24 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l := env^.NewStringUTF(env, PChar(_str1));
   jParams[1].l := env^.NewStringUTF(env, PChar(_str2));
   jParams[2].l := env^.NewStringUTF(env, PChar(_str3));
   jParams[3].l := env^.NewStringUTF(env, PChar(_str4));
   jParams[4].l := env^.NewStringUTF(env, PChar(_str5));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[2].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[3].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env,jParams[2].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[4].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env,jParams[2].l); env^.DeleteLocalRef(env,jParams[3].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9571,15 +9753,19 @@ var
 label
   _exceptionOcurred;
 begin
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;Z)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l := env^.NewStringUTF(env, PChar(_str1));
   jParams[1].l := env^.NewStringUTF(env, PChar(_str2));
   jParams[2].z := JBool(_bool);
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
 
@@ -9597,10 +9783,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()F');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallFloatMethod(env, _jobject, jMethod);
 
@@ -9616,10 +9804,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()D');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallDoubleMethod(env, _jobject, jMethod);
 
@@ -9635,12 +9825,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Landroid/view/ViewGroup;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, _jobject, jMethod);
 
@@ -9656,12 +9846,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, _jobject, jMethod);
 
@@ -9677,12 +9867,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Landroid/net/Uri;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, _jobject, jMethod);
 
@@ -9698,10 +9888,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethod(env, _jobject, jMethod);
 
@@ -9718,10 +9910,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
+
   cls := env^.GetObjectClass(env, _jobject);
   if cls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, cls, PChar(javaFuncion), '()Ljava/lang/CharSequence;');  //direct jni api
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
 
   _jString:= env^.CallObjectMethod(env,_jobject,jMethod);
 
@@ -9738,10 +9932,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()J');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallLongMethod(env, _jobject, jMethod);
 
@@ -9758,10 +9954,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jStr:= env^.CallObjectMethod(env, _jobject, jMethod);
 
@@ -9778,12 +9976,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Landroid/view/View;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, _jobject, jMethod);
 
@@ -9800,11 +9998,12 @@ var
 label
   _exceptionOcurred;
 begin
-   Result := false;
+   Result := false; if (env = nil) or (_jobject = nil) then exit;
+
    jCls:= env^.GetObjectClass(env, _jobject);
    if jCls = nil then goto _exceptionOcurred;
    jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '()Z');
-   if jMethod = nil then goto _exceptionOcurred;
+   if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
    jBoo:= env^.CallBooleanMethod(env, _jobject, jMethod);
 
@@ -9823,11 +10022,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
 
@@ -9849,12 +10049,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) or (_byteArray = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '([B)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   newSize0:= Length(_byteArray);
   jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
@@ -9881,11 +10081,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) or (_byteArray = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '([BZ)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   newSize0:= Length(_byteArray);
   jNewArray0:= env^.NewByteArray(env, newSize0);  // allocate
@@ -9912,11 +10113,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(DD)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].d:= _double1;
   jParams[1].d:= _double2;
@@ -9938,11 +10140,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(DD)F');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].d:= _double1;
   jParams[1].d:= _double2;
@@ -9963,11 +10166,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(DDDD)F');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].d:= _double1;
   jParams[1].d:= _double2;
@@ -9991,11 +10195,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Z)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].z:= JBool(_bool);
 
@@ -10017,12 +10222,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
 
@@ -10041,12 +10246,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;I)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].i:= _int;
@@ -10067,12 +10272,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(IIII)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
@@ -10097,12 +10302,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
 
@@ -10123,12 +10328,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/net/Uri;)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
 
@@ -10148,11 +10353,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/net/Uri;)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
 
@@ -10173,11 +10379,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/net/Uri;)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _uri;
 
@@ -10199,12 +10406,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/content/Intent;)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _intent;
 
@@ -10225,11 +10432,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/content/Intent;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _intent;
 
@@ -10250,11 +10458,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
 
@@ -10275,11 +10484,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
 
@@ -10301,11 +10511,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(II)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
@@ -10328,11 +10539,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(III)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int0;
   jParams[1].i:= _int1;
@@ -10356,11 +10568,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(J)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].j:= _long;
 
@@ -10382,11 +10595,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
 
@@ -10407,12 +10621,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(II)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int1;
   jParams[1].i:= _int2;
@@ -10433,12 +10647,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
 
@@ -10458,15 +10672,18 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str1));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str2));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10486,14 +10703,18 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10513,14 +10734,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Z)J');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].z:= JBool(_bool);
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallLongMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10540,14 +10764,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Z)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].z:= JBool(_bool);
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10567,15 +10794,17 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].i:= _int;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10594,14 +10823,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].i:= _int;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10620,16 +10852,18 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;II)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].i:= _int0;
   jParams[2].i:= _int1;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10648,17 +10882,19 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;III)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].i:= _int0;
   jParams[2].i:= _int1;
   jParams[3].i:= _int2;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10678,14 +10914,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].i:= _int;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10706,14 +10945,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls := env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;I)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l := env^.NewStringUTF(env, pchar(_str) );
   jParams[1].i:= _int;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10734,14 +10976,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;J)J');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].j:= _long;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallLongMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10760,11 +11005,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(I)J');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
 
@@ -10782,11 +11028,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(JJI)J');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].j:= _long0;
   jParams[1].j:= _long1;
@@ -10808,14 +11055,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;J)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].j:= _long;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10835,14 +11085,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;F)F');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].f:= _float;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallFloatMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10862,14 +11115,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;F)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].f:= _float;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10890,14 +11146,18 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10919,15 +11179,18 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;II)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
   jParams[1].i:= _int1;
   jParams[2].i:= _int2;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10948,14 +11211,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls    := env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;Ljava/lang/String;)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo    := env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -10976,15 +11242,19 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls    := env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;Ljava/lang/String;Ljava/lang/String;)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_str2));
+
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[2].l = nil) then begin env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo    := env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
   Result  := boolean(jBoo);
@@ -11005,12 +11275,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(FF)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f:= _float1;
   jParams[1].f:= _float2;
@@ -11031,11 +11301,12 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(DDZ)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].d:= _float1;
   jParams[1].d:= _float2;
@@ -11058,12 +11329,12 @@ var
 label
   _exceptionOcurred;
 begin
-  result := nil;
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;FF)Landroid/graphics/Bitmap;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].f:= _float1;
@@ -11085,13 +11356,16 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
-
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11110,13 +11384,16 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)F');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11135,13 +11412,16 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)J');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11161,13 +11441,16 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11187,15 +11470,20 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_str2));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[2].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11218,13 +11506,16 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11245,14 +11536,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := false; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(ILjava/lang/String;)Z');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jBoo:= env^.CallBooleanMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11273,14 +11567,17 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(ILjava/lang/String;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _int;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11301,14 +11598,18 @@ var
 label
   _exceptionOcurred;
 begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
 
@@ -11331,15 +11632,17 @@ var
 label
   _exceptionOcurred;
 begin
-  Result := nil;
+  Result := nil; if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;Ljava/lang/String;)[B');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _bitmap;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jResultArray:= env^.CallObjectMethodA(env, _jobject, jMethod,  @jParams);
 
