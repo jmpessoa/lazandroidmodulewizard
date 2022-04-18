@@ -2319,6 +2319,7 @@ begin
   begin
     strList.Add('  Result := nil;');
     strList.Add('  ');
+    strList.Add('  if (env = nil) or (this = nil) then exit;');
     strList.Add('  jCls:= Get_gjClass(env);');
     strList.Add('  if jCls = nil then goto _exceptionOcurred;');
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+'_jCreate'+''', '''+jniSignature+'''); ');
@@ -2326,10 +2327,11 @@ begin
   end
   else
   begin
+    strList.Add('  if (env = nil) or (_'+LowerCase(FJavaClassName)+' = nil) then exit;');
     strList.Add('  jCls:= env^.GetObjectClass(env, _'+LowerCase(FJavaClassName)+');');
     strList.Add('  if jCls = nil then goto _exceptionOcurred;');
     strList.Add('  jMethod:= env^.GetMethodID(env, jCls, '''+funcName+''', '''+jniSignature+'''); ');
-    strList.Add('  if jMethod = nil then goto _exceptionOcurred;');
+    strList.Add('  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;');
   end;
   strList.Add('  ');
 
