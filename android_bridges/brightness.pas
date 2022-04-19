@@ -100,6 +100,7 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jBrightness_jCreate', '(J)Ljava/lang/Object;');
