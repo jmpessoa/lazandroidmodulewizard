@@ -76,7 +76,6 @@ end;
 
 procedure jSoundPool.Init(refApp: jApp);
 begin
-
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
@@ -216,6 +215,7 @@ label
 begin
   Result := nil;
 
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jSoundPool_jCreate', '(JI)Ljava/lang/Object;');
@@ -242,10 +242,11 @@ label
 begin
   Result := 0;
 
+  if (env = nil) or (_jsoundpool = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jsoundpool);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SoundPlay', '(IFFIIF)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= soundId;
   jParams[1].f:= _leftVolume;

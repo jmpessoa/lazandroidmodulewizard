@@ -78,7 +78,6 @@ end;
 
 procedure jWifiManager.Init(refApp: jApp);
 begin
-
   if FInitialized  then Exit;
   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
@@ -240,6 +239,7 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jWifiManager_jCreate', '(J)Ljava/lang/Object;');
@@ -265,10 +265,12 @@ label
   _exceptionOcurred;
 begin
   Result := nil;
+
+  if (env = nil) or (_jwifimanager = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jwifimanager);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'Scan', '()[Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jresultArray:= env^.CallObjectMethod(env, _jwifimanager, jMethod);
 

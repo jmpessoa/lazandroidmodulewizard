@@ -302,6 +302,7 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (this = nil) then exit;
   jCls := Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'jPaintShader_jCreate', '(JLjava/lang/Object;)Ljava/lang/Object;');
@@ -324,10 +325,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) or (_Paint = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'SetPaint', '(Landroid/graphics/Paint;)V'); // '(Ljava/lang/Object;)V'
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l := _Paint;
 
@@ -345,10 +348,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'Combine', '(IIBI)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i := _shdrA;
   jParams[1].i := _shdrB;
@@ -369,10 +374,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewBitmapShader', '(Landroid/graphics/Bitmap;BBI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l := _Bitmap;
   jParams[1].b := _tileX;
@@ -393,10 +400,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewBitmapShader', '(Landroid/graphics/Bitmap;BBFFFI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l := _Bitmap;
   jParams[1].b := _tileX;
@@ -420,10 +429,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewLinearGradient', '(FFFFIIBI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _X0;
   jParams[1].f := _Y0;
@@ -450,16 +461,20 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewLinearGradient', '(FFFF[I[FBI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   // gradient colors
   clrArray := env^.NewIntArray(env, Length(_Colors));  // allocate
+  if clrArray = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
   env^.SetIntArrayRegion(env, clrArray, 0, Length(_Colors), @_Colors[0]);
   // gradient positions
   posArray := env^.NewFloatArray(env, Length(_Positions));  // allocate
+  if posArray = nil then begin env^.DeleteLocalRef(env, clrArray); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
   env^.SetFloatArrayRegion(env, posArray, 0, Length(_Positions), @_Positions[0]);
 
   jParams[0].f := _X0;
@@ -487,10 +502,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewLinearGradient', '(FFFFFIIBI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _X;
   jParams[1].f := _Y;
@@ -518,16 +535,20 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewLinearGradient', '(FFFFF[I[FBI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   // gradient colors
   clrArray := env^.NewIntArray(env, Length(_Colors));  // allocate
+  if clrArray = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
   env^.SetIntArrayRegion(env, clrArray, 0, Length(_Colors), @_Colors[0]);
   // gradient positions
   posArray := env^.NewFloatArray(env, Length(_Positions));  // allocate
+  if posArray = nil then begin env^.DeleteLocalRef(env, clrArray); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
   env^.SetFloatArrayRegion(env, posArray, 0, Length(_Positions), @_Positions[0]);
 
   jParams[0].f := _X;
@@ -557,10 +578,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewRadialGradient', '(FFFIIBI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f:= _cX;
   jParams[1].f:= _cY;
@@ -586,16 +609,20 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewRadialGradient', '(FFF[I[FBI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   // gradient colors
   clrArray := env^.NewIntArray(env, Length(_Colors));  // allocate
+  if clrArray = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
   env^.SetIntArrayRegion(env, clrArray, 0, Length(_Colors), @_Colors[0]);
   // gradient positions
   posArray := env^.NewFloatArray(env, Length(_Stops));  // allocate
+  if posArray = nil then begin env^.DeleteLocalRef(env, clrArray); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
   env^.SetFloatArrayRegion(env, posArray, 0, Length(_Stops), @_Stops[0]);
 
   jParams[0].f:= _cX;
@@ -623,10 +650,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewSweepGradient', '(FFIII)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _cX;
   jParams[1].f := _cY;
@@ -650,16 +679,20 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'NewSweepGradient', '(FF[I[FI)I');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   // gradient colors
   clrArray := env^.NewIntArray(env, Length(_Colors));  // allocate
+  if clrArray = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
   env^.SetIntArrayRegion(env, clrArray, 0, Length(_Colors), @_Colors[0]);
   // gradient positions
   posArray := env^.NewFloatArray(env, Length(_Positions));  // allocate
+  if posArray = nil then begin env^.DeleteLocalRef(env, clrArray); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
   env^.SetFloatArrayRegion(env, posArray, 0, Length(_Positions), @_Positions[0]);
 
   jParams[0].f:= _cX;
@@ -685,10 +718,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'SetMatrix', '(FFFFFI)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _X;
   jParams[0].f := _Y;
@@ -711,10 +746,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'SetRotate', '(FI)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _Degree;
   jParams[1].i := _ID;
@@ -733,10 +770,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'SetRotate', '(FFFI)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _Degree;
   jParams[1].f := _PointX;
@@ -757,10 +796,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'SetScale', '(FFI)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _X;
   jParams[1].f := _Y;
@@ -780,10 +821,12 @@ var
 label
   _exceptionOcurred;
 begin
+
+  if (env = nil) or (_jpaintshader = nil) then exit;
   jCls := env^.GetObjectClass(env, _jpaintshader);
   if jCls = nil then goto _exceptionOcurred;
   jMethod := env^.GetMethodID(env, jCls, 'SetTranslate', '(FFI)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].f := _X;
   jParams[1].f := _Y;

@@ -730,6 +730,7 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jsRecyclerView_jCreate', '(JIII)Ljava/lang/Object;');
@@ -757,10 +758,11 @@ label
   _exceptionOcurred;
 begin
 
+  if (env = nil) or (_jsrecyclerview = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemViewLayout', '(Landroid/view/View;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _itemViewLayout;
 
@@ -779,10 +781,11 @@ label
   _exceptionOcurred;
 begin
 
+  if (env = nil) or (_jsrecyclerview = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jsrecyclerview);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetItemViewLayout', '(Landroid/view/View;Z)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= _itemViewLayout;
   jParams[1].z:= JBool(_forceCardStyle);
