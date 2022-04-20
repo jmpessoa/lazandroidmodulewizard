@@ -96,7 +96,7 @@ public class jToggleButton extends ToggleButton /*dummy*/ { //please, fix what G
 	   LAMWCommon.setLGravity(_g);
    }
 
-   public void setLWeight(float _w) {
+   public void SetLWeight(float _w) {
 	   LAMWCommon.setLWeight(_w);
    }
 

@@ -72,42 +72,16 @@ jMenu = class(jControl)
 end;
 
 function jMenu_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jMenu_jFree(env: PJNIEnv; _jmenu: JObject);
-procedure jMenu_Add(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-procedure jMenu_AddCheckable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-procedure jMenu_AddDrawable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-procedure jMenu_CheckItemCommute(env: PJNIEnv; _jmenu: JObject; _item: jObject);
-procedure jMenu_CheckItem(env: PJNIEnv; _jmenu: JObject; _item: jObject);
-procedure jMenu_UnCheckItem(env: PJNIEnv; _jmenu: JObject; _item: jObject);
-procedure jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);overload;
-procedure jMenu_AddCheckableSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
-function jMenu_Size(env: PJNIEnv; _jmenu: JObject): integer;
-function jMenu_FindMenuItemByID(env: PJNIEnv; _jmenu: JObject; _itemID: integer): jObject;
-function jMenu_GetMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _index: integer): jObject;
-procedure jMenu_UnCheckAllMenuItem(env: PJNIEnv; _jmenu: JObject);
-function jMenu_CountSubMenus(env: PJNIEnv; _jmenu: JObject): integer;
-procedure jMenu_UnCheckAllSubMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _subMenuIndex: integer);
-procedure jMenu_RegisterForContextMenu(env: PJNIEnv; _jmenu: JObject; _view: jObject);
-procedure JMenu_UnRegisterForContextMenu(env: PJNIEnv; _JMenu: JObject; _View: JObject);
 procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer); overload;
 procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _subMenu: jObject; _itemID: integer; _caption: string; _itemType: integer); overload;
 function jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _title: string; _headerIconIdentifier: string): jObject; overload;
-procedure jMenu_InvalidateOptionsMenu(env: PJNIEnv; _jmenu: JObject);
 
 procedure jMenu_SetItemVisible(env: PJNIEnv; _jmenu: JObject; _item: jObject; _value: boolean); overload;
 procedure jMenu_SetItemVisible(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer; _value: boolean); overload;
 procedure jMenu_Clear(env: PJNIEnv; _jmenu: JObject; _menu: jObject);  overload;
-procedure jMenu_Clear(env: PJNIEnv; _jmenu: JObject);   overload;
 procedure jMenu_SetItemTitle(env: PJNIEnv; _jmenu: JObject; _item: jObject; _title: string);  overload;
-procedure jMenu_SetItemTitle(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer; _title: string);  overload;
 procedure jMenu_SetItemIcon(env: PJNIEnv; _jmenu: JObject; _item: jObject; _iconIdentifier: integer);  overload;
 procedure jMenu_SetItemIcon(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer; _iconIdentifier: integer); overload;
-procedure jMenu_SetItemChecked(env: PJNIEnv; _jmenu: JObject; _item: jObject; _value: boolean);
-procedure jMenu_SetItemCheckable(env: PJNIEnv; _jmenu: JObject; _item: jObject; _value: boolean);
-function jMenu_GetItemIdByIndex(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer): integer;
-function jMenu_GetItemIndexById(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _id: integer): integer;
-procedure jMenu_RemoveItemById(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _id: integer);
-procedure jMenu_RemoveItemByIndex(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer);
 procedure jMenu_AddDropDownItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _view: jObject);
 
 implementation
@@ -157,28 +131,28 @@ procedure jMenu.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jMenu.Add(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_Add(FjEnv, FjObject, _menu ,_itemID ,_caption);
+     jni_proc_men_it(FjEnv, FjObject, 'Add', _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.AddCheckable(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddCheckable(FjEnv, FjObject, _menu ,_itemID ,_caption);
+     jni_proc_men_it(FjEnv, FjObject, 'AddCheckable', _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.AddDrawable(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddDrawable(FjEnv, FjObject, _menu ,_itemID ,_caption);
+     jni_proc_men_it(FjEnv, FjObject, 'AddDrawable', _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.SetOptions(Value: TStrings);
@@ -195,90 +169,94 @@ procedure jMenu.CheckItemCommute(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_CheckItemCommute(FjEnv, FjObject, _item);
+     jni_proc_mei(FjEnv, FjObject, 'CheckItemCommute', _item);
 end;
 
 procedure jMenu.CheckItem(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_CheckItem(FjEnv, FjObject, _item);
+     jni_proc_mei(FjEnv, FjObject, 'CheckItem', _item);
 end;
 
 procedure jMenu.UnCheckItem(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_UnCheckItem(FjEnv, FjObject, _item);
+     jni_proc_mei(FjEnv, FjObject, 'UnCheckItem', _item);
 end;
 
 procedure jMenu.AddSubMenu(_menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddSubMenu(FjEnv, FjObject, _menu ,_startItemID ,_captions);
+     jni_proc_men_i_das(FjEnv, FjObject, 'AddSubMenu', _menu ,_startItemID ,_captions);
 end;
 
 procedure jMenu.AddCheckableSubMenu(_menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddCheckableSubMenu(FjEnv, FjObject, _menu ,_startItemID ,_captions);
+     jni_proc_men_i_das(FjEnv, FjObject, 'AddCheckableSubMenu', _menu ,_startItemID ,_captions);
 end;
 
 function jMenu.Size(): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_Size(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'Size');
 end;
 
 function jMenu.FindMenuItemByID(_itemID: integer): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_FindMenuItemByID(FjEnv, FjObject, _itemID);
+   Result:= jni_func_i_out_mei(FjEnv, FjObject, 'FindMenuItemByID', _itemID);
 end;
 
 function jMenu.GetMenuItemByIndex(_index: integer): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_GetMenuItemByIndex(FjEnv, FjObject, _index);
+   Result:= jni_func_i_out_mei(FjEnv, FjObject, 'GetMenuItemByIndex', _index);
 end;
 
 procedure jMenu.UnCheckAllMenuItem();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_UnCheckAllMenuItem(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'UnCheckAllMenuItem');
 end;
 
 function jMenu.CountSubMenus(): integer;
 begin
+  Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_CountSubMenus(FjEnv, FjObject);
+   Result:= jni_func_out_i(FjEnv, FjObject, 'CountSubMenus');
 end;
 
 procedure jMenu.UnCheckAllSubMenuItemByIndex(_subMenuIndex: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_UnCheckAllSubMenuItemByIndex(FjEnv, FjObject, _subMenuIndex);
+     jni_proc_i(FjEnv, FjObject, 'UnCheckAllSubMenuItemByIndex', _subMenuIndex);
 end;
 
 procedure jMenu.RegisterForContextMenu(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_RegisterForContextMenu(FjEnv, FjObject, _view);
+     jni_proc_viw(FjEnv, FjObject, 'RegisterForContextMenu', _view);
 end;
 
 procedure jMenu.UnRegisterForContextMenu(_View: JObject); 
 begin 
   if(FInitialized) then 
-   JMenu_UnRegisterForContextMenu(FjEnv, FjObject, _View); 
+   jni_proc_viw(FjEnv, FjObject, 'UnRegisterForContextMenu', _View);
 end; 
 
 procedure jMenu.AddItem(_menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: TMenuItemType; _showAsAction: TMenuItemShowAsAction);
@@ -306,7 +284,7 @@ procedure jMenu.InvalidateOptionsMenu();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_InvalidateOptionsMenu(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'InvalidateOptionsMenu');
 end;
 
 procedure jMenu.SetItemVisible(_item: jObject; _value: boolean);
@@ -334,7 +312,7 @@ procedure jMenu.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_Clear(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Clear');
 end;
 
 procedure jMenu.SetItemTitle(_item: jObject; _title: string);
@@ -348,7 +326,7 @@ procedure jMenu.SetItemTitle(_menu: jObject; _index: integer; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_SetItemTitle(FjEnv, FjObject, _menu ,_index ,_title);
+     jni_proc_men_it(FjEnv, FjObject, 'SetItemTitle', _menu ,_index ,_title);
 end;
 
 procedure jMenu.SetItemIcon(_item: jObject; _iconIdentifier: integer);
@@ -369,42 +347,44 @@ procedure jMenu.SetItemChecked(_item: jObject; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_SetItemChecked(FjEnv, FjObject, _item ,_value);
+     jni_proc_mei_z(FjEnv, FjObject, 'SetItemChecked', _item ,_value);
 end;
 
 procedure jMenu.SetItemCheckable(_item: jObject; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_SetItemCheckable(FjEnv, FjObject, _item ,_value);
+     jni_proc_mei_z(FjEnv, FjObject, 'SetItemCheckable', _item ,_value);
 end;
 
 function jMenu.GetItemIdByIndex(_menu: jObject; _index: integer): integer;
 begin
+  Result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_GetItemIdByIndex(FjEnv, FjObject, _menu ,_index);
+   Result:= jni_func_men_i_out_i(FjEnv, FjObject, 'GetItemIdByIndex', _menu ,_index);
 end;
 
 function jMenu.GetItemIndexById(_menu: jObject; _id: integer): integer;
 begin
+  Result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_GetItemIndexById(FjEnv, FjObject, _menu ,_id);
+   Result:= jni_func_men_i_out_i(FjEnv, FjObject, 'GetItemIndexById', _menu ,_id);
 end;
 
 procedure jMenu.RemoveItemById(_menu: jObject; _id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_RemoveItemById(FjEnv, FjObject, _menu ,_id);
+     jni_proc_men_i(FjEnv, FjObject, 'RemoveItemById', _menu ,_id);
 end;
 
 procedure jMenu.RemoveItemByIndex(_menu: jObject; _index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_RemoveItemByIndex(FjEnv, FjObject, _menu ,_index);
+     jni_proc_men_i(FjEnv, FjObject, 'RemoveItemByIndex', _menu ,_index);
 end;
 
 procedure jMenu.AddDropDownItem(_menu: jObject; _view: jObject);
@@ -423,9 +403,12 @@ var
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   jMethod:= env^.GetMethodID(env, jCls, 'jMenu_jCreate', '(J)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
@@ -439,272 +422,38 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-procedure jMenu_jFree(env: PJNIEnv; _jmenu: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jmenu, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_Add(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _itemID;
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_caption));
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'Add', '(Landroid/view/Menu;ILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[2].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_AddCheckable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _itemID;
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_caption));
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddCheckable', '(Landroid/view/Menu;ILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[2].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_AddDrawable(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _itemID;
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_caption));
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddDrawable', '(Landroid/view/Menu;ILjava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[2].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_CheckItemCommute(env: PJNIEnv; _jmenu: JObject; _item: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _item;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'CheckItemCommute', '(Landroid/view/MenuItem;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jMenu_CheckItem(env: PJNIEnv; _jmenu: JObject; _item: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _item;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'CheckItem', '(Landroid/view/MenuItem;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jMenu_UnCheckItem(env: PJNIEnv; _jmenu: JObject; _item: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _item;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'UnCheckItem', '(Landroid/view/MenuItem;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_AddSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-  newSize0: integer;
-  jNewArray0: jObject=nil;
-  i: integer;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _startItemID;
-  newSize0:= Length(_captions); //?; Length(?);
-  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
-  for i:= 0 to newSize0 - 1 do
-  begin
-     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_captions[i])));
-  end;
-  jParams[2].l:= jNewArray0;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddSubMenu', '(Landroid/view/Menu;I[Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[2].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_AddCheckableSubMenu(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-  newSize0: integer;
-  jNewArray0: jObject=nil;
-  i: integer;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _startItemID;
-  newSize0:= Length(_captions); //?; //Length(?);
-  jNewArray0:= env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
-  for i:= 0 to newSize0 - 1 do
-  begin
-     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_captions[i])));
-  end;
-  jParams[2].l:= jNewArray0;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddCheckableSubMenu', '(Landroid/view/Menu;I[Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[2].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jMenu_Size(env: PJNIEnv; _jmenu: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'Size', '()I');
-  Result:= env^.CallIntMethod(env, _jmenu, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jMenu_FindMenuItemByID(env: PJNIEnv; _jmenu: JObject; _itemID: integer): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _itemID;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'FindMenuItemByID', '(I)Landroid/view/MenuItem;');
-  Result:= env^.CallObjectMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jMenu_GetMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _index: integer): jObject;
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _index;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetMenuItemByIndex', '(I)Landroid/view/MenuItem;');
-  Result:= env^.CallObjectMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_UnCheckAllMenuItem(env: PJNIEnv; _jmenu: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'UnCheckAllMenuItem', '()V');
-  env^.CallVoidMethod(env, _jmenu, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jMenu_CountSubMenus(env: PJNIEnv; _jmenu: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'CountSubMenus', '()I');
-  Result:= env^.CallIntMethod(env, _jmenu, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_UnCheckAllSubMenuItemByIndex(env: PJNIEnv; _jmenu: JObject; _subMenuIndex: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _subMenuIndex;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'UnCheckAllSubMenuItemByIndex', '(I)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_RegisterForContextMenu(env: PJNIEnv; _jmenu: JObject; _view: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _view;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'RegisterForContextMenu', '(Landroid/view/View;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure JMenu_UnRegisterForContextMenu(env: PJNIEnv; _JMenu: JObject; _View: JObject); 
-var 
-  JParams: array[0..0] of JValue; 
-  JMethod: JMethodID = nil; 
-  JCls: JClass = nil; 
-begin 
-  JParams[0].l := _View; 
-  JCls := env^.GetObjectClass(env, _JMenu); 
-  JMethod := env^.GetMethodID(env, JCls, 'UnRegisterForContextMenu', '(Landroid/view/View;)V'); 
-  env^.CallVoidMethodA(env, _JMenu, JMethod, @JParams);
-  env^.DeleteLocalRef(env, jCls);
-end; 	
-
 procedure jMenu_AddItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: integer; _showAsAction: integer);
 var
   jParams: array[0..5] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'AddItem', '(Landroid/view/Menu;ILjava/lang/String;Ljava/lang/String;II)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _menu;
   jParams[1].i:= _itemID;
   jParams[2].l:= env^.NewStringUTF(env, PChar(_caption));
   jParams[3].l:= env^.NewStringUTF(env, PChar(_iconIdentifier));
   jParams[4].i:= _itemType;
   jParams[5].i:= _showAsAction;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddItem', '(Landroid/view/Menu;ILjava/lang/String;Ljava/lang/String;II)V');
+
+  if jParams[2].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if jParams[3].l = nil then begin env^.DeleteLocalRef(env, jParams[2].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env,jParams[3].l);
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -713,16 +462,29 @@ var
   jParams: array[0..3] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'AddItem', '(Landroid/view/SubMenu;ILjava/lang/String;I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _subMenu;
   jParams[1].i:= _itemID;
   jParams[2].l:= env^.NewStringUTF(env, PChar(_caption));
   jParams[3].i:= _itemType;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddItem', '(Landroid/view/SubMenu;ILjava/lang/String;I)V');
+
+  if jParams[2].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -731,27 +493,30 @@ var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'AddSubMenu', '(Landroid/view/Menu;Ljava/lang/String;Ljava/lang/String;)Landroid/view/SubMenu;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _menu;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_title));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_headerIconIdentifier));
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddSubMenu', '(Landroid/view/Menu;Ljava/lang/String;Ljava/lang/String;)Landroid/view/SubMenu;');
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if jParams[2].l = nil then begin env^.DeleteLocalRef(env, jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   Result:= env^.CallObjectMethodA(env, _jmenu, jMethod, @jParams);
+
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);
-end;
 
-procedure jMenu_InvalidateOptionsMenu(env: PJNIEnv; _jmenu: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'InvalidateOptionsMenu', '()V');
-  env^.CallVoidMethod(env, _jmenu, jMethod);
-  env^.DeleteLocalRef(env, jCls);
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 procedure jMenu_SetItemVisible(env: PJNIEnv; _jmenu: JObject; _item: jObject; _value: boolean);
@@ -759,13 +524,23 @@ var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemVisible', '(Landroid/view/MenuItem;Z)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _item;
   jParams[1].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemVisible', '(Landroid/view/MenuItem;Z)V');
+
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -774,14 +549,24 @@ var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemVisible', '(Landroid/view/Menu;IZ)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _menu;
   jParams[1].i:= _index;
   jParams[2].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemVisible', '(Landroid/view/Menu;IZ)V');
+
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -790,24 +575,22 @@ var
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
-  jParams[0].l:= _menu;
+  if (env = nil) or (_jmenu = nil) then exit;
+
   jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'Clear', '(Landroid/view/Menu;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= _menu;
+
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
-end;
 
-
-procedure jMenu_Clear(env: PJNIEnv; _jmenu: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'Clear', '()V');
-  env^.CallVoidMethod(env, _jmenu, jMethod);
-  env^.DeleteLocalRef(env, jCls);
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -816,31 +599,27 @@ var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemTitle', '(Landroid/view/MenuItem;Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _item;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_title));
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemTitle', '(Landroid/view/MenuItem;Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
-procedure jMenu_SetItemTitle(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer; _title: string);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _index;
-  jParams[2].l:= env^.NewStringUTF(env, PChar(_title));
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemTitle', '(Landroid/view/Menu;ILjava/lang/String;)V');
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-env^.DeleteLocalRef(env,jParams[2].l);
+
+  env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -849,13 +628,23 @@ var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemIcon', '(Landroid/view/MenuItem;I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _item;
   jParams[1].i:= _iconIdentifier;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemIcon', '(Landroid/view/MenuItem;I)V');
+
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
@@ -864,103 +653,25 @@ var
   jParams: array[0..2] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemIcon', '(Landroid/view/Menu;II)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _menu;
   jParams[1].i:= _index;
   jParams[2].i:= _iconIdentifier;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemIcon', '(Landroid/view/Menu;II)V');
+
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jCls);
-end;
 
-
-procedure jMenu_SetItemChecked(env: PJNIEnv; _jmenu: JObject; _item: jObject; _value: boolean);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _item;
-  jParams[1].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemChecked', '(Landroid/view/MenuItem;Z)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jMenu_SetItemCheckable(env: PJNIEnv; _jmenu: JObject; _item: jObject; _value: boolean);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _item;
-  jParams[1].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetItemCheckable', '(Landroid/view/MenuItem;Z)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jMenu_GetItemIdByIndex(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer): integer;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _index;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetItemIdByIndex', '(Landroid/view/Menu;I)I');
-  Result:= env^.CallIntMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jMenu_GetItemIndexById(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _id: integer): integer;
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetItemIndexById', '(Landroid/view/Menu;I)I');
-  Result:= env^.CallIntMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jMenu_RemoveItemById(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _id: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveItemById', '(Landroid/view/Menu;I)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jMenu_RemoveItemByIndex(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _index: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _menu;
-  jParams[1].i:= _index;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveItemByIndex', '(Landroid/view/Menu;I)V');
-  env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 procedure jMenu_AddDropDownItem(env: PJNIEnv; _jmenu: JObject; _menu: jObject; _view: jObject);
@@ -968,13 +679,24 @@ var
   jParams: array[0..1] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
+label
+  _exceptionOcurred;
 begin
+  if (env = nil) or (_jmenu = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jmenu);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'AddDropDownItem', '(Landroid/view/Menu;Landroid/view/View;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   jParams[0].l:= _menu;
   jParams[1].l:= _view;
-  jCls:= env^.GetObjectClass(env, _jmenu);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddDropDownItem', '(Landroid/view/Menu;Landroid/view/View;)V');
+
   env^.CallVoidMethodA(env, _jmenu, jMethod, @jParams);
+
   env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 

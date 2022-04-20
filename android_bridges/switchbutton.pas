@@ -67,27 +67,6 @@ type
   end;
 
 function jSwitchButton_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jSwitchButton_jFree(env: PJNIEnv; _jswitchbutton: JObject);
-procedure jSwitchButton_SetViewParent(env: PJNIEnv; _jswitchbutton: JObject; _viewgroup: jObject);
-procedure jSwitchButton_RemoveFromViewParent(env: PJNIEnv; _jswitchbutton: JObject);
-function jSwitchButton_GetView(env: PJNIEnv; _jswitchbutton: JObject): jObject;
-procedure jSwitchButton_SetLParamWidth(env: PJNIEnv; _jswitchbutton: JObject; _w: integer);
-procedure jSwitchButton_SetLParamHeight(env: PJNIEnv; _jswitchbutton: JObject; _h: integer);
-procedure jSwitchButton_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jswitchbutton: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jSwitchButton_AddLParamsAnchorRule(env: PJNIEnv; _jswitchbutton: JObject; _rule: integer);
-procedure jSwitchButton_AddLParamsParentRule(env: PJNIEnv; _jswitchbutton: JObject; _rule: integer);
-procedure jSwitchButton_SetLayoutAll(env: PJNIEnv; _jswitchbutton: JObject; _idAnchor: integer);
-procedure jSwitchButton_ClearLayoutAll(env: PJNIEnv; _jswitchbutton: JObject);
-procedure jSwitchButton_SetId(env: PJNIEnv; _jswitchbutton: JObject; _id: integer);
-procedure jSwitchButton_SetTextOff(env: PJNIEnv; _jswitchbutton: JObject; _caption: string);
-procedure jSwitchButton_SetTextOn(env: PJNIEnv; _jswitchbutton: JObject; _caption: string);
-procedure jSwitchButton_SetChecked(env: PJNIEnv; _jswitchbutton: JObject; _state: boolean);
-procedure jSwitchButton_DispatchOnToggleEvent(env: PJNIEnv; _jswitchbutton: JObject; _value: boolean);
-procedure jSwitchButton_Toggle(env: PJNIEnv; _jswitchbutton: JObject);
-procedure jSwitchButton_SetThumbIcon(env: PJNIEnv; _jswitchbutton: JObject; _thumbIconIdentifier: string);
-procedure jSwitchButton_SetShowText(env: PJNIEnv; _jswitchbutton: JObject; _state: boolean);
-function jSwitchButton_IsChecked(env: PJNIEnv; _jswitchbutton: JObject): boolean;
-procedure jSwitchButton_SetFrameGravity(env: PJNIEnv; _jswitchbutton: JObject; _value: integer);
 
 
 implementation
@@ -146,36 +125,31 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jSwitchButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   jSwitchButton_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jSwitchButton_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  jSwitchButton_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-      jSwitchButton_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
+      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+
+
   for rToP := rpBottom to rpCenterVertical do
-  begin
-    if rToP in FPositionRelativeToParent then
-    begin
-      jSwitchButton_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
-    end;
-  end;
+   if rToP in FPositionRelativeToParent then
+      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jSwitchButton_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -185,15 +159,15 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FTextOff <> 'OFF' then
-    jSwitchButton_SetTextOff(FjEnv, FjObject, FTextOff);
+    SetTextOff(FTextOff);
 
    if FTextOn <> 'ON' then
-    jSwitchButton_SetTextOn(FjEnv, FjObject, FTextOn);
+    SetTextOn(FTextOn);
 
    if FSwitchState <> tsOff then
-     jSwitchButton_SetChecked(FjEnv, FjObject, True);
+     SetChecked(True);
 
-   jSwitchButton_DispatchOnToggleEvent(FjEnv, FjObject, True);
+   DispatchOnToggleEvent(True);
 
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
@@ -245,70 +219,70 @@ procedure jSwitchButton.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jSwitchButton.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 procedure jSwitchButton.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jSwitchButton.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSwitchButton_GetView(FjEnv, FjObject);
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 procedure jSwitchButton.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jSwitchButton.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 procedure jSwitchButton.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jSwitchButton.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jSwitchButton.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jSwitchButton.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jSwitchButton.ClearLayout();
@@ -319,55 +293,61 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jSwitchButton_clearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jSwitchButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jSwitchButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
 procedure jSwitchButton.SetTextOff(_caption: string);
 begin
   //in designing component state: set value here...
-    FTextOff:= _caption;
-  if FInitialized then
-     jSwitchButton_SetTextOff(FjEnv, FjObject, _caption);
+  FTextOff:= _caption;
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetTextOff', _caption);
 end;
 
 procedure jSwitchButton.SetTextOn(_caption: string);
 begin
   //in designing component state: set value here...
   FTextOn:= _caption;
-  if FInitialized then
-     jSwitchButton_SetTextOn(FjEnv, FjObject, _caption);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetTextOn', _caption);
 end;
 
 procedure jSwitchButton.SetChecked(_state: boolean);
 begin
   //in designing component state: set value here...
-  if _state = True then FSwitchState:= tsOn
-  else FSwitchState:= tsOff;
+  if _state = True then
+   FSwitchState:= tsOn
+  else
+   FSwitchState:= tsOff;
 
-  if FInitialized then
-     jSwitchButton_SetChecked(FjEnv, FjObject, _state);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetChecked', _state);
 end;
 
 procedure jSwitchButton.DispatchOnToggleEvent(_value: boolean);
 begin
-  if FInitialized then
-     jSwitchButton_DispatchOnToggleEvent(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'DispatchOnToggleEvent', _value);
 end;
 
 procedure jSwitchButton.Toggle();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_Toggle(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Toggle');
 end;
 
 procedure jSwitchButton.SetSwitchState(_state: TToggleState);
@@ -377,9 +357,9 @@ begin
   if FInitialized then
   begin
     if _state = tsOff then
-      jSwitchButton_SetChecked(FjEnv, FjObject, False)
+      SetChecked(False)
     else
-      jSwitchButton_SetChecked(FjEnv, FjObject, True);
+      SetChecked(True);
   end;
 end;
 
@@ -387,7 +367,7 @@ procedure jSwitchButton.SetThumbIcon(_thumbIconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSwitchButton_SetThumbIcon(FjEnv, FjObject, _thumbIconIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'SetThumbIcon', _thumbIconIdentifier);
 end;
 
 (*  Api 21
@@ -401,9 +381,11 @@ end;
 
 function jSwitchButton.IsChecked(): boolean;
 begin
+  Result := false;
+
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSwitchButton_IsChecked(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsChecked');
 end;
 
 procedure jSwitchButton.SetLGravity(_value: TLayoutGravity);
@@ -411,7 +393,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jSwitchButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 end;
 
 
@@ -424,9 +406,12 @@ var
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   jMethod:= env^.GetMethodID(env, jCls, 'jSwitchButton_jCreate', '(J)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
@@ -439,294 +424,6 @@ end;
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-
-procedure jSwitchButton_jFree(env: PJNIEnv; _jswitchbutton: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jswitchbutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetViewParent(env: PJNIEnv; _jswitchbutton: JObject; _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_RemoveFromViewParent(env: PJNIEnv; _jswitchbutton: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jswitchbutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jSwitchButton_GetView(env: PJNIEnv; _jswitchbutton: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jswitchbutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetLParamWidth(env: PJNIEnv; _jswitchbutton: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetLParamHeight(env: PJNIEnv; _jswitchbutton: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jswitchbutton: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_AddLParamsAnchorRule(env: PJNIEnv; _jswitchbutton: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_AddLParamsParentRule(env: PJNIEnv; _jswitchbutton: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetLayoutAll(env: PJNIEnv; _jswitchbutton: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_ClearLayoutAll(env: PJNIEnv; _jswitchbutton: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jswitchbutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetId(env: PJNIEnv; _jswitchbutton: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetTextOff(env: PJNIEnv; _jswitchbutton: JObject; _caption: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_caption));
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTextOff', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetTextOn(env: PJNIEnv; _jswitchbutton: JObject; _caption: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_caption));
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTextOn', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetChecked(env: PJNIEnv; _jswitchbutton: JObject; _state: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_state);
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetChecked', '(Z)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jSwitchButton_DispatchOnToggleEvent(env: PJNIEnv; _jswitchbutton: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnToggleEvent', '(Z)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jSwitchButton_Toggle(env: PJNIEnv; _jswitchbutton: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'Toggle', '()V');
-  env^.CallVoidMethod(env, _jswitchbutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetThumbIcon(env: PJNIEnv; _jswitchbutton: JObject; _thumbIconIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_thumbIconIdentifier));
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetThumbIcon', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jSwitchButton_SetShowText(env: PJNIEnv; _jswitchbutton: JObject; _state: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_state);
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetShowText', '(Z)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-function jSwitchButton_IsChecked(env: PJNIEnv; _jswitchbutton: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsChecked', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jswitchbutton, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jSwitchButton_SetFrameGravity(env: PJNIEnv; _jswitchbutton: JObject; _value: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _value;
-  jCls:= env^.GetObjectClass(env, _jswitchbutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jswitchbutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 
 end.

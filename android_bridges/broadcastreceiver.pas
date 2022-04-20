@@ -202,6 +202,7 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jBroadcastReceiver_jCreate', '(J)Ljava/lang/Object;');
@@ -223,11 +224,11 @@ var
 label
   _exceptionOcurred;
 begin
-
+  if (env = nil) or (_jbroadcastreceiver = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'RegisterIntentActionFilter', '(I)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _intentAction;
 
@@ -246,10 +247,13 @@ var
 label
   _exceptionOcurred;
 begin
+  Result := nil;
+
+  if (env = nil) or (_jbroadcastreceiver = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jbroadcastreceiver);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetResultExtras', '()Landroid/os/Bundle;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   Result:= env^.CallObjectMethod(env, _jbroadcastreceiver, jMethod);
 

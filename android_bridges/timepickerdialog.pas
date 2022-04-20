@@ -37,9 +37,6 @@ jTimePickerDialog = class(jControl)
 end;
 
 function jTimePickerDialog_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jTimePickerDialog_jFree(env: PJNIEnv; _jtimepickerdialog: JObject);
-procedure jTimePickerDialog_Show(env: PJNIEnv; _jtimepickerdialog: JObject); overload;
-procedure jTimePickerDialog_Show(env: PJNIEnv; _jtimepickerdialog: JObject; _hourOfDay24Based: integer; _minute: integer); overload;
 
 
 implementation
@@ -85,14 +82,14 @@ procedure jTimePickerDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTimePickerDialog_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jTimePickerDialog.Show();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTimePickerDialog_Show(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Show');
 end;
 
 procedure jTimePickerDialog.GenEvent_OnTimePicker(Obj: TObject;  hourOfDay: integer; minute: integer);
@@ -104,7 +101,7 @@ procedure jTimePickerDialog.Show(_hourOfDay24Based: integer; _minute: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTimePickerDialog_Show(FjEnv, FjObject, _hourOfDay24Based ,_minute);
+     jni_proc_ii(FjEnv, FjObject, 'Show', _hourOfDay24Based ,_minute);
 end;
 
 {-------- jTimePickerDialog_JNI_Bridge ----------}
@@ -116,9 +113,12 @@ var
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   jMethod:= env^.GetMethodID(env, jCls, 'jTimePickerDialog_jCreate', '(J)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
@@ -131,44 +131,6 @@ end;
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-
-procedure jTimePickerDialog_jFree(env: PJNIEnv; _jtimepickerdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jtimepickerdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jtimepickerdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jTimePickerDialog_Show(env: PJNIEnv; _jtimepickerdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jtimepickerdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'Show', '()V');
-  env^.CallVoidMethod(env, _jtimepickerdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jTimePickerDialog_Show(env: PJNIEnv; _jtimepickerdialog: JObject; _hourOfDay24Based: integer; _minute: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _hourOfDay24Based;
-  jParams[1].i:= _minute;
-  jCls:= env^.GetObjectClass(env, _jtimepickerdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'Show', '(II)V');
-  env^.CallVoidMethodA(env, _jtimepickerdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 
 

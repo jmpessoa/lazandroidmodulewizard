@@ -36,9 +36,6 @@ jDatePickerDialog = class(jControl)
 end;
 
 function jDatePickerDialog_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jDatePickerDialog_jFree(env: PJNIEnv; _jdatepickerdialog: JObject);
-procedure jDatePickerDialog_Show(env: PJNIEnv; _jdatepickerdialog: JObject); overload;
-procedure jDatePickerDialog_Show(env: PJNIEnv; _jdatepickerdialog: JObject; _year: integer; _monthOfYear: integer; _dayOfMonth: integer); overload;
 
 implementation
 
@@ -83,14 +80,14 @@ procedure jDatePickerDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDatePickerDialog_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jDatePickerDialog.Show();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDatePickerDialog_Show(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Show');
 end;
 
 procedure jDatePickerDialog.GenEvent_OnDatePicker(Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
@@ -102,7 +99,7 @@ procedure jDatePickerDialog.Show(_year: integer; _monthOfYear: integer; _dayOfMo
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDatePickerDialog_Show(FjEnv, FjObject, _year ,_monthOfYear ,_dayOfMonth);
+     jni_proc_iii(FjEnv, FjObject, 'Show', _year ,_monthOfYear ,_dayOfMonth);
 end;
 
 {-------- jDatePickerDialog_JNI_Bridge ----------}
@@ -114,9 +111,12 @@ var
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   jMethod:= env^.GetMethodID(env, jCls, 'jDatePickerDialog_jCreate', '(J)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
@@ -129,43 +129,5 @@ end;
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-
-procedure jDatePickerDialog_jFree(env: PJNIEnv; _jdatepickerdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jdatepickerdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jdatepickerdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jDatePickerDialog_Show(env: PJNIEnv; _jdatepickerdialog: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jdatepickerdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'Show', '()V');
-  env^.CallVoidMethod(env, _jdatepickerdialog, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jDatePickerDialog_Show(env: PJNIEnv; _jdatepickerdialog: JObject; _year: integer; _monthOfYear: integer; _dayOfMonth: integer);
-var
-  jParams: array[0..2] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _year;
-  jParams[1].i:= _monthOfYear;
-  jParams[2].i:= _dayOfMonth;
-  jCls:= env^.GetObjectClass(env, _jdatepickerdialog);
-  jMethod:= env^.GetMethodID(env, jCls, 'Show', '(III)V');
-  env^.CallVoidMethodA(env, _jdatepickerdialog, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
 
 end.
