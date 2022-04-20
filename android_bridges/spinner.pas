@@ -121,9 +121,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
   end;
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
-procedure jSpinner_SetFontAndTextTypeFace(env: PJNIEnv; _jspinner: JObject; _fontFace: integer; _fontStyle: integer);
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string; _strTag: string);
-procedure jSpinner_SetColorFilter(env: PJNIEnv; _jspinner: JObject; _color: integer);
 
 
 implementation
@@ -257,7 +255,7 @@ begin
      SetFontSize(FFontSize);
 
    SetTextAlignment(FTextAlignment);
-   jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   SetFontFace(FFontFace);
 
    if FItems <> nil then
    begin
@@ -566,15 +564,17 @@ end;
 procedure jSpinner.SetFontFace(AValue: TFontFace);
 begin
  FFontFace:= AValue;
- if(FInitialized) then
-   jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+ if FjObject = nil then exit;
+
+ jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 procedure jSpinner.SetTextTypeFace(Value: TTextTypeFace);
 begin
   FTextTypeFace:= Value;
-  if(FInitialized) then
-    jSpinner_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+  if FjObject = nil then exit;
+
+  jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 function jSpinner.GetText(): string;
@@ -687,7 +687,7 @@ procedure jSpinner.SetColorFilter(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSpinner_SetColorFilter(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jni_proc_i(FjEnv, FjObject, 'SetColorFilter', GetARGB(FCustomColor, _color));
 end;
 
 //TODO
@@ -719,6 +719,7 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jSpinner_jCreate', '(J)Ljava/lang/Object;');
@@ -742,29 +743,6 @@ end;
 //to end of "public class Controls" in "Controls.java"
 *)
 
-procedure jSpinner_SetFontAndTextTypeFace(env: PJNIEnv; _jspinner: JObject; _fontFace: integer; _fontStyle: integer);
-var
-  jParams: array[0..1] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;    
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'SetFontAndTextTypeFace', '(II)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].i:= _fontFace;
-  jParams[1].i:= _fontStyle;
-
-  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);   
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string; _strTag: string);
 var
   jParams: array[0..2] of jValue;
@@ -774,43 +752,24 @@ label
   _exceptionOcurred;
 begin
 
+  if (env = nil) or (_jspinner = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jspinner);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'SetItem', '(ILjava/lang/String;Ljava/lang/String;)V');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].i:= _index;
   jParams[1].l:= env^.NewStringUTF(env, PChar(_item));
   jParams[2].l:= env^.NewStringUTF(env, PChar(_strTag));
+
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if jParams[2].l = nil then begin env^.DeleteLocalRef(env, jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
 
   env^.DeleteLocalRef(env,jParams[1].l);
   env^.DeleteLocalRef(env,jParams[2].l);
   env^.DeleteLocalRef(env, jCls);   
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-procedure jSpinner_SetColorFilter(env: PJNIEnv; _jspinner: JObject; _color: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jspinner);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'SetColorFilter', '(I)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].i:= _color;
-
-  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
-
-  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;

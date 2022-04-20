@@ -71,27 +71,6 @@ TOnLongClickToggleButton=procedure(Sender:TObject; isStateOn:boolean) of object;
   end;
 
 function jToggleButton_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jToggleButton_jFree(env: PJNIEnv; _jtogglebutton: JObject);
-procedure jToggleButton_SetViewParent(env: PJNIEnv; _jtogglebutton: JObject; _viewgroup: jObject);
-procedure jToggleButton_RemoveFromViewParent(env: PJNIEnv; _jtogglebutton: JObject);
-function jToggleButton_GetView(env: PJNIEnv; _jtogglebutton: JObject): jObject;
-procedure jToggleButton_SetLParamWidth(env: PJNIEnv; _jtogglebutton: JObject; _w: integer);
-procedure jToggleButton_SetLParamHeight(env: PJNIEnv; _jtogglebutton: JObject; _h: integer);
-procedure jToggleButton_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jtogglebutton: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jToggleButton_AddLParamsAnchorRule(env: PJNIEnv; _jtogglebutton: JObject; _rule: integer);
-procedure jToggleButton_AddLParamsParentRule(env: PJNIEnv; _jtogglebutton: JObject; _rule: integer);
-procedure jToggleButton_SetLayoutAll(env: PJNIEnv; _jtogglebutton: JObject; _idAnchor: integer);
-procedure jToggleButton_ClearLayoutAll(env: PJNIEnv; _jtogglebutton: JObject);
-procedure jToggleButton_SetId(env: PJNIEnv; _jtogglebutton: JObject; _id: integer);
-procedure jToggleButton_SetChecked(env: PJNIEnv; _jtogglebutton: JObject; _value: boolean);
-procedure jToggleButton_DispatchOnToggleEvent(env: PJNIEnv; _jtogglebutton: JObject; _value: boolean);
-procedure jToggleButton_SetTextOn(env: PJNIEnv; _jtogglebutton: JObject; _caption: string);
-procedure jToggleButton_SetTextOff(env: PJNIEnv; _jtogglebutton: JObject; _caption: string);
-procedure jToggleButton_Toggle(env: PJNIEnv; _jtogglebutton: JObject);
-function jToggleButton_IsChecked(env: PJNIEnv; _jtogglebutton: JObject): boolean;
-procedure jToggleButton_SetBackgroundDrawable(env: PJNIEnv; _jtogglebutton: JObject; _imageIdentifier: string);
-procedure jToggleButton_SetFrameGravity(env: PJNIEnv; _jtogglebutton: JObject; _value: integer);
-procedure jToggleButton_SetEnabledLongClick(env: PJNIEnv; _jtogglebutton: JObject; _enableLongClick: boolean);
 
 
 implementation
@@ -151,35 +130,31 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jToggleButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
 
-   jToggleButton_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jToggleButton_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  jToggleButton_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-      jToggleButton_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
+      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+
+
   for rToP := rpBottom to rpCenterVertical do
-  begin
     if rToP in FPositionRelativeToParent then
-    begin
-      jToggleButton_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
-    end;
-  end;
+      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+
+
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jToggleButton_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -189,18 +164,18 @@ begin
     View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FTextOff <> 'OFF' then
-    jToggleButton_SetTextOff(FjEnv, FjObject, FTextOff);
+    SetTextOff(FTextOff);
 
    if FTextOn <> 'ON' then
-    jToggleButton_SetTextOn(FjEnv, FjObject, FTextOn);
+    SetTextOn(FTextOn);
 
    if FToggleState <> tsOff then
-     jToggleButton_SetChecked(FjEnv, FjObject, True);
+     SetChecked(True);
 
-   jToggleButton_DispatchOnToggleEvent(FjEnv, FjObject, True);
+   DispatchOnToggleEvent(True);
 
    if FEnabledLongClick then
-      jToggleButton_SetEnabledLongClick(FjEnv, FjObject, True);
+      SetEnabledLongClick(True);
 
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
@@ -252,70 +227,70 @@ procedure jToggleButton.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jToggleButton.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 procedure jToggleButton.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jToggleButton.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToggleButton_GetView(FjEnv, FjObject);
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 procedure jToggleButton.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jToggleButton.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 procedure jToggleButton.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jToggleButton.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jToggleButton.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jToggleButton.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jToggleButton.ClearLayout();
@@ -326,55 +301,61 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jToggleButton_clearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jToggleButton_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jToggleButton_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
 procedure jToggleButton.SetChecked(_value: boolean);
 begin
   //in designing component state: set value here...
-  if _value = True then FToggleState:= tsOn
-  else FToggleState:= tsOff;
+  if _value = True then
+   FToggleState := tsOn
+  else
+   FToggleState := tsOff;
 
-  if FInitialized then
-     jToggleButton_SetChecked(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetChecked', _value);
 end;
 
 procedure jToggleButton.DispatchOnToggleEvent(_value: boolean);
 begin
-  if FInitialized then
-     jToggleButton_DispatchOnToggleEvent(FjEnv, FjObject, _value);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'DispatchOnToggleEvent', _value);
 end;
 
 procedure jToggleButton.SetTextOn(_caption: string);
 begin
   //in designing component state: set value here...
   FTextOn:= _caption;
-  if FInitialized then
-     jToggleButton_SetTextOn(FjEnv, FjObject, _caption);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetTextOn', _caption);
 end;
 
 procedure jToggleButton.SetTextOff(_caption: string);
 begin
   //in designing component state: set value here...
   FTextOff:= _caption;
-  if FInitialized then
-     jToggleButton_SetTextOff(FjEnv, FjObject, _caption);
+  if FjObject = nil then exit;
+
+  jni_proc_t(FjEnv, FjObject, 'SetTextOff', _caption);
 end;
 
 procedure jToggleButton.Toggle();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_Toggle(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Toggle');
 end;
 
 procedure jToggleButton.SetToggleState(_state: TToggleState);
@@ -384,24 +365,25 @@ begin
   if FInitialized then
   begin
     if _state = tsOff then
-      jToggleButton_SetChecked(FjEnv, FjObject, False)
+      SetChecked(False)
     else
-      jToggleButton_SetChecked(FjEnv, FjObject, True);
+      SetChecked(True);
   end;
 end;
 
 function jToggleButton.IsChecked(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToggleButton_IsChecked(FjEnv, FjObject);
+   Result:= jni_func_out_z(FjEnv, FjObject, 'IsChecked');
 end;
 
 procedure jToggleButton.SetBackgroundDrawable(_imageIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToggleButton_SetBackgroundDrawable(FjEnv, FjObject, _imageIdentifier);
+     jni_proc_t(FjEnv, FjObject, 'SetBackgroundDrawable', _imageIdentifier);
 end;
 
 procedure jToggleButton.SetLGravity(_value: TLayoutGravity);
@@ -409,15 +391,16 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jToggleButton_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jToggleButton.SetEnabledLongClick(_enableLongClick: boolean);
 begin
   //in designing component state: set value here...
   FEnabledLongClick:= _enableLongClick;
-  if FInitialized then
-     jToggleButton_SetEnabledLongClick(FjEnv, FjObject, _enableLongClick);
+  if FjObject = nil then exit;
+
+  jni_proc_z(FjEnv, FjObject, 'SetEnabledLongClick', _enableLongClick);
 end;
 
 procedure jToggleButton.GenEvent_OnLongClickToggleButton(Sender:TObject;state:boolean);
@@ -440,9 +423,12 @@ var
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   jMethod:= env^.GetMethodID(env, jCls, 'jToggleButton_jCreate', '(J)Ljava/lang/Object;');
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);
 end;
 
@@ -455,303 +441,5 @@ end;
 
 //to end of "public class Controls" in "Controls.java"
 *)
-
-
-procedure jToggleButton_jFree(env: PJNIEnv; _jtogglebutton: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jtogglebutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetViewParent(env: PJNIEnv; _jtogglebutton: JObject; _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_RemoveFromViewParent(env: PJNIEnv; _jtogglebutton: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jtogglebutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jToggleButton_GetView(env: PJNIEnv; _jtogglebutton: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jtogglebutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetLParamWidth(env: PJNIEnv; _jtogglebutton: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetLParamHeight(env: PJNIEnv; _jtogglebutton: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jtogglebutton: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_AddLParamsAnchorRule(env: PJNIEnv; _jtogglebutton: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_AddLParamsParentRule(env: PJNIEnv; _jtogglebutton: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetLayoutAll(env: PJNIEnv; _jtogglebutton: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_ClearLayoutAll(env: PJNIEnv; _jtogglebutton: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jtogglebutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetId(env: PJNIEnv; _jtogglebutton: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetChecked(env: PJNIEnv; _jtogglebutton: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetChecked', '(Z)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jToggleButton_DispatchOnToggleEvent(env: PJNIEnv; _jtogglebutton: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'DispatchOnToggleEvent', '(Z)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jToggleButton_SetTextOn(env: PJNIEnv; _jtogglebutton: JObject; _caption: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_caption));
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTextOn', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetTextOff(env: PJNIEnv; _jtogglebutton: JObject; _caption: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_caption));
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetTextOff', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_Toggle(env: PJNIEnv; _jtogglebutton: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'Toggle', '()V');
-  env^.CallVoidMethod(env, _jtogglebutton, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jToggleButton_IsChecked(env: PJNIEnv; _jtogglebutton: JObject): boolean;
-var
-  jBoo: JBoolean;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'IsChecked', '()Z');
-  jBoo:= env^.CallBooleanMethod(env, _jtogglebutton, jMethod);
-  Result:= boolean(jBoo);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jToggleButton_SetBackgroundDrawable(env: PJNIEnv; _jtogglebutton: JObject; _imageIdentifier: string);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= env^.NewStringUTF(env, PChar(_imageIdentifier));
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundDrawable', '(Ljava/lang/String;)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env,jParams[0].l);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jToggleButton_SetFrameGravity(env: PJNIEnv; _jtogglebutton: JObject; _value: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _value;
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jToggleButton_SetEnabledLongClick(env: PJNIEnv; _jtogglebutton: JObject; _enableLongClick: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-
-  jCls:= env^.GetObjectClass(env, _jtogglebutton);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'SetEnabledLongClick', '(Z)V');
-  if jMethod = nil then goto _exceptionOcurred;
-
-  jParams[0].z:= JBool(_enableLongClick);
-
-  env^.CallVoidMethodA(env, _jtogglebutton, jMethod, @jParams);
-
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
 
 end.

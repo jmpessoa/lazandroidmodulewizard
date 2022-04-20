@@ -642,6 +642,7 @@ label
 begin
   result := nil;
 
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'jLocation_jCreate', '(JJJII)Ljava/lang/Object;');
@@ -672,12 +673,15 @@ label
 begin
   Result := nil;
 
+  if (env = nil) or (_jlocation = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jlocation);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetLatitudeLongitude', '(Ljava/lang/String;)[D');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_locationAddress));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   jResultArray:= env^.CallObjectMethodA(env, _jlocation, jMethod,  @jParams);
 
@@ -708,18 +712,27 @@ var
 label
   _exceptionOcurred;
 begin
+  Result := '';
 
+  if (env = nil) or (_jlocation = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jlocation);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[D)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   newSize0:= Length(_latitude);
   jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
+
+  if jNewArray0 = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.SetDoubleArrayRegion(env, jNewArray0, 0 , newSize0, @_latitude[0] {source});
   jParams[0].l:= jNewArray0;
+
   newSize1:= Length(_longitude);
   jNewArray1:= env^.NewDoubleArray(env, newSize1);  // allocate
+
+  if jNewArray1 = nil then begin env^.DeleteLocalRef(env, jNewArray0); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
   jParams[1].l:= jNewArray1;
 
@@ -747,18 +760,27 @@ var
 label
   _exceptionOcurred;
 begin
+  Result := '';
 
+  if (env = nil) or (_jlocation = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jlocation);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[DI)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   newSize0:= Length(_latitude);
   jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
+
+  if jNewArray0 = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.SetDoubleArrayRegion(env, jNewArray0, 0 , newSize0, @_latitude[0] {source});
   jParams[0].l:= jNewArray0;
+
   newSize1:= Length(_longitude);
   jNewArray1:= env^.NewDoubleArray(env, newSize1);  // allocate
+
+  if jNewArray1 = nil then begin env^.DeleteLocalRef(env, jNewArray0); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
   jParams[1].l:= jNewArray1;
   jParams[2].i:= _pathFlag;
@@ -787,18 +809,27 @@ var
 label
   _exceptionOcurred;
 begin
+  Result := '';
 
+  if (env = nil) or (_jlocation = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jlocation);
   if jCls = nil then goto _exceptionOcurred;
   jMethod:= env^.GetMethodID(env, jCls, 'GetGoogleMapsUrl', '([D[DII)Ljava/lang/String;');
-  if jMethod = nil then goto _exceptionOcurred;
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
   newSize0:= Length(_latitude);
   jNewArray0:= env^.NewDoubleArray(env, newSize0);  // allocate
+
+  if jNewArray0 = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.SetDoubleArrayRegion(env, jNewArray0, 0 , newSize0, @_latitude[0] {source});
   jParams[0].l:= jNewArray0;
+
   newSize1:= Length(_longitude);
   jNewArray1:= env^.NewDoubleArray(env, newSize1);  // allocate
+
+  if jNewArray1 = nil then begin env^.DeleteLocalRef(env, jNewArray0); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
   env^.SetDoubleArrayRegion(env, jNewArray1, 0 , newSize1, @_longitude[0] {source});
   jParams[1].l:= jNewArray1;
   jParams[2].i:= _pathFlag;

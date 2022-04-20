@@ -57,28 +57,6 @@ jsCardView = class(jVisualControl)
 end;
 
 function jsCardView_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
-procedure jsCardView_jFree(env: PJNIEnv; _jscardview: JObject);
-procedure jsCardView_SetViewParent(env: PJNIEnv; _jscardview: JObject; _viewgroup: jObject);
-function jsCardView_GetParent(env: PJNIEnv; _jscardview: JObject): jObject;
-procedure jsCardView_RemoveFromViewParent(env: PJNIEnv; _jscardview: JObject);
-function jsCardView_GetView(env: PJNIEnv; _jscardview: JObject): jObject;
-procedure jsCardView_SetLParamWidth(env: PJNIEnv; _jscardview: JObject; _w: integer);
-procedure jsCardView_SetLParamHeight(env: PJNIEnv; _jscardview: JObject; _h: integer);
-function jsCardView_GetLParamWidth(env: PJNIEnv; _jscardview: JObject): integer;
-function jsCardView_GetLParamHeight(env: PJNIEnv; _jscardview: JObject): integer;
-procedure jsCardView_SetLGravity(env: PJNIEnv; _jscardview: JObject; _g: integer);
-procedure jsCardView_SetLWeight(env: PJNIEnv; _jscardview: JObject; _w: single);
-procedure jsCardView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jscardview: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-procedure jsCardView_AddLParamsAnchorRule(env: PJNIEnv; _jscardview: JObject; _rule: integer);
-procedure jsCardView_AddLParamsParentRule(env: PJNIEnv; _jscardview: JObject; _rule: integer);
-procedure jsCardView_SetLayoutAll(env: PJNIEnv; _jscardview: JObject; _idAnchor: integer);
-procedure jsCardView_ClearLayoutAll(env: PJNIEnv; _jscardview: JObject);
-procedure jsCardView_SetId(env: PJNIEnv; _jscardview: JObject; _id: integer);
-procedure jsCardView_SetCardElevation(env: PJNIEnv; _jscardview: JObject; _elevation: single);
-procedure jsCardView_SetCardBackgroundColor(env: PJNIEnv; _jscardview: JObject; _color: integer);
-procedure jsCardView_SetContentPadding(env: PJNIEnv; _jscardview: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer);
-procedure jsCardView_SetFitsSystemWindows(env: PJNIEnv; _jscardview: JObject; _value: boolean);
-procedure jsCardView_SetRadius(env: PJNIEnv; _jscardview: JObject; _radius: single);
 
 implementation
 
@@ -133,43 +111,36 @@ begin
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jsCardView_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
 
-   jsCardView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsCardView_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+   View_SetId(FjEnv, FjObject, Self.Id);
   end;
 
-  jsCardView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
-  begin
     if rToA in FPositionRelativeToAnchor then
-    begin
-      jsCardView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
-    end;
-  end;
+      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+
   for rToP := rpBottom to rpCenterVertical do
-  begin
     if rToP in FPositionRelativeToParent then
-    begin
-      jsCardView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
-    end;
-  end;
+      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsCardView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    
    if FColor <> colbrDefault then
-    jsCardView_SetCardBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    SetColor(FColor);
 
    View_SetVisible(FjEnv, FjObject, FVisible);
   end;
@@ -179,7 +150,7 @@ procedure jsCardView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-       jsCardView_SetCardBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+       jni_proc_i(FjEnv, FjObject, 'SetCardBackgroundColor', GetARGB(FCustomColor, FColor));
 end;
 
 procedure jsCardView.SetVisible(Value : Boolean);
@@ -223,49 +194,51 @@ procedure jsCardView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_jFree(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'jFree');
 end;
 
 procedure jsCardView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(FjEnv, FjObject, _viewgroup);
 end;
 
 function jsCardView.GetParent(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsCardView_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(FjEnv, FjObject);
 end;
 
 procedure jsCardView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(FjEnv, FjObject);
 end;
 
 function jsCardView.GetView(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsCardView_GetView(FjEnv, FjObject);
+   Result:= View_GetView(FjEnv, FjObject);
 end;
 
 procedure jsCardView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(FjEnv, FjObject, _w);
 end;
 
 procedure jsCardView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(FjEnv, FjObject, _h);
 end;
 
 function jsCardView.GetWidth(): integer;
@@ -276,7 +249,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jsCardView_getLParamWidth(FjEnv, FjObject );
+   Result:= View_getLParamWidth(FjEnv, FjObject );
 end;
 
 function jsCardView.GetHeight(): integer;
@@ -287,7 +260,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jsCardView_getLParamHeight(FjEnv, FjObject );
+   Result:= View_getLParamHeight(FjEnv, FjObject );
 end;
 
 procedure jsCardView.SetLGravity(_gravity: TLayoutGravity);
@@ -295,42 +268,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     jsCardView_SetLGravity(FjEnv, FjObject, Ord(_gravity));
+     View_SetLGravity(FjEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jsCardView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetLWeight(FjEnv, FjObject, _w);
+     View_SetLWeight(FjEnv, FjObject, _w);
 end;
 
 procedure jsCardView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsCardView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jsCardView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
 end;
 
 procedure jsCardView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
 end;
 
 procedure jsCardView.ClearLayout();
@@ -341,15 +314,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsCardView_clearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(FjEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsCardView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsCardView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -357,7 +330,7 @@ procedure jsCardView.SetCardElevation(_elevation: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetCardElevation(FjEnv, FjObject, _elevation);
+     jni_proc_f(FjEnv, FjObject, 'SetCardElevation', _elevation);
 end;
 
 
@@ -365,21 +338,21 @@ procedure jsCardView.SetContentPadding(_left: integer; _top: integer; _right: in
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetContentPadding(FjEnv, FjObject, _left ,_top ,_right ,_bottom);
+     jni_proc_iiii(FjEnv, FjObject, 'SetContentPadding', _left ,_top ,_right ,_bottom);
 end;
 
 procedure jsCardView.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jsCardView.SetRadius(_radius: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCardView_SetRadius(FjEnv, FjObject, _radius);
+     jni_proc_f(FjEnv, FjObject, 'SetRadius', _radius);
 end;
 
 {-------- jsCardView_JNI_Bridge ----------}
@@ -391,309 +364,14 @@ var
   jCls: jClass=nil;
 begin
   jParams[0].j:= _Self;
+
+  if (env = nil) or (this = nil) then exit;
   jCls:= Get_gjClass(env);
   jMethod:= env^.GetMethodID(env, jCls, 'jsCardView_jCreate', '(J)Ljava/lang/Object;');
+
   Result:= env^.CallObjectMethodA(env, this, jMethod, @jParams);
+
   Result:= env^.NewGlobalRef(env, Result);
-end;
-
-
-procedure jsCardView_jFree(env: PJNIEnv; _jscardview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'jFree', '()V');
-  env^.CallVoidMethod(env, _jscardview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetViewParent(env: PJNIEnv; _jscardview: JObject; _viewgroup: jObject);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].l:= _viewgroup;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetViewParent', '(Landroid/view/ViewGroup;)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsCardView_GetParent(env: PJNIEnv; _jscardview: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetParent', '()Landroid/view/ViewGroup;');
-  Result:= env^.CallObjectMethod(env, _jscardview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_RemoveFromViewParent(env: PJNIEnv; _jscardview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'RemoveFromViewParent', '()V');
-  env^.CallVoidMethod(env, _jscardview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsCardView_GetView(env: PJNIEnv; _jscardview: JObject): jObject;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetView', '()Landroid/view/View;');
-  Result:= env^.CallObjectMethod(env, _jscardview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetLParamWidth(env: PJNIEnv; _jscardview: JObject; _w: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _w;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamWidth', '(I)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetLParamHeight(env: PJNIEnv; _jscardview: JObject; _h: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLParamHeight', '(I)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsCardView_GetLParamWidth(env: PJNIEnv; _jscardview: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamWidth', '()I');
-  Result:= env^.CallIntMethod(env, _jscardview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-function jsCardView_GetLParamHeight(env: PJNIEnv; _jscardview: JObject): integer;
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'GetLParamHeight', '()I');
-  Result:= env^.CallIntMethod(env, _jscardview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetLGravity(env: PJNIEnv; _jscardview: JObject; _g: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _g;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLGravity', '(I)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetLWeight(env: PJNIEnv; _jscardview: JObject; _w: single);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _w;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLWeight', '(F)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetLeftTopRightBottomWidthHeight(env: PJNIEnv; _jscardview: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
-var
-  jParams: array[0..5] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jParams[4].i:= _w;
-  jParams[5].i:= _h;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLeftTopRightBottomWidthHeight', '(IIIIII)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_AddLParamsAnchorRule(env: PJNIEnv; _jscardview: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsAnchorRule', '(I)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_AddLParamsParentRule(env: PJNIEnv; _jscardview: JObject; _rule: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _rule;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'AddLParamsParentRule', '(I)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetLayoutAll(env: PJNIEnv; _jscardview: JObject; _idAnchor: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _idAnchor;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetLayoutAll', '(I)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_ClearLayoutAll(env: PJNIEnv; _jscardview: JObject);
-var
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'ClearLayoutAll', '()V');
-  env^.CallVoidMethod(env, _jscardview, jMethod);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetId(env: PJNIEnv; _jscardview: JObject; _id: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _id;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'setId', '(I)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetCardElevation(env: PJNIEnv; _jscardview: JObject; _elevation: single);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _elevation;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetCardElevation', '(F)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-
-procedure jsCardView_SetCardBackgroundColor(env: PJNIEnv; _jscardview: JObject; _color: integer);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _color;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetCardBackgroundColor', '(I)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsCardView_SetContentPadding(env: PJNIEnv; _jscardview: JObject; _left: integer; _top: integer; _right: integer; _bottom: integer);
-var
-  jParams: array[0..3] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].i:= _left;
-  jParams[1].i:= _top;
-  jParams[2].i:= _right;
-  jParams[3].i:= _bottom;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetContentPadding', '(IIII)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsCardView_SetFitsSystemWindows(env: PJNIEnv; _jscardview: JObject; _value: boolean);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].z:= JBool(_value);
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetFitsSystemWindows', '(Z)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
-end;
-
-procedure jsCardView_SetRadius(env: PJNIEnv; _jscardview: JObject; _radius: single);
-var
-  jParams: array[0..0] of jValue;
-  jMethod: jMethodID=nil;
-  jCls: jClass=nil;
-begin
-  jParams[0].f:= _radius;
-  jCls:= env^.GetObjectClass(env, _jscardview);
-  jMethod:= env^.GetMethodID(env, jCls, 'SetRadius', '(F)V');
-  env^.CallVoidMethodA(env, _jscardview, jMethod, @jParams);
-  env^.DeleteLocalRef(env, jCls);
 end;
 
 end.
