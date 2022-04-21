@@ -71,7 +71,7 @@ begin
   for i:=0 to jMenu1.Options.Count-1 do
   begin
     showmessage(intTostr(i));
-    jMenu1.AddItem(jObjMenu, 10+i {itemID}, jMenu1.Options.Strings[i], jMenu1.IconIdentifiers.Strings[i] ,  mitDefault, misAlways);
+    jMenu1.AddItem(jObjMenu, 10+i {itemID}, jMenu1.Options.Strings[i], jMenu1.IconIdentifiers.Strings[i] , mitDefault, misNever {or misAlways});
   end;
 end;
 

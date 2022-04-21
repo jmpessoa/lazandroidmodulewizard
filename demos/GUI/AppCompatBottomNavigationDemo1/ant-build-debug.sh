@@ -1,4 +1,4 @@
-export PATH=/adt32/ant/bin:$PATH
-export JAVA_HOME=/Program Files/Java/jdk1.8.0_151
-cd /android/workspace/AppCompatBottomNavigationDemo1
+export PATH=/laztoapk/downloads/apache-ant-1.10.3/bin:$PATH
+export JAVA_HOME=/Program Files/Java/jdk1.8.0_221
+cd /Temp/AppCompatBottomNavigationDemo1/
 ant -Dtouchtest.enabled=true debug
