@@ -15,18 +15,17 @@
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
-    <CustomData Count="11">
+    <CustomData Count="10">
       <Item0 Name="BuildSystem" Value="Gradle"/>
       <Item1 Name="LAMW" Value="GUI"/>
       <Item2 Name="LamwVersion" Value="0.8.6.1"/>
-      <Item3 Name="MinSdk" Value="18"/>
-      <Item4 Name="NdkApi" Value="android-22"/>
-      <Item5 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r22\"/>
-      <Item6 Name="Package" Value="org.lamw.appcompatbottomnavigationdemo1"/>
-      <Item7 Name="SdkPath" Value="C:\Users\sotrafa\AppData\Local\Android\Sdk\"/>
-      <Item8 Name="StartModule" Value="AndroidModule1"/>
-      <Item9 Name="Support" Value="TRUE"/>
-      <Item10 Name="Theme" Value="AppCompat.Light.DarkActionBar"/>
+      <Item3 Name="NdkApi" Value="android-22"/>
+      <Item4 Name="NdkPath" Value="C:\android\ndkr18b\"/>
+      <Item5 Name="Package" Value="org.lamw.appcompatbottomnavigationdemo1"/>
+      <Item6 Name="SdkPath" Value="C:\android\sdk\"/>
+      <Item7 Name="StartModule" Value="AndroidModule1"/>
+      <Item8 Name="Support" Value="TRUE"/>
+      <Item9 Name="Theme" Value="AppCompat.Light.DarkActionBar"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -88,12 +87,12 @@
       <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r22\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\arm-linux-androideabi\22\;C:\laztoapk\downloads\android-ndk-r22\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
+      <Libraries Value="C:\android\ndkr18b\platforms\android-22\arch-arm\usr\lib\;C:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>
-        <SyntaxMode Value="Delphi"/>
+        <SyntaxMode Value="delphi"/>
         <CStyleMacros Value="True"/>
       </SyntaxOptions>
     </Parsing>
@@ -117,7 +116,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r22\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

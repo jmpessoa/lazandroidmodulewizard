@@ -13,11 +13,6 @@ import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
 
 public class jPanel extends RelativeLayout {
@@ -38,7 +33,7 @@ public class jPanel extends RelativeLayout {
 
 	private int animationDurationIn = 1500;
 	private int animationDurationOut = 1500;
-	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
+	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft, TopToBottom, BottomToTop, MoveCustom
 
 	//Constructor
 	public  jPanel(android.content.Context context, Controls ctrls,long pasobj ) {
@@ -257,8 +252,9 @@ public class jPanel extends RelativeLayout {
 		        int color = Color.TRANSPARENT;
 		        Drawable background = this.getBackground();        
 		        if (background instanceof ColorDrawable) {
-		          color = ((ColorDrawable)this.getBackground()).getColor();
-			        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
+		            color = ((ColorDrawable)this.getBackground()).getColor();
+			        shape.setColorFilter(color, Mode.SRC_ATOP);
+			        shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 			        //[ifdef_api16up]
 			  	    if(Build.VERSION.SDK_INT >= 16) 
 			             this.setBackground((Drawable)shape);
@@ -321,25 +317,40 @@ public class jPanel extends RelativeLayout {
 		//fadeOutAnimation(layout, 2000);
 		//fadeInAnimation(layout, 2000);
 
-		if ( (animationDurationIn > 0)  && (animationMode != 0) ) {
-			switch (animationMode) {
-				case 1: {
-					fadeInAnimation(this, animationDurationIn);
-					break;
-				}
-				case 2: {  //RightToLeft
-					slidefromRightToLeft(this, animationDurationIn);
-					break;
-				}
-				case 3: {  //RightToLeft
-					slidefromLeftToRight3(this, animationDurationIn);
-					break;
-				}
-			}
-		}
+		if ( (animationDurationIn > 0)  && (animationMode != 0) )
+			Animate( true, 0, 0);		
 
 		if (animationMode == 0)
 		   this.setVisibility(android.view.View.VISIBLE);
+	}
+	
+	// by ADiV
+	public void Animate( boolean animateIn, int _xFromTo, int _yFromTo ){
+			    if ( animationMode == 0 ) return;
+			    
+			    if( animateIn && (animationDurationIn > 0) )
+			    	switch (animationMode) {
+			    	 case 1: controls.fadeInAnimation(this, animationDurationIn); break; // Fade
+			    	 case 2: controls.slidefromRightToLeftIn(this, animationDurationIn); break; //RightToLeft
+			    	 case 3: controls.slidefromLeftToRightIn(this, animationDurationIn); break; //LeftToRight
+			    	 case 4: controls.slidefromTopToBottomIn(this, animationDurationIn); break; //TopToBottom
+			    	 case 5: controls.slidefromBottomToTopIn(this, animationDurationIn); break; //BottomToTop
+			    	 case 6: controls.slidefromMoveCustomIn(this, animationDurationIn, _xFromTo, _yFromTo); break; //MoveCustom
+			    	}
+			    
+			    if( !animateIn && (animationDurationOut > 0) )
+			    	switch (animationMode) {
+			    	 case 1: controls.fadeOutAnimation(this, animationDurationOut); break; // Fade
+			    	 case 2: controls.slidefromRightToLeftOut(this, animationDurationOut); break; //RightToLeft
+			    	 case 3: controls.slidefromLeftToRightOut(this, animationDurationOut); break; //LeftToRight
+			    	 case 4: controls.slidefromTopToBottomOut(this, animationDurationOut); break; //TopToBottom
+			    	 case 5: controls.slidefromBottomToTopOut(this, animationDurationOut); break; //BottomToTop
+			    	 case 6: controls.slidefromMoveCustomOut(this, animationDurationOut, _xFromTo, _yFromTo); break; //MoveCustom
+			    	}			
+	}
+	
+	public void AnimateRotate( int _angleFrom, int _angleTo ){
+		controls.animateRotate( this, animationDurationIn, _angleFrom, _angleTo );		
 	}
 	
 	public void SetVisibilityGone() {
@@ -358,116 +369,6 @@ public class jPanel extends RelativeLayout {
 	public void SetAnimationMode(int _animationMode) {
 		animationMode = _animationMode;
 	}
-
-	/// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
-	private void fadeInAnimation(final View view, int duration) {
-		Animation fadeIn = new AlphaAnimation(0, 1);
-		fadeIn.setInterpolator(new DecelerateInterpolator());
-		fadeIn.setDuration(duration);
-		fadeIn.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-			}
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				view.setVisibility(View.VISIBLE);
-			}
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-			}
-		});
-
-		view.startAnimation(fadeIn);
-	}
-
-	private void fadeOutAnimation(final View view, int duration) {
-		Animation fadeOut = new AlphaAnimation(1, 0);
-		fadeOut.setInterpolator(new AccelerateInterpolator());
-		fadeOut.setStartOffset(duration);
-		fadeOut.setDuration(duration);
-		fadeOut.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-			}
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				view.setVisibility(View.INVISIBLE);
-			}
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-			}
-		});
-		view.startAnimation(fadeOut);
-	}
-
-	//https://stackoverflow.com/questions/20696801/how-to-make-a-right-to-left-animation-in-a-layout/20696822
-	private void slidefromRightToLeft(View view, long duration) {
-		TranslateAnimation animate;
-		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(controls.appLayout.getWidth(),
-					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
-		} else {
-			animate = new TranslateAnimation(view.getWidth(),0, 0, 0); // View for animation
-		}
-		animate.setDuration(duration);
-		animate.setFillAfter(true);
-		view.startAnimation(animate);
-		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-	}
-
-	private void slidefromLeftToRight(View view, long duration) {  //try
-
-		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(0,
-					controls.appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
-		} else {
-			animate = new TranslateAnimation(0,view.getWidth(), 0, 0); // View for animation
-		}
-
-		animate.setDuration(duration);
-		animate.setFillAfter(true);
-		view.startAnimation(animate);
-		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-	}
-
-
-	private void slidefromRightToLeft3(View view, long duration) {
-		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(0, -controls.appLayout.getWidth(),
-					0, 0); //(xFrom,xTo, yFrom,yTo)
-		} else {
-			animate = new TranslateAnimation(0,-controls.appLayout.getWidth(),
-					0, 0); // View for animation
-		}
-
-		animate.setDuration(duration);
-		animate.setFillAfter(true);
-		view.startAnimation(animate);
-		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-	}
-
-	private void slidefromLeftToRight3(View view, long duration) {  //try
-
-		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-		if (view.getHeight() == 0) {
-			//controls.appLayout.getHeight(); // parent layout
-			animate = new TranslateAnimation(-controls.appLayout.getWidth(),
-					0, 0, 0); //(xFrom,xTo, yFrom,yTo)
-		} else {
-			animate = new TranslateAnimation(-controls.appLayout.getWidth(),0, 0, 0); // View for animation
-		}
-
-		animate.setDuration(duration);
-		animate.setFillAfter(true);
-		view.startAnimation(animate);
-		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-	}
-
 }
 
 

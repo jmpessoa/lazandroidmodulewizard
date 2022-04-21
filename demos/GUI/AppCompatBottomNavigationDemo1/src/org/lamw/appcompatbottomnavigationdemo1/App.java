@@ -121,7 +121,7 @@ public class App extends AppCompatActivity {
       	case 2  : this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  break;
       	default : ; // Device Default , Rotation by Device
       }
-
+      
       this.setContentView(controls.appLayout);
       
       this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
@@ -190,26 +190,30 @@ public class App extends AppCompatActivity {
 
     // http://stackoverflow.com/questions/15686555/display-back-button-on-action-bar
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {  // don't work for androidx???
+    public boolean onOptionsItemSelected(MenuItem item) {
 	 switch (item.getItemId()) {
-
         case android.R.id.home:
-            controls.jAppOnBackPressed(); return true; // app icon in action bar clicked; go home
-
-         default:
+            // app icon in action bar clicked; go home
+	    controls.jAppOnBackPressed();
+            return true;
+        default:
 		String caption = item.getTitle().toString();
 		controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption, item.isChecked());
 		return true; //renabor
      }
    }
 
-   @Override
+   //by jmpessoa: context menu support -  Context menu items do not support icons!
+   @Override    
    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
       super.onCreateContextMenu(menu, v, menuInfo);
-      controls.jAppOnCreateContextMenu(menu);
+      //Log.i("App.Java_onCreateContextMenu", "long_pressed!");
+      
+      controls.jAppOnCreateContextMenu(menu);              
    }
 
-   @Override
+   /*by jmpessoa: Handles menu item selections*/
+   @Override    
    public boolean onContextItemSelected(MenuItem item) {
 	   
    	  String caption = item.getTitle().toString();
@@ -217,28 +221,15 @@ public class App extends AppCompatActivity {
       return true; // stop propagating event
    }
 
+   //by jmpessoa: option menu support
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
+	    
 	    controls.jAppOnCreateOptionsMenu(menu);
-	    if (menu != null) {  //NEW!! added androidx support !!!!
-            for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item != null) {
-                item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        String caption = item.getTitle().toString();
-                        controls.jAppOnClickOptionMenuItem(item, item.getItemId(), caption, item.isChecked());
-                        return true;
-                    }
-                });
-            }
-        }
-
-        }
         return true;
    }   
-
+   
+   /*by jmpessoa: TODO :Handles prepare menu item*/
    @Override
    public boolean onPrepareOptionsMenu(Menu menu) {
 	           
@@ -257,7 +248,8 @@ public class App extends AppCompatActivity {
        return super.onPrepareOptionsMenu(menu);
    }
    
-   @Override
+   /*by jmpessoa: TODO :Handles opened menu */
+   @Override     
    public boolean onMenuOpened(int featureId, Menu menu) {
 	   //TODO!!!!
      return super.onMenuOpened(featureId, menu);

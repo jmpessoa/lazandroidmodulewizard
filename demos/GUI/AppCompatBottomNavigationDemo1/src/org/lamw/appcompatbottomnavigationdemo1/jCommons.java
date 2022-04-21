@@ -127,9 +127,16 @@ public class jCommons {
 		if ( (parent != null) && (aOwnerView != null) ) { parent.removeView(aOwnerView); }
 		parent = _viewgroup;
 		if ( (parent != null) && (aOwnerView != null) ) {
-			parent.addView(aOwnerView, newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
+			
+			if (parent instanceof LinearLayout) { 
+				parent.addView(aOwnerView, 0, newLayoutParams(parent, (ViewGroup.MarginLayoutParams) lparams));
+			}
+			else {
+				parent.addView(aOwnerView, newLayoutParams(parent, (ViewGroup.MarginLayoutParams) lparams));
+			}
+
 			lparams = (ViewGroup.MarginLayoutParams)aOwnerView.getLayoutParams();
-            aOwnerView.setVisibility(android.view.View.VISIBLE);
+                        aOwnerView.setVisibility(android.view.View.VISIBLE);
 		}
 		mRemovedFromParent = false;
 	}
@@ -699,10 +706,11 @@ public class jCommons {
 	public static void StatusSetColor(Controls controls, int color){
 		if (controls.activity instanceof AppCompatActivity)
         {	
-			if (Build.VERSION.SDK_INT >= 21)				
-				((AppCompatActivity) controls.activity).getWindow().setStatusBarColor(color);										    
+			if (Build.VERSION.SDK_INT >= 21){
+				((AppCompatActivity) controls.activity).getWindow().setStatusBarColor(color);
+			}
         }	
-	}		
+	}
 
 	public static void ActionBarSetTabNavigationMode(Controls controls) {
       //not AppCompat ..
