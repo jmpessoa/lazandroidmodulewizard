@@ -12,13 +12,13 @@ import androidx.cardview.widget.CardView;
  
 public class jsCardView extends CardView /*dummy*/ { //please, fix what GUI object will be extended!
 
-   private long pascalObj = 0;        // Pascal Object
-   private Controls controls  = null; //Java/Pascal [events] Interface ...
-   private jCommons LAMWCommon;
-   private Context context = null;
+   private long pascalObj      = 0;        // Pascal Object
+   private Controls controls   = null; //Java/Pascal [events] Interface ...
+   private Context context     = null;
+   private jCommons LAMWCommon = null;   
 
-   private OnClickListener onClickListener;   // click event
-   private Boolean enabled  = true;           // click-touch enabled!
+   //private OnClickListener onClickListener = null; // click event
+   //private Boolean enabled                 = true; // click-touch enabled!
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    public jsCardView(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
@@ -32,21 +32,21 @@ public class jsCardView extends CardView /*dummy*/ { //please, fix what GUI obje
 
       this.setUseCompatPadding(true);
       this.setContentPadding(10, 10, 10, 10);
-      this.setCardElevation(20);
+      this.setCardElevation(20);      
       
-      onClickListener = new OnClickListener(){
-      /*.*/public void onClick(View view){     // *.* is a mask to future parse...;
+      /*onClickListener = new OnClickListener(){
+       public void onClick(View view){     // *.* is a mask to future parse...;
               if (enabled) {
                 // controls.pOnClickGeneric(pascalObj); //JNI event onClick!
               }
            };
       };
-      setOnClickListener(onClickListener);
+      setOnClickListener(onClickListener);*/
    } //end constructor
 
    public void jFree() {
-      //free local objects...
-  	 setOnClickListener(null);
+     //free local objects...
+  	 //setOnClickListener(null);
 	 LAMWCommon.free();
    }
    
@@ -146,7 +146,7 @@ cardView.setUseCompatPadding(...);
 		LAMWCommon.setFitsSystemWindows(_value);
    }
      
-   public void	SetRadius(float _radius) {
+   public void SetRadius(float _radius) {
        this.setRadius(_radius);
    }
    

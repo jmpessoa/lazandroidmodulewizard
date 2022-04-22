@@ -1672,7 +1672,7 @@ public class jListView extends ListView {
 		typeFace = Typeface.DEFAULT;
 		
 		setBackgroundColor(0x00000000);
-		setCacheColorHint(0);		
+		setCacheColorHint(0);
 
 		alist = new ArrayList<jListItemRow>();
 		orig_alist = new ArrayList<jListItemRow>();
@@ -1797,6 +1797,10 @@ public class jListView extends ListView {
 	// by ADiV
 	public void SetFastScrollEnabled(boolean _enable){
 		this.setFastScrollEnabled(_enable); 
+	}
+	
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource( controls.GetDrawableResourceId(_imgResIdentifier) );			
 	}
 
 	//thanks to @renabor

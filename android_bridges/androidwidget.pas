@@ -3646,7 +3646,7 @@ begin
   end;
 
   jForm(Form).FormState := fsFormClose;
-  jForm(Form).FVisible:= False;
+  jForm(Form).FVisible  := False;
 
   if jForm(Form).ActivityMode <> actMain then //actSplash or actRecycable
   begin
