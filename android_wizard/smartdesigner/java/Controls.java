@@ -1288,7 +1288,7 @@ public  int Image_getWH (String filename ) {
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
 		//animate = new TranslateAnimation(0,-appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
-		animate = new TranslateAnimation(0,-view.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0,view.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
 		
 		if(animate == null) return;
 		
@@ -1303,7 +1303,7 @@ public  int Image_getWH (String filename ) {
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
 		//animate = new TranslateAnimation(0, appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
-		animate = new TranslateAnimation(0, appLayout.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0, -appLayout.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
 		
 		if(animate == null) return;
 
@@ -1332,7 +1332,7 @@ public  int Image_getWH (String filename ) {
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
-		animate = new TranslateAnimation(0, 0, 0, appLayout.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
 		
 		if(animate == null) return;
 
@@ -1362,7 +1362,7 @@ public  int Image_getWH (String filename ) {
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
 		//animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)
-		animate = new TranslateAnimation(0,	0, 0, -view.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0,	0, 0, view.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
 		
 		if(animate == null) return;
 

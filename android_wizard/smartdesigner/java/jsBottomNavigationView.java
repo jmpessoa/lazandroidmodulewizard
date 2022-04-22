@@ -8,10 +8,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomnavigation.LabelVisibilityMode;
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/13/2018 22:10:54]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -43,6 +44,8 @@ public class jsBottomNavigationView extends BottomNavigationView /*dummy*/ { //p
       controls  = _ctrls;
 
       LAMWCommon = new jCommons(this,context,pascalObj);
+      
+      this.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_LABELED);
       
       this.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
           @Override

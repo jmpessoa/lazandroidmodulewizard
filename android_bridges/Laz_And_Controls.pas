@@ -1817,6 +1817,7 @@ type
 
     procedure DisableScroll(_disable : boolean); // by ADiV
     procedure SetFastScrollEnabled(_enable : boolean); // by ADiV
+    procedure SetBackgroundByResIdentifier(_imgResIdentifier: string);
     procedure DispatchOnDrawItemTextCustomFont(_value: boolean);
 
     //Property
@@ -9904,6 +9905,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemWidgetImage', _value);
+end;
+
+procedure jListView.SetBackgroundByResIdentifier(_imgResIdentifier: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_t(FjEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
 end;
 
 function jListView.SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
