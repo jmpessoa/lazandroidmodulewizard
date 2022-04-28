@@ -263,6 +263,36 @@ public class jPanel extends RelativeLayout {
 	    }
 	 }
 	
+	//https://www.tabnine.com/code/java/methods/android.graphics.drawable.GradientDrawable/setCornerRadii
+	
+	public void SetRoundCorners( float _TopLeftRadius, float _TopRightRadius, float _BottomRightRadius, float _BottomLeftRadius ) {
+		   if (this != null) {  		
+			        PaintDrawable  shape =  new PaintDrawable();
+			        
+			        shape.setCornerRadii(
+			        		new float[]
+			        	            {
+			        				 _TopLeftRadius, _TopLeftRadius,
+			        				 _TopRightRadius, _TopRightRadius,
+			        				 _BottomRightRadius, _BottomRightRadius,
+			        				 _BottomLeftRadius, _BottomLeftRadius
+			        	            }
+			        		);
+			        
+			        int color = Color.TRANSPARENT;
+			        Drawable background = this.getBackground();        
+			        if (background instanceof ColorDrawable) {
+			            color = ((ColorDrawable)this.getBackground()).getColor();
+				        shape.setColorFilter(color, Mode.SRC_ATOP);
+				        shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
+				        //[ifdef_api16up]
+				  	    if(Build.VERSION.SDK_INT >= 16) 
+				             this.setBackground((Drawable)shape);
+				        //[endif_api16up]		          
+			        }                		  	  
+		    }
+    }
+	
 	public void SetRadiusRoundCorner(int _radius) {
 		mRadius =  _radius;
 	}

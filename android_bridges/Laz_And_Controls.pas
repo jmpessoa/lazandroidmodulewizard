@@ -210,6 +210,7 @@ type
      procedure MatchParent();
      procedure WrapContent();
      procedure SetRoundCorner();
+     procedure SetRoundCorners( _TopLeftRadius, _TopRightRadius, _BottomRightRadius, _BottomLeftRadius : single );
      procedure SetRadiusRoundCorner(_radius: integer);
      procedure SetBackgroundAlpha(_alpha: integer); //You can basically set it from anything between 0(fully transparent) to 255 (completely opaque)
      procedure SetMarginLeftTopRightBottom(_left,_top,_right,_bottom: integer);
@@ -2883,9 +2884,9 @@ begin
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
 
-  if gApp.TopIndex < 0 then Exit;
-
   Result := rotate;
+
+  if gApp.TopIndex < 0 then Exit;
 
   Form := jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
@@ -2985,6 +2986,8 @@ var
   Form: jForm;
   prepareItems: boolean;
 begin
+  result := 0;
+
   prepareItems:= False;
 
   gApp.Jni.jEnv:= env;
@@ -3007,6 +3010,8 @@ var
   Form: jForm;
   prepareMoreItems: boolean;
 begin
+  result := 0;
+
   prepareMoreItems:= True;
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -3027,6 +3032,8 @@ var
   pasStr: string;
   _jBoolean:  JBoolean;
 begin
+  result := 0;
+
   mute:= False;
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
@@ -3608,6 +3615,8 @@ var
   _jBoolean: JBoolean;
   outColor: dword;
 begin
+  result := 0;
+
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
@@ -3631,6 +3640,8 @@ function Java_Event_pOnListViewDrawItemCustomFont(env:PJNIEnv;this:JObject;Sende
 var
   outReturnCustomFontname: string;
 begin
+  result := nil;
+
   gApp.Jni.jEnv:= env;
   gApp.Jni.jThis:= this;
   outReturnCustomFontname:= '';
@@ -3648,6 +3659,8 @@ var
   _jBoolean: JBoolean;
   outColor: dword;
 begin
+  result := 0;
+
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
@@ -3673,6 +3686,8 @@ var
   _jBoolean: JBoolean;
   outText: string;
 begin
+  result := nil;
+
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
@@ -3697,6 +3712,8 @@ function  Java_Event_pOnListViewDrawItemBackgroundColor(env: PJNIEnv; this: jobj
 var
   outColor: dword;
 begin
+  result := 0;
+
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
@@ -3716,6 +3733,8 @@ var
   _jBoolean: JBoolean;
   outBitmap: JObject;
 begin
+  result := nil;
+
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
@@ -3741,6 +3760,8 @@ var
   _jBoolean: JBoolean;
   outBitmap: JObject;
 begin
+  result := nil;
+
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
@@ -4022,6 +4043,7 @@ var
   pasCanNavi : Boolean;
   _jBoolean  : jBoolean;
 begin
+  result := 0;
 
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
@@ -4079,6 +4101,8 @@ function Java_Event_pOnWebViewReceivedSslError(env:PJNIEnv;this:JObject;Sender:T
 var
   outReturn: boolean;
 begin
+  result := 0;
+
   gApp.Jni.jEnv:= env;
   //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis := this;
@@ -4120,6 +4144,8 @@ function Java_Event_pOnAsyncEventDoInBackground(env: PJNIEnv; this: jobject; Obj
 var
   doing: boolean;
 begin
+  result := 0;
+
   doing:= True;  //doing!
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
@@ -4140,6 +4166,8 @@ function Java_Event_pOnAsyncEventProgressUpdate(env: PJNIEnv; this: jobject; Obj
 var
   progressUpdate: integer;
 begin
+  result := 0;
+
   progressUpdate:= Progress + 1;
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
@@ -4160,6 +4188,8 @@ function Java_Event_pOnAsyncEventPreExecute(env: PJNIEnv; this: jobject; Obj: TO
 var
   startProgress: integer;
 begin
+  result := 0;
+
   startProgress:= 0;
   gApp.Jni.jEnv:= env;
   //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
@@ -5838,6 +5868,7 @@ end;
 
 function jEditText.GetTextLength(): int64;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_j(FjEnv, FjObject, 'GetTextLength');
@@ -5845,6 +5876,7 @@ end;
 
 function jEditText.IsEmpty(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'IsEmpty');
@@ -7216,6 +7248,7 @@ end;
 
 function jImageView.GetView(): jObject;
 begin
+ result := nil;
  if FInitialized then
    Result:= View_GetView(FjEnv, FjObject);
 end;
@@ -7271,6 +7304,7 @@ end;
 
 function jImageView.SaveToJPG(filePath: string; cuality: integer; angle: integer): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tii_out_z(FjEnv, FjObject, 'SaveToJPG', filePath ,cuality ,angle);
@@ -7278,6 +7312,7 @@ end;
 
 function jImageView.SaveToPNG(filePath: string; cuality: integer; angle: integer): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tii_out_z(FjEnv, FjObject, 'SaveToPNG', filePath ,cuality ,angle);
@@ -7300,6 +7335,8 @@ end;
 
 function jImageView.GetCount: integer;
 begin
+  result := 0;
+
   if FjObject = nil then exit;
 
   if FImageList = nil then Exit;
@@ -7533,16 +7570,12 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageView_GetBitmapImage(FjEnv, FjObject);
+   Result:= jni_func_out_bmp(FjEnv, FjObject, 'GetBitmapImage');
 end;
 
 function jImageView.GetImage(): jObject;
 begin
-  Result := nil;
-
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jImageView_GetBitmapImage(FjEnv, FjObject);
+  Result:= GetBitmapImage();
 end;
 
 function jImageView.GetBitmapImage(_x, _y, _width, _height: integer): jObject;
@@ -7558,7 +7591,7 @@ procedure jImageView.SetImageFromURI(_uri: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetImageFromURI(FjEnv, FjObject, _uri);
+     jni_proc_uri(FjEnv, FjObject, 'SetImageFromURI', _uri);
 end;
 
 procedure jImageView.SetImageFromIntentResult(_intentData: jObject);
@@ -7655,6 +7688,7 @@ end;
 
 function jImageView.GetJByteBuffer(_width: integer; _height: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jImageView_GetByteBuffer(FjEnv, FjObject, _width ,_height);
@@ -7662,6 +7696,7 @@ end;
 
 function jImageView.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jImageView_GetBitmapFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
@@ -7669,6 +7704,7 @@ end;
 
 function jImageView.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
 begin
+  result := nil;
   if FInitialized then
    Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
 end;
@@ -8060,7 +8096,7 @@ begin
   Result := '';
   if not FInitialized then Exit;
 
-  jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
+  jni_proc_t(FjEnv, FjObject, 'SetCharSet', FCharSet);
   Result := jni_func_t_out_t(FjEnv, FjObject, 'Get', _stringUrl);
 end;
 
@@ -8088,7 +8124,7 @@ begin
   Result := '';
   if not FInitialized then Exit;
 
-  jHttpClient_SetCharSet(FjEnv, FjObject, FCharSet);
+  jni_proc_t(FjEnv, FjObject, 'AddCreateTableQuery', FCharSet);
   Result := jni_func_t_out_t(FjEnv, FjObject, 'Post', _stringUrl); //fixed! thanks to JKennes
 end;
 
@@ -8103,7 +8139,7 @@ procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string; _name: string; 
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jHttpClient_PostNameValueDataAsync(FjEnv, FjObject, _stringUrl ,_name ,_value);
+    jni_proc_ttt(FjEnv, FjObject, 'PostNameValueDataAsync', _stringUrl ,_name ,_value);
 end;
 
 procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string; _listNameValue: string);
@@ -8115,6 +8151,7 @@ end;
 
 function jHttpClient.GetCookiesCount(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetCookiesCount');
@@ -8122,6 +8159,7 @@ end;
 
 function jHttpClient.GetCookieByIndex(_index: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetCookieByIndex(FjEnv, FjObject, _index);
@@ -8129,6 +8167,7 @@ end;
 
 function jHttpClient.GetCookieAttributeValue(_cookie: jObject; _fieldName: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetCookieAttributeValue(FjEnv, FjObject, _cookie ,_fieldName);
@@ -8150,6 +8189,7 @@ end;
 
 function jHttpClient.AddCookie(_name: string; _value: string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_AddCookie(FjEnv, FjObject, _name ,_value);
@@ -8157,6 +8197,7 @@ end;
 
 function jHttpClient.IsExpired(_cookie: jObject): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_IsExpired(FjEnv, FjObject, _cookie);
@@ -8164,6 +8205,7 @@ end;
 
 function jHttpClient.GetStateful(_url: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStateful', _url);
@@ -8171,6 +8213,7 @@ end;
 
 function jHttpClient.PostStateful(_url: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'PostStateful', _url);
@@ -8179,6 +8222,7 @@ end;
 
 function jHttpClient.IsCookiePersistent(_cookie: jObject): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_IsCookiePersistent(FjEnv, FjObject, _cookie);
@@ -8193,6 +8237,7 @@ end;
 
 function jHttpClient.GetCookieByName(_cookieName: string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetCookieByName(FjEnv, FjObject, _cookieName);
@@ -8207,6 +8252,7 @@ end;
 
 function jHttpClient.GetCookieValue(_cookie: jObject): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetCookieValue(FjEnv, FjObject, _cookie);
@@ -8214,6 +8260,7 @@ end;
 
 function jHttpClient.GetCookieName(_cookie: jObject): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetCookieName(FjEnv, FjObject, _cookie);
@@ -8221,6 +8268,7 @@ end;
 
 function jHttpClient.GetCookies(_nameValueSeparator: string): TDynArrayOfString;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetCookies(FjEnv, FjObject, _nameValueSeparator);
@@ -8242,6 +8290,7 @@ end;
 
 function jHttpClient.DeleteStateful(_url: string; _value:string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tt_out_t(FjEnv, FjObject, 'DeleteStateful', _url, _value);
@@ -8269,6 +8318,7 @@ end;
 
 function jHttpClient.UrlExist(_urlString: string): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_z(FjEnv, FjObject, 'UrlExist', _urlString);
@@ -8276,6 +8326,7 @@ end;
 
 function jHttpClient.GetCookies(_urlString: string; _nameValueSeparator: string): TDynArrayOfString;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetCookies(FjEnv, FjObject, _urlString ,_nameValueSeparator);
@@ -8283,6 +8334,7 @@ end;
 
 function jHttpClient.AddCookie(_urlString: string; _name: string; _value: string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_AddCookie(FjEnv, FjObject, _urlString ,_name ,_value);
@@ -8293,6 +8345,7 @@ end;
 
 function jHttpClient.OpenConnection(_urlString: string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_OpenConnection(FjEnv, FjObject, _urlString);
@@ -8300,6 +8353,7 @@ end;
 
 function jHttpClient.SetRequestProperty(_httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_SetRequestProperty(FjEnv, FjObject, _httpConnection ,_headerName, _headerValue);
@@ -8316,6 +8370,7 @@ end;
 
 function jHttpClient.GetHeaderField(_httpConnection: jObject; _headerName: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetHeaderField(FjEnv, FjObject, _httpConnection ,_headerName);
@@ -8323,6 +8378,7 @@ end;
 
 function jHttpClient.GetHeaderFields(_httpConnection: jObject): TDynArrayOfString;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetHeaderFields(FjEnv, FjObject, _httpConnection);
@@ -8338,6 +8394,7 @@ end;
 
 function jHttpClient.Get(_httpConnection: jObject): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_Get(FjEnv, FjObject, _httpConnection);
@@ -8345,6 +8402,7 @@ end;
 
 function jHttpClient.AddRequestProperty(_httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_AddRequestProperty(FjEnv, FjObject, _httpConnection ,_headerName ,_headerValue);
@@ -8352,6 +8410,7 @@ end;
 
 function jHttpClient.Post(_httpConnection: jObject): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_Post(FjEnv, FjObject, _httpConnection);
@@ -8360,6 +8419,7 @@ end;
 
 function jHttpClient.GetResponseCode(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetResponseCode');
@@ -8367,6 +8427,7 @@ end;
 
 function jHttpClient.GetDefaultConnection(): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jHttpClient_GetDefaultConnection(FjEnv, FjObject);
@@ -8392,6 +8453,7 @@ end;
 
 function jHttpClient.GetResponseTimeout(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   Result:= FResponseTimeout;
   if FInitialized then
@@ -8400,6 +8462,7 @@ end;
 
 function jHttpClient.GetConnectionTimeout(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   Result:= FConnectionTimeout;
   if FInitialized then
@@ -8636,6 +8699,8 @@ end;
 
 function jSMS.Send(multipartMessage: Boolean): integer;
 begin
+  result := 0;
+
   if FSMSMessage = nil then exit;
 
   if FInitialized then
@@ -8652,6 +8717,8 @@ end;
 
 function jSMS.Send(toName: string; multipartMessage: Boolean): integer;
 begin
+  result := 0;
+
   if FSMSMessage = nil then exit;
 
   if FInitialized then
@@ -8668,6 +8735,8 @@ end;
 
 function jSMS.Send(toNumber: string;  msg: string; multipartMessage: Boolean): integer;
 begin
+ result := 0;
+
  if FInitialized then
  begin
     if toNumber <> '' then
@@ -8680,6 +8749,8 @@ end;
 
 function jSMS.Send(toNumber: string;  msg: string; packageDeliveredAction: string; multipartMessage: Boolean): integer;
 begin
+ result := 0;
+
  if FInitialized then
  begin
     if toNumber <> '' then
@@ -8693,6 +8764,7 @@ end;
 
 function jSMS.Read(intentReceiver: jObject; addressBodyDelimiter: string): string;
 begin
+result := '';
 if FInitialized then
    Result:= jRead_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,intentReceiver, addressBodyDelimiter);  //message
 end;
@@ -9100,6 +9172,7 @@ end;
 
 function jListView.IsItemChecked(index: integer): boolean;
 begin
+  result := false;
   if FInitialized then
     Result:= jni_func_i_out_z(FjEnv, FjObject, 'isItemChecked', index);
 end;
@@ -9169,6 +9242,7 @@ end;
 // by ADiV
 function jListView.GetFontSizeByIndex(index: Integer): integer;
 begin
+  result := 0;
   if FInitialized then
     Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetFontSizeByIndex', index);
 end;
@@ -9228,6 +9302,7 @@ end;
 
 function jListView.GetItemText(index: Integer): string;
 begin
+  result := '';
   if FInitialized then
     Result:= jni_func_i_out_t(FjEnv, FjObject, 'getItemText', index);
 end;
@@ -9536,6 +9611,7 @@ end;
 
 function jListView.GetItemIndex(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetItemIndex');
@@ -9543,6 +9619,7 @@ end;
 
 function jListView.GetItemCaption(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetItemCaption');
@@ -9597,6 +9674,7 @@ end;
 
 function jListView.GetWidgetText(_index: integer): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetWidgetText', _index);
@@ -9628,6 +9706,7 @@ end;
 
 function jListView.GetItemTagString(_index: integer): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_t(FjEnv, FjObject, 'getItemTagString', _index);
@@ -9698,6 +9777,7 @@ end;
 
 function jListView.GetCenterItemCaption(_fullItemCaption: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetCenterItemCaption', _fullItemCaption);
@@ -9705,6 +9785,7 @@ end;
 
 function jListView.GetLeftItemCaption(_fullItemCaption: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetLeftItemCaption', _fullItemCaption);
@@ -9712,6 +9793,7 @@ end;
 
 function jListView.GetRightItemCaption(_fullItemCaption: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetRightItemCaption', _fullItemCaption);
@@ -9719,6 +9801,7 @@ end;
 
 function jListView.GetLongPressSelectedItem(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetLongPressSelectedItem');
@@ -9916,6 +9999,7 @@ end;
 
 function jListView.SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jListView_SplitCenterItemCaption(FjEnv, FjObject, _centerItemCaption ,_delimiter);
@@ -9944,6 +10028,7 @@ end;
 
 function jListView.GetCheckedItemPosition(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetCheckedItemPosition');
@@ -10141,6 +10226,7 @@ end;
 
 function jScrollView.GetView: jObject;
 begin
+    result := nil;
     if FInitialized then
        Result:= View_GetViewGroup(FjEnv, FjObject);
 end;
@@ -10238,6 +10324,7 @@ end;
 
 function jScrollView.GetScrollX(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollX');
@@ -10245,6 +10332,7 @@ end;
 
 function jScrollView.GetScrollY(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollY');
@@ -10252,6 +10340,7 @@ end;
 
 function jScrollView.GetBottom(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetBottom');
@@ -10259,6 +10348,7 @@ end;
 
 function jScrollView.GetTop(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetTop');
@@ -10266,6 +10356,7 @@ end;
 
 function jScrollView.GetLeft(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetLeft');
@@ -10273,6 +10364,7 @@ end;
 
 function jScrollView.GetRight(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetRight');
@@ -10386,6 +10478,7 @@ end;
 
 function jScrollView.GetInnerItemId(_index: integer): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemId', _index);
@@ -10393,6 +10486,7 @@ end;
 
 function jScrollView.GetInnerItemIndex(_itemId: integer): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemIndex', _itemId);
@@ -10566,6 +10660,7 @@ end;
 
 function jHorizontalScrollView.GetView: jObject;
 begin
+    result := nil;
     if FInitialized then
        Result:= View_GetViewGroup(FjEnv, FjObject);
 end;
@@ -10653,6 +10748,7 @@ end;
 
 function jHorizontalScrollView.GetScrollX(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollX');
@@ -10660,6 +10756,7 @@ end;
 
 function jHorizontalScrollView.GetScrollY(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollY');
@@ -10667,6 +10764,7 @@ end;
 
 function jHorizontalScrollView.GetBottom(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetBottom');
@@ -10674,6 +10772,7 @@ end;
 
 function jHorizontalScrollView.GetTop(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetTop');
@@ -10681,6 +10780,7 @@ end;
 
 function jHorizontalScrollView.GetLeft(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetLeft');
@@ -10688,6 +10788,7 @@ end;
 
 function jHorizontalScrollView.GetRight(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetRight');
@@ -10779,6 +10880,7 @@ end;
 
 function jHorizontalScrollView.GetInnerItemId(_index: integer): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemId', _index);
@@ -10786,6 +10888,7 @@ end;
 
 function jHorizontalScrollView.GetInnerItemIndex(_itemId: integer): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemIndex', _itemId);
@@ -11003,6 +11106,7 @@ end;
 
 function jWebView.CanGoBack(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'CanGoBack');
@@ -11010,6 +11114,7 @@ end;
 
 function jWebView.CanGoBackOrForward(_steps: integer): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_z(FjEnv, FjObject, 'CanGoBackOrForward', _steps);
@@ -11017,6 +11122,7 @@ end;
 
 function jWebView.CanGoForward(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'CanGoForward');
@@ -11100,10 +11206,10 @@ end;
 //LMB
 function jWebView.ScrollY: integer;
 begin
+  result := 0;
+
   if FInitialized then
-     result := jni_func_out_i(FjEnv, FjObject, 'getScrollY')
-  else
-    result := 0
+     result := jni_func_out_i(FjEnv, FjObject, 'getScrollY');
 end;
 
 //LMB
@@ -11138,19 +11244,17 @@ end;
 //LMB
 function jWebView.GetFindIndex: integer;
 begin
+  result := 0;
   if FInitialized then
-     result := jni_func_out_i(FjEnv, FjObject, 'getFindIndex')
-  else
-    result := 0;
+     result := jni_func_out_i(FjEnv, FjObject, 'getFindIndex');
 end;
 
 //LMB
 function jWebView.GetFindCount: integer;
 begin
+  result := 0;
   if FInitialized then
-     result := jni_func_out_i(FjEnv, FjObject, 'getFindCount')
-  else
-    result := 0;
+     result := jni_func_out_i(FjEnv, FjObject, 'getFindCount');
 end;
 
 function jWebView.GetWidth: integer;
@@ -11390,10 +11494,10 @@ begin
        if path <> '' then FImageName:= ExtractFileName(fullFileName)
        else  FImageName:= fullFileName;
 
-       jBitmap_loadFile(FjEnv, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
+       jni_proc_t(FjEnv, FjObject, 'loadFile', GetFilePath(FFilePath)+'/'+FImageName);
 
-       FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-       FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+       FWidth:= jni_func_out_i(FjEnv, FjObject, 'GetWidth' );
+       FHeight:= jni_func_out_i(FjEnv, FjObject, 'GetHeight' );
      end;
   end;
 end;
@@ -11403,8 +11507,8 @@ begin
    if FInitialized then
    begin
        jni_proc_t(FjEnv, FjObject, 'loadRes', imgResIdentifier);
-       FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-       FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+       FWidth:= jni_func_out_i(FjEnv, FjObject, 'GetWidth' );
+       FHeight:= jni_func_out_i(FjEnv, FjObject, 'GetHeight' );
    end;
 end;
 
@@ -11422,27 +11526,26 @@ end;
 
 function jBitmap.GetJavaBitmap: jObject;
 begin
-  if FInitialized then
-  begin
-     Result:= jBitmap_jInstance(FjEnv, FjObject );
-  end;
+  Result:= GetImage();
 end;
 
 function jBitmap.GetImage(): jObject;
 begin
+  result := nil;
+
   if FInitialized then
-  begin
-     Result:= jBitmap_jInstance(FjEnv, FjObject );
-  end;
+     Result:= jni_func_out_bmp(FjEnv, FjObject, 'jInstance' );
+
 end;
 
 //by Tomash
 function jBitmap.GetCanvas(): jObject;
 begin
+  result := nil;
+
   if FInitialized then
-  begin
      Result:= jBitmap_GetCanvas(FjEnv, FjObject );
-  end;
+
 end;
 
 procedure jBitmap.GetBitmapSizeFromFile(_fullPathFile: string; var w, h :integer);
@@ -11490,6 +11593,7 @@ end;
 
 function jBitmap.GetByteArrayFromBitmap(var bufferImage: TDynArrayOfJByte): integer;
 begin
+  result := 0;
   if FInitialized then
    Result:= jBitmap_GetByteArrayFromBitmap(FjEnv, FjObject , bufferImage);
 end;
@@ -11556,7 +11660,7 @@ begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
       if  (FImageName <> '') then
       begin
-        jBitmap_loadFile(FjEnv, FjObject, GetFilePath(FFilePath)+'/'+FImageName);
+        jni_proc_t(FjEnv, FjObject, 'loadFile', GetFilePath(FFilePath)+'/'+FImageName);
         jBitmap_getWH(FjEnv, FjObject , integer(FWidth),integer(FHeight));
       end;
    end;
@@ -11729,6 +11833,8 @@ end;
 
 function jBitmap.ClockWise(_bmp: jObject ): jObject;
 begin
+  result := nil;
+
   if _bmp = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
@@ -11737,6 +11843,8 @@ end;
 
 function jBitmap.AntiClockWise(_bmp: jObject ): jObject;
 begin
+  result := nil;
+
   if _bmp = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
@@ -11745,6 +11853,8 @@ end;
 
 function jBitmap.SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
 begin
+  result := nil;
+
   if _bmp = nil then exit;
 
   //in designing component state: result value here...
@@ -11754,6 +11864,7 @@ end;
 
 function jBitmap.SetScale(_scaleX: single; _scaleY: single): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_ff_out_bmp(FjEnv, FjObject, 'SetScale' ,_scaleX ,_scaleY);
@@ -11761,9 +11872,11 @@ end;
 
 function jBitmap.LoadFromAssets(fileName: string): jObject;
 begin
+  result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_LoadFromAssets(FjEnv, FjObject, fileName);
+   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'LoadFromAssets', fileName);
 end;
 
 procedure jBitmap.LoadFromBuffer(buffer: Pointer; size: Integer);
@@ -11776,15 +11889,19 @@ end;
 
 function jBitmap.LoadFromBuffer(var buffer: TDynArrayOfJByte): jObject;
 begin
+  result := nil;
+
   if buffer = nil then exit;
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_LoadFromBuffer(FjEnv, FjObject, buffer);
+   Result:= jni_func_dab_out_bmp(FjEnv, FjObject, 'LoadFromBuffer2', buffer);
 end;
 
 function jBitmap.GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject;
 begin
+  result := nil;
+
   if _bmp = nil then exit;
 
   //in designing component state: result value here...
@@ -11794,20 +11911,26 @@ end;
 
 function jBitmap.GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject;
 begin
+  result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject,_newWidth ,_newHeight);
+   Result:= jni_func_ii_out_bmp(FjEnv, FjObject, 'GetResizedBitmap', _newWidth ,_newHeight);
 end;
 
 function jBitmap.GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject;
 begin
+  result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject, _factorScaleX ,_factorScaleY);
+   Result:= jni_func_ff_out_bmp(FjEnv, FjObject, 'GetResizedBitmap', _factorScaleX ,_factorScaleY);
 end;
 
 function jBitmap.GetJByteBuffer(_width: integer; _height: integer): jObject;
 begin
+  result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetByteBuffer(FjEnv, FjObject, _width ,_height);
@@ -11815,6 +11938,8 @@ end;
 
 function jBitmap.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
 begin
+  result := nil;
+
   if _jbyteBuffer = nil then exit;
 
   //in designing component state: result value here...
@@ -11824,15 +11949,19 @@ end;
 
 function jBitmap.GetBitmapFromJByteArray(var _image: TDynArrayOfJByte): jObject;
 begin
+  result := nil;
+
   if _image = nil then exit;
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetBitmapFromByteArray(FjEnv, FjObject, _image);
+   Result:= jni_func_dab_out_bmp(FjEnv, FjObject, 'GetBitmapFromByteArray', _image);
 end;
 
 function jBitmap.GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
 begin
+  result := nil;
+
   if jbyteBuffer = nil then exit;
 
   if FInitialized then
@@ -11841,6 +11970,8 @@ end;
 
 function jBitmap.GetJByteBufferFromImage(_bmap: jObject): jObject;
 begin
+  result := nil;
+
   if _bmap = nil then exit;
 
   //in designing component state: result value here...
@@ -11850,6 +11981,8 @@ end;
 
 function jBitmap.GetJByteBufferFromImage(): jObject;
 begin
+  result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject);
@@ -11857,13 +11990,17 @@ end;
 
 function jBitmap.GetImageFromFile(_fullPathFile: string): jObject;
 begin
+  result := nil;
+
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_LoadFromFile(FjEnv, FjObject, _fullPathFile);
+   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'LoadFromFile', _fullPathFile);
 end;
 
 function jBitmap.GetRoundedShape(_bitmapImage: jObject): jObject;
 begin
+  result := nil;
+
   if _bitmapImage = nil then exit;
 
   //in designing component state: result value here...
@@ -11873,6 +12010,7 @@ end;
 
 function jBitmap.GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject;
 begin
+  result := nil;
   if _bitmapImage = nil then exit;
 
   //in designing component state: result value here...
@@ -11882,6 +12020,7 @@ end;
 
 function jBitmap.DrawText(_bitmapImage: jObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;
 begin
+  result := nil;
   if _bitmapImage = nil then exit;
 
   //in designing component state: result value here...
@@ -11913,13 +12052,14 @@ begin
   if FInitialized then
   begin
      jni_proc_bmp(FjEnv, FjObject, 'SetImage', _bitmapImage);
-     FWidth:= jBitmap_GetWidth(FjEnv, FjObject );
-     FHeight:= jBitmap_GetHeight(FjEnv, FjObject );
+     FWidth:= jni_func_out_i(FjEnv, FjObject, 'GetWidth' );
+     FHeight:= jni_func_out_i(FjEnv, FjObject, 'GetHeight' );
   end;
 end;
 
 function jBitmap.DrawText(_text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
     Result:= jBitmap_DrawText(FjEnv, FjObject, _text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
@@ -11927,6 +12067,7 @@ end;
 
 function jBitmap.DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
 begin
+  result := nil;
   if _bitmapImageIn = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
@@ -11935,6 +12076,7 @@ end;
 
 function jBitmap.CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jBitmap_CreateBitmap(FjEnv, FjObject, _width ,_height, GetARGB(FCustomColor, _backgroundColor));
@@ -11942,6 +12084,7 @@ end;
 
 function jBitmap.GetThumbnailImage(_fullPathFile: string; _thumbnailSize: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_ti_out_bmp(FjEnv, FjObject, 'GetThumbnailImage', _fullPathFile ,_thumbnailSize);
@@ -11949,6 +12092,7 @@ end;
 
 function jBitmap.GetThumbnailImage(_bitmap: jObject; _thumbnailSize: integer): jObject;
 begin
+  result := nil;
   if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
@@ -11957,6 +12101,7 @@ end;
 
 function jBitmap.GetThumbnailImage(_bitmap: jObject; _width: integer; _height: integer): jObject;
 begin
+  result := nil;
   if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
@@ -11965,6 +12110,7 @@ end;
 
 function jBitmap.GetThumbnailImageFromAssets(_fileName: string; thumbnailSize: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_ti_out_bmp(FjEnv, FjObject, 'GetThumbnailImageFromAssets', _fileName ,thumbnailSize);
@@ -11972,6 +12118,7 @@ end;
 
 function jBitmap.GetThumbnailImage(_fullPathFile: string; _width: integer; _height: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tii_out_bmp(FjEnv, FjObject, 'GetThumbnailImage', _fullPathFile ,_width ,_height);
@@ -11979,6 +12126,7 @@ end;
 
 function jBitmap.GetThumbnailImageFromAssets(_filename: string; _width: integer; _height: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tii_out_bmp(FjEnv, FjObject, 'GetThumbnailImageFromAssets', _filename ,_width ,_height);
@@ -11993,6 +12141,7 @@ procedure jBitmap.LoadFromStream(Stream: TMemoryStream);
 
 function jBitmap.GetBase64StringFromImage(_bitmap: jObject; _compressFormat: TBitmapCompressFormat): string;
 begin
+  result := '';
   if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
@@ -12001,6 +12150,7 @@ end;
 
 function jBitmap.GetImageFromBase64String(_imageBase64String: string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetImageFromBase64String', _imageBase64String);
@@ -12008,6 +12158,7 @@ end;
 
 function jBitmap.GetBase64StringFromImageFile(_fullPathToImageFile: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetBase64StringFromImageFile', _fullPathToImageFile);
@@ -12060,7 +12211,7 @@ begin
 
   //new!
   if (FFontFace <> ffNormal) or (FTextTypeFace <> tfNormal) then
-    jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+    jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 
   // PaintShader new! //by kordal
   if FPaintShader <> nil then
@@ -12175,7 +12326,7 @@ end;
 procedure jCanvas.drawCircle(_cx: single; _cy: single; _radius: single);
 begin
   if FInitialized then
-     jCanvas_drawCircle(FjEnv, FjObject , _cx, _cy, _radius);
+     jni_proc_fff(FjEnv, FjObject, 'drawCircle',  _cx, _cy, _radius);
 end;
 
 procedure jCanvas.drawOval(_left, _top, _right, _bottom: single);
@@ -12273,6 +12424,7 @@ end;
 
 function jCanvas.GetDensity(): Single;
 begin
+  result := 0;
   if FInitialized then
     Result := jni_func_out_f(FjEnv, FjObject, 'GetDensity');
 end;
@@ -12320,6 +12472,7 @@ end;
 
 function jCanvas.GetNewPath(var _points: TDynArrayOfSingle): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCanvas_GetNewPath(FjEnv, FjObject, _points);
@@ -12327,6 +12480,7 @@ end;
 
 function jCanvas.GetNewPath(_points: array of single): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCanvas_GetNewPath(FjEnv, FjObject, _points);
@@ -12362,6 +12516,7 @@ end;
 
 function jCanvas.CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCanvas_CreateBitmap(FjEnv, FjObject, _width,_height, GetARGB(FCustomColor, _backgroundColor));
@@ -12369,6 +12524,7 @@ end;
 
 function jCanvas.CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCanvas_CreateBitmap(FjEnv, FjObject, _width,_height, _backgroundColor);
@@ -12376,14 +12532,16 @@ end;
 
 function jCanvas.GetBitmap(): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_GetBitmap(FjEnv, FjObject);
+   Result:= jni_func_out_bmp(FjEnv, FjObject, 'GetBitmap');
 end;
 
 // by Kordal
 function jCanvas.GetPaint(): JObject;
 begin
+  result := nil;
   if FInitialized then
     Result := jCanvas_GetPaint(FjEnv, FjObject);
 end;
@@ -12471,6 +12629,7 @@ end;
 
 function jCanvas.GetJInstance(): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCanvas_GetJInstance(FjEnv, FjObject);
@@ -12485,6 +12644,7 @@ end;
 
 function jCanvas.GetTextHeight(_text: string): single;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCanvas_GetTextHeight(FjEnv, FjObject, _text);
@@ -12492,6 +12652,7 @@ end;
 
 function jCanvas.GetTextWidth(_text: string): single;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jCanvas_GetTextWidth(FjEnv, FjObject, _text);
@@ -12501,14 +12662,14 @@ procedure jCanvas.SetFontAndTextTypeFace(_fontFace: integer; _fontStyle: integer
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, _fontFace ,_fontStyle);
+     jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', _fontFace ,_fontStyle);
 end;
 
 procedure jCanvas.SetFontFace(AValue: TFontFace);
 begin
  FFontFace:= AValue;
  if(FInitialized) then
-   jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 {  //deprecated
@@ -12525,7 +12686,7 @@ procedure jCanvas.SetTextTypeFace(AValue: TTextTypeFace);
 begin
   FTextTypeFace:= AValue ;
   if(FInitialized) then
-   jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 
@@ -12660,9 +12821,9 @@ begin
      if str <> 'null' then
      begin
         if  Pos('/', str) > 0  then
-          jView_viewSave(FjEnv, FjObject , str)
+          jni_proc_t(FjEnv, FjObject, 'saveView', str)
         else
-          jView_viewSave(FjEnv, FjObject , GetFilePath(FFilePath)+'/'+str);  //intern app
+          jni_proc_t(FjEnv, FjObject, 'saveView', GetFilePath(FFilePath)+'/'+str);  //intern app
      end;
   end;
 end;
@@ -12775,23 +12936,22 @@ end;
 
 function jView.GetDrawingCache(): jObject;
 begin
-  //in designing component state: result value here...
-  if FInitialized then
-   Result:= jView_GetBitmap(FjEnv, FjObject);
+  result := GetImage();
 end;
 
 function jView.GetImage(): jObject;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jView_GetBitmap(FjEnv, FjObject);
+   Result:= jni_func_out_bmp(FjEnv, FjObject, 'GetBitmap');
 end;
 
 
 procedure jView.SetLayerType(Value: TLayerType);
 begin
   if FInitialized then
-    jView_SetLayerType(FjEnv, FjObject, Byte(Value));
+    jni_proc_i(FjEnv, FjObject, 'SetLayerType', Byte(Value));
 end;
 
 procedure jView.BringToFront;
@@ -12903,8 +13063,7 @@ end;
 Procedure jDialogYN.Show;
 begin
   //Fixed to show text if it is changed, when "Show" is called
-  if FInitialized then
-     jDialogYN_Show(FjEnv, FjObject, FTitle, FMsg, FYes, FNo );
+  Show( FTitle, FMsg, FYes, FNo );
 end;
 
 Procedure jDialogYN.Show(titleText, msgText, yesText, noText, neutralText: string);
@@ -12916,21 +13075,20 @@ end;
 Procedure jDialogYN.Show(titleText, msgText, yesText, noText: string);
 begin
   if FInitialized then
-     jDialogYN_Show(FjEnv, FjObject, titleText, msgText, yesText, noText);
+     jni_proc_tttt(FjEnv, FjObject, 'show', titleText, msgText, yesText, noText);
 end;
 
 Procedure jDialogYN.Show(titleText, msgText: string);
 begin
   //Fixed to show text if it is changed, when "Show" is called
-  if FInitialized then
-     jDialogYN_Show(FjEnv, FjObject, titleText, msgText, FYes, FNo);
+  Show( titleText, msgText, FYes, FNo );
 end;
 
 procedure jDialogYN.ShowOK(titleText: string; msgText: string; _OkText: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDialogYN_ShowOK(FjEnv, FjObject, titleText ,msgText ,_OkText);
+     jni_proc_ttt(FjEnv, FjObject, 'ShowOK', titleText ,msgText ,_OkText);
 end;
 
 // by ADiV
@@ -13050,28 +13208,26 @@ end;
 procedure jDialogProgress.Stop;
 begin
   if FInitialized then
-     jDialogProgress_Stop(FjEnv, FjObject);
+     jni_proc(FjEnv, FjObject, 'Stop');
 end;
 
 
 procedure jDialogProgress.Close;
 begin
-  if FInitialized then
-     jDialogProgress_Stop(FjEnv, FjObject);
+  Stop;
 end;
 
 procedure jDialogProgress.Start;
 begin
   if FInitialized then
-     jDialogProgress_Show(FjEnv, FjObject)
+     jni_proc(FjEnv, FjObject, 'Show')
 
 end;
 
 procedure jDialogProgress.Show();
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     jDialogProgress_Show(FjEnv, FjObject);
+  Start;
 end;
 
 procedure jDialogProgress.Show(_title: string; _msg: string);
@@ -13491,6 +13647,7 @@ end;
 
 function jImageBtn.GetLParamWidth(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= View_GetLParamWidth(FjEnv, FjObject);
@@ -13498,6 +13655,7 @@ end;
 
 function jImageBtn.GetLParamHeight(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= View_GetLParamHeight(FjEnv, FjObject);
@@ -13800,10 +13958,9 @@ end;
 
 function jSqliteCursor.GetCursor: jObject;
 begin
+  result := nil;
   if FInitialized  then
-   result := jSqliteCursor_GetCursor(FjEnv, FjObject)
-  else
-   result := nil;
+   result := jSqliteCursor_GetCursor(FjEnv, FjObject);
 end;
 
 function jSqliteCursor.GetEOF: Boolean;
@@ -13930,38 +14087,30 @@ end;
 
 function jSqliteCursor.GetRowCount: integer;
 begin
-
+   result := 0;
    if FInitialized  then
-    result:= jni_func_out_i(FjEnv, FjObject, 'GetRowCount' )
-   else
-    result := 0;
+    result:= jni_func_out_i(FjEnv, FjObject, 'GetRowCount' );
 end;
 
 function jSqliteCursor.GetColumnCount: integer;
 begin
-
+  result := 0;
   if FInitialized  then
-   Result := jni_func_out_i(FjEnv, FjObject, 'GetColumnCount' )
-  else
-   result := 0;
+   Result := jni_func_out_i(FjEnv, FjObject, 'GetColumnCount' );
 end;
 
 function jSqliteCursor.GetColumnIndex(colName: string): integer;
 begin
-
+   result := -1;
    if FInitialized  then
-    result:= jni_func_t_out_i(FjEnv, FjObject, 'GetColumnIndex', colName)
-   else
-    result := -1;
+    result:= jni_func_t_out_i(FjEnv, FjObject, 'GetColumnIndex', colName);
 end;
 
 function jSqliteCursor.GetColumName(columnIndex: integer): string;
 begin
-
+   result := '';
    if FInitialized  then
-    result:= jni_func_i_out_t(FjEnv, FjObject, 'GetColumName', columnIndex)
-   else
-    result := '';
+    result:= jni_func_i_out_t(FjEnv, FjObject, 'GetColumName', columnIndex);
 end;
 {
 Cursor.FIELD_TYPE_NULL    //0
@@ -13991,119 +14140,95 @@ end;
 
 function jSqliteCursor.GetValueAsString(columnIndex: integer): string;
 begin
-
+ result := '';
  if FInitialized  then
-  result := jni_func_i_out_t(FjEnv, FjObject, 'GetValueAsString', columnIndex)
- else
-  result := '';
+  result := jni_func_i_out_t(FjEnv, FjObject, 'GetValueAsString', columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsString(colName: string): string;
 begin
-
+ result := '';
  if FInitialized  then
-  result := GetValueAsString(GetColumnIndex(colName))
- else
-  result := '';
+  result := GetValueAsString(GetColumnIndex(colName));
 end;
 
 function jSqliteCursor.GetValueAsBitmap(columnIndex: integer): jObject;
 begin
-
+  result := nil;
   if FInitialized  then
-   result:= jni_func_i_out_bmp(FjEnv, FjObject, 'GetValueAsBitmap', columnIndex)
-  else
-   result := nil;
+   result:= jni_func_i_out_bmp(FjEnv, FjObject, 'GetValueAsBitmap', columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsBitmap(colName: string): jObject;
 begin
-
+  result := nil;
   if FInitialized  then
-   result := GetValueAsBitmap(GetColumnIndex(colName))
-  else
-   result := nil;
+   result := GetValueAsBitmap(GetColumnIndex(colName));
 end;
 
 function jSqliteCursor.GetValueAsInteger(columnIndex: integer): integer;
 begin
-
+  result := -1;
   if FInitialized  then
-   result := jni_func_i_out_i(FjEnv, FjObject, 'GetValueAsInteger', columnIndex)
-  else
-   result := -1;
+   result := jni_func_i_out_i(FjEnv, FjObject, 'GetValueAsInteger', columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsInteger(colName: string): integer;
 begin
-
+  result := -1;
   if FInitialized  then
-   result :=  GetValueAsInteger(GetColumnIndex(colName))
-  else
-   result := -1;
+   result :=  GetValueAsInteger(GetColumnIndex(colName));
 end;
 
 function jSqliteCursor.GetValueAsDouble(columnIndex: integer): double;
 begin
-
+  result := -1;
   if FInitialized  then
-   result := jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , columnIndex)
-  else
-   result := -1;
+   result := jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsDouble(colName: string): double;
 begin
-
+  result := -1;
   if FInitialized  then
-   Result :=  GetValueAsDouble(GetColumnIndex(colName))
-  else
-   result := -1;
+   Result :=  GetValueAsDouble(GetColumnIndex(colName));
 end;
 
 function jSqliteCursor.GetValueAsFloat(columnIndex: integer): real;
 begin
-
+  result := -1;
   if FInitialized  then
-   Result := jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , columnIndex)
-  else
-   result := -1;
+   Result := jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsFloat(colName: string): real;
 begin
-
+  result := -1;
   if FInitialized  then
-   result := GetValueAsFloat(GetColumnIndex(colName))
-  else
-   result := -1;
+   result := GetValueAsFloat(GetColumnIndex(colName));
 end;
 
 function jSqliteCursor.GetValueToString(columnIndex: integer): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
-   result := jni_func_i_out_t(FjEnv, FjObject, 'GetValueToString', columnIndex)
-  else
-   result := '';
+   result := jni_func_i_out_t(FjEnv, FjObject, 'GetValueToString', columnIndex);
 end;
 
 function jSqliteCursor.GetValueToString(colName: string): string;
 begin
-
+  result := '';
   if FInitialized  then
-   Result :=  GetValueToString(GetColumnIndex(colName))
-  else
-   result := '';
+   Result :=  GetValueToString(GetColumnIndex(colName));
 end;
 
 function jSqliteCursor.GetPosition(): integer;
 begin
+  result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   result := jni_func_out_i(FjEnv, FjObject, 'GetPosition')
-  else
-   result := -1;
+   result := jni_func_out_i(FjEnv, FjObject, 'GetPosition');
 end;
 
 {jSqliteDataAccess}
@@ -14151,11 +14276,11 @@ begin
 
   if FTableName <> nil then
    for i:= 0 to FTableName.Count-1 do
-     jSqliteDataAccess_AddTableName(FjEnv, FjObject , FTableName.Strings[i]);
+     jni_proc_t(FjEnv, FjObject, 'AddTableName', FTableName.Strings[i]);
 
   if FCreateTableQuery <> nil then
    for i:= 0 to FCreateTableQuery.Count-1 do
-     jSqliteDataAccess_AddCreateTableQuery(FjEnv, FjObject , FCreateTableQuery.Strings[i]);
+     jni_proc_t(FjEnv, FjObject, 'AddCreateTableQuery', FCreateTableQuery.Strings[i]);
 
   if not FReturnHeaderOnSelect then
       SetReturnHeaderOnSelect(FReturnHeaderOnSelect);
@@ -14207,10 +14332,9 @@ end;
 // Do not use 'SELECT' in this function
 function jSqliteDataAccess.ExecSQL(execQuery: string) : boolean;
 begin
+   result := false;
    if FInitialized then
-    result := jni_func_t_out_z(FjEnv, FjObject, 'ExecSQL', execQuery)
-   else
-    result := false;
+    result := jni_func_t_out_z(FjEnv, FjObject, 'ExecSQL', execQuery);
 end;
 
 //"data/data/com.data.pack/databases/" + myData.db;
@@ -14251,8 +14375,8 @@ procedure jSqliteDataAccess.AddTable(tableName: string; createTableQuery: string
 begin
   if not FInitialized then Exit;
 
-  jSqliteDataAccess_AddTableName(FjEnv, FjObject , tableName);
-  jSqliteDataAccess_AddCreateTableQuery(FjEnv, FjObject , createTableQuery);
+  jni_proc_t(FjEnv, FjObject, 'AddTableName', tableName);
+  jni_proc_t(FjEnv, FjObject, 'AddCreateTableQuery', createTableQuery);
 end;
 
 procedure jSqliteDataAccess.CreateAllTables;
@@ -14441,6 +14565,7 @@ end;
 
 function jSqliteDataAccess.InsertIntoTableBatch(var _insertQueries: TDynArrayOfString): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jSqliteDataAccess_InsertIntoTableBatch(FjEnv, FjObject, _insertQueries);
@@ -14448,6 +14573,7 @@ end;
 
 function jSqliteDataAccess.UpdateTableBatch(var _updateQueries: TDynArrayOfString): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jSqliteDataAccess_UpdateTableBatch(FjEnv, FjObject, _updateQueries);
@@ -14802,6 +14928,7 @@ end;
 
 function jPanel.GetChildCount(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetChildCount');
@@ -14980,6 +15107,13 @@ begin
      jni_proc(FjEnv, FjObject, 'SetRoundCorner');
 end;
 
+procedure jPanel.SetRoundCorners( _TopLeftRadius, _TopRightRadius, _BottomRightRadius, _BottomLeftRadius : single );
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_ffff(FjEnv, FjObject, 'SetRoundCorners', _TopLeftRadius, _TopRightRadius, _BottomRightRadius, _BottomLeftRadius );
+end;
+
 procedure jPanel.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
@@ -15007,6 +15141,7 @@ end;
 
 function jPanel.GetViewParent(): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= View_GetParent(FjEnv, FjObject);
@@ -15315,6 +15450,7 @@ end;
 
 function jDBListView.GetView(): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
     Result := View_GetView(FjEnv, FjObject);
@@ -15337,6 +15473,7 @@ end;
 
 function jDBListView.GetParent(): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
     Result := View_GetParent(FjEnv, FjObject);
@@ -15437,6 +15574,7 @@ end;
 *)
 function jDBListView.GetItemIndex(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
     Result := jni_func_out_i(FjEnv, FjObject, 'GetItemIndex');
@@ -15444,6 +15582,7 @@ end;
 
 function jDBListView.GetItemCaption(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
     Result := jni_func_out_t(FjEnv, FjObject, 'GetItemCaption');

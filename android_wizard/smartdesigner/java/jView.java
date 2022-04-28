@@ -40,7 +40,7 @@ public class jView extends View {
 	*/
 
 	//updated by Tomash
-	public Bitmap getBitmap(){
+	public Bitmap GetBitmap(){
 		try {
  	    	Bitmap bitmap = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
   	    	Canvas canvas = new Canvas(bitmap);
@@ -67,11 +67,11 @@ public class jView extends View {
 	}
 
 	//
-	public void setjCanvas(java.lang.Object canvas) {
+	public void SetjCanvas(java.lang.Object canvas) {
 		jcanvas = (jCanvas)canvas;
 	}
 	
-	public void SetLayerType(byte _value) {
+	public void SetLayerType(int _value) {
 		setLayerType(_value/*View.LAYER_TYPE_SOFTWARE*/, null);
 	}	
 	

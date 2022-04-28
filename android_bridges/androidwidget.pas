@@ -2006,6 +2006,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   procedure jni_proc_tti(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string; _int0: integer);
   procedure jni_proc_ttii(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string; _int0,_int1: integer);
   procedure jni_proc_ttt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2, _str3: string);
+  procedure jni_proc_tttt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2, _str3, _str4: string);
   procedure jni_proc_ttti(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2, _str3: string; _int0 : integer);
   procedure jni_proc_ttttt(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2, _str3, _str4, _str5: string);
   procedure jni_proc_ttz(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str1, _str2: string; _bool : boolean);
@@ -3727,12 +3728,14 @@ end;
 
 function  jForm.GetOnViewClickListener(jObjForm: jObject): jObject;
 begin
+  result := nil;
   if FInitialized then
     Result:= jForm_GetOnViewClickListener(FjEnv, jObjForm);
 end;
 
 function  jForm.GetOnListItemClickListener(jObjForm: jObject): jObject;
 begin
+  result := nil;
   if FInitialized then
     Result:= jForm_GetOnListItemClickListener(FjEnv, jObjForm);
 end;
@@ -3753,57 +3756,65 @@ end;
 
 function jForm.GetStringExtra(intentData: jObject; extraName: string): string;
 begin
+   result := '';
    if FInitialized then
      Result:= jForm_GetStringExtra(FjEnv, FjObject, intentData ,extraName);
 end;
 
 function jForm.GetIntExtra(intentData: jObject; extraName: string; defaultValue: integer): integer;
 begin
+  result := 0;
   if FInitialized then
     Result:= jForm_GetIntExtra(FjEnv, FjObject, intentData ,extraName ,defaultValue);
 end;
 
 function jForm.GetDoubleExtra(intentData: jObject; extraName: string; defaultValue: double): double;
 begin
+  result := 0;
   if FInitialized then
     Result:= jForm_GetDoubleExtra(FjEnv, FjObject, intentData ,extraName ,defaultValue);
 end;
 
 function jForm.SetWifiEnabled(_status: boolean): boolean;
 begin
+  result := false;
+
   if not FInitialized then Exit;
 
-  Result:= False;
-  if FInitialized then
-    Result:= jni_func_z_out_z(FjEnv, FjObject, 'SetWifiEnabled', _status);
+  Result:= jni_func_z_out_z(FjEnv, FjObject, 'SetWifiEnabled', _status);
 end;
 
 function jForm.IsWifiEnabled(): boolean;
 begin
+   result := false;
    if FInitialized then
     Result:= jni_func_out_z(FjEnv, FjObject, 'IsWifiEnabled');
 end;
 
 function jForm.IsConnected(): boolean; // by renabor
 begin
+   result := false;
    if FInitialized then
     Result:= jni_func_out_z(FjEnv, FjObject, 'IsConnected');
 end;
 
 function jForm.IsConnectedWifi(): boolean; // by renabor
 begin
+  result := false;
   if FInitialized then
      Result:= jni_func_out_z(FjEnv, FjObject, 'IsConnectedWifi');
 end;
 
 function jForm.IsScreenLocked(): boolean;
 begin
+   result := false;
    if FInitialized then
     Result:= jni_func_out_z(FjEnv, FjObject, 'IsScreenLocked');
 end;
 
 function jForm.IsSleepMode(): boolean;
 begin
+   result := false;
    if FInitialized then
     Result:= jni_func_out_z(FjEnv, FjObject, 'IsSleepMode');
 end;
@@ -3871,42 +3882,50 @@ end;
 
 function jForm.CreateDir(_dirName: string): string;
 begin
+  result := '';
   if FInitialized then
     Result:= jni_func_t_out_t(FjEnv,FjObject, 'CreateDir', _dirName);
 end;
 
 function jForm.CreateDir(_environmentDir: TEnvDirectory; _dirName: string): string;
 begin
+  result := '';
   if FInitialized then
     Result:= jni_func_it_out_t(FjEnv, FjObject, 'CreateDir', Ord(_environmentDir) ,_dirName);
 end;
 
 function jForm.CreateDir(_fullPath: string; _dirName: string): string;
 begin
+  result := '';
   if FInitialized then
     Result:= jni_func_tt_out_t(FjEnv, FjObject, 'CreateDir', _fullPath ,_dirName);
 end;
 
 function jForm.IsExternalStorageEmulated(): boolean;
 begin
+  result := false;
   if FInitialized then
     Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageEmulated');
 end;
 
 function jForm.IsExternalStorageRemovable(): boolean;
 begin
+  result := false;
   if FInitialized then
     Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageRemovable');
 end;
 
 function jForm.GetjFormVersionFeatures(): string;
 begin
+  result := '';
   if FInitialized then
     Result:= jni_func_out_t(FjEnv, FjObject, 'GetjFormVersionFeatures');
 end;
 
 function jForm.GetActionBar(): jObject;
 begin
+  result := nil;
+
   if FInitialized then
   begin
     if FActionBarTitle <> abtNone then
@@ -4154,6 +4173,7 @@ end;
 
 function jForm.GetScreenDpi(): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenDpi');
@@ -4161,6 +4181,7 @@ end;
 
 function jForm.GetScreenDensity(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetScreenDensity');
@@ -4169,14 +4190,15 @@ end;
 //SplitStr(var theString: string; delimiter: string): string;
 function jForm.GetScreenDensity(strDensity: string): integer;
 begin
+   result := 0;
    SplitStr(strDensity, ':');
    if (strDensity <> '') then
-     Result:= StrToInt(strDensity)
-   else Result:= 0;
+     Result:= StrToInt(strDensity);
 end;
 
 function jForm.GetScreenSize(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetScreenSize');
@@ -4234,27 +4256,28 @@ end;
 
 function jForm.GetTitleActionBar(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
-  begin
     if FActionBarTitle <> abtNone then
        Result:= jni_func_out_t(FjEnv, FjObject, 'GetTitleActionBar');
-  end;
+
 end;
 
 function jForm.GetSubTitleActionBar(): string;
 begin
   //in designing component state: result value here...
+  result := '';
 
   if FInitialized then
-  begin
     if FActionBarTitle <> abtNone then
       Result:= jni_func_out_t(FjEnv, FjObject, 'GetSubTitleActionBar');
-  end;
+
 end;
 
 function jForm.CopyFromAssetsToInternalAppStorage(_filename: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
     Result:= jni_func_t_out_t(FjEnv, FjObject, 'CopyFromAssetsToInternalAppStorage', _filename);
@@ -4290,6 +4313,7 @@ end;
 
 function jForm.GetRealPathFromURI(_Uri: jObject): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetRealPathFromURI(FjEnv, FjObject, _Uri);
@@ -4309,12 +4333,12 @@ end;
 
 function jForm.ActionBarIsShowing(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
-  begin
     if FActionBarTitle <> abtNone then
       Result:= jni_func_out_z(FjEnv, FjObject, 'ActionBarIsShowing');
-  end;
+
 end;
 
 procedure jForm.ToggleSoftInput();
@@ -4326,6 +4350,7 @@ end;
 
 function jForm.GetDeviceModel(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceModel');
@@ -4333,6 +4358,7 @@ end;
 
 function jForm.GetDeviceManufacturer(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceManufacturer');
@@ -4374,6 +4400,7 @@ end;
 
 function jForm.ParseUri(_uriAsString: string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_ParseUri(FjEnv, FjObject, _uriAsString);
@@ -4381,6 +4408,7 @@ end;
 
 function jForm.UriToString(_uri: jObject): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_UriToString(FjEnv, FjObject, _uri);
@@ -4388,6 +4416,7 @@ end;
 
 function jForm.IsConnectedTo(_connectionType: TConnectionType): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_z(FjEnv, FjObject, 'IsConnectedTo', Ord(_connectionType));
@@ -4395,6 +4424,7 @@ end;
 
 function jForm.IsMobileDataEnabled(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'IsMobileDataEnabled');
@@ -4430,6 +4460,7 @@ end;
 
 function jForm.GetDeviceDataMobileIPAddress(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceDataMobileIPAddress');
@@ -4437,6 +4468,7 @@ end;
 
 function jForm.GetDeviceWifiIPAddress(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceWifiIPAddress');
@@ -4444,6 +4476,7 @@ end;
 
 function jForm.GetWifiBroadcastIPAddress(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetWifiBroadcastIPAddress');
@@ -4451,6 +4484,7 @@ end;
 
 function jForm.LoadFromAssetsTextContent(_filename: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'LoadFromAssetsTextContent', _filename);
@@ -4628,6 +4662,7 @@ end;
 
 function jForm.isUsageStatsAllowed(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'isUsageStatsAllowed');
@@ -4642,6 +4677,7 @@ end;
 
 function jForm.GetTaskInFront(): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(FjEnv, FjObject, 'GetTaskInFront');
@@ -4649,6 +4685,7 @@ end;
 
 function jForm.GetApplicationIcon(_package:string): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetApplicationIcon', _package);
@@ -4656,6 +4693,7 @@ end;
 
 function jForm.GetApplicationName(_package:string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetApplicationName', _package);
@@ -4663,6 +4701,7 @@ end;
 
 function jForm.GetInstalledAppList(): TDynArrayOfString;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetInstalledAppList(FjEnv, FjObject);
@@ -4684,6 +4723,7 @@ end;
 
 function jForm.UriEncode(_message: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'UriEncode', _message);
@@ -4691,6 +4731,7 @@ end;
 
 function jForm.ParseHtmlFontAwesome(_htmlString: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'ParseHtmlFontAwesome', _htmlString);
@@ -4736,6 +4777,7 @@ end;
 
 function jForm.GetSettingsSystemInt(_strKey: string): integer;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetSettingsSystemInt', _strKey);
@@ -4743,6 +4785,7 @@ end;
 
 function jForm.GetSettingsSystemString(_strKey: string): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetSettingsSystemString', _strKey);
@@ -4750,6 +4793,7 @@ end;
 
 function jForm.GetSettingsSystemFloat(_strKey: string): single;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_f(FjEnv, FjObject, 'GetSettingsSystemFloat', _strKey);
@@ -4757,6 +4801,7 @@ end;
 
 function jForm.GetSettingsSystemLong(_strKey: string): int64;
 begin
+  result := 0;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_j(FjEnv, FjObject, 'GetSettingsSystemLong', _strKey);
@@ -4764,6 +4809,7 @@ end;
 
 function jForm.PutSettingsSystemInt(_strKey: string; _value: integer): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_ti_out_z(FjEnv, FjObject, 'PutSettingsSystemInt', _strKey ,_value);
@@ -4771,6 +4817,7 @@ end;
 
 function jForm.PutSettingsSystemLong(_strKey: string; _value: int64): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tj_out_z(FjEnv, FjObject, 'PutSettingsSystemLong', _strKey ,_value);
@@ -4778,6 +4825,7 @@ end;
 
 function jForm.PutSettingsSystemFloat(_strKey: string; _value: single): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tf_out_z(FjEnv, FjObject, 'PutSettingsSystemFloat', _strKey ,_value);
@@ -4785,6 +4833,7 @@ end;
 
 function jForm.PutSettingsSystemString(_strKey: string; _strValue: string): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tt_out_z(FjEnv, FjObject, 'PutSettingsSystemString', _strKey ,_strValue);
@@ -4792,6 +4841,7 @@ end;
 
 function jForm.IsRuntimePermissionNeed(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'IsRuntimePermissionNeed');
@@ -4799,6 +4849,7 @@ end;
 
 function jForm.IsRuntimePermissionGranted(_manifestPermission: string): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsRuntimePermissionGranted', _manifestPermission);
@@ -4827,6 +4878,7 @@ end;
 
 function jForm.HasActionBar(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'HasActionBar');
@@ -4834,6 +4886,7 @@ end;
 
 function jForm.IsAppCompatProject(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'IsAppCompatProject');
@@ -4965,6 +5018,7 @@ end;
 
 function jForm.GetJByteBuffer(_width: integer; _height: integer): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetJByteBuffer(FjEnv, FjObject, _width ,_height);
@@ -4977,6 +5031,7 @@ end;
 
 function jForm.GetJByteBufferFromImage(_bitmap: jObject): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetByteBufferFromImage(FjEnv, FjObject, _bitmap);
@@ -5056,6 +5111,7 @@ end;
 
 function jForm.GetBitmapFromUri(_treeUri: jObject): jObject;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetBitmapFromUri(FjEnv, FjObject, _treeUri);
@@ -5063,6 +5119,7 @@ end;
 
 function jForm.LoadBytesFromUri(_treeUri: jObject): TDynArrayOfJByte;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_LoadBytesFromUri(FjEnv, FjObject, _treeUri);
@@ -5070,6 +5127,7 @@ end;
 
 function jForm.GetFileNameByUri(_treeUri: jObject): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetFileNameByUri(FjEnv, FjObject, _treeUri);
@@ -5077,6 +5135,7 @@ end;
 
 function jForm.GetTextFromUri(_treeUri: jObject): string;
 begin
+  result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetTextFromUri(FjEnv, FjObject, _treeUri);
@@ -5121,6 +5180,7 @@ end;
 
 function jForm.GetFileList(_treeUri: jObject): TDynArrayOfString;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetFileList(FjEnv, FjObject, _treeUri);
@@ -5129,6 +5189,7 @@ end;
 
 function jForm.GetFileList(_treeUri: jObject; _fileExtension: string): TDynArrayOfString;
 begin
+  result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetFileList(FjEnv, FjObject, _treeUri ,_fileExtension);
@@ -5144,6 +5205,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := nil;
+
   if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
@@ -5205,6 +5268,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := '';
+
   if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
@@ -5233,6 +5298,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := '';
+
   if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
@@ -5484,6 +5551,7 @@ end;
 
 function jForm.IsExternalStorageReadWriteAvailable(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageReadWriteAvailable');
@@ -5491,6 +5559,7 @@ end;
 
 function jForm.IsExternalStorageReadable(): boolean;
 begin
+  result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageReadable');
@@ -5559,6 +5628,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := '';
+
   if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
@@ -5588,6 +5659,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0;
+
   if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
@@ -5616,6 +5689,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := 0;
+
   if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
@@ -5754,6 +5829,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := '';
+
   if (env = nil) or (_jform = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jform);
@@ -6178,6 +6255,8 @@ var
 label
   _exceptionOcurred;
 begin
+  result := '';
+
   if (env = nil) or (_jform = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jform);
   if jCls = nil then goto _exceptionOcurred;
@@ -6615,6 +6694,7 @@ end;
 
 function GetLayoutParamsByParent(paren: jVisualControl; lpParam: TLayoutParams;  side: TSide): DWord;
 begin
+  result := 0;
   case lpParam of
      lpMatchParent:          Result:= GetParamByParentSide(paren, side);//TLayoutParamsArray[altMATCHPARENT];  //-1
      lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];  //-2
@@ -6662,6 +6742,7 @@ end;
 
 function GetLayoutParamsByParent2(paren: TAndroidWidget; lpParam: TLayoutParams;  side: TSide): DWord;
 begin
+  result := 0;
   case lpParam of
      lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
      lpWrapContent:          Result:= TLayoutParamsArray[altWRAPCONTENT];
@@ -6761,6 +6842,7 @@ end;
 
 function GetLayoutParams(App:jApp; lpParam: TLayoutParams; side: TSide): DWord;
 begin
+  result := 0;
   case lpParam of
 
    lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
@@ -6807,6 +6889,7 @@ end;
 
 function GetDesignerLayoutParams(lpParam: TLayoutParams;  L: integer): DWord;
 begin
+  result := 0;
   case lpParam of
 
    lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
@@ -9893,6 +9976,43 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+procedure jni_proc_tttt(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                      _str1, _str2, _str3, _str4: string);
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  if (env = nil) or (_jobject = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str1));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str2));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_str3));
+  jParams[3].l:= env^.NewStringUTF(env, PChar(_str4));
+
+  if (jParams[0].l = nil) then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[1].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[2].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if (jParams[3].l = nil) then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env,jParams[2].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  env^.CallVoidMethodA(env, _jobject, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env,jParams[3].l);
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 procedure jni_proc_ttti(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                       _str1, _str2, _str3: string; _int0 : integer);
 var
@@ -10091,6 +10211,7 @@ var
 label
   _exceptionOcurred;
 begin
+  result := nil;
 
   if (env = nil) or (_jobject = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jobject);
@@ -10267,7 +10388,9 @@ var
 label
   _exceptionOcurred;
 begin
-  result := 0; if (env = nil) or (_jobject = nil) then exit;
+  result := 0;
+
+  if (env = nil) or (_jobject = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, _jobject);
   if jCls = nil then goto _exceptionOcurred;
@@ -10624,6 +10747,7 @@ var
 label
   _exceptionOcurred;
 begin
+  result := '';
 
   if (env = nil) or (_jobject = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jobject);
@@ -11827,6 +11951,7 @@ var
 label
   _exceptionOcurred;
 begin
+  result := nil;
 
   if (env = nil) or (_jobject = nil) then exit;
   jCls:= env^.GetObjectClass(env, _jobject);
