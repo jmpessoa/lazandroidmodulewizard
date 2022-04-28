@@ -1091,7 +1091,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
        Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
   }
   
-  mCursor.moveToFirst();  //reset cursor ...
+  if(mCursor != null)
+   mCursor.moveToFirst();  //reset cursor ...
 
   return allRows;
  }
