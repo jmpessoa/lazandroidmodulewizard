@@ -316,11 +316,15 @@ function jSqliteCursor_GetValueAsFloat (env:PJNIEnv;  SqliteCursor: jObject; col
 Function  jSqliteDataAccess_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject;
                                         dataBaseName: string; colDelimiter: char; rowDelimiter: char): jObject;
 
-function jSqliteDataAccess_GetCursor(env:PJNIEnv;  SqliteDataBase: jObject): jObject;
+function  jSqliteDataAccess_GetCursor(env:PJNIEnv;  SqliteDataBase: jObject): jObject;
 procedure jSqliteDataAccess_SetSelectDelimiters(env:PJNIEnv; SqliteDataBase: jObject; coldelim: char; rowdelim: char);
 function  jSqliteDataAccess_UpdateImage(env:PJNIEnv; SqliteDataBase: jObject;
                                         tableName: string; imageFieldName: string; keyFieldName: string; imageValue: jObject; keyValue: integer) : boolean; overload;
 function  jSqliteDataAccess_UpdateImage(env: PJNIEnv; _jsqlitedataaccess: JObject; _tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean; overload;
+
+procedure jSqliteDataAccess_PutDouble(env: PJNIEnv; _jsqlitedataaccess: JObject; _colum: string; _value: double);
+procedure jSqliteDataAccess_PutShort(env: PJNIEnv; _jsqlitedataaccess: JObject; _colum: string; _value: smallint);
+procedure jSqliteDataAccess_PutByte(env: PJNIEnv; _jsqlitedataaccess: JObject; _colum: string; _value: byte);
 
 //procedure jSqliteDataAccess_InsertIntoTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _insertQueries: TDynArrayOfString);
 //procedure jSqliteDataAccess_UpdateTableBatch(env: PJNIEnv; _jsqlitedataaccess: JObject; var _updateQueries: TDynArrayOfString);
@@ -3758,6 +3762,90 @@ begin
   env^.DeleteLocalRef(env,_jParams[1].l);
   env^.DeleteLocalRef(env,_jParams[2].l);
   env^.DeleteLocalRef(env, cls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jSqliteDataAccess_PutDouble(env: PJNIEnv; _jsqlitedataaccess: JObject; _colum: string; _value: double);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jsqlitedataaccess = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'PutDouble', '(Ljava/lang/String;D)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_colum));
+  jParams[1].d:= _value;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jSqliteDataAccess_PutShort(env: PJNIEnv; _jsqlitedataaccess: JObject; _colum: string; _value: smallint);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jsqlitedataaccess = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'PutShort', '(Ljava/lang/String;S)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_colum));
+  jParams[1].s:= _value;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jSqliteDataAccess_PutByte(env: PJNIEnv; _jsqlitedataaccess: JObject; _colum: string; _value: byte);
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jsqlitedataaccess = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jsqlitedataaccess);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'PutByte', '(Ljava/lang/String;B)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_colum));
+  jParams[1].b:= _value;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  env^.CallVoidMethodA(env, _jsqlitedataaccess, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;

@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -97,7 +98,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
 
     private String mUpgradePathFormat;
 
-    private int mForcedUpgradeVersion = 0;
+    private int mForcedUpgradeVersion = 0;    
 
     /**
      * Create a helper object to create, open, and/or manage a database in 
@@ -131,8 +132,8 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
             DB_PATH = context.getApplicationInfo().dataDir + "/databases";  //internal app database path
         }
 
-   DATABASE_NAME = name;
-   DATABASE_VERSION = version;
+        DATABASE_NAME = name;
+        DATABASE_VERSION = version;
 
 
         if (version < 1) throw new IllegalArgumentException("Version must be >= 1, was " + version);
@@ -674,6 +675,8 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
  public Cursor mCursor = null;	
  
  public Bitmap bufBmp = null;
+ 
+ private ContentValues mContentValues = null;
 
  //private static String DATABASE_NAME;
  //private static String DB_PATH;
@@ -738,6 +741,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   selectColDelimiter = colDelim;
   selectRowDelimiter = rowDelim;
 
+  mContentValues = new ContentValues();
  }
 
  public void OpenOrCreate(String dataBaseName) throws IOException { 
@@ -1272,6 +1276,108 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
         return result;
 
+    }
+    
+    public long Insert(String _tableName) {
+    	
+    	if( mContentValues == null ) return -1;
+    	
+        SQLiteDatabase mydb = getWritableDatabase();
+
+        if( mydb == null ) return -1;                            
+
+        long nInsert = mydb.insert(_tableName, null, mContentValues);
+        
+        mydb.close();
+        
+        return nInsert;
+
+    }
+    
+    public int Update(String _tableName, String _whereClause, String[] _whereArgs){
+    	SQLiteDatabase mydb = getWritableDatabase();
+
+        if( mydb == null ) return -1;                            
+
+        int nUpdate = mydb.update(_tableName, mContentValues, _whereClause, _whereArgs);
+        
+        mydb.close();
+        
+        return nUpdate;
+    }
+    
+    public int Delete(String _tableName, String _whereClause, String[] _whereArgs){
+    	SQLiteDatabase mydb = getWritableDatabase();
+
+        if( mydb == null ) return -1;                            
+
+        int nDelete = mydb.delete(_tableName, _whereClause, _whereArgs);
+        
+        mydb.close();
+        
+        return nDelete;
+    }
+    
+    public void ContentValuesClear( ){
+    	if( mContentValues == null ) return;
+    	
+    	mContentValues.clear();	
+    }
+    
+    public void PutString( String _colum, String _value ){
+    	if((mContentValues == null) || (_colum == null)) return;    	
+    	if(_colum.length() <= 0) return;
+    	
+    	mContentValues.put(_colum, _value);	
+    }
+    
+    public void PutShort( String _colum, short _value ){
+    	if((mContentValues == null) || (_colum == null)) return;
+    	if(_colum.length() <= 0) return;
+    	
+    	mContentValues.put(_colum, _value);	
+    }
+    
+    public void PutLong( String _colum, long _value ){
+    	if((mContentValues == null) || (_colum == null)) return;
+    	if(_colum.length() <= 0) return;
+    	
+    	mContentValues.put(_colum, _value);	
+    }
+    
+    public void PutDouble( String _colum, double _value ){
+    	if((mContentValues == null) || (_colum == null)) return;
+    	if(_colum.length() <= 0) return;
+    	
+    	mContentValues.put(_colum, _value);	
+    }
+    
+    public void PutInteger( String _colum, int _value ){
+    	if((mContentValues == null) || (_colum == null)) return;
+    	if(_colum.length() <= 0) return;
+    	
+    	mContentValues.put(_colum, _value);	
+    }
+    
+    public void PutBoolean( String _colum, boolean _value ){
+    	if((mContentValues == null) || (_colum == null)) return;
+    	if(_colum.length() <= 0) return;
+    	
+    	mContentValues.put(_colum, _value);	
+    }
+    
+    public void PutFloat( String _colum, float _value ){
+    	if((mContentValues == null) || (_colum == null)) return;
+    	if(_colum.length() <= 0) return;
+    	
+    	mContentValues.put(_colum, _value);	
+    }
+    
+    public void PutByte( String _colum, byte _value ){
+    	if((mContentValues == null) || (_colum == null)) return;
+    	if(_colum.length() <= 0) return;
+    	
+    	mContentValues.put(_colum, _value);	
     }
 
  /*

@@ -864,6 +864,20 @@ type
     function DBImport( _dbImportFileFull : string ) : boolean; overload;
     function DBImport( _dbImportUri : jObject ) : boolean; overload;
 
+    function Insert( _tableName : string ) : int64;
+    function Update( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
+    function Delete( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
+
+    procedure ContentValuesClear;
+    procedure PutString( _colum : string; _value : string );
+    procedure PutShort( _colum : string; _value : smallint );
+    procedure PutLong( _colum  : string; _value : int64 );
+    procedure PutDouble( _colum : string; _value : double );
+    procedure PutInteger( _colum : string; _value : integer );
+    procedure PutBoolean( _colum : string; _value : boolean );
+    procedure PutFloat( _colum  : string; _value : single );
+    procedure PutByte( _colum  : string; _value : byte );
+
     function DatabaseExists(_databaseName: string): boolean;
     procedure SetAssetsSearchFolder(_folderName: string);
     procedure SetReturnHeaderOnSelect(_returnHeader: boolean);
@@ -14287,6 +14301,84 @@ begin
 
   FFullPathDataBaseName:= GetFilePath(fpathDataBase) + '/' + FDataBaseName;
 
+end;
+
+function jSqliteDataAccess.Insert( _tableName : string ) : int64;
+begin
+ result := -1;
+
+ if FInitialized then
+    result := jni_func_t_out_j(FjEnv, FjObject, 'Insert', _tableName);
+end;
+
+function jSqliteDataAccess.Update( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
+begin
+ result := 0;
+
+ if FInitialized then
+    result := jni_func_tt_ars_out_i(FjEnv, FjObject, 'Update', _tableName, _whereClause, _whereArgs);
+end;
+
+function jSqliteDataAccess.Delete( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
+begin
+ result := 0;
+
+ if FInitialized then
+    result := jni_func_tt_ars_out_i(FjEnv, FjObject, 'Delete', _tableName, _whereClause, _whereArgs);
+end;
+
+procedure jSqliteDataAccess.ContentValuesClear;
+begin
+ if FInitialized then
+  jni_proc( FjEnv, FjObject, 'ContentValuesClear');
+end;
+
+procedure jSqliteDataAccess.PutString( _colum : string; _value : string );
+begin
+ if FInitialized then
+  jni_proc_tt( FjEnv, FjObject, 'PutString', _colum, _value);
+end;
+
+procedure jSqliteDataAccess.PutShort( _colum : string; _value : smallint );
+begin
+ if FInitialized then
+  jSqliteDataAccess_PutShort(FjEnv, FjObject, _colum, _value);
+end;
+
+procedure jSqliteDataAccess.PutLong( _colum  : string; _value : int64 );
+begin
+ if FInitialized then
+  jni_proc_tj( FjEnv, FjObject, 'PutLong', _colum, _value);
+end;
+
+procedure jSqliteDataAccess.PutDouble( _colum : string; _value : double );
+begin
+ if FInitialized then
+  jSqliteDataAccess_PutDouble(FjEnv, FjObject, _colum, _value);
+end;
+
+procedure jSqliteDataAccess.PutInteger( _colum : string; _value : integer );
+begin
+ if FInitialized then
+  jni_proc_ti( FjEnv, FjObject, 'PutInteger', _colum, _value);
+end;
+
+procedure jSqliteDataAccess.PutBoolean( _colum : string; _value : boolean );
+begin
+ if FInitialized then
+  jni_proc_tz( FjEnv, FjObject, 'PutBoolean', _colum, _value);
+end;
+
+procedure jSqliteDataAccess.PutFloat( _colum  : string; _value : single );
+begin
+ if FInitialized then
+  jni_proc_tf( FjEnv, FjObject, 'PutFloat', _colum, _value);
+end;
+
+procedure jSqliteDataAccess.PutByte( _colum  : string; _value : byte );
+begin
+ if FInitialized then
+  jSqliteDataAccess_PutByte(FjEnv, FjObject, _colum, _value);
 end;
 
 function jSqliteDataAccess.DBExport( _dbExportDir, _dbExportFileName : string ) : boolean;
