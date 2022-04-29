@@ -1286,9 +1286,22 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 
         if( mydb == null ) return -1;                            
 
-        long nInsert = mydb.insert(_tableName, null, mContentValues);
+        long nInsert = -1;
         
-        mydb.close();
+        mydb.beginTransaction();
+
+        try {
+        	    nInsert = mydb.insert(_tableName, null, mContentValues); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();                
+        } catch (Exception e) {
+        	    nInsert = -1;
+                e.printStackTrace();
+        } finally {
+                // transaction over
+                mydb.endTransaction();
+                mydb.close();
+        }
         
         return nInsert;
 
@@ -1297,11 +1310,49 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
     public int Update(String _tableName, String _whereClause, String[] _whereArgs){
     	SQLiteDatabase mydb = getWritableDatabase();
 
-        if( mydb == null ) return -1;                            
+        if( mydb == null ) return 0;                            
 
-        int nUpdate = mydb.update(_tableName, mContentValues, _whereClause, _whereArgs);
+        int nUpdate = 0;
         
-        mydb.close();
+        mydb.beginTransaction();
+
+        try {
+        	    nUpdate = mydb.update(_tableName, mContentValues, _whereClause, _whereArgs); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();                
+        } catch (Exception e) {
+        	    nUpdate = 0;
+                e.printStackTrace();
+        } finally {
+                // transaction over
+                mydb.endTransaction();
+                mydb.close();
+        }       
+        
+        return nUpdate;
+    }
+    
+    public int UpdateAll(String _tableName){
+    	SQLiteDatabase mydb = getWritableDatabase();
+
+        if( mydb == null ) return 0;                            
+
+        int nUpdate = 0;
+        
+        mydb.beginTransaction();
+
+        try {
+        	    nUpdate = mydb.update(_tableName, mContentValues, null, null); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();                
+        } catch (Exception e) {
+        	    nUpdate = 0;
+                e.printStackTrace();
+        } finally {
+                // transaction over
+                mydb.endTransaction();
+                mydb.close();
+        }       
         
         return nUpdate;
     }
@@ -1309,11 +1360,49 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
     public int Delete(String _tableName, String _whereClause, String[] _whereArgs){
     	SQLiteDatabase mydb = getWritableDatabase();
 
-        if( mydb == null ) return -1;                            
+        if( mydb == null ) return 0;                            
 
-        int nDelete = mydb.delete(_tableName, _whereClause, _whereArgs);
+        int nDelete = 0;
         
-        mydb.close();
+        mydb.beginTransaction();
+
+        try {
+        	    nDelete = mydb.delete(_tableName, _whereClause, _whereArgs); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();                
+        } catch (Exception e) {
+        	    nDelete = 0;
+                e.printStackTrace();
+        } finally {
+                // transaction over
+                mydb.endTransaction();
+                mydb.close();
+        }
+        
+        return nDelete;
+    }
+    
+    public int DeleteAll(String _tableName){
+    	SQLiteDatabase mydb = getWritableDatabase();
+
+        if( mydb == null ) return 0;                            
+
+        int nDelete = 0;
+        
+        mydb.beginTransaction();
+
+        try {
+        	    nDelete = mydb.delete(_tableName, null, null); //Execute a single SQL statement that is NOT a SELECT or any other SQL statement that returns data.
+                //Set the transaction flag is successful, the transaction will be submitted when the end of the transaction
+                mydb.setTransactionSuccessful();                
+        } catch (Exception e) {
+        	    nDelete = 0;
+                e.printStackTrace();
+        } finally {
+                // transaction over
+                mydb.endTransaction();
+                mydb.close();
+        }
         
         return nDelete;
     }
