@@ -866,7 +866,9 @@ type
 
     function Insert( _tableName : string ) : int64;
     function Update( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
+    function UpdateAll( _tableName : string ) : integer;
     function Delete( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
+    function DeleteAll( _tableName : string ) : integer;
 
     procedure ContentValuesClear;
     procedure PutString( _colum : string; _value : string );
@@ -14319,12 +14321,28 @@ begin
     result := jni_func_tt_ars_out_i(FjEnv, FjObject, 'Update', _tableName, _whereClause, _whereArgs);
 end;
 
+function jSqliteDataAccess.UpdateAll( _tableName : string ) : integer;
+begin
+ result := 0;
+
+ if FInitialized then
+    result := jni_func_t_out_i(FjEnv, FjObject, 'UpdateAll', _tableName);
+end;
+
 function jSqliteDataAccess.Delete( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
 begin
  result := 0;
 
  if FInitialized then
     result := jni_func_tt_ars_out_i(FjEnv, FjObject, 'Delete', _tableName, _whereClause, _whereArgs);
+end;
+
+function jSqliteDataAccess.DeleteAll( _tableName : string ) : integer;
+begin
+ result := 0;
+
+ if FInitialized then
+    result := jni_func_t_out_i(FjEnv, FjObject, 'DeleteAll', _tableName);
 end;
 
 procedure jSqliteDataAccess.ContentValuesClear;
