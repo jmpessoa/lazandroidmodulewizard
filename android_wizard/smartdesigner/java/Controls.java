@@ -926,9 +926,9 @@ public  int Image_getWH (String filename ) {
       if (email == null) {
         return;
       }
-      email.putExtra(Intent.EXTRA_EMAIL, to);
-      email.putExtra(Intent.EXTRA_CC, cc);
-      email.putExtra(Intent.EXTRA_BCC, bcc);
+      email.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
+      email.putExtra(Intent.EXTRA_CC, new String[]{cc});
+      email.putExtra(Intent.EXTRA_BCC, new String[]{bcc});
       email.putExtra(Intent.EXTRA_SUBJECT, subject);
       email.putExtra(Intent.EXTRA_TEXT, message);
       // Use email client only
