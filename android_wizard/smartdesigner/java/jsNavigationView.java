@@ -330,21 +330,21 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    }
       
    private Bitmap GetBitmapFromById(int _resID) {
-	    if( _resID == 0 ) return null; // by tr3e
+	    if( _resID == 0 ) return null; // by ADiV
 	   
  		Drawable res = null;		
  		
- 		if (Build.VERSION.SDK_INT < 21 ) {
- 			Log.i("jsNavigationView","Build.VERSION.SDK_INT < 21");
+ 		if (Build.VERSION.SDK_INT < 22 ) {
+ 			Log.i("jsNavigationView","Build.VERSION.SDK_INT < 22");
  			res = this.controls.activity.getResources().getDrawable(_resID);
  		}
  		
  		
- 		if(Build.VERSION.SDK_INT >= 21) {
- 			Log.i("jsNavigationView","Build.VERSION.SDK_INT >= 21");
- 			//[ifdef_api21up]
+ 		if(Build.VERSION.SDK_INT >= 22) {
+ 			Log.i("jsNavigationView","Build.VERSION.SDK_INT >= 22");
+ 			//[ifdef_api22up]
  			res = this.controls.activity.getResources().getDrawable(_resID, null);
- 			//[endif_api21up]	
+ 			//[endif_api22up]	
  		}	
         
  		

@@ -460,15 +460,16 @@ public class Controls {
 
     Drawable res = null;
 
-    if (android.os.Build.VERSION.SDK_INT < 21) {
+    if (android.os.Build.VERSION.SDK_INT < 22) {
       res = activity.getResources().getDrawable(_resID);
     }
 
-    //[ifdef_api21up]
-    if (android.os.Build.VERSION.SDK_INT >= 21) {
+    //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
+    //[ifdef_api22up]
+    if (android.os.Build.VERSION.SDK_INT >= 22) {
       res = activity.getResources().getDrawable(_resID, null);
     }
-    //[endif_api21up]
+    //[endif_api22up]
 
     return res;
   }
