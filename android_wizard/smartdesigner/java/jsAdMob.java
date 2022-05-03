@@ -68,8 +68,7 @@ public class jsAdMob extends FrameLayout {
    private int admobBannerWidth         = 0; // Control change of width
    private int admobBannerWidthAdaptive = 0; // Adaptive width
    private boolean admobBannerIsLoading = false;
-   
-   private Boolean    isAdmobInit    = false;
+   private boolean admobIsInit          = false; 
 
    //--- Banner ---//
    private AdView     admobBannerView    = null;
@@ -97,10 +96,9 @@ public class jsAdMob extends FrameLayout {
       context   = _ctrls.activity;
       pascalObj = _Self;
       controls  = _ctrls;
-
-      isAdmobInit = false;
-      admobBannerView = null;
       
+      admobBannerView = null;
+      admobIsInit          = false;
       admobBannerIsLoading = false;
 
       LAMWCommon = new jCommons(this,context,pascalObj);      
@@ -161,15 +159,15 @@ public class jsAdMob extends FrameLayout {
    
    public void AdMobInit(){	  	   
 	   
-	   if( isAdmobInit ) return;	   
+	   if( admobIsInit ) return;
 	   if( controls.activity == null ) return;
 	   
 	   // Initialize the Mobile Ads SDK.
        MobileAds.initialize(controls.activity, 
     	   new OnInitializationCompleteListener() {    	           
-           @Override
+           //@Override
            public void onInitializationComplete(InitializationStatus initializationStatus) {
-        	   isAdmobInit = true;
+        	   admobIsInit = true;
         	   controls.pOnAdMobInitializationComplete(pascalObj);
            }
        });
@@ -241,7 +239,8 @@ public class jsAdMob extends FrameLayout {
 	   if (admobBannerView == null) return;
 	   
 	   if (admobBannerIsLoading) { 
-		   admobBannerStop = true; 
+		   admobBannerStop      = true;
+		   admobBannerIsLoading = false;
 		   return; 
 	   }	   	       
 	   
@@ -299,28 +298,27 @@ public class jsAdMob extends FrameLayout {
 	            
 	            @Override
 	            public void onAdLoaded() {
+	            	
+	            	admobBannerIsLoading = false;
 	            	            	
 	                //showToast("Ad loaded.");
 	            	if (!admobBannerStop){
 	                 if (admobBannerView.getVisibility() == View.GONE) {                	
 	                	admobBannerView.setVisibility(View.VISIBLE);                	
 	                 }
-	                
-	                 admobBannerIsLoading = false;
+	                	                 
 	                 controls.pOnAdMobLoaded(pascalObj, ADMOB_BANNER);	                	                              
-	            	}else{
-	            	 admobBannerIsLoading = false;	
-	                 AdMobBannerStop();
-	            	}
-	            	
+	            	}else	            	 
+	                 AdMobBannerStop();	            		            
 	            		   
 	            }
 
 	            @Override
 	            public void onAdFailedToLoad(int errorCode) {
 	            	
-	            	if (!admobBannerStop){	            		
-	            	 admobBannerIsLoading = false;
+	            	admobBannerIsLoading = false;
+	            	
+	            	if (!admobBannerStop){	            			            	 
 	            	 controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_BANNER, errorCode);
 	                 //showToast(String.format("Domain: " + errorDomain + " Message: " + errorMessage + " Error: " + adsError.toString()));
 	                
@@ -330,8 +328,7 @@ public class jsAdMob extends FrameLayout {
 	                 	case AdRequest.ERROR_CODE_NETWORK_ERROR: showToast("NETWORK ERROR"); break;
 	                 	case AdRequest.ERROR_CODE_NO_FILL: showToast("NO FILL"); break;
 	                 }*/	            	
-	            	} else{
-	            		admobBannerIsLoading = false;
+	            	} else{	            		
 	                	AdMobBannerStop();
 	            	}
 	            }

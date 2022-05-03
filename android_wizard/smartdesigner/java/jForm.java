@@ -1074,14 +1074,15 @@ public class jForm {
 
         Drawable res = null;
 
-        if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
+        if (Build.VERSION.SDK_INT < 22) {    //for old device < 22
             res = this.controls.activity.getResources().getDrawable(_resID);
         }
 
-        //[ifdef_api21up]
-        if (Build.VERSION.SDK_INT >= 21) {
-            res = this.controls.activity.getResources().getDrawable(_resID, null);
-        }//[endif_api21up]
+        //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
+        //[ifdef_api22up]
+        if (Build.VERSION.SDK_INT >= 22) {
+        	res = this.controls.activity.getResources().getDrawable(_resID, null);
+        }//[endif_api22up]
 
         return res;
     }
@@ -2306,14 +2307,15 @@ public class jForm {
         } catch (PackageManager.NameNotFoundException e) {
             Log.i("GetApplicationIcon", "NameNotFoundException");
             // Get a default icon
-            if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
+            if (Build.VERSION.SDK_INT < 22) {    //for old device < 22
                 dw = drawableToBitmap(this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher));
             }
 
-            //[ifdef_api21up]
-            if (Build.VERSION.SDK_INT >= 21) {
+            //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
+            //[ifdef_api22up]
+            if (Build.VERSION.SDK_INT >= 22) {
                 dw = drawableToBitmap(this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher, null));
-            }//[endif_api21up]
+            }//[endif_api22up]
         }
         return dw;
     }
