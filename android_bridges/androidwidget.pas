@@ -2911,15 +2911,17 @@ end;
 procedure jVisualControl.SetVisible(Value: boolean);
 begin
   FVisible:= Value;
+
   if FInitialized then
      View_SetVisible(FjEnv, FjObject, FVisible);
 end;
 
 function jVisualControl.GetVisible(): boolean;
 begin
-  Result:= FVisible;
   if FInitialized then
-     Result:= View_GetVisible(FjEnv, FjObject);
+     FVisible:= View_GetVisible(FjEnv, FjObject);
+
+  Result:= FVisible;
 end;
 
 procedure jVisualControl.DefineProperties(Filer: TFiler); //hide "id"  in ".lfm"
@@ -8675,13 +8677,17 @@ begin
     mid   := env^.GetMethodID(env, jlc, 'getSimpleName', '()Ljava/lang/String;');
     jStr  := env^.CallObjectMethod(env, clazz, mid);
 
-    exceptionInfo  := GetPStringAndDeleteLocalRef(env, jStr);
+    if length(exceptionInfo) <= 0 then
+     exceptionInfo := GetPStringAndDeleteLocalRef(env, jStr)
+    else
+     exceptionInfo := exceptionInfo + ' ' + GetPStringAndDeleteLocalRef(env, jStr);
 
     mid  := env^.GetMethodID(env, clazz, 'getMessage', '()Ljava/lang/String;');
     jStr := env^.CallObjectMethod(env, exc, mid);
 
     env^.DeleteLocalRef(env, clazz);
     env^.DeleteLocalRef(env, jlc);
+    env^.DeleteLocalRef(env, exc);
 
     exceptionCount := exceptionCount + 1;
     exceptionInfo  := exceptionInfo + ': ' + GetPStringAndDeleteLocalRef(env, jStr);
