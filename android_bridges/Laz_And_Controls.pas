@@ -1554,6 +1554,9 @@ type
     function GetBitmapImage(_x, _y, _width, _height: integer): jObject; overload;
     function GetImage(): jObject;
 
+    function GetLParamWidth(): integer;
+    function GetLParamHeight(): integer;
+
     procedure SetRotation(angle: integer);
     function SaveToJPG(filePath: string; cuality: integer; angle: integer): boolean;
     function SaveToPNG(filePath: string; cuality: integer; angle: integer): boolean;
@@ -5010,7 +5013,10 @@ procedure jTextView.BringToFront;
 begin
  //in designing component state: set value here...
  if FInitialized then
-  View_BringToFront( FjEnv, FjObject);
+ begin
+    FVisible := true;
+    View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 procedure jTextView.ApplyDrawableXML(_xmlIdentifier: string);
@@ -6308,7 +6314,10 @@ procedure jButton.BringToFront;
 begin
  //in designing component state: set value here...
  if FInitialized then
+ begin
+    FVisible := true;
     View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 procedure jButton.ApplyDrawableXML(_xmlIdentifier: string);
@@ -6990,9 +6999,12 @@ end;
 
 procedure jProgressBar.BringToFront;
 begin
- if not FInitialized then Exit;
-
-  View_BringToFront(FjEnv, FjObject);
+ //in designing component state: set value here...
+ if FInitialized then
+ begin
+    FVisible := true;
+    View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 procedure jProgressBar.SetColors( _color, _colorBack : TARGBColorBridge );
@@ -7603,6 +7615,22 @@ begin
    Result:= jni_func_iiii_out_bmp(FjEnv, FjObject, 'GetBitmapImage', _x, _y, _width, _height);
 end;
 
+function jImageView.GetLParamWidth(): integer;
+begin
+  result := 0;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= View_GetLParamWidth(FjEnv, FjObject);
+end;
+
+function jImageView.GetLParamHeight(): integer;
+begin
+  result := 0;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= View_GetLParamHeight(FjEnv, FjObject);
+end;
+
 procedure jImageView.SetImageFromURI(_uri: jObject);
 begin
   //in designing component state: set value here...
@@ -7691,8 +7719,11 @@ end;
 procedure jImageView.BringToFront;
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     View_BringToFront(FjEnv, FjObject);
+ if FInitialized then
+ begin
+    FVisible := true;
+    View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 procedure jImageView.SetVisibilityGone();
@@ -9457,8 +9488,11 @@ end;
 procedure jListView.BringToFront;
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     View_BringToFront(FjEnv, FjObject);
+ if FInitialized then
+ begin
+    FVisible := true;
+    View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 procedure jListView.SetVisibilityGone();
@@ -10525,8 +10559,11 @@ end;
 procedure jScrollView.BringToFront;
 begin
   //in designing component state: set value here...
-  if FInitialized then
-     View_BringToFront(FjEnv, FjObject);
+ if FInitialized then
+ begin
+    FVisible := true;
+    View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 procedure jScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer; scrolldiff: integer);
@@ -12972,8 +13009,12 @@ end;
 
 procedure jView.BringToFront;
 begin
-  if FInitialized then
-   View_BringToFront( FjEnv, FjObject);
+ //in designing component state: set value here...
+ if FInitialized then
+ begin
+    FVisible := true;
+    View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 //------------------------------------------------------------------------------
@@ -13679,8 +13720,12 @@ end;
 
 procedure jImageBtn.BringToFront;
 begin
-  if FInitialized then
-   View_BringToFront(FjEnv, FjObject);
+  //in designing component state: set value here...
+ if FInitialized then
+ begin
+    FVisible := true;
+    View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 procedure jImageBtn.ClearLayout();
@@ -15053,9 +15098,12 @@ end;
 
 procedure jPanel.BringToFront;
 begin
-  //in designing component state: set value here...
-  if FInitialized then
-     View_BringToFront(FjEnv, FjObject);
+ //in designing component state: set value here...
+ if FInitialized then
+ begin
+    FVisible := true;
+    View_BringToFront(FjEnv, FjObject);
+ end;
 end;
 
 procedure jPanel.SetVisibilityGone();
