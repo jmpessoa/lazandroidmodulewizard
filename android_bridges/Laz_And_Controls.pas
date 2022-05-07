@@ -1601,6 +1601,7 @@ type
     procedure Clear();
 
     procedure ApplyDrawableXML(_xmlIdentifier: string);
+    procedure SetClipToOutline(_value: boolean);
 
     procedure GenEvent_OnImageViewPopupItemSelected(Sender:TObject; caption:string);
 
@@ -7895,6 +7896,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
+end;
+
+procedure jImageView.SetClipToOutline(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jni_proc_z(FjEnv, FjObject, 'SetClipToOutline', _value);
 end;
 
   { jImageList }
