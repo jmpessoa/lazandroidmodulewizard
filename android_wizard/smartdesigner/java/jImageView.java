@@ -1,4 +1,4 @@
-package org.lamw.appcompatcollapsingtoolbardemo1;
+package org.lamw.appimageviewrippledemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -976,6 +976,11 @@ public class jImageView extends ImageView {
 	public void ApplyDrawableXML(String _xmlIdentifier) {
 		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
     }
+
+    //https://forum.lazarus.freepascal.org/index.php/topic,59281.0.html
+	public void SetClipToOutline(boolean _value) {   //thanks to Agmcz !
+		this.setClipToOutline(_value);
+	}
 
 }
 
