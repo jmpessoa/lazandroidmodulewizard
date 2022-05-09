@@ -1696,7 +1696,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
                  case 2: msgResult = "[Async Insert Task] Success!! SQL Queries Executed!"; break;
                 }
 
-                return null;
+                return "";
         }
 
         @Override

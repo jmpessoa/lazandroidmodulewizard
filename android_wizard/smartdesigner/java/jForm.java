@@ -540,16 +540,13 @@ public class jForm {
 
     public String GetDateTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        if (formatter == null) {
-            return "";
-        }
+        
+        if (formatter == null) return "";        
 
         String r = formatter.format(new Date());
 
-        if (r == null) {
-            return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -557,16 +554,13 @@ public class jForm {
       // by ADiV
       public String GetDateTime(long millisDateTime) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        if (formatter == null) {
-          return "";
-        }
+        
+        if (formatter == null) return "";        
 
         String r = formatter.format(millisDateTime);
 
-        if (r == null) {
-          return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
       }
 
@@ -578,16 +572,13 @@ public class jForm {
   //by ADiV
   public String GetTimeHHssSS(long millisTime) {
     SimpleDateFormat formatter = new SimpleDateFormat("mm:ss:SS");
-    if (formatter == null) {
-      return "";
-    }
-
+    
+    if (formatter == null) return "";
+    
     String r = formatter.format(new Date(millisTime));
 
-    if (r == null) {
-      return "";
-    }
-
+    if (r == null) return "";
+    
     return r;
   }
 
@@ -636,9 +627,7 @@ public class jForm {
 
         SimpleDateFormat formatter = new SimpleDateFormat(sPattern);
 
-        if (formatter == null) {
-          return "";
-        }
+        if (formatter == null) return "";
 
         Date dateObject;
 
@@ -650,10 +639,14 @@ public class jForm {
           e.printStackTrace();
           return "";
         }
-
+        
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        return formatter.format(dateObject);
+        String r = formatter.format(dateObject);
+
+        if (r == null) return "";
+        
+        return r;
       }
 
     //Free object except Self, Pascal Code Free the class.
@@ -671,14 +664,11 @@ public class jForm {
     public String GetStringExtra(Intent data, String extraName) {
         String valueStr = "";
 
-        if (data != null) {
+        if (data != null) 
             valueStr = data.getStringExtra(extraName);
-        }
-
-        if (valueStr == null) {
-            return "";
-        }
-
+        
+        if (valueStr == null) return "";
+        
         return valueStr;
     }
 
@@ -837,9 +827,7 @@ public class jForm {
             }
         }
 
-        if (absPath == null) {
-            return "";
-        }
+        if (absPath == null) return "";        
 
         return absPath;
     }
@@ -847,9 +835,7 @@ public class jForm {
     public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath
         String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
 
-        if (PathDat == null) {
-            return "";
-        }
+        if (PathDat == null) return "";        
 
         return PathDat;
     }
@@ -909,7 +895,7 @@ public class jForm {
     }
 
     //ref. https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
-//result: path to new storage [Internal App Storage]
+    //result: path to new storage [Internal App Storage]
     public String LoadFromAssets(String _filename) {
 
         String pathRes = "";
@@ -987,8 +973,8 @@ public class jForm {
     public String CreateDir(String _dirName) {
         this.controls.activity.getDir(_dirName, 0); //if not exist -->> CREATE!
         String absPath = this.controls.activity.getFilesDir().getPath();
-        if (absPath == null) 
-            return "";
+        
+        if (absPath == null) return "";
         
         absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/" + _dirName;
         return absPath;
@@ -1159,14 +1145,12 @@ public class jForm {
     //by  thierrydijoux
     public String GetQuantityStringByName(String _resName, int _quantity) {
         int id = this.controls.activity.getResources().getIdentifier(_resName, "plurals", this.controls.activity.getPackageName());
-        if (id == 0) {
-            return "";
-        }
+        
+        if (id == 0) return "";
+        
         String value = this.controls.activity.getResources().getQuantityString(id, _quantity, _quantity);
 
-        if (value == null) {
-            return "";
-        }
+        if (value == null) return "";        
 
         return value;
     }
@@ -1174,11 +1158,11 @@ public class jForm {
     //by thierrydijoux
     public String GetStringResourceByName(String _resName) {
         int id = this.controls.activity.getResources().getIdentifier(_resName, "string", this.controls.activity.getPackageName());
-        if (id == 0) {
-            return "";
-        }
+        
+        if (id == 0) return "";        
 
         String value = "" + this.controls.activity.getResources().getText(id);
+        
         return value;
     }
 
@@ -1293,9 +1277,7 @@ public class jForm {
             }
         }
 
-        if (f == null) {
-            return "";
-        }
+        if (f == null) return "";        
 
         return f;
     }
@@ -1315,28 +1297,21 @@ public class jForm {
         try {
             TelephonyManager telephony = (TelephonyManager) this.controls.activity.getSystemService(Context.TELEPHONY_SERVICE);
 
-            if (telephony == null) {
-                return "";
-            }
+            if (telephony == null) return "";            
 
             devid = telephony.getDeviceId();
 
-            if (devid == null) {
-                return "";
-            }
+            if (devid == null) return "";            
 
-            if (devid == "") {
-                devid = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);
-            }
+            if (devid == "") 
+                devid = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);            
 
         } catch (SecurityException e) //ExceptionExceptionException
         {
             e.printStackTrace();
         }
 
-        if (devid == null) {
-            return "";
-        }
+        if (devid == null) return "";
 
         return devid;
     }
@@ -1463,9 +1438,9 @@ public class jForm {
     //By ADiV
     public String GetVersionName() {
         PackageManager pm = controls.activity.getPackageManager();
-        if (pm == null) {
-            return "";
-        }
+        
+        if (pm == null) return "";
+        
         try {
             PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
             return pinfo.versionName;
@@ -1479,18 +1454,15 @@ public class jForm {
         try {
             //Create a pattern
             Pattern pattern = Pattern.compile(patternString);
-            if (null == pattern) {
-                return "";
-            }
+            
+            if (null == pattern) return "";            
 
             //Match the pattern string in provided string
             Matcher matcher = pattern.matcher(inputString);
             if (null != matcher && matcher.find()) {
                 String r = matcher.group(1);
 
-                if (r == null) {
-                    return "";
-                }
+                if (r == null) return "";                
 
                 return r;
             }
@@ -1520,15 +1492,14 @@ public class jForm {
             return "";
         }
 
-        if (url == null) {
-            return "";
-        }
-
+        if (url == null) return "";
+        
         try {
             uc = url.openConnection();
-            if (uc == null) {
+            
+            if (uc == null) 
                 return "";
-            }
+            
             uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
             inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
             if (null != inReader) {
@@ -1545,12 +1516,14 @@ public class jForm {
         // Get the current version pattern sequence
         String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
 
-        if (versionString == "") {
-            return "";
-        }
+        if (versionString == "") return "";        
 
         // get version from "htlgb">X.X.X</span>
-        return GetAppVersion(appVersion_PatternSeq, versionString);
+        versionString = GetAppVersion(appVersion_PatternSeq, versionString);
+        
+        if (versionString == "") return "";
+        
+        return versionString;
     }
 
     public void CancelShowCustomMessage() {
@@ -1651,9 +1624,9 @@ public class jForm {
     public String GetScreenDensity() {
         String r = "";
         DisplayMetrics metrics = new DisplayMetrics();
-        if (metrics == null) {
-            return "";
-        }
+        
+        if (metrics == null) return "";
+        
         controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int density = metrics.densityDpi;
 //[ifdef_api16up]
@@ -1747,17 +1720,19 @@ public class jForm {
 
     public String GetTitleActionBar() {
         ActionBar actionBar = this.controls.activity.getActionBar();
-        if (actionBar == null) {
+        
+        if (actionBar == null) 
             return "";
-        }
+        
         return (String) actionBar.getTitle();
     }
 
     public String GetSubTitleActionBar() {
         ActionBar actionBar = this.controls.activity.getActionBar();
-        if (actionBar == null) {
+        
+        if (actionBar == null) 
             return "";
-        }
+        
         return (String) actionBar.getSubtitle();
     }
 
@@ -1790,9 +1765,7 @@ public class jForm {
             e.printStackTrace();
         }
 
-        if (PathDat == null) {
-            return "";
-        }
+        if (PathDat == null) return "";        
 
         return PathDat + "/" + _filename2;
     }
@@ -1800,18 +1773,18 @@ public class jForm {
     //by ADiV
     public String GetStripAccents(String _str) {
         _str = Normalizer.normalize(_str, Normalizer.Form.NFD);
-        if (_str == null) {
-            return "";
-        }
+        
+        if (_str == null) return "";
+        
         _str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
         return _str;
     }
 
     public String GetPathFromAssetsFile(String _assetsFileName) {
         String r = LoadFromAssets(_assetsFileName);
-        if (r == null) {
-            return "";
-        }
+        
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -1952,16 +1925,12 @@ public class jForm {
     }
 
     public String UriToString(Uri _uri) {
-        if (_uri == null) {
-            return "";
-        }
+        if (_uri == null) return "";        
 
         String r = _uri.toString();
 
-        if (r == null) {
-            return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -2041,10 +2010,9 @@ public class jForm {
     public String GetDeviceWifiIPAddress() {
         //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
         WifiManager mWifi = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (mWifi == null) {
-            return "";
-        }
-
+        
+        if (mWifi == null) return "";
+        
         //String ip = Formatter.formatIpAddress(
         int ipAddress = mWifi.getConnectionInfo().getIpAddress();
         String sIP = String.format(Locale.ROOT, "%d.%d.%d.%d",
@@ -2053,10 +2021,8 @@ public class jForm {
                 (ipAddress >> 16 & 0xff),
                 (ipAddress >> 24 & 0xff));
 
-        if (sIP == null) {
-            return "";
-        }
-
+        if (sIP == null) return "";
+        
         return sIP;
     }
 
@@ -2064,18 +2030,16 @@ public class jForm {
      * Calculate the broadcast IP we need to send the packet along. ref. http://www.ece.ncsu.edu/wireless/MadeInWALAN/AndroidTutorial/
      */
     public String GetWifiBroadcastIPAddress() throws IOException {
-        String r = null;
+        String r = "";
         //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
         WifiManager mWifi = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (mWifi == null) {
-            return "";
-        }
+        
+        if (mWifi == null) return "";
+        
         // DhcpInfo  is a simple object for retrieving the results of a DHCP request
         DhcpInfo dhcp = mWifi.getDhcpInfo();
 
-        if (dhcp == null) {
-            return "";
-        }
+        if (dhcp == null) return "";        
 
         int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
         byte[] quads = new byte[4];
@@ -2086,16 +2050,14 @@ public class jForm {
         // The high order byte is quads[0].
         r = InetAddress.getByAddress(quads).getHostAddress();
 
-        if (r == null) {
-            return "";
-        }
+        if (r == null)  return "";        
 
         return r;
     }
 
     //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
     public String LoadFromAssetsTextContent(String _filename) {
-        String str;
+        String str = "";
         // load text
         try {
             //Log.i("loadFromAssets", "name: "+_filename);
@@ -2112,9 +2074,7 @@ public class jForm {
             // set result to TextView
             str = new String(buffer);
             //Log.i("loadFromAssets", ":: "+ str);
-            if (str == null) {
-                return "";
-            }
+            if (str == null) return "";            
 
             return str.toString();
         } catch (IOException ex) {
@@ -2293,10 +2253,8 @@ public class jForm {
             taskid = taskInfo.get(0).topActivity.getPackageName();
         }
 
-        if (taskid == null) {
-            return "";
-        }
-
+        if (taskid == null) return "";
+        
         return taskid;
     }
 
@@ -2321,7 +2279,7 @@ public class jForm {
     }
 
     public String GetApplicationName(String packageName) {
-        String appname;
+        String appname = "";
         ApplicationInfo ai;
         try {
             PackageManager pm = this.controls.activity.getPackageManager();
@@ -2389,9 +2347,9 @@ public class jForm {
 
     public String UriEncode(String _message) {
         String r = Uri.encode(_message);
-        if (r == null) {
-            return "";
-        }
+        
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -2418,9 +2376,9 @@ public class jForm {
     //https://developer.android.com/reference/android/provider/Settings.System
     public String GetSettingsSystemString(String _strKey) {
         String r = android.provider.Settings.System.getString(controls.activity.getContentResolver(), _strKey);
-        if (r == null) {
-            r = "";
-        }
+        
+        if (r == null) r = "";
+        
         return r;
     }
 
@@ -2632,9 +2590,7 @@ public class jForm {
     }
 
     public String GetRealPathFromURI(Uri _Uri) {
-        if (_Uri == null) {
-            return "";
-        }
+        if (_Uri == null) return "";        
 
         String path;
 
@@ -2644,10 +2600,8 @@ public class jForm {
             path = getRealPathFromURI_API19(_Uri);
         }
 
-        if (path == null) {
-            return "";
-        }
-
+        if (path == null) return "";
+        
         return path;
     }
 
@@ -2675,24 +2629,18 @@ public class jForm {
     }
 
     public String CopyFileFromUri(Uri _srcUri, String _outputDir) {
-        if (_srcUri == null) {
-            return "";
-        }
-
+        if (_srcUri == null) return "";
+        
         String fileName = "";
         ContentResolver cr = controls.activity.getContentResolver();
 
-        if (cr == null) {
-            return "";
-        }
-
+        if (cr == null) return "";
+        
         String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
         Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);
 
-        if (metaCursor == null) {
-            return "";
-        }
-
+        if (metaCursor == null) return "";
+        
         try {
             if (metaCursor.moveToFirst()) {
                 fileName = metaCursor.getString(0);
@@ -2701,9 +2649,8 @@ public class jForm {
             metaCursor.close();
         }
 
-        if (fileName.equals("")) {  //fixed
-            return "";
-        }
+        if (fileName.equals("")) //fixed
+            return "";        
 
         try {
             InputStream input = cr.openInputStream(_srcUri);
@@ -2756,12 +2703,21 @@ public class jForm {
 
     public void CopyStringToClipboard(String _txt) {
         ClipData cdata = ClipData.newPlainText("text", _txt);
+        
+        if(cdata == null) return;
+        
         mClipBoard.setPrimaryClip(cdata);
     }
 
     public String PasteStringFromClipboard() {
         ClipData cdata = mClipBoard.getPrimaryClip();
+        
+        if(cdata == null) return "";
+        
         ClipData.Item item = cdata.getItemAt(0);
+        
+        if(item == null) return "";
+        
         return item.getText().toString();
     }
 
@@ -2958,6 +2914,9 @@ public class jForm {
     //Android 11:
     public String GetTextFromUri(Uri _treeUri) {
         StringBuilder stringBuilder = new StringBuilder();
+        
+        if(stringBuilder == null) return "";
+        
         InputStream inputStream = null;
         BufferedReader reader = null;
 
@@ -2970,13 +2929,18 @@ public class jForm {
              }
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
         }
+        
         return stringBuilder.toString();
     }
 
     //Android 11:
     public String GetTextFromUriAsString(String _treeUriAsString) {
         StringBuilder stringBuilder = new StringBuilder();
+        
+        if(stringBuilder == null) return "";
+        
         InputStream inputStream = null;
         BufferedReader reader = null;
 
@@ -2991,6 +2955,7 @@ public class jForm {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
         }
         return stringBuilder.toString();
     }
@@ -3217,13 +3182,24 @@ public class jForm {
 
     public String GetMimeTypeFromExtension(String _fileExtension) {
         MimeTypeMap myMime = MimeTypeMap.getSingleton();
-        return myMime.getMimeTypeFromExtension(_fileExtension);
+        
+        if(myMime == null) return "";
+        
+        String r = myMime.getMimeTypeFromExtension(_fileExtension);
+        
+        if(r == null) return "";
+        
+        return r;
     }
 
     //Android 11:
     public String GetFileNameByUri(Uri uri) {
         String result = null;
+        
         final ContentResolver resolver = controls.activity.getContentResolver();
+        
+        if(resolver == null) return "";
+        
         if (uri.getScheme().equals("content")) {
             Cursor cursor = resolver.query(uri, null, null, null, null);
             try {
@@ -3236,9 +3212,12 @@ public class jForm {
                 }
             }
         }
-        if (result == null) {
+        
+        if (result == null) 
             result = uri.getLastPathSegment();
-        }
+        
+        if (result == null) return "";
+        	
         return result;
     }
 }
