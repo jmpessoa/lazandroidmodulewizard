@@ -19,7 +19,7 @@ public class jBroadcastReceiver extends BroadcastReceiver {
    private Context  context   = null;
    
    private int mResultCode;
-   private String mResultData;
+   private String mResultData = "";
    private Bundle mResultExtras; 
  
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...

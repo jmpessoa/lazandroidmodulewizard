@@ -796,9 +796,7 @@ public  String getStrDateTime() {
 // -------------------------------------------------------------------------
 // thierrydijoux - get locale info
   public String getLocale(int localeType) {
-    if (this.activity == null) {
-      return "";
-    }
+    if (this.activity == null) return "";    
 
     Context context = this.activity;
 
@@ -830,9 +828,7 @@ public  String getStrDateTime() {
         break;
     }
 
-    if (value == null) {
-      return "";
-    }
+    if (value == null) return "";
 
     return value;
   }
