@@ -377,7 +377,7 @@ public class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what G
             }
             mDrawing = false;
             mRun = false;
-            return null;
+            return "";
         }
 
         @Override

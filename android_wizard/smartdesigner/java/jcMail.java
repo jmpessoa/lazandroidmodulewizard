@@ -163,7 +163,7 @@ public class jcMail /*extends ...*/ {
             //fetches new messages from server
             Message[] messages = folderInbox.getMessages();
             count = messages.length;
-            if (count <= 0) return null;
+            if (count <= 0) return "";
             i = _index;
             if (i < 0) i = 0;
             if (i >= count) i = count-1;

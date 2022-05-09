@@ -1426,7 +1426,7 @@ public class jHttpClient /*extends ...*/ {
                 }
                 if (conn != null) conn.disconnect();
             }
-            return null;
+            return "";
         }
 
         @Override
