@@ -454,20 +454,18 @@ public class Controls {
 
   public Drawable GetDrawableResourceById(int _resID) {
 
-    if (_resID == 0) {
-      return null;
-    }
+    if ((_resID == 0) || (this.activity == null)) return null;
 
     Drawable res = null;
 
     if (android.os.Build.VERSION.SDK_INT < 22) {
-      res = activity.getResources().getDrawable(_resID);
+      res = this.activity.getResources().getDrawable(_resID);
     }
 
     //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
     //[ifdef_api22up]
     if (android.os.Build.VERSION.SDK_INT >= 22) {
-      res = activity.getResources().getDrawable(_resID, null);
+      res = this.activity.getResources().getDrawable(_resID, null);
     }
     //[endif_api22up]
 
@@ -481,16 +479,14 @@ public class Controls {
     System.gc();
   }
 
-  public void systemSetOrientation(int orientation) {
-    this.activity.setRequestedOrientation(orientation);
-  }
-
   public int getAPILevel() {
     return android.os.Build.VERSION.SDK_INT;
   }
 
   //by jmpessoa
   public int systemGetOrientation() {
+	if (this.activity == null) return 0;
+	
     return (this.activity.getResources().getConfiguration().orientation);
   }
 
@@ -499,14 +495,10 @@ public class Controls {
   }
 
   public void classChkNull(Class<?> object) {
-    if (object == null) {
-      Log.i("JAVA", "checkNull-Null");
-    }
-    ;
-    if (object != null) {
-      Log.i("JAVA", "checkNull-Not Null");
-    }
-    ;
+	  
+    if (object == null) Log.i("JAVA", "checkNull-Null");   
+    if (object != null) Log.i("JAVA", "checkNull-Not Null");    
+    
   }
 
   public Context GetContext() {
@@ -518,16 +510,20 @@ public class Controls {
 // -------------------------------------------------------------------------
 //
   public void appFinish() {
-    activity.finish();
+	if (this.activity != null)  
+		this.activity.finish();
+	
     System.exit(0); //<< ------- fix by jmpessoa
   }
 
   public void appRecreate() {
-    activity.recreate();
+	if (this.activity != null)
+		this.activity.recreate();
   }
 
   public void appKillProcess() {
-    this.activity.finish();
+	if (this.activity != null)
+		this.activity.finish();
   }
 
   // -------------------------------------------------------------------------
@@ -536,13 +532,16 @@ public class Controls {
 // src : codedata.txt
 // tgt : /data/data/com.kredix.control/data/codedata.txt
   public boolean assetSaveToFile(String src, String tgt) {
+	  
+	if (this.activity == null) return false;
+	
     InputStream is = null;
     FileOutputStream fos = null;
     String path = '/' + tgt.substring(1, tgt.lastIndexOf("/"));
     File outDir = new File(path);
-    if (outDir == null) {
-      return false;
-    }
+    
+    if (outDir == null) return false;
+    
     outDir.mkdirs();
     try {
       is = this.activity.getAssets().open(src);
@@ -555,10 +554,10 @@ public class Controls {
       }
       is.close();
       fos.close();
-      return (true);
+      return true;
     } catch (IOException e) {
       e.printStackTrace();
-      return (false);
+      return false;
     }
   }
 
@@ -567,23 +566,20 @@ public class Controls {
 // -------------------------------------------------------------------------
 
   public void view_SetVisible(View view, int state) {
-    if (view == null) {
-      return;
-    }
+    if (view == null) return;
+    
     view.setVisibility(state);
   }
 
   public void view_SetBackGroundColor(View view, int color) {
-    if (view == null) {
-      return;
-    }
+    if (view == null) return;
+    
     view.setBackgroundColor(color);
   }
 
   public void view_Invalidate(View view) {
-    if (view == null) {
-      return;
-    }
+    if (view == null) return;
+    
     view.invalidate();
   }
 
@@ -591,16 +587,16 @@ public class Controls {
 //  System Info
 // -------------------------------------------------------------------------
 // Result : Width(16bit) : Height (16bit)
-  public int getScreenWH(android.content.Context context) {
+  public int getScreenWH() {
     return ((screenWidth << 16) | screenHeight);
   }
 
   // LORDMAN - 2013-07-28
   public int getStrLength(String Txt) {  //fix by jmpessoa
     int len = 0;
-    if (Txt != null) {
+    if (Txt != null) 
       len = Txt.length();
-    }
+    
     return (len);
   }
 
@@ -727,14 +723,17 @@ public  String getStrDateTime() {
 //  Android path
 // -------------------------------------------------------------------------
 // Result : /data/app/com.kredix-1.apk
-  public String getPathApp(android.content.Context context, String pkgName) {
-    if (context == null) return "";
+  public String getPathApp(String pkgName) {
+	if (this.activity == null) return "";    
+
+	Context context = this.activity;	  
     
     String PathApp = "";
 
     try {
-      PathApp = context.getPackageManager().getApplicationInfo(pkgName, 0).sourceDir;
+        PathApp = context.getPackageManager().getApplicationInfo(pkgName, 0).sourceDir;
     } catch (NameNotFoundException e) {
+    	return "";
     }
 
     if (PathApp == null) return "";
@@ -743,8 +742,10 @@ public  String getStrDateTime() {
   }
 
   // Result : /data/data/com/kredix/files
-  public String getPathDat(android.content.Context context) {
-    if (context == null) return "";
+  public String getPathDat() {
+    if (this.activity == null) return "";    
+
+	Context context = this.activity;
     
     //String version = Build.VERSION.RELEASE;
     String PathDat = context.getFilesDir().getAbsolutePath();
@@ -764,6 +765,9 @@ public  String getStrDateTime() {
   }
 
   private File getMyEnvDir(String environmentDir) {
+	  
+	   if (this.activity == null) return null;
+	   
        if (Build.VERSION.SDK_INT <=  29) 
            return Environment.getExternalStoragePublicDirectory(environmentDir);
        else 
@@ -780,8 +784,10 @@ public  String getStrDateTime() {
   }
 
   //by jmpessoa
-  public String getPathDataBase(android.content.Context context) {
-    if (context == null) return "";    
+  public String getPathDataBase() {
+	if (this.activity == null) return "";    
+
+	Context context = this.activity;    
 
     String destPath = context.getFilesDir().getAbsolutePath();
 
@@ -906,7 +912,9 @@ public  int Image_getWH (String filename ) {
 // -------------------------------------------------------------------------
 //
   public void jToast(String str) {
-    Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
+	if (this.activity == null) return;
+	
+    Toast.makeText(this.activity, str, Toast.LENGTH_SHORT).show();
   }
 
   //by jmpessoa
@@ -918,11 +926,14 @@ public  int Image_getWH (String filename ) {
       String bcc,
       String subject,
       String message) {
+	  
+	if (this.activity == null) return;
+	  
     try {
       Intent email = new Intent(Intent.ACTION_SEND);
-      if (email == null) {
-        return;
-      }
+      
+      if (email == null) return;
+      
       email.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
       email.putExtra(Intent.EXTRA_CC, new String[]{cc});
       email.putExtra(Intent.EXTRA_BCC, new String[]{bcc});
@@ -944,9 +955,9 @@ public  int Image_getWH (String filename ) {
 
   public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
     SmsManager sms = SmsManager.getDefault();
-    if (sms == null) {
-      return 0;
-    }
+    
+    if (sms == null) return 0;
+    
     try {
       //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
       if (multipartMessage) {
@@ -972,9 +983,9 @@ public  int Image_getWH (String filename ) {
     String SMS_DELIVERED = packageDeliveredAction;
     PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
     SmsManager sms = SmsManager.getDefault();
-    if (sms == null) {
-      return 0;
-    }
+    
+    if (sms == null)  return 0;
+    
     int partsCount = 1;
     try {
       if (multipartMessage) {
@@ -1024,6 +1035,8 @@ public  int Image_getWH (String filename ) {
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
   @SuppressLint("DefaultLocale")
   public String jContact_getMobileNumberByDisplayName(String contactName) {
+	  
+	if (this.activity == null) return "";
 
     String matchNumber = "";
     String username;
@@ -1033,9 +1046,8 @@ public  int Image_getWH (String filename ) {
     username = username.toLowerCase();
 
     Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-    if (phones == null) {
-      return "";
-    }
+    
+    if (phones == null) return "";    
 
     while (phones.moveToNext()) {
       String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
@@ -1058,12 +1070,13 @@ public  int Image_getWH (String filename ) {
   //by jmpessoa
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
   public String jContact_getDisplayNameList(char delimiter) {
+	if (this.activity == null) return "";
+	
     String nameList = "";
     Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-    if (phones == null) {
-      return "";
-    }
-
+    
+    if (phones == null) return "";
+    
     while (phones.moveToNext()) {
       String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
       String phoneType = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
@@ -1081,9 +1094,9 @@ public  int Image_getWH (String filename ) {
 // -------------------------------------------------------------------------
   public int[] getBmpArray(String file) {
     Bitmap bmp = BitmapFactory.decodeFile(file);
-    if (bmp == null) {
-      return null;
-    }
+    
+    if (bmp == null) return null;
+    
     int length = bmp.getWidth() * bmp.getHeight();
     int[] pixels = new int[length + 2];
     bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
@@ -1093,16 +1106,16 @@ public  int Image_getWH (String filename ) {
   }
 
   private String getRealPathFromURI(Uri contentURI) {
-    String result;
+    String result = "";
     Cursor cursor = this.GetContext().getContentResolver().query(contentURI, null,
         null, null, null);
+    
     if (cursor == null) { // Source is Dropbox or other similar local file path
       result = contentURI.getPath();
     } else {
       cursor.moveToFirst();
       try {
-        int idx = cursor
-            .getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
         result = cursor.getString(idx);
       } catch (Exception e) {
         result = "";
@@ -1110,9 +1123,7 @@ public  int Image_getWH (String filename ) {
       cursor.close();
     }
 
-    if (result == null) {
-      return "";
-    }
+    if (result == null) return "";    
 
     return result;
   }
@@ -1126,6 +1137,8 @@ public  int Image_getWH (String filename ) {
    * you are browsing the files saved in the DCIM folder....
    */
   private void galleryAddPic(File image_uri) {
+	if (this.activity == null) return;
+	  
     if (Build.VERSION.SDK_INT < 19) {
       this.activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(image_uri)));
     } else {
@@ -1146,11 +1159,13 @@ public  int Image_getWH (String filename ) {
 
     //StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder(); //by Guser97
     //StrictMode.setVmPolicy(builder.build()); //by Guser97
+	  
+	if (this.activity == null) return "";
 
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    if (intent == null) {
-      return "";
-    }
+    
+    if (intent == null) return "";
+    
     //String  image_path = (path+File.separator+filename);
     File newfile = new File(path, File.separator + filename);
     if (newfile == null) {
@@ -1208,9 +1223,9 @@ public  int Image_getWH (String filename ) {
 
   public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    if (intent == null) {
-      return;
-    }
+    
+    if (intent == null) return;
+    
     Uri mImageCaptureUri = Uri.fromFile(new File("", filename));
     intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
     intent.putExtra("return-data", true);
@@ -1219,6 +1234,9 @@ public  int Image_getWH (String filename ) {
   
   /// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
 	public void fadeInAnimation(final View view, int duration) {
+		
+		if (view == null) return;
+		
 		Animation fadeIn = new AlphaAnimation(0, 1);
 		
 		if(fadeIn == null) return;
@@ -1243,6 +1261,9 @@ public  int Image_getWH (String filename ) {
 	}
 
 	public void fadeOutAnimation(final View view, int duration) {
+		
+		if (view == null) return;
+		
 		Animation fadeOut = new AlphaAnimation(1, 0);
 		
 		if(fadeOut == null) return;
@@ -1268,6 +1289,9 @@ public  int Image_getWH (String filename ) {
 
 	//https://stackoverflow.com/questions/20696801/how-to-make-a-right-to-left-animation-in-a-layout/20696822
 	public void slidefromRightToLeftIn(View view, long duration) {
+		
+		if (view == null) return;
+		
 		TranslateAnimation animate;
 		
 		//animate = new TranslateAnimation(appLayout.getWidth(), 0, 0, 0); //(xFrom,xTo, yFrom,yTo)
@@ -1282,6 +1306,9 @@ public  int Image_getWH (String filename ) {
 	}
 	
 	public void slidefromRightToLeftOut(View view, long duration) {
+		
+		if (view == null) return;
+		
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
 		//animate = new TranslateAnimation(0,-appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
@@ -1296,6 +1323,8 @@ public  int Image_getWH (String filename ) {
 	}
 
 	public void slidefromLeftToRightOut(View view, long duration) {  //try
+		
+		if (view == null) return;
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
@@ -1311,6 +1340,8 @@ public  int Image_getWH (String filename ) {
 	}
 
 	public void slidefromLeftToRightIn(View view, long duration) {  //try
+		
+		if (view == null) return;
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
@@ -1326,6 +1357,8 @@ public  int Image_getWH (String filename ) {
 	}
 	
 	public void slidefromTopToBottomOut(View view, long duration) {  //try
+		
+		if (view == null) return;
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
@@ -1340,6 +1373,8 @@ public  int Image_getWH (String filename ) {
 	}
 
 	public void slidefromTopToBottomIn(View view, long duration) {  //try
+		
+		if (view == null) return;
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
@@ -1355,6 +1390,8 @@ public  int Image_getWH (String filename ) {
 	}
 	
 	public void slidefromBottomToTopOut(View view, long duration) {  //try
+		
+		if (view == null) return;
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
@@ -1370,6 +1407,8 @@ public  int Image_getWH (String filename ) {
 	}
 
 	public void slidefromBottomToTopIn(View view, long duration) {  //try
+		
+		if (view == null) return;
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
@@ -1385,6 +1424,8 @@ public  int Image_getWH (String filename ) {
 	}
 	
 	public void slidefromMoveCustomIn(View view, long duration, int _xFrom, int _yFrom) {  //try
+		
+		if (view == null) return;
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
@@ -1399,6 +1440,8 @@ public  int Image_getWH (String filename ) {
 	}
 	
 	public void slidefromMoveCustomOut(View view, long duration, int _xTo, int _yTo) {  //try
+		
+		if (view == null) return;
 
 		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
 		
@@ -1413,6 +1456,9 @@ public  int Image_getWH (String filename ) {
 	}
 	
 	public void animateRotate( View view, long duration, int _angleFrom, int _angleTo ){
+		
+		if (view == null) return;
+		
 		RotateAnimation animate; 
 		
 		animate = new RotateAnimation(_angleFrom, _angleTo, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);

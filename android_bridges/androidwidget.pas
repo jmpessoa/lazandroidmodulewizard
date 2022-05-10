@@ -1874,22 +1874,14 @@ procedure View_SetViewParent          (env: PJNIEnv; view: JObject; _viewgroup: 
 procedure View_RemoveFromViewParent   (env: PJNIEnv; view: JObject);
 
 // System Info
-Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject;context : jObject) : TWH;
-Function  jSysInfo_PathApp             (env:PJNIEnv;this:jobject;context : jObject; AppName : String) : String;
-Function  jSysInfo_PathDat             (env:PJNIEnv;this:jobject;context : jObject) : String;
-Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
-Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
+Function  jSysInfo_ScreenWH            (env:PJNIEnv;this:jobject) : TWH;
 
 //by thierrydijoux
 Function jSysInfo_Language (env:PJNIEnv; this: jobject; localeType: TLocaleType): String;
 
-Function  jSysInfo_PathDataBase             (env:PJNIEnv;this:jobject;context : jObject) : String;
 // Device Info
 
 Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
-function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
-Procedure jSystem_SetOrientation       (env:PJNIEnv;this:jobject; orientation : Integer);
-function jSystem_GetOrientation        (env:PJNIEnv;this:jobject): integer;
 function Get_gjClass(env: PJNIEnv): jClass;
 
 //-----
@@ -6408,11 +6400,11 @@ begin
   Jni.jRLayout  := layout;
   Jni.jIntent   := intent;
 
-  FAPILevel := jSystem_getAPILevel(env, this);
+  FAPILevel := jni_func_out_i(env, this, 'getAPILevel');
 
   // Screen
-  Screen.WH     := jSysInfo_ScreenWH(env, this, activity);
-  startOrient:= jSystem_GetOrientation(env, this);
+  Screen.WH     := jSysInfo_ScreenWH(env, this);
+  startOrient   := jni_func_out_i(env, this, 'systemGetOrientation');
 
   if  startOrient = 1 then
        Orientation   :=  ssPortrait
@@ -6422,12 +6414,12 @@ begin
   else Orientation   :=  ssUnknown ;
 
   // Device
-  Path.App      := jSysInfo_PathApp(env, this, activity, PChar(FAppName){gjAppName});
-  Path.Dat      := jSysInfo_PathDat(env, this, activity);
-  Path.Ext      := jSysInfo_PathExt(env, this);
-  Path.DCIM     := jSysInfo_PathDCIM(env, this);
+  Path.App      := jni_func_t_out_t(env, this, 'getPathApp', PChar(FAppName){gjAppName});
+  Path.Dat      := jni_func_out_t(env, this, 'getPathDat');
+  Path.Ext      := jni_func_out_t(env, this, 'getPathExt');
+  Path.DCIM     := jni_func_out_t(env, this, 'getPathDCIM');
 
-  Path.DataBase := jSysInfo_PathDataBase(env, this, activity);
+  Path.DataBase := jni_func_out_t(env, this, 'getPathDataBase');
 
   if Pos('getLocale',Self.GetControlsVersionFeatures) > 0 then //"ver&rev=Feature;ver$rev=Feature2"
   begin
@@ -8462,27 +8454,25 @@ end;
 //------------------------------------------------------------------------------
 
 // Get Device Screen
-Function  jSysInfo_ScreenWH (env:PJNIEnv;this:jobject;context : jObject) : TWH;
+Function  jSysInfo_ScreenWH (env:PJNIEnv;this:jobject) : TWH;
  Var
-  jMethod : jMethodID = nil;
-  _jParam  : jValue;
+  jMethod  : jMethodID = nil;
   _wh      : Integer;
-  jCls: jClass=nil;
+  jCls     : jClass=nil;
 label
   _exceptionOcurred;
  begin
   Result.Width  := 0;
   Result.Height := 0;
 
-  if (env = nil) or (this = nil) or (context = nil) then exit;
+  if (env = nil) or (this = nil) then exit;
 
   jCls:= env^.GetObjectClass(env, this);
   if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'getScreenWH', '(Landroid/content/Context;)I');
+  jMethod:= env^.GetMethodID(env, jCls, 'getScreenWH', '()I');
   if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
-  _jParam.l     := context;
-  _wh           := env^.CallIntMethodA(env,this,jMethod,@_jParam);
+  _wh           := env^.CallIntMethod(env,this,jMethod);
   Result.Width  := (_wh shr 16);
   Result.Height := (_wh and $0000FFFF);
 
@@ -8491,118 +8481,10 @@ label
   _exceptionOcurred: jni_ExceptionOccurred(env);
  end;
 
-// "/data/app/com.kredix-1.apk"
-Function  jSysInfo_PathApp(env:PJNIEnv; this:jobject; context : jObject; AppName : String) : String;
- Var
-  jMethod : jMethodID = nil;
-  _jParams : Array[0..1] of jValue;
-  _jString : jString;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
- begin
-  result := ''; if (env = nil) or (this = nil) or (context = nil) then exit;
-
-  jCls:= env^.GetObjectClass(env, this);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'getPathApp', '(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;');
-  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
-
-  _jParams[0].l := context;
-  _jParams[1].l := env^.NewStringUTF(env, pchar(AppName) );
-
-  if _jParams[1].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
-
-  _jString      := env^.CallObjectMethodA(env,this,jMethod,@_jParams);
-
-  Result:= GetPStringAndDeleteLocalRef(env, _jString);
-
-  env^.DeleteLocalRef(env, _jParams[1].l);
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-
- end;
-
-// "/data/data/com.kredix/files"
-Function  jSysInfo_PathDat  (env:PJNIEnv; this:jobject; context : jObject) : String;
- Var
-  jMethod : jMethodID = nil;
-  _jParam  : jValue;
-  _jString : jString;
-  jCls: jClass=nil;
-label
-  _exceptionOcurred;
- begin
-  result := ''; if (env = nil) or (this = nil) or (context = nil) then exit;
-
-  jCls:= env^.GetObjectClass(env, this);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'getPathDat', '(Landroid/content/Context;)Ljava/lang/String;');
-  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
-
-  _jParam.l := context;
-  _jString  := env^.CallObjectMethodA(env,this,jMethod,@_jParam);
-
-  Result:= GetPStringAndDeleteLocalRef(env, _jString);
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
- end;
-
-//by jmpessoa
-Function  jSysInfo_PathDataBase (env:PJNIEnv;this:jobject;context : jObject) : String;
-Var
- jMethod : jMethodID = nil;
- _jParam  : jValue;
- _jString : jString;
- jCls: jClass=nil;
-label
-  _exceptionOcurred;
-begin
-  result := ''; if (env = nil) or (this = nil) or (context = nil) then exit;
-
-  jCls:= env^.GetObjectClass(env, this);
-  if jCls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, jCls, 'getPathDataBase', '(Landroid/content/Context;)Ljava/lang/String;');
-  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
-
-  _jParam.l := context;
-  _jString  := env^.CallObjectMethodA(env,this,jMethod,@_jParam);
-
-  Result:= GetPStringAndDeleteLocalRef(env, _jString);
-  env^.DeleteLocalRef(env, jCls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-Function  jSysInfo_PathExt             (env:PJNIEnv;this:jobject) : String;
-begin
-  result := ''; if (env = nil) or (this = nil) then exit;
-
-  Result:= jni_func_out_t(env, this, 'getPathExt');
-end;
-
-Function  jSysInfo_PathDCIM            (env:PJNIEnv;this:jobject) : String;
-begin
-  result := ''; if (env = nil) or (this = nil) then exit;
-
-  Result:= jni_func_out_t(env, this, 'getPathDCIM');
-end;
-
 //by thierrydijoux
 Function jSysInfo_Language (env:PJNIEnv; this: jObject; localeType: TLocaleType): String;
 begin
- result := ''; if (env = nil) or (this = nil) then exit;
-
  Result:= jni_func_i_out_t(env, this, 'getLocale', Ord(localeType));
-end;
-
-Procedure jSystem_SetOrientation(env:PJNIEnv; this:jobject; orientation : Integer);
-begin
- if (env = nil) or (this = nil) then exit;
-
- jni_proc_i(env, this, 'systemSetOrientation', orientation);
 end;
 
 Procedure jSystem_ShowAlert(env:PJNIEnv; this:jobject; _title: string; _message: string; _btnText: string);
@@ -8636,21 +8518,6 @@ begin
  env^.DeleteLocalRef(env,jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-function jSystem_getAPILevel(env: PJNIEnv; this: JObject): Integer;
-begin
-  result := 0; if (env = nil) or (this = nil) then exit;
-
-  Result := jni_func_out_i(env, this, 'getAPILevel');
-end;
-
-//by jmpessoa
-function jSystem_GetOrientation(env:PJNIEnv; this:jobject): integer;
-begin
-  result := 0; if (env = nil) or (this = nil) then exit;
-
-  Result := jni_func_out_i(env, this, 'systemGetOrientation');
 end;
 
 // --- Jni create, procedures and functions ---//
