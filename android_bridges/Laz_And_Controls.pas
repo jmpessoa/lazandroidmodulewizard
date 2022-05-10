@@ -2883,7 +2883,7 @@ begin
   Form.UpdateJNI(gApp);
 
   // Update width and height when rotating
-  gApp.Screen.WH  := jSysInfo_ScreenWH(env, this, gApp.GetContext);
+  gApp.Screen.WH  := jSysInfo_ScreenWH(env, this);
   Form.ScreenWH   := gApp.Screen.WH;
   Form.Width      := gApp.Screen.WH.Width;
   Form.Height     := gApp.Screen.WH.Height;
@@ -2915,7 +2915,7 @@ begin
   Form.UpdateJNI(gApp);
 
   // Update width and height when rotating
-  gApp.Screen.WH  := jSysInfo_ScreenWH(env, this, gApp.GetContext);
+  gApp.Screen.WH  := jSysInfo_ScreenWH(env, this);
   Form.ScreenWH   := gApp.Screen.WH;
 
   if rotate = 1 then

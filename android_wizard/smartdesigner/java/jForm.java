@@ -195,12 +195,11 @@ public class jForm {
 
         layout = new RelativeLayout(controls.activity);
 
-        if (layout == null) {
-            return;
-        }
-
+        if (layout == null) return;
+        
         layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
+                                    ViewGroup.LayoutParams.MATCH_PARENT);
+        
         layout.setLayoutParams(layparam);
 
         mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
